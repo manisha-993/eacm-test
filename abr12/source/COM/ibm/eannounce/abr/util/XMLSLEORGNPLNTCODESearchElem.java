@@ -1,209 +1,215 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*     */ import COM.ibm.eannounce.objects.MetaFlag;
+/*     */ import COM.ibm.eannounce.objects.SBRException;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.StringTokenizer;
+/*     */ import java.util.Vector;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class XMLSLEORGNPLNTCODESearchElem
+/*     */   extends XMLElem
+/*     */ {
+/*  64 */   private String SLEORGNPLNTCODE_SEARCH_ACTION = "SRDSLEORG";
+/*  65 */   private String SLEORGNPLNTCODE_ENTITY = "SLEORGNPLNTCODE";
+/*  66 */   private String SLEORGNPLNTCODE_SEARCH_ATTRIBURE = "MODCATG";
+/*  67 */   private EntityItem[] SLEORGNPLNTCODEItem = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public XMLSLEORGNPLNTCODESearchElem() {
+/*  78 */     super(null);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String getCOFCAT(EntityItem paramEntityItem) {
+/*  87 */     String str = "@@";
+/*  88 */     if (paramEntityItem != null) {
+/*  89 */       String str1 = paramEntityItem.getEntityType();
+/*  90 */       String str2 = null;
+/*  91 */       if ("MODEL".equals(str1)) {
+/*  92 */         str2 = "COFCAT";
+/*  93 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)paramEntityItem.getAttribute(str2);
+/*  94 */         if (eANFlagAttribute != null && eANFlagAttribute.toString().length() > 0) {
+/*     */           
+/*  96 */           MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/*  97 */           for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/*     */             
+/*  99 */             if (arrayOfMetaFlag[b].isSelected()) {
+/* 100 */               str = arrayOfMetaFlag[b].toString();
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */               
+/* 107 */               if ("Service".equalsIgnoreCase(str))
+/*     */               {
+/* 109 */                 str = "Servicepac";
+/*     */               }
+/*     */               break;
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/* 115 */       } else if ("PRODSTRUCT".equals(str1)) {
+/* 116 */         str = "Hardware";
+/* 117 */       } else if ("SWPRODSTRUCT".equals(str1)) {
+/* 118 */         str = "Software";
+/*     */       } 
+/*     */     } 
+/* 121 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected Hashtable doSearch(Database paramDatabase, EntityItem paramEntityItem, StringBuffer paramStringBuffer) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException, SBRException {
+/* 136 */     String str = getCOFCAT(paramEntityItem);
+/* 137 */     ABRUtil.append(paramStringBuffer, "XMLSLEORGNPLNTCODESearchElem.doSearch COFCAT" + str + NEWLINE);
+/* 138 */     Vector<String> vector1 = new Vector();
+/* 139 */     vector1.add(this.SLEORGNPLNTCODE_SEARCH_ATTRIBURE);
+/* 140 */     Vector<String> vector2 = new Vector();
+/* 141 */     vector2.add(str);
+/* 142 */     ABRUtil.append(paramStringBuffer, "XMLSLEORGNPLNTCODESearchElem.doSearch searchAction=" + this.SLEORGNPLNTCODE_SEARCH_ACTION + NEWLINE);
+/* 143 */     ABRUtil.append(paramStringBuffer, "XMLSLEORGNPLNTCODESearchElem.doSearch srchType=" + this.SLEORGNPLNTCODE_ENTITY + NEWLINE);
+/* 144 */     ABRUtil.append(paramStringBuffer, "XMLSLEORGNPLNTCODESearchElem.doSearch attribute=" + this.SLEORGNPLNTCODE_SEARCH_ATTRIBURE + NEWLINE);
+/* 145 */     ABRUtil.append(paramStringBuffer, "XMLSLEORGNPLNTCODESearchElem.doSearch value=" + str + NEWLINE);
+/* 146 */     this.SLEORGNPLNTCODEItem = ABRUtil.doSearch(paramDatabase, paramEntityItem.getProfile(), this.SLEORGNPLNTCODE_SEARCH_ACTION, this.SLEORGNPLNTCODE_ENTITY, false, vector1, vector2, paramStringBuffer);
+/*     */     
+/* 148 */     Hashtable<Object, Object> hashtable = new Hashtable<>();
+/* 149 */     if (this.SLEORGNPLNTCODEItem != null) {
+/* 150 */       for (byte b = 0; b < this.SLEORGNPLNTCODEItem.length; b++) {
+/* 151 */         EntityItem entityItem = this.SLEORGNPLNTCODEItem[b];
+/*     */         
+/* 153 */         int i = entityItem.getEntityID();
+/* 154 */         String str1 = entityItem.getEntityType();
+/* 155 */         String str2 = getCounryList(paramDatabase, paramEntityItem, i, str1);
+/* 156 */         String str3 = PokUtils.getAttributeValue(entityItem, "SLEORGGRP", ";", "", false);
+/* 157 */         Object object = hashtable.get(str2);
+/* 158 */         if (object == null) {
+/* 159 */           Vector[] arrayOfVector = new Vector[2];
+/* 160 */           arrayOfVector[0] = new Vector();
+/* 161 */           arrayOfVector[1] = new Vector();
+/* 162 */           Hashtable<Object, Object> hashtable1 = new Hashtable<>();
+/* 163 */           StringTokenizer stringTokenizer = new StringTokenizer(str3, ";");
+/* 164 */           while (stringTokenizer.hasMoreTokens()) {
+/* 165 */             String str4 = stringTokenizer.nextToken();
+/* 166 */             hashtable1.put(str4, "");
+/*     */           } 
+/* 168 */           arrayOfVector[0].addElement(hashtable1);
+/* 169 */           arrayOfVector[1].add(entityItem);
+/* 170 */           hashtable.put(str2, arrayOfVector);
+/*     */         } else {
+/* 172 */           Vector[] arrayOfVector = (Vector[])hashtable.get(str2);
+/* 173 */           Hashtable<String, String> hashtable1 = arrayOfVector[0].get(0);
+/* 174 */           StringTokenizer stringTokenizer = new StringTokenizer(str3, ",");
+/* 175 */           while (stringTokenizer.hasMoreTokens()) {
+/* 176 */             String str4 = stringTokenizer.nextToken();
+/* 177 */             hashtable1.put(str4, "");
+/*     */           } 
+/* 179 */           arrayOfVector[0].addElement(hashtable1);
+/* 180 */           arrayOfVector[1].add(entityItem);
+/* 181 */           hashtable.put(str2, arrayOfVector);
+/*     */         } 
+/*     */       } 
+/*     */     }
+/* 185 */     return hashtable;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String getCounryList(Database paramDatabase, EntityItem paramEntityItem, int paramInt, String paramString) throws MiddlewareRequestException, SQLException, MiddlewareException {
+/* 199 */     String str = "";
+/* 200 */     EntityList entityList = paramDatabase.getEntityList(paramEntityItem.getProfile(), new ExtractActionItem(null, paramDatabase, paramEntityItem
+/* 201 */           .getProfile(), "dummy"), new EntityItem[] { new EntityItem(null, paramEntityItem
+/* 202 */             .getProfile(), paramString, paramInt) });
+/* 203 */     EntityItem entityItem = entityList.getParentEntityGroup().getEntityItem(0);
+/*     */     
+/* 205 */     str = PokUtils.getAttributeFlagValue(entityItem, "COUNTRYLIST");
+/* 206 */     if (str == null) str = "@@"; 
+/* 207 */     return str;
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.util;
 
-import java.sql.SQLException;
-import java.util.Hashtable;
-import java.util.StringTokenizer;
-import java.util.Vector;
-
-import COM.ibm.eannounce.objects.EANFlagAttribute;
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.eannounce.objects.EntityList;
-import COM.ibm.eannounce.objects.ExtractActionItem;
-import COM.ibm.eannounce.objects.MetaFlag;
-import COM.ibm.opicmpdh.middleware.Database;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-/**********************************************************************************
-*  Class used to hold info and structure to be generated for the xml feed
-* for abrs.  search must be used to find values for these nodes
-*/
-// $Log: XMLSLEORGNPLNTCODESearchElem.java,v $
-// Revision 1.5  2015/01/26 15:53:39  wangyul
-// fix the issue PR24222 -- SPF ADS abr string buffer
-//
-// Revision 1.4  2013/08/26 12:33:21  wangyulo
-// New RTC Workitem 999513 - change MODEL_UPDATE and SEO_UPDATE to use new MODCATG value Servicepac when deriving Sales Org and Plant Code
-//
-// Revision 1.3  2012/08/02 13:47:42  wangyulo
-// fix the defect 770704- BH Defect BHALM109267 - correction to SWPRODSTRUCT for old data
-//
-// Revision 1.2  2011/03/30 07:46:07  guobin
-// add the world wide avail of SLEORGGRP/SLEORGNPLNTCD
-//
-// Revision 1.1  2011/03/24 16:10:22  guobin
-// search for the SLEORGNPLNTCODE entities when there is no avail
-//
-// Revision 1.1  2008/04/17 19:37:53  wendy
-// Init for
-//  Search for the MODEL
-// 	1.	If there isnâ€™t an AVAIL where AVAILTYPE="Planned Availability" (146) and ANNDATE < â€œ20100301â€� then 
-//		retrieve all SLEORGNPLNTCODE entities where SLEORGNPLNTCODE.MODCATG equals 
-//	a.	MODEL.COFCAT if MODEL.COFCAT = â€œHardwareâ€� or â€œSoftwareâ€�
-//	b.	â€œHardwareâ€� if MODEL.COFCAT = â€œServiceâ€�
-//	Else retrieve all SLEORGNPLNTCODE entities where SLEORGNPLNTCODE.SLEORGGRP = a value in AVAIL.SLEORGGRP and SLEORGNPLNTCODE.MODCATG equals 
-//	a.	MODEL.COFCAT if MODEL.COFCAT = â€œHardwareâ€� or â€œSoftwareâ€�
-//	b.	â€œHardwareâ€� if MODEL.COFCAT = â€œServiceâ€�
-//  
-//  Search for the PRODSTRUCT and SWPRODSTRUCT
-//  retrieve all SLEORGNPLNTCODE entities where SLEORGNPLNTCODE.MODCATG = â€œHardwareâ€� for PRODSTRUCT or â€œSoftwareâ€� for SWPRODSTRUCT
-//
-
-public class XMLSLEORGNPLNTCODESearchElem extends XMLElem
-{
-    
-    private String SLEORGNPLNTCODE_SEARCH_ACTION="SRDSLEORG";
-    private String SLEORGNPLNTCODE_ENTITY= "SLEORGNPLNTCODE";
-    private String SLEORGNPLNTCODE_SEARCH_ATTRIBURE="MODCATG";    
-    private EntityItem[] SLEORGNPLNTCODEItem = null;
-	/**********************************************************************************
-    * Constructor for search value elements
-    *
-    *@param downnname String with name of first node to be created- for model
-    *@param upnname String with name of second node to be created- for fc
-    *@param srchAct String with search action name
-    *@param stype String with entitytype to find
-    */
-    public XMLSLEORGNPLNTCODESearchElem()
-    {
-    	super(null);
-    } 
-    
-    /**
-	 * @param parentItem
-	 * @param COFCAT
-	 * @return
-	 */
-	private String getCOFCAT(EntityItem parentItem) {
-		String COFCAT = CHEAT;
-		if (parentItem != null) {
-			String roottype = parentItem.getEntityType();
-			String attrcode = null;
-			if ("MODEL".equals(roottype)) {
-				attrcode = "COFCAT";
-				EANFlagAttribute fAtt = (EANFlagAttribute)parentItem.getAttribute(attrcode);
-				if (fAtt!=null && fAtt.toString().length()>0){
-                    // Get the selected Flag codes.
-                    MetaFlag[] mfArray = (MetaFlag[]) fAtt.get();
-                    for (int i = 0; i < mfArray.length; i++){
-                        // get selection
-                        if (mfArray[i].isSelected()) {
-                        	COFCAT = (mfArray[i].toString()); // get longdesription
-                        	/**
-                        	 * Deriving logic in the case where there isnâ€™t an AVAIL where AVAILTYPE="Planned Availability" (146) 
-                        	 * and ANNDATE < â€œ20100301â€� is not designed.
-                             * If MODEL.COFCAT = â€œServiceâ€�, match to SLEORGNPLNTCODE.MODCATG with value â€œHardwareâ€� 
-                             * and requires code changes. So we have to defer the test cases until code update.
-                        	 */
-                        	if("Service".equalsIgnoreCase(COFCAT)){
-                        		//New change for RTC Workitem 999513 base on the BH FS ABR XML System Feed Mapping 20130820.doc
-                        		COFCAT = "Servicepac";
-                        	}
-                        	break;
-                        }
-                    }
-				}
-			} else if ("PRODSTRUCT".equals(roottype)) {
-				COFCAT = "Hardware";
-			} else if ("SWPRODSTRUCT".equals(roottype)) {
-				COFCAT = "Software";
-			}
-		}
-		return COFCAT;
-	}
- 	
-    /**********************************************************************************
-     * search for entity to get entityid for xml output
-     *
-     *@param dbCurrent Database
-     *@param item EntityItem
-     *@param debugSb StringBuffer for debug output
-     */
-     protected Hashtable doSearch(Database dbCurrent, EntityItem item,StringBuffer debugSb)
-     throws java.sql.SQLException, COM.ibm.opicmpdh.middleware.MiddlewareException,
-     COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-     COM.ibm.eannounce.objects.SBRException
-     {
- 		String COFCAT = getCOFCAT(item);
- 		ABRUtil.append(debugSb,"XMLSLEORGNPLNTCODESearchElem.doSearch COFCAT" + COFCAT + NEWLINE);   	 
-    	Vector attrVct = new Vector();
-    	attrVct.add(SLEORGNPLNTCODE_SEARCH_ATTRIBURE);
-    	Vector valVct = new Vector();
-    	valVct.add(COFCAT);
-	   	ABRUtil.append(debugSb,"XMLSLEORGNPLNTCODESearchElem.doSearch searchAction="+SLEORGNPLNTCODE_SEARCH_ACTION + NEWLINE);
-	   	ABRUtil.append(debugSb,"XMLSLEORGNPLNTCODESearchElem.doSearch srchType="+SLEORGNPLNTCODE_ENTITY + NEWLINE);
-	   	ABRUtil.append(debugSb,"XMLSLEORGNPLNTCODESearchElem.doSearch attribute="+SLEORGNPLNTCODE_SEARCH_ATTRIBURE + NEWLINE);
-	   	ABRUtil.append(debugSb,"XMLSLEORGNPLNTCODESearchElem.doSearch value=" + COFCAT + NEWLINE);
-    	SLEORGNPLNTCODEItem = ABRUtil.doSearch(dbCurrent, item.getProfile(), SLEORGNPLNTCODE_SEARCH_ACTION,SLEORGNPLNTCODE_ENTITY, false, attrVct, valVct, debugSb);
-    	
-    	Hashtable xmltable = new Hashtable();
-    	if(SLEORGNPLNTCODEItem!=null){
-			for(int i=0;i<SLEORGNPLNTCODEItem.length;i++){
-				EntityItem  SLEORGNPLNTCODE = SLEORGNPLNTCODEItem[i];				
-				
-				int entityid = SLEORGNPLNTCODE.getEntityID();
-				String entitytype = SLEORGNPLNTCODE.getEntityType();
-				String country = getCounryList(dbCurrent,item,entityid,entitytype);				
-				String SLEORGGRP = PokUtils.getAttributeValue(SLEORGNPLNTCODE, "SLEORGGRP",";", "", false);				
-				Object sop = (Object)xmltable.get(country);
-				if(sop==null){
-					Vector vct[] = new Vector[2];
-					vct[0] = new Vector();
-					vct[1] = new Vector();
-					Hashtable SLEORGGRP_table = new Hashtable();
-					StringTokenizer str = new StringTokenizer(SLEORGGRP,";");
-					while (str.hasMoreTokens()) {
-						String dir = str.nextToken();
-						SLEORGGRP_table.put(dir, "");
-					}				
-					vct[0].addElement(SLEORGGRP_table);
-					vct[1].add(SLEORGNPLNTCODE);
-					xmltable.put(country, vct);
-				}else{
-					Vector vct[] = (Vector[])xmltable.get(country);
-					Hashtable SLEORGGRP_table = (Hashtable)vct[0].get(0);
-					StringTokenizer str = new StringTokenizer(SLEORGGRP,",");
-					while (str.hasMoreTokens()) {
-						String dir = str.nextToken();
-						SLEORGGRP_table.put(dir, "");
-					}					
-					vct[0].addElement(SLEORGGRP_table);
-					vct[1].add(SLEORGNPLNTCODE);
-					xmltable.put(country, vct);				
-				}				
-			}
-		}    	
-		return xmltable; 
- 	}
-     /**
-      * 
-      * @param dbCurrent
-      * @param item
-      * @param entityid
-      * @param entitytype
-      * @return
-     * @throws MiddlewareException 
-     * @throws SQLException 
-     * @throws MiddlewareRequestException 
-      */
-     private String getCounryList(Database dbCurrent, EntityItem item, int entityid, String entitytype) throws MiddlewareRequestException, SQLException, MiddlewareException {
-    	 String sReturn ="";
-    	 EntityList m_elist = dbCurrent.getEntityList(item.getProfile(),
-                 new ExtractActionItem(null, dbCurrent, item.getProfile(),"dummy"),
-                 new EntityItem[] { new EntityItem(null, item.getProfile(), entitytype, entityid) });
-    	 EntityItem rootEntity  = m_elist.getParentEntityGroup().getEntityItem(0);
-    	 
-    	 sReturn = PokUtils.getAttributeFlagValue(rootEntity, "COUNTRYLIST");
-    	 if(sReturn==null) sReturn=CHEAT;    	 
-    	 return sReturn;
-	} 
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\XMLSLEORGNPLNTCODESearchElem.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

@@ -1,304 +1,315 @@
-package COM.ibm.eannounce.abr.sg.adsxmlbh1;
+/*     */ package COM.ibm.eannounce.abr.sg.adsxmlbh1;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.ChwBulkYMDMProd;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.ChwBulkYMDMSalesBom;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.MODEL;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.UpdateParkStatus;
+/*     */ import COM.ibm.eannounce.abr.util.EACustom;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.objects.EANList;
+/*     */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.PrintWriter;
+/*     */ import java.io.StringWriter;
+/*     */ import java.sql.Connection;
+/*     */ import java.sql.PreparedStatement;
+/*     */ import java.sql.ResultSet;
+/*     */ import java.sql.SQLException;
+/*     */ import java.text.MessageFormat;
+/*     */ import java.text.StringCharacterIterator;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.Set;
+/*     */ 
+/*     */ public class TMFBULKABRSTATUS extends PokBaseABR {
+/*  29 */   private StringBuffer rptSb = new StringBuffer();
+/*  30 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/*  31 */   static final String NEWLINE = new String(FOOL_JTEST);
+/*  32 */   private int abr_debuglvl = 0;
+/*  33 */   private String navName = "";
+/*  34 */   private Hashtable metaTbl = new Hashtable<>();
+/*  35 */   private String CACEHSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'MODEL' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
+/*  36 */   private String modelSQL = "select entity2id as MODELID from opicm.relator where ENTITYTYPE = 'PRODSTRUCT' and ENTITYID = ?  and VALTO > current timestamp and EFFTO > current timestamp with ur";
+/*  37 */   private String tmfSQL = "SELECT f.ATTRIBUTEVALUE AS MACHTYPE, t1.ATTRIBUTEVALUE AS MODEL, t2.ATTRIBUTEVALUE AS FEATURECODE FROM opicm.RELATOR r JOIN OPICM.FLAG f ON f.ENTITYTYPE =r.ENTITY2TYPE  AND f.ENTITYID =r.ENTITY2ID AND f.ATTRIBUTECODE ='MACHTYPEATR' JOIN OPICM.TEXT t1 ON t1.ENTITYTYPE =r.ENTITY2TYPE AND t1.ENTITYID =r.ENTITY2ID AND t1.ATTRIBUTECODE ='MODELATR' and t1.nlsid=1 JOIN OPICM.TEXT t2 ON t2.ENTITYTYPE =r.ENTITY1TYPE AND t2.ENTITYID =r.ENTITY1ID AND t2.ATTRIBUTECODE ='FEATURECODE' WHERE r.ENTITYTYPE ='PRODSTRUCT' AND r.ENTITYID =? AND r.VALTO >CURRENT TIMESTAMP AND r.EFFTO > CURRENT TIMESTAMP AND f.VALTO >CURRENT TIMESTAMP AND f.EFFTO > CURRENT TIMESTAMP AND t1.VALTO >CURRENT TIMESTAMP AND t1.EFFTO > CURRENT TIMESTAMP AND t2.VALTO >CURRENT TIMESTAMP AND t2.EFFTO > CURRENT TIMESTAMP WITH ur";
+/*     */   
+/*  39 */   String xml = null;
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/*  44 */     String str1 = "<head>" + EACustom.getMetaTags(getDescription()) + NEWLINE + EACustom.getCSS() + NEWLINE + EACustom.getTitle("{0} {1}") + NEWLINE + "</head>" + NEWLINE + "<body id=\"ibm-com\">" + EACustom.getMastheadDiv() + NEWLINE + "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
+/*     */     
+/*  46 */     String str2 = "<table>" + NEWLINE + "<tr><th>Userid: </th><td>{0}</td></tr>" + NEWLINE + "<tr><th>Role: </th><td>{1}</td></tr>" + NEWLINE + "<tr><th>Workgroup: </th><td>{2}</td></tr>" + NEWLINE + "<tr><th>Date: </th><td>{3}</td></tr>" + NEWLINE + "<tr><th>Description: </th><td>{4}</td></tr>" + NEWLINE + "</table>" + NEWLINE + "<!-- {5} -->" + NEWLINE;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*  52 */     String str3 = "";
+/*     */ 
+/*     */ 
+/*     */     
+/*  56 */     String str4 = "";
+/*  57 */     String str5 = "";
+/*     */     
+/*  59 */     String[] arrayOfString = new String[10];
+/*     */     
+/*     */     try {
+/*  62 */       MessageFormat messageFormat = new MessageFormat(str1);
+/*  63 */       arrayOfString[0] = getShortClassName(getClass());
+/*  64 */       arrayOfString[1] = "ABR";
+/*  65 */       str3 = messageFormat.format(arrayOfString);
+/*  66 */       setDGTitle("TMFBULKABRSTATUS report");
+/*  67 */       setDGString(getABRReturnCode());
+/*  68 */       setDGRptName("TMFBULKABRSTATUS");
+/*  69 */       setDGRptClass("TMFBULKABRSTATUS");
+/*     */       
+/*  71 */       setReturnCode(0);
+/*     */       
+/*  73 */       start_ABRBuild(false);
+/*     */       
+/*  75 */       this
+/*  76 */         .abr_debuglvl = ABRServerProperties.getABRDebugLevel(this.m_abri.getABRCode());
+/*     */ 
+/*     */ 
+/*     */       
+/*  80 */       this.m_elist = this.m_db.getEntityList(this.m_prof, new ExtractActionItem(null, this.m_db, this.m_prof, "dummy"), new EntityItem[] { new EntityItem(null, this.m_prof, 
+/*     */               
+/*  82 */               getEntityType(), getEntityID()) });
+/*     */       
+/*  84 */       EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*  85 */       addDebug("*****mlm rootEntity = " + entityItem.getEntityType() + entityItem.getEntityID());
+/*     */       
+/*  87 */       this.navName = getNavigationName();
+/*  88 */       str5 = this.m_elist.getParentEntityGroup().getLongDescription();
+/*  89 */       addDebug("navName=" + this.navName);
+/*  90 */       addDebug("rootDesc" + str5);
+/*     */ 
+/*     */       
+/*  93 */       String str6 = null;
+/*  94 */       Connection connection1 = this.m_db.getPDHConnection();
+/*  95 */       PreparedStatement preparedStatement1 = connection1.prepareStatement(this.modelSQL);
+/*  96 */       preparedStatement1.setInt(1, entityItem.getEntityID());
+/*  97 */       ResultSet resultSet1 = preparedStatement1.executeQuery();
+/*  98 */       while (resultSet1.next()) {
+/*  99 */         str6 = resultSet1.getString("MODELID");
+/*     */       }
+/*     */       
+/* 102 */       String str7 = null;
+/* 103 */       String str8 = null;
+/* 104 */       String str9 = null;
+/* 105 */       PreparedStatement preparedStatement2 = connection1.prepareStatement(this.tmfSQL);
+/* 106 */       preparedStatement2.setInt(1, entityItem.getEntityID());
+/* 107 */       ResultSet resultSet2 = preparedStatement2.executeQuery();
+/* 108 */       while (resultSet2.next()) {
+/* 109 */         str7 = resultSet2.getString("MACHTYPE");
+/* 110 */         str8 = resultSet2.getString("MODEL");
+/* 111 */         str9 = resultSet2.getString("FEATURECODE");
+/*     */       } 
+/*     */       
+/* 114 */       addDebug("MACHTYPE:" + str7 + ",MODEL:" + str8 + ",FEATURECODE:" + str9);
+/*     */       
+/* 116 */       Connection connection2 = this.m_db.getODSConnection();
+/* 117 */       PreparedStatement preparedStatement3 = connection2.prepareStatement(this.CACEHSQL);
+/* 118 */       preparedStatement3.setString(1, str6);
+/* 119 */       ResultSet resultSet3 = preparedStatement3.executeQuery();
+/* 120 */       while (resultSet3.next()) {
+/* 121 */         this.xml = resultSet3.getString("XMLMESSAGE");
+/*     */       }
+/*     */       
+/* 124 */       if (this.xml != null) {
+/*     */         
+/* 126 */         MODEL mODEL = (MODEL)XMLParse.getObjectFromXml(this.xml, MODEL.class);
+/* 127 */         ChwBulkYMDMProd chwBulkYMDMProd = new ChwBulkYMDMProd(mODEL, "PRODSTRUCT", String.valueOf(entityItem.getEntityID()), this.m_db.getODSConnection(), this.m_db.getPDHConnection());
+/* 128 */         addDebug("Calling " + chwBulkYMDMProd.getRFCName());
+/* 129 */         chwBulkYMDMProd.execute();
+/* 130 */         addDebug(chwBulkYMDMProd.createLogEntry());
+/* 131 */         if (chwBulkYMDMProd.getRfcrc() == 0) {
+/* 132 */           addOutput(chwBulkYMDMProd.getRFCName() + " called successfully!");
+/*     */         } else {
+/* 134 */           addOutput(chwBulkYMDMProd.getRFCName() + " called  faild!");
+/* 135 */           addOutput(chwBulkYMDMProd.getError_text());
+/*     */         } 
+/* 137 */         UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", chwBulkYMDMProd.getRFCNum());
+/*     */         
+/* 139 */         runParkCaller((RdhBase)updateParkStatus, chwBulkYMDMProd.getRFCNum());
+/*     */         
+/* 141 */         Set set = RFCConfig.getBHPlnts();
+/* 142 */         for (String str : set) {
+/* 143 */           ChwBulkYMDMSalesBom chwBulkYMDMSalesBom = new ChwBulkYMDMSalesBom(str7, str8, str9, str);
+/* 144 */           addDebug("Calling " + chwBulkYMDMSalesBom.getRFCName());
+/* 145 */           chwBulkYMDMSalesBom.execute();
+/* 146 */           addDebug(chwBulkYMDMSalesBom.createLogEntry());
+/* 147 */           if (chwBulkYMDMSalesBom.getRfcrc() == 0) {
+/* 148 */             addOutput(chwBulkYMDMSalesBom.getRFCName() + " called successfully!");
+/*     */           } else {
+/* 150 */             addOutput(chwBulkYMDMSalesBom.getRFCName() + " called  faild!");
+/* 151 */             addDebug(chwBulkYMDMSalesBom.getRFCName() + " webservice return code: " + chwBulkYMDMSalesBom.getRfcrc());
+/* 152 */             addOutput(chwBulkYMDMSalesBom.getError_text());
+/*     */           } 
+/* 154 */           updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", chwBulkYMDMSalesBom.getRFCNum());
+/* 155 */           runParkCaller((RdhBase)updateParkStatus, chwBulkYMDMSalesBom.getRFCNum());
+/*     */         } 
+/*     */       } else {
+/*     */         
+/* 159 */         addOutput("XML file not exist in cache,RFC caller not called!");
+/*     */       }
+/*     */     
+/* 162 */     } catch (Exception exception) {
+/*     */       
+/* 164 */       exception.printStackTrace();
+/* 165 */       setReturnCode(-1);
+/* 166 */       StringWriter stringWriter = new StringWriter();
+/* 167 */       String str6 = "<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
+/* 168 */       String str7 = "<pre>{0}</pre>";
+/* 169 */       MessageFormat messageFormat = new MessageFormat(str6);
+/* 170 */       setReturnCode(-3);
+/* 171 */       exception.printStackTrace(new PrintWriter(stringWriter));
+/*     */       
+/* 173 */       arrayOfString[0] = exception.getMessage();
+/* 174 */       this.rptSb.append(messageFormat.format(arrayOfString) + NEWLINE);
+/* 175 */       messageFormat = new MessageFormat(str7);
+/* 176 */       arrayOfString[0] = stringWriter.getBuffer().toString();
+/* 177 */       this.rptSb.append(messageFormat.format(arrayOfString) + NEWLINE);
+/* 178 */       logError("Exception: " + exception.getMessage());
+/* 179 */       logError(stringWriter.getBuffer().toString());
+/*     */       
+/* 181 */       setCreateDGEntity(true);
+/*     */     } finally {
+/*     */       
+/* 184 */       StringBuffer stringBuffer = new StringBuffer();
+/* 185 */       MessageFormat messageFormat = new MessageFormat(str2);
+/* 186 */       arrayOfString[0] = this.m_prof.getOPName();
+/* 187 */       arrayOfString[1] = this.m_prof.getRoleDescription();
+/* 188 */       arrayOfString[2] = this.m_prof.getWGName();
+/* 189 */       arrayOfString[3] = getNow();
+/* 190 */       arrayOfString[4] = stringBuffer.toString();
+/* 191 */       arrayOfString[5] = str4 + " " + getABRVersion();
+/* 192 */       this.rptSb.insert(0, convertToHTML(this.xml) + "\n");
+/* 193 */       this.rptSb.insert(0, str3 + messageFormat.format(arrayOfString) + NEWLINE);
+/*     */       
+/* 195 */       println(EACustom.getDocTypeHtml());
+/* 196 */       println(this.rptSb.toString());
+/* 197 */       printDGSubmitString();
+/*     */       
+/* 199 */       println(EACustom.getTOUDiv());
+/* 200 */       buildReportFooter();
+/*     */     } 
+/*     */   }
+/*     */   protected void runParkCaller(RdhBase paramRdhBase, String paramString) throws Exception {
+/* 204 */     addDebug("Calling " + paramRdhBase.getRFCName());
+/*     */     try {
+/* 206 */       paramRdhBase.execute();
+/* 207 */     } catch (Exception exception) {
+/*     */       
+/* 209 */       exception.printStackTrace();
+/*     */     } 
+/* 211 */     addDebug(paramRdhBase.createLogEntry());
+/* 212 */     if (paramRdhBase.getRfcrc() == 0) {
+/* 213 */       addOutput("Parking records updated successfully for ZDMRELNUM=" + paramString);
+/*     */     } else {
+/* 215 */       addOutput(paramRdhBase.getRFCName() + " called faild!");
+/* 216 */       addOutput(paramRdhBase.getError_text());
+/*     */     } 
+/*     */   }
+/*     */   
+/*     */   protected static String convertToHTML(String paramString) {
+/* 221 */     String str = "";
+/* 222 */     StringBuffer stringBuffer = new StringBuffer();
+/* 223 */     StringCharacterIterator stringCharacterIterator = null;
+/* 224 */     char c = ' ';
+/* 225 */     if (paramString != null) {
+/* 226 */       stringCharacterIterator = new StringCharacterIterator(paramString);
+/* 227 */       c = stringCharacterIterator.first();
+/* 228 */       while (c != '￿') {
+/*     */         
+/* 230 */         switch (c) {
+/*     */           
+/*     */           case '<':
+/* 233 */             stringBuffer.append("&lt;");
+/*     */             break;
+/*     */           case '>':
+/* 236 */             stringBuffer.append("&gt;");
+/*     */             break;
+/*     */ 
+/*     */           
+/*     */           case '"':
+/* 241 */             stringBuffer.append("&quot;");
+/*     */             break;
+/*     */           
+/*     */           case '\'':
+/* 245 */             stringBuffer.append("&#" + c + ";");
+/*     */             break;
+/*     */           default:
+/* 248 */             stringBuffer.append(c);
+/*     */             break;
+/*     */         } 
+/* 251 */         c = stringCharacterIterator.next();
+/*     */       } 
+/* 253 */       str = stringBuffer.toString();
+/*     */     } 
+/*     */     
+/* 256 */     return str;
+/*     */   }
+/*     */   
+/*     */   private String getNavigationName() throws SQLException, MiddlewareException {
+/* 260 */     return getNavigationName(this.m_elist.getParentEntityGroup().getEntityItem(0));
+/*     */   }
+/*     */   
+/*     */   private String getNavigationName(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 264 */     StringBuffer stringBuffer = new StringBuffer();
+/*     */ 
+/*     */     
+/* 267 */     EANList eANList = (EANList)this.metaTbl.get(paramEntityItem.getEntityType());
+/* 268 */     if (eANList == null) {
+/* 269 */       EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, paramEntityItem.getEntityType(), "Navigate");
+/* 270 */       eANList = entityGroup.getMetaAttribute();
+/*     */       
+/* 272 */       this.metaTbl.put(paramEntityItem.getEntityType(), eANList);
+/*     */     } 
+/* 274 */     for (byte b = 0; b < eANList.size(); b++) {
+/* 275 */       EANMetaAttribute eANMetaAttribute = (EANMetaAttribute)eANList.getAt(b);
+/* 276 */       stringBuffer.append(PokUtils.getAttributeValue(paramEntityItem, eANMetaAttribute.getAttributeCode(), ", ", "", false));
+/* 277 */       if (b + 1 < eANList.size()) {
+/* 278 */         stringBuffer.append(" ");
+/*     */       }
+/*     */     } 
+/* 281 */     return stringBuffer.toString();
+/*     */   }
+/*     */   
+/*     */   protected void addOutput(String paramString) {
+/* 285 */     this.rptSb.append("<p>" + paramString + "</p>" + NEWLINE);
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   protected void addDebug(String paramString) {
+/* 290 */     if (3 <= this.abr_debuglvl) {
+/* 291 */       this.rptSb.append("<!-- " + paramString + " -->" + NEWLINE);
+/*     */     }
+/*     */   }
+/*     */   
+/*     */   protected void addError(String paramString) {
+/* 296 */     addOutput(paramString);
+/* 297 */     setReturnCode(-1);
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 302 */     return "TMFBULKABRSTATUS";
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 307 */     return "1.0";
+/*     */   }
+/*     */ }
 
-import COM.ibm.eannounce.abr.sg.rfc.ChwBulkYMDMProd;
-import COM.ibm.eannounce.abr.sg.rfc.ChwBulkYMDMSalesBom;
-import COM.ibm.eannounce.abr.sg.rfc.MODEL;
-import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
-import COM.ibm.eannounce.abr.sg.rfc.UpdateParkStatus;
-import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
-import COM.ibm.eannounce.abr.util.EACustom;
-import COM.ibm.eannounce.abr.util.PokBaseABR;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.opicmpdh.middleware.D;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-import com.ibm.transform.oim.eacm.util.PokUtils;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.text.CharacterIterator;
-import java.text.MessageFormat;
-import java.text.StringCharacterIterator;
-import java.util.Hashtable;
-import java.util.Vector;
-
-public class TMFBULKABRSTATUS extends PokBaseABR {
-
-    private StringBuffer rptSb = new StringBuffer();
-    private static final char[] FOOL_JTEST = { '\n' };
-    static final String NEWLINE = new String(FOOL_JTEST);
-    private int abr_debuglvl = D.EBUG_ERR;
-    private String navName = "";
-    private Hashtable metaTbl = new Hashtable();
-    private String CACEHSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'MODEL' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
-    private String modelSQL = "select entity2id as MODELID from opicm.relator where ENTITYTYPE = 'PRODSTRUCT' and ENTITYID = ?  and VALTO > current timestamp and EFFTO > current timestamp with ur";
-    private String tmfSQL = "SELECT f.ATTRIBUTEVALUE AS MACHTYPE, t1.ATTRIBUTEVALUE AS MODEL, t2.ATTRIBUTEVALUE AS FEATURECODE FROM opicm.RELATOR r JOIN OPICM.FLAG f ON f.ENTITYTYPE =r.ENTITY2TYPE  AND f.ENTITYID =r.ENTITY2ID AND f.ATTRIBUTECODE ='MACHTYPEATR' JOIN OPICM.TEXT t1 ON t1.ENTITYTYPE =r.ENTITY2TYPE AND t1.ENTITYID =r.ENTITY2ID AND t1.ATTRIBUTECODE ='MODELATR' and t1.nlsid=1 JOIN OPICM.TEXT t2 ON t2.ENTITYTYPE =r.ENTITY1TYPE AND t2.ENTITYID =r.ENTITY1ID AND t2.ATTRIBUTECODE ='FEATURECODE' WHERE r.ENTITYTYPE ='PRODSTRUCT' AND r.ENTITYID =? AND r.VALTO >CURRENT TIMESTAMP AND r.EFFTO > CURRENT TIMESTAMP AND f.VALTO >CURRENT TIMESTAMP AND f.EFFTO > CURRENT TIMESTAMP AND t1.VALTO >CURRENT TIMESTAMP AND t1.EFFTO > CURRENT TIMESTAMP AND t2.VALTO >CURRENT TIMESTAMP AND t2.EFFTO > CURRENT TIMESTAMP WITH ur";
-
-    String xml = null;
-
-    public void execute_run() {
-        String HEADER = "<head>" + EACustom.getMetaTags(getDescription()) + NEWLINE + EACustom.getCSS() + NEWLINE
-                + EACustom.getTitle("{0} {1}") + NEWLINE + "</head>" + NEWLINE + "<body id=\"ibm-com\">"
-                + EACustom.getMastheadDiv() + NEWLINE
-                + "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
-        String HEADER2 = "<table>" + NEWLINE + "<tr><th>Userid: </th><td>{0}</td></tr>" + NEWLINE
-                + "<tr><th>Role: </th><td>{1}</td></tr>" + NEWLINE + "<tr><th>Workgroup: </th><td>{2}</td></tr>"
-                + NEWLINE + "<tr><th>Date: </th><td>{3}</td></tr>" + NEWLINE
-                + "<tr><th>Description: </th><td>{4}</td></tr>" + NEWLINE + "</table>" + NEWLINE + "<!-- {5} -->"
-                + NEWLINE;
-
-        String header1 = "";
-
-
-        MessageFormat msgf;
-        String abrversion = "";
-        String rootDesc = "";
-
-        Object[] args = new String[10];
-
-        try {
-            msgf = new MessageFormat(HEADER);
-            args[0] = getShortClassName(getClass());
-            args[1] = "ABR";
-            header1 = msgf.format(args);
-            setDGTitle("TMFBULKABRSTATUS report");
-            setDGString(getABRReturnCode());
-            setDGRptName("TMFBULKABRSTATUS"); // Set the report name
-            setDGRptClass("TMFBULKABRSTATUS"); // Set the report class
-            // Default set to pass
-            setReturnCode(PASS);
-
-            start_ABRBuild(false); // pull the VE
-
-            abr_debuglvl = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties
-                    .getABRDebugLevel(m_abri.getABRCode());
-
-            // get the root entity using current timestamp, need this to get the
-            // timestamps or info for VE pulls
-            m_elist = m_db.getEntityList(m_prof,
-                    new ExtractActionItem(null, m_db, m_prof,"dummy"),
-                    new EntityItem[] { new EntityItem(null, m_prof, getEntityType(), getEntityID()) });
-
-            EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-            addDebug("*****mlm rootEntity = " + rootEntity.getEntityType() + rootEntity.getEntityID());
-            // NAME is navigate attributes - only used if error rpt is generated
-            navName = getNavigationName();
-            rootDesc = m_elist.getParentEntityGroup().getLongDescription();
-            addDebug("navName=" + navName);
-            addDebug("rootDesc" + rootDesc);
-            // build the text file
-
-            String entityid = null;
-            Connection connection1 = m_db.getPDHConnection();
-            PreparedStatement statement1 = connection1.prepareStatement(modelSQL);
-            statement1.setInt(1, rootEntity.getEntityID());
-            ResultSet resultSet1 = statement1.executeQuery();
-            while (resultSet1.next()) {
-                entityid = resultSet1.getString("MODELID");
-            }
-
-            String machtype = null;
-            String modelatr = null;
-            String featurecode = null;
-            PreparedStatement statement2 = connection1.prepareStatement(tmfSQL);
-            statement2.setInt(1, rootEntity.getEntityID());
-            ResultSet resultSet2 = statement2.executeQuery();
-            while (resultSet2.next()) {
-                machtype = resultSet2.getString("MACHTYPE");
-                modelatr = resultSet2.getString("MODEL");
-                featurecode = resultSet2.getString("FEATURECODE");
-            }
-
-            this.addDebug("MACHTYPE:"+machtype+",MODEL:"+modelatr+",FEATURECODE:"+featurecode);
-
-            Connection connection = m_db.getODSConnection();
-            PreparedStatement statement = connection.prepareStatement(CACEHSQL);
-            statement.setString(1, entityid);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                xml = resultSet.getString("XMLMESSAGE");
-            }
-
-            if (xml != null) {
-
-                MODEL model = XMLParse.getObjectFromXml(xml, MODEL.class);
-                ChwBulkYMDMProd abr = new ChwBulkYMDMProd(model,"PRODSTRUCT",String.valueOf(rootEntity.getEntityID()),m_db.getODSConnection(),m_db.getPDHConnection());
-                this.addDebug("Calling " + abr.getRFCName());
-                abr.execute();
-                this.addDebug(abr.createLogEntry());
-                if (abr.getRfcrc() == 0) {
-                    this.addOutput(abr.getRFCName() + " called successfully!");
-                } else {
-                    this.addOutput(abr.getRFCName() + " called  faild!");
-                    this.addOutput(abr.getError_text());
-                }
-                UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", abr.getRFCNum());
-                
-				runParkCaller(updateParkStatus,abr.getRFCNum());
-               ChwBulkYMDMSalesBom bom = new ChwBulkYMDMSalesBom(machtype,modelatr,featurecode);
-                this.addDebug("Calling " + bom.getRFCName());
-                bom.execute();
-                this.addDebug(bom.createLogEntry());
-                if (bom.getRfcrc() == 0) {
-                    this.addOutput(bom.getRFCName() + " called successfully!");
-                } else {
-                    this.addOutput(bom.getRFCName() + " called  faild!");
-                    this.addDebug(bom.getRFCName()+" webservice return code:"+bom.getRfcrc());
-                    this.addOutput(bom.getError_text());
-                }
-                updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", bom.getRFCNum());
-                
-				runParkCaller(updateParkStatus,bom.getRFCNum());
-
-            } else {
-                this.addOutput("XML file not exist in cache,RFC caller not called!");
-            }
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-            setReturnCode(FAIL);
-            java.io.StringWriter exBuf = new java.io.StringWriter();
-            String Error_EXCEPTION = "<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
-            String Error_STACKTRACE = "<pre>{0}</pre>";
-            msgf = new MessageFormat(Error_EXCEPTION);
-            setReturnCode(INTERNAL_ERROR);
-            e.printStackTrace(new java.io.PrintWriter(exBuf));
-            // Put exception into document
-            args[0] = e.getMessage();
-            rptSb.append(msgf.format(args) + NEWLINE);
-            msgf = new MessageFormat(Error_STACKTRACE);
-            args[0] = exBuf.getBuffer().toString();
-            rptSb.append(msgf.format(args) + NEWLINE);
-            logError("Exception: " + e.getMessage());
-            logError(exBuf.getBuffer().toString());
-            // was an error make sure user gets report
-            setCreateDGEntity(true);
-
-        } finally {
-            StringBuffer sb = new StringBuffer();
-            msgf = new MessageFormat(HEADER2);
-            args[0] = m_prof.getOPName();
-            args[1] = m_prof.getRoleDescription();
-            args[2] = m_prof.getWGName();
-            args[3] = getNow();
-            args[4] = sb.toString();
-            args[5] = abrversion + " " + getABRVersion();
-            rptSb.insert(0, convertToHTML(xml)+NEW_LINE);
-            rptSb.insert(0, header1 + msgf.format(args) + NEWLINE);
-
-            println(EACustom.getDocTypeHtml()); // Output the doctype and html
-            println(rptSb.toString()); // Output the Report
-            printDGSubmitString();
-
-            println(EACustom.getTOUDiv());
-            buildReportFooter(); // Print </html>
-        }
-    }
-    protected void runParkCaller(RdhBase caller, String zdmnum) throws Exception {
-		this.addDebug("Calling " + caller.getRFCName());
-		try {
-			caller.execute();
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
-		this.addDebug(caller.createLogEntry());
-		if (caller.getRfcrc() == 0) {
-			this.addOutput("Parking records updated successfully for ZDMRELNUM="+zdmnum);
-		} else {
-			this.addOutput(caller.getRFCName() + " called faild!");
-			this.addOutput(caller.getError_text());
-		}
-	}
-    protected static String convertToHTML(String txt)
-    {
-        String retVal="";
-        StringBuffer htmlSB = new StringBuffer();
-        StringCharacterIterator sci = null;
-        char ch = ' ';
-        if (txt != null) {
-            sci = new StringCharacterIterator(txt);
-            ch = sci.first();
-            while(ch != CharacterIterator.DONE)
-            {
-                switch(ch)
-                {
-                    case '<':
-                        htmlSB.append("&lt;");
-                        break;
-                    case '>':
-                        htmlSB.append("&gt;");
-                        break;
-                    case '"':
-                        // double quotation marks could be saved as &quot; also. this will be &#34;
-                        // this should be included too, but left out to be consistent with west coast
-                        htmlSB.append("&quot;");
-                        break;
-                    case '\'':
-                        //IE6 doesn't support &apos; to convert single quotation marks,we can use &#39; instead
-                        htmlSB.append("&#"+((int)ch)+";");
-                        break;
-                    default:
-                        htmlSB.append(ch);
-                        break;
-                }
-                ch = sci.next();
-            }
-            retVal = htmlSB.toString();
-        }
-
-        return retVal;
-    }
-
-    private String getNavigationName() throws java.sql.SQLException, MiddlewareException {
-        return getNavigationName(m_elist.getParentEntityGroup().getEntityItem(0));
-    }
-
-    private String getNavigationName(EntityItem theItem) throws java.sql.SQLException, MiddlewareException {
-        StringBuffer navName = new StringBuffer();
-        // NAME is navigate attributes
-        // check hashtable to see if we already got this meta
-        EANList metaList = (EANList) metaTbl.get(theItem.getEntityType());
-        if (metaList == null) {
-            EntityGroup eg = new EntityGroup(null, m_db, m_prof, theItem.getEntityType(), "Navigate");
-            metaList = eg.getMetaAttribute(); // iterator does not maintain
-            // navigate order
-            metaTbl.put(theItem.getEntityType(), metaList);
-        }
-        for (int ii = 0; ii < metaList.size(); ii++) {
-            EANMetaAttribute ma = (EANMetaAttribute) metaList.getAt(ii);
-            navName.append(PokUtils.getAttributeValue(theItem, ma.getAttributeCode(), ", ", "", false));
-            if (ii + 1 < metaList.size()) {
-                navName.append(" ");
-            }
-        }
-        return navName.toString();
-    }
-
-    protected void addOutput(String msg) {
-        rptSb.append("<p>"+msg+"</p>"+NEWLINE);
-    }
-
-
-    protected void addDebug(String msg) {
-        if (D.EBUG_DETAIL <= abr_debuglvl) {
-            rptSb.append("<!-- " + msg + " -->" + NEWLINE);
-        }
-    }
-
-    protected void addError(String msg) {
-        addOutput(msg);
-        setReturnCode(FAIL);
-    }
-
-    @Override
-    public String getDescription() {
-        return "TMFBULKABRSTATUS";
-    }
-
-    @Override
-    public String getABRVersion() {
-        return "1.0";
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\adsxmlbh1\TMFBULKABRSTATUS.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

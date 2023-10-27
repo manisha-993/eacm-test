@@ -1,855 +1,695 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2009,2011  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.abr.sg.adsxmlbh1;
+/*     */ package COM.ibm.eannounce.abr.sg.adsxmlbh1;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.XMLActivityElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLCATAElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLChgSetElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLDistinctGroupElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLFEATQTYElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLGroupElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLLSEOAVAILElembh1;
+/*     */ import COM.ibm.eannounce.abr.util.XMLLSEOActivityElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLLSEOWARRGroupElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLLSEOWWSEOLangElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLMultiFlagElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLNLSElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLNotificationElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLStatusElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLVMElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLZCONFElem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.sql.SQLException;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class ADSLSEOABR
+/*     */   extends XMLMQRoot
+/*     */ {
+/* 156 */   private static final XMLElem XMLMAP = (XMLElem)new XMLGroupElem("SEO_UPDATE"); static {
+/* 157 */     XMLMAP.addChild((XMLElem)new XMLVMElem("SEO_UPDATE", "1"));
+/*     */     
+/* 159 */     XMLMAP.addChild(new XMLElem("PDHDOMAIN", "PDHDOMAIN"));
+/* 160 */     XMLMAP.addChild((XMLElem)new XMLNotificationElem("DTSOFMSG"));
+/* 161 */     XMLMAP.addChild((XMLElem)new XMLActivityElem("ACTIVITY"));
+/* 162 */     XMLMAP.addChild(new XMLElem("ENTITYTYPE", "ENTITYTYPE"));
+/* 163 */     XMLMAP.addChild(new XMLElem("ENTITYID", "ENTITYID"));
+/* 164 */     XMLMAP.addChild(new XMLElem("SEOID", "SEOID"));
+/*     */     
+/* 166 */     XMLMAP.addChild((XMLElem)new XMLStatusElem("STATUS", "STATUS", 1));
+/* 167 */     XMLMAP.addChild(new XMLElem("PRFCNTR", "PRFTCTR", 1));
+/* 168 */     XMLMAP.addChild(new XMLElem("PRICEDIND", "PRCINDC"));
+/* 169 */     XMLMAP.addChild(new XMLElem("ZEROPRICE", "ZEROPRICE"));
+/* 170 */     XMLMAP.addChild(new XMLElem("PRDHIERCD", "BHPRODHIERCD"));
+/* 171 */     XMLMAP.addChild(new XMLElem("ACCTASGNGRP", "BHACCTASGNGRP", 2));
+/* 172 */     XMLMAP.addChild(new XMLElem("UPCCD", "UPCCD"));
+/*     */     
+/* 174 */     XMLGroupElem xMLGroupElem1 = new XMLGroupElem(null, "WWSEO");
+/* 175 */     XMLMAP.addChild((XMLElem)xMLGroupElem1);
+/* 176 */     xMLGroupElem1.addChild(new XMLElem("SWROYALBEARING", "SWROYALBEARING"));
+/* 177 */     xMLGroupElem1.addChild(new XMLElem("SPECIALBID", "SPECBID"));
+/* 178 */     xMLGroupElem1.addChild(new XMLElem("SEOORDERCODE", "SEOORDERCODE"));
+/* 179 */     xMLGroupElem1.addChild(new XMLElem("WWENTITYTYPE", "ENTITYTYPE"));
+/* 180 */     xMLGroupElem1.addChild(new XMLElem("WWENTITYID", "ENTITYID"));
+/* 181 */     xMLGroupElem1.addChild(new XMLElem("WWSEOID", "SEOID"));
+/* 182 */     xMLGroupElem1.addChild(new XMLElem("PROJECT", "PROJCDNAM", 1));
+/*     */ 
+/*     */     
+/* 185 */     XMLGroupElem xMLGroupElem2 = new XMLGroupElem(null, "WEIGHTNDIMN");
+/* 186 */     xMLGroupElem1.addChild((XMLElem)xMLGroupElem2);
+/* 187 */     xMLGroupElem2.addChild(new XMLElem("WGHTMTRIC", "WGHTMTRIC|WGHTMTRICUNIT"));
+/*     */ 
+/*     */ 
+/*     */     
+/* 191 */     XMLDistinctGroupElem xMLDistinctGroupElem1 = new XMLDistinctGroupElem(null, "SGMNTACRNYM", null, true, true);
+/* 192 */     xMLGroupElem1.addChild((XMLElem)xMLDistinctGroupElem1);
+/* 193 */     xMLDistinctGroupElem1.addChild(new XMLElem("DIVISION", "DIV", 1));
+/*     */     
+/* 195 */     XMLGroupElem xMLGroupElem3 = new XMLGroupElem(null, "MODEL", "U:WWSEOLSEO:U:WWSEO:U:MODELWWSEO:U");
+/* 196 */     XMLMAP.addChild((XMLElem)xMLGroupElem3);
+/* 197 */     xMLGroupElem3.addChild(new XMLElem("PARENTENTITYTYPE", "ENTITYTYPE"));
+/* 198 */     xMLGroupElem3.addChild(new XMLElem("PARENTENTITYID", "ENTITYID"));
+/* 199 */     xMLGroupElem3.addChild(new XMLElem("PARENTMODEL", "MODELATR"));
+/* 200 */     xMLGroupElem3.addChild(new XMLElem("PARENTMACHTYPE", "MACHTYPEATR", 1));
+/*     */     
+/* 202 */     xMLGroupElem3.addChild(new XMLElem("CATEGORY", "COFCAT"));
+/*     */     
+/* 204 */     xMLGroupElem3.addChild(new XMLElem("SUBCATEGORY", "COFSUBCAT", 2));
+/* 205 */     xMLGroupElem3.addChild(new XMLElem("GROUP", "COFGRP"));
+/* 206 */     xMLGroupElem3.addChild(new XMLElem("SUBGROUP", "COFSUBGRP"));
+/*     */     
+/* 208 */     xMLGroupElem1 = new XMLGroupElem(null, "WWSEO");
+/* 209 */     XMLMAP.addChild((XMLElem)xMLGroupElem1);
+/* 210 */     xMLGroupElem1.addChild(new XMLElem("WHITEBOXINDC", "WHITEBOXINDC"));
+/*     */ 
+/*     */ 
+/*     */     
+/* 214 */     xMLGroupElem1.addChild(new XMLElem("UNSPSC", "UNSPSCCD"));
+/* 215 */     xMLGroupElem1.addChild(new XMLElem("UNUOM", "UNSPSCCDUOM"));
+/*     */     
+/* 217 */     XMLElem xMLElem1 = new XMLElem("LANGUAGELIST");
+/* 218 */     XMLMAP.addChild(xMLElem1);
+/*     */     
+/* 220 */     XMLNLSElem xMLNLSElem = new XMLNLSElem("LANGUAGEELEMENT");
+/* 221 */     xMLElem1.addChild((XMLElem)xMLNLSElem);
+/*     */     
+/* 223 */     xMLNLSElem.addChild(new XMLElem("NLSID", "NLSID"));
+/* 224 */     xMLNLSElem.addChild(new XMLElem("MKTGDESC", "LSEOMKTGDESC"));
+/*     */     
+/* 226 */     xMLGroupElem3 = new XMLGroupElem(null, "WWSEO");
+/* 227 */     xMLNLSElem.addChild((XMLElem)xMLGroupElem3);
+/* 228 */     xMLGroupElem3.addChild((XMLElem)new XMLLSEOWWSEOLangElem("MKTGNAME", "MKTGNAME"));
+/* 229 */     xMLGroupElem3.addChild((XMLElem)new XMLLSEOWWSEOLangElem("INVNAME", "PRCFILENAM"));
+/*     */ 
+/*     */     
+/* 232 */     XMLElem xMLElem2 = new XMLElem("AVAILABILITYLIST");
+/* 233 */     XMLMAP.addChild(xMLElem2);
+/*     */     
+/* 235 */     xMLElem2.addChild((XMLElem)new XMLLSEOAVAILElembh1());
+/*     */ 
+/*     */     
+/* 238 */     XMLGroupElem xMLGroupElem8 = new XMLGroupElem("IMAGELIST", "IMG");
+/* 239 */     XMLMAP.addChild((XMLElem)xMLGroupElem8);
+/*     */     
+/* 241 */     XMLElem xMLElem7 = new XMLElem("IMAGEELEMENT");
+/* 242 */     xMLGroupElem8.addChild(xMLElem7);
+/*     */     
+/* 244 */     xMLElem7.addChild((XMLElem)new XMLActivityElem("IMAGEACTION"));
+/* 245 */     xMLElem7.addChild(new XMLElem("ENTITYTYPE", "ENTITYTYPE"));
+/* 246 */     xMLElem7.addChild(new XMLElem("ENTITYID", "ENTITYID"));
+/* 247 */     xMLElem7.addChild(new XMLElem("STATUS", "STATUS", 1));
+/* 248 */     xMLElem7.addChild(new XMLElem("PUBFROM", "PUBFROM"));
+/* 249 */     xMLElem7.addChild(new XMLElem("PUBTO", "PUBTO"));
+/* 250 */     xMLElem7.addChild(new XMLElem("IMAGEDESCRIPTION", "IMGDESC"));
+/* 251 */     xMLElem7.addChild(new XMLElem("MARKETINGIMAGEFILENAME", "MKTGIMGFILENAM"));
+/*     */ 
+/*     */     
+/* 254 */     XMLElem xMLElem6 = new XMLElem("COUNTRYLIST");
+/* 255 */     xMLElem7.addChild(xMLElem6);
+/*     */     
+/* 257 */     XMLChgSetElem xMLChgSetElem1 = new XMLChgSetElem("COUNTRYELEMENT");
+/* 258 */     xMLElem6.addChild((XMLElem)xMLChgSetElem1);
+/*     */     
+/* 260 */     xMLChgSetElem1.addChild((XMLElem)new XMLMultiFlagElem("COUNTRY_FC", "COUNTRYLIST", "COUNTRYACTION", 1));
+/*     */ 
+/*     */ 
+/*     */     
+/* 264 */     XMLGroupElem xMLGroupElem7 = new XMLGroupElem("MMLIST", "MM");
+/* 265 */     XMLMAP.addChild((XMLElem)xMLGroupElem7);
+/*     */     
+/* 267 */     XMLElem xMLElem8 = new XMLElem("MMELEMENT");
+/* 268 */     xMLGroupElem7.addChild(xMLElem8);
+/*     */     
+/* 270 */     xMLElem8.addChild((XMLElem)new XMLActivityElem("MMACTION"));
+/* 271 */     xMLElem8.addChild(new XMLElem("ENTITYTYPE", "ENTITYTYPE"));
+/* 272 */     xMLElem8.addChild(new XMLElem("ENTITYID", "ENTITYID"));
+/* 273 */     xMLElem8.addChild(new XMLElem("STATUS", "MMSTATUS", 1));
+/* 274 */     xMLElem8.addChild(new XMLElem("PUBFROM", "PUBFROM"));
+/* 275 */     xMLElem8.addChild(new XMLElem("PUBTO", "PUBTO"));
+/*     */ 
+/*     */     
+/* 278 */     XMLElem xMLElem5 = new XMLElem("MSGLIST");
+/* 279 */     xMLElem8.addChild(xMLElem5);
+/*     */     
+/* 281 */     xMLNLSElem = new XMLNLSElem("MSGELEMENT");
+/* 282 */     xMLElem5.addChild((XMLElem)xMLNLSElem);
+/*     */     
+/* 284 */     xMLNLSElem.addChild(new XMLElem("NLSID", "NLSID"));
+/* 285 */     xMLNLSElem.addChild(new XMLElem("SHRTMKTGMSG", "SHRTMKTGMSG"));
+/* 286 */     xMLNLSElem.addChild(new XMLElem("LONGMKTGMSG", "LONGMKTGMSG"));
+/*     */     
+/* 288 */     xMLElem5 = new XMLElem("AUDIENCELIST");
+/* 289 */     xMLElem8.addChild(xMLElem5);
+/*     */     
+/* 291 */     xMLChgSetElem1 = new XMLChgSetElem("AUDIENCEELEMENT");
+/* 292 */     xMLElem5.addChild((XMLElem)xMLChgSetElem1);
+/*     */     
+/* 294 */     xMLChgSetElem1.addChild((XMLElem)new XMLMultiFlagElem("AUDIENCE", "CATAUDIENCE", "AUDIENCEACTION"));
+/*     */     
+/* 296 */     xMLElem5 = new XMLElem("COUNTRYLIST");
+/* 297 */     xMLElem8.addChild(xMLElem5);
+/*     */     
+/* 299 */     xMLChgSetElem1 = new XMLChgSetElem("COUNTRYELEMENT");
+/* 300 */     xMLElem5.addChild((XMLElem)xMLChgSetElem1);
+/*     */     
+/* 302 */     xMLChgSetElem1.addChild((XMLElem)new XMLMultiFlagElem("COUNTRY_FC", "COUNTRYLIST", "COUNTRYACTION", 1));
+/*     */ 
+/*     */ 
+/*     */     
+/* 306 */     XMLGroupElem xMLGroupElem6 = new XMLGroupElem("FBLIST", "FB");
+/* 307 */     XMLMAP.addChild((XMLElem)xMLGroupElem6);
+/*     */     
+/* 309 */     XMLElem xMLElem9 = new XMLElem("FBELEMENT");
+/* 310 */     xMLGroupElem6.addChild(xMLElem9);
+/*     */     
+/* 312 */     xMLElem9.addChild((XMLElem)new XMLActivityElem("FBACTION"));
+/* 313 */     xMLElem9.addChild(new XMLElem("ENTITYTYPE", "ENTITYTYPE"));
+/* 314 */     xMLElem9.addChild(new XMLElem("ENTITYID", "ENTITYID"));
+/* 315 */     xMLElem9.addChild(new XMLElem("STATUS", "FBSTATUS", 1));
+/* 316 */     xMLElem9.addChild(new XMLElem("PUBFROM", "PUBFROM"));
+/* 317 */     xMLElem9.addChild(new XMLElem("PUBTO", "PUBTO"));
+/*     */ 
+/*     */     
+/* 320 */     XMLElem xMLElem4 = new XMLElem("FBSTMTLIST");
+/* 321 */     xMLElem9.addChild(xMLElem4);
+/*     */     
+/* 323 */     xMLNLSElem = new XMLNLSElem("FBSTMTELEMENT");
+/* 324 */     xMLElem4.addChild((XMLElem)xMLNLSElem);
+/*     */     
+/* 326 */     xMLNLSElem.addChild(new XMLElem("NLSID", "NLSID"));
+/*     */     
+/* 328 */     xMLNLSElem.addChild((XMLElem)new XMLActivityElem("ACTIVITY"));
+/* 329 */     xMLNLSElem.addChild(new XMLElem("FBSTMT", "FBSTMT"));
+/*     */     
+/* 331 */     xMLElem4 = new XMLElem("AUDIENCELIST");
+/* 332 */     xMLElem9.addChild(xMLElem4);
+/*     */     
+/* 334 */     xMLChgSetElem1 = new XMLChgSetElem("AUDIENCEELEMENT");
+/* 335 */     xMLElem4.addChild((XMLElem)xMLChgSetElem1);
+/*     */     
+/* 337 */     xMLChgSetElem1.addChild((XMLElem)new XMLMultiFlagElem("AUDIENCE", "CATAUDIENCE", "AUDIENCEACTION"));
+/*     */     
+/* 339 */     xMLElem4 = new XMLElem("COUNTRYLIST");
+/* 340 */     xMLElem9.addChild(xMLElem4);
+/*     */     
+/* 342 */     xMLChgSetElem1 = new XMLChgSetElem("COUNTRYELEMENT");
+/* 343 */     xMLElem4.addChild((XMLElem)xMLChgSetElem1);
+/*     */     
+/* 345 */     xMLChgSetElem1.addChild((XMLElem)new XMLMultiFlagElem("COUNTRY_FC", "COUNTRYLIST", "COUNTRYACTION", 1));
+/*     */ 
+/*     */ 
+/*     */     
+/* 349 */     xMLElem4 = new XMLElem("AUDIENCELIST");
+/* 350 */     XMLMAP.addChild(xMLElem4);
+/* 351 */     XMLChgSetElem xMLChgSetElem2 = new XMLChgSetElem("AUDIENCEELEMENT");
+/* 352 */     xMLElem4.addChild((XMLElem)xMLChgSetElem2);
+/* 353 */     xMLChgSetElem2.addChild((XMLElem)new XMLMultiFlagElem("AUDIENCE", "AUDIEN", "AUDIENCEACTION"));
+/*     */ 
+/*     */     
+/* 356 */     XMLMAP.addChild((XMLElem)new XMLZCONFElem());
+/*     */ 
+/*     */     
+/* 359 */     xMLElem4 = new XMLElem("CATALOGOVERRIDELIST");
+/* 360 */     XMLMAP.addChild(xMLElem4);
+/* 361 */     xMLElem4.addChild((XMLElem)new XMLCATAElem());
+/*     */ 
+/*     */     
+/* 364 */     XMLGroupElem xMLGroupElem5 = new XMLGroupElem("CATATTRIBUTELIST", "CATDATA");
+/* 365 */     XMLMAP.addChild((XMLElem)xMLGroupElem5);
+/* 366 */     XMLElem xMLElem10 = new XMLElem("CATATTRIBUTEELEMENT");
+/* 367 */     xMLGroupElem5.addChild(xMLElem10);
+/* 368 */     xMLElem10.addChild((XMLElem)new XMLActivityElem("CATATTRIBUTEACTION"));
+/* 369 */     xMLElem10.addChild(new XMLElem("CATATTRIBUTE", "DAATTRIBUTECODE"));
+/* 370 */     xMLElem10.addChild(new XMLElem("NLSID", "NLSID"));
+/*     */     
+/* 372 */     xMLElem10.addChild(new XMLElem("CATATTRIUBTEVALUE", "DAATTRIBUTEVALUE"));
+/*     */ 
+/*     */ 
+/*     */     
+/* 376 */     XMLDistinctGroupElem xMLDistinctGroupElem2 = new XMLDistinctGroupElem("FEATURELIST", "FEATURE|SWFEATURE", null, true);
+/* 377 */     XMLMAP.addChild((XMLElem)xMLDistinctGroupElem2);
+/* 378 */     XMLElem xMLElem11 = new XMLElem("FEATUREELEMENT");
+/* 379 */     xMLDistinctGroupElem2.addChild(xMLElem11);
+/* 380 */     xMLElem11.addChild((XMLElem)new XMLActivityElem("ACTIVITY"));
+/* 381 */     xMLElem11.addChild(new XMLElem("ENTITYTYPE", "ENTITYTYPE"));
+/* 382 */     xMLElem11.addChild(new XMLElem("ENTITYID", "ENTITYID"));
+/* 383 */     xMLElem11.addChild(new XMLElem("FEATURECODE", "FEATURECODE"));
+/* 384 */     xMLElem11.addChild((XMLElem)new XMLFEATQTYElem("QTY", "CONFQTY"));
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 451 */     XMLLSEOWARRGroupElem xMLLSEOWARRGroupElem1 = new XMLLSEOWARRGroupElem("WARRLIST", "WARR");
+/* 452 */     XMLMAP.addChild((XMLElem)xMLLSEOWARRGroupElem1);
+/*     */     
+/* 454 */     XMLElem xMLElem12 = new XMLElem("WARRELEMENT");
+/* 455 */     xMLLSEOWARRGroupElem1.addChild(xMLElem12);
+/*     */     
+/* 457 */     xMLElem12.addChild((XMLElem)new XMLLSEOActivityElem("WARRACTION"));
+/* 458 */     xMLElem12.addChild(new XMLElem("WARRENTITYTYPE", "ENTITYTYPE"));
+/* 459 */     xMLElem12.addChild(new XMLElem("WARRENTITYID", "ENTITYID"));
+/* 460 */     xMLElem12.addChild(new XMLElem("WARRID", "WARRID"));
+/*     */     
+/* 462 */     XMLLSEOWARRGroupElem xMLLSEOWARRGroupElem2 = new XMLLSEOWARRGroupElem(null, "MODELWARR|PRODSTRUCTWARR", "U:MODELWARR|U:PRODSTRUCTWARR", "SPECIAL");
+/* 463 */     xMLElem12.addChild((XMLElem)xMLLSEOWARRGroupElem2);
+/* 464 */     xMLLSEOWARRGroupElem2.addChild(new XMLElem("PUBFROM", "EFFECTIVEDATE"));
+/* 465 */     xMLLSEOWARRGroupElem2.addChild(new XMLElem("PUBTO", "ENDDATE"));
+/* 466 */     xMLLSEOWARRGroupElem2.addChild(new XMLElem("DEFWARR", "DEFWARR"));
+/* 467 */     XMLElem xMLElem3 = new XMLElem("COUNTRYLIST");
+/* 468 */     xMLElem12.addChild(xMLElem3);
+/*     */     
+/* 470 */     xMLChgSetElem1 = new XMLChgSetElem("COUNTRYELEMENT");
+/* 471 */     xMLElem3.addChild((XMLElem)xMLChgSetElem1);
+/* 472 */     XMLLSEOWARRGroupElem xMLLSEOWARRGroupElem3 = new XMLLSEOWARRGroupElem(null, "MODELWARR|PRODSTRUCTWARR", "U:MODELWARR|U:PRODSTRUCTWARR");
+/* 473 */     xMLChgSetElem1.addChild((XMLElem)xMLLSEOWARRGroupElem3);
+/*     */     
+/* 475 */     xMLLSEOWARRGroupElem3.addChild((XMLElem)new XMLMultiFlagElem("COUNTRY_FC", "COUNTRYLIST", "COUNTRYACTION", 1));
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 480 */     XMLGroupElem xMLGroupElem4 = new XMLGroupElem("REPLLSEOLIST", "LSEO", "D:LSEOREPLLSEO:D", true);
+/* 481 */     XMLMAP.addChild((XMLElem)xMLGroupElem4);
+/*     */     
+/* 483 */     XMLElem xMLElem13 = new XMLElem("REPLLSEOELEMENT");
+/* 484 */     xMLGroupElem4.addChild(xMLElem13);
+/*     */     
+/* 486 */     xMLElem13.addChild((XMLElem)new XMLActivityElem("ACTIVITY"));
+/*     */     
+/* 488 */     xMLElem13.addChild(new XMLElem("SEOENTITYTYPE", "ENTITYTYPE"));
+/*     */     
+/* 490 */     xMLElem13.addChild(new XMLElem("SEOENTITYID", "ENTITYID"));
+/*     */     
+/* 492 */     xMLElem13.addChild(new XMLElem("SEOID", "SEOID"));
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public XMLElem getXMLMap() {
+/* 503 */     return XMLMAP;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVeName() {
+/* 509 */     return "ADSLSEO";
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public String getVeName2() {
+/* 514 */     return "ADSLSEO2";
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public String getStatusAttr() {
+/* 519 */     return "STATUS";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getMQCID() {
+/* 525 */     return "SEO_UPDATE";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVersion() {
+/* 534 */     return "$Revision: 1.39 $";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void mergeLists(ADSABRSTATUS paramADSABRSTATUS, EntityList paramEntityList1, EntityList paramEntityList2) throws SQLException, MiddlewareException, MiddlewareRequestException, MiddlewareShutdownInProgressException {
+/* 684 */     paramADSABRSTATUS.addDebug("Entered ADSLSEOABR call COM.ibm.eannounce.objects.EntityList.mergeLists");
+/*     */     
+/* 686 */     EntityList.mergeLists(paramEntityList1, paramEntityList2);
+/* 687 */     paramADSABRSTATUS.addDebug("mergeLists:: after merge Extract " + PokUtils.outputList(paramEntityList1));
+/*     */   }
+/*     */ }
 
-import java.util.Hashtable;
 
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.eannounce.objects.EntityList;
-import COM.ibm.eannounce.objects.EntityGroup;
-
-
-/**********************************************************************************
-*/ 
-//$Log: ADSLSEOABR.java,v $
-//Revision 1.39  2013/12/04 01:44:42  guobin
-//delete XML Spec sent to dev - Avails RFR Defect: BH 185136 , fix LSEOABR AVAILIST
-//
-//Revision 1.38  2013/11/18 15:14:05  guobin
-//middleware.jar part of fix for CQ 227988
-//
-//Revision 1.37  2013/04/12 07:32:19  wangyulo
-//Fix the Work Item 923416: There is a tag <ERROR/> instead <PUBFROM> in LSEO xml
-//
-//Revision 1.36  2012/12/05 14:53:44  wangyulo
-//Fix the defect 848608 to correct the mapping for DIVISION
-//
-//Revision 1.35  2012/04/17 12:46:58  liuweimi
-//CQ 97850	1.0	32.00	Change SUBCATEGORY to Short Description
-//
-//Revision 1.34  2012/02/24 07:05:50  guobin
-//[Work Item 663013] Tax sections should be removed from SEO_UPDATE XML
-//
-//Revision 1.33  2012/01/18 15:54:09  guobin
-//Fix the issue 635138 --there should be <ACTIVITY> tag before FBSTMT tag in LSEO xml
-//
-//Revision 1.32  2012/01/10 13:16:36  guobin
-//The defect 634524 for DM4 - SEO_UPDATE has incorrect structure mutiple Models.
-//
-//Revision 1.31  2011/12/14 02:22:27  guobin
-//Update the Version V Mod M for the ADSABR
-//
-//Revision 1.30  2011/08/30 07:58:08  guobin
-//Add WARRLIST for LSEO  change XMLActivityElem  to XMLLSEOActivityElem
-//
-//Revision 1.29  2011/08/26 01:44:48  guobin
-//add WARRLIST
-//
-//Revision 1.28  2011/07/15 13:07:36  guobin
-//Add deletion Action for Replacement offer
-//
-//Revision 1.27  2011/07/13 11:51:29  liuweimi
-//add replacement offer to LSEO
-//
-//Revision 1.26  2011/06/27 19:27:16  wendy
-//Correct mergelists, was dropping EntityGroups and causing memory leaks
-//
-//Revision 1.25  2011/05/25 03:59:59  guobin
-//CQ 31982	Add UNSPSC and UNSPSCUOM (mapped from WWSEO)
-//
-//Revision 1.24  2011/03/18 06:27:40  guobin
-//correction	161.00	Correct attr name to DAATTRIBUTEVALUE
-//
-//Revision 1.23  2011/02/23 02:07:02  guobin
-//Add the association between SLEORGNPLNTCODE and TAXCATG,TAXGRP for special bid LSEO
-//  
-//Revision 1.22  2011/02/18 13:45:54  guobin
-//add the ADSLSEO2 VE for the LSEO
-//
-//Revision 1.21  2011/02/16 03:25:47  guobin
-//CQ 31962	44.20, 44.30	Correct mapping for UNSPSC and UNUOM
-//
-//Revision 1.20  2011/02/15 10:59:49  lucasrg
-//Applied mapping updates for DM Cycle 2
-//
-//Revision 1.19  2011/02/14 05:34:15  guobin
-//change for speicbid LSEO
-//
-//Revision 1.18  2011/02/11 11:25:16  guobin
-//add CATLGOR to MODEL
-//
-//Revision 1.17  2011/02/10 15:12:34  guobin
-//add 20110210 VE for SLEORGNPLNTCODE of specialbid avail of LSEO
-//
-//Revision 1.16  2011/01/17 13:57:13  guobin
-//change ZCONF
-//
-//Revision 1.15  2010/12/20 10:53:18  guobin
-//add Catalog Override Defaults
-//
-//Revision 1.14  2010/12/06 12:59:02  guobin
-//change tag name COUNTRY_FC
-//
-//Revision 1.13  2010/12/06 12:14:52  guobin
-//change Tag name AUDIENCEACATION
-//
-//Revision 1.12  2010/12/06 07:39:00  guobin
-//Updated Tag names
-//
-//Revision 1.11  2010/11/26 07:47:46  guobin
-//Fixes to SEO_UPDATE -- tag names and tag position in XML only.
-//
-//Revision 1.10  2010/10/29 15:18:05  rick
-//changing MQCID again.
-//
-//Revision 1.9  2010/10/12 19:24:55  rick
-//setting new MQCID value
-//
-//Revision 1.8  2010/08/12 05:04:01  rick
-//change to support languagelist with attributecodes from
-//LSEO and WWSEO.
-//
-//Revision 1.7  2010/08/03 17:33:17  rick
-//changing WHITEBOXINDC to long description
-//
-//Revision 1.6  2010/07/21 22:44:50  rick
-//change for SWROYALBEARING.
-//
-//Revision 1.5  2010/07/19 14:45:54  rick
-//changes to support FEATURE and SWFEATURE in
-//FEATURELIST for LSEO XML.
-//
-//Revision 1.4  2010/06/24 20:28:31  rick
-//BH 1.0 changes
-//
-//Revision 1.3  2010/06/22 15:43:10  rick
-//BH 1.0 interface changes
-//
-//Revision 1.1  2010/05/19 22:25:20  rick
-//adding adsxmlbh1 folder for BH 1.0.
-//
-//Revision 1.2  2010/03/15 15:47:07  rick
-//changing BHACCTASGNGRP and TAXCLS to shortdesc.
-//
-//Revision 1.1  2010/03/02 02:17:56  rick
-//changes for new wave2 package
-//
-//Revision 1.5  2010/01/28 00:29:47  rick
-//change to use BHACCTASGNGRP instead of
-// ACCTASGNGRP and LSEO for MQCID.
-//
-//Revision 1.4  2010/01/07 18:03:03  wendy
-//cvs failure again
-//
-public class ADSLSEOABR extends XMLMQRoot
-{
-    private static final XMLElem XMLMAP;
-
-    static {
-        XMLMAP = new XMLGroupElem("SEO_UPDATE");
-        XMLMAP.addChild(new XMLVMElem("SEO_UPDATE","1"));
-        // level2
-        XMLMAP.addChild(new XMLElem("PDHDOMAIN","PDHDOMAIN"));
-        XMLMAP.addChild(new XMLNotificationElem("DTSOFMSG")); // pull from profile.endofday
-        XMLMAP.addChild(new XMLActivityElem("ACTIVITY"));
-        XMLMAP.addChild(new XMLElem("ENTITYTYPE","ENTITYTYPE"));
-        XMLMAP.addChild(new XMLElem("ENTITYID","ENTITYID"));
-        XMLMAP.addChild(new XMLElem("SEOID","SEOID"));
-        //XMLMAP.addChild(new XMLElem("STATUS","STATUS",XMLElem.FLAGVAL)); BH FS ABR XML System Feed Mapping 20131106b.doc
-        XMLMAP.addChild(new XMLStatusElem("STATUS", "STATUS", XMLElem.FLAGVAL));
-        XMLMAP.addChild(new XMLElem("PRFCNTR","PRFTCTR",XMLElem.FLAGVAL));
-        XMLMAP.addChild(new XMLElem("PRICEDIND","PRCINDC"));
-        XMLMAP.addChild(new XMLElem("ZEROPRICE","ZEROPRICE"));
-        XMLMAP.addChild(new XMLElem("PRDHIERCD","BHPRODHIERCD"));
-        XMLMAP.addChild(new XMLElem("ACCTASGNGRP","BHACCTASGNGRP",XMLElem.SHORTDESC));
-        XMLMAP.addChild(new XMLElem("UPCCD","UPCCD"));
- 
-        XMLElem elemwwseo = new XMLGroupElem(null,"WWSEO");
-        XMLMAP.addChild(elemwwseo);
-        elemwwseo.addChild(new XMLElem("SWROYALBEARING","SWROYALBEARING"));
-        elemwwseo.addChild(new XMLElem("SPECIALBID","SPECBID"));
-        elemwwseo.addChild(new XMLElem("SEOORDERCODE","SEOORDERCODE"));
-        elemwwseo.addChild(new XMLElem("WWENTITYTYPE","ENTITYTYPE"));
-        elemwwseo.addChild(new XMLElem("WWENTITYID","ENTITYID"));
-        elemwwseo.addChild(new XMLElem("WWSEOID","SEOID"));
-        elemwwseo.addChild(new XMLElem("PROJECT","PROJCDNAM",XMLElem.FLAGVAL));
-        
-
-        XMLElem elemweightndimn = new XMLGroupElem(null,"WEIGHTNDIMN");
-        elemwwseo.addChild(elemweightndimn);
-        elemweightndimn.addChild(new XMLElem("WGHTMTRIC","WGHTMTRIC|WGHTMTRICUNIT"));
-        
-        //Defect 635138 It should show <DIVISION> tag once in xml report
-        //Defect 848608 to correct the mapping for DIVISION                      
-        XMLElem elemSGMNTACRNYM = new XMLDistinctGroupElem(null,"SGMNTACRNYM",null,true,true);
-        elemwwseo.addChild(elemSGMNTACRNYM);
-        elemSGMNTACRNYM.addChild(new XMLElem("DIVISION","DIV",XMLElem.FLAGVAL));
-
-        XMLElem elem = new XMLGroupElem(null,"MODEL","U:WWSEOLSEO:U:WWSEO:U:MODELWWSEO:U");
-        XMLMAP.addChild(elem);
-        elem.addChild(new XMLElem("PARENTENTITYTYPE","ENTITYTYPE"));
-        elem.addChild(new XMLElem("PARENTENTITYID","ENTITYID"));
-        elem.addChild(new XMLElem("PARENTMODEL","MODELATR"));
-        elem.addChild(new XMLElem("PARENTMACHTYPE","MACHTYPEATR",XMLElem.FLAGVAL));
-
-        elem.addChild(new XMLElem("CATEGORY","COFCAT"));
-//        SEO_UPDATE	CQ 97850	1.0	32.00	Change SUBCATEGORY to Short Description
-        elem.addChild(new XMLElem("SUBCATEGORY","COFSUBCAT",XMLElem.SHORTDESC));
-        elem.addChild(new XMLElem("GROUP","COFGRP"));
-        elem.addChild(new XMLElem("SUBGROUP","COFSUBGRP")); 
-        //asked by Dave, line 34 in spreadsheet - code puts <WHITEBOXINDC> after <PROJECT>, it should be after <SUBGROUP>
-        elemwwseo = new XMLGroupElem(null,"WWSEO");
-        XMLMAP.addChild(elemwwseo);
-        elemwwseo.addChild(new XMLElem("WHITEBOXINDC","WHITEBOXINDC"));
-        
-        //Change	CQ 31962 - fix mapping	44.20		1	1.0	<UNSPSC>	</UNSPSC>	2	SEO_UPDATE  /UNSPSC		WWSEOLSEO-u:	WWSEO	UNSPSCCD
-        //Change	CQ 31962 - fix mapping	44.30		1	1.0	<UNUOM>	</UNUOM>	2	SEO_UPDATE  /UNUOM		WWSEOLSEO-u:	WWSEO	UNSPSCCDUOM
-        elemwwseo.addChild(new XMLElem("UNSPSC","UNSPSCCD"));
-        elemwwseo.addChild(new XMLElem("UNUOM","UNSPSCCDUOM"));
-        
-        XMLElem langlist = new XMLElem("LANGUAGELIST");
-        XMLMAP.addChild(langlist);
-        // level 3
-        XMLElem langelem = new XMLNLSElem("LANGUAGEELEMENT");
-        langlist.addChild(langelem);
-        // level 4
-        langelem.addChild(new XMLElem("NLSID","NLSID"));
-        langelem.addChild(new XMLElem("MKTGDESC","LSEOMKTGDESC"));
-        
-        elem = new XMLGroupElem(null,"WWSEO");
-        langelem.addChild(elem);
-        elem.addChild(new XMLLSEOWWSEOLangElem("MKTGNAME","MKTGNAME"));
-        elem.addChild(new XMLLSEOWWSEOLangElem("INVNAME","PRCFILENAM"));
-
-        // BH AVAILABILITYLIST Structure       
-        XMLElem availlist = new XMLElem("AVAILABILITYLIST");
-		XMLMAP.addChild(availlist);
-		
-		availlist.addChild(new XMLLSEOAVAILElembh1());
-		
-        // start of IMAGELIST structure
-        XMLElem list = new XMLGroupElem("IMAGELIST","IMG");
-        XMLMAP.addChild(list);
-        // level 3
-        XMLElem imgelem = new XMLElem("IMAGEELEMENT");//check for chgs is controlled by XMLGroupElem
-        list.addChild(imgelem);
-        // level 4
-        imgelem.addChild(new XMLActivityElem("IMAGEACTION"));
-        imgelem.addChild(new XMLElem("ENTITYTYPE","ENTITYTYPE"));
-        imgelem.addChild(new XMLElem("ENTITYID","ENTITYID"));
-        imgelem.addChild(new XMLElem("STATUS","STATUS",XMLElem.FLAGVAL));
-        imgelem.addChild(new XMLElem("PUBFROM","PUBFROM"));
-        imgelem.addChild(new XMLElem("PUBTO","PUBTO"));
-        imgelem.addChild(new XMLElem("IMAGEDESCRIPTION","IMGDESC"));
-        imgelem.addChild(new XMLElem("MARKETINGIMAGEFILENAME","MKTGIMGFILENAM"));
-
-        //level 4
-        list = new XMLElem("COUNTRYLIST");
-        imgelem.addChild(list);
-        // level 5
-        XMLElem listelem = new XMLChgSetElem("COUNTRYELEMENT");
-        list.addChild(listelem);
-        //level 6
-        listelem.addChild(new XMLMultiFlagElem("COUNTRY_FC","COUNTRYLIST","COUNTRYACTION",XMLElem.FLAGVAL));
-        // end of IMAGELIST structure
-
-        // start of MMLIST structure
-        list = new XMLGroupElem("MMLIST","MM");
-        XMLMAP.addChild(list);
-        // level 3
-        XMLElem mmelem = new XMLElem("MMELEMENT");//check for chgs is controlled by XMLGroupElem
-        list.addChild(mmelem);
-        // level 4
-        mmelem.addChild(new XMLActivityElem("MMACTION"));
-        mmelem.addChild(new XMLElem("ENTITYTYPE","ENTITYTYPE"));
-        mmelem.addChild(new XMLElem("ENTITYID","ENTITYID"));
-        mmelem.addChild(new XMLElem("STATUS","MMSTATUS",XMLElem.FLAGVAL));
-        mmelem.addChild(new XMLElem("PUBFROM","PUBFROM"));
-        mmelem.addChild(new XMLElem("PUBTO","PUBTO"));
-        
-
-        list = new XMLElem("MSGLIST");
-        mmelem.addChild(list);
-        // level 5
-        langelem = new XMLNLSElem("MSGELEMENT");
-        list.addChild(langelem);
-        //level 6
-        langelem.addChild(new XMLElem("NLSID","NLSID"));
-        langelem.addChild(new XMLElem("SHRTMKTGMSG","SHRTMKTGMSG"));
-        langelem.addChild(new XMLElem("LONGMKTGMSG","LONGMKTGMSG"));
-        //level 4
-        list = new XMLElem("AUDIENCELIST");
-        mmelem.addChild(list);
-        // level 5
-        listelem = new XMLChgSetElem("AUDIENCEELEMENT");
-        list.addChild(listelem);
-        //level 6
-        listelem.addChild(new XMLMultiFlagElem("AUDIENCE","CATAUDIENCE","AUDIENCEACTION"));
-	    //level 4
-        list = new XMLElem("COUNTRYLIST");
-        mmelem.addChild(list);
-        // level 5
-        listelem = new XMLChgSetElem("COUNTRYELEMENT");
-        list.addChild(listelem);
-        //level 6
-        listelem.addChild(new XMLMultiFlagElem("COUNTRY_FC","COUNTRYLIST","COUNTRYACTION",XMLElem.FLAGVAL));
-        // end of MMLIST structure
-
-        // start of FBLIST structure
-        list = new XMLGroupElem("FBLIST","FB");
-        XMLMAP.addChild(list);
-        // level 3
-        XMLElem fbelem = new XMLElem("FBELEMENT");//check for chgs is controlled by XMLGroupElem
-        list.addChild(fbelem);
-        // level 4
-        fbelem.addChild(new XMLActivityElem("FBACTION"));
-        fbelem.addChild(new XMLElem("ENTITYTYPE","ENTITYTYPE"));
-        fbelem.addChild(new XMLElem("ENTITYID","ENTITYID"));
-        fbelem.addChild(new XMLElem("STATUS","FBSTATUS",XMLElem.FLAGVAL));
-        fbelem.addChild(new XMLElem("PUBFROM","PUBFROM"));
-        fbelem.addChild(new XMLElem("PUBTO","PUBTO"));
-        
-
-        list = new XMLElem("FBSTMTLIST");
-        fbelem.addChild(list);
-        // level 5
-        langelem = new XMLNLSElem("FBSTMTELEMENT");
-        list.addChild(langelem);
-        //level 6
-        langelem.addChild(new XMLElem("NLSID","NLSID"));
-        //change There should be <ACTIVITY> tag before FBSTMT tag in LSEO xml(2012-01-12)
-        langelem.addChild(new XMLActivityElem("ACTIVITY"));
-        langelem.addChild(new XMLElem("FBSTMT","FBSTMT"));
-        //level 4
-        list = new XMLElem("AUDIENCELIST");
-        fbelem.addChild(list);
-        // level 5
-        listelem = new XMLChgSetElem("AUDIENCEELEMENT");
-        list.addChild(listelem);
-        //level 6
-        listelem.addChild(new XMLMultiFlagElem("AUDIENCE","CATAUDIENCE","AUDIENCEACTION"));
-	    //level 4
-        list = new XMLElem("COUNTRYLIST");
-        fbelem.addChild(list);
-        // level 5
-        listelem = new XMLChgSetElem("COUNTRYELEMENT");
-        list.addChild(listelem);
-        //level 6
-        listelem.addChild(new XMLMultiFlagElem("COUNTRY_FC","COUNTRYLIST","COUNTRYACTION",XMLElem.FLAGVAL));
-        // end of FBLIST structure
-        
-        // AudienceList
-        list = new XMLElem("AUDIENCELIST");
-        XMLMAP.addChild(list);
-        XMLElem audielem = new XMLChgSetElem("AUDIENCEELEMENT");
-        list.addChild(audielem);
-        audielem.addChild(new XMLMultiFlagElem("AUDIENCE","AUDIEN","AUDIENCEACTION"));
-        
-        //add 20101217 Level 2 Catalog Override Defaults
-        XMLMAP.addChild(new XMLZCONFElem());
-        
-        // BH <CATALOGOVERRIDELIST> Structure       
-    	list = new XMLElem("CATALOGOVERRIDELIST");
-		XMLMAP.addChild(list);
-		list.addChild(new XMLCATAElem());
-		
-		// <CATATTRIBUTELIST>		
-        list = new XMLGroupElem("CATATTRIBUTELIST","CATDATA");
-        XMLMAP.addChild(list);
-        XMLElem cataelem = new XMLElem("CATATTRIBUTEELEMENT");//check for chgs is controlled by XMLGroupElem
-        list.addChild(cataelem);
-        cataelem.addChild(new XMLActivityElem("CATATTRIBUTEACTION"));
-        cataelem.addChild(new XMLElem("CATATTRIBUTE","DAATTRIBUTECODE"));
-        cataelem.addChild(new XMLElem("NLSID","NLSID"));
-        //correction	161.00	Correct attr name to DAATTRIBUTEVALUE
-        cataelem.addChild(new XMLElem("CATATTRIUBTEVALUE","DAATTRIBUTEVALUE"));
-        // end of <CATATTRIBUTELIST>
-        
-        // Featurelist 
-        list = new XMLDistinctGroupElem("FEATURELIST","FEATURE|SWFEATURE",null,true);
-        XMLMAP.addChild(list);
-        XMLElem featelem = new XMLElem("FEATUREELEMENT");
-        list.addChild(featelem);
-        featelem.addChild(new XMLActivityElem("ACTIVITY"));
-        featelem.addChild(new XMLElem("ENTITYTYPE","ENTITYTYPE"));
-        featelem.addChild(new XMLElem("ENTITYID","ENTITYID"));
-        featelem.addChild(new XMLElem("FEATURECODE","FEATURECODE"));
-        featelem.addChild(new XMLFEATQTYElem("QTY","CONFQTY"));
-        // end of Featurelist
-
-        
-        /*
-         * TAXCATEGORYLIST and TAXCODELIST copied from ADSMODELABR
-         * 
-         * According to "BH FS ABR Data Transformation System Feed 20110124.doc"
-         * 
-         * Find the parent MODEL as follows:
-         * WWSEOLSEO-u: MODELWWSEO-u
-         */
-        //XMLElem modelElem = new XMLGroupElem(null,"MODEL");
-        //XMLMAP.addChild(modelElem);
-        
-        //TAXCATEGORYLIST
-        
-//		list = new XMLGroupElem("TAXCATEGORYLIST","TAXCATG");
-//		XMLMAP.addChild(list);
-//		// level 3
-//        XMLElem taxelem = new XMLElem("TAXCATEGORYELEMENT");//check for chgs is controlled by XMLGroupElem
-//        list.addChild(taxelem);
-//        // level 4
-//        taxelem.addChild(new XMLActivityElem("TAXCATEGORYACTION"));
-//        //level 4
-//        list = new XMLElem("COUNTRYLIST");
-//        taxelem.addChild(list);
-//        // level 5
-//        listelem = new XMLChgSetElem("COUNTRYELEMENT");
-//        list.addChild(listelem);
-//        //level 6
-//        listelem.addChild(new XMLMultiFlagElem("COUNTRY_FC","COUNTRYLIST","COUNTRYACTION",XMLElem.FLAGVAL));
-//        //level 4
-//        taxelem.addChild(new XMLElem("TAXCATEGORYVALUE","TAXCATGATR",XMLElem.FLAGVAL));
-//        XMLElem elemSVCMODTAXRELEVANCE = new XMLGroupElem(null,"MODTAXRELEVANCE","U:MODTAXRELEVANCE");
-//        taxelem.addChild(elemSVCMODTAXRELEVANCE);
-//        elemSVCMODTAXRELEVANCE.addChild(new XMLElem("TAXCLASSIFICATION","TAXCLS",XMLElem.SHORTDESC));        
-//        taxelem.addChild(new XMLSLEORGGRPElem("D:TAXCATGSLEORGA:D"));
-        //End of TAXCATEGORYLIST
-        
-        //TAXCODELIST
-//        list = new XMLGroupElem("TAXCODELIST","TAXGRP");
-//        XMLMAP.addChild(list);
-//		//1.0 <TAXCODEELEMENT> level 3
-//        XMLElem taxcodeelem = new XMLElem("TAXCODEELEMENT");
-//        list.addChild(taxcodeelem);
-//        //1.0	<TAXCODEACTION>	</TAXCODEACTION>	4
-//        taxcodeelem.addChild(new XMLActivityElem("TAXCODEACTION"));
-//        //1.0	<TAXCODEDESCRIPTION>	</TAXCODEDESCRIPTION>
-//        taxcodeelem.addChild(new XMLElem("TAXCODEDESCRIPTION","DESC"));
-//        //1.0	<DISTRIBUTIONCHANNEL>	</DISTRIBUTIONCHANNEL>	4
-//        //taxcodeelem.addChild(new XMLElem("DISTRIBUTIONCHANNEL","DISTRBCHANL"));
-//        //1.0	<TAXCODE>	</TAXCODE>	4
-//        taxcodeelem.addChild(new XMLElem("TAXCODE","TAXCD"));
-//        //level 4
-//        list = new XMLElem("COUNTRYLIST");
-//        taxcodeelem.addChild(list);
-//        // level 5
-//        XMLElem cntryelem = new XMLChgSetElem("COUNTRYELEMENT");
-//        list.addChild(cntryelem);
-//        //level 6
-//        cntryelem.addChild(new XMLMultiFlagElem("COUNTRY_FC","COUNTRYLIST","COUNTRYACTION",XMLElem.FLAGVAL));
-//        //level 4 new added <SLEORGGRPLIST>
-//        taxcodeelem.addChild(new XMLSLEORGGRPElem("D:TAXGRPSLEORGA:D"));
-        //End of TAXCODELIST
-
-        // start of WARRLIST structure
-        list = new XMLLSEOWARRGroupElem("WARRLIST","WARR");
-        XMLMAP.addChild(list);
-        // level 3
-        XMLElem warrelem = new XMLElem("WARRELEMENT");//check for chgs is controlled by XMLGroupElem
-        list.addChild(warrelem);
-        // level 4
-        warrelem.addChild(new XMLLSEOActivityElem("WARRACTION"));
-        warrelem.addChild(new XMLElem("WARRENTITYTYPE","ENTITYTYPE"));
-        warrelem.addChild(new XMLElem("WARRENTITYID","ENTITYID"));
-        warrelem.addChild(new XMLElem("WARRID","WARRID"));
-        //TODO need change 
-        XMLElem modelwarrelem = new XMLLSEOWARRGroupElem(null,"MODELWARR|PRODSTRUCTWARR","U:MODELWARR|U:PRODSTRUCTWARR","SPECIAL");
-        warrelem.addChild(modelwarrelem);
-        modelwarrelem.addChild(new XMLElem("PUBFROM","EFFECTIVEDATE"));
-        modelwarrelem.addChild(new XMLElem("PUBTO","ENDDATE"));
-        modelwarrelem.addChild(new XMLElem("DEFWARR","DEFWARR"));
-        list = new XMLElem("COUNTRYLIST");
-        warrelem.addChild(list);
-        // level 5
-        listelem = new XMLChgSetElem("COUNTRYELEMENT");
-        list.addChild(listelem);
-        XMLElem modelwarr2elem = new XMLLSEOWARRGroupElem(null,"MODELWARR|PRODSTRUCTWARR","U:MODELWARR|U:PRODSTRUCTWARR");
-        listelem.addChild(modelwarr2elem);
-        //Need to confirm whether exist this attribute <COUNTRY_FC>	</COUNTRY_FC>	6			MODELWARR	COUNTRYLIST
-        modelwarr2elem.addChild(new XMLMultiFlagElem("COUNTRY_FC","COUNTRYLIST","COUNTRYACTION",XMLElem.FLAGVAL));     
-        // end of WARRLIST structure
-       
-        //start of <REPLLSEOLIST>
-//        Add	CQ 32374	224.00		1	1.0	<REPLLSEOLIST>		2	SEO_UPDATE  /REPLLSEOLIST	
-        list = new XMLGroupElem("REPLLSEOLIST","LSEO","D:LSEOREPLLSEO:D",true);
-        XMLMAP.addChild(list);
-//        Add	CQ 32374 	225.00		0..1	1.0	<REPLLSEOELEMENT>		3	SEO_UPDATE  /REPLLSEOLIST /REPLLSEOELEMENT		LSEOREPLLSEO-d
-        XMLElem repllseoelem = new XMLElem("REPLLSEOELEMENT");
-        list.addChild(repllseoelem);
-//        Add	CQ 32374 	226.00		1	1.0	<ACTIVITY>	</ACTIVITY>	4	SEO_UPDATE  /REPLLSEOLIST /REPLLSEOELEMENT /ACTIVITY			derived
-        repllseoelem.addChild(new XMLActivityElem("ACTIVITY"));//TODO should be changed to another value
-//        Add	CQ 32374 	227.00		1	1.0	<SEOENTITYTYPE>	</SEOENTITYTYPE>	4	SEO_UPDATE  /REPLLSEOLIST /REPLLSEOELEMENT /SEOENTITYTYPE			LSEO	ENTITYTYPE		Text	"LSEO"
-        repllseoelem.addChild(new XMLElem("SEOENTITYTYPE","ENTITYTYPE"));
-//        Add	CQ 32374 	228.00		1	1.0	<SEOENTITYID>	</SEOENTITYID>	4	SEO_UPDATE  /REPLLSEOLIST /REPLLSEOELEMENT /SEOENTITYID			LSEO	ENTITYID		Text	Integer
-        repllseoelem.addChild(new XMLElem("SEOENTITYID","ENTITYID"));
-//        Add	CQ 32374 	229.00		1	1.0	<SEOID>	</SEOID>	4	SEO_UPDATE  /REPLLSEOLIST /REPLLSEOELEMENT /SEOID		 	LSEO	SEOID		Text
-        repllseoelem.addChild(new XMLElem("SEOID","SEOID"));
-//        Add	CQ 32374 	230.00			1.0		</REPLLSEOELEMENT>	3	SEO_UPDATE  /REPLLSEOLIST /REPLLSEOELEMENT																																			
-//        Add	CQ 32374 	231.00			1.0		</REPLLSEOLIST>	2	SEO_UPDATE  /REPLLSEOLIST																																			
-
-    }
-        
-
-    /**********************************
-    * get xml object mapping
-    */
-    public XMLElem getXMLMap() {
-        return XMLMAP;
-    }
-
-	/**********************************
-    * get the name of the VE to use
-    */
-    public String getVeName() { return "ADSLSEO"; }
-    
-    /**********************************
-     * get the name of the VE to use
-     */
-     public String getVeName2() { return "ADSLSEO2"; }
-
-    /**********************************
-    * get the status attribute to use for this ABR
-    */
-    public String getStatusAttr() { return "STATUS";}
-
-    /**********************************
-    *
-	A.	MQ-Series CID
-    */
-    public String getMQCID() { return "SEO_UPDATE"; }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getVersion()
-    {
-    	return "$Revision: 1.39 $";//"1.0";
-    }
-    /*protected void mergeLists(ADSABRSTATUS abr, EntityList list1, EntityList list2) throws
-    java.sql.SQLException,
-    COM.ibm.opicmpdh.middleware.MiddlewareException,
-    COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-    COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    
-    {
-    	abr.addDebug("Entered ADSLSEOABRSTATUS.mergeLists");
-        // we want to merge the VEs ADSLSEO and ADSLSEO2
-        // This means moving the MODEL, MODELWWSEO and WWSEO from list2 into list1
-    	
-    	// get the MODEL group from list2
-    	EntityGroup mdlGrp2 = list2.getEntityGroup("MODEL");
-    	
-    	// get the MODELWWSEO group from list2
-    	EntityGroup mdlwwseoGrp2 = list2.getEntityGroup("MODELWWSEO");
-    	
-    	// get the WWSEO group and item from list1
-    	EntityGroup wwseoGrp1 = list1.getEntityGroup("WWSEO");
-    	EntityItem wwseo1 = wwseoGrp1.getEntityItem(0); 
-    	    	    	    	
-        // get the WWSEO group and item from list2
-    	EntityGroup wwseoGrp2 = list2.getEntityGroup("WWSEO");
-    	EntityItem wwseo2 = wwseoGrp2.getEntityItem(0); 
-    	
-    	//add 20110210 VE for SLEORGNPLNTCODE of specialbid avail of LSEO
-    	//not only merge in the LSEO ABR, but also need add the corresponding in the XMLMQAdapter.java
-    	EntityGroup MODELAVAILGrp2 = list2.getEntityGroup("MODELAVAIL");
-    	EntityGroup AVAILGrp2 = list2.getEntityGroup("AVAIL");
-    	EntityGroup AVAILANNAGrp2 = list2.getEntityGroup("AVAILANNA");
-    	EntityGroup ANNOUNCEMENTGrp2 = list2.getEntityGroup("ANNOUNCEMENT");
-    	EntityGroup AVAILSLEORGAGrp2 = list2.getEntityGroup("AVAILSLEORGA");
-    	EntityGroup SLEORGNPLNTCODEGrp2 = list2.getEntityGroup("SLEORGNPLNTCODE");
-    	EntityGroup MDLCATLGORGrp2 = list2.getEntityGroup("MDLCATLGOR");
-    	EntityGroup CATLGORGrp2 = list2.getEntityGroup("CATLGOR");
-    	EntityGroup MODTAXRELEVANCEGrp2 = list2.getEntityGroup("MODTAXRELEVANCE");
-    	EntityGroup TAXCATGGrp2 = list2.getEntityGroup("TAXCATG");
-    	EntityGroup MODELTAXGRPGrp2 = list2.getEntityGroup("MODELTAXGRP");
-    	EntityGroup TAXGRPGrp2 = list2.getEntityGroup("TAXGRP");
-    	
-    	EntityGroup TAXCATGSLEORGAGrp2 = list2.getEntityGroup("TAXCATGSLEORGA");
-    	EntityGroup TAXGRPSLEORGAGrp2 = list2.getEntityGroup("TAXGRPSLEORGA");
-    	//add 20110210 end    	
-    	    	
-    	// put the MODEL group in list1
-    	list1.putEntityGroup(mdlGrp2);
-    	
-    	// remove the MODEL group from list2
-    	list2.removeEntityGroup(mdlGrp2);
-    	
-    	// put the MODELWWSEO group in list1
-    	list1.putEntityGroup(mdlwwseoGrp2);
-    	
-    	// remove the MODELWWSEO group in list2
-    	list2.removeEntityGroup(mdlwwseoGrp2);
-    	
-    	//add 20110210 put and remove group
-    	//add the null condition to avoid nullpointer exception
-    	if(MODELAVAILGrp2!=null) list1.putEntityGroup(MODELAVAILGrp2);    	
-    	if(AVAILGrp2!=null) list1.putEntityGroup(AVAILGrp2);    	
-    	if(AVAILANNAGrp2!=null)	list1.putEntityGroup(AVAILANNAGrp2);    	
-    	if(ANNOUNCEMENTGrp2!=null) list1.putEntityGroup(ANNOUNCEMENTGrp2);    	
-    	if(AVAILSLEORGAGrp2!=null) list1.putEntityGroup(AVAILSLEORGAGrp2);    	
-    	if(SLEORGNPLNTCODEGrp2!=null) list1.putEntityGroup(SLEORGNPLNTCODEGrp2);
-    	if(MDLCATLGORGrp2!=null) list1.putEntityGroup(MDLCATLGORGrp2);
-    	if(CATLGORGrp2!=null) list1.putEntityGroup(CATLGORGrp2);   	
-    	if(MODTAXRELEVANCEGrp2!=null) list1.putEntityGroup(MODTAXRELEVANCEGrp2);
-    	if(TAXCATGGrp2!=null) list1.putEntityGroup(TAXCATGGrp2);
-    	if(MODELTAXGRPGrp2!=null) list1.putEntityGroup(MODELTAXGRPGrp2);
-    	if(TAXGRPGrp2!=null) list1.putEntityGroup(TAXGRPGrp2);
-    	if(TAXCATGSLEORGAGrp2!=null) list1.putEntityGroup(TAXCATGSLEORGAGrp2);
-    	if(TAXGRPSLEORGAGrp2!=null) list1.putEntityGroup(TAXGRPSLEORGAGrp2);
-    	
-    	if(MODELAVAILGrp2!=null) list2.removeEntityGroup(MODELAVAILGrp2);
-    	if(AVAILGrp2!=null) list2.removeEntityGroup(AVAILGrp2);
-    	if(AVAILANNAGrp2!=null) list2.removeEntityGroup(AVAILANNAGrp2);
-    	if(ANNOUNCEMENTGrp2!=null) list2.removeEntityGroup(ANNOUNCEMENTGrp2);
-    	if(AVAILSLEORGAGrp2!=null) list2.removeEntityGroup(AVAILSLEORGAGrp2);
-    	if(SLEORGNPLNTCODEGrp2!=null) list2.removeEntityGroup(SLEORGNPLNTCODEGrp2); 
-    	if(MDLCATLGORGrp2!=null) list2.removeEntityGroup(MDLCATLGORGrp2);
-    	if(CATLGORGrp2!=null) list2.removeEntityGroup(CATLGORGrp2);
-    	if(MODTAXRELEVANCEGrp2!=null) list2.removeEntityGroup(MODTAXRELEVANCEGrp2);
-    	if(TAXCATGGrp2!=null) list2.removeEntityGroup(TAXCATGGrp2);
-    	if(MODELTAXGRPGrp2!=null) list2.removeEntityGroup(MODELTAXGRPGrp2);
-    	if(TAXGRPGrp2!=null) list2.removeEntityGroup(TAXGRPGrp2);
-    	if(TAXCATGSLEORGAGrp2!=null) list2.removeEntityGroup(TAXCATGSLEORGAGrp2);
-    	if(TAXGRPSLEORGAGrp2!=null) list2.removeEntityGroup(TAXGRPSLEORGAGrp2);
-    	//add 20110210 end
-    	
-    	// remove the WWSEO group from list1
-    	list1.removeEntityGroup(wwseoGrp1);
-    	
-    	// remove all downlinks from wwseo2
-    	if (wwseo2 != null) {
-    	EntityItem down_item_array[] = new EntityItem[wwseo2.getDownLinkCount()];
-    	wwseo2.getDownLink().copyInto(down_item_array);
-    	for (int j=0; j<down_item_array.length; j++){
-        	// Get the entity on the other side of the downlink
-			EntityItem down_item = down_item_array[j];
-			wwseo2.removeDownLink(down_item);
-			down_item_array[j] = null;
-    	}
-    	down_item_array = null;
-    	}
-    	
-        // Remove downlinks of wwseo1 and put onto wwseo2
-    	// also Remove uplinks to wwseo1 and put them onto wwseo2
-    	if (wwseo1 != null && wwseo2 != null) {
-    	EntityItem down_item_array2[] = new EntityItem[wwseo1.getDownLinkCount()];
-    	wwseo1.getDownLink().copyInto(down_item_array2);
-    	for (int j=0; j<down_item_array2.length; j++){
-        	// Get the entity on the other side of the downlink
-			EntityItem down_item = down_item_array2[j];
-			wwseo1.removeDownLink(down_item);
-			wwseo2.putDownLink(down_item);
-			down_item.removeUpLink(wwseo1);
-			down_item.putUpLink(wwseo2);
-			down_item_array2[j] = null;
-		}
-    	down_item_array2 = null;
-    	}
-    	    	    	
-    	// put the WWSEO group from list2 into list1
-    	list1.putEntityGroup(wwseoGrp2);
-    	
-    	// remove the WWSEO group from list2
-    	list2.removeEntityGroup(wwseoGrp2); 
-    	    	
-    	// put the WWSEO group from list1 into list2 so that it will be dereferenced
-    	list2.putEntityGroup(wwseoGrp1); 
-    	
-    	// release memory
-        list2.dereference();
-        
-
-        abr.addDebug("mergeLists:: after merge Extract "+PokUtils.outputList(list1));
-                
-    }*/
-    
-    /* (non-Javadoc)
-     * @see COM.ibm.eannounce.abr.sg.adsxmlbh1.XMLMQAdapter#mergeLists(COM.ibm.eannounce.abr.sg.adsxmlbh1.ADSABRSTATUS, COM.ibm.eannounce.objects.EntityList, COM.ibm.eannounce.objects.EntityList)
-     */
-    protected void mergeLists(ADSABRSTATUS abr, EntityList list1, EntityList list2) throws
-    java.sql.SQLException,
-    COM.ibm.opicmpdh.middleware.MiddlewareException,
-    COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-    COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {
-    	abr.addDebug("Entered ADSLSEOABR call COM.ibm.eannounce.objects.EntityList.mergeLists");
-
-    	COM.ibm.eannounce.objects.EntityList.mergeLists(list1,list2);
-    	abr.addDebug("mergeLists:: after merge Extract "+PokUtils.outputList(list1));
-    	
-    }
-//        //loop thru list1 and list2 and collect any items that have the same key
-//        Hashtable existTbl = new Hashtable();
-//        EntityItem lseoparent = list1.getParentEntityGroup().getEntityItem(0);
-//    	existTbl.put(lseoparent.getKey(), lseoparent);
-//    	
-//        for(int i=0; i<list1.getEntityGroupCount(); i++){
-//        	EntityGroup eg = list1.getEntityGroup(i);
-//        	EntityGroup eg2= list2.getEntityGroup(eg.getEntityType());
-//        	if(eg2!=null){
-//        		for(int e=0; e<eg2.getEntityItemCount(); e++){
-//        			EntityItem item = eg2.getEntityItem(e);
-//        			EntityItem item1 = eg.getEntityItem(item.getKey());
-//        			if(item1!=null){
-//        				existTbl.put(item1.getKey(), item1);
-//        			}
-//        		}
-//        	}
-//        }
-//        
-//        EntityGroup egArray[] = new EntityGroup[list2.getEntityGroupCount()];
-//        for(int i=0; i<list2.getEntityGroupCount(); i++){
-//        	EntityGroup eg = list2.getEntityGroup(i);
-//        	egArray[i]=eg;
-//        }
-//        // merge lists by moving entitygroups or entityitems or up and downlinks to existing items
-//        for(int i=0; i<egArray.length; i++){
-//        	EntityGroup eg = egArray[i];
-//        	mergeItems(abr,list1, list2, eg.getEntityType(),existTbl);
-//        	egArray[i] = null;
-//        }
-//       	
-//       	// release memory
-//        egArray = null;
-//       	existTbl.clear();
-//       	existTbl = null;
-//        list2.dereference();
-//        
-//        abr.addDebug("mergeLists:: after merge Extract "+PokUtils.outputList(list1));
-//    }
-//    
-//    /**
-//     * merge items for specified entitygroup type
-//     * @param abr
-//     * @param list1
-//     * @param list2
-//     * @param groupname
-//     * @param existTbl
-//     */
-//    private void mergeItems(ADSABRSTATUS abr,EntityList list1, EntityList list2, String groupname, Hashtable existTbl){
-//        // add all entities from new list2 to first pull list1
-//        EntityGroup origGrp = list1.getEntityGroup(groupname);
-//        EntityGroup newGrp = list2.getEntityGroup(groupname);
-//
-//        if(origGrp!=null){
-//        	//list1 entitygroup existed 
-//        	EntityItem eiArray[] = newGrp.getEntityItemsAsArray();
-//        	for (int i=0;i<eiArray.length; i++) {
-//        		EntityItem item = eiArray[i];
-//        		EntityItem list1Item = origGrp.getEntityItem(item.getKey());
-//        		if(list1Item==null){
-//        			// put it in the orig list group
-//        			origGrp.putEntityItem(item);
-//        			// must move metaattr to new group too
-//        			item.reassign(origGrp); 
-//        			// remove it from new list
-//        			newGrp.removeEntityItem(item);
-//        			//move any links to existing items
-//        			moveLinks(abr,list1Item, item, existTbl);
-//        		}else{ 
-//        			//entityitem already existed
-//        			moveLinks(abr,list1Item, item, existTbl);	
-//        		}
-//        	}
-//        }else{ 
-//        	// group did not exist in list1
-//        	list2.removeEntityGroup(newGrp);
-//        	list1.putEntityGroup(newGrp);
-//        	for (int i=0;i<newGrp.getEntityItemCount(); i++) {
-//        		EntityItem item = newGrp.getEntityItem(i);
-//        		//move any links to existing items
-//        		moveLinks(abr,null, item, existTbl);
-//        	}
-//        }
-//    }
-//
-//    /**
-//     * move any links from item2 to item1
-//     * @param abr
-//     * @param list1Item
-//     * @param item2
-//     * @param existTbl
-//     */
-//    private void moveLinks(ADSABRSTATUS abr,EntityItem list1Item, EntityItem item2, Hashtable existTbl)
-//    { 
-//    	if(list1Item==null){
-//        	//item did not exist in list1, the item2 was added to list1 entitygroup
-//    		//move any links to list1 items if they already existed
-//        	// does any of the item2 links refer to an existing key in list1
-//        	if(item2.getUpLinkCount()>0){
-//    			EntityItem upArray[] = new EntityItem[item2.getUpLinkCount()];
-//    			item2.getUpLink().copyInto(upArray);
-//    			for (int j=0; j<upArray.length; j++){
-//    				EntityItem upItem = upArray[j]; 
-//    				EntityItem upitem1 = (EntityItem)existTbl.get(upItem.getKey());
-//    				if(upitem1!=null){ // entity existed like MODEL, move up link to it from list2
-//    					// remove from list2 item and add to the list1 item
-//        				item2.removeUpLink(upItem);
-//        				item2.putUpLink(upitem1);
-//    				}
-//
-//    				upArray[j]=null;
-//    			}
-//    			upArray = null;
-//    		}
-//    		if(item2.getDownLinkCount()>0){  
-//    			EntityItem downArray[] = new EntityItem[item2.getDownLinkCount()];
-//    			item2.getDownLink().copyInto(downArray);
-//    			for (int j=0; j<downArray.length; j++){
-//    				EntityItem dnItem = downArray[j]; 
-//    				EntityItem dnitem1 = (EntityItem)existTbl.get(dnItem.getKey());
-//    				if(dnitem1!=null){ // entity existed like MODEL, move down link to it from list2
-//    					// remove from list2 item and add to the list1 item
-//        				item2.removeDownLink(dnItem);
-//        				item2.putDownLink(dnitem1);
-//    				}
-//    				
-//    				downArray[j]=null;
-//    			}
-//    			downArray = null;
-//    		}
-//    	}else{
-//    		//entity already exists in list1, move up and downlinks to list1 from list2 if they dont exist already
-//    		if(item2.getUpLinkCount()>0){
-//    			EntityItem upArray[] = new EntityItem[item2.getUpLinkCount()];
-//    			item2.getUpLink().copyInto(upArray);
-//    			for (int j=0; j<upArray.length; j++){
-//    				EntityItem upItem = upArray[j]; 
-//    				EntityItem upitem1 = (EntityItem)existTbl.get(upItem.getKey());
-//    				if(upitem1==null){
-//    					// remove  from list2  item and add to list1 item
-//        				item2.removeUpLink(upItem);
-//        				list1Item.putUpLink(upItem);
-//    				}
-//    	
-//    				upArray[j]=null;
-//    			}
-//    			upArray = null;
-//    		}
-//    		if(item2.getDownLinkCount()>0){  
-//    			EntityItem downArray[] = new EntityItem[item2.getDownLinkCount()];
-//    			item2.getDownLink().copyInto(downArray);
-//    			for (int j=0; j<downArray.length; j++){
-//    				EntityItem dnItem = downArray[j]; 
-//    				EntityItem dnitem1 = (EntityItem)existTbl.get(dnItem.getKey());
-//    				if(dnitem1==null){
-//    					// remove  from list2  item and add to list1 item
-//    					item2.removeDownLink(dnItem);
-//    					list1Item.putDownLink(dnItem);
-//    				}
-//    				downArray[j]=null;
-//    			}
-//    			downArray = null;
-//    		}
-//    	}
-//   }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\adsxmlbh1\ADSLSEOABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

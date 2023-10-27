@@ -1,90 +1,94 @@
-package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ 
+/*    */ import com.google.gson.annotations.SerializedName;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class RdhEccn_maex
+/*    */ {
+/*    */   @SerializedName("ALAND")
+/*    */   private String aland;
+/*    */   @SerializedName("ALNUM")
+/*    */   private String alnum;
+/*    */   @SerializedName("EMBGR")
+/*    */   private String embgr;
+/*    */   @SerializedName("GEGRU")
+/*    */   private String gegru;
+/*    */   @SerializedName("PMAST")
+/*    */   private String pmast;
+/*    */   
+/*    */   public String getAland() {
+/* 23 */     return this.aland;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setAland(String paramString) {
+/* 30 */     this.aland = paramString;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getAlnum() {
+/* 37 */     return this.alnum;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setAlnum(String paramString) {
+/* 44 */     this.alnum = paramString;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getEmbgr() {
+/* 51 */     return this.embgr;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setEmbgr(String paramString) {
+/* 58 */     this.embgr = paramString;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getGegru() {
+/* 65 */     return this.gegru;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setGegru(String paramString) {
+/* 72 */     this.gegru = paramString;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getPmast() {
+/* 79 */     return this.pmast;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setPmast(String paramString) {
+/* 86 */     this.pmast = paramString;
+/*    */   }
+/*    */ }
 
-import com.google.gson.annotations.SerializedName;
 
-public class RdhEccn_maex
-{
-    @SerializedName("ALAND")
-    private String aland;
-    @SerializedName("ALNUM")
-    private String alnum;
-    @SerializedName("EMBGR")
-    private String embgr;
-    @SerializedName("GEGRU")
-    private String gegru;
-    @SerializedName("PMAST")
-    private String pmast;
-    
-    /**
-     * @return the aland
-     */
-    public String getAland()
-    {
-        return aland;
-    }
-    /**
-     * @param aland the aland to set
-     */
-    public void setAland(String aland)
-    {
-        this.aland = aland;
-    }
-    /**
-     * @return the alnum
-     */
-    public String getAlnum()
-    {
-        return alnum;
-    }
-    /**
-     * @param alnum the alnum to set
-     */
-    public void setAlnum(String alnum)
-    {
-        this.alnum = alnum;
-    }
-    /**
-     * @return the embgr
-     */
-    public String getEmbgr()
-    {
-        return embgr;
-    }
-    /**
-     * @param embgr the embgr to set
-     */
-    public void setEmbgr(String embgr)
-    {
-        this.embgr = embgr;
-    }
-    /**
-     * @return the gegru
-     */
-    public String getGegru()
-    {
-        return gegru;
-    }
-    /**
-     * @param gegru the gegru to set
-     */
-    public void setGegru(String gegru)
-    {
-        this.gegru = gegru;
-    }
-    /**
-     * @return the pmast
-     */
-    public String getPmast()
-    {
-        return pmast;
-    }
-    /**
-     * @param pmast the pmast to set
-     */
-    public void setPmast(String pmast)
-    {
-        this.pmast = pmast;
-    }
-    
-    
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\entity\RdhEccn_maex.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

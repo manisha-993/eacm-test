@@ -1,71 +1,76 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2007, 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.abr.sg.translation;
+/*    */ package COM.ibm.eannounce.abr.sg.translation;
+/*    */ 
+/*    */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*    */ import java.sql.SQLException;
+/*    */ import java.text.DateFormat;
+/*    */ import java.text.ParseException;
+/*    */ import java.text.SimpleDateFormat;
+/*    */ import java.util.Date;
+/*    */ import java.util.Map;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public abstract class AddTranslationProcess
+/*    */ {
+/*    */   static final String STATUS_FINAL = "0020";
+/* 28 */   private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public abstract boolean isValid(EntityHandler paramEntityHandler, Date paramDate) throws Exception;
+/*    */ 
+/*    */   
+/*    */   public void createRelators(RelatorHandler paramRelatorHandler, EntityHandler paramEntityHandler) throws Exception {
+/* 36 */     paramRelatorHandler.addChild(paramEntityHandler.getEntityType(), paramEntityHandler
+/* 37 */         .getEntityID());
+/*    */   }
+/*    */   
+/*    */   private Date parseDate(Object paramObject) {
+/*    */     try {
+/* 42 */       return DATE_FORMAT.parse((String)paramObject);
+/* 43 */     } catch (ParseException parseException) {
+/* 44 */       throw new IllegalArgumentException("Unable to parse date: " + paramObject);
+/*    */     } 
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   protected boolean isStatusFinal(Map paramMap, String paramString) throws MiddlewareException, SQLException {
+/* 50 */     return "0020".equals(paramMap.get(paramString));
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   protected boolean isAfter(Map paramMap, String paramString, Date paramDate) throws MiddlewareException, SQLException {
+/* 55 */     String str = (String)paramMap.get(paramString);
+/* 56 */     if (str == null)
+/* 57 */       throw new IllegalArgumentException(paramString + " cannot be null"); 
+/* 58 */     Date date = parseDate(str);
+/* 59 */     return paramDate.after(date);
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   protected boolean isBefore(Map paramMap, String paramString, Date paramDate) throws MiddlewareException, SQLException {
+/* 64 */     String str = (String)paramMap.get(paramString);
+/* 65 */     if (str == null)
+/* 66 */       return true; 
+/* 67 */     Date date = parseDate(str);
+/* 68 */     return paramDate.before(date);
+/*    */   }
+/*    */ }
 
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
 
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-
-/**
- * Base class for processing added translation languages
- * 
- * @author lucasrg
- * 
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\translation\AddTranslationProcess.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public abstract class AddTranslationProcess {
-
-	static final String STATUS_FINAL = "0020";
-
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat(
-			"yyyy-MM-dd");
-
-	public abstract boolean isValid(EntityHandler entityHandler, Date targetDate)
-			throws Exception;
-
-	public void createRelators(final RelatorHandler relatorHandler,
-			EntityHandler currentEntity) throws Exception {
-		relatorHandler.addChild(currentEntity.getEntityType(),
-				currentEntity.getEntityID());
-	}
-
-	private Date parseDate(Object value) {
-		try {
-			return DATE_FORMAT.parse((String) value);
-		} catch (ParseException e) {
-			throw new IllegalArgumentException("Unable to parse date: " + value);
-		}
-	}
-
-	protected boolean isStatusFinal(Map attributes, String attributeCode)
-			throws MiddlewareException, SQLException {
-		return STATUS_FINAL.equals(attributes.get(attributeCode));
-	}
-
-	protected boolean isAfter(Map attributes, String attributeCode,
-			Date targetDate) throws MiddlewareException, SQLException {
-		String value = (String) attributes.get(attributeCode);
-		if (value == null)
-			throw new IllegalArgumentException(attributeCode+" cannot be null");
-		Date date = parseDate(value);
-		return targetDate.after(date);
-	}
-
-	protected boolean isBefore(Map attributes, String attributeCode,
-			Date targetDate) throws MiddlewareException, SQLException {
-		String value = (String) attributes.get(attributeCode);
-		if (value == null)
-			return true; //If there is no "end date", it is valid
-		Date date = parseDate(value);
-		return targetDate.before(date);
-	}
-
-}

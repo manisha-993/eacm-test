@@ -1,26 +1,32 @@
-/* Copyright IBM Corp. 2016 */
-package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ 
+/*    */ import com.google.gson.annotations.SerializedName;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class RdhDepd_dep_ident
+/*    */ {
+/*    */   @SerializedName("DEP_EXTERN")
+/*    */   private String dep_extern;
+/*    */   
+/*    */   public String getDep_extern() {
+/* 16 */     return this.dep_extern;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setDep_extern(String paramString) {
+/* 24 */     this.dep_extern = paramString;
+/*    */   }
+/*    */ }
 
-import com.google.gson.annotations.SerializedName;
 
-public class RdhDepd_dep_ident
-{
-    @SerializedName("DEP_EXTERN")
-    private String dep_extern;
-
-    /**
-     * @return the dep_extern
-     */
-    public String getDep_extern()
-    {
-        return dep_extern;
-    }
-
-    /**
-     * @param dep_extern the dep_extern to set
-     */
-    public void setDep_extern(String dep_extern)
-    {
-        this.dep_extern = dep_extern;
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\entity\RdhDepd_dep_ident.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

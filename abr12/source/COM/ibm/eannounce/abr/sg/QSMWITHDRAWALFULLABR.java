@@ -1,1007 +1,1012 @@
+/*      */ package COM.ibm.eannounce.abr.sg;
+/*      */ 
+/*      */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*      */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*      */ import COM.ibm.eannounce.objects.EntityGroup;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.EntityList;
+/*      */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*      */ import COM.ibm.opicmpdh.middleware.Database;
+/*      */ import COM.ibm.opicmpdh.middleware.DatePackage;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.Profile;
+/*      */ import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.io.BufferedInputStream;
+/*      */ import java.io.BufferedReader;
+/*      */ import java.io.FileInputStream;
+/*      */ import java.io.FileOutputStream;
+/*      */ import java.io.IOException;
+/*      */ import java.io.InputStreamReader;
+/*      */ import java.io.OutputStreamWriter;
+/*      */ import java.nio.channels.FileChannel;
+/*      */ import java.sql.SQLException;
+/*      */ import java.text.MessageFormat;
+/*      */ import java.text.ParseException;
+/*      */ import java.util.ArrayList;
+/*      */ import java.util.Collections;
+/*      */ import java.util.Hashtable;
+/*      */ import java.util.List;
+/*      */ import java.util.ResourceBundle;
+/*      */ import java.util.Vector;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public class QSMWITHDRAWALFULLABR
+/*      */   extends PokBaseABR
+/*      */ {
+/*   42 */   private StringBuffer rptSb = new StringBuffer();
+/*   43 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/*   44 */   static final String NEWLINE = new String(FOOL_JTEST);
+/*      */   
+/*   46 */   private ResourceBundle rsBundle = null;
+/*   47 */   private Hashtable metaTbl = new Hashtable<>();
+/*   48 */   private String navName = "";
+/*      */   
+/*   50 */   private String ffFileName = null;
+/*   51 */   private String ffPathName = null;
+/*   52 */   private String ffFTPPathName = null;
+/*   53 */   private String dir = null;
+/*   54 */   private String dirDest = null;
+/*   55 */   private final String QSMRPTPATH = "_rptpath";
+/*   56 */   private final String QSMGENPATH = "_genpath";
+/*   57 */   private final String QSMFTPPATH = "_ftppath";
+/*   58 */   private int abr_debuglvl = 0;
+/*      */   
+/*      */   private static final String CREFINIPATH = "_inipath";
+/*      */   private static final String FTPSCRPATH = "_script";
+/*      */   private static final String TARGETFILENAME = "_wdtargetfilename";
+/*      */   private static final String LOGPATH = "_logpath";
+/*      */   private static final String BACKUPPATH = "_backuppath";
+/*      */   private static final String FILEPREFIX = "_wdfilePrefix";
+/*   66 */   private String lineStr = "";
+/*      */   private static final String FAILD = "FAILD";
+/*      */   private static final String IFTYPE = "IFTYPE";
+/*      */   private static final String IOPUCTY = "IOPUCTY";
+/*      */   private static final String ISLMPRN = "ISLMPRN";
+/*      */   private static final String DSLMOPD = "DSLMOPD";
+/*      */   private static final String DSLMWDN = "DSLMWDN";
+/*      */   private static final String DUSALRW = "DUSALRW";
+/*      */   private static final String QSMEDMW = "QSMEDMW";
+/*      */   private static final String CPDAA = "CPDAA";
+/*      */   private static final String BLANK = "BLANK";
+/*      */   private static final String BLANK1 = "BLANK1";
+/*      */   private static final String BLANK2 = "BLANK2";
+/*   79 */   private String abrcode = "";
+/*      */   
+/*      */   private EntityItem rootEntity;
+/*      */   private static final Hashtable COLUMN_LENGTH;
+/*      */   private static final String ISLMTYP = "ISLMTYP";
+/*      */   private static final String ISLMMOD = "ISLMMOD";
+/*      */   private static final String ISLMFTR = "ISLMFTR";
+/*      */   private static final String ISLMRFA = "ISLMRFA";
+/*   87 */   private static final List geoWWList = Collections.unmodifiableList(new ArrayList()
+/*      */       {
+/*      */       
+/*      */       });
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   static {
+/*  102 */     COLUMN_LENGTH = new Hashtable<>();
+/*  103 */     COLUMN_LENGTH.put("IFTYPE", "20");
+/*  104 */     COLUMN_LENGTH.put("IOPUCTY", "3");
+/*  105 */     COLUMN_LENGTH.put("ISLMPRN", "14");
+/*  106 */     COLUMN_LENGTH.put("DSLMOPD", "10");
+/*  107 */     COLUMN_LENGTH.put("DSLMWDN", "10");
+/*  108 */     COLUMN_LENGTH.put("QSMEDMW", "10");
+/*  109 */     COLUMN_LENGTH.put("CPDAA", "1");
+/*  110 */     COLUMN_LENGTH.put("DUSALRW", "10");
+/*  111 */     COLUMN_LENGTH.put("ISLMTYP", "4");
+/*  112 */     COLUMN_LENGTH.put("ISLMMOD", "3");
+/*  113 */     COLUMN_LENGTH.put("ISLMFTR", "6");
+/*  114 */     COLUMN_LENGTH.put("BLANK", "1");
+/*  115 */     COLUMN_LENGTH.put("ISLMRFA", "6");
+/*  116 */     COLUMN_LENGTH.put("BLANK1", "32");
+/*  117 */     COLUMN_LENGTH.put("BLANK2", "42");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected ResourceBundle getBundle() {
+/*  124 */     return this.rsBundle;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void processThis(QSMFULLABRSTATUS paramQSMFULLABRSTATUS, Profile paramProfile, Database paramDatabase, String paramString, EntityItem paramEntityItem, StringBuffer paramStringBuffer) throws Exception {
+/*      */     try {
+/*  135 */       this.m_prof = paramProfile;
+/*  136 */       this.m_db = paramDatabase;
+/*  137 */       this.rootEntity = paramEntityItem;
+/*  138 */       this.rptSb = paramStringBuffer;
+/*  139 */       this.abrcode = paramString;
+/*      */       
+/*  141 */       setReturnCode(0);
+/*      */       
+/*  143 */       this.m_elist = getEntityList(getT002ModelVEName());
+/*      */       
+/*  145 */       if (this.m_elist.getEntityGroupCount() > 0)
+/*      */       {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/*  154 */         generateFlatFile(paramEntityItem);
+/*  155 */         exeFtpShell(this.ffPathName);
+/*      */       }
+/*      */     
+/*  158 */     } catch (IOException iOException) {
+/*      */       
+/*  160 */       iOException.printStackTrace();
+/*  161 */     } catch (ParseException parseException) {
+/*      */       
+/*  163 */       parseException.printStackTrace();
+/*      */     } 
+/*      */   }
+/*      */   
+/*      */   private void setFileName(EntityItem paramEntityItem) {
+/*  168 */     String str = ABRServerProperties.getValue(this.abrcode, "_wdfilePrefix", null);
+/*      */ 
+/*      */     
+/*  171 */     StringBuffer stringBuffer = new StringBuffer(str.trim());
+/*      */     
+/*      */     try {
+/*  174 */       DatePackage datePackage = this.m_db.getDates();
+/*  175 */       String str1 = datePackage.getNow();
+/*      */       
+/*  177 */       str1 = str1.replace(' ', '_');
+/*  178 */       stringBuffer.append(paramEntityItem.getEntityType() + paramEntityItem.getEntityID() + "_");
+/*  179 */       stringBuffer.append(str1 + ".txt");
+/*  180 */       this.dir = ABRServerProperties.getValue(this.abrcode, "_genpath", "/Dgq");
+/*  181 */       if (!this.dir.endsWith("/")) {
+/*  182 */         this.dir += "/";
+/*      */       }
+/*  184 */       this.ffFileName = stringBuffer.toString();
+/*  185 */       this.ffPathName = this.dir + this.ffFileName;
+/*  186 */     } catch (MiddlewareException middlewareException) {
+/*      */       
+/*  188 */       middlewareException.printStackTrace();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void generateFlatFile(EntityItem paramEntityItem) throws IOException, SQLException, MiddlewareException, ParseException {
+/*  204 */     FileChannel fileChannel1 = null;
+/*  205 */     FileChannel fileChannel2 = null;
+/*      */ 
+/*      */     
+/*  208 */     setFileName(paramEntityItem);
+/*  209 */     FileOutputStream fileOutputStream = new FileOutputStream(this.ffPathName);
+/*  210 */     OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, "UTF-8");
+/*      */ 
+/*      */ 
+/*      */     
+/*  214 */     createT002Model(paramEntityItem, outputStreamWriter);
+/*  215 */     createT006Feature(paramEntityItem, outputStreamWriter);
+/*  216 */     createT020NPMesUpgrade(paramEntityItem, outputStreamWriter);
+/*  217 */     createT632TypeModelFeatureRelation(paramEntityItem, outputStreamWriter);
+/*      */     
+/*  219 */     outputStreamWriter.close();
+/*      */     
+/*  221 */     this.dirDest = ABRServerProperties.getValue(this.abrcode, "_ftppath", "/Dgq");
+/*  222 */     if (!this.dirDest.endsWith("/")) {
+/*  223 */       this.dirDest += "/";
+/*      */     }
+/*      */     
+/*  226 */     this.ffFTPPathName = this.dirDest + this.ffFileName;
+/*  227 */     addDebug("******* " + this.ffFTPPathName);
+/*      */     
+/*      */     try {
+/*  230 */       fileChannel1 = (new FileInputStream(this.ffPathName)).getChannel();
+/*  231 */       fileChannel2 = (new FileOutputStream(this.ffFTPPathName)).getChannel();
+/*  232 */       fileChannel2.transferFrom(fileChannel1, 0L, fileChannel1.size());
+/*      */     } finally {
+/*  234 */       fileChannel1.close();
+/*  235 */       fileChannel2.close();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createT002Model(EntityItem paramEntityItem, OutputStreamWriter paramOutputStreamWriter) throws IOException {
+/*  246 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("AVAIL");
+/*  247 */     String str1 = "";
+/*  248 */     String str2 = "";
+/*  249 */     boolean bool = false;
+/*      */     
+/*  251 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/*      */       
+/*  253 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/*      */       
+/*  255 */       str1 = PokUtils.getAttributeValue(entityItem, "AVAILTYPE", "", "");
+/*  256 */       str2 = PokUtils.getAttributeValue(entityItem, "AVAILANNTYPE", "", "");
+/*  257 */       if (str2.equals("EPIC")) {
+/*  258 */         bool = true;
+/*      */       }
+/*      */ 
+/*      */       
+/*  262 */       if (str1.equals("Planned Availability") || str1.equals("End of Service") || str1
+/*  263 */         .equals("Last Order")) {
+/*  264 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("QSMGEO");
+/*      */         
+/*  266 */         if (eANFlagAttribute != null) {
+/*  267 */           if (eANFlagAttribute.isSelected("6199")) {
+/*  268 */             createT002ModelRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Asia Pacific", str1, bool);
+/*      */           }
+/*  270 */           if (eANFlagAttribute.isSelected("6200")) {
+/*  271 */             createT002ModelRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Canada and Caribbean North", str1, bool);
+/*      */           }
+/*      */           
+/*  274 */           if (eANFlagAttribute.isSelected("6198")) {
+/*  275 */             createT002ModelRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Europe/Middle East/Africa", str1, bool);
+/*      */           }
+/*      */           
+/*  278 */           if (eANFlagAttribute.isSelected("6204")) {
+/*  279 */             createT002ModelRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Latin America", str1, bool);
+/*      */           }
+/*  281 */           if (eANFlagAttribute.isSelected("6221")) {
+/*  282 */             createT002ModelRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "US Only", str1, bool);
+/*      */           }
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createT002ModelRecords(EntityItem paramEntityItem1, OutputStreamWriter paramOutputStreamWriter, EntityItem paramEntityItem2, String paramString1, String paramString2, boolean paramBoolean) throws IOException {
+/*  307 */     Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(paramEntityItem2, "MODELAVAIL", "MODEL");
+/*  308 */     addDebug("availmodel=" + paramEntityItem2);
+/*      */     
+/*  310 */     for (byte b = 0; b < vector.size(); b++) {
+/*  311 */       StringBuffer stringBuffer = new StringBuffer();
+/*  312 */       String str1 = "";
+/*  313 */       String str2 = "";
+/*  314 */       String str3 = "";
+/*  315 */       String str4 = "";
+/*  316 */       String str5 = "";
+/*  317 */       String str6 = "";
+/*  318 */       String str7 = "";
+/*  319 */       String str8 = "";
+/*      */       
+/*  321 */       EntityItem entityItem1 = vector.elementAt(b);
+/*      */       
+/*  323 */       EntityItem entityItem2 = null;
+/*      */       
+/*  325 */       stringBuffer.append(getValue("IFTYPE", "M=(CHK&UPG)T001"));
+/*  326 */       if (paramString1.equals("Latin America")) {
+/*  327 */         str1 = "601";
+/*  328 */         str8 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "ANNNUMBER", "", "");
+/*  329 */       } else if (paramString1.equals("Europe/Middle East/Africa")) {
+/*  330 */         str1 = "999";
+/*  331 */         str8 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "ANNNUMBER", "", "");
+/*  332 */       } else if (paramString1.equals("Asia Pacific")) {
+/*  333 */         str1 = "872";
+/*  334 */         str8 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "ANNNUMBER", "", "");
+/*  335 */       } else if (paramString1.equals("US Only")) {
+/*  336 */         str1 = "897";
+/*  337 */         str8 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "USDOCNO", "", "");
+/*  338 */       } else if (paramString1.equals("Canada and Caribbean North")) {
+/*  339 */         str1 = "649";
+/*  340 */         str8 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "USDOCNO", "", "");
+/*      */       } 
+/*  342 */       stringBuffer.append(getValue("IOPUCTY", str1));
+/*  343 */       String str9 = PokUtils.getAttributeValue(entityItem1, "MACHTYPEATR", "", "");
+/*  344 */       str9 = str9 + PokUtils.getAttributeValue(entityItem1, "MODELATR", "", "");
+/*  345 */       stringBuffer.append(getValue("ISLMPRN", str9));
+/*      */       
+/*  347 */       str7 = PokUtils.getAttributeValue(entityItem1, "WTHDRWEFFCTVDATE", "", "");
+/*      */       
+/*  349 */       if (str7 != null) {
+/*  350 */         if (str7.equals("")) {
+/*  351 */           str4 = "2050-12-31";
+/*      */         } else {
+/*  353 */           str4 = str7;
+/*      */         } 
+/*      */       } else {
+/*  356 */         str4 = "2050-12-31";
+/*      */       } 
+/*      */       
+/*  359 */       entityItem2 = searchForAvailType(entityItem1, "Last Order");
+/*  360 */       if (entityItem2 != null) {
+/*  361 */         str5 = PokUtils.getAttributeValue(entityItem2, "EFFECTIVEDATE", "", "");
+/*  362 */         str6 = "O";
+/*      */       } else {
+/*  364 */         str5 = "2050-12-31";
+/*  365 */         str6 = "N";
+/*      */       } 
+/*      */       
+/*  368 */       entityItem2 = searchForAvailType(entityItem1, "End of Service");
+/*  369 */       if (entityItem2 != null) {
+/*  370 */         str2 = PokUtils.getAttributeValue(paramEntityItem2, "EFFECTIVEDATE", ",", "", false);
+/*  371 */         str3 = PokUtils.getAttributeValue(paramEntityItem2, "EFFECTIVEDATE", ",", "", false);
+/*      */       } else {
+/*  373 */         str2 = "2050-12-31";
+/*  374 */         str3 = "2050-12-31";
+/*      */       } 
+/*      */       
+/*  377 */       stringBuffer.append(getValue("DSLMWDN", str4));
+/*  378 */       stringBuffer.append(getValue("QSMEDMW", str2));
+/*  379 */       stringBuffer.append(getValue("DSLMOPD", str5));
+/*  380 */       stringBuffer.append(getValue("DUSALRW", str3));
+/*  381 */       stringBuffer.append(getValue("CPDAA", str6));
+/*  382 */       stringBuffer.append(getValue("BLANK", " "));
+/*  383 */       stringBuffer.append(getValue("ISLMRFA", str8));
+/*      */       
+/*  385 */       stringBuffer.append(NEWLINE);
+/*  386 */       paramOutputStreamWriter.write(stringBuffer.toString());
+/*  387 */       paramOutputStreamWriter.flush();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private EntityItem searchForAvailType(EntityItem paramEntityItem, String paramString) {
+/*  393 */     EntityItem entityItem = null;
+/*      */ 
+/*      */     
+/*  396 */     Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(paramEntityItem, "MODELAVAIL", "AVAIL");
+/*      */     
+/*  398 */     addDebug("*****mlm searchforavail withdrawalAVAIL " + vector);
+/*      */     
+/*  400 */     for (byte b = 0; b < vector.size(); b++) {
+/*  401 */       EntityItem entityItem1 = vector.elementAt(b);
+/*      */       
+/*  403 */       String str = PokUtils.getAttributeValue(entityItem1, "AVAILTYPE", ",", "", false);
+/*  404 */       addDebug("*****mlm searchforavail withdrawal model = " + paramEntityItem.getEntityType() + paramEntityItem.getEntityID() + "avail entity type = " + entityItem1
+/*  405 */           .getEntityType() + " avail type = " + str);
+/*  406 */       if (paramString.equals(str)) {
+/*  407 */         entityItem = entityItem1;
+/*      */         
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/*  412 */     return entityItem;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createT006Feature(EntityItem paramEntityItem, OutputStreamWriter paramOutputStreamWriter) throws IOException, SQLException, MiddlewareException {
+/*  430 */     String str = "";
+/*  431 */     boolean bool = false;
+/*      */     
+/*  433 */     this.m_elist = getEntityList(getT006ProdstructVEName());
+/*      */     
+/*  435 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("AVAIL");
+/*  436 */     int i = entityGroup.getEntityItemCount();
+/*      */     
+/*  438 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/*  439 */       EANFlagAttribute eANFlagAttribute = null;
+/*  440 */       String str1 = "";
+/*      */       
+/*  442 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/*      */       
+/*  444 */       str1 = PokUtils.getAttributeValue(entityItem, "AVAILTYPE", "", "");
+/*  445 */       str = PokUtils.getAttributeValue(entityItem, "AVAILANNTYPE", "", "");
+/*  446 */       if (str.equals("EPIC")) {
+/*  447 */         bool = true;
+/*      */       }
+/*      */ 
+/*      */       
+/*  451 */       if (str1.equals("Planned Availability") || str1.equals("End of Service") || str1
+/*  452 */         .equals("Last Order")) {
+/*  453 */         eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("QSMGEO");
+/*  454 */         if (eANFlagAttribute != null) {
+/*  455 */           if (eANFlagAttribute.isSelected("6199")) {
+/*  456 */             createT006FeatureRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Asia Pacific", str1, bool);
+/*      */           }
+/*  458 */           if (eANFlagAttribute.isSelected("6200")) {
+/*  459 */             createT006FeatureRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Canada and Caribbean North", str1, bool);
+/*      */           }
+/*      */           
+/*  462 */           if (eANFlagAttribute.isSelected("6198")) {
+/*  463 */             createT006FeatureRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Europe/Middle East/Africa", str1, bool);
+/*      */           }
+/*      */           
+/*  466 */           if (eANFlagAttribute.isSelected("6204")) {
+/*  467 */             createT006FeatureRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Latin America", str1, bool);
+/*      */           }
+/*  469 */           if (eANFlagAttribute.isSelected("6221")) {
+/*  470 */             createT006FeatureRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "US Only", str1, bool);
+/*      */           }
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createT006FeatureRecords(EntityItem paramEntityItem1, OutputStreamWriter paramOutputStreamWriter, EntityItem paramEntityItem2, String paramString1, String paramString2, boolean paramBoolean) throws IOException, SQLException, MiddlewareException {
+/*  496 */     Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(paramEntityItem2, "OOFAVAIL", "PRODSTRUCT");
+/*      */     
+/*  498 */     for (byte b = 0; b < vector.size(); b++) {
+/*  499 */       StringBuffer stringBuffer = new StringBuffer();
+/*  500 */       EntityItem entityItem1 = vector.elementAt(b);
+/*      */       
+/*  502 */       ExtractActionItem extractActionItem = new ExtractActionItem(null, this.m_db, this.m_prof, getT006FeatureVEName());
+/*      */       
+/*  504 */       EntityList entityList = this.m_db.getEntityList(this.m_prof, extractActionItem, new EntityItem[] { new EntityItem(null, this.m_prof, entityItem1
+/*  505 */               .getEntityType(), entityItem1.getEntityID()) });
+/*      */       
+/*  507 */       addDebug("EntityList for " + this.m_prof.getValOn() + " extract QSMFULL2 contains the following entities: \n" + 
+/*  508 */           PokUtils.outputList(entityList));
+/*      */       
+/*  510 */       EntityGroup entityGroup1 = entityList.getEntityGroup("FEATURE");
+/*  511 */       EntityGroup entityGroup2 = entityList.getEntityGroup("MODEL");
+/*  512 */       EntityItem entityItem2 = entityGroup1.getEntityItem(0);
+/*  513 */       EntityItem entityItem3 = entityGroup2.getEntityItem(0);
+/*      */       
+/*  515 */       stringBuffer = new StringBuffer();
+/*  516 */       String str1 = "";
+/*  517 */       String str2 = "";
+/*  518 */       String str3 = "";
+/*      */       
+/*  520 */       stringBuffer.append(getValue("IFTYPE", "F=(CHKT631&UPGT005)"));
+/*      */       
+/*  522 */       if (paramString1.equals("Latin America")) {
+/*  523 */         str1 = "601";
+/*  524 */         str3 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "ANNNUMBER", "", "");
+/*  525 */       } else if (paramString1.equals("Europe/Middle East/Africa")) {
+/*  526 */         str1 = "999";
+/*  527 */         str3 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "ANNNUMBER", "", "");
+/*  528 */       } else if (paramString1.equals("Asia Pacific")) {
+/*  529 */         str1 = "872";
+/*  530 */         str3 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "ANNNUMBER", "", "");
+/*  531 */       } else if (paramString1.equals("US Only")) {
+/*  532 */         str1 = "897";
+/*  533 */         str3 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "USDOCNO", "", "");
+/*  534 */       } else if (paramString1.equals("Canada and Caribbean North")) {
+/*  535 */         str1 = "649";
+/*  536 */         str3 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "USDOCNO", "", "");
+/*      */       } 
+/*  538 */       stringBuffer.append(getValue("IOPUCTY", str1));
+/*  539 */       String str4 = PokUtils.getAttributeValue(entityItem3, "MACHTYPEATR", ",", "", false);
+/*  540 */       str4 = str4 + PokUtils.getAttributeValue(entityItem2, "FEATURECODE", ",", "", false);
+/*  541 */       stringBuffer.append(getValue("ISLMPRN", str4));
+/*  542 */       stringBuffer.append(getValue("BLANK2", ""));
+/*  543 */       stringBuffer.append(getValue("ISLMRFA", str3));
+/*      */ 
+/*      */       
+/*  546 */       stringBuffer.append(NEWLINE);
+/*  547 */       paramOutputStreamWriter.write(stringBuffer.toString());
+/*  548 */       paramOutputStreamWriter.flush();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createT020NPMesUpgrade(EntityItem paramEntityItem, OutputStreamWriter paramOutputStreamWriter) throws IOException, SQLException, MiddlewareException {
+/*  566 */     this.m_elist = getEntityList(getNPMesUpgradeVEName());
+/*      */     
+/*  568 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("AVAIL");
+/*      */     
+/*  570 */     String str = "";
+/*  571 */     boolean bool = false;
+/*      */     
+/*  573 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/*  574 */       EANFlagAttribute eANFlagAttribute = null;
+/*      */       
+/*  576 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/*      */       
+/*  578 */       str = PokUtils.getAttributeValue(entityItem, "AVAILANNTYPE", "", "");
+/*  579 */       if (str.equals("EPIC")) {
+/*  580 */         bool = true;
+/*      */       }
+/*      */       
+/*  583 */       eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("QSMGEO");
+/*  584 */       if (eANFlagAttribute != null) {
+/*  585 */         if (eANFlagAttribute.isSelected("6199")) {
+/*  586 */           createT020NPMesUpgradeRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Asia Pacific", bool);
+/*      */         }
+/*  588 */         if (eANFlagAttribute.isSelected("6200")) {
+/*  589 */           createT020NPMesUpgradeRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Canada and Caribbean North", bool);
+/*      */         }
+/*  591 */         if (eANFlagAttribute.isSelected("6198")) {
+/*  592 */           createT020NPMesUpgradeRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Europe/Middle East/Africa", bool);
+/*      */         }
+/*  594 */         if (eANFlagAttribute.isSelected("6204")) {
+/*  595 */           createT020NPMesUpgradeRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Latin America", bool);
+/*      */         }
+/*  597 */         if (eANFlagAttribute.isSelected("6221")) {
+/*  598 */           createT020NPMesUpgradeRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "US Only", bool);
+/*      */         }
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createT020NPMesUpgradeRecords(EntityItem paramEntityItem1, OutputStreamWriter paramOutputStreamWriter, EntityItem paramEntityItem2, String paramString, boolean paramBoolean) throws IOException, SQLException, MiddlewareException {
+/*  621 */     StringBuffer stringBuffer = new StringBuffer();
+/*  622 */     String str1 = "";
+/*  623 */     String str2 = "";
+/*  624 */     String str3 = "";
+/*      */     
+/*  626 */     Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(paramEntityItem2, "MODELCONVERTAVAIL", "MODELCONVERT");
+/*      */     
+/*  628 */     for (byte b = 0; b < vector.size(); b++) {
+/*      */       
+/*  630 */       EntityItem entityItem1 = vector.elementAt(b);
+/*      */       
+/*  632 */       stringBuffer.append(getValue("IFTYPE", "N=(CHK&UPG)T019"));
+/*      */       
+/*  634 */       if (paramString.equals("Latin America")) {
+/*  635 */         str2 = "601";
+/*  636 */         str3 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "ANNNUMBER", "", "");
+/*  637 */       } else if (paramString.equals("Europe/Middle East/Africa")) {
+/*  638 */         str2 = "999";
+/*  639 */         str3 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "ANNNUMBER", "", "");
+/*  640 */       } else if (paramString.equals("Asia Pacific")) {
+/*  641 */         str2 = "872";
+/*  642 */         str3 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "ANNNUMBER", "", "");
+/*  643 */       } else if (paramString.equals("US Only")) {
+/*  644 */         str2 = "897";
+/*  645 */         str3 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "USDOCNO", "", "");
+/*  646 */       } else if (paramString.equals("Canada and Caribbean North")) {
+/*  647 */         str2 = "649";
+/*  648 */         str3 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "USDOCNO", "", "");
+/*      */       } 
+/*  650 */       stringBuffer.append(getValue("IOPUCTY", str2));
+/*      */       
+/*  652 */       str1 = PokUtils.getAttributeValue(entityItem1, "TOMACHTYPE", "", "");
+/*  653 */       str1 = str1 + PokUtils.getAttributeValue(entityItem1, "TOMODEL", "", "");
+/*  654 */       stringBuffer.append(getValue("ISLMPRN", str1));
+/*      */       
+/*  656 */       EntityItem entityItem2 = searchForAvailTypeLO(entityItem1, "Last Order");
+/*      */       
+/*  658 */       if (entityItem2 != null) {
+/*  659 */         stringBuffer.append(getValue("DSLMWDN", PokUtils.getAttributeValue(entityItem2, "EFFECTIVEDATE", "", "")));
+/*      */       } else {
+/*  661 */         stringBuffer.append(getValue("DSLMWDN", "2050-12-31"));
+/*      */       } 
+/*  663 */       stringBuffer.append(getValue("BLANK1", ""));
+/*  664 */       stringBuffer.append(getValue("ISLMRFA", str3));
+/*      */ 
+/*      */       
+/*  667 */       stringBuffer.append(NEWLINE);
+/*  668 */       paramOutputStreamWriter.write(stringBuffer.toString());
+/*  669 */       paramOutputStreamWriter.flush();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityItem searchForAvailTypeLO(EntityItem paramEntityItem, String paramString) {
+/*  676 */     EntityItem entityItem = null;
+/*      */ 
+/*      */     
+/*  679 */     Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(paramEntityItem, "MODELCONVERTAVAIL", "AVAIL");
+/*      */     
+/*  681 */     for (byte b = 0; b < vector.size(); b++) {
+/*  682 */       EntityItem entityItem1 = vector.elementAt(b);
+/*      */       
+/*  684 */       String str = PokUtils.getAttributeValue(entityItem1, "AVAILTYPE", ",", "", false);
+/*      */       
+/*  686 */       if (paramString.equals(str)) {
+/*  687 */         entityItem = entityItem1;
+/*      */         
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/*  692 */     return entityItem;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createT632TypeModelFeatureRelation(EntityItem paramEntityItem, OutputStreamWriter paramOutputStreamWriter) throws IOException, SQLException, MiddlewareException {
+/*  709 */     String str1 = "";
+/*  710 */     String str2 = "";
+/*  711 */     boolean bool = false;
+/*      */     
+/*  713 */     this.m_elist = getEntityList(getT006ProdstructVEName());
+/*      */     
+/*  715 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("AVAIL");
+/*  716 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/*  717 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/*      */ 
+/*      */       
+/*  720 */       EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("QSMGEO");
+/*  721 */       if (eANFlagAttribute != null && 
+/*  722 */         eANFlagAttribute.isSelected("6221")) {
+/*      */         
+/*  724 */         Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(entityItem, "OOFAVAIL", "PRODSTRUCT");
+/*      */         
+/*  726 */         String str = "";
+/*  727 */         str = PokUtils.getAttributeValue(entityItem, "AVAILTYPE", "", "");
+/*  728 */         str2 = PokUtils.getAttributeValue(entityItem, "AVAILANNTYPE", "", "");
+/*      */         
+/*  730 */         if (str2.equals("EPIC")) {
+/*  731 */           bool = true;
+/*      */         }
+/*      */         
+/*  734 */         for (byte b1 = 0; b1 < vector.size(); b1++) {
+/*  735 */           StringBuffer stringBuffer = new StringBuffer();
+/*  736 */           EntityItem entityItem1 = vector.elementAt(b1);
+/*      */           
+/*  738 */           ExtractActionItem extractActionItem = new ExtractActionItem(null, this.m_db, this.m_prof, getT006FeatureVEName());
+/*      */           
+/*  740 */           EntityList entityList = this.m_db.getEntityList(this.m_prof, extractActionItem, new EntityItem[] { new EntityItem(null, this.m_prof, entityItem1
+/*  741 */                   .getEntityType(), entityItem1.getEntityID()) });
+/*      */           
+/*  743 */           EntityGroup entityGroup1 = entityList.getEntityGroup("FEATURE");
+/*  744 */           EntityGroup entityGroup2 = entityList.getEntityGroup("MODEL");
+/*  745 */           EntityItem entityItem2 = entityGroup1.getEntityItem(0);
+/*  746 */           EntityItem entityItem3 = entityGroup2.getEntityItem(0);
+/*      */           
+/*  748 */           stringBuffer = new StringBuffer();
+/*  749 */           stringBuffer.append(getValue("IFTYPE", "T=(CHK&UPG)T631"));
+/*  750 */           stringBuffer.append(getValue("IOPUCTY", "897"));
+/*  751 */           str1 = getRFANumber(paramEntityItem, bool, entityItem);
+/*  752 */           stringBuffer.append(getValue("ISLMTYP", PokUtils.getAttributeValue(entityItem3, "MACHTYPEATR", "", "")));
+/*  753 */           stringBuffer.append(getValue("ISLMMOD", PokUtils.getAttributeValue(entityItem3, "MODELATR", "", "")));
+/*  754 */           stringBuffer.append(getValue("ISLMFTR", PokUtils.getAttributeValue(entityItem2, "FEATURECODE", "", "")));
+/*  755 */           stringBuffer.append(getValue("BLANK", " "));
+/*  756 */           if (str.equals("Last Order")) {
+/*  757 */             stringBuffer.append(PokUtils.getAttributeValue(entityItem, "EFFECTIVEDATE", ",", "", false));
+/*      */           } else {
+/*  759 */             stringBuffer.append(getValue("DSLMWDN", "2050-12-31"));
+/*      */           } 
+/*  761 */           stringBuffer.append(getValue("BLANK1", ""));
+/*  762 */           stringBuffer.append(getValue("ISLMRFA", str1));
+/*      */           
+/*  764 */           stringBuffer.append(NEWLINE);
+/*  765 */           paramOutputStreamWriter.write(stringBuffer.toString());
+/*  766 */           paramOutputStreamWriter.flush();
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getRFANumber(EntityItem paramEntityItem1, boolean paramBoolean, EntityItem paramEntityItem2) {
+/*      */     String str;
+/*  776 */     if (paramBoolean) {
+/*  777 */       str = PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "");
+/*      */     } else {
+/*  779 */       str = "R" + PokUtils.getAttributeValue(paramEntityItem1, "ANNNUMBER", "", "");
+/*      */     } 
+/*      */ 
+/*      */     
+/*  783 */     return str;
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   protected String getValue(String paramString1, String paramString2) {
+/*  788 */     if (paramString2 == null)
+/*  789 */       paramString2 = ""; 
+/*  790 */     int i = (paramString2 == null) ? 0 : paramString2.length();
+/*  791 */     int j = Integer.parseInt(COLUMN_LENGTH.get(paramString1).toString());
+/*  792 */     if (i == j)
+/*  793 */       return paramString2; 
+/*  794 */     if (i > j) {
+/*  795 */       return paramString2.substring(0, j);
+/*      */     }
+/*  797 */     return paramString2 + getBlank(j - i);
+/*      */   }
+/*      */   
+/*      */   protected String getBlank(int paramInt) {
+/*  801 */     StringBuffer stringBuffer = new StringBuffer();
+/*  802 */     while (paramInt > 0) {
+/*  803 */       stringBuffer.append(" ");
+/*  804 */       paramInt--;
+/*      */     } 
+/*  806 */     return stringBuffer.toString();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityList getEntityList(String paramString) throws SQLException, MiddlewareException {
+/*  814 */     ExtractActionItem extractActionItem = new ExtractActionItem(null, this.m_db, this.m_prof, paramString);
+/*      */     
+/*  816 */     EntityList entityList = this.m_db.getEntityList(this.m_prof, extractActionItem, new EntityItem[] { new EntityItem(null, this.m_prof, this.rootEntity
+/*  817 */             .getEntityType(), this.rootEntity.getEntityID()) });
+/*      */     
+/*  819 */     addDebug("EntityList for " + this.m_prof.getValOn() + " extract " + paramString + " contains the following entities: \n" + 
+/*  820 */         PokUtils.outputList(entityList));
+/*  821 */     return entityList;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getT002ModelVEName() {
+/*  830 */     return "QSMFULL";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getT006FeatureVEName() {
+/*  839 */     return "QSMFULL2";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getT006ProdstructVEName() {
+/*  848 */     return "QSMFULL1";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getNPMesUpgradeVEName() {
+/*  857 */     return "QSMFULL4";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public boolean exeFtpShell(String paramString) {
+/*  865 */     String str1 = ABRServerProperties.getValue(this.abrcode, "_script", null) + " -f " + paramString;
+/*  866 */     String str2 = ABRServerProperties.getValue(this.abrcode, "_inipath", null);
+/*  867 */     if (str2 != null)
+/*  868 */       str1 = str1 + " -i " + str2; 
+/*  869 */     if (this.dir != null)
+/*  870 */       str1 = str1 + " -d " + this.dir; 
+/*  871 */     String str3 = ABRServerProperties.getValue(this.abrcode, "_wdfilePrefix", null);
+/*  872 */     if (str3 != null)
+/*  873 */       str1 = str1 + " -p " + str3; 
+/*  874 */     addDebug("file=" + str3);
+/*  875 */     String str4 = ABRServerProperties.getValue(this.abrcode, "_wdtargetfilename", null);
+/*  876 */     if (str4 != null)
+/*  877 */       str1 = str1 + " -t " + str4; 
+/*  878 */     String str5 = ABRServerProperties.getValue(this.abrcode, "_logpath", null);
+/*  879 */     if (str5 != null)
+/*  880 */       str1 = str1 + " -l " + str5; 
+/*  881 */     String str6 = ABRServerProperties.getValue(this.abrcode, "_backuppath", null);
+/*  882 */     if (str6 != null)
+/*  883 */       str1 = str1 + " -b " + str6; 
+/*  884 */     Runtime runtime = Runtime.getRuntime();
+/*  885 */     String str7 = "";
+/*  886 */     BufferedReader bufferedReader = null;
+/*  887 */     BufferedInputStream bufferedInputStream = null;
+/*      */     
+/*      */     try {
+/*  890 */       Process process = runtime.exec(str1);
+/*  891 */       if (process.waitFor() != 0) {
+/*  892 */         return false;
+/*      */       }
+/*  894 */       bufferedInputStream = new BufferedInputStream(process.getInputStream());
+/*  895 */       bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream));
+/*  896 */       while ((this.lineStr = bufferedReader.readLine()) != null) {
+/*  897 */         str7 = str7 + this.lineStr;
+/*  898 */         if (this.lineStr.indexOf("FAILD") > -1) {
+/*  899 */           return false;
+/*      */         }
+/*      */       } 
+/*  902 */     } catch (Exception exception) {
+/*  903 */       exception.printStackTrace();
+/*  904 */       return false;
+/*      */     } finally {
+/*  906 */       if (bufferedReader != null) {
+/*      */         try {
+/*  908 */           bufferedReader.close();
+/*  909 */           bufferedInputStream.close();
+/*  910 */         } catch (IOException iOException) {
+/*  911 */           iOException.printStackTrace();
+/*      */         } 
+/*      */       }
+/*      */     } 
+/*  915 */     return !(str7 == null);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addOutput(String paramString) {
+/*  922 */     this.rptSb.append("<p>" + paramString + "</p>" + NEWLINE);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addOutput(String paramString, Object[] paramArrayOfObject) {
+/*  930 */     String str = getBundle().getString(paramString);
+/*  931 */     if (paramArrayOfObject != null) {
+/*  932 */       MessageFormat messageFormat = new MessageFormat(str);
+/*  933 */       str = messageFormat.format(paramArrayOfObject);
+/*      */     } 
+/*      */     
+/*  936 */     addOutput(str);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addDebug(String paramString) {
+/*  943 */     this.rptSb.append("<!-- " + paramString + " -->" + NEWLINE);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addError(String paramString) {
+/*  950 */     addOutput(paramString);
+/*  951 */     setReturnCode(-1);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addError(String paramString, Object[] paramArrayOfObject) {
+/*  962 */     EntityGroup entityGroup = this.m_elist.getParentEntityGroup();
+/*  963 */     setReturnCode(-1);
+/*      */ 
+/*      */     
+/*  966 */     MessageFormat messageFormat = new MessageFormat(getBundle().getString("ERROR_PREFIX"));
+/*  967 */     Object[] arrayOfObject = new Object[2];
+/*  968 */     arrayOfObject[0] = entityGroup.getLongDescription();
+/*  969 */     arrayOfObject[1] = this.navName;
+/*      */     
+/*  971 */     addMessage(messageFormat.format(arrayOfObject), paramString, paramArrayOfObject);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addMessage(String paramString1, String paramString2, Object[] paramArrayOfObject) {
+/*  979 */     String str = getBundle().getString(paramString2);
+/*      */     
+/*  981 */     if (paramArrayOfObject != null) {
+/*  982 */       MessageFormat messageFormat = new MessageFormat(str);
+/*  983 */       str = messageFormat.format(paramArrayOfObject);
+/*      */     } 
+/*      */     
+/*  986 */     addOutput(paramString1 + " " + str);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getABRVersion() {
+/*  995 */     return "1.0";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getDescription() {
+/* 1004 */     return "QSMWITHDRAWALFULLABR";
+/*      */   }
+/*      */ }
 
-// QSM withdrawal abr
 
-package COM.ibm.eannounce.abr.sg;
-
-import java.io.*;
-import java.nio.channels.FileChannel;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import COM.ibm.eannounce.abr.util.PokBaseABR;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.opicmpdh.middleware.*;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
-import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
-import COM.ibm.opicmpdh.transactions.OPICMABRItem;
-
-/**********************************************************************************
-* QSM withdrawal ABR
-**********************************************************************************/
-//$Log: QSMWITHDRAWALFULLABR.java,v $
-//Revision 1.5  2018/09/20 07:28:54  whwyue
-//update format for type feature
-//
-//Revision 1.4  2018/09/19 12:51:32  whwyue
-//Update logic for type feature
-//
-//Revision 1.3  2018/09/18 09:45:21  whwyue
-//Update log
-//
-//
-/**
- * @author whwyue
- *
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\QSMWITHDRAWALFULLABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class QSMWITHDRAWALFULLABR extends PokBaseABR {
-	private StringBuffer rptSb = new StringBuffer();
-	private static final char[] FOOL_JTEST = { '\n' };
-	static final String NEWLINE = new String(FOOL_JTEST);
-
-	private ResourceBundle rsBundle = null;
-	private Hashtable metaTbl = new Hashtable();
-	private String navName = "";
-
-	private String ffFileName = null;
-	private String ffPathName = null;
-	private String ffFTPPathName = null;
-	private String dir = null;
-	private String dirDest = null;
-	private final String QSMRPTPATH = "_rptpath";
-	private final String QSMGENPATH = "_genpath";
-	private final String QSMFTPPATH = "_ftppath";
-	private int abr_debuglvl = D.EBUG_ERR;
-
-	private static final String CREFINIPATH = "_inipath";
-	private static final String FTPSCRPATH = "_script";
-	private static final String TARGETFILENAME = "_wdtargetfilename";
-	private static final String LOGPATH = "_logpath";
-	private static final String BACKUPPATH = "_backuppath";
-	private static final String FILEPREFIX = "_wdfilePrefix";
-	private String lineStr = "";
-	private static final String FAILD = "FAILD";
-	private static final String IFTYPE = "IFTYPE";
-	private static final String IOPUCTY = "IOPUCTY";
-	private static final String ISLMPRN = "ISLMPRN";
-	private static final String DSLMOPD = "DSLMOPD";
-	private static final String DSLMWDN = "DSLMWDN";
-	private static final String DUSALRW = "DUSALRW";
-	private static final String QSMEDMW = "QSMEDMW";
-	private static final String CPDAA = "CPDAA";
-	private static final String BLANK = "BLANK";
-	private static final String BLANK1 = "BLANK1";
-	private static final String BLANK2 = "BLANK2";
-	private String abrcode = "";
-	private EntityItem rootEntity;
-	private static final Hashtable COLUMN_LENGTH;
-
-	private static final String ISLMTYP = "ISLMTYP";
-	private static final String ISLMMOD = "ISLMMOD";
-	private static final String ISLMFTR = "ISLMFTR";
-	private static final String ISLMRFA = "ISLMRFA";
-	private static final List geoWWList = Collections.unmodifiableList(new ArrayList() {
-		{
-			add("Asia Pacific");
-			add("Canada and Caribbean North");
-			add("Europe/Middle East/Africa");
-			add("Latin America");
-			add("US Only");
-		}
-	});
-
-	/**
-	 * Record format defintion Form (record name), (record length), <starting
-	 * postion>, <type>
-	 */
-	static {
-		COLUMN_LENGTH = new Hashtable();
-		COLUMN_LENGTH.put(IFTYPE, "20");
-		COLUMN_LENGTH.put(IOPUCTY, "3");
-		COLUMN_LENGTH.put(ISLMPRN, "14");
-		COLUMN_LENGTH.put(DSLMOPD, "10");
-		COLUMN_LENGTH.put(DSLMWDN, "10");
-		COLUMN_LENGTH.put(QSMEDMW, "10");
-		COLUMN_LENGTH.put(CPDAA, "1");
-		COLUMN_LENGTH.put(DUSALRW, "10");
-		COLUMN_LENGTH.put(ISLMTYP, "4");
-		COLUMN_LENGTH.put(ISLMMOD, "3");
-		COLUMN_LENGTH.put(ISLMFTR, "6");
-		COLUMN_LENGTH.put(BLANK, "1");
-		COLUMN_LENGTH.put(ISLMRFA, "6");
-		COLUMN_LENGTH.put(BLANK1, "32");
-		COLUMN_LENGTH.put(BLANK2, "42");
-	}
-
-	/**********************************
-	 * get the resource bundle
-	 */
-	protected ResourceBundle getBundle() {
-		return rsBundle;
-	}
-
-	/**********************************
-	 * Execute ABR.
-	 *
-	 */
-
-	public void processThis(QSMFULLABRSTATUS abr, Profile m_prof, Database m_db, String abri, EntityItem rootEntity,
-			StringBuffer rpt) throws Exception {
-		try {
-			this.m_prof = m_prof;
-			this.m_db = m_db;
-			this.rootEntity = rootEntity;
-			rptSb = rpt;
-			abrcode = abri;
-			// Default set to pass
-			setReturnCode(PASS);
-
-			m_elist = getEntityList(getT002ModelVEName());
-
-			if (m_elist.getEntityGroupCount() > 0) {
-				// NAME is navigate attributes - only used if error rpt is
-				// generated
-//				navName = getNavigationName();
-//				setDGTitle(navName);
-//				addDebug("Title=" + navName);
-//				setDGString(getABRReturnCode());				
-//				setDGRptName("QSMWITHDRAWALFULLABR"); // Set the report name
-//				setDGRptClass(getABRCode()); // Set the report class
-				generateFlatFile(rootEntity);
-				exeFtpShell(ffPathName);
-			}
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	private void setFileName(EntityItem rootEntity) {
-		// FILE_PREFIX=EACMFEEDQSMFULLABR_
-		String filePrefix = ABRServerProperties.getValue(abrcode, FILEPREFIX, null);
-		// ABRServerProperties.getOutputPath()
-		// ABRServerProperties.get
-		StringBuffer sb = new StringBuffer(filePrefix.trim());
-		DatePackage dbNow;
-		try {
-			dbNow = m_db.getDates();
-			String dts = dbNow.getNow();
-			// replace special characters
-			dts = dts.replace(' ', '_');
-			sb.append(rootEntity.getEntityType() + rootEntity.getEntityID() + "_");
-			sb.append(dts + ".txt");
-			dir = ABRServerProperties.getValue(abrcode, QSMGENPATH, "/Dgq");
-			if (!dir.endsWith("/")) {
-				dir = dir + "/";
-			}
-			ffFileName = sb.toString();
-			ffPathName = dir + ffFileName;
-		} catch (MiddlewareException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
-	/********************************************
-	 * Build a text file using all The records are data based on the type of
-	 * data described above.
-	 * 
-	 * @throws IOException
-	 * @throws MiddlewareException
-	 * @throws SQLException
-	 * @throws ParseException
-	 */
-	private void generateFlatFile(EntityItem rootEntity)
-			throws IOException, SQLException, MiddlewareException, ParseException {
-		FileChannel sourceChannel = null;
-		FileChannel destChannel = null;
-
-		// generate file name
-		setFileName(rootEntity);
-		FileOutputStream fos = new FileOutputStream(ffPathName);
-		OutputStreamWriter wOut = new OutputStreamWriter(fos, "UTF-8");
-
-		// build the text file
-
-		createT002Model(rootEntity, wOut);
-		createT006Feature(rootEntity, wOut);
-		createT020NPMesUpgrade(rootEntity, wOut);
-		createT632TypeModelFeatureRelation(rootEntity, wOut);
-
-		wOut.close();
-
-		dirDest = ABRServerProperties.getValue(abrcode, QSMFTPPATH, "/Dgq");
-		if (!dirDest.endsWith("/")) {
-			dirDest = dirDest + "/";
-		}
-
-		ffFTPPathName = dirDest + ffFileName;
-		addDebug("******* " + ffFTPPathName);
-
-		try {
-			sourceChannel = new FileInputStream(ffPathName).getChannel();
-			destChannel = new FileOutputStream(ffFTPPathName).getChannel();
-			destChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
-		} finally {
-			sourceChannel.close();
-			destChannel.close();
-		}
-
-	}
-
-	/*
-	 * Create T002 model records
-	 * 
-	 * @throws IOException
-	 */
-	private void createT002Model(EntityItem rootEntity, OutputStreamWriter wOut) throws IOException {
-		EntityGroup availGrp = m_elist.getEntityGroup("AVAIL");
-		String strAvailType = "";
-		String strAvailAnnType = "";
-		boolean isEpic = false;
-
-		for (int availI = 0; availI < availGrp.getEntityItemCount(); availI++) {
-
-			EntityItem availEI = availGrp.getEntityItem(availI);
-
-			strAvailType = PokUtils.getAttributeValue(availEI, "AVAILTYPE", "", "");
-			strAvailAnnType = PokUtils.getAttributeValue(availEI, "AVAILANNTYPE", "", "");
-			if (strAvailAnnType.equals("EPIC")) {
-				isEpic = true;
-			}
-
-			// ******* NEW *******
-			if ((strAvailType.equals("Planned Availability")) || (strAvailType.equals("End of Service"))
-					|| (strAvailType.equals("Last Order"))) {
-				EANFlagAttribute qsmGeoList = (EANFlagAttribute) availEI.getAttribute("QSMGEO");
-
-				if (qsmGeoList != null) {
-					if (qsmGeoList.isSelected("6199")) {
-						createT002ModelRecords(rootEntity, wOut, availEI, "Asia Pacific", strAvailType, isEpic);
-					}
-					if (qsmGeoList.isSelected("6200")) {
-						createT002ModelRecords(rootEntity, wOut, availEI, "Canada and Caribbean North", strAvailType,
-								isEpic);
-					}
-					if (qsmGeoList.isSelected("6198")) {
-						createT002ModelRecords(rootEntity, wOut, availEI, "Europe/Middle East/Africa", strAvailType,
-								isEpic);
-					}
-					if (qsmGeoList.isSelected("6204")) {
-						createT002ModelRecords(rootEntity, wOut, availEI, "Latin America", strAvailType, isEpic);
-					}
-					if (qsmGeoList.isSelected("6221")) {
-						createT002ModelRecords(rootEntity, wOut, availEI, "US Only", strAvailType, isEpic);
-					}
-				}
-			}
-		}
-	}
-
-	/*
-	 * Create records for ANNOUNCEMENT -> AVAIL -> MODELAVAIL -> MODEL
-	 * 
-	 * @throws IOException
-	 */
-	private void createT002ModelRecords(EntityItem rootEntity, OutputStreamWriter wOut, EntityItem availEI,
-			String strAvailGenAreaSel, String strMainAvailType, boolean isEpic) throws IOException {
-
-		StringBuffer sb;
-		String strIOPUCTY;
-		String strQSMEDMW;
-		String strDUSALRW;
-		String strDSLMWDN;
-		String strDSLMOPD;
-		String strCPDAA;
-		String strWTHDRWEFFCTVDATE;
-		String strISLMRFA;
-
-		Vector modelAvailVect = PokUtils.getAllLinkedEntities(availEI, "MODELAVAIL", "MODEL");
-		addDebug("availmodel="+ availEI);
-
-		for (int i = 0; i < modelAvailVect.size(); i++) {
-			sb = new StringBuffer();
-			strIOPUCTY = "";
-			strQSMEDMW = "";
-			strDUSALRW = "";
-			strDSLMWDN = "";
-			strDSLMOPD = "";
-			strCPDAA = "";
-			strWTHDRWEFFCTVDATE = "";
-			strISLMRFA= "";
-
-			EntityItem eiModel = (EntityItem) modelAvailVect.elementAt(i);
-
-			EntityItem eiSearchAvail = null;
-
-			sb.append(getValue(IFTYPE, "M=(CHK&UPG)T001"));
-			if (strAvailGenAreaSel.equals("Latin America")) {
-				strIOPUCTY = "601";
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-			} else if (strAvailGenAreaSel.equals("Europe/Middle East/Africa")) {
-				strIOPUCTY = "999";
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-			} else if (strAvailGenAreaSel.equals("Asia Pacific")) {
-				strIOPUCTY = "872";
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-			} else if (strAvailGenAreaSel.equals("US Only")) {
-				strIOPUCTY = "897";
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "USDOCNO", "", "");
-			} else if (strAvailGenAreaSel.equals("Canada and Caribbean North")) {
-				strIOPUCTY = "649";
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "USDOCNO", "", "");
-			}
-			sb.append(getValue(IOPUCTY, strIOPUCTY));
-			String description = PokUtils.getAttributeValue(eiModel, "MACHTYPEATR", "", "");
-			description += PokUtils.getAttributeValue(eiModel, "MODELATR", "", "");
-			sb.append(getValue(ISLMPRN, description));
-
-			strWTHDRWEFFCTVDATE = PokUtils.getAttributeValue(eiModel, "WTHDRWEFFCTVDATE", "", "");
-
-			if (strWTHDRWEFFCTVDATE != null) {
-				if (strWTHDRWEFFCTVDATE.equals("")) {
-					strDSLMWDN = "2050-12-31";
-				} else {
-					strDSLMWDN = strWTHDRWEFFCTVDATE;
-				}
-			} else {
-				strDSLMWDN = "2050-12-31";
-			}
-
-			eiSearchAvail = searchForAvailType(eiModel, "Last Order");
-			if (eiSearchAvail != null) {
-				strDSLMOPD = PokUtils.getAttributeValue(eiSearchAvail, "EFFECTIVEDATE", "", "");
-				strCPDAA = "O";
-			} else {
-				strDSLMOPD = "2050-12-31";
-				strCPDAA = "N";
-			}
-
-			eiSearchAvail = searchForAvailType(eiModel, "End of Service");
-			if (eiSearchAvail != null) {
-				strQSMEDMW = PokUtils.getAttributeValue(availEI, "EFFECTIVEDATE", ",", "", false);
-				strDUSALRW = PokUtils.getAttributeValue(availEI, "EFFECTIVEDATE", ",", "", false);
-			} else {
-				strQSMEDMW = "2050-12-31";
-				strDUSALRW = "2050-12-31";
-			}
-
-			sb.append(getValue(DSLMWDN, strDSLMWDN));
-			sb.append(getValue(QSMEDMW, strQSMEDMW));
-			sb.append(getValue(DSLMOPD, strDSLMOPD));
-			sb.append(getValue(DUSALRW, strDUSALRW));
-			sb.append(getValue(CPDAA, strCPDAA));
-			sb.append(getValue(BLANK, " "));
-			sb.append(getValue(ISLMRFA, strISLMRFA));
-			
-			sb.append(NEWLINE);
-			wOut.write(sb.toString());
-			wOut.flush();
-		}
-	}
-
-	private EntityItem searchForAvailType(EntityItem eiModel, String strSearchAvailType) {
-
-		EntityItem eiReturn = null;
-		String strAvailType;
-
-		Vector availVect = PokUtils.getAllLinkedEntities(eiModel, "MODELAVAIL", "AVAIL");
-
-		addDebug("*****mlm searchforavail withdrawalAVAIL " + availVect);
-
-		for (int i = 0; i < availVect.size(); i++) {
-			EntityItem eiAvail = (EntityItem) availVect.elementAt(i);
-
-			strAvailType = PokUtils.getAttributeValue(eiAvail, "AVAILTYPE", ",", "", false);
-			addDebug("*****mlm searchforavail withdrawal model = " + eiModel.getEntityType() + eiModel.getEntityID()
-					+ "avail entity type = " + eiAvail.getEntityType() + " avail type = " + strAvailType);
-			if (strSearchAvailType.equals(strAvailType)) {
-				eiReturn = eiAvail;
-				break;
-			}
-		}
-
-		return eiReturn;
-	}
-
-	/*
-	 * Create records for ANNOUNCEMENT -> AVAIL -> OOFAVAIL -> PRODSTRUCT ->
-	 * MODEL
-	 * 
-	 * @throws IOException
-	 * 
-	 * @throws SQLException
-	 * 
-	 * @throws MiddlewareException
-	 */
-	private void createT006Feature(EntityItem rootEntity, OutputStreamWriter wOut)
-			throws IOException, SQLException, MiddlewareException {
-
-		EANFlagAttribute qsmGeoList;
-		String strAvailType;
-		String strAvailAnnType = "";
-		boolean isEpic = false;
-
-		m_elist = getEntityList(getT006ProdstructVEName());
-
-		EntityGroup availGrp = m_elist.getEntityGroup("AVAIL");
-		int availg = availGrp.getEntityItemCount();
-
-		for (int availI = 0; availI < availGrp.getEntityItemCount(); availI++) {
-			qsmGeoList = null;
-			strAvailType = "";
-
-			EntityItem availEI = availGrp.getEntityItem(availI);
-
-			strAvailType = PokUtils.getAttributeValue(availEI, "AVAILTYPE", "", "");
-			strAvailAnnType = PokUtils.getAttributeValue(availEI, "AVAILANNTYPE", "", "");
-			if (strAvailAnnType.equals("EPIC")) {
-				isEpic = true;
-			}
-
-			// ******* NEW *******
-			if ((strAvailType.equals("Planned Availability")) || (strAvailType.equals("End of Service"))
-					|| (strAvailType.equals("Last Order"))) {
-				qsmGeoList = (EANFlagAttribute) availEI.getAttribute("QSMGEO");
-				if (qsmGeoList != null) {
-					if (qsmGeoList.isSelected("6199")) {
-						createT006FeatureRecords(rootEntity, wOut, availEI, "Asia Pacific", strAvailType, isEpic);
-					}
-					if (qsmGeoList.isSelected("6200")) {
-						createT006FeatureRecords(rootEntity, wOut, availEI, "Canada and Caribbean North", strAvailType,
-								isEpic);
-					}
-					if (qsmGeoList.isSelected("6198")) {
-						createT006FeatureRecords(rootEntity, wOut, availEI, "Europe/Middle East/Africa", strAvailType,
-								isEpic);
-					}
-					if (qsmGeoList.isSelected("6204")) {
-						createT006FeatureRecords(rootEntity, wOut, availEI, "Latin America", strAvailType, isEpic);
-					}
-					if (qsmGeoList.isSelected("6221")) {
-						createT006FeatureRecords(rootEntity, wOut, availEI, "US Only", strAvailType, isEpic);
-					}
-				}
-			}
-		}
-	}
-
-	/*
-	 * Create records for ANNOUNCEMENT -> AVAIL -> OOFAVAIL -> PRODSTRUCT ->
-	 * MODEL
-	 * 
-	 * @throws IOException
-	 * 
-	 * @throws SQLException
-	 * 
-	 * @throws MiddlewareException
-	 */
-	private void createT006FeatureRecords(EntityItem rootEntity, OutputStreamWriter wOut, EntityItem availEI,
-			String strAvailGenAreaSel, String strMainAvailType, boolean isEpic)
-			throws IOException, SQLException, MiddlewareException {
-
-		StringBuffer sb;
-		String strIOPUCTY;
-		String strDSLMWDN;
-		String strISLMRFA;
-		
-		Vector prodstructVect = PokUtils.getAllLinkedEntities(availEI, "OOFAVAIL", "PRODSTRUCT");
-
-		for (int i = 0; i < prodstructVect.size(); i++) {
-			sb = new StringBuffer();
-			EntityItem eiProdstruct = (EntityItem) prodstructVect.elementAt(i);
-
-			ExtractActionItem eaItem = new ExtractActionItem(null, m_db, m_prof, getT006FeatureVEName());
-
-			EntityList list = m_db.getEntityList(m_prof, eaItem, new EntityItem[] {
-					new EntityItem(null, m_prof, eiProdstruct.getEntityType(), eiProdstruct.getEntityID()) });
-
-			addDebug("EntityList for " + m_prof.getValOn() + " extract QSMFULL2 contains the following entities: \n"
-					+ PokUtils.outputList(list));
-
-			EntityGroup featureGrp = list.getEntityGroup("FEATURE");
-			EntityGroup modelGrp = list.getEntityGroup("MODEL");
-			EntityItem eiFeature = featureGrp.getEntityItem(0);
-			EntityItem eiModel = modelGrp.getEntityItem(0);
-
-			sb = new StringBuffer();
-			strIOPUCTY = "";
-			strDSLMWDN = "";
-			strISLMRFA = "";
-
-			sb.append(getValue(IFTYPE, "F=(CHKT631&UPGT005)"));
-
-			if (strAvailGenAreaSel.equals("Latin America")) {
-				strIOPUCTY = "601";
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-			} else if (strAvailGenAreaSel.equals("Europe/Middle East/Africa")) {
-				strIOPUCTY = "999";
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-			} else if (strAvailGenAreaSel.equals("Asia Pacific")) {
-				strIOPUCTY = "872";
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-			} else if (strAvailGenAreaSel.equals("US Only")) {
-				strIOPUCTY = "897";
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "USDOCNO", "", "");
-			} else if (strAvailGenAreaSel.equals("Canada and Caribbean North")) {
-				strIOPUCTY = "649";
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "USDOCNO", "", "");
-			}
-			sb.append(getValue(IOPUCTY, strIOPUCTY));
-			String strISLMPRN = PokUtils.getAttributeValue(eiModel, "MACHTYPEATR", ",", "", false);
-			strISLMPRN += PokUtils.getAttributeValue(eiFeature, "FEATURECODE", ",", "", false);
-			sb.append(getValue(ISLMPRN, strISLMPRN));
-			sb.append(getValue(BLANK2,""));
-			sb.append(getValue(ISLMRFA, strISLMRFA));
-//			strDSLMWDN = validateProdstructs(eiFeature);
-//			sb.append(getValue(DSLMWDN, strDSLMWDN));
-			sb.append(NEWLINE);
-			wOut.write(sb.toString());
-			wOut.flush();
-		}
-	}
-
-	/******
-	 * Create T020 NP Mes Upgrade records
-	 * 
-	 * @param rootEntity
-	 * @param wOut
-	 * @throws IOException
-	 * @throws MiddlewareException
-	 * @throws SQLException
-	 */
-	private void createT020NPMesUpgrade(EntityItem rootEntity, OutputStreamWriter wOut)
-			throws IOException, SQLException, MiddlewareException {
-
-		EANFlagAttribute qsmGeoList;
-
-		m_elist = getEntityList(getNPMesUpgradeVEName());
-
-		EntityGroup availGrp = m_elist.getEntityGroup("AVAIL");
-
-		String strAvailAnnType = "";
-		boolean isEpic = false;
-
-		for (int iAvail = 0; iAvail < availGrp.getEntityItemCount(); iAvail++) {
-			qsmGeoList = null;
-
-			EntityItem eiAvail = (EntityItem) availGrp.getEntityItem(iAvail);
-
-			strAvailAnnType = PokUtils.getAttributeValue(eiAvail, "AVAILANNTYPE", "", "");
-			if (strAvailAnnType.equals("EPIC")) {
-				isEpic = true;
-			}
-
-			qsmGeoList = (EANFlagAttribute) eiAvail.getAttribute("QSMGEO");
-			if (qsmGeoList != null) {
-				if (qsmGeoList.isSelected("6199")) {
-					createT020NPMesUpgradeRecords(rootEntity, wOut, eiAvail, "Asia Pacific", isEpic);
-				}
-				if (qsmGeoList.isSelected("6200")) {
-					createT020NPMesUpgradeRecords(rootEntity, wOut, eiAvail, "Canada and Caribbean North", isEpic);
-				}
-				if (qsmGeoList.isSelected("6198")) {
-					createT020NPMesUpgradeRecords(rootEntity, wOut, eiAvail, "Europe/Middle East/Africa", isEpic);
-				}
-				if (qsmGeoList.isSelected("6204")) {
-					createT020NPMesUpgradeRecords(rootEntity, wOut, eiAvail, "Latin America", isEpic);
-				}
-				if (qsmGeoList.isSelected("6221")) {
-					createT020NPMesUpgradeRecords(rootEntity, wOut, eiAvail, "US Only", isEpic);
-				}
-			}
-		}
-	}
-
-	/******
-	 * Create T020 NP Mes Upgrade records
-	 * 
-	 * @param rootEntity
-	 * @param wOut
-	 * @throws IOException
-	 * @throws MiddlewareException
-	 * @throws SQLException
-	 */
-	private void createT020NPMesUpgradeRecords(EntityItem rootEntity, OutputStreamWriter wOut, EntityItem eiAvail,
-			String strAvailGenAreaSel, boolean isEpic) throws IOException, SQLException, MiddlewareException {
-
-		StringBuffer sb;
-		String strISLMPRN;
-		String strIOPUCTY;
-		String strISLMRFA;
-
-		sb = new StringBuffer();
-		strISLMPRN = "";
-		strIOPUCTY = "";
-		strISLMRFA = "";
-
-		Vector modelConvertVect = PokUtils.getAllLinkedEntities(eiAvail, "MODELCONVERTAVAIL", "MODELCONVERT");
-
-		for (int indM = 0; indM < modelConvertVect.size(); indM++) {
-
-			EntityItem eiModelConvert = (EntityItem) modelConvertVect.elementAt(indM);
-
-			sb.append(getValue(IFTYPE, "N=(CHK&UPG)T019"));
-
-			if (strAvailGenAreaSel.equals("Latin America")) {
-				strIOPUCTY = "601";
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(eiAvail, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-			} else if (strAvailGenAreaSel.equals("Europe/Middle East/Africa")) {
-				strIOPUCTY = "999";
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(eiAvail, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-			} else if (strAvailGenAreaSel.equals("Asia Pacific")) {
-				strIOPUCTY = "872";
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(eiAvail, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-			} else if (strAvailGenAreaSel.equals("US Only")) {
-				strIOPUCTY = "897";
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(eiAvail, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "USDOCNO", "", "");
-			} else if (strAvailGenAreaSel.equals("Canada and Caribbean North")) {
-				strIOPUCTY = "649";
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(eiAvail, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "USDOCNO", "", "");
-			}
-			sb.append(getValue(IOPUCTY, strIOPUCTY));
-
-			strISLMPRN = PokUtils.getAttributeValue(eiModelConvert, "TOMACHTYPE", "", "");
-			strISLMPRN += PokUtils.getAttributeValue(eiModelConvert, "TOMODEL", "", "");
-			sb.append(getValue(ISLMPRN, strISLMPRN));
-
-			EntityItem searchAvail = searchForAvailTypeLO(eiModelConvert, "Last Order");
-
-			if (searchAvail != null) {
-				sb.append(getValue(DSLMWDN, PokUtils.getAttributeValue(searchAvail, "EFFECTIVEDATE", "", "")));
-			} else {
-				sb.append(getValue(DSLMWDN, "2050-12-31"));
-			}
-			    sb.append(getValue(BLANK1,""));
-			    sb.append(getValue(ISLMRFA, strISLMRFA));
-			    
-
-			sb.append(NEWLINE);
-			wOut.write(sb.toString());
-			wOut.flush();
-
-		}
-	}
-
-	private EntityItem searchForAvailTypeLO(EntityItem eiModelConvert, String strSearchAvailType) {
-
-		EntityItem eiReturn = null;
-		String strAvailType;
-
-		Vector availVect = PokUtils.getAllLinkedEntities(eiModelConvert, "MODELCONVERTAVAIL", "AVAIL");
-
-		for (int i = 0; i < availVect.size(); i++) {
-			EntityItem eiAvail = (EntityItem) availVect.elementAt(i);
-
-			strAvailType = PokUtils.getAttributeValue(eiAvail, "AVAILTYPE", ",", "", false);
-
-			if (strSearchAvailType.equals(strAvailType)) {
-				eiReturn = eiAvail;
-				break;
-			}
-		}
-
-		return eiReturn;
-	}
-
-	/******
-	 * Create T632 records
-	 * 
-	 * @param rootEntity
-	 * @param wOut
-	 * @throws IOException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	private void createT632TypeModelFeatureRelation(EntityItem rootEntity, OutputStreamWriter wOut)
-			throws IOException, SQLException, MiddlewareException {
-
-		StringBuffer sb;
-		String strAvailType;
-		String strISLMRFA="";
-		String strAvailAnnType="";
-		boolean isEpic = false;
-
-		m_elist = getEntityList(getT006ProdstructVEName());
-
-		EntityGroup availGrp = m_elist.getEntityGroup("AVAIL");
-		for (int availI = 0; availI < availGrp.getEntityItemCount(); availI++) {
-			EntityItem availEI = availGrp.getEntityItem(availI);
-
-			// Create T632 records only for US ONLY and WorldWide GEOs
-			EANFlagAttribute qsmGeoList = (EANFlagAttribute) availEI.getAttribute("QSMGEO");
-			if (qsmGeoList != null) {
-				if (qsmGeoList.isSelected("6221")) {
-
-					Vector prodstructVect = PokUtils.getAllLinkedEntities(availEI, "OOFAVAIL", "PRODSTRUCT");
-
-					strAvailType = "";
-					strAvailType = PokUtils.getAttributeValue(availEI, "AVAILTYPE", "", "");
-					strAvailAnnType = PokUtils.getAttributeValue(availEI,
-					 "AVAILANNTYPE", "", "");
-					if (strAvailAnnType.equals("EPIC")){
-					 isEpic = true;
-					}
-
-					for (int i = 0; i < prodstructVect.size(); i++) {
-						sb = new StringBuffer();
-						EntityItem eiProdstruct = (EntityItem) prodstructVect.elementAt(i);
-
-						ExtractActionItem eaItem = new ExtractActionItem(null, m_db, m_prof, getT006FeatureVEName());
-
-						EntityList list = m_db.getEntityList(m_prof, eaItem, new EntityItem[] { new EntityItem(null,
-								m_prof, eiProdstruct.getEntityType(), eiProdstruct.getEntityID()) });
-
-						EntityGroup featureGrp = list.getEntityGroup("FEATURE");
-						EntityGroup modelGrp = list.getEntityGroup("MODEL");
-						EntityItem eiFeature = featureGrp.getEntityItem(0);
-						EntityItem eiModel = modelGrp.getEntityItem(0);
-
-						sb = new StringBuffer();
-						sb.append(getValue(IFTYPE, "T=(CHK&UPG)T631"));
-						sb.append(getValue(IOPUCTY, "897"));
-						strISLMRFA = getRFANumber(rootEntity, isEpic, availEI);
-						sb.append(getValue(ISLMTYP, PokUtils.getAttributeValue(eiModel, "MACHTYPEATR", "", "")));
-						sb.append(getValue(ISLMMOD, PokUtils.getAttributeValue(eiModel, "MODELATR", "", "")));
-						sb.append(getValue(ISLMFTR, PokUtils.getAttributeValue(eiFeature, "FEATURECODE", "", "")));
-						sb.append(getValue(BLANK, " "));
-						if (strAvailType.equals("Last Order")) {
-							sb.append(PokUtils.getAttributeValue(availEI, "EFFECTIVEDATE", ",", "", false));
-						} else {
-							sb.append(getValue(DSLMWDN, "2050-12-31"));
-						}
-						    sb.append(getValue(BLANK1,""));
-						    sb.append(getValue(ISLMRFA, strISLMRFA));
-						    
-						sb.append(NEWLINE);
-						wOut.write(sb.toString());
-						wOut.flush();
-
-					}
-				}
-			}
-		}
-	}
-	
-	private String getRFANumber(EntityItem rootEntity, boolean isEpic, EntityItem availEI) {
-		String strISLMRFA;
-		if(isEpic){
-			strISLMRFA = PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "");
-		}else{
-			strISLMRFA = "R"+ PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-		}
-		
-		//strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "R"+"ANNNUMBER", "", "");
-		return strISLMRFA;
-	}
-	
-
-	protected String getValue(String column, String columnValue) {
-		if (columnValue == null)
-			columnValue = "";
-		int columnValueLength = columnValue == null ? 0 : columnValue.length();
-		int columnLength = Integer.parseInt(COLUMN_LENGTH.get(column).toString());
-		if (columnValueLength == columnLength)
-			return columnValue;
-		if (columnValueLength > columnLength)
-			return columnValue.substring(0, columnLength);
-
-		return columnValue + getBlank(columnLength - columnValueLength);
-	}
-
-	protected String getBlank(int count) {
-		StringBuffer sb = new StringBuffer();
-		while (count > 0) {
-			sb.append(" ");
-			count--;
-		}
-		return sb.toString();
-	}
-
-	/******************************************
-	 * get entitylist used for compares
-	 */
-	private EntityList getEntityList(String veName)
-			throws java.sql.SQLException, COM.ibm.opicmpdh.middleware.MiddlewareException {
-		ExtractActionItem eaItem = new ExtractActionItem(null, m_db, m_prof, veName);
-
-		EntityList list = m_db.getEntityList(m_prof, eaItem, new EntityItem[] {
-				new EntityItem(null, m_prof, rootEntity.getEntityType(), rootEntity.getEntityID()) });
-
-		addDebug("EntityList for " + m_prof.getValOn() + " extract " + veName + " contains the following entities: \n"
-				+ PokUtils.outputList(list));
-		return list;
-	}
-
-	/**********************************
-	 * get the name of the VE to use for MODEL records
-	 * 
-	 * @return java.lang.String
-	 */
-	public String getT002ModelVEName() {
-		return "QSMFULL";
-	}
-
-	/**********************************
-	 * get the name of the VE to use for FEATURE records
-	 * 
-	 * @return java.lang.String
-	 */
-	public String getT006FeatureVEName() {
-		return "QSMFULL2";
-	}
-
-	/**********************************
-	 * get the name of the VE to use for FEATURE records
-	 * 
-	 * @return java.lang.String
-	 */
-	public String getT006ProdstructVEName() {
-		return "QSMFULL1";
-	}
-
-	/**********************************
-	 * get the name of the VE to use for FEATURE records
-	 * 
-	 * @return java.lang.String
-	 */
-	public String getNPMesUpgradeVEName() {
-		return "QSMFULL4";
-	}
-
-	public boolean exeFtpShell(String fileName) {
-		// String cmd =
-		// "/usr/bin/rsync -av /var/log/www.solive.kv/access_log
-		// testuser@10.0.1.219::store --password-file=/etc/client/rsync.pwd";
-
-		String cmd = ABRServerProperties.getValue(abrcode, FTPSCRPATH, null) + " -f " + fileName;
-		String ibiinipath = ABRServerProperties.getValue(abrcode, CREFINIPATH, null);
-		if (ibiinipath != null)
-			cmd += " -i " + ibiinipath;
-		if (dir != null)
-			cmd += " -d " + dir;
-		String filePrefix = ABRServerProperties.getValue(abrcode, FILEPREFIX, null);
-		if (filePrefix != null)
-			cmd += " -p " + filePrefix;
-		addDebug("file="+ filePrefix );
-		String targetFilePath = ABRServerProperties.getValue(abrcode, TARGETFILENAME, null);
-		if (targetFilePath != null)
-			cmd += " -t " + targetFilePath;
-		String logPath = ABRServerProperties.getValue(abrcode, LOGPATH, null);
-		if (logPath != null)
-			cmd += " -l " + logPath;
-		String backupPath = ABRServerProperties.getValue(abrcode, BACKUPPATH, null);
-		if (backupPath != null)
-			cmd += " -b " + backupPath;
-		Runtime run = Runtime.getRuntime();
-		String result = "";
-		BufferedReader br = null;
-		BufferedInputStream in = null;
-		// addDebug("cmd:" + cmd);
-		try {
-			Process p = run.exec(cmd);
-			if (p.waitFor() != 0) {
-				return false;
-			}
-			in = new BufferedInputStream(p.getInputStream());
-			br = new BufferedReader(new InputStreamReader(in));
-			while ((lineStr = br.readLine()) != null) {
-				result += lineStr;
-				if (lineStr.indexOf(FAILD) > -1) {
-					return false;
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-					in.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return result == null ? false : true;
-	}
-
-	/**********************************
-	 * add msg to report output
-	 */
-	protected void addOutput(String msg) {
-		rptSb.append("<p>" + msg + "</p>" + NEWLINE);
-	}
-
-	/**********************************
-	 * used for output
-	 *
-	 */
-	protected void addOutput(String resrcCode, Object args[]) {
-		String msg = getBundle().getString(resrcCode);
-		if (args != null) {
-			MessageFormat msgf = new MessageFormat(msg);
-			msg = msgf.format(args);
-		}
-
-		addOutput(msg);
-	}
-
-	/**********************************
-	 * add debug info as html comment
-	 */
-	protected void addDebug(String msg) {
-		rptSb.append("<!-- " + msg + " -->" + NEWLINE);
-	}
-
-	/**********************************
-	 * add error info and fail abr
-	 */
-	protected void addError(String msg) {
-		addOutput(msg);
-		setReturnCode(FAIL);
-	}
-
-	/**********************************
-	 * used for error output Prefix with LD(EntityType) NDN(EntityType) of the
-	 * EntityType that the ABR is checking (root EntityType)
-	 *
-	 * The entire message should be prefixed with 'Error: '
-	 *
-	 */
-	protected void addError(String errCode, Object args[]) {
-		EntityGroup eGrp = m_elist.getParentEntityGroup();
-		setReturnCode(FAIL);
-
-		// ERROR_PREFIX = Error: &quot;{0} {1}&quot;
-		MessageFormat msgf = new MessageFormat(getBundle().getString("ERROR_PREFIX"));
-		Object args2[] = new Object[2];
-		args2[0] = eGrp.getLongDescription();
-		args2[1] = navName;
-
-		addMessage(msgf.format(args2), errCode, args);
-	}
-
-	/**********************************
-	 * used for warning or error output
-	 *
-	 */
-	private void addMessage(String msgPrefix, String errCode, Object args[]) {
-		String msg = getBundle().getString(errCode);
-		// get message to output
-		if (args != null) {
-			MessageFormat msgf = new MessageFormat(msg);
-			msg = msgf.format(args);
-		}
-
-		addOutput(msgPrefix + " " + msg);
-	}
-
-	/***********************************************
-	 * Get the version
-	 *
-	 * @return java.lang.String
-	 */
-	public String getABRVersion() {
-		return "1.0";
-	}
-
-	/***********************************************
-	 * Get ABR description
-	 *
-	 * @return java.lang.String
-	 */
-	public String getDescription() {
-		return "QSMWITHDRAWALFULLABR";
-	}
-
-}

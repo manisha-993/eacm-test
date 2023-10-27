@@ -1,1246 +1,1251 @@
-//Licensed Materials -- Property of IBM
-
-//(C) Copyright IBM Corp. 2010  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-
-package COM.ibm.eannounce.abr.ln.adsxmlbh1;
-
-import java.io.*;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.opicmpdh.transactions.OPICMList;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
-/*
-The ABR will be queued for an instance of “XML Reconciliation Reports” (XMLRECPT) by setting XMLRECRPTABRSTATUS = “Queued” (0020). The value of this attribute is changed to “In Process” (0050) by Task Master at the start of execution of this ABR. The following is used in the selection criterion of entries from the XMLMSGLOG.
-•	T1 = XMLRECRPTLRDTS or, if empty use “1980-01-01”
-•	T2 = VALFROM of XMLRECRPTABRSTATUS for the current value of “In Process”
-
-The selection from the XMLMSGLOG table from a query point of view should be:
-•	Order by:  MSGTYPE, SENDMSGDTS
-•	Group on:  MSGTYPE
-
-The selection criterion of entries from the XMLMSGLOG table is:
-•	T1 < SENDMSGDTS <=  T2
-•	XMLRECPT.MQPROPFILE = XMLMSGLOG.MQPROPFILE
-
-An XML Report Message is created for the result of the preceding selection criteria.
-
-The XML Report Message is sent to the system (MQ Series Queue) identified in the Property File named in the MQPROPFILE. 
-
-Upon successful completion of this ABR (i.e. after the reconciliation report XML is placed on the MQ Series queue), set XMLRECRPTLRDTS = T2.
-
-Each MSGTYPE produces one or more instances <MSGELEMENT> and each row selected from the XML Message Log for the MSGTYPE produces one or more instances of <ENTITYLIST>.
-
-
- 
-IX.	XML Report Message
-
-<RECONCILE_MSGS xmlns="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/RECONCILE_MSGS">
-<DTSOFMSG></DTSOFMSG>
-<FROMMSGDTS></FROMMSGDTS>
-<TOMSGDTS></TOMSGDTS>
-<MSGLIST>
-     <MSGELEMENT>
-          <SETUPENTITYTYPE></SETUPENTITYTYPE>
-          <SETUPENTITYID></SETUPENTITYID>
-          <DETUPDTS></DETUPDTS>
-          <MSGTYPE></MSGTYPE>
-          <MSGCOUNT></MSGCOUNT>
-          <ENTITYLIST>
-               <ENTITYELEMENT>
-                    <ENTITYTYPE></ENTITYTYPE>
-                    <ENTITYID></ENTITYID>
-                    <DTSOFMSG></DTSOFMSG>
-               </ENTITYELEMENT>
-          </ENTITYLIST>
-     </MSGELEMENT>
-</MSGLIST>
-</RECONCILE_MSGS>
-
- */  
-//$Log: XMLRECRPTABRSTATUS.java,v $
-//Revision 1.2  2015/09/10 09:26:50  wangyul
-//Fix Defect 1392225 - SQL error got when I triggered the reconcile report for CHIS on lpar5
-//
-//Revision 1.1  2015/02/04 14:55:48  wangyul
-//RCQ00337765-RQ change the XML mapping to pull DIV from PROJ for Lenovo
-//
-//Revision 1.11  2014/01/17 11:24:00  wangyulo
-//the ABR changes needed to comply with V17 standards
-//
-//Revision 1.10  2013/12/11 08:08:23  guobin
-//xsd validation for generalarea, reconcile, wwcompat and price XML
-//
-//Revision 1.9  2013/05/24 05:51:12  liuweimi
-//RCQ00241437 - send an 'empty' reconcile XML when no msgs sent - config using meta
-//
-//Revision 1.8  2013/02/19 13:51:53  wangyulo
-//update for defect 894771 -- RCQ00241437-WI BH W1 - Support XML Reconcile report when 0 XML records sent - DCUT
-//
-//Revision 1.7  2012/05/21 12:31:29  wangyulo
-//fix the defect 724568-- reconcile msg ENTITYLISTS should be empty for GA price and wwcompat
-//
-
-public class XMLRECRPTABRSTATUS extends PokBaseABR {
-	
-	private static final int XMLMSGLOG_ROW_LIMIT;
-	static{
-		String rowlimit = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("XMLRECRPTABRSTATUS", "_XMLGENCOUNT","3000");
-		XMLMSGLOG_ROW_LIMIT = Integer.parseInt(rowlimit);
-	}
-	private static final int MAXFILE_SIZE=5000000;
-	private StringBuffer rptSb = new StringBuffer();
-	private static final char[] FOOL_JTEST = {'\n'};
-	static final String NEWLINE = new String(FOOL_JTEST);
-	private Object[] args = new String[10];
-
-    private StringBuffer xmlgenSb = new StringBuffer();
-	private ResourceBundle rsBundle = null;
-	private Hashtable metaTbl = new Hashtable();
-	private String navName = "";
-	private PrintWriter dbgPw=null;
-	private String dbgfn = null;
-	private int dbgLen=0; 
-    private int abr_debuglvl=D.EBUG_ERR;
-	private Vector vctReturnsEntityKeys = new Vector();
-	private String actionTaken="";
-    private PrintWriter userxmlPw=null;
-    private String userxmlfn = null;
-    private int userxmlLen=0;
-    private StringBuffer userxmlSb= new StringBuffer(); 
-    private String t2DTS = "&nbsp;";  // T2
-    private String t1DTS = "&nbsp;";   // T1
-    protected static final String STATUS_PROCESS = "0050";
-    protected String attrXMLABRPROPFILE = "MQPROPFILE";
-    protected static final String CHEAT = "@@";
-    protected static final Hashtable SETUP_MSGTYPE_TBL;
-    static {
-    	SETUP_MSGTYPE_TBL = new Hashtable();
-    	SETUP_MSGTYPE_TBL.put("ADSXMLSETUP","GENERALAREA_UPDATE");
-    	SETUP_MSGTYPE_TBL.put("XMLPRODPRICESETUP","PRODUCT_PRICE_UPDATE");
-    	SETUP_MSGTYPE_TBL.put("XMLCOMPATSETUP","WWCOMPAT_UPDATE");
-    	SETUP_MSGTYPE_TBL.put("XMLXLATESETUP","XLATE_UPDATE");
-    }
-	
-	
-	private void setupPrintWriter(){
-		String fn = m_abri.getFileName();
-		int extid = fn.lastIndexOf(".");
-		dbgfn = fn.substring(0,extid+1)+"dbg";
-		userxmlfn = fn.substring(0,extid+1)+"userxml";
-		try {
-			dbgPw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(dbgfn, true), "UTF-8"));
-		} catch (Exception x) {
-			D.ebug(D.EBUG_ERR, "trouble creating debug PrintWriter " + x);
-		}
-		 try {
-	            userxmlPw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(userxmlfn, true), "UTF-8"));
-	        } catch (Exception x) {
-	            D.ebug(D.EBUG_ERR, "trouble creating xmlgen PrintWriter " + x);
-	        }
-	}
-	private void closePrintWriter() {
-		if (dbgPw != null){
-			dbgPw.flush();
-			dbgPw.close();
-			dbgPw = null;
-		}
-       if (userxmlPw != null){
-            userxmlPw.flush();
-            userxmlPw.close();
-            userxmlPw = null;
-        }
-	}
-	
-	  protected void addUserXML(String s){
-	        if (userxmlPw != null){
-	            userxmlLen+=s.length();
-	            userxmlPw.println(s);
-	            userxmlPw.flush();
-	        }else{
-	            userxmlSb.append(ADSABRSTATUS.convertToHTML(s)+NEWLINE);
-	        }
-	    }
-
-	/**********************************
-	 *  Execute ABR.
-	 */
-	public void execute_run()
-	{
-		/*
-        The Report should identify:
-            USERID (USERTOKEN)
-            Role
-            Workgroup
-            Date/Time
-            EntityType LongDescription
-			Any errors or list LSEO created or changed
-		 */
-		// must split because too many arguments for messageformat, max of 10.. this was 11
-		String HEADER = "<head>"+
-		EACustom.getMetaTags(getDescription()) + NEWLINE +
-		EACustom.getCSS() + NEWLINE +
-		EACustom.getTitle("{0} {1}") + NEWLINE +
-		"</head>" + NEWLINE + "<body id=\"ibm-com\">" +
-		EACustom.getMastheadDiv() + NEWLINE +
-		"<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
-		String HEADER2 = "<table>"+NEWLINE +
-		"<tr><th>Userid: </th><td>{0}</td></tr>"+NEWLINE +
-		"<tr><th>Role: </th><td>{1}</td></tr>"+NEWLINE +
-		"<tr><th>Workgroup: </th><td>{2}</td></tr>"+NEWLINE +
-		"<tr><th>Date: </th><td>{3}</td></tr>"+NEWLINE +
-		"<tr><th>Prior feed Date/Time: </th><td>{4}</td></tr>"+NEWLINE +
-		"<tr><th>Description: </th><td>{5}</td></tr>"+NEWLINE +
-		"<tr><th>Return code: </th><td>{6}</td></tr>"+NEWLINE +
-		"<tr><th>Action Taken: </th><td>{7}</td></tr>"+NEWLINE+
-		"</table>"+NEWLINE+
-		"<!-- {8} -->" + NEWLINE;
-
-		MessageFormat msgf;
-		String abrversion="";
-
-		println(EACustom.getDocTypeHtml()); //Output the doctype and html
-
-		try
-		{
-			start_ABRBuild(false); // pull dummy VE
-
-		    abr_debuglvl = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getABRDebugLevel(m_abri.getABRCode());
-		       
-			setupPrintWriter();
-
-			//get properties file for the base class
-			rsBundle = ResourceBundle.getBundle(getClass().getName(), ABRUtil.getLocale(m_prof.getReadLanguage().getNLSID()));			
-			  //get the root entity using current timestamp, need this to get the timestamps or info for VE pulls
-	        m_elist = m_db.getEntityList(m_prof,
-	                new ExtractActionItem(null, m_db, m_prof,"dummy"),
-	                new EntityItem[] { new EntityItem(null, m_prof, getEntityType(), getEntityID()) });
-			long startTime = System.currentTimeMillis();			
-			// get root from VE
-			EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-			// debug display list of groups
-			addDebug("DEBUG: "+getShortClassName(getClass())+" entered for " +rootEntity.getKey()+
-					" extract: "+m_abri.getVEName()+" using DTS: "+m_prof.getValOn()+NEWLINE + PokUtils.outputList(m_elist));
-
-			//Default set to pass
-			setReturnCode(PASS);
-//			fixme remove this.. avoid msgs to userid for testing
-//			setCreateDGEntity(false);
-
-			//NAME is navigate attributes
-			navName = getNavigationName(rootEntity);
-
-            addDebug("getT1 entered for Periodic XMLRECRPTABR "+rootEntity.getKey());
-            // get it from the attribute
-            EANMetaAttribute metaAttr = rootEntity.getEntityGroup().getMetaAttribute("XMLRECRPTLRDTS");
-            if (metaAttr==null) {
-                throw new MiddlewareException("XMLRECRPTLRDTS not in meta for Periodic ABR "+rootEntity.getKey());
-            }
-            //TODO defect 636891 The xml report mismatch with the XMLRECPT.MQPROPFILE,
-            metaAttr = rootEntity.getEntityGroup().getMetaAttribute("MQPROPFILE");
-            if (metaAttr==null) {
-                throw new MiddlewareException("MQPROPFILE not in meta for Periodic ABR "+rootEntity.getKey());
-            }
-            String propfile = PokUtils.getAttributeFlagValue(rootEntity, attrXMLABRPROPFILE);   	
-	    	if (propfile == null) {
-	    	    addError("XMLRECRPTABR: No MQ properties files, nothing will be generated.");
-	    	    
-			    //NOT_REQUIRED = Not Required for {0}.
-			    addXMLGenMsg("NOT_REQUIRED", "XMLRECRPTABRSTATUS");     	        
-	    	} 	      
-            t1DTS = PokUtils.getAttributeValue(rootEntity, "XMLRECRPTLRDTS", ", ", m_strEpoch, false);
-            boolean istimestamp = isTimestamp(t1DTS);
-            if (istimestamp && getReturnCode()==PASS){
-            	AttributeChangeHistoryGroup statusHistory = getSTATUSHistory("XMLRECRPTABRSTATUS");
-                setT2DTS(statusHistory);
-                processThis(rootEntity, propfile);
-            } else if (!istimestamp){
-            	addError("Invalid DateTime Stamp for XMLRECRPTLRDTS, please put format: yyyy-MM-dd-HH.mm.ss.SSSSSS ");
-            }
-            if (getReturnCode()==PASS) {
-                PDGUtility pdgUtility = new PDGUtility();
-                OPICMList attList = new OPICMList();
-                attList.put("XMLRECRPTLRDTS","XMLRECRPTLRDTS=" + t2DTS);
-                pdgUtility.updateAttribute(m_db, m_prof, rootEntity, attList);
-            }
-            addDebug("Total Time: "+Stopwatch.format(System.currentTimeMillis()-startTime));
-			
-		}catch(Throwable exc) {
-			java.io.StringWriter exBuf = new java.io.StringWriter();
-			String Error_EXCEPTION="<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
-			String Error_STACKTRACE="<pre>{0}</pre>";
-			msgf = new MessageFormat(Error_EXCEPTION);
-			setReturnCode(INTERNAL_ERROR);
-			exc.printStackTrace(new java.io.PrintWriter(exBuf));
-			// Put exception into document
-			args[0] = exc.getMessage();
-			rptSb.append(msgf.format(args) + NEWLINE);
-			msgf = new MessageFormat(Error_STACKTRACE);
-			args[0] = exBuf.getBuffer().toString();
-			rptSb.append(msgf.format(args) + NEWLINE);
-			logError("Exception: "+exc.getMessage());
-			logError(exBuf.getBuffer().toString());
-		}
-		finally	{
-			setDGTitle(navName);
-			setDGRptName(getShortClassName(getClass()));
-			setDGRptClass(getABRCode());
-			// make sure the lock is released
-			if(!isReadOnly()) {
-				clearSoftLock();
-			}
-			closePrintWriter();
-		}
-
-		//Print everything up to </html>
-		//Insert Header into beginning of report
-		msgf = new MessageFormat(HEADER);
-		args[0] = getDescription();
-		args[1] = navName;
-		String header1 = msgf.format(args);
-		msgf = new MessageFormat(HEADER2);
-		args[0] = m_prof.getOPName();
-		args[1] = m_prof.getRoleDescription();
-		args[2] = m_prof.getWGName();
-		args[3] = getNow();
-		args[4] = t1DTS;
-		args[5] = navName;
-		args[6] = (this.getReturnCode()==PokBaseABR.PASS?"Passed":"Failed");
-		args[7] = actionTaken+"<br />"+xmlgenSb.toString();
-		args[8] = abrversion+" "+getABRVersion();
-
-		restoreXtraContent();
-		 //XML_MSG= XML Message
-		 //XML_MSG= XML Message
-        String info = header1+msgf.format(args)+"<pre>"+
-		rsBundle.getString("XML_MSG")+"<br />"+
-	    userxmlSb.toString()+"</pre>" + NEWLINE;
-		rptSb.insert(0, info + NEWLINE);
-
-		println(rptSb.toString()); // Output the Report
-		printDGSubmitString();
-		println(EACustom.getTOUDiv());
-		buildReportFooter(); // Print </html>
-
-		metaTbl.clear();
-	}
-	
-	/**
-	 * 
-	 * @param rootEntity
-	 * @throws Exception 
-	 */
-	 public void processThis (EntityItem rootEntity, String propfile) throws Exception{
-		 StringBuffer strbSQL;
-		 addDebug("XMLRECRPTABR.processThis checking between "+t1DTS+" and "+t2DTS);
-		 strbSQL = new StringBuffer();
-		 strbSQL.append("select SETUPENTITYTYPE, SETUPENTITYID, SETUPDTS, MSGTYPE, ENTITYTYPE, ENTITYID, DTSOFMSG, MSGCOUNT from cache.xmlmsglog ");
-		 strbSQL.append(" where sendmsgdts between '" + t1DTS + "' and '" + t2DTS + "'");
-		 if (propfile != null){
-			 strbSQL.append(" and locate('"+ propfile + "', MQPROPFILE)>0");
-		 }
-		 strbSQL.append(" and msgstatus = 'S' order by setupdts, msgtype, setupentityid");
-		 TreeMap rootmap = new TreeMap();
-	        ResultSet result=null;
-			PreparedStatement statement = null;			
-	        try {
-	        	statement = m_db.getODSConnection().prepareStatement(new String(strbSQL));
-	        	result = statement.executeQuery();
-	        	int chunkcounter = 0;
-	        	int counter=0;
-	        	while (result.next()) {
-	        		counter++;
-	        		String setupentitytype = result.getString(1);
-					int setupentityid = result.getInt(2);
-					String setupdts = result.getString(3);
-					String msgtype = result.getString(4);
-					String entitytype = result.getString(5);
-					int entityid = result.getInt(6);
-					String dtsofmsg = result.getString(7);
-					int msgcount = result.getInt(8);
-					if (setupentitytype ==null)
-						setupentitytype = CHEAT;
-					if (setupdts ==null){
-						setupdts = CHEAT;
-					}else{
-						setupdts =  setupdts.replace(' ','-').replace(':','.');
-					}	
-					if (msgtype ==null)
-						msgtype = CHEAT;
-					if (entitytype ==null)
-						entitytype = CHEAT;
-					if (dtsofmsg ==null){
-						dtsofmsg = CHEAT;
-					} else {
-						dtsofmsg = dtsofmsg.replace(' ','-').replace(':','.');
-					}
-					String key = setupentitytype + setupdts + msgtype + Integer.toString(setupentityid);
-					if (!rootmap.containsKey(key)){
-						XMLMSGInfo xmlmsginfo = new XMLMSGInfo(setupentitytype,setupentityid,setupdts,msgtype,msgcount);
-						xmlmsginfo.getEntitylist_xml().add(new String[]{entitytype,("0".equals(Integer.toString(entityid))?CHEAT:Integer.toString(entityid)),dtsofmsg});
-						rootmap.put(key, xmlmsginfo);
-					} else{
-						//TODO set MSGCOUNT
-						XMLMSGInfo xmlmsginfo = (XMLMSGInfo)rootmap.get(key);			
-						xmlmsginfo.setMsgcount_xml(xmlmsginfo.getMsgcount_xml() + msgcount);
-						xmlmsginfo.getEntitylist_xml().add(new String[]{entitytype,("0".equals(Integer.toString(entityid))?CHEAT:Integer.toString(entityid)),dtsofmsg});
-					}
-					if (counter>=XMLMSGLOG_ROW_LIMIT){
-						addDebug("Chunking size is " +  XMLMSGLOG_ROW_LIMIT + ". Start to run chunking "  + ++chunkcounter  + " times.");
-						sentToMQ(rootmap, rootEntity);
-						counter = 0;
-					}
-	            }
-	            //TODO
-	            if (counter>0){
-	            	sentToMQ(rootmap, rootEntity);
-	            }else if((XMLMSGLOG_ROW_LIMIT*chunkcounter+counter)==0){
-	            	sentToMQ(rootmap, rootEntity); 
-	            }
-	            
-	            
-	            addOutput("The total number is " + (XMLMSGLOG_ROW_LIMIT*chunkcounter+ counter) + " entities");	
-				
-	        } catch (RuntimeException rx) {
-	        	addXMLGenMsg("FAILED", rootEntity.getKey());
-				addDebug("RuntimeException on ? " + rx);
-			    rx.printStackTrace();
-			    throw rx;
-			} catch (Exception x) {
-				addXMLGenMsg("FAILED", rootEntity.getKey());
-				addDebug("Exception on ? " + x);
-			    x.printStackTrace();
-			    throw x;
-			}finally{
-				 if (statement != null)
-					try {
-						statement.close();
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-			}
-	 }
-	 private void sentToMQ(TreeMap xmlmsgMap,EntityItem rootEntity) throws DOMException, MissingResourceException, ParserConfigurationException, TransformerException{
-		 	String val = PokUtils.getAttributeFlagValue(rootEntity, attrXMLABRPROPFILE);
-	    	Vector vct = new Vector();    	
-	    	if (val != null) {
-	    		// parse the string into substrings    	        
-	    	    StringTokenizer st = new StringTokenizer(val,PokUtils.DELIMITER);    	           
-	    	    while(st.hasMoreTokens())
-	            {
-	    	        vct.addElement(st.nextToken());
-	            }                       	        
-	    	}
-//	    	If XMLRECPT attribute XMLRECRPTOPTION has a value of “Not Zero Report” (NRZERO), then do not send a report when <MSGCOUNT> was set to zero.
-	    	String xmlrecrptoption = PokUtils.getAttributeFlagValue(rootEntity, "XMLRECRPTOPTION");
-	    	addDebug("XMLRECRPTOPTION = " + xmlrecrptoption);
-	    	if(xmlmsgMap.size()==0 && "XRZERO".equals(xmlrecrptoption)){
-	    		//do nothing
-	    		addDebug("don't send anything when xmlmsgMap.size is 0 and XMLRECRPTOPTION = " + xmlrecrptoption);
-	    	}
-	    	else if (xmlmsgMap.size()==0 && !("XRZERO".equals(xmlrecrptoption))){				
-				//NO_CHANGES_FND=No Changes found for {0}
-				//addOutput("No message log found for ADSWWCOMPATXMLABR");	    		
-				processMQZero(xmlmsgMap, vct);
-				addDebug("send zero report when xmlmsgMap.size is 0 and XMLRECRPTOPTION = " + xmlrecrptoption);
-			}else{
-				addDebug("send normal report when xmlmsgMap.size > 0 and XMLRECRPTOPTION = " + xmlrecrptoption);
-				processMQ(xmlmsgMap, vct);
-		    }
-					
-	    	// release memory		
-			xmlmsgMap.clear();
-			
-		}
-	 /**
-		 * @param abr
-		 * @param profileT2
-		 * @param compatVct
-		 * @param mqVct
-		 * @throws ParserConfigurationException
-		 * @throws DOMException
-		 * @throws TransformerException
-		 * @throws MissingResourceException
-		 */
-		private void processMQZero(TreeMap xmlmsgMap, Vector mqVct) throws ParserConfigurationException, DOMException, TransformerException, MissingResourceException {
-			if (mqVct==null){
-				addDebug("XMLRECRPTABR: No MQ properties files, nothing will be generated.");
-				//NOT_REQUIRED = Not Required for {0}.
-				addXMLGenMsg("NOT_REQUIRED", "XMLRECRPTABRSTATUS");
-			}else{
-					DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-					DocumentBuilder builder = factory.newDocumentBuilder();
-					Document document = builder.newDocument();  // Create
-					String nodeName = "RECONCILE_MSGS";
-					String xmlns = "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/" + nodeName;
-
-					// Element parent = (Element) document.createElement("WWCOMPAT_UPDATE");
-					Element parent = (Element) document.createElementNS(xmlns,nodeName);
-					parent.appendChild(document.createComment("RECONCILE_MSGS Version "+XMLMQAdapter.XMLVERSION10+" Mod "+XMLMQAdapter.XMLMOD10));
-					// create the root
-					document.appendChild(parent);
-					parent.setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns",xmlns);
-
-			        Element elem = (Element) document.createElement("DTSOFMSG");
-					elem.appendChild(document.createTextNode(getNow()));
-					parent.appendChild(elem);
-				    elem = (Element) document.createElement("FROMMSGDTS");
-					elem.appendChild(document.createTextNode(t1DTS));
-					parent.appendChild(elem);
-					elem = (Element) document.createElement("TOMSGDTS");
-					elem.appendChild(document.createTextNode(t2DTS));
-					parent.appendChild(elem);
-					Element msglist = (Element) document.createElement("MSGLIST");
-					parent.appendChild(msglist);					
-						Element msglog = (Element) document.createElement("MSGELEMENT");
-						msglist.appendChild(msglog);
-	
-						elem = (Element) document.createElement("SETUPENTITYTYPE");
-						elem.appendChild(document.createTextNode(CHEAT));
-						msglog.appendChild(elem);
-	
-						elem = (Element) document.createElement("SETUPENTITYID");
-						elem.appendChild(document.createTextNode(CHEAT));
-						msglog.appendChild(elem);
-	
-						elem = (Element) document.createElement("SETUPDTS");
-						elem.appendChild(document.createTextNode(CHEAT));
-						msglog.appendChild(elem);
-	
-						elem = (Element) document.createElement("MSGTYPE");
-						elem.appendChild(document.createTextNode(CHEAT));
-						msglog.appendChild(elem);
-						
-						elem = (Element) document.createElement("MSGCOUNT");
-						elem.appendChild(document.createTextNode("0"));
-						msglog.appendChild(elem);
-	
-						Element entitylist = (Element) document.createElement("ENTITYLIST");
-						msglog.appendChild(entitylist);
-
-				String xml = transformXML(document);
-//				new added
-				boolean ifpass = false;
-//				String entitytype = rootEntity.getEntityType();
-				String entitytype = "XMLRECPT";
-				String ifNeed = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("ADSABRSTATUS" ,"_"+entitytype+"_XSDNEEDED","NO");
-				if ("YES".equals(ifNeed.toUpperCase())) {
-				   String xsdfile = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("ADSABRSTATUS","_"+entitytype+"_XSDFILE","NONE");
-				    if ("NONE".equals(xsdfile)) {
-				    	addError("there is no xsdfile for "+entitytype+" defined in the propertyfile ");
-				    } else {
-				    	long rtm = System.currentTimeMillis();
-				    	Class cs = this.getClass();
-				    	StringBuffer debugSb = new StringBuffer();
-				    	ifpass = ABRUtil.validatexml(cs,debugSb,xsdfile,xml);
-				    	if (debugSb.length()>0){
-				    		String s = debugSb.toString();
-							if (s.indexOf("fail") != -1)
-								addError(s);
-							addOutput(s);
-				    	}
-				    	long ltm = System.currentTimeMillis();
-						addDebug(D.EBUG_DETAIL, "Time for validation: "+Stopwatch.format(ltm-rtm));
-				    	if (ifpass) {
-				    		addDebug("the xml for "+entitytype+" passed the validation");
-				    	}
-				    }
-				} else {
-					addOutput("the xml for "+entitytype+" doesn't need to be validated");
-					ifpass = true;
-				}
-
-				//new added end
-				//add flag(new added)
-				if (xml != null && ifpass) {
-				//addDebug("XMLRECRPTABR: Generated MQ xml:"+ADSABRSTATUS.NEWLINE+xml+ADSABRSTATUS.NEWLINE);
-				notify("XMLRECPT", xml, mqVct);
-				}
-				document = null;
-			}
-
-		}
-	 
-	 /**
-		 * @param abr
-		 * @param profileT2
-		 * @param compatVct
-		 * @param mqVct
-		 * @throws ParserConfigurationException
-		 * @throws DOMException
-		 * @throws TransformerException
-		 * @throws MissingResourceException
-		 */
-		private void processMQ(TreeMap xmlmsgMap, Vector mqVct) throws ParserConfigurationException, DOMException, TransformerException, MissingResourceException {
-			if (mqVct==null){
-				addDebug("XMLRECRPTABR: No MQ properties files, nothing will be generated.");
-				//NOT_REQUIRED = Not Required for {0}.
-				addXMLGenMsg("NOT_REQUIRED", "XMLRECRPTABRSTATUS");
-			}else{
-					DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-					DocumentBuilder builder = factory.newDocumentBuilder();
-					Document document = builder.newDocument();  // Create
-					String nodeName = "RECONCILE_MSGS";
-					String xmlns = "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/" + nodeName;
-
-					// Element parent = (Element) document.createElement("WWCOMPAT_UPDATE");
-					Element parent = (Element) document.createElementNS(xmlns,nodeName);
-					parent.appendChild(document.createComment("RECONCILE_MSGS Version "+XMLMQAdapter.XMLVERSION10+" Mod "+XMLMQAdapter.XMLMOD10));
-					// create the root
-					document.appendChild(parent);
-					parent.setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns",xmlns);
-
-			        Element elem = (Element) document.createElement("DTSOFMSG");
-					elem.appendChild(document.createTextNode(getNow()));
-					parent.appendChild(elem);
-				    elem = (Element) document.createElement("FROMMSGDTS");
-					elem.appendChild(document.createTextNode(t1DTS));
-					parent.appendChild(elem);
-					elem = (Element) document.createElement("TOMSGDTS");
-					elem.appendChild(document.createTextNode(t2DTS));
-					parent.appendChild(elem);
-					Element msglist = (Element) document.createElement("MSGLIST");
-					parent.appendChild(msglist);					
-					Collection xmlmsglogs = xmlmsgMap.values();
-					Iterator itr = xmlmsglogs.iterator();
-					while (itr.hasNext()){
-						XMLMSGInfo xmlmsginfo = (XMLMSGInfo)itr.next();
-						Element msglog = (Element) document.createElement("MSGELEMENT");
-						msglist.appendChild(msglog);
-
-						elem = (Element) document.createElement("SETUPENTITYTYPE");
-						elem.appendChild(document.createTextNode(xmlmsginfo.setupentitytype_xml));
-						msglog.appendChild(elem);
-
-						elem = (Element) document.createElement("SETUPENTITYID");
-						elem.appendChild(document.createTextNode(xmlmsginfo.setupentityid_xml));
-						msglog.appendChild(elem);
-
-						elem = (Element) document.createElement("SETUPDTS");
-						elem.appendChild(document.createTextNode(xmlmsginfo.setupdts_xml));
-						msglog.appendChild(elem);
-
-						elem = (Element) document.createElement("MSGTYPE");
-						elem.appendChild(document.createTextNode(xmlmsginfo.msgtype_xml));
-						msglog.appendChild(elem);
-						
-						elem = (Element) document.createElement("MSGCOUNT");
-						elem.appendChild(document.createTextNode(Integer.toString(xmlmsginfo.getMsgcount_xml())));
-						msglog.appendChild(elem);
-
-						Element entitylist = (Element) document.createElement("ENTITYLIST");
-						msglog.appendChild(entitylist);
-						if(!SETUP_MSGTYPE_TBL.containsKey(xmlmsginfo.setupentitytype_xml)){
-							for (int i = 0; i < xmlmsginfo.entitylist_xml.size(); i++){
-								Element entityelement = (Element) document.createElement("ENTITYELEMENT");
-								entitylist.appendChild(entityelement);
-								String[] entitymsg = (String[])xmlmsginfo.entitylist_xml.elementAt(i);
-								elem = (Element) document.createElement("ENTITYTYPE");
-								elem.appendChild(document.createTextNode(entitymsg[0]));
-								entityelement.appendChild(elem);
-								elem = (Element) document.createElement("ENTITYID");
-								elem.appendChild(document.createTextNode(entitymsg[1]));
-								entityelement.appendChild(elem);
-								elem = (Element) document.createElement("DTSOFMSG");
-								elem.appendChild(document.createTextNode(entitymsg[2]));
-								entityelement.appendChild(elem);
-	
-							}
-						}
-						// release memory
-						xmlmsginfo.dereference();
-				}
-
-				String xml = transformXML(document);
-//				new added
-				boolean ifpass = false;
-//				String entitytype = rootEntity.getEntityType();
-				String entitytype = "XMLRECPT";
-				String ifNeed = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("ADSABRSTATUS" ,"_"+entitytype+"_XSDNEEDED","NO");
-				if ("YES".equals(ifNeed.toUpperCase())) {
-				   String xsdfile = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("ADSABRSTATUS","_"+entitytype+"_XSDFILE","NONE");				    if ("NONE".equals(xsdfile)) {
-				    	addError("there is no xsdfile for "+entitytype+" defined in the propertyfile ");
-				    } else {
-				    	long rtm = System.currentTimeMillis();
-				    	Class cs = this.getClass();
-				    	StringBuffer debugSb = new StringBuffer();
-				    	ifpass = ABRUtil.validatexml(cs,debugSb,xsdfile,xml);
-				    	if (debugSb.length()>0){
-				    		String s = debugSb.toString();
-							if (s.indexOf("fail") != -1)
-								addError(s);
-							addOutput(s);
-				    	}
-				    	long ltm = System.currentTimeMillis();
-						addDebug(D.EBUG_DETAIL, "Time for validation: "+Stopwatch.format(ltm-rtm));
-				    	if (ifpass) {
-				    		addDebug("the xml for "+entitytype+" passed the validation");
-				    	}
-				    }
-				} else {
-					addOutput("the xml for "+entitytype+" doesn't need to be validated");
-					ifpass = true;
-				}
-
-				//new added end
-
-
-				//add flag(new added)
-				if (xml != null && ifpass) {
-				//addDebug("XMLRECRPTABR: Generated MQ xml:"+ADSABRSTATUS.NEWLINE+xml+ADSABRSTATUS.NEWLINE);
-				notify("XMLRECPT", xml, mqVct);
-				}
-				document = null;
-			}
-
-		}
-		
-		 /**********************************
-	     * generate the xml
-	     */
-	    protected String transformXML(Document document) throws
-	    ParserConfigurationException,
-	    javax.xml.transform.TransformerException
-	    {
-	        //set up a transformer
-	        TransformerFactory transfac = TransformerFactory.newInstance();
-	        Transformer trans = transfac.newTransformer();
-	        trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-	        // OIDH can't handle whitespace.. trans.setOutputProperty(OutputKeys.INDENT, "yes");
-	        trans.setOutputProperty(OutputKeys.INDENT, "no");
-	        trans.setOutputProperty(OutputKeys.METHOD, "xml");
-	        trans.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-
-	        //create string from xml tree
-	        java.io.StringWriter sw = new java.io.StringWriter();
-	        StreamResult result = new StreamResult(sw);
-	        DOMSource source = new DOMSource(document);
-	        trans.transform(source, result);
-	        String xmlString = XMLElem.removeCheat(sw.toString());
-
-	        //(ADSABRSTATUS)mqAbr.addDebug
-	        // transform again for user to see in rpt
-	        trans.setOutputProperty(OutputKeys.INDENT, "yes");
-	        sw = new java.io.StringWriter();
-	        result = new StreamResult(sw);
-	        trans.transform(source, result);
-	        addUserXML(XMLElem.removeCheat(sw.toString()));
-
-	        return xmlString;
-	    }
-	    /**********************************
-	     * feed the xml
-	     */
-
-	    // RQK change to receive mqVct as a parameter
-
-	    protected void notify(String rootInfo, String xml, Vector mqVct)
-	    throws MissingResourceException
-	    {
-	        MessageFormat msgf = null;
-	        // Vector mqVct = mqAbr.getMQPropertiesFN();
-	        int sendCnt=0;
-	        boolean hasFailure = false;
-
-	        // write to each queue, only one now, but leave this just in case
-	        for (int i=0; i<mqVct.size(); i++){
-
-	            String mqProperties = (String)mqVct.elementAt(i);
-	            addDebug("in notify looking at prop file "+mqProperties);
-	            try {
-	                ResourceBundle rsBundleMQ = ResourceBundle.getBundle(mqProperties,
-	                        getLocale(getProfile().getReadLanguage().getNLSID()));
-	                Hashtable ht = MQUsage.getMQSeriesVars(rsBundleMQ);
-	                boolean bNotify = ((Boolean)ht.get(MQUsage.NOTIFY)).booleanValue();
-	                ht.put(MQUsage.MQCID,getMQCID()); //add to hashtable for CID to MQ
-	                ht.put(MQUsage.XMLTYPE,"ADS"); //add to hashtable to indicate ADS msg
-					Hashtable userProperties = MQUsage.getUserProperties(rsBundleMQ, getMQCID());
-	                if (bNotify) {
-	                    try{
-							addDebug("User infor " + userProperties);
-	                    	MQUsage.putToMQQueueWithRFH2("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+xml, ht,userProperties);
-	                        //SENT_SUCCESS = XML was generated and sent successfully for {0} {1}.
-	                        msgf = new MessageFormat(rsBundle.getString("SENT_SUCCESS"));
-	                        args[0] = mqProperties;
-	                        args[1] = rootInfo;
-	                        addOutput(msgf.format(args));
-	                        sendCnt++;
-	                        if (!hasFailure){  // dont overwrite a failed notice
-	                            //xmlgen = rsBundle.getString("SUCCESS");//"Success";
-	                            addXMLGenMsg("SUCCESS", rootInfo);
-	                            addDebug("sent successfully to prop file "+mqProperties);
-	                        }
-	                    }catch (com.ibm.mq.MQException ex) {
-	                        //MQ_ERROR = Error: An MQSeries error occurred for {0}: Completion code {1} Reason code {2}.
-	                        //FAILED = Failed sending {0}
-	                        addXMLGenMsg("FAILED", rootInfo);
-	                        hasFailure = true;
-	                        msgf = new MessageFormat(rsBundle.getString("MQ_ERROR"));
-	                        args[0] = mqProperties+" "+rootInfo;
-	                        args[1] = ""+ex.completionCode;
-	                        args[2] = ""+ex.reasonCode;
-	                        addError(msgf.format(args));
-	                        ex.printStackTrace(System.out);
-	                        addDebug("failed sending to prop file "+mqProperties);
-	                    } catch (java.io.IOException ex) {
-	                        //MQIO_ERROR = Error: An error occurred when writing to the MQ message buffer for {0}: {1}
-	                        addXMLGenMsg("FAILED", rootInfo);
-	                        hasFailure = true;
-	                        msgf = new MessageFormat(rsBundle.getString("MQIO_ERROR"));
-	                        args[0] = mqProperties+" "+rootInfo;
-	                        args[1] = ex.toString();
-	                        addError(msgf.format(args));
-	                        ex.printStackTrace(System.out);
-	                        addDebug("failed sending to prop file "+mqProperties);
-	                    }
-	                }else{
-	                    //NO_NOTIFY = XML was generated but NOTIFY was false in the {0} properties file.
-	                    msgf = new MessageFormat(rsBundle.getString("NO_NOTIFY"));
-	                    args[0] = mqProperties;
-	                    addError(msgf.format(args));
-	                    //{0} "Not sent";
-	                    addXMLGenMsg("NOT_SENT", rootInfo);
-	                    addDebug("not sent to prop file "+mqProperties+ " because Notify not true");
-
-	                }
-	            } catch (MissingResourceException mre) {
-	                addXMLGenMsg("FAILED",mqProperties + " " + rootInfo);
-	                hasFailure = true;
-	                addError("Prop file "+mqProperties + " "+rootInfo + " not found");
-	            }
-
-	        } // end mq loop
-	        if (sendCnt>0 && sendCnt!=mqVct.size()){ // some went but not all
-	            addXMLGenMsg("ALL_NOT_SENT", rootInfo);// {0} "Not sent to all";
-	        }
-	    }
-	  /**********************************************************************************
-     * Get the history of the ABR (XMLRECRPTABRSTATUS) in VALFROM order
-     *  The current value should be “In Process?? (0050)
-     *  TQ = VALFROM of this row.
-     *  T2 = TQ
-     * @throws MiddlewareException 
-     */
-    private void setT2DTS(AttributeChangeHistoryGroup xmlrecrptabrstatus) throws MiddlewareException {
-      
-            if (xmlrecrptabrstatus != null && xmlrecrptabrstatus.getChangeHistoryItemCount() > 1) {
-                // get the historyitem count.
-                int i = xmlrecrptabrstatus.getChangeHistoryItemCount();
-                // Find the time stamp for "Queued" Status. Notic: last
-                // chghistory is the current one(in process),-2 is queued.
-                AttributeChangeHistoryItem achi = (AttributeChangeHistoryItem) xmlrecrptabrstatus.getChangeHistoryItem(i - 1);
-                if (achi != null) {
-                    addDebug("getT2Time [" + (i - 1) + "] isActive: " + achi.isActive() + " isValid: " + achi.isValid()
-                            + " chgdate: " + achi.getChangeDate() + " flagcode: " + achi.getFlagCode());
-                    if (achi.getFlagCode().equals(STATUS_PROCESS)) {
-                        t2DTS = achi.getChangeDate();
-                    } else {
-                        addDebug("getT2Time for the value of " + achi.getFlagCode()
-                                + "is not Queued, set getNow() to t2DTS and find the prior &DTFS!");
-                        t2DTS = getNow();
-                    }
-                }
-            } else {
-                t2DTS = getNow();
-                addDebug("getT2Time for ADSABRSTATUS changedHistoryGroup has no history, set getNow to t2DTS");
-            }
-        
-    }
-    /**
-     * set instance variable ADSABRSTATUSHistory
-     * @param mqAbr
-     * @return
-     * @throws MiddlewareException
-     */
-    private AttributeChangeHistoryGroup getSTATUSHistory(String attCode) throws MiddlewareException {
-        EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-        EANAttribute att = rootEntity.getAttribute(attCode);
-        if (att != null) {
-            return new AttributeChangeHistoryGroup(m_db, m_prof, att);
-        } else {
-            addDebug( attCode + " of "+rootEntity.getKey()+ "  was null");
-            return null;
-        }
-    }
-    /**
-     * CHECK whether is DateTime Stamp
-     * @param dateString
-     * @return
-     */
-    public static boolean isTimestamp(String dateString){
-		boolean isValid = false;
-		DateFormat dateFormat;
-		dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss.SSSSSS",Locale.ENGLISH);
-		try {
-			dateFormat.parse(dateString);
-			isValid = true;
-		} catch (ParseException e) {
-			isValid = false;
-		}
-		return isValid;
-	}
-    /**
-     *  restoreXtraContent
-     *
-     */
-    private void restoreXtraContent(){
-        // if written to file and still small enough, restore debug and xmlgen to the abr rpt and delete the file
-        if (userxmlLen+rptSb.length()<MAXFILE_SIZE){
-            // read the file in and put into the stringbuffer
-            InputStream is = null;
-            FileInputStream fis = null;
-            BufferedReader rdr = null;
-            try{
-                fis = new FileInputStream(userxmlfn);
-                is = new BufferedInputStream(fis);
-
-                String s=null;
-                rdr = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-                // append lines until done
-                while((s=rdr.readLine()) !=null){
-                    userxmlSb.append(ADSABRSTATUS.convertToHTML(s)+NEWLINE);
-                }
-                // remove the file
-                File f1 = new File(userxmlfn);
-                if (f1.exists()) {
-                    f1.delete();
-                }
-            }catch(Exception e){
-                e.printStackTrace();
-            }finally{
-                if (is!=null){
-                    try{
-                        is.close();
-                    }catch(Exception x){
-                        x.printStackTrace();
-                    }
-                }
-                if (fis!=null){
-                    try{
-                        fis.close();
-                    }catch(Exception x){
-                        x.printStackTrace();
-                    }
-                }
-            }
-        }else{
-            userxmlSb.append("XML generated was too large for this file");
-        }
-        // if written to file and still small enough, restore debug and xmlgen to the abr rpt and delete the file
-        if (dbgLen+userxmlSb.length()+rptSb.length()<MAXFILE_SIZE){
-            // read the file in and put into the stringbuffer
-            InputStream is = null;
-            FileInputStream fis = null;
-            BufferedReader rdr = null;
-            try{
-                fis = new FileInputStream(dbgfn);
-                is = new BufferedInputStream(fis);
-
-                String s=null;
-                StringBuffer sb = new StringBuffer();
-                rdr = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-                // append lines until done
-                while((s=rdr.readLine()) !=null){
-                    sb.append(s+NEWLINE);
-                }
-                rptSb.append("<!-- "+sb.toString()+" -->"+NEWLINE);
-
-                // remove the file
-                File f1 = new File(dbgfn);
-                if (f1.exists()) {
-                    f1.delete();
-                }
-            }catch(Exception e){
-                e.printStackTrace();
-            }finally{
-                if (is!=null){
-                    try{
-                        is.close();
-                    }catch(Exception x){
-                        x.printStackTrace();
-                    }
-                }
-                if (fis!=null){
-                    try{
-                        fis.close();
-                    }catch(Exception x){
-                        x.printStackTrace();
-                    }
-                }
-            }
-        }
-    }
-    
-	 /**********************************************************************************
-     *  Get Locale based on NLSID
-     *
-     *@return java.util.Locale
-     */
-    public static Locale getLocale(int nlsID)
-    {
-        Locale locale = null;
-        switch (nlsID)
-        {
-        case 1:
-            locale = Locale.US;
-            break;
-        case 2:
-            locale = Locale.GERMAN;
-            break;
-        case 3:
-            locale = Locale.ITALIAN;
-            break;
-        case 4:
-            locale = Locale.JAPANESE;
-            break;
-        case 5:
-            locale = Locale.FRENCH;
-            break;
-        case 6:
-            locale = new Locale("es", "ES");
-            break;
-        case 7:
-            locale = Locale.UK;
-            break;
-        default:
-            locale = Locale.US;
-        break;
-        }
-        return locale;
-    }
-    /******************************************
-     * build xml generation msg
-     */
-    protected void addXMLGenMsg(String rsrc, String info)
-    {
-        MessageFormat msgf = new MessageFormat(rsBundle.getString(rsrc));
-        Object args[] = new Object[]{info};
-        xmlgenSb.append(msgf.format(args)+"<br />");
-    }
-
-	/******
-	 * @see COM.ibm.eannounce.abr.util.PokBaseABR#dereference()
-	 */
-	public void dereference(){
-		super.dereference();
-
-		rsBundle = null;
-		rptSb = null;
-		args = null;
-
-		metaTbl = null;
-		navName = null;
-		vctReturnsEntityKeys.clear();
-		vctReturnsEntityKeys = null;
-
-		dbgPw=null;
-		dbgfn = null;
-	}
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.util.PokBaseABR#getABRVersion()
-	 */
-	public String getABRVersion() {
-		return "$Revision: 1.2 $";
-	}
-	  /**********************************
-    *
-	A.	MQ-Series CID
-    */
-    public String getMQCID() { return "RECONCILE_MSGS"; }
-
-
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.util.PokBaseABR#getDescription()
-	 */
-	public String getDescription() {
-		return "ADSIDLSTATUS";
-	}
-	/**********************************
-	 * add msg to report output
-	 * @param msg
-	 */
-	protected void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
-
-	/**********************************
-	 * add debug info as html comment
-	 * @param msg
-	 */
-	protected void addDebug(String msg) { 
-		dbgLen+=msg.length();
-		dbgPw.println(msg);
-		dbgPw.flush();
-		//rptSb.append("<!-- "+msg+" -->"+NEWLINE);
-	}
-	/**********************
-	 * support conditional msgs
-	 * @param level
-	 * @param msg
-	 */
-	protected void addDebug(int level,String msg) { 
-		if (level <= abr_debuglvl) {
-			addDebug(msg);
-		}
-	}
-	/**********************************
-	 * used for error output
-	 * Prefix with LD(EntityType) NDN(EntityType) of the EntityType that the ABR is checking
-	 * (root EntityType)
-	 *
-	 * The entire message should be prefixed with 'Error: '
-	 *
-	 */
-	protected void addError(String errCode, Object args[]){
-		setReturnCode(FAIL);
-
-		//ERROR_PREFIX = Error:  reduce size of output, do not prepend root info
-		addMessage(rsBundle.getString("ERROR_PREFIX"), errCode, args);
-	} 
-    /**********************************
-     * add error info and fail abr
-     */
-    protected void addError(String msg) {
-        addOutput(msg);
-        setReturnCode(FAIL);
-    }
-
-
-	/**********************************
-	 * used for warning or error output
-	 *
-	 */
-	private void addMessage(String msgPrefix, String errCode, Object args[])
-	{
-		String msg = rsBundle.getString(errCode);
-		// get message to output
-		if (args!=null){
-			MessageFormat msgf = new MessageFormat(msg);
-			msg = msgf.format(args);
-		}
-
-		addOutput(msgPrefix+" "+msg);
-	}
-
-	/**********************************************************************************
-	 *  Get Name based on navigation attributes for specified entity
-	 *
-	 *@return java.lang.String
-	 */
-	private String getNavigationName(EntityItem theItem) throws java.sql.SQLException, MiddlewareException
-	{
-		StringBuffer navName = new StringBuffer();
-
-		// NAME is navigate attributes
-		// check hashtable to see if we already got this meta
-		EANList metaList = (EANList)metaTbl.get(theItem.getEntityType());
-		if (metaList==null)	{
-			EntityGroup eg = new EntityGroup(null, m_db, m_prof, theItem.getEntityType(), "Navigate");
-			metaList = eg.getMetaAttribute();  // iterator does not maintain navigate order
-			metaTbl.put(theItem.getEntityType(), metaList);
-		}
-		for (int ii=0; ii<metaList.size(); ii++){
-			EANMetaAttribute ma = (EANMetaAttribute)metaList.getAt(ii);
-			navName.append(PokUtils.getAttributeValue(theItem, ma.getAttributeCode(),", ", "", false));
-			if (ii+1<metaList.size()){
-				navName.append(" ");
-			}
-		}
-
-		return navName.toString().trim();
-	}
-
-	 private static class XMLMSGInfo{
-			
-         String setupentitytype_xml = XMLElem.CHEAT;
-         String setupentityid_xml = XMLElem.CHEAT;
-         String setupdts_xml = XMLElem.CHEAT;
-         String msgtype_xml = XMLElem.CHEAT; 
-         int  msgcount_xml;
-         Vector entitylist_xml = new Vector ();
-
-
-         XMLMSGInfo(
-                     String setupentitytype,
-                     int    setupentityid,
-                     String setupdts,
-                     String msgtype,
-                     int msgcount
-                     )
-
-                 {
-		        	 if (setupentitytype != null){
-		        		 setupentitytype_xml = setupentitytype.trim();
-		 			}
-		 			
-		 			if (setupentityid != 0){
-		 				setupentityid_xml = Integer.toString(setupentityid);
-		 			}
-		 						
-		 			if (setupdts != null){
-		 				setupdts_xml = setupdts.trim();
-		 			}
-		 			
-		             if (msgtype != null){
-		            	 msgtype_xml = msgtype.trim();
-		 			}
-		             msgcount_xml = msgcount;
-		            	 
-            }
-         
-         void dereference(){
-        	 setupentitytype_xml = null; 		
-        	 setupentityid_xml = null;
-        	 setupdts_xml = null;
-        	 msgtype_xml = null;
-        	 if (entitylist_xml!=null)
-        	 entitylist_xml.clear();
-        	 entitylist_xml = null;
-         }
-
-		public Vector getEntitylist_xml() {
-			return entitylist_xml;
-		}
-
-		public void setEntitylist_xml(Vector entitylist_xml) {
-			this.entitylist_xml = entitylist_xml;
-		}
-
-		public int getMsgcount_xml() {
-			return msgcount_xml;
-		}
-
-		public void setMsgcount_xml(int msgcount_xml) {
-			this.msgcount_xml = msgcount_xml;
-		}
-		
-		String getKey(){
-			return setupentitytype_xml+setupentityid_xml+setupdts_xml+msgtype_xml;
-		}
-	 }
-}
-
+/*      */ package COM.ibm.eannounce.abr.ln.adsxmlbh1;
+/*      */ 
+/*      */ import COM.ibm.eannounce.abr.util.ABRUtil;
+/*      */ import COM.ibm.eannounce.abr.util.EACustom;
+/*      */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*      */ import COM.ibm.eannounce.abr.util.XMLElem;
+/*      */ import COM.ibm.eannounce.objects.AttributeChangeHistoryGroup;
+/*      */ import COM.ibm.eannounce.objects.AttributeChangeHistoryItem;
+/*      */ import COM.ibm.eannounce.objects.EANAttribute;
+/*      */ import COM.ibm.eannounce.objects.EANList;
+/*      */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*      */ import COM.ibm.eannounce.objects.EntityGroup;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*      */ import COM.ibm.eannounce.objects.MQUsage;
+/*      */ import COM.ibm.eannounce.objects.PDGUtility;
+/*      */ import COM.ibm.opicmpdh.middleware.D;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.Stopwatch;
+/*      */ import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+/*      */ import COM.ibm.opicmpdh.transactions.OPICMList;
+/*      */ import com.ibm.mq.MQException;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.io.BufferedInputStream;
+/*      */ import java.io.BufferedReader;
+/*      */ import java.io.File;
+/*      */ import java.io.FileInputStream;
+/*      */ import java.io.FileOutputStream;
+/*      */ import java.io.IOException;
+/*      */ import java.io.InputStreamReader;
+/*      */ import java.io.OutputStreamWriter;
+/*      */ import java.io.PrintWriter;
+/*      */ import java.io.StringWriter;
+/*      */ import java.sql.PreparedStatement;
+/*      */ import java.sql.ResultSet;
+/*      */ import java.sql.SQLException;
+/*      */ import java.text.MessageFormat;
+/*      */ import java.text.ParseException;
+/*      */ import java.text.SimpleDateFormat;
+/*      */ import java.util.Collection;
+/*      */ import java.util.Hashtable;
+/*      */ import java.util.Iterator;
+/*      */ import java.util.Locale;
+/*      */ import java.util.MissingResourceException;
+/*      */ import java.util.ResourceBundle;
+/*      */ import java.util.StringTokenizer;
+/*      */ import java.util.TreeMap;
+/*      */ import java.util.Vector;
+/*      */ import javax.xml.parsers.DocumentBuilder;
+/*      */ import javax.xml.parsers.DocumentBuilderFactory;
+/*      */ import javax.xml.parsers.ParserConfigurationException;
+/*      */ import javax.xml.transform.Transformer;
+/*      */ import javax.xml.transform.TransformerException;
+/*      */ import javax.xml.transform.TransformerFactory;
+/*      */ import javax.xml.transform.dom.DOMSource;
+/*      */ import javax.xml.transform.stream.StreamResult;
+/*      */ import org.w3c.dom.DOMException;
+/*      */ import org.w3c.dom.Document;
+/*      */ import org.w3c.dom.Element;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public class XMLRECRPTABRSTATUS
+/*      */   extends PokBaseABR
+/*      */ {
+/*      */   private static final int XMLMSGLOG_ROW_LIMIT;
+/*      */   private static final int MAXFILE_SIZE = 5000000;
+/*      */   
+/*      */   static {
+/*  114 */     String str = ABRServerProperties.getValue("XMLRECRPTABRSTATUS", "_XMLGENCOUNT", "3000");
+/*  115 */     XMLMSGLOG_ROW_LIMIT = Integer.parseInt(str);
+/*      */   }
+/*      */   
+/*  118 */   private StringBuffer rptSb = new StringBuffer();
+/*  119 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/*  120 */   static final String NEWLINE = new String(FOOL_JTEST);
+/*  121 */   private Object[] args = (Object[])new String[10];
+/*      */   
+/*  123 */   private StringBuffer xmlgenSb = new StringBuffer();
+/*  124 */   private ResourceBundle rsBundle = null;
+/*  125 */   private Hashtable metaTbl = new Hashtable<>();
+/*  126 */   private String navName = "";
+/*  127 */   private PrintWriter dbgPw = null;
+/*  128 */   private String dbgfn = null;
+/*  129 */   private int dbgLen = 0;
+/*  130 */   private int abr_debuglvl = 0;
+/*  131 */   private Vector vctReturnsEntityKeys = new Vector();
+/*  132 */   private String actionTaken = "";
+/*  133 */   private PrintWriter userxmlPw = null;
+/*  134 */   private String userxmlfn = null;
+/*  135 */   private int userxmlLen = 0;
+/*  136 */   private StringBuffer userxmlSb = new StringBuffer();
+/*  137 */   private String t2DTS = "&nbsp;";
+/*  138 */   private String t1DTS = "&nbsp;";
+/*      */   protected static final String STATUS_PROCESS = "0050";
+/*  140 */   protected String attrXMLABRPROPFILE = "MQPROPFILE";
+/*      */   
+/*      */   protected static final String CHEAT = "@@";
+/*      */   
+/*  144 */   protected static final Hashtable SETUP_MSGTYPE_TBL = new Hashtable<>(); static {
+/*  145 */     SETUP_MSGTYPE_TBL.put("ADSXMLSETUP", "GENERALAREA_UPDATE");
+/*  146 */     SETUP_MSGTYPE_TBL.put("XMLPRODPRICESETUP", "PRODUCT_PRICE_UPDATE");
+/*  147 */     SETUP_MSGTYPE_TBL.put("XMLCOMPATSETUP", "WWCOMPAT_UPDATE");
+/*  148 */     SETUP_MSGTYPE_TBL.put("XMLXLATESETUP", "XLATE_UPDATE");
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private void setupPrintWriter() {
+/*  153 */     String str = this.m_abri.getFileName();
+/*  154 */     int i = str.lastIndexOf(".");
+/*  155 */     this.dbgfn = str.substring(0, i + 1) + "dbg";
+/*  156 */     this.userxmlfn = str.substring(0, i + 1) + "userxml";
+/*      */     try {
+/*  158 */       this.dbgPw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.dbgfn, true), "UTF-8"));
+/*  159 */     } catch (Exception exception) {
+/*  160 */       D.ebug(0, "trouble creating debug PrintWriter " + exception);
+/*      */     } 
+/*      */     try {
+/*  163 */       this.userxmlPw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.userxmlfn, true), "UTF-8"));
+/*  164 */     } catch (Exception exception) {
+/*  165 */       D.ebug(0, "trouble creating xmlgen PrintWriter " + exception);
+/*      */     } 
+/*      */   }
+/*      */   private void closePrintWriter() {
+/*  169 */     if (this.dbgPw != null) {
+/*  170 */       this.dbgPw.flush();
+/*  171 */       this.dbgPw.close();
+/*  172 */       this.dbgPw = null;
+/*      */     } 
+/*  174 */     if (this.userxmlPw != null) {
+/*  175 */       this.userxmlPw.flush();
+/*  176 */       this.userxmlPw.close();
+/*  177 */       this.userxmlPw = null;
+/*      */     } 
+/*      */   }
+/*      */   
+/*      */   protected void addUserXML(String paramString) {
+/*  182 */     if (this.userxmlPw != null) {
+/*  183 */       this.userxmlLen += paramString.length();
+/*  184 */       this.userxmlPw.println(paramString);
+/*  185 */       this.userxmlPw.flush();
+/*      */     } else {
+/*  187 */       this.userxmlSb.append(ADSABRSTATUS.convertToHTML(paramString) + NEWLINE);
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void execute_run() {
+/*  211 */     String str1 = "<head>" + EACustom.getMetaTags(getDescription()) + NEWLINE + EACustom.getCSS() + NEWLINE + EACustom.getTitle("{0} {1}") + NEWLINE + "</head>" + NEWLINE + "<body id=\"ibm-com\">" + EACustom.getMastheadDiv() + NEWLINE + "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
+/*      */     
+/*  213 */     String str2 = "<table>" + NEWLINE + "<tr><th>Userid: </th><td>{0}</td></tr>" + NEWLINE + "<tr><th>Role: </th><td>{1}</td></tr>" + NEWLINE + "<tr><th>Workgroup: </th><td>{2}</td></tr>" + NEWLINE + "<tr><th>Date: </th><td>{3}</td></tr>" + NEWLINE + "<tr><th>Prior feed Date/Time: </th><td>{4}</td></tr>" + NEWLINE + "<tr><th>Description: </th><td>{5}</td></tr>" + NEWLINE + "<tr><th>Return code: </th><td>{6}</td></tr>" + NEWLINE + "<tr><th>Action Taken: </th><td>{7}</td></tr>" + NEWLINE + "</table>" + NEWLINE + "<!-- {8} -->" + NEWLINE;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  226 */     String str3 = "";
+/*      */     
+/*  228 */     println(EACustom.getDocTypeHtml());
+/*      */ 
+/*      */     
+/*      */     try {
+/*  232 */       start_ABRBuild(false);
+/*      */       
+/*  234 */       this.abr_debuglvl = ABRServerProperties.getABRDebugLevel(this.m_abri.getABRCode());
+/*      */       
+/*  236 */       setupPrintWriter();
+/*      */ 
+/*      */       
+/*  239 */       this.rsBundle = ResourceBundle.getBundle(getClass().getName(), ABRUtil.getLocale(this.m_prof.getReadLanguage().getNLSID()));
+/*      */       
+/*  241 */       this.m_elist = this.m_db.getEntityList(this.m_prof, new ExtractActionItem(null, this.m_db, this.m_prof, "dummy"), new EntityItem[] { new EntityItem(null, this.m_prof, 
+/*      */               
+/*  243 */               getEntityType(), getEntityID()) });
+/*  244 */       long l = System.currentTimeMillis();
+/*      */       
+/*  246 */       EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*      */       
+/*  248 */       addDebug("DEBUG: " + getShortClassName(getClass()) + " entered for " + entityItem.getKey() + " extract: " + this.m_abri
+/*  249 */           .getVEName() + " using DTS: " + this.m_prof.getValOn() + NEWLINE + PokUtils.outputList(this.m_elist));
+/*      */ 
+/*      */       
+/*  252 */       setReturnCode(0);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  257 */       this.navName = getNavigationName(entityItem);
+/*      */       
+/*  259 */       addDebug("getT1 entered for Periodic XMLRECRPTABR " + entityItem.getKey());
+/*      */       
+/*  261 */       EANMetaAttribute eANMetaAttribute = entityItem.getEntityGroup().getMetaAttribute("XMLRECRPTLRDTS");
+/*  262 */       if (eANMetaAttribute == null) {
+/*  263 */         throw new MiddlewareException("XMLRECRPTLRDTS not in meta for Periodic ABR " + entityItem.getKey());
+/*      */       }
+/*      */       
+/*  266 */       eANMetaAttribute = entityItem.getEntityGroup().getMetaAttribute("MQPROPFILE");
+/*  267 */       if (eANMetaAttribute == null) {
+/*  268 */         throw new MiddlewareException("MQPROPFILE not in meta for Periodic ABR " + entityItem.getKey());
+/*      */       }
+/*  270 */       String str = PokUtils.getAttributeFlagValue(entityItem, this.attrXMLABRPROPFILE);
+/*  271 */       if (str == null) {
+/*  272 */         addError("XMLRECRPTABR: No MQ properties files, nothing will be generated.");
+/*      */ 
+/*      */         
+/*  275 */         addXMLGenMsg("NOT_REQUIRED", "XMLRECRPTABRSTATUS");
+/*      */       } 
+/*  277 */       this.t1DTS = PokUtils.getAttributeValue(entityItem, "XMLRECRPTLRDTS", ", ", this.m_strEpoch, false);
+/*  278 */       boolean bool = isTimestamp(this.t1DTS);
+/*  279 */       if (bool && getReturnCode() == 0) {
+/*  280 */         AttributeChangeHistoryGroup attributeChangeHistoryGroup = getSTATUSHistory("XMLRECRPTABRSTATUS");
+/*  281 */         setT2DTS(attributeChangeHistoryGroup);
+/*  282 */         processThis(entityItem, str);
+/*  283 */       } else if (!bool) {
+/*  284 */         addError("Invalid DateTime Stamp for XMLRECRPTLRDTS, please put format: yyyy-MM-dd-HH.mm.ss.SSSSSS ");
+/*      */       } 
+/*  286 */       if (getReturnCode() == 0) {
+/*  287 */         PDGUtility pDGUtility = new PDGUtility();
+/*  288 */         OPICMList oPICMList = new OPICMList();
+/*  289 */         oPICMList.put("XMLRECRPTLRDTS", "XMLRECRPTLRDTS=" + this.t2DTS);
+/*  290 */         pDGUtility.updateAttribute(this.m_db, this.m_prof, entityItem, oPICMList);
+/*      */       } 
+/*  292 */       addDebug("Total Time: " + Stopwatch.format(System.currentTimeMillis() - l));
+/*      */     }
+/*  294 */     catch (Throwable throwable) {
+/*  295 */       StringWriter stringWriter = new StringWriter();
+/*  296 */       String str6 = "<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
+/*  297 */       String str7 = "<pre>{0}</pre>";
+/*  298 */       MessageFormat messageFormat1 = new MessageFormat(str6);
+/*  299 */       setReturnCode(-3);
+/*  300 */       throwable.printStackTrace(new PrintWriter(stringWriter));
+/*      */       
+/*  302 */       this.args[0] = throwable.getMessage();
+/*  303 */       this.rptSb.append(messageFormat1.format(this.args) + NEWLINE);
+/*  304 */       messageFormat1 = new MessageFormat(str7);
+/*  305 */       this.args[0] = stringWriter.getBuffer().toString();
+/*  306 */       this.rptSb.append(messageFormat1.format(this.args) + NEWLINE);
+/*  307 */       logError("Exception: " + throwable.getMessage());
+/*  308 */       logError(stringWriter.getBuffer().toString());
+/*      */     } finally {
+/*      */       
+/*  311 */       setDGTitle(this.navName);
+/*  312 */       setDGRptName(getShortClassName(getClass()));
+/*  313 */       setDGRptClass(getABRCode());
+/*      */       
+/*  315 */       if (!isReadOnly()) {
+/*  316 */         clearSoftLock();
+/*      */       }
+/*  318 */       closePrintWriter();
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/*  323 */     MessageFormat messageFormat = new MessageFormat(str1);
+/*  324 */     this.args[0] = getDescription();
+/*  325 */     this.args[1] = this.navName;
+/*  326 */     String str4 = messageFormat.format(this.args);
+/*  327 */     messageFormat = new MessageFormat(str2);
+/*  328 */     this.args[0] = this.m_prof.getOPName();
+/*  329 */     this.args[1] = this.m_prof.getRoleDescription();
+/*  330 */     this.args[2] = this.m_prof.getWGName();
+/*  331 */     this.args[3] = getNow();
+/*  332 */     this.args[4] = this.t1DTS;
+/*  333 */     this.args[5] = this.navName;
+/*  334 */     this.args[6] = (getReturnCode() == 0) ? "Passed" : "Failed";
+/*  335 */     this.args[7] = this.actionTaken + "<br />" + this.xmlgenSb.toString();
+/*  336 */     this.args[8] = str3 + " " + getABRVersion();
+/*      */     
+/*  338 */     restoreXtraContent();
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  343 */     String str5 = str4 + messageFormat.format(this.args) + "<pre>" + this.rsBundle.getString("XML_MSG") + "<br />" + this.userxmlSb.toString() + "</pre>" + NEWLINE;
+/*  344 */     this.rptSb.insert(0, str5 + NEWLINE);
+/*      */     
+/*  346 */     println(this.rptSb.toString());
+/*  347 */     printDGSubmitString();
+/*  348 */     println(EACustom.getTOUDiv());
+/*  349 */     buildReportFooter();
+/*      */     
+/*  351 */     this.metaTbl.clear();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void processThis(EntityItem paramEntityItem, String paramString) throws Exception {
+/*  361 */     addDebug("XMLRECRPTABR.processThis checking between " + this.t1DTS + " and " + this.t2DTS);
+/*  362 */     StringBuffer stringBuffer = new StringBuffer();
+/*  363 */     stringBuffer.append("select SETUPENTITYTYPE, SETUPENTITYID, SETUPDTS, MSGTYPE, ENTITYTYPE, ENTITYID, DTSOFMSG, MSGCOUNT from cache.xmlmsglog ");
+/*  364 */     stringBuffer.append(" where sendmsgdts between '" + this.t1DTS + "' and '" + this.t2DTS + "'");
+/*  365 */     if (paramString != null) {
+/*  366 */       stringBuffer.append(" and locate('" + paramString + "', MQPROPFILE)>0");
+/*      */     }
+/*  368 */     stringBuffer.append(" and msgstatus = 'S' order by setupdts, msgtype, setupentityid");
+/*  369 */     TreeMap<Object, Object> treeMap = new TreeMap<>();
+/*  370 */     ResultSet resultSet = null;
+/*  371 */     PreparedStatement preparedStatement = null;
+/*      */     try {
+/*  373 */       preparedStatement = this.m_db.getODSConnection().prepareStatement(new String(stringBuffer));
+/*  374 */       resultSet = preparedStatement.executeQuery();
+/*  375 */       byte b1 = 0;
+/*  376 */       byte b2 = 0;
+/*  377 */       while (resultSet.next()) {
+/*  378 */         b2++;
+/*  379 */         String str1 = resultSet.getString(1);
+/*  380 */         int i = resultSet.getInt(2);
+/*  381 */         String str2 = resultSet.getString(3);
+/*  382 */         String str3 = resultSet.getString(4);
+/*  383 */         String str4 = resultSet.getString(5);
+/*  384 */         int j = resultSet.getInt(6);
+/*  385 */         String str5 = resultSet.getString(7);
+/*  386 */         int k = resultSet.getInt(8);
+/*  387 */         if (str1 == null)
+/*  388 */           str1 = "@@"; 
+/*  389 */         if (str2 == null) {
+/*  390 */           str2 = "@@";
+/*      */         } else {
+/*  392 */           str2 = str2.replace(' ', '-').replace(':', '.');
+/*      */         } 
+/*  394 */         if (str3 == null)
+/*  395 */           str3 = "@@"; 
+/*  396 */         if (str4 == null)
+/*  397 */           str4 = "@@"; 
+/*  398 */         if (str5 == null) {
+/*  399 */           str5 = "@@";
+/*      */         } else {
+/*  401 */           str5 = str5.replace(' ', '-').replace(':', '.');
+/*      */         } 
+/*  403 */         String str6 = str1 + str2 + str3 + Integer.toString(i);
+/*  404 */         if (!treeMap.containsKey(str6)) {
+/*  405 */           XMLMSGInfo xMLMSGInfo = new XMLMSGInfo(str1, i, str2, str3, k);
+/*  406 */           xMLMSGInfo.getEntitylist_xml().add(new String[] { str4, "0".equals(Integer.toString(j)) ? "@@" : Integer.toString(j), str5 });
+/*  407 */           treeMap.put(str6, xMLMSGInfo);
+/*      */         } else {
+/*      */           
+/*  410 */           XMLMSGInfo xMLMSGInfo = (XMLMSGInfo)treeMap.get(str6);
+/*  411 */           xMLMSGInfo.setMsgcount_xml(xMLMSGInfo.getMsgcount_xml() + k);
+/*  412 */           xMLMSGInfo.getEntitylist_xml().add(new String[] { str4, "0".equals(Integer.toString(j)) ? "@@" : Integer.toString(j), str5 });
+/*      */         } 
+/*  414 */         if (b2 >= XMLMSGLOG_ROW_LIMIT) {
+/*  415 */           addDebug("Chunking size is " + XMLMSGLOG_ROW_LIMIT + ". Start to run chunking " + ++b1 + " times.");
+/*  416 */           sentToMQ(treeMap, paramEntityItem);
+/*  417 */           b2 = 0;
+/*      */         } 
+/*      */       } 
+/*      */       
+/*  421 */       if (b2 > 0) {
+/*  422 */         sentToMQ(treeMap, paramEntityItem);
+/*  423 */       } else if (XMLMSGLOG_ROW_LIMIT * b1 + b2 == 0) {
+/*  424 */         sentToMQ(treeMap, paramEntityItem);
+/*      */       } 
+/*      */ 
+/*      */       
+/*  428 */       addOutput("The total number is " + (XMLMSGLOG_ROW_LIMIT * b1 + b2) + " entities");
+/*      */     }
+/*  430 */     catch (RuntimeException runtimeException) {
+/*  431 */       addXMLGenMsg("FAILED", paramEntityItem.getKey());
+/*  432 */       addDebug("RuntimeException on ? " + runtimeException);
+/*  433 */       runtimeException.printStackTrace();
+/*  434 */       throw runtimeException;
+/*  435 */     } catch (Exception exception) {
+/*  436 */       addXMLGenMsg("FAILED", paramEntityItem.getKey());
+/*  437 */       addDebug("Exception on ? " + exception);
+/*  438 */       exception.printStackTrace();
+/*  439 */       throw exception;
+/*      */     } finally {
+/*  441 */       if (preparedStatement != null)
+/*      */         try {
+/*  443 */           preparedStatement.close();
+/*  444 */         } catch (SQLException sQLException) {
+/*  445 */           sQLException.printStackTrace();
+/*      */         }  
+/*      */     } 
+/*      */   }
+/*      */   private void sentToMQ(TreeMap paramTreeMap, EntityItem paramEntityItem) throws DOMException, MissingResourceException, ParserConfigurationException, TransformerException {
+/*  450 */     String str1 = PokUtils.getAttributeFlagValue(paramEntityItem, this.attrXMLABRPROPFILE);
+/*  451 */     Vector<String> vector = new Vector();
+/*  452 */     if (str1 != null) {
+/*      */       
+/*  454 */       StringTokenizer stringTokenizer = new StringTokenizer(str1, "|");
+/*  455 */       while (stringTokenizer.hasMoreTokens())
+/*      */       {
+/*  457 */         vector.addElement(stringTokenizer.nextToken());
+/*      */       }
+/*      */     } 
+/*      */     
+/*  461 */     String str2 = PokUtils.getAttributeFlagValue(paramEntityItem, "XMLRECRPTOPTION");
+/*  462 */     addDebug("XMLRECRPTOPTION = " + str2);
+/*  463 */     if (paramTreeMap.size() == 0 && "XRZERO".equals(str2)) {
+/*      */       
+/*  465 */       addDebug("don't send anything when xmlmsgMap.size is 0 and XMLRECRPTOPTION = " + str2);
+/*      */     }
+/*  467 */     else if (paramTreeMap.size() == 0 && !"XRZERO".equals(str2)) {
+/*      */ 
+/*      */       
+/*  470 */       processMQZero(paramTreeMap, vector);
+/*  471 */       addDebug("send zero report when xmlmsgMap.size is 0 and XMLRECRPTOPTION = " + str2);
+/*      */     } else {
+/*  473 */       addDebug("send normal report when xmlmsgMap.size > 0 and XMLRECRPTOPTION = " + str2);
+/*  474 */       processMQ(paramTreeMap, vector);
+/*      */     } 
+/*      */ 
+/*      */     
+/*  478 */     paramTreeMap.clear();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void processMQZero(TreeMap paramTreeMap, Vector paramVector) throws ParserConfigurationException, DOMException, TransformerException, MissingResourceException {
+/*  492 */     if (paramVector == null) {
+/*  493 */       addDebug("XMLRECRPTABR: No MQ properties files, nothing will be generated.");
+/*      */       
+/*  495 */       addXMLGenMsg("NOT_REQUIRED", "XMLRECRPTABRSTATUS");
+/*      */     } else {
+/*  497 */       DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+/*  498 */       DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+/*  499 */       Document document = documentBuilder.newDocument();
+/*  500 */       String str1 = "RECONCILE_MSGS";
+/*  501 */       String str2 = "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/" + str1;
+/*      */ 
+/*      */       
+/*  504 */       Element element1 = document.createElementNS(str2, str1);
+/*  505 */       element1.appendChild(document.createComment("RECONCILE_MSGS Version 1 Mod 0"));
+/*      */       
+/*  507 */       document.appendChild(element1);
+/*  508 */       element1.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", str2);
+/*      */       
+/*  510 */       Element element2 = document.createElement("DTSOFMSG");
+/*  511 */       element2.appendChild(document.createTextNode(getNow()));
+/*  512 */       element1.appendChild(element2);
+/*  513 */       element2 = document.createElement("FROMMSGDTS");
+/*  514 */       element2.appendChild(document.createTextNode(this.t1DTS));
+/*  515 */       element1.appendChild(element2);
+/*  516 */       element2 = document.createElement("TOMSGDTS");
+/*  517 */       element2.appendChild(document.createTextNode(this.t2DTS));
+/*  518 */       element1.appendChild(element2);
+/*  519 */       Element element3 = document.createElement("MSGLIST");
+/*  520 */       element1.appendChild(element3);
+/*  521 */       Element element4 = document.createElement("MSGELEMENT");
+/*  522 */       element3.appendChild(element4);
+/*      */       
+/*  524 */       element2 = document.createElement("SETUPENTITYTYPE");
+/*  525 */       element2.appendChild(document.createTextNode("@@"));
+/*  526 */       element4.appendChild(element2);
+/*      */       
+/*  528 */       element2 = document.createElement("SETUPENTITYID");
+/*  529 */       element2.appendChild(document.createTextNode("@@"));
+/*  530 */       element4.appendChild(element2);
+/*      */       
+/*  532 */       element2 = document.createElement("SETUPDTS");
+/*  533 */       element2.appendChild(document.createTextNode("@@"));
+/*  534 */       element4.appendChild(element2);
+/*      */       
+/*  536 */       element2 = document.createElement("MSGTYPE");
+/*  537 */       element2.appendChild(document.createTextNode("@@"));
+/*  538 */       element4.appendChild(element2);
+/*      */       
+/*  540 */       element2 = document.createElement("MSGCOUNT");
+/*  541 */       element2.appendChild(document.createTextNode("0"));
+/*  542 */       element4.appendChild(element2);
+/*      */       
+/*  544 */       Element element5 = document.createElement("ENTITYLIST");
+/*  545 */       element4.appendChild(element5);
+/*      */       
+/*  547 */       String str3 = transformXML(document);
+/*      */       
+/*  549 */       boolean bool = false;
+/*      */       
+/*  551 */       String str4 = "XMLRECPT";
+/*  552 */       String str5 = ABRServerProperties.getValue("ADSABRSTATUS", "_" + str4 + "_XSDNEEDED", "NO");
+/*  553 */       if ("YES".equals(str5.toUpperCase())) {
+/*  554 */         String str = ABRServerProperties.getValue("ADSABRSTATUS", "_" + str4 + "_XSDFILE", "NONE");
+/*  555 */         if ("NONE".equals(str)) {
+/*  556 */           addError("there is no xsdfile for " + str4 + " defined in the propertyfile ");
+/*      */         } else {
+/*  558 */           long l1 = System.currentTimeMillis();
+/*  559 */           Class<?> clazz = getClass();
+/*  560 */           StringBuffer stringBuffer = new StringBuffer();
+/*  561 */           bool = ABRUtil.validatexml(clazz, stringBuffer, str, str3);
+/*  562 */           if (stringBuffer.length() > 0) {
+/*  563 */             String str6 = stringBuffer.toString();
+/*  564 */             if (str6.indexOf("fail") != -1)
+/*  565 */               addError(str6); 
+/*  566 */             addOutput(str6);
+/*      */           } 
+/*  568 */           long l2 = System.currentTimeMillis();
+/*  569 */           addDebug(3, "Time for validation: " + Stopwatch.format(l2 - l1));
+/*  570 */           if (bool) {
+/*  571 */             addDebug("the xml for " + str4 + " passed the validation");
+/*      */           }
+/*      */         } 
+/*      */       } else {
+/*  575 */         addOutput("the xml for " + str4 + " doesn't need to be validated");
+/*  576 */         bool = true;
+/*      */       } 
+/*      */ 
+/*      */ 
+/*      */       
+/*  581 */       if (str3 != null && bool)
+/*      */       {
+/*  583 */         notify("XMLRECPT", str3, paramVector);
+/*      */       }
+/*  585 */       document = null;
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void processMQ(TreeMap paramTreeMap, Vector paramVector) throws ParserConfigurationException, DOMException, TransformerException, MissingResourceException {
+/*  601 */     if (paramVector == null) {
+/*  602 */       addDebug("XMLRECRPTABR: No MQ properties files, nothing will be generated.");
+/*      */       
+/*  604 */       addXMLGenMsg("NOT_REQUIRED", "XMLRECRPTABRSTATUS");
+/*      */     } else {
+/*  606 */       DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+/*  607 */       DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+/*  608 */       Document document = documentBuilder.newDocument();
+/*  609 */       String str1 = "RECONCILE_MSGS";
+/*  610 */       String str2 = "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/" + str1;
+/*      */ 
+/*      */       
+/*  613 */       Element element1 = document.createElementNS(str2, str1);
+/*  614 */       element1.appendChild(document.createComment("RECONCILE_MSGS Version 1 Mod 0"));
+/*      */       
+/*  616 */       document.appendChild(element1);
+/*  617 */       element1.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", str2);
+/*      */       
+/*  619 */       Element element2 = document.createElement("DTSOFMSG");
+/*  620 */       element2.appendChild(document.createTextNode(getNow()));
+/*  621 */       element1.appendChild(element2);
+/*  622 */       element2 = document.createElement("FROMMSGDTS");
+/*  623 */       element2.appendChild(document.createTextNode(this.t1DTS));
+/*  624 */       element1.appendChild(element2);
+/*  625 */       element2 = document.createElement("TOMSGDTS");
+/*  626 */       element2.appendChild(document.createTextNode(this.t2DTS));
+/*  627 */       element1.appendChild(element2);
+/*  628 */       Element element3 = document.createElement("MSGLIST");
+/*  629 */       element1.appendChild(element3);
+/*  630 */       Collection collection = paramTreeMap.values();
+/*  631 */       Iterator<XMLMSGInfo> iterator = collection.iterator();
+/*  632 */       while (iterator.hasNext()) {
+/*  633 */         XMLMSGInfo xMLMSGInfo = iterator.next();
+/*  634 */         Element element4 = document.createElement("MSGELEMENT");
+/*  635 */         element3.appendChild(element4);
+/*      */         
+/*  637 */         element2 = document.createElement("SETUPENTITYTYPE");
+/*  638 */         element2.appendChild(document.createTextNode(xMLMSGInfo.setupentitytype_xml));
+/*  639 */         element4.appendChild(element2);
+/*      */         
+/*  641 */         element2 = document.createElement("SETUPENTITYID");
+/*  642 */         element2.appendChild(document.createTextNode(xMLMSGInfo.setupentityid_xml));
+/*  643 */         element4.appendChild(element2);
+/*      */         
+/*  645 */         element2 = document.createElement("SETUPDTS");
+/*  646 */         element2.appendChild(document.createTextNode(xMLMSGInfo.setupdts_xml));
+/*  647 */         element4.appendChild(element2);
+/*      */         
+/*  649 */         element2 = document.createElement("MSGTYPE");
+/*  650 */         element2.appendChild(document.createTextNode(xMLMSGInfo.msgtype_xml));
+/*  651 */         element4.appendChild(element2);
+/*      */         
+/*  653 */         element2 = document.createElement("MSGCOUNT");
+/*  654 */         element2.appendChild(document.createTextNode(Integer.toString(xMLMSGInfo.getMsgcount_xml())));
+/*  655 */         element4.appendChild(element2);
+/*      */         
+/*  657 */         Element element5 = document.createElement("ENTITYLIST");
+/*  658 */         element4.appendChild(element5);
+/*  659 */         if (!SETUP_MSGTYPE_TBL.containsKey(xMLMSGInfo.setupentitytype_xml)) {
+/*  660 */           for (byte b = 0; b < xMLMSGInfo.entitylist_xml.size(); b++) {
+/*  661 */             Element element = document.createElement("ENTITYELEMENT");
+/*  662 */             element5.appendChild(element);
+/*  663 */             String[] arrayOfString = xMLMSGInfo.entitylist_xml.elementAt(b);
+/*  664 */             element2 = document.createElement("ENTITYTYPE");
+/*  665 */             element2.appendChild(document.createTextNode(arrayOfString[0]));
+/*  666 */             element.appendChild(element2);
+/*  667 */             element2 = document.createElement("ENTITYID");
+/*  668 */             element2.appendChild(document.createTextNode(arrayOfString[1]));
+/*  669 */             element.appendChild(element2);
+/*  670 */             element2 = document.createElement("DTSOFMSG");
+/*  671 */             element2.appendChild(document.createTextNode(arrayOfString[2]));
+/*  672 */             element.appendChild(element2);
+/*      */           } 
+/*      */         }
+/*      */ 
+/*      */         
+/*  677 */         xMLMSGInfo.dereference();
+/*      */       } 
+/*      */       
+/*  680 */       String str3 = transformXML(document);
+/*      */       
+/*  682 */       boolean bool = false;
+/*      */       
+/*  684 */       String str4 = "XMLRECPT";
+/*  685 */       String str5 = ABRServerProperties.getValue("ADSABRSTATUS", "_" + str4 + "_XSDNEEDED", "NO");
+/*  686 */       if ("YES".equals(str5.toUpperCase())) {
+/*  687 */         String str = ABRServerProperties.getValue("ADSABRSTATUS", "_" + str4 + "_XSDFILE", "NONE"); if ("NONE".equals(str)) {
+/*  688 */           addError("there is no xsdfile for " + str4 + " defined in the propertyfile ");
+/*      */         } else {
+/*  690 */           long l1 = System.currentTimeMillis();
+/*  691 */           Class<?> clazz = getClass();
+/*  692 */           StringBuffer stringBuffer = new StringBuffer();
+/*  693 */           bool = ABRUtil.validatexml(clazz, stringBuffer, str, str3);
+/*  694 */           if (stringBuffer.length() > 0) {
+/*  695 */             String str6 = stringBuffer.toString();
+/*  696 */             if (str6.indexOf("fail") != -1)
+/*  697 */               addError(str6); 
+/*  698 */             addOutput(str6);
+/*      */           } 
+/*  700 */           long l2 = System.currentTimeMillis();
+/*  701 */           addDebug(3, "Time for validation: " + Stopwatch.format(l2 - l1));
+/*  702 */           if (bool) {
+/*  703 */             addDebug("the xml for " + str4 + " passed the validation");
+/*      */           }
+/*      */         } 
+/*      */       } else {
+/*  707 */         addOutput("the xml for " + str4 + " doesn't need to be validated");
+/*  708 */         bool = true;
+/*      */       } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  715 */       if (str3 != null && bool)
+/*      */       {
+/*  717 */         notify("XMLRECPT", str3, paramVector);
+/*      */       }
+/*  719 */       document = null;
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected String transformXML(Document paramDocument) throws ParserConfigurationException, TransformerException {
+/*  732 */     TransformerFactory transformerFactory = TransformerFactory.newInstance();
+/*  733 */     Transformer transformer = transformerFactory.newTransformer();
+/*  734 */     transformer.setOutputProperty("omit-xml-declaration", "yes");
+/*      */     
+/*  736 */     transformer.setOutputProperty("indent", "no");
+/*  737 */     transformer.setOutputProperty("method", "xml");
+/*  738 */     transformer.setOutputProperty("encoding", "UTF-8");
+/*      */ 
+/*      */     
+/*  741 */     StringWriter stringWriter = new StringWriter();
+/*  742 */     StreamResult streamResult = new StreamResult(stringWriter);
+/*  743 */     DOMSource dOMSource = new DOMSource(paramDocument);
+/*  744 */     transformer.transform(dOMSource, streamResult);
+/*  745 */     String str = XMLElem.removeCheat(stringWriter.toString());
+/*      */ 
+/*      */ 
+/*      */     
+/*  749 */     transformer.setOutputProperty("indent", "yes");
+/*  750 */     stringWriter = new StringWriter();
+/*  751 */     streamResult = new StreamResult(stringWriter);
+/*  752 */     transformer.transform(dOMSource, streamResult);
+/*  753 */     addUserXML(XMLElem.removeCheat(stringWriter.toString()));
+/*      */     
+/*  755 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void notify(String paramString1, String paramString2, Vector<String> paramVector) throws MissingResourceException {
+/*  766 */     MessageFormat messageFormat = null;
+/*      */     
+/*  768 */     byte b1 = 0;
+/*  769 */     boolean bool = false;
+/*      */ 
+/*      */     
+/*  772 */     for (byte b2 = 0; b2 < paramVector.size(); b2++) {
+/*      */       
+/*  774 */       String str = paramVector.elementAt(b2);
+/*  775 */       addDebug("in notify looking at prop file " + str);
+/*      */       try {
+/*  777 */         ResourceBundle resourceBundle = ResourceBundle.getBundle(str, 
+/*  778 */             getLocale(getProfile().getReadLanguage().getNLSID()));
+/*  779 */         Hashtable<String, String> hashtable = MQUsage.getMQSeriesVars(resourceBundle);
+/*  780 */         boolean bool1 = ((Boolean)hashtable.get("NOTIFY")).booleanValue();
+/*  781 */         hashtable.put("MQCID", getMQCID());
+/*  782 */         hashtable.put("XMLTYPE", "ADS");
+/*  783 */         Hashtable hashtable1 = MQUsage.getUserProperties(resourceBundle, getMQCID());
+/*  784 */         if (bool1) {
+/*      */           try {
+/*  786 */             addDebug("User infor " + hashtable1);
+/*  787 */             MQUsage.putToMQQueueWithRFH2("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + paramString2, hashtable, hashtable1);
+/*      */             
+/*  789 */             messageFormat = new MessageFormat(this.rsBundle.getString("SENT_SUCCESS"));
+/*  790 */             this.args[0] = str;
+/*  791 */             this.args[1] = paramString1;
+/*  792 */             addOutput(messageFormat.format(this.args));
+/*  793 */             b1++;
+/*  794 */             if (!bool) {
+/*      */               
+/*  796 */               addXMLGenMsg("SUCCESS", paramString1);
+/*  797 */               addDebug("sent successfully to prop file " + str);
+/*      */             } 
+/*  799 */           } catch (MQException mQException) {
+/*      */ 
+/*      */             
+/*  802 */             addXMLGenMsg("FAILED", paramString1);
+/*  803 */             bool = true;
+/*  804 */             messageFormat = new MessageFormat(this.rsBundle.getString("MQ_ERROR"));
+/*  805 */             this.args[0] = str + " " + paramString1;
+/*  806 */             this.args[1] = "" + mQException.completionCode;
+/*  807 */             this.args[2] = "" + mQException.reasonCode;
+/*  808 */             addError(messageFormat.format(this.args));
+/*  809 */             mQException.printStackTrace(System.out);
+/*  810 */             addDebug("failed sending to prop file " + str);
+/*  811 */           } catch (IOException iOException) {
+/*      */             
+/*  813 */             addXMLGenMsg("FAILED", paramString1);
+/*  814 */             bool = true;
+/*  815 */             messageFormat = new MessageFormat(this.rsBundle.getString("MQIO_ERROR"));
+/*  816 */             this.args[0] = str + " " + paramString1;
+/*  817 */             this.args[1] = iOException.toString();
+/*  818 */             addError(messageFormat.format(this.args));
+/*  819 */             iOException.printStackTrace(System.out);
+/*  820 */             addDebug("failed sending to prop file " + str);
+/*      */           } 
+/*      */         } else {
+/*      */           
+/*  824 */           messageFormat = new MessageFormat(this.rsBundle.getString("NO_NOTIFY"));
+/*  825 */           this.args[0] = str;
+/*  826 */           addError(messageFormat.format(this.args));
+/*      */           
+/*  828 */           addXMLGenMsg("NOT_SENT", paramString1);
+/*  829 */           addDebug("not sent to prop file " + str + " because Notify not true");
+/*      */         }
+/*      */       
+/*  832 */       } catch (MissingResourceException missingResourceException) {
+/*  833 */         addXMLGenMsg("FAILED", str + " " + paramString1);
+/*  834 */         bool = true;
+/*  835 */         addError("Prop file " + str + " " + paramString1 + " not found");
+/*      */       } 
+/*      */     } 
+/*      */     
+/*  839 */     if (b1 > 0 && b1 != paramVector.size()) {
+/*  840 */       addXMLGenMsg("ALL_NOT_SENT", paramString1);
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setT2DTS(AttributeChangeHistoryGroup paramAttributeChangeHistoryGroup) throws MiddlewareException {
+/*  852 */     if (paramAttributeChangeHistoryGroup != null && paramAttributeChangeHistoryGroup.getChangeHistoryItemCount() > 1) {
+/*      */       
+/*  854 */       int i = paramAttributeChangeHistoryGroup.getChangeHistoryItemCount();
+/*      */ 
+/*      */       
+/*  857 */       AttributeChangeHistoryItem attributeChangeHistoryItem = (AttributeChangeHistoryItem)paramAttributeChangeHistoryGroup.getChangeHistoryItem(i - 1);
+/*  858 */       if (attributeChangeHistoryItem != null) {
+/*  859 */         addDebug("getT2Time [" + (i - 1) + "] isActive: " + attributeChangeHistoryItem.isActive() + " isValid: " + attributeChangeHistoryItem.isValid() + " chgdate: " + attributeChangeHistoryItem
+/*  860 */             .getChangeDate() + " flagcode: " + attributeChangeHistoryItem.getFlagCode());
+/*  861 */         if (attributeChangeHistoryItem.getFlagCode().equals("0050")) {
+/*  862 */           this.t2DTS = attributeChangeHistoryItem.getChangeDate();
+/*      */         } else {
+/*  864 */           addDebug("getT2Time for the value of " + attributeChangeHistoryItem.getFlagCode() + "is not Queued, set getNow() to t2DTS and find the prior &DTFS!");
+/*      */           
+/*  866 */           this.t2DTS = getNow();
+/*      */         } 
+/*      */       } 
+/*      */     } else {
+/*  870 */       this.t2DTS = getNow();
+/*  871 */       addDebug("getT2Time for ADSABRSTATUS changedHistoryGroup has no history, set getNow to t2DTS");
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private AttributeChangeHistoryGroup getSTATUSHistory(String paramString) throws MiddlewareException {
+/*  882 */     EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*  883 */     EANAttribute eANAttribute = entityItem.getAttribute(paramString);
+/*  884 */     if (eANAttribute != null) {
+/*  885 */       return new AttributeChangeHistoryGroup(this.m_db, this.m_prof, eANAttribute);
+/*      */     }
+/*  887 */     addDebug(paramString + " of " + entityItem.getKey() + "  was null");
+/*  888 */     return null;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public static boolean isTimestamp(String paramString) {
+/*  897 */     boolean bool = false;
+/*      */     
+/*  899 */     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss.SSSSSS", Locale.ENGLISH);
+/*      */     try {
+/*  901 */       simpleDateFormat.parse(paramString);
+/*  902 */       bool = true;
+/*  903 */     } catch (ParseException parseException) {
+/*  904 */       bool = false;
+/*      */     } 
+/*  906 */     return bool;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void restoreXtraContent() {
+/*  914 */     if (this.userxmlLen + this.rptSb.length() < 5000000) {
+/*      */       
+/*  916 */       BufferedInputStream bufferedInputStream = null;
+/*  917 */       FileInputStream fileInputStream = null;
+/*  918 */       BufferedReader bufferedReader = null;
+/*      */       try {
+/*  920 */         fileInputStream = new FileInputStream(this.userxmlfn);
+/*  921 */         bufferedInputStream = new BufferedInputStream(fileInputStream);
+/*      */         
+/*  923 */         String str = null;
+/*  924 */         bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream, "UTF-8"));
+/*      */         
+/*  926 */         while ((str = bufferedReader.readLine()) != null) {
+/*  927 */           this.userxmlSb.append(ADSABRSTATUS.convertToHTML(str) + NEWLINE);
+/*      */         }
+/*      */         
+/*  930 */         File file = new File(this.userxmlfn);
+/*  931 */         if (file.exists()) {
+/*  932 */           file.delete();
+/*      */         }
+/*  934 */       } catch (Exception exception) {
+/*  935 */         exception.printStackTrace();
+/*      */       } finally {
+/*  937 */         if (bufferedInputStream != null) {
+/*      */           try {
+/*  939 */             bufferedInputStream.close();
+/*  940 */           } catch (Exception exception) {
+/*  941 */             exception.printStackTrace();
+/*      */           } 
+/*      */         }
+/*  944 */         if (fileInputStream != null) {
+/*      */           try {
+/*  946 */             fileInputStream.close();
+/*  947 */           } catch (Exception exception) {
+/*  948 */             exception.printStackTrace();
+/*      */           } 
+/*      */         }
+/*      */       } 
+/*      */     } else {
+/*  953 */       this.userxmlSb.append("XML generated was too large for this file");
+/*      */     } 
+/*      */     
+/*  956 */     if (this.dbgLen + this.userxmlSb.length() + this.rptSb.length() < 5000000) {
+/*      */       
+/*  958 */       BufferedInputStream bufferedInputStream = null;
+/*  959 */       FileInputStream fileInputStream = null;
+/*  960 */       BufferedReader bufferedReader = null;
+/*      */       try {
+/*  962 */         fileInputStream = new FileInputStream(this.dbgfn);
+/*  963 */         bufferedInputStream = new BufferedInputStream(fileInputStream);
+/*      */         
+/*  965 */         String str = null;
+/*  966 */         StringBuffer stringBuffer = new StringBuffer();
+/*  967 */         bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream, "UTF-8"));
+/*      */         
+/*  969 */         while ((str = bufferedReader.readLine()) != null) {
+/*  970 */           stringBuffer.append(str + NEWLINE);
+/*      */         }
+/*  972 */         this.rptSb.append("<!-- " + stringBuffer.toString() + " -->" + NEWLINE);
+/*      */ 
+/*      */         
+/*  975 */         File file = new File(this.dbgfn);
+/*  976 */         if (file.exists()) {
+/*  977 */           file.delete();
+/*      */         }
+/*  979 */       } catch (Exception exception) {
+/*  980 */         exception.printStackTrace();
+/*      */       } finally {
+/*  982 */         if (bufferedInputStream != null) {
+/*      */           try {
+/*  984 */             bufferedInputStream.close();
+/*  985 */           } catch (Exception exception) {
+/*  986 */             exception.printStackTrace();
+/*      */           } 
+/*      */         }
+/*  989 */         if (fileInputStream != null) {
+/*      */           try {
+/*  991 */             fileInputStream.close();
+/*  992 */           } catch (Exception exception) {
+/*  993 */             exception.printStackTrace();
+/*      */           } 
+/*      */         }
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public static Locale getLocale(int paramInt) {
+/* 1007 */     Locale locale = null;
+/* 1008 */     switch (paramInt)
+/*      */     
+/*      */     { case 1:
+/* 1011 */         locale = Locale.US;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1035 */         return locale;case 2: locale = Locale.GERMAN; return locale;case 3: locale = Locale.ITALIAN; return locale;case 4: locale = Locale.JAPANESE; return locale;case 5: locale = Locale.FRENCH; return locale;case 6: locale = new Locale("es", "ES"); return locale;case 7: locale = Locale.UK; return locale; }  locale = Locale.US; return locale;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addXMLGenMsg(String paramString1, String paramString2) {
+/* 1042 */     MessageFormat messageFormat = new MessageFormat(this.rsBundle.getString(paramString1));
+/* 1043 */     Object[] arrayOfObject = { paramString2 };
+/* 1044 */     this.xmlgenSb.append(messageFormat.format(arrayOfObject) + "<br />");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void dereference() {
+/* 1051 */     super.dereference();
+/*      */     
+/* 1053 */     this.rsBundle = null;
+/* 1054 */     this.rptSb = null;
+/* 1055 */     this.args = null;
+/*      */     
+/* 1057 */     this.metaTbl = null;
+/* 1058 */     this.navName = null;
+/* 1059 */     this.vctReturnsEntityKeys.clear();
+/* 1060 */     this.vctReturnsEntityKeys = null;
+/*      */     
+/* 1062 */     this.dbgPw = null;
+/* 1063 */     this.dbgfn = null;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getABRVersion() {
+/* 1069 */     return "$Revision: 1.2 $";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getMQCID() {
+/* 1075 */     return "RECONCILE_MSGS";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getDescription() {
+/* 1082 */     return "ADSIDLSTATUS";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addOutput(String paramString) {
+/* 1088 */     this.rptSb.append("<p>" + paramString + "</p>" + NEWLINE);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addDebug(String paramString) {
+/* 1095 */     this.dbgLen += paramString.length();
+/* 1096 */     this.dbgPw.println(paramString);
+/* 1097 */     this.dbgPw.flush();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addDebug(int paramInt, String paramString) {
+/* 1106 */     if (paramInt <= this.abr_debuglvl) {
+/* 1107 */       addDebug(paramString);
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addError(String paramString, Object[] paramArrayOfObject) {
+/* 1119 */     setReturnCode(-1);
+/*      */ 
+/*      */     
+/* 1122 */     addMessage(this.rsBundle.getString("ERROR_PREFIX"), paramString, paramArrayOfObject);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addError(String paramString) {
+/* 1128 */     addOutput(paramString);
+/* 1129 */     setReturnCode(-1);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addMessage(String paramString1, String paramString2, Object[] paramArrayOfObject) {
+/* 1139 */     String str = this.rsBundle.getString(paramString2);
+/*      */     
+/* 1141 */     if (paramArrayOfObject != null) {
+/* 1142 */       MessageFormat messageFormat = new MessageFormat(str);
+/* 1143 */       str = messageFormat.format(paramArrayOfObject);
+/*      */     } 
+/*      */     
+/* 1146 */     addOutput(paramString1 + " " + str);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getNavigationName(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 1156 */     StringBuffer stringBuffer = new StringBuffer();
+/*      */ 
+/*      */ 
+/*      */     
+/* 1160 */     EANList eANList = (EANList)this.metaTbl.get(paramEntityItem.getEntityType());
+/* 1161 */     if (eANList == null) {
+/* 1162 */       EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, paramEntityItem.getEntityType(), "Navigate");
+/* 1163 */       eANList = entityGroup.getMetaAttribute();
+/* 1164 */       this.metaTbl.put(paramEntityItem.getEntityType(), eANList);
+/*      */     } 
+/* 1166 */     for (byte b = 0; b < eANList.size(); b++) {
+/* 1167 */       EANMetaAttribute eANMetaAttribute = (EANMetaAttribute)eANList.getAt(b);
+/* 1168 */       stringBuffer.append(PokUtils.getAttributeValue(paramEntityItem, eANMetaAttribute.getAttributeCode(), ", ", "", false));
+/* 1169 */       if (b + 1 < eANList.size()) {
+/* 1170 */         stringBuffer.append(" ");
+/*      */       }
+/*      */     } 
+/*      */     
+/* 1174 */     return stringBuffer.toString().trim();
+/*      */   }
+/*      */   
+/*      */   private static class XMLMSGInfo
+/*      */   {
+/* 1179 */     String setupentitytype_xml = "@@";
+/* 1180 */     String setupentityid_xml = "@@";
+/* 1181 */     String setupdts_xml = "@@";
+/* 1182 */     String msgtype_xml = "@@";
+/*      */     int msgcount_xml;
+/* 1184 */     Vector entitylist_xml = new Vector();
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     XMLMSGInfo(String param1String1, int param1Int1, String param1String2, String param1String3, int param1Int2) {
+/* 1196 */       if (param1String1 != null) {
+/* 1197 */         this.setupentitytype_xml = param1String1.trim();
+/*      */       }
+/*      */       
+/* 1200 */       if (param1Int1 != 0) {
+/* 1201 */         this.setupentityid_xml = Integer.toString(param1Int1);
+/*      */       }
+/*      */       
+/* 1204 */       if (param1String2 != null) {
+/* 1205 */         this.setupdts_xml = param1String2.trim();
+/*      */       }
+/*      */       
+/* 1208 */       if (param1String3 != null) {
+/* 1209 */         this.msgtype_xml = param1String3.trim();
+/*      */       }
+/* 1211 */       this.msgcount_xml = param1Int2;
+/*      */     }
+/*      */ 
+/*      */     
+/*      */     void dereference() {
+/* 1216 */       this.setupentitytype_xml = null;
+/* 1217 */       this.setupentityid_xml = null;
+/* 1218 */       this.setupdts_xml = null;
+/* 1219 */       this.msgtype_xml = null;
+/* 1220 */       if (this.entitylist_xml != null)
+/* 1221 */         this.entitylist_xml.clear(); 
+/* 1222 */       this.entitylist_xml = null;
+/*      */     }
+/*      */     
+/*      */     public Vector getEntitylist_xml() {
+/* 1226 */       return this.entitylist_xml;
+/*      */     }
+/*      */     
+/*      */     public void setEntitylist_xml(Vector param1Vector) {
+/* 1230 */       this.entitylist_xml = param1Vector;
+/*      */     }
+/*      */     
+/*      */     public int getMsgcount_xml() {
+/* 1234 */       return this.msgcount_xml;
+/*      */     }
+/*      */     
+/*      */     public void setMsgcount_xml(int param1Int) {
+/* 1238 */       this.msgcount_xml = param1Int;
+/*      */     }
+/*      */     
+/*      */     String getKey() {
+/* 1242 */       return this.setupentitytype_xml + this.setupentityid_xml + this.setupdts_xml + this.msgtype_xml;
+/*      */     }
+/*      */   }
+/*      */ }
+
+
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\ln\adsxmlbh1\XMLRECRPTABRSTATUS.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

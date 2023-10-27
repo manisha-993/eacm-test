@@ -1,387 +1,462 @@
-/* Copyright IBM Corp. 2016 */
-package COM.ibm.eannounce.abr.sg.rfc;
+/*     */ package COM.ibm.eannounce.abr.sg.rfc;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.OutputData;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhBase_zdm_geo_to_class;
+/*     */ import COM.ibm.eannounce.abr.util.EACMWebServiceUtil;
+/*     */ import COM.ibm.eannounce.abr.util.RfcConfigProperties;
+/*     */ import com.google.gson.ExclusionStrategy;
+/*     */ import com.google.gson.Gson;
+/*     */ import com.google.gson.GsonBuilder;
+/*     */ import com.google.gson.annotations.SerializedName;
+/*     */ import java.lang.reflect.Field;
+/*     */ import java.util.ArrayList;
+/*     */ import java.util.HashMap;
+/*     */ import java.util.List;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public abstract class RdhBase
+/*     */ {
+/*     */   @SerializedName("PIMS_IDENTITY")
+/*     */   protected String pims_identity;
+/*     */   @SerializedName("RFA_NUM")
+/*     */   protected String rfa_num;
+/*     */   @SerializedName("DEFAULT_MANDT")
+/*     */   protected String default_mandt;
+/*     */   @SerializedName("CLIENT_NAME")
+/*     */   private String client_name;
+/*     */   @Foo
+/*     */   private String rfc_name;
+/*     */   @Foo
+/*     */   protected RdhBase_zdm_geo_to_class zdm_geo_to_class;
+/*     */   @Foo
+/*  42 */   private String input = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   @SerializedName("N45BZDM_GEO_TO_CLASS")
+/*     */   private List<RdhBase_zdm_geo_to_class> geo_to_class_list;
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   @Foo
+/*     */   private int rfcrc;
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   @Foo
+/*     */   private String error_text;
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private HashMap<String, List<HashMap<String, String>>> RETURN_MULTIPLE_OBJ;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public RdhBase(String paramString1, String paramString2, String paramString3) {
+/*  68 */     this.pims_identity = "T";
+/*  69 */     this.rfa_num = paramString1;
+/*  70 */     this.rfc_name = paramString2;
+/*  71 */     this.default_mandt = RfcConfigProperties.getPropertys("rdh.service.default.Mandt");
+/*  72 */     this.client_name = RfcConfigProperties.getPropertys("rdh.service.client.name");
+/*  73 */     this.zdm_geo_to_class = new RdhBase_zdm_geo_to_class("WW");
+/*  74 */     this.geo_to_class_list = new ArrayList<>();
+/*  75 */     this.geo_to_class_list.add(this.zdm_geo_to_class);
+/*  76 */     setDefaultValues();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void setDefaultValues() {}
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected abstract boolean isReadyToExecute();
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute() throws Exception {
+/* 113 */     if (isReadyToExecute()) {
+/*     */ 
+/*     */       
+/*     */       try {
+/* 117 */         this.input = generateJson();
+/* 118 */         GsonBuilder gsonBuilder = new GsonBuilder();
+/* 119 */         Gson gson = gsonBuilder.disableHtmlEscaping().create();
+/*     */         
+/* 121 */         OutputData outputData = (OutputData)gson.fromJson(EACMWebServiceUtil.callService(this.input, this.rfc_name), OutputData.class);
+/* 122 */         saveRfcResults(outputData);
+/* 123 */         if (!isValidRfcrc()) {
+/* 124 */           throw new Exception(this.error_text);
+/*     */         }
+/* 126 */       } catch (Exception exception) {
+/*     */         
+/* 128 */         this.rfcrc = 8;
+/* 129 */         this.error_text = "Something wrong when calling webservice: " + this.rfc_name + " - " + exception.getMessage();
+/* 130 */         throw new Exception(createLogEntry());
+/*     */       
+/*     */       }
+/*     */ 
+/*     */     
+/*     */     }
+/*     */     else {
+/*     */ 
+/*     */       
+/* 139 */       throw new Exception(createLogEntry());
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String generateJson() throws Exception {
+/* 153 */     GsonBuilder gsonBuilder = new GsonBuilder();
+/* 154 */     Gson gson = gsonBuilder.setExclusionStrategies(new ExclusionStrategy[] { new RdhExclusionStrategy() }).registerTypeAdapterFactory(new NullStringToEmptyAdapterFactory()).disableHtmlEscaping().create();
+/*     */     
+/* 156 */     return gson.toJson(this);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void saveRfcResults(OutputData paramOutputData) {
+/* 166 */     this.rfcrc = paramOutputData.getRFCRC();
+/* 167 */     this.error_text = paramOutputData.getERROR_TEXT();
+/* 168 */     this.RETURN_MULTIPLE_OBJ = paramOutputData.getRETURN_MULTIPLE_OBJ();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setDeleteAction() {}
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String createLogEntry() {
+/* 197 */     String str = "";
+/*     */     try {
+/* 199 */       str = generateJson();
+/* 200 */     } catch (Exception exception) {
+/* 201 */       this.rfcrc = 8;
+/* 202 */       this.error_text = "Something wrong when generated Json: " + exception.getMessage();
+/*     */     } 
+/* 204 */     return "RFC Result: " + (
+/* 205 */       isValidRfcrc() ? "Success" : ("FAILED Reason: " + this.error_text)) + " " + 
+/* 206 */       System.getProperty("line.separator") + " Remote function " + this.rfc_name + " : " + 
+/* 207 */       addBlankToJson(str);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String addBlankToJson(String paramString) {
+/* 215 */     return paramString.replaceAll("([0-9]+|\"|]|}),", "$1, ")
+/* 216 */       .replace("\\u003d", "=").replace("\\u0027", "'")
+/* 217 */       .replace("\\u003c", "<").replace("\\u003e", ">");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public int getRfcrc() {
+/* 226 */     return this.rfcrc;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setRfcrc(int paramInt) {
+/* 235 */     this.rfcrc = paramInt;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getError_text() {
+/* 244 */     return this.error_text;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setError_text(String paramString) {
+/* 253 */     this.error_text = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean isNullOrBlank(String paramString) {
+/* 265 */     return (paramString == null || paramString.length() == 0);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean isValidRfcrc() {
+/* 273 */     return (this.rfcrc == 0);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean checkFieldsNotEmplyOrNull(Object paramObject, List<String> paramList, boolean paramBoolean) {
+/*     */     try {
+/* 286 */       Field[] arrayOfField = paramObject.getClass().getDeclaredFields();
+/* 287 */       for (Field field : arrayOfField) {
+/*     */         
+/* 289 */         if (paramList.contains(field.getName())) {
+/* 290 */           field.setAccessible(true);
+/* 291 */           Object object = field.get(paramObject);
+/* 292 */           if (object == null || object.toString().length() == 0) {
+/*     */ 
+/*     */             
+/* 295 */             setRfcrc(8);
+/* 296 */             String str = "The ";
+/* 297 */             if (!paramBoolean)
+/*     */             {
+/* 299 */               str = "One ";
+/*     */             }
+/* 301 */             setError_text(str + paramObject.getClass().getSimpleName() + "." + field
+/* 302 */                 .getName() + " attribute is not set to a value");
+/*     */             
+/* 304 */             return false;
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/* 308 */     } catch (Exception exception) {
+/* 309 */       setRfcrc(8);
+/* 310 */       setError_text("something wrong when check Null or Empty : " + getClass().getName());
+/* 311 */       return false;
+/*     */     } 
+/* 313 */     return true;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected <T> boolean checkFieldsNotEmplyOrNullInCollection(List<T> paramList, List<String> paramList1) {
+/*     */     // Byte code:
+/*     */     //   0: aload_1
+/*     */     //   1: invokeinterface iterator : ()Ljava/util/Iterator;
+/*     */     //   6: astore_3
+/*     */     //   7: aload_3
+/*     */     //   8: invokeinterface hasNext : ()Z
+/*     */     //   13: ifeq -> 45
+/*     */     //   16: aload_3
+/*     */     //   17: invokeinterface next : ()Ljava/lang/Object;
+/*     */     //   22: astore #4
+/*     */     //   24: aload_0
+/*     */     //   25: aload #4
+/*     */     //   27: aload_2
+/*     */     //   28: iconst_0
+/*     */     //   29: invokevirtual checkFieldsNotEmplyOrNull : (Ljava/lang/Object;Ljava/util/List;Z)Z
+/*     */     //   32: istore #5
+/*     */     //   34: iload #5
+/*     */     //   36: ifne -> 42
+/*     */     //   39: iload #5
+/*     */     //   41: ireturn
+/*     */     //   42: goto -> 7
+/*     */     //   45: iconst_1
+/*     */     //   46: ireturn
+/*     */     // Line number table:
+/*     */     //   Java source line number -> byte code offset
+/*     */     //   #325	-> 0
+/*     */     //   #327	-> 24
+/*     */     //   #328	-> 34
+/*     */     //   #330	-> 39
+/*     */     //   #332	-> 42
+/*     */     //   #333	-> 45
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected <T> boolean checkFieldsNotEmplyOrNullInCollection(List<T> paramList, String paramString) {
+/*     */     // Byte code:
+/*     */     //   0: new java/util/ArrayList
+/*     */     //   3: dup
+/*     */     //   4: invokespecial <init> : ()V
+/*     */     //   7: astore_3
+/*     */     //   8: aload_3
+/*     */     //   9: aload_2
+/*     */     //   10: invokeinterface add : (Ljava/lang/Object;)Z
+/*     */     //   15: pop
+/*     */     //   16: aload_1
+/*     */     //   17: invokeinterface iterator : ()Ljava/util/Iterator;
+/*     */     //   22: astore #4
+/*     */     //   24: aload #4
+/*     */     //   26: invokeinterface hasNext : ()Z
+/*     */     //   31: ifeq -> 64
+/*     */     //   34: aload #4
+/*     */     //   36: invokeinterface next : ()Ljava/lang/Object;
+/*     */     //   41: astore #5
+/*     */     //   43: aload_0
+/*     */     //   44: aload #5
+/*     */     //   46: aload_3
+/*     */     //   47: iconst_0
+/*     */     //   48: invokevirtual checkFieldsNotEmplyOrNull : (Ljava/lang/Object;Ljava/util/List;Z)Z
+/*     */     //   51: istore #6
+/*     */     //   53: iload #6
+/*     */     //   55: ifne -> 61
+/*     */     //   58: iload #6
+/*     */     //   60: ireturn
+/*     */     //   61: goto -> 24
+/*     */     //   64: iconst_1
+/*     */     //   65: ireturn
+/*     */     // Line number table:
+/*     */     //   Java source line number -> byte code offset
+/*     */     //   #345	-> 0
+/*     */     //   #346	-> 8
+/*     */     //   #347	-> 16
+/*     */     //   #349	-> 43
+/*     */     //   #350	-> 53
+/*     */     //   #352	-> 58
+/*     */     //   #354	-> 61
+/*     */     //   #355	-> 64
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getRFCName() {
+/* 358 */     return this.rfc_name;
+/*     */   }
+/*     */   public String getRFCNum() {
+/* 361 */     return this.rfa_num;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean checkFieldsNotEmplyOrNull(Object paramObject, String paramString) {
+/* 371 */     ArrayList<String> arrayList = new ArrayList();
+/* 372 */     arrayList.add(paramString);
+/* 373 */     return checkFieldsNotEmplyOrNull(paramObject, arrayList, true);
+/*     */   }
+/*     */   public String getInput() {
+/* 376 */     return this.input;
+/*     */   }
+/*     */   
+/*     */   public HashMap<String, List<HashMap<String, String>>> getRETURN_MULTIPLE_OBJ() {
+/* 380 */     return this.RETURN_MULTIPLE_OBJ;
+/*     */   }
+/*     */   
+/*     */   public void setRETURN_MULTIPLE_OBJ(HashMap<String, List<HashMap<String, String>>> paramHashMap) {
+/* 384 */     this.RETURN_MULTIPLE_OBJ = paramHashMap;
+/*     */   }
+/*     */ }
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
-import COM.ibm.eannounce.abr.sg.rfc.entity.OutputData;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhBase_zdm_geo_to_class;
-import COM.ibm.eannounce.abr.util.EACMWebServiceUtil;
-import COM.ibm.eannounce.abr.util.RfcConfigProperties;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.SerializedName;
-
-
-/**
- * The RdhBase java class is the superclass for all of the RDH RFC
- * callers/proxies. This java class is abstract.
- * 
- * @author will
- * 
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\RdhBase.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public abstract class RdhBase
-{
-
-    @SerializedName("PIMS_IDENTITY")
-    protected String pims_identity;
-    @SerializedName("RFA_NUM")
-    protected String rfa_num;
-    @SerializedName("DEFAULT_MANDT")
-    protected String default_mandt;
-    @SerializedName("CLIENT_NAME")
-    private String client_name;
-    @Foo
-    private String rfc_name;
-    @Foo
-    protected RdhBase_zdm_geo_to_class zdm_geo_to_class;
-
-    @Foo
-    private String input = null;
-    // magic field for RFC input
-    @SerializedName("N45BZDM_GEO_TO_CLASS")
-    private List<RdhBase_zdm_geo_to_class> geo_to_class_list;
-
-    @Foo
-    private int rfcrc;
-    @Foo
-    private String error_text;
-    
-    private HashMap<String, List<HashMap<String, String>>> RETURN_MULTIPLE_OBJ;
-
-    /**
-     * Constructor
-     * 
-     * @param event The identifier to be used to uniquely tag a set of parking
-     * table entries associated with a product feed.
-     * @param rfc_name The name of the RDH remote function. For example:
-     * "Z_DM_SAP_MATM_CREATE".
-     * @param enablementprocess it was used to set pims_identify and geo based on enablementprocess. 
-     * if it is null, will set to pims_identify and geo as ESW
-     * UDT will set it to null since it is only for ESW
-     */
-    public RdhBase(String event, String rfc_name, String enablementprocess)
-    {
-        this.pims_identity = "T";// Set to "E" as default ESW.
-        this.rfa_num = event;
-        this.rfc_name = rfc_name;
-        this.default_mandt = RfcConfigProperties.getPropertys("rdh.service.default.Mandt");
-        this.client_name = RfcConfigProperties.getPropertys("rdh.service.client.name");
-        this.zdm_geo_to_class = new RdhBase_zdm_geo_to_class("WW");
-        this.geo_to_class_list = new ArrayList<RdhBase_zdm_geo_to_class>();
-        geo_to_class_list.add(zdm_geo_to_class);
-        setDefaultValues();
-    }
-
-    /**
-     * This method sets attributes to default values. This method is usually
-     * overridden by the concrete classes.
-     */
-    protected void setDefaultValues()
-    {
-        // Do nothing in this class
-    }
-
-    /**
-     * Verifies that all required attributes of the RDH RFC caller have been set
-     * to a value before the execute() operation attempts to invoke the
-     * corresponding RDH RFC web service. This method is abstract. It must be
-     * defined on each RDH RFC caller class.
-     * 
-     * @return false if not all required attributes have been set
-     */
-    protected abstract boolean isReadyToExecute();
-
-    /**
-     * If isReadyToExecute() == TRUE, then: Call the RdhBase.generateJson()
-     * method to generate the JSON input. Call the RDH RFC web service which
-     * corresponds to the RDH RFC caller class. Call the
-     * RdhBase.saveRfcResults() method to store the RFC result values. If
-     * isReadyToExecute() == FALSE, then: Throw an java exception to indicate
-     * all required parameters have not been set. The RDH RFC web service is not
-     * called. Set the <rfcrc> attribute to "8" (error). Set the <error_text> to
-     * "All required parameters have not been set.  The RDH RFC web service is not called."
-     * Indicate which parameter names are missing values in the <error_text>.
-     * 
-     * @throws Exception
-     */
-    public void execute() throws Exception
-    {
-        if (isReadyToExecute())
-        {  
-            try
-            {
-                input = generateJson();
-                GsonBuilder builder = new GsonBuilder();
-                Gson gson = builder.disableHtmlEscaping().create();
-                OutputData output = gson
-                        .fromJson(EACMWebServiceUtil.callService(input, rfc_name), OutputData.class);
-                saveRfcResults(output);
-                if(!isValidRfcrc()){//some caller think 4 is valid and not need to throw it
-                    throw new Exception(error_text);
-                }
-            } catch (Exception e)
-            {
-                rfcrc = 8;
-                error_text = "Something wrong when calling webservice: " + rfc_name + " - " + e.getMessage();
-                throw new Exception(createLogEntry());
-            }
-        } else
-        {
-            // Should be done in isReadyToExecute() by child class
-            // rfcrc = 8;
-            // error_text =
-            // "All required parameters have not been set.  The RDH RFC web service is not called.";
-            // Indicate which parameter names are missing values in the <error_text>
-            throw new Exception(createLogEntry());
-        }
-
-    }
-
-    /**
-     * Generates the JSON structure/data to be used as input by the RDH RFC web
-     * service.
-     * 
-     * @return
-     * @throws Exception 
-     */
-    public String generateJson() throws Exception
-    {
-        GsonBuilder builder = new GsonBuilder();
-        Gson gson = builder.setExclusionStrategies(new RdhExclusionStrategy()).registerTypeAdapterFactory(new NullStringToEmptyAdapterFactory()).disableHtmlEscaping().create();
-
-        return gson.toJson(this);
-    }
-
-    /**
-     * Saves the results returned by the executed RDH RFC web service.
-     * 
-     * @param output
-     */
-    protected void saveRfcResults(OutputData output)
-    {
-        this.rfcrc = output.getRFCRC();
-        this.error_text = output.getERROR_TEXT();
-        this.RETURN_MULTIPLE_OBJ = output.getRETURN_MULTIPLE_OBJ();
-    }
-
-    /**
-     * Sets one or more attributes to indicate a delete action should be
-     * performed. Since the setDeleteAction() operation only applies to some of
-     * the RDH RFC callers, this method should be overloaded by those RDH RFC
-     * callers which support a delete operation.
-     */
-    public void setDeleteAction()
-    {
-
-    }
-
-    /**
-     * This method should return a character string so it can be written to a
-     * log where the user can be view the results of their submitted data feed.
-     * The character string should contain: The name of the RDH remote function.
-     * The JSON used to invoke the corresponding RDH RFC web service. The JSON
-     * should be compressed but contain a blank space after each comma. The
-     * result of execution (ex. "Success" or "Failed") If the RFC web service
-     * fails, error text should be returned which describes why the web service
-     * failed.
-     * @throws Exception 
-     */
-    public String createLogEntry() 
-    {
-        // The JSON should be compressed but contain a blank space after each
-        // comma.
-        String json = "";
-        try{
-            json = generateJson();
-        }catch(Exception e){
-            rfcrc = 8;
-            error_text = "Something wrong when generated Json: " + e.getMessage();
-        }
-        return "RFC Result: "
-                + (this.isValidRfcrc() ? "Success" : ("FAILED" + " Reason: " + this.error_text)) 
-                + " " + System.getProperty("line.separator") 
-                + " Remote function " + this.rfc_name + " : " + addBlankToJson(json);
-    }
-
-    // no boolean type was required right now.
-    private String addBlankToJson(String jsondata)
-    {
-        // return jsondata.replaceAll("\",", "\", ").replaceAll("],",
-        // "], ").replaceAll("},", "}, ");
-        return jsondata.replaceAll("([0-9]+|\"|]|}),", "$1, ")
-                .replace("\\u003d", "=").replace("\\u0027", "'")
-                .replace("\\u003c", "<").replace("\\u003e", ">");
-    }
-
-    /**
-     * 
-     * @return RFC return code
-     */
-    public int getRfcrc()
-    {
-        return rfcrc;
-    }
-
-    /**
-     * 
-     * @param rfcrc RFC return code
-     */
-    public void setRfcrc(int rfcrc)
-    {
-        this.rfcrc = rfcrc;
-    }
-
-    /**
-     * 
-     * @return Error Message
-     */
-    public String getError_text()
-    {
-        return error_text;
-    }
-
-    /**
-     * 
-     * @param error_text Error Message for RFC call
-     */
-    public void setError_text(String error_text)
-    {
-        this.error_text = error_text;
-    }
-    
-    
-    
-    /**
-     * utility method that is used to check null or empty string
-     * @param attr
-     * @return
-     */
-    protected boolean isNullOrBlank(String attr)
-    {
-    	return attr == null || attr.length() == 0;
-    }
-    
-    /**
-     * check if the return code is valid and the call is successful
-     * @return normal caller will return 0 as valid, but some callers may be different, depend on the child class
-     */
-    protected boolean isValidRfcrc(){
-        return this.rfcrc == 0;
-    }
-
-    /**
-     * that is used to check if the value of fields are null or empty string in specified class
-     * @param checkFileds
-     * @param isSingle it is about the error message - if yes, use 'The', otherwise use 'One'
-     * @param clazz
-     * @return
-     */
-    protected boolean checkFieldsNotEmplyOrNull(Object obj, List<String> checkFileds, boolean isSingle)
-    {
-        try{
-            Field[] fields = obj.getClass().getDeclaredFields();
-            for(Field field : fields)
-            {
-                if(checkFileds.contains(field.getName())){
-                    field.setAccessible(true);
-                    Object object = field.get(obj);
-                    if(object == null || object.toString().length() == 0)
-                    {
-                    	//invalid data issue ,set RFC return code to 8
-                        this.setRfcrc(8);
-                        String header = "The ";
-                        if(!isSingle)
-                        {
-                            header = "One ";
-                        }
-                        this.setError_text(header + obj.getClass().getSimpleName() + "."
-                                + field.getName()
-                                + " attribute is not set to a value");
-                        return false;
-                    }
-                }
-            }
-        }catch(Exception e){
-            this.setRfcrc(8);
-            this.setError_text("something wrong when check Null or Empty : " + this.getClass().getName());
-            return false;
-        }
-        return true;
-    }
-    
-    /**
-     * that is used to check if the value of fields are null or empty string in specified class
-     * @param <T>
-     * @param objs
-     * @param checkFileds
-     * @return
-     */
-    protected <T> boolean checkFieldsNotEmplyOrNullInCollection(List<T> objs, List<String> checkFileds)
-    {
-        for(Object obj : objs)
-        {
-            boolean result = checkFieldsNotEmplyOrNull(obj, checkFileds, false);
-            if(!result)
-            {
-                return result;
-            }
-        }
-        return true;
-    }
-    
-    /**
-     * that is used to check if the value of fields are null or empty string in specified class
-     * @param <T>
-     * @param objs
-     * @param checkFileds
-     * @return
-     */
-    protected <T> boolean checkFieldsNotEmplyOrNullInCollection(List<T> objs, String checkFiled)
-    {
-        List<String> checkFileds = new ArrayList<String>();
-        checkFileds.add(checkFiled);
-        for(Object obj : objs)
-        {
-            boolean result = checkFieldsNotEmplyOrNull(obj, checkFileds, false);
-            if(!result)
-            {
-                return result;
-            }
-        }
-        return true;
-    }
-    public String getRFCName() {
-    	return rfc_name;
-    }
-    public String getRFCNum() {
-    	return rfa_num;
-    }
-    /**
-     * check if the field value of object is null or empty string 
-     * @param obj
-     * @param checkFiled
-     * @return
-     */
-    protected boolean checkFieldsNotEmplyOrNull(Object obj, String checkFiled)
-    {
-        List<String> checkFileds = new ArrayList<String>();
-        checkFileds.add(checkFiled);
-        return checkFieldsNotEmplyOrNull(obj, checkFileds, true);
-    }
-    public String getInput() {
-    	return input;
-    }
-
-	public HashMap<String, List<HashMap<String, String>>> getRETURN_MULTIPLE_OBJ() {
-		return RETURN_MULTIPLE_OBJ;
-	}
-
-	public void setRETURN_MULTIPLE_OBJ(HashMap<String, List<HashMap<String, String>>> rETURN_MULTIPLE_OBJ) {
-		RETURN_MULTIPLE_OBJ = rETURN_MULTIPLE_OBJ;
-	}
-    
-}

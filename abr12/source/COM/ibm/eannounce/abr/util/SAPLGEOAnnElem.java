@@ -1,136 +1,141 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2007  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Vector;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ import org.w3c.dom.Node;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class SAPLGEOAnnElem
+/*     */   extends SAPLElem
+/*     */ {
+/*     */   public SAPLGEOAnnElem(String paramString1, String paramString2) {
+/*  64 */     super(paramString1, "ANNOUNCEMENT", paramString2, false);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void addGEOElements(Vector paramVector, Document paramDocument, Element paramElement, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  86 */     if (paramVector != null && paramVector.size() > 0) {
+/*  87 */       Vector<EntityItem> vector = new Vector();
+/*     */       
+/*  89 */       for (byte b = 0; b < AVAIL_ORDER.length; b++) {
+/*  90 */         Vector vector1 = PokUtils.getEntitiesWithMatchedAttr(paramVector, "AVAILTYPE", AVAIL_ORDER[b]);
+/*  91 */         if (vector1.size() > 0) {
+/*  92 */           vector = PokUtils.getAllLinkedEntities(vector1, "AVAILANNA", "ANNOUNCEMENT");
+/*  93 */           vector1.clear();
+/*  94 */           if (vector.size() > 0) {
+/*  95 */             paramStringBuffer.append("SAPLGEOAnnElem: Found ANNOUNCEMENTs for AVAILTYPE " + AVAIL_ORDER[b] + NEWLINE);
+/*     */             
+/*     */             break;
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/* 101 */       if (vector.size() > 0) {
+/* 102 */         EntityItem entityItem = vector.firstElement();
+/* 103 */         if (vector.size() > 1) {
+/* 104 */           paramStringBuffer.append("SAPLGEOAnnElem: Error: more than one ANNOUNCEMENT found.  Using first one " + entityItem
+/* 105 */               .getKey() + NEWLINE);
+/*     */         }
+/*     */         
+/* 108 */         Element element = paramDocument.createElement(this.nodeName);
+/* 109 */         addXMLAttrs(element);
+/* 110 */         paramElement.appendChild(element);
+/* 111 */         Node node = getContentNode(paramDocument, entityItem, paramElement);
+/* 112 */         if (node != null) {
+/* 113 */           element.appendChild(node);
+/*     */         }
+/* 115 */         vector.clear();
+/*     */       } else {
+/* 117 */         paramStringBuffer.append("SAPLGEOAnnElem: No ANNOUNCEMENTs found for node:" + this.nodeName + NEWLINE);
+/*     */         
+/* 119 */         Element element = paramDocument.createElement(this.nodeName);
+/* 120 */         addXMLAttrs(element);
+/* 121 */         paramElement.appendChild(element);
+/* 122 */         if (this.attrCode != null) {
+/* 123 */           element.appendChild(paramDocument.createTextNode("@@"));
+/*     */         }
+/*     */       } 
+/*     */     } else {
+/* 127 */       paramStringBuffer.append("SAPLGEOAnnElem: No AVAIL passed in for node:" + this.nodeName + NEWLINE);
+/* 128 */       Element element = paramDocument.createElement(this.nodeName);
+/* 129 */       addXMLAttrs(element);
+/* 130 */       paramElement.appendChild(element);
+/* 131 */       if (this.attrCode != null)
+/* 132 */         element.appendChild(paramDocument.createTextNode("@@")); 
+/*     */     } 
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.util;
 
-import COM.ibm.eannounce.objects.*;
-import com.ibm.transform.oim.eacm.util.*;
-
-import java.util.*;
-import java.io.*;
-
-import org.w3c.dom.*;
-
-/**********************************************************************************
-*  Class used to hold info and structure to be generated for the xml feed
-* for SAPLABRSTATUS abrs
-* This class will look at AVAILs in order for a particular country and use first one found
-* The EACM XML Payloads specify AVAIL that do not specify an AVAILTYPE use the
-*   instance of AVAIL based on the following priority of AVAILTYPE:
-*   1.  146 (Planned Availability)
-*   2.  143 (First Order)
-*   3.  149 (Last Order)
-*   4.  AVT220 (Lease Rental Withdrawal)
-*
-
-Wayne Kehrli	The EACM XML Payloads specify AVAIL that do not specify an AVAILTYPE use the instance of AVAIL based on the following priority of AVAILTYPE:
-1.	146 (Planned Availability)
-2.	143 (First Order)
-3.	149 (Last Order)
-4.	AVT220 (Lease Rental Withdrawal)
-
-Wayne Kehrli	and the corresponding Announcement
-Wendy	so i look for the first ann in that order?
-Wayne Kehrli	yes
-Wendy	k
-
-*/
-// $Log: SAPLGEOAnnElem.java,v $
-// Revision 1.3  2008/02/19 17:18:25  wendy
-// Cleanup RSA warnings
-//
-// Revision 1.2  2007/04/20 14:58:33  wendy
-// RQ0417075638 updates
-//
-// Revision 1.1  2007/04/02 17:38:17  wendy
-// Support classes for SAPL xml generation
-//
-
-public class SAPLGEOAnnElem extends SAPLElem
-{
-    /**********************************************************************************
-    * Constructor for ANN from filtered AVAIL entities
-    * look in order (the first one you find) from AVAILTYPE
-    *
-    *@param nname String with name of node to be created
-    *@param code String with attribute code to retrieve
-    */
-    public SAPLGEOAnnElem(String nname, String code)
-    {
-        super(nname,"ANNOUNCEMENT",code,false);
-    }
-
-    /**********************************************************************************
-    * Create a node for this element add to the parent
-    *
-    *@param itemVct Vector of AVAIL EntityItem for a country, find the first one that matches
-    * this filter with an announcement
-    *@param document Document needed to create nodes
-    *@param parent Element node to add this node too
-    *@param debugSb StringBuffer used for debug output
-    */
-    protected void addGEOElements(Vector itemVct, Document document, Element parent,StringBuffer debugSb)
-    throws COM.ibm.eannounce.objects.EANBusinessRuleException,
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-        java.rmi.RemoteException,
-        IOException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {
-        if (itemVct !=null && itemVct.size()>0){
-			Vector annVct = new Vector();
-
-			for(int t=0; t<AVAIL_ORDER.length; t++){
-            	Vector matchVct = PokUtils.getEntitiesWithMatchedAttr(itemVct, "AVAILTYPE", AVAIL_ORDER[t]);
-				if (matchVct.size()>0){ // look for ANNOUNCEMENT thru AVAILANNA
-					annVct = PokUtils.getAllLinkedEntities(matchVct, "AVAILANNA", "ANNOUNCEMENT");
-					matchVct.clear();
-					if (annVct.size()>0){
-						debugSb.append("SAPLGEOAnnElem: Found ANNOUNCEMENTs for AVAILTYPE "+AVAIL_ORDER[t]+NEWLINE);
-						break;
-					}
-				}
-			}
-
-			if(annVct.size()>0){
-                EntityItem item = (EntityItem)annVct.firstElement();
-				if(annVct.size()>1){
-					debugSb.append("SAPLGEOAnnElem: Error: more than one ANNOUNCEMENT found. "+
-						" Using first one "+item.getKey()+NEWLINE);
-				}
-
-                Element elem = (Element) document.createElement(nodeName);
-                addXMLAttrs(elem);
-                parent.appendChild(elem);
-                Node contentElem = getContentNode(document, item,parent);
-                if (contentElem!=null){
-                    elem.appendChild(contentElem);
-                }
-                annVct.clear();
-			}else{
-				debugSb.append("SAPLGEOAnnElem: No ANNOUNCEMENTs found for node:"+
-					nodeName+NEWLINE);
-				Element elem = (Element) document.createElement(nodeName);
-				addXMLAttrs(elem);
-				parent.appendChild(elem);
-				if (attrCode!=null){ // a value is expected, prevent a normal empty tag, OIDH cant handle it
-					elem.appendChild(document.createTextNode(CHEAT));
-				}
-			}
-        }else{
-            debugSb.append("SAPLGEOAnnElem: No AVAIL passed in for node:"+nodeName+NEWLINE);
-            Element elem = (Element) document.createElement(nodeName);
-            addXMLAttrs(elem);
-            parent.appendChild(elem);
-			if (attrCode!=null){ // a value is expected, prevent a normal empty tag, OIDH cant handle it
-				elem.appendChild(document.createTextNode(CHEAT));
-			}
-        }
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\SAPLGEOAnnElem.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

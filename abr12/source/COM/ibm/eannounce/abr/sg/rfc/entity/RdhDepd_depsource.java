@@ -1,28 +1,32 @@
-/* Copyright IBM Corp. 2016 */
-package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ 
+/*    */ import com.google.gson.annotations.SerializedName;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class RdhDepd_depsource
+/*    */ {
+/*    */   @SerializedName("LINE")
+/*    */   private String line;
+/*    */   
+/*    */   public String getLine() {
+/* 16 */     return this.line;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setLine(String paramString) {
+/* 24 */     this.line = paramString;
+/*    */   }
+/*    */ }
 
-import com.google.gson.annotations.SerializedName;
 
-public class RdhDepd_depsource
-{
-    @SerializedName("LINE")
-    private String line;
-
-    /**
-     * @return the line
-     */
-    public String getLine()
-    {
-        return line;
-    }
-
-    /**
-     * @param line the line to set
-     */
-    public void setLine(String line)
-    {
-        this.line = line;
-    }
-    
-    
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\entity\RdhDepd_depsource.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

@@ -1,91 +1,93 @@
-/* Copyright IBM Corp. 2016 */
-package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ 
+/*    */ import com.google.gson.annotations.SerializedName;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class RdhBomc_csap_mbom
+/*    */ {
+/*    */   @SerializedName("MATNR")
+/*    */   private String matnr;
+/*    */   @SerializedName("WERKS")
+/*    */   private String werks;
+/*    */   @SerializedName("STLAN")
+/*    */   private String stlan;
+/*    */   @SerializedName("STLAL")
+/*    */   private String stlal;
+/*    */   @SerializedName("DATUV")
+/*    */   private String datuv;
+/*    */   
+/*    */   public String getMatnr() {
+/* 28 */     return this.matnr;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setMatnr(String paramString) {
+/* 35 */     this.matnr = paramString;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getWerks() {
+/* 42 */     return this.werks;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setWerks(String paramString) {
+/* 49 */     this.werks = paramString;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getStlan() {
+/* 56 */     return this.stlan;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setStlan(String paramString) {
+/* 63 */     this.stlan = paramString;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getDatuv() {
+/* 70 */     return this.datuv;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setDatuv(String paramString) {
+/* 77 */     this.datuv = paramString;
+/*    */   }
+/*    */   
+/*    */   public String getStlal() {
+/* 81 */     return this.stlal;
+/*    */   }
+/*    */   
+/*    */   public void setStlal(String paramString) {
+/* 85 */     this.stlal = paramString;
+/*    */   }
+/*    */ }
 
-import com.google.gson.annotations.SerializedName;
 
-public class RdhBomc_csap_mbom
-{
-    @SerializedName("MATNR")
-    private String matnr; 
-    
-    @SerializedName("WERKS")
-    private String werks; 
-    
-    @SerializedName("STLAN")
-    private String stlan;
-    
-    @SerializedName("STLAL")
-    private String stlal;
-    
-    @SerializedName("DATUV")
-    private String datuv;
-    
-    /**
-     * @return the matnr
-     */
-    public String getMatnr()
-    {
-        return matnr;
-    }
-    /**
-     * @param matnr the matnr to set
-     */
-    public void setMatnr(String matnr)
-    {
-        this.matnr = matnr;
-    }
-    /**
-     * @return the werks
-     */
-    public String getWerks()
-    {
-        return werks;
-    }
-    /**
-     * @param werks the werks to set
-     */
-    public void setWerks(String werks)
-    {
-        this.werks = werks;
-    }
-    /**
-     * @return the stlan
-     */
-    public String getStlan()
-    {
-        return stlan;
-    }
-    /**
-     * @param stlan the stlan to set
-     */
-    public void setStlan(String stlan)
-    {
-        this.stlan = stlan;
-    }
-    /**
-     * @return the datuv
-     */
-    public String getDatuv()
-    {
-        return datuv;
-    }
-    /**
-     * @param datuv the datuv to set
-     */
-    public void setDatuv(String datuv)
-    {
-        this.datuv = datuv;
-    }
-    
-	public String getStlal() {
-		return stlal;
-	}
-	
-	public void setStlal(String stlal) {
-		this.stlal = stlal;
-	}
-    
-    
-    
-
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\entity\RdhBomc_csap_mbom.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

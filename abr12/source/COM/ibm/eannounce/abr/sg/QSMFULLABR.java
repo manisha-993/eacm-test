@@ -1,3270 +1,3275 @@
-//Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*      */ package COM.ibm.eannounce.abr.sg;
+/*      */ 
+/*      */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*      */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*      */ import COM.ibm.eannounce.objects.EANList;
+/*      */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*      */ import COM.ibm.eannounce.objects.EntityGroup;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.EntityList;
+/*      */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*      */ import COM.ibm.opicmpdh.middleware.Database;
+/*      */ import COM.ibm.opicmpdh.middleware.DatePackage;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*      */ import COM.ibm.opicmpdh.middleware.Profile;
+/*      */ import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.io.BufferedInputStream;
+/*      */ import java.io.BufferedReader;
+/*      */ import java.io.FileInputStream;
+/*      */ import java.io.FileOutputStream;
+/*      */ import java.io.IOException;
+/*      */ import java.io.InputStreamReader;
+/*      */ import java.io.OutputStreamWriter;
+/*      */ import java.nio.channels.FileChannel;
+/*      */ import java.sql.SQLException;
+/*      */ import java.text.MessageFormat;
+/*      */ import java.text.ParseException;
+/*      */ import java.text.SimpleDateFormat;
+/*      */ import java.util.ArrayList;
+/*      */ import java.util.Collections;
+/*      */ import java.util.Date;
+/*      */ import java.util.Hashtable;
+/*      */ import java.util.List;
+/*      */ import java.util.ResourceBundle;
+/*      */ import java.util.Vector;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public class QSMFULLABR
+/*      */   extends PokBaseABR
+/*      */ {
+/*  313 */   private StringBuffer rptSb = new StringBuffer();
+/*  314 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/*  315 */   static final String NEWLINE = new String(FOOL_JTEST);
+/*      */   
+/*  317 */   private ResourceBundle rsBundle = null;
+/*  318 */   private Hashtable metaTbl = new Hashtable<>();
+/*  319 */   private String navName = "";
+/*      */   
+/*  321 */   private String ffFileName = null;
+/*  322 */   private String ffPathName = null;
+/*  323 */   private String ffFTPPathName = null;
+/*  324 */   private String dir = null;
+/*  325 */   private String dirDest = null;
+/*  326 */   private final String QSMRPTPATH = "_rptpath";
+/*  327 */   private final String QSMGENPATH = "_genpath";
+/*  328 */   private final String QSMFTPPATH = "_ftppath";
+/*  329 */   private int abr_debuglvl = 0;
+/*      */   
+/*      */   private static final String CREFINIPATH = "_inipath";
+/*      */   private static final String FTPSCRPATH = "_script";
+/*      */   private static final String TARGETFILENAME = "_targetfilename";
+/*      */   private static final String LOGPATH = "_logpath";
+/*      */   private static final String BACKUPPATH = "_backuppath";
+/*  336 */   private String fileprefix = null;
+/*  337 */   private String lineStr = "";
+/*  338 */   private String abrcode = "";
+/*      */   
+/*      */   private EntityItem rootEntity;
+/*      */   private static final String FAILD = "FAILD";
+/*      */   private static final String IFTYPE = "IFTYPE";
+/*      */   private static final String IOPUCTY = "IOPUCTY";
+/*      */   private static final String ISLMPAL = "ISLMPAL";
+/*      */   private static final String ISLMRFA = "ISLMRFA";
+/*      */   private static final String ISLMPRN = "ISLMPRN";
+/*      */   private static final String CSLMPCI = "CSLMPCI";
+/*      */   private static final String IPRTNUM = "IPRTNUM";
+/*      */   private static final String FPUNINC = "FPUNINC";
+/*      */   private static final String CAOAV = "CAOAV";
+/*      */   private static final String DSLMCPA = "DSLMCPA";
+/*      */   private static final String DSLMCPO = "DSLMCPO";
+/*      */   private static final String DSLMGAD = "DSLMGAD";
+/*      */   private static final String DSLMMVA = "DSLMMVA";
+/*      */   private static final String DSLMOPD = "DSLMOPD";
+/*      */   private static final String DSLMWDN = "DSLMWDN";
+/*      */   private static final String QSMEDMW = "QSMEDMW";
+/*      */   private static final String ASLMMVP = "ASLMMVP";
+/*      */   private static final String CCUOICR = "CCUOICR";
+/*      */   private static final String CICIB = "CICIB";
+/*      */   private static final String CICIC = "CICIC";
+/*      */   private static final String CICRY = "CICRY";
+/*      */   private static final String CIDCJ = "CIDCJ";
+/*      */   private static final String CIDXF = "CIDXF";
+/*      */   private static final String CINCA = "CINCA";
+/*      */   private static final String CINCB = "CINCB";
+/*      */   private static final String CINCC = "CINCC";
+/*      */   private static final String CINPM = "CINPM";
+/*      */   private static final String CISUP = "CISUP";
+/*      */   private static final String CITEM = "CITEM";
+/*      */   private static final String CJLBIC1 = "CJLBIC1";
+/*      */   private static final String CJLBIDS = "CJLBIDS";
+/*      */   private static final String CJLBOEM = "CJLBOEM";
+/*      */   private static final String CJLBPOF = "CJLBPOF";
+/*      */   private static final String CJLBSAC = "CJLBSAC";
+/*      */   private static final String CLASSPT = "CLASSPT";
+/*      */   private static final String CPDAA = "CPDAA";
+/*      */   private static final String CSLMFCC = "CSLMFCC";
+/*      */   private static final String CSLMGGC = "CSLMGGC";
+/*      */   private static final String CSLMIDP = "CSLMIDP";
+/*      */   private static final String CSLMLRP = "CSLMLRP";
+/*      */   private static final String CSLMSAS = "CSLMSAS";
+/*      */   private static final String CSLMSYT = "CSLMSYT";
+/*      */   private static final String CSLMWCD = "CSLMWCD";
+/*      */   private static final String FAGRMBE = "FAGRMBE";
+/*      */   private static final String FCUOCNF = "FCUOCNF";
+/*      */   private static final String FSLMCLS = "FSLMCLS";
+/*      */   private static final String FSLMCPU = "FSLMCPU";
+/*      */   private static final String FSLMIOP = "FSLMIOP";
+/*      */   private static final String FSLMLGS = "FSLMLGS";
+/*      */   private static final String FSLMMLC = "FSLMMLC";
+/*      */   private static final String FSLMPOP = "FSLMPOP";
+/*      */   private static final String FSLMVDE = "FSLMVDE";
+/*      */   private static final String FSLMVTS = "FSLMVTS";
+/*      */   private static final String FSLM2CF = "FSLM2CF";
+/*      */   private static final String ICESPCC = "ICESPCC";
+/*      */   private static final String IDORIG = "IDORIG";
+/*      */   private static final String IOLCPLM = "IOLCPLM";
+/*      */   private static final String PCUAHEA = "PCUAHEA";
+/*      */   private static final String PCUASEA = "PCUASEA";
+/*      */   private static final String PCUAUEA = "PCUAUEA";
+/*      */   private static final String QSLMCSU = "QSLMCSU";
+/*      */   private static final String QSMXANN = "QSMXANN";
+/*      */   private static final String QSMXESA = "QSMXESA";
+/*      */   private static final String QSMXSSA = "QSMXSSA";
+/*      */   private static final String SYSDES = "SYSDES";
+/*      */   private static final String TSLMDES = "TSLMDES";
+/*      */   private static final String TSLTDES = "TSLTDES";
+/*      */   private static final String TIMSTMP = "TIMSTMP";
+/*      */   private static final String USERID = "USERID";
+/*      */   private static final String FBRAND = "FBRAND";
+/*      */   private static final String FSLMHVP = "FSLMHVP";
+/*      */   private static final String FSLMCVP = "FSLMCVP";
+/*      */   private static final String FSLMMES = "FSLMMES";
+/*      */   private static final String CSLMTM1 = "CSLMTM1";
+/*      */   private static final String CSLMTM2 = "CSLMTM2";
+/*      */   private static final String CSLMTM3 = "CSLMTM3";
+/*      */   private static final String CSLMTM4 = "CSLMTM4";
+/*      */   private static final String CSLMTM5 = "CSLMTM5";
+/*      */   private static final String CSLMTM6 = "CSLMTM6";
+/*      */   private static final String CSLMTM7 = "CSLMTM7";
+/*      */   private static final String CSLMTM8 = "CSLMTM8";
+/*      */   private static final String FSAPRES = "FSAPRES";
+/*      */   private static final String CUSAPMS = "CUSAPMS";
+/*      */   private static final String DUSALRW = "DUSALRW";
+/*      */   private static final String DUSAMDW = "DUSAMDW";
+/*      */   private static final String DUSAWUW = "DUSAWUW";
+/*      */   private static final String FSLMCBL = "FSLMCBL";
+/*      */   private static final String FSLMMRR = "FSLMMRR";
+/*      */   private static final String FUSAAAS = "FUSAAAS";
+/*      */   private static final String FUSAADM = "FUSAADM";
+/*      */   private static final String FUSAEDE = "FUSAEDE";
+/*      */   private static final String FUSAICC = "FUSAICC";
+/*      */   private static final String FUSALEP = "FUSALEP";
+/*      */   private static final String FUSAMRS = "FUSAMRS";
+/*      */   private static final String FUSAVLM = "FUSAVLM";
+/*      */   private static final String FUSAXMO = "FUSAXMO";
+/*      */   private static final String QUSAPOP = "QUSAPOP";
+/*      */   private static final String DSLMEOD = "DSLMEOD";
+/*      */   private static final String FSLMRFM = "FSLMRFM";
+/*      */   private static final Hashtable COLUMN_LENGTH;
+/*      */   private static final String DSLMMES = "DSLMMES";
+/*      */   private static final String CIDXC = "CIDXC";
+/*      */   private static final String CSLMFTY = "CSLMFTY";
+/*      */   private static final String CVOAT = "CVOAT";
+/*      */   private static final String FSLMPIO = "FSLMPIO";
+/*      */   private static final String FSLMSTK = "FSLMSTK";
+/*      */   private static final String PCUAEAP = "PCUAEAP";
+/*      */   private static final String POGMES = "POGMES";
+/*      */   private static final String STSPCFT = "STSPCFT";
+/*      */   private static final String FUSAIRR = "FUSAIRR";
+/*      */   private static final String CPDXA = "CPDXA";
+/*      */   private static final String DSLMEFF = "DSLMEFF";
+/*      */   private static final String CSLMRCH = "CSLMRCH";
+/*      */   private static final String CSLMNUM = "CSLMNUM";
+/*      */   private static final String FSLMAPG = "FSLMAPG";
+/*      */   private static final String FSLMASP = "FSLMASP";
+/*      */   private static final String FSLMJAP = "FSLMJAP";
+/*      */   private static final String FSLMAUS = "FSLMAUS";
+/*      */   private static final String FSLMBGL = "FSLMBGL";
+/*      */   private static final String FSLMBRU = "FSLMBRU";
+/*      */   private static final String FSLMHKG = "FSLMHKG";
+/*      */   private static final String FSLMIDN = "FSLMIDN";
+/*      */   private static final String FSLMIND = "FSLMIND";
+/*      */   private static final String FSLMKOR = "FSLMKOR";
+/*      */   private static final String FSLMMAC = "FSLMMAC";
+/*      */   private static final String FSLMMAL = "FSLMMAL";
+/*      */   private static final String FSLMMYA = "FSLMMYA";
+/*      */   private static final String FSLMNZL = "FSLMNZL";
+/*      */   private static final String FSLMPHI = "FSLMPHI";
+/*      */   private static final String FSLMPRC = "FSLMPRC";
+/*      */   private static final String FSLMSLA = "FSLMSLA";
+/*      */   private static final String FSLMSNG = "FSLMSNG";
+/*      */   private static final String FSLMTAI = "FSLMTAI";
+/*      */   private static final String FSLMTHA = "FSLMTHA";
+/*      */   private static final String ISLMTYP = "ISLMTYP";
+/*      */   private static final String ISLMMOD = "ISLMMOD";
+/*      */   private static final String ISLMFTR = "ISLMFTR";
+/*      */   private static final String ISLMXX1 = "ISLMXX1";
+/*      */   private static final String QSMNPMT = "QSMNPMT";
+/*      */   private static final String QSMNPMM = "QSMNPMM";
+/*  482 */   private static final List geoWWList = Collections.unmodifiableList(new ArrayList()
+/*      */       {
+/*      */       
+/*      */       });
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   static {
+/*  497 */     COLUMN_LENGTH = new Hashtable<>();
+/*  498 */     COLUMN_LENGTH.put("IFTYPE", "1");
+/*  499 */     COLUMN_LENGTH.put("IOPUCTY", "3");
+/*  500 */     COLUMN_LENGTH.put("ISLMPAL", "8");
+/*  501 */     COLUMN_LENGTH.put("ISLMRFA", "6");
+/*  502 */     COLUMN_LENGTH.put("ISLMPRN", "14");
+/*  503 */     COLUMN_LENGTH.put("CSLMPCI", "2");
+/*  504 */     COLUMN_LENGTH.put("IPRTNUM", "12");
+/*  505 */     COLUMN_LENGTH.put("FPUNINC", "1");
+/*  506 */     COLUMN_LENGTH.put("CAOAV", "1");
+/*  507 */     COLUMN_LENGTH.put("DSLMCPA", "10");
+/*  508 */     COLUMN_LENGTH.put("DSLMCPO", "10");
+/*  509 */     COLUMN_LENGTH.put("DSLMGAD", "10");
+/*  510 */     COLUMN_LENGTH.put("DSLMMVA", "10");
+/*  511 */     COLUMN_LENGTH.put("DSLMOPD", "10");
+/*  512 */     COLUMN_LENGTH.put("DSLMWDN", "10");
+/*  513 */     COLUMN_LENGTH.put("QSMEDMW", "10");
+/*  514 */     COLUMN_LENGTH.put("ASLMMVP", "4");
+/*  515 */     COLUMN_LENGTH.put("CCUOICR", "1");
+/*  516 */     COLUMN_LENGTH.put("CICIB", "1");
+/*  517 */     COLUMN_LENGTH.put("CICIC", "1");
+/*  518 */     COLUMN_LENGTH.put("CICRY", "1");
+/*  519 */     COLUMN_LENGTH.put("CIDCJ", "1");
+/*  520 */     COLUMN_LENGTH.put("CIDXF", "1");
+/*  521 */     COLUMN_LENGTH.put("CINCA", "1");
+/*  522 */     COLUMN_LENGTH.put("CINCB", "1");
+/*  523 */     COLUMN_LENGTH.put("CINCC", "1");
+/*  524 */     COLUMN_LENGTH.put("CINPM", "1");
+/*  525 */     COLUMN_LENGTH.put("CISUP", "1");
+/*  526 */     COLUMN_LENGTH.put("CITEM", "1");
+/*  527 */     COLUMN_LENGTH.put("CJLBIC1", "2");
+/*  528 */     COLUMN_LENGTH.put("CJLBIDS", "1");
+/*  529 */     COLUMN_LENGTH.put("CJLBOEM", "1");
+/*  530 */     COLUMN_LENGTH.put("CJLBPOF", "1");
+/*  531 */     COLUMN_LENGTH.put("CJLBSAC", "3");
+/*  532 */     COLUMN_LENGTH.put("CLASSPT", "3");
+/*  533 */     COLUMN_LENGTH.put("CPDAA", "1");
+/*  534 */     COLUMN_LENGTH.put("CSLMFCC", "4");
+/*  535 */     COLUMN_LENGTH.put("CSLMGGC", "2");
+/*  536 */     COLUMN_LENGTH.put("CSLMIDP", "1");
+/*  537 */     COLUMN_LENGTH.put("CSLMLRP", "1");
+/*  538 */     COLUMN_LENGTH.put("CSLMSAS", "1");
+/*  539 */     COLUMN_LENGTH.put("CSLMSYT", "5");
+/*  540 */     COLUMN_LENGTH.put("CSLMWCD", "1");
+/*  541 */     COLUMN_LENGTH.put("FAGRMBE", "1");
+/*  542 */     COLUMN_LENGTH.put("FCUOCNF", "1");
+/*  543 */     COLUMN_LENGTH.put("FSLMCLS", "1");
+/*  544 */     COLUMN_LENGTH.put("FSLMCPU", "1");
+/*  545 */     COLUMN_LENGTH.put("FSLMIOP", "1");
+/*  546 */     COLUMN_LENGTH.put("FSLMLGS", "1");
+/*  547 */     COLUMN_LENGTH.put("FSLMMLC", "1");
+/*  548 */     COLUMN_LENGTH.put("FSLMPOP", "1");
+/*  549 */     COLUMN_LENGTH.put("FSLMVDE", "1");
+/*  550 */     COLUMN_LENGTH.put("FSLMVTS", "1");
+/*  551 */     COLUMN_LENGTH.put("FSLM2CF", "1");
+/*  552 */     COLUMN_LENGTH.put("ICESPCC", "1");
+/*  553 */     COLUMN_LENGTH.put("IDORIG", "3");
+/*  554 */     COLUMN_LENGTH.put("IOLCPLM", "2");
+/*  555 */     COLUMN_LENGTH.put("PCUAHEA", "3");
+/*  556 */     COLUMN_LENGTH.put("PCUASEA", "3");
+/*  557 */     COLUMN_LENGTH.put("PCUAUEA", "3");
+/*  558 */     COLUMN_LENGTH.put("QSLMCSU", "2");
+/*  559 */     COLUMN_LENGTH.put("QSMXANN", "1");
+/*  560 */     COLUMN_LENGTH.put("QSMXESA", "1");
+/*  561 */     COLUMN_LENGTH.put("QSMXSSA", "1");
+/*  562 */     COLUMN_LENGTH.put("SYSDES", "30");
+/*  563 */     COLUMN_LENGTH.put("TSLMDES", "30");
+/*  564 */     COLUMN_LENGTH.put("TSLTDES", "56");
+/*  565 */     COLUMN_LENGTH.put("TIMSTMP", "26");
+/*  566 */     COLUMN_LENGTH.put("USERID", "8");
+/*  567 */     COLUMN_LENGTH.put("FBRAND", "1");
+/*  568 */     COLUMN_LENGTH.put("FSLMHVP", "1");
+/*  569 */     COLUMN_LENGTH.put("FSLMCVP", "1");
+/*  570 */     COLUMN_LENGTH.put("FSLMMES", "1");
+/*  571 */     COLUMN_LENGTH.put("CSLMTM1", "3");
+/*  572 */     COLUMN_LENGTH.put("CSLMTM2", "3");
+/*  573 */     COLUMN_LENGTH.put("CSLMTM3", "3");
+/*  574 */     COLUMN_LENGTH.put("CSLMTM4", "3");
+/*  575 */     COLUMN_LENGTH.put("CSLMTM5", "3");
+/*  576 */     COLUMN_LENGTH.put("CSLMTM6", "3");
+/*  577 */     COLUMN_LENGTH.put("CSLMTM7", "3");
+/*  578 */     COLUMN_LENGTH.put("CSLMTM8", "3");
+/*  579 */     COLUMN_LENGTH.put("FSAPRES", "1");
+/*  580 */     COLUMN_LENGTH.put("CUSAPMS", "1");
+/*  581 */     COLUMN_LENGTH.put("DUSALRW", "10");
+/*  582 */     COLUMN_LENGTH.put("DUSAMDW", "10");
+/*  583 */     COLUMN_LENGTH.put("DUSAWUW", "10");
+/*  584 */     COLUMN_LENGTH.put("FSLMCBL", "1");
+/*  585 */     COLUMN_LENGTH.put("FSLMMRR", "1");
+/*  586 */     COLUMN_LENGTH.put("FUSAAAS", "1");
+/*  587 */     COLUMN_LENGTH.put("FUSAADM", "1");
+/*  588 */     COLUMN_LENGTH.put("FUSAEDE", "1");
+/*  589 */     COLUMN_LENGTH.put("FUSAICC", "1");
+/*  590 */     COLUMN_LENGTH.put("FUSALEP", "1");
+/*  591 */     COLUMN_LENGTH.put("FUSAMRS", "1");
+/*  592 */     COLUMN_LENGTH.put("FUSAVLM", "1");
+/*  593 */     COLUMN_LENGTH.put("FUSAXMO", "1");
+/*  594 */     COLUMN_LENGTH.put("QUSAPOP", "4");
+/*  595 */     COLUMN_LENGTH.put("DSLMEOD", "10");
+/*  596 */     COLUMN_LENGTH.put("FSLMRFM", "1");
+/*  597 */     COLUMN_LENGTH.put("DSLMMES", "10");
+/*  598 */     COLUMN_LENGTH.put("CIDXC", "1");
+/*  599 */     COLUMN_LENGTH.put("CSLMFTY", "2");
+/*  600 */     COLUMN_LENGTH.put("CVOAT", "1");
+/*  601 */     COLUMN_LENGTH.put("FSLMPIO", "1");
+/*  602 */     COLUMN_LENGTH.put("FSLMSTK", "1");
+/*  603 */     COLUMN_LENGTH.put("PCUAEAP", "3");
+/*  604 */     COLUMN_LENGTH.put("POGMES", "10");
+/*  605 */     COLUMN_LENGTH.put("STSPCFT", "4");
+/*  606 */     COLUMN_LENGTH.put("FUSAIRR", "1");
+/*  607 */     COLUMN_LENGTH.put("CPDXA", "2");
+/*  608 */     COLUMN_LENGTH.put("DSLMEFF", "10");
+/*  609 */     COLUMN_LENGTH.put("CSLMRCH", "1");
+/*  610 */     COLUMN_LENGTH.put("CSLMNUM", "6");
+/*  611 */     COLUMN_LENGTH.put("FSLMAPG", "1");
+/*  612 */     COLUMN_LENGTH.put("FSLMASP", "1");
+/*  613 */     COLUMN_LENGTH.put("FSLMJAP", "1");
+/*  614 */     COLUMN_LENGTH.put("FSLMAUS", "1");
+/*  615 */     COLUMN_LENGTH.put("FSLMBGL", "1");
+/*  616 */     COLUMN_LENGTH.put("FSLMBRU", "1");
+/*  617 */     COLUMN_LENGTH.put("FSLMHKG", "1");
+/*  618 */     COLUMN_LENGTH.put("FSLMIDN", "1");
+/*  619 */     COLUMN_LENGTH.put("FSLMIND", "1");
+/*  620 */     COLUMN_LENGTH.put("FSLMKOR", "1");
+/*  621 */     COLUMN_LENGTH.put("FSLMMAC", "1");
+/*  622 */     COLUMN_LENGTH.put("FSLMMAL", "1");
+/*  623 */     COLUMN_LENGTH.put("FSLMMYA", "1");
+/*  624 */     COLUMN_LENGTH.put("FSLMNZL", "1");
+/*  625 */     COLUMN_LENGTH.put("FSLMPHI", "1");
+/*  626 */     COLUMN_LENGTH.put("FSLMPRC", "1");
+/*  627 */     COLUMN_LENGTH.put("FSLMSLA", "1");
+/*  628 */     COLUMN_LENGTH.put("FSLMSNG", "1");
+/*  629 */     COLUMN_LENGTH.put("FSLMTAI", "1");
+/*  630 */     COLUMN_LENGTH.put("FSLMTHA", "1");
+/*  631 */     COLUMN_LENGTH.put("ISLMTYP", "4");
+/*  632 */     COLUMN_LENGTH.put("ISLMMOD", "3");
+/*  633 */     COLUMN_LENGTH.put("ISLMFTR", "6");
+/*  634 */     COLUMN_LENGTH.put("ISLMXX1", "1");
+/*  635 */     COLUMN_LENGTH.put("QSMNPMT", "4");
+/*  636 */     COLUMN_LENGTH.put("QSMNPMM", "3");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected ResourceBundle getBundle() {
+/*  643 */     return this.rsBundle;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void processThis(QSMFULLABRSTATUS paramQSMFULLABRSTATUS, Profile paramProfile, Database paramDatabase, String paramString, EntityItem paramEntityItem, StringBuffer paramStringBuffer) throws Exception {
+/*      */     try {
+/*  654 */       this.m_prof = paramProfile;
+/*  655 */       this.m_db = paramDatabase;
+/*  656 */       this.abrcode = paramString;
+/*  657 */       this.rootEntity = paramEntityItem;
+/*      */       
+/*  659 */       setReturnCode(0);
+/*      */       
+/*  661 */       this.rptSb = paramStringBuffer;
+/*  662 */       this.m_elist = getEntityList(getT002ModelVEName());
+/*      */ 
+/*      */       
+/*  665 */       if (this.m_elist.getEntityGroupCount() > 0) {
+/*  666 */         addDebug("QSMfull abr running");
+/*      */         
+/*  668 */         this.navName = getNavigationName();
+/*  669 */         setDGTitle(this.navName);
+/*  670 */         setDGString(getABRReturnCode());
+/*  671 */         setDGRptName("QSMFULLABR");
+/*  672 */         setDGRptClass(getABRCode());
+/*  673 */         generateFlatFile(paramEntityItem);
+/*  674 */         exeFtpShell(this.ffPathName);
+/*      */       }
+/*      */     
+/*  677 */     } catch (IOException iOException) {
+/*      */       
+/*  679 */       iOException.printStackTrace();
+/*  680 */     } catch (ParseException parseException) {
+/*      */       
+/*  682 */       parseException.printStackTrace();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setFileName(EntityItem paramEntityItem) {
+/*  695 */     this.fileprefix = ABRServerProperties.getFilePrefix(this.abrcode);
+/*      */ 
+/*      */     
+/*  698 */     StringBuffer stringBuffer = new StringBuffer(this.fileprefix.trim());
+/*      */     
+/*      */     try {
+/*  701 */       DatePackage datePackage = this.m_db.getDates();
+/*  702 */       String str = datePackage.getNow();
+/*      */       
+/*  704 */       str = str.replace(' ', '_');
+/*  705 */       stringBuffer.append(paramEntityItem.getEntityType() + paramEntityItem.getEntityID() + "_");
+/*  706 */       stringBuffer.append(str + ".txt");
+/*  707 */       this.dir = ABRServerProperties.getValue(this.abrcode, "_genpath", "/Dgq");
+/*  708 */       if (!this.dir.endsWith("/")) {
+/*  709 */         this.dir += "/";
+/*      */       }
+/*  711 */       this.ffFileName = stringBuffer.toString();
+/*  712 */       this.ffPathName = this.dir + this.ffFileName;
+/*  713 */     } catch (MiddlewareException middlewareException) {
+/*      */       
+/*  715 */       middlewareException.printStackTrace();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void generateFlatFile(EntityItem paramEntityItem) throws IOException, SQLException, MiddlewareException, ParseException {
+/*  730 */     FileChannel fileChannel1 = null;
+/*  731 */     FileChannel fileChannel2 = null;
+/*      */ 
+/*      */     
+/*  734 */     setFileName(paramEntityItem);
+/*      */     
+/*  736 */     FileOutputStream fileOutputStream = new FileOutputStream(this.ffPathName);
+/*      */ 
+/*      */ 
+/*      */     
+/*  740 */     OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, "UTF-8");
+/*      */ 
+/*      */ 
+/*      */     
+/*  744 */     createT002Model(paramEntityItem, outputStreamWriter);
+/*  745 */     createT006Feature(paramEntityItem, outputStreamWriter);
+/*  746 */     createT017ProductCategory(paramEntityItem, outputStreamWriter);
+/*  747 */     createT020NPMesUpgrade(paramEntityItem, outputStreamWriter);
+/*  748 */     createT512ReleaseTo(paramEntityItem, outputStreamWriter);
+/*  749 */     createT632TypeModelFeatureRelation(paramEntityItem, outputStreamWriter);
+/*      */     
+/*  751 */     outputStreamWriter.close();
+/*      */     
+/*  753 */     this.dirDest = ABRServerProperties.getValue(this.abrcode, "_ftppath", "/Dgq");
+/*  754 */     if (!this.dirDest.endsWith("/")) {
+/*  755 */       this.dirDest += "/";
+/*      */     }
+/*      */     
+/*  758 */     this.ffFTPPathName = this.dirDest + this.ffFileName;
+/*  759 */     addDebug("******* " + this.ffFTPPathName);
+/*      */     
+/*      */     try {
+/*  762 */       fileChannel1 = (new FileInputStream(this.ffPathName)).getChannel();
+/*  763 */       fileChannel2 = (new FileOutputStream(this.ffFTPPathName)).getChannel();
+/*  764 */       fileChannel2.transferFrom(fileChannel1, 0L, fileChannel1.size());
+/*      */     } finally {
+/*  766 */       fileChannel1.close();
+/*  767 */       fileChannel2.close();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createT002Model(EntityItem paramEntityItem, OutputStreamWriter paramOutputStreamWriter) throws IOException {
+/*  777 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("AVAIL");
+/*  778 */     String str1 = "";
+/*  779 */     String str2 = "";
+/*  780 */     boolean bool = false;
+/*      */     
+/*  782 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/*      */       
+/*  784 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/*      */       
+/*  786 */       str1 = PokUtils.getAttributeValue(entityItem, "AVAILTYPE", "", "");
+/*  787 */       str2 = PokUtils.getAttributeValue(entityItem, "AVAILANNTYPE", "", "");
+/*  788 */       if (str2.equals("EPIC")) {
+/*  789 */         bool = true;
+/*      */       }
+/*      */ 
+/*      */       
+/*  793 */       if (str1.equals("Planned Availability") || str1
+/*  794 */         .equals("End of Service") || str1
+/*  795 */         .equals("Last Order")) {
+/*  796 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("QSMGEO");
+/*      */         
+/*  798 */         if (eANFlagAttribute != null) {
+/*  799 */           if (eANFlagAttribute.isSelected("6199")) {
+/*  800 */             createT002ModelRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Asia Pacific", str1, bool);
+/*      */           }
+/*  802 */           if (eANFlagAttribute.isSelected("6200")) {
+/*  803 */             createT002ModelRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Canada and Caribbean North", str1, bool);
+/*      */           }
+/*  805 */           if (eANFlagAttribute.isSelected("6198")) {
+/*  806 */             createT002ModelRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Europe/Middle East/Africa", str1, bool);
+/*      */           }
+/*  808 */           if (eANFlagAttribute.isSelected("6204")) {
+/*  809 */             createT002ModelRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Latin America", str1, bool);
+/*      */           }
+/*  811 */           if (eANFlagAttribute.isSelected("6221")) {
+/*  812 */             createT002ModelRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "US Only", str1, bool);
+/*      */           }
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createT002ModelRecords(EntityItem paramEntityItem1, OutputStreamWriter paramOutputStreamWriter, EntityItem paramEntityItem2, String paramString1, String paramString2, boolean paramBoolean) throws IOException {
+/*  870 */     Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(paramEntityItem2, "MODELAVAIL", "MODEL");
+/*      */     
+/*  872 */     for (byte b = 0; b < vector.size(); b++) {
+/*  873 */       StringBuffer stringBuffer = new StringBuffer();
+/*  874 */       String str1 = "";
+/*  875 */       String str2 = "";
+/*  876 */       String str3 = "";
+/*  877 */       String str4 = "";
+/*  878 */       String str5 = "";
+/*  879 */       String str6 = "";
+/*  880 */       String str7 = "";
+/*  881 */       String str8 = "";
+/*  882 */       String str9 = "";
+/*  883 */       String str10 = "";
+/*  884 */       String str11 = "";
+/*  885 */       String str12 = "";
+/*  886 */       String str13 = "";
+/*  887 */       String str14 = "";
+/*  888 */       String str15 = "";
+/*  889 */       String str16 = "";
+/*  890 */       String str17 = "";
+/*  891 */       String str18 = "";
+/*  892 */       String str19 = "";
+/*  893 */       String str20 = "";
+/*  894 */       String str21 = "";
+/*  895 */       String str22 = "";
+/*  896 */       String str23 = "";
+/*  897 */       String str24 = "";
+/*  898 */       String str25 = "";
+/*  899 */       String str26 = "";
+/*  900 */       String str27 = "";
+/*  901 */       String str28 = "";
+/*  902 */       String str29 = "";
+/*  903 */       String str30 = "";
+/*  904 */       String str31 = "";
+/*  905 */       String str32 = "";
+/*      */       
+/*  907 */       String str33 = "";
+/*  908 */       String str34 = "";
+/*  909 */       String str35 = "";
+/*  910 */       String str36 = "";
+/*  911 */       String str37 = "";
+/*  912 */       String str38 = "";
+/*  913 */       String str39 = "";
+/*  914 */       String str40 = "";
+/*  915 */       String str41 = "";
+/*  916 */       String str42 = "";
+/*      */       
+/*  918 */       EntityItem entityItem1 = vector.elementAt(b);
+/*      */       
+/*  920 */       EntityItem entityItem2 = null;
+/*      */       
+/*  922 */       if (paramString1.equals("Asia Pacific") || paramString1
+/*  923 */         .equals("US Only") || paramString1
+/*  924 */         .equals("Canada and Caribbean North")) {
+/*  925 */         str23 = "N";
+/*      */       } else {
+/*      */         
+/*  928 */         Vector<EntityItem> vector3 = PokUtils.getAllLinkedEntities(entityItem1, "MODELSTDMAINT", "STDMAINT");
+/*  929 */         if (!vector3.isEmpty()) {
+/*  930 */           EntityItem entityItem = vector3.elementAt(0);
+/*  931 */           if (entityItem != null) {
+/*  932 */             str23 = PokUtils.getAttributeValue(entityItem, "MAINTELIG", "", "");
+/*      */           }
+/*      */         } 
+/*      */       } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  942 */       stringBuffer.append(getValue("IFTYPE", "M"));
+/*      */       
+/*  944 */       if (paramString1.equals("Latin America")) {
+/*  945 */         str9 = "601";
+/*  946 */         str10 = PokUtils.getAttributeValue(paramEntityItem1, "LDOCNO", "", "");
+/*  947 */         str28 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "ANNNUMBER", "", "");
+/*  948 */       } else if (paramString1.equals("Europe/Middle East/Africa")) {
+/*  949 */         str9 = "999";
+/*  950 */         str10 = PokUtils.getAttributeValue(paramEntityItem1, "EDOCNO", "", "");
+/*  951 */         str28 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "ANNNUMBER", "", "");
+/*  952 */       } else if (paramString1.equals("Asia Pacific")) {
+/*  953 */         str9 = "872";
+/*  954 */         str10 = PokUtils.getAttributeValue(paramEntityItem1, "ADOCNO", "", "");
+/*  955 */         str28 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "ANNNUMBER", "", "");
+/*  956 */       } else if (paramString1.equals("US Only")) {
+/*  957 */         str9 = "897";
+/*  958 */         str10 = PokUtils.getAttributeValue(paramEntityItem1, "USDOCNO", "", "");
+/*  959 */         str28 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "USDOCNO", "", "");
+/*  960 */       } else if (paramString1.equals("Canada and Caribbean North")) {
+/*  961 */         str9 = "649";
+/*  962 */         str10 = PokUtils.getAttributeValue(paramEntityItem1, "CDOCNO", "", "");
+/*  963 */         str28 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "USDOCNO", "", "");
+/*      */       } 
+/*  965 */       stringBuffer.append(getValue("IOPUCTY", str9));
+/*      */       
+/*  967 */       stringBuffer.append(getValue("ISLMPAL", str10));
+/*  968 */       stringBuffer.append(getValue("ISLMRFA", str28));
+/*  969 */       String str43 = PokUtils.getAttributeValue(entityItem1, "MACHTYPEATR", "", "");
+/*  970 */       str43 = str43 + PokUtils.getAttributeValue(entityItem1, "MODELATR", "", "");
+/*  971 */       stringBuffer.append(getValue("ISLMPRN", str43));
+/*  972 */       stringBuffer.append(getValue("CSLMPCI", "MM"));
+/*  973 */       stringBuffer.append(getValue("IPRTNUM", "            "));
+/*  974 */       stringBuffer.append(getValue("FPUNINC", "2"));
+/*  975 */       stringBuffer.append(getValue("CAOAV", ""));
+/*      */       
+/*  977 */       stringBuffer.append(getValue("DSLMCPA", PokUtils.getAttributeValue(paramEntityItem1, "ANNDATE", ",", "", false)));
+/*  978 */       stringBuffer.append(getValue("DSLMCPO", ""));
+/*  979 */       stringBuffer.append(getValue("DSLMGAD", PokUtils.getAttributeValue(paramEntityItem2, "EFFECTIVEDATE", ",", "", false)));
+/*  980 */       stringBuffer.append(getValue("DSLMMVA", PokUtils.getAttributeValue(paramEntityItem1, "ANNDATE", ",", "", false)));
+/*      */       
+/*  982 */       entityItem2 = searchForAvailType(entityItem1, "Last Order");
+/*  983 */       if (entityItem2 != null) {
+/*      */         
+/*  985 */         str36 = PokUtils.getAttributeValue(entityItem2, "EFFECTIVEDATE", "", "");
+/*  986 */         str37 = "O";
+/*      */       } else {
+/*      */         
+/*  989 */         str36 = "2050-12-31";
+/*  990 */         str37 = "N";
+/*      */       } 
+/*      */       
+/*  993 */       str42 = PokUtils.getAttributeValue(entityItem1, "WTHDRWEFFCTVDATE", "", "");
+/*      */       
+/*  995 */       if (str42 != null) {
+/*  996 */         if (str42.equals("")) {
+/*  997 */           str35 = "2050-12-31";
+/*      */         } else {
+/*  999 */           str35 = str42;
+/*      */         } 
+/*      */       } else {
+/* 1002 */         str35 = "2050-12-31";
+/*      */       } 
+/*      */       
+/* 1005 */       stringBuffer.append(getValue("DSLMOPD", str36));
+/* 1006 */       stringBuffer.append(getValue("DSLMWDN", str35));
+/*      */       
+/* 1008 */       entityItem2 = searchForAvailType(entityItem1, "End of Service");
+/* 1009 */       if (entityItem2 != null) {
+/* 1010 */         str33 = PokUtils.getAttributeValue(paramEntityItem2, "EFFECTIVEDATE", ",", "", false);
+/* 1011 */         str34 = PokUtils.getAttributeValue(paramEntityItem2, "EFFECTIVEDATE", ",", "", false);
+/*      */       } else {
+/* 1013 */         str33 = "2050-12-31";
+/* 1014 */         str34 = "2050-12-31";
+/*      */       } 
+/*      */       
+/* 1017 */       stringBuffer.append(getValue("QSMEDMW", str33));
+/*      */       
+/* 1019 */       stringBuffer.append(getValue("ASLMMVP", "01.0"));
+/* 1020 */       str2 = PokUtils.getAttributeValue(entityItem1, "ICRCATEGORY", "", "");
+/* 1021 */       stringBuffer.append(getValue("CCUOICR", str2));
+/* 1022 */       stringBuffer.append(getValue("CICIB", "N"));
+/* 1023 */       stringBuffer.append(getValue("CICIC", "N"));
+/* 1024 */       stringBuffer.append(getValue("CICRY", "N"));
+/* 1025 */       stringBuffer.append(getValue("CIDCJ", "N"));
+/* 1026 */       stringBuffer.append(getValue("CIDXF", PokUtils.getAttributeValue(entityItem1, "LICNSINTERCD", "", "")));
+/*      */       
+/* 1028 */       String str44 = "";
+/* 1029 */       String str45 = "";
+/* 1030 */       EntityItem entityItem3 = null;
+/* 1031 */       Vector<EntityItem> vector1 = PokUtils.getAllLinkedEntities(entityItem1, "MODELGEOMOD", "GEOMOD");
+/* 1032 */       if (vector1.size() > 0) {
+/* 1033 */         for (int i = 0; i < vector1.size(); i++) {
+/* 1034 */           entityItem3 = vector1.elementAt(i);
+/* 1035 */           str45 = PokUtils.getAttributeValue(entityItem3, "GENAREASELECTION", "", "");
+/* 1036 */           if (str45.equals(paramString1)) {
+/* 1037 */             str44 = PokUtils.getAttributeValue(entityItem3, "NOCHRGRENT", "", "");
+/* 1038 */             str1 = PokUtils.getAttributeValue(entityItem3, "GRADUATEDCHARGE", "", "");
+/* 1039 */             str3 = PokUtils.getAttributeValue(entityItem3, "PURCHONLY", "", "");
+/* 1040 */             str4 = PokUtils.getAttributeValue(entityItem3, "PLNTOFMFR", "", "");
+/* 1041 */             str5 = PokUtils.getAttributeValue(entityItem3, "INTEGRATEDMODEL", "", "");
+/* 1042 */             str6 = PokUtils.getAttributeValue(entityItem3, "PERCALLCLS", "", "");
+/* 1043 */             str8 = PokUtils.getAttributeValue(entityItem3, "EMEABRANDCD", "", "");
+/* 1044 */             str7 = PokUtils.getAttributeValue(entityItem3, "ANNUALMAINT", "", "");
+/* 1045 */             str31 = PokUtils.getAttributeValue(entityItem3, "METHODPROD", "", "");
+/* 1046 */             str29 = PokUtils.getAttributeValue(entityItem3, "EDUCPURCHELIG", "", "");
+/*      */             
+/* 1048 */             i = vector1.size();
+/*      */           } else {
+/* 1050 */             entityItem3 = null;
+/*      */           } 
+/*      */         } 
+/*      */       }
+/*      */       
+/* 1055 */       stringBuffer.append(getValue("CINCA", str44));
+/*      */       
+/* 1057 */       str27 = PokUtils.getAttributeValue(entityItem1, "PRCINDC", "", "");
+/* 1058 */       if (str27.equals("Yes")) {
+/* 1059 */         stringBuffer.append(getValue("CINCB", "N"));
+/* 1060 */       } else if (str27.equals("No")) {
+/* 1061 */         stringBuffer.append(getValue("CINCB", "Y"));
+/*      */       } else {
+/* 1063 */         stringBuffer.append(getValue("CINCB", "N"));
+/*      */       } 
+/*      */       
+/* 1066 */       stringBuffer.append(getValue("CINCC", "N"));
+/* 1067 */       stringBuffer.append(getValue("CINPM", PokUtils.getAttributeValue(entityItem1, "NETPRICEMES", "", "")));
+/*      */       
+/* 1069 */       stringBuffer.append(getValue("CISUP", "N"));
+/*      */       
+/* 1071 */       stringBuffer.append(getValue("CITEM", "N"));
+/* 1072 */       String str46 = PokUtils.getAttributeValue(paramEntityItem1, "INDDEFNCATG", ",", "", false);
+/* 1073 */       if (str46.length() >= 2) {
+/* 1074 */         stringBuffer.append(getValue("CJLBIC1", str46.substring(0, 2)));
+/*      */       } else {
+/* 1076 */         stringBuffer.append(getValue("CJLBIC1", ""));
+/*      */       } 
+/* 1078 */       if (str46.length() >= 3) {
+/* 1079 */         stringBuffer.append(getValue("CJLBIDS", str46.substring(2)));
+/*      */       } else {
+/* 1081 */         stringBuffer.append(getValue("CJLBIDS", ""));
+/*      */       } 
+/* 1083 */       stringBuffer.append(getValue("CJLBOEM", PokUtils.getAttributeValue(entityItem1, "SPECMODDESGN", "", "")));
+/*      */       
+/* 1085 */       stringBuffer.append(getValue("CJLBPOF", ""));
+/*      */       
+/* 1087 */       Vector<EntityItem> vector2 = PokUtils.getAllLinkedEntities(entityItem1, "MODELSGMTACRONYMA", "SGMNTACRNYM");
+/* 1088 */       if (!vector2.isEmpty()) {
+/* 1089 */         EntityItem entityItem = vector2.elementAt(0);
+/* 1090 */         if (entityItem != null) {
+/* 1091 */           stringBuffer.append(getValue("CJLBSAC", PokUtils.getAttributeValue(entityItem, "ACRNYM", "", "")));
+/*      */         } else {
+/* 1093 */           stringBuffer.append(getValue("CJLBSAC", "   "));
+/*      */         } 
+/*      */       } else {
+/* 1096 */         stringBuffer.append(getValue("CJLBSAC", "   "));
+/*      */       } 
+/*      */       
+/* 1099 */       stringBuffer.append(getValue("CLASSPT", "IHW"));
+/*      */       
+/* 1101 */       if (paramString2.equals("Last Order")) {
+/* 1102 */         stringBuffer.append(getValue("CPDAA", "O"));
+/*      */       } else {
+/* 1104 */         stringBuffer.append(getValue("CPDAA", "N"));
+/*      */       } 
+/*      */       
+/* 1107 */       stringBuffer.append(getValue("CSLMFCC", PokUtils.getAttributeValue(entityItem1, "FUNCCLS", "", "")));
+/*      */       
+/* 1109 */       if (paramString1.equals("Asia Pacific")) {
+/* 1110 */         stringBuffer.append(getValue("CSLMGGC", str1));
+/*      */       } else {
+/* 1112 */         stringBuffer.append(getValue("CSLMGGC", " "));
+/*      */       } 
+/*      */       
+/* 1115 */       String str47 = PokUtils.getAttributeValue(entityItem1, "PRODID", "", "");
+/* 1116 */       if (str47.equals("0-CPU")) {
+/* 1117 */         str30 = "0";
+/* 1118 */       } else if (str47.equals("1-Unit Record Equipm.")) {
+/* 1119 */         str30 = "1";
+/* 1120 */       } else if (str47.equals("2-System Component")) {
+/* 1121 */         str30 = "2";
+/* 1122 */       } else if (str47.equals("3-Stand Alone Material")) {
+/* 1123 */         str30 = "3";
+/* 1124 */       } else if (str47.equals("4-System Control")) {
+/* 1125 */         str30 = "4";
+/* 1126 */       } else if (str47.equals("5-Program Product")) {
+/* 1127 */         str30 = "5";
+/* 1128 */       } else if (str47.equals("6-Special Program")) {
+/* 1129 */         str30 = "6";
+/* 1130 */       } else if (str47.equals("7-Control Unit")) {
+/* 1131 */         str30 = "7";
+/* 1132 */       } else if (str47.equals("8-Disk Packs")) {
+/* 1133 */         str30 = "8";
+/*      */       } else {
+/* 1135 */         str30 = "";
+/*      */       } 
+/*      */       
+/* 1138 */       stringBuffer.append(getValue("CSLMIDP", str30));
+/* 1139 */       stringBuffer.append(getValue("CSLMLRP", "0"));
+/* 1140 */       stringBuffer.append(getValue("CSLMSAS", "0"));
+/* 1141 */       stringBuffer.append(getValue("CSLMSYT", PokUtils.getAttributeValue(entityItem1, "SYSTEMTYPE", "", "")));
+/*      */       
+/* 1143 */       EntityItem entityItem4 = null;
+/* 1144 */       str40 = PokUtils.getAttributeValue(entityItem1, "WARRSVCCOVR", "", "");
+/* 1145 */       if (str40 != null) {
+/* 1146 */         if (str40.equals("No Warranty") || str40.equals("")) {
+/* 1147 */           str39 = "Z";
+/*      */         } else {
+/* 1149 */           Vector<EntityItem> vector3 = PokUtils.getAllLinkedEntities(entityItem1, "MODELWARR", "WARR");
+/* 1150 */           if (!vector3.isEmpty()) {
+/* 1151 */             entityItem4 = vector3.elementAt(0);
+/* 1152 */             if (entityItem4 != null) {
+/* 1153 */               String str = PokUtils.getAttributeValue(entityItem4, "WARRID", "", "");
+/* 1154 */               if (str.equals("WTY0000")) {
+/* 1155 */                 if (vector3.size() > 1) {
+/* 1156 */                   entityItem4 = vector3.elementAt(1);
+/*      */                 } else {
+/* 1158 */                   entityItem4 = null;
+/*      */                 } 
+/*      */               }
+/*      */             } 
+/*      */             
+/* 1163 */             if (entityItem4 != null) {
+/* 1164 */               str39 = PokUtils.getAttributeValue(entityItem4, "WARRCATG", "", "");
+/*      */             } else {
+/* 1166 */               str39 = "";
+/*      */             } 
+/*      */           } else {
+/* 1169 */             str39 = "";
+/*      */           } 
+/*      */         } 
+/*      */       } else {
+/* 1173 */         str39 = "Z";
+/*      */       } 
+/* 1175 */       stringBuffer.append(getValue("CSLMWCD", str39));
+/*      */       
+/* 1177 */       stringBuffer.append(getValue("FAGRMBE", str23));
+/*      */       
+/* 1179 */       if (str2.equals("1") || str2.equals("2")) {
+/* 1180 */         stringBuffer.append(getValue("FCUOCNF", "N"));
+/* 1181 */       } else if (str2.equals("3")) {
+/* 1182 */         stringBuffer.append(getValue("FCUOCNF", "Y"));
+/*      */       } else {
+/* 1184 */         stringBuffer.append(getValue("FCUOCNF", "N"));
+/*      */       } 
+/*      */       
+/* 1187 */       stringBuffer.append(getValue("FSLMCLS", "N"));
+/*      */       
+/* 1189 */       String str48 = PokUtils.getAttributeValue(entityItem1, "SYSIDUNIT", "", "");
+/* 1190 */       if (str48.equals("SIU-CPU")) {
+/* 1191 */         stringBuffer.append(getValue("FSLMCPU", "Y"));
+/*      */       } else {
+/* 1193 */         stringBuffer.append(getValue("FSLMCPU", "N"));
+/*      */       } 
+/*      */       
+/* 1196 */       stringBuffer.append(getValue("FSLMIOP", str5));
+/* 1197 */       stringBuffer.append(getValue("FSLMLGS", "N"));
+/* 1198 */       stringBuffer.append(getValue("FSLMMLC", PokUtils.getAttributeValue(entityItem1, "MACHLVLCNTRL", "", "")));
+/*      */       
+/* 1200 */       if (paramString1.equals("Latin America") || paramString1
+/* 1201 */         .equals("US Only") || paramString1
+/* 1202 */         .equals("Canada and Caribbean North")) {
+/* 1203 */         stringBuffer.append(getValue("FSLMPOP", "No"));
+/* 1204 */       } else if (paramString1.equals("Europe/Middle East/Africa")) {
+/* 1205 */         stringBuffer.append(getValue("FSLMPOP", "Yes"));
+/* 1206 */       } else if (paramString1.equals("Asia Pacific")) {
+/* 1207 */         if (str27.equals("Yes")) {
+/* 1208 */           stringBuffer.append(getValue("FSLMPOP", "Y"));
+/* 1209 */         } else if (str27.equals("No")) {
+/* 1210 */           stringBuffer.append(getValue("FSLMPOP", "N"));
+/*      */         } else {
+/* 1212 */           stringBuffer.append(getValue("FSLMPOP", " "));
+/*      */         } 
+/*      */       } else {
+/* 1215 */         stringBuffer.append(getValue("FSLMPOP", " "));
+/*      */       } 
+/*      */       
+/* 1218 */       stringBuffer.append(getValue("FSLMVDE", PokUtils.getAttributeValue(entityItem1, "VOLUMEDISCOUNTELIG", "", "")));
+/* 1219 */       stringBuffer.append(getValue("FSLMVTS", "N"));
+/*      */       
+/* 1221 */       ArrayList<String> arrayList = new ArrayList();
+/* 1222 */       if (entityItem4 != null) {
+/* 1223 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem4.getAttribute("WARRTYPE");
+/* 1224 */         if (eANFlagAttribute != null) {
+/* 1225 */           if (paramString1.equals("Europe/Middle East/Africa")) {
+/* 1226 */             if (eANFlagAttribute.isSelected("W0310") || eANFlagAttribute.isSelected("W0330") || eANFlagAttribute
+/* 1227 */               .isSelected("W0200") || eANFlagAttribute.isSelected("W0240") || eANFlagAttribute.isSelected("W0250")) {
+/* 1228 */               str11 = "Y";
+/*      */             } else {
+/* 1230 */               str11 = "N";
+/*      */             } 
+/*      */           }
+/*      */           
+/* 1234 */           if (paramString1.equals("Latin America")) {
+/* 1235 */             if (eANFlagAttribute.isSelected("W0310") || eANFlagAttribute.isSelected("W0330") || eANFlagAttribute
+/* 1236 */               .isSelected("W0560") || eANFlagAttribute.isSelected("W0570") || eANFlagAttribute.isSelected("W0580")) {
+/* 1237 */               str11 = "Y";
+/*      */             } else {
+/* 1239 */               str11 = "N";
+/*      */             } 
+/*      */           }
+/*      */           
+/* 1243 */           if (paramString1.equals("Asia Pacific")) {
+/* 1244 */             if (eANFlagAttribute.isSelected("W0550") || eANFlagAttribute
+/* 1245 */               .isSelected("W0390") || eANFlagAttribute
+/* 1246 */               .isSelected("W0200") || eANFlagAttribute.isSelected("W0240") || eANFlagAttribute.isSelected("W0250") || eANFlagAttribute
+/* 1247 */               .isSelected("W0310") || eANFlagAttribute.isSelected("W0330") || eANFlagAttribute
+/* 1248 */               .isSelected("W0590")) {
+/* 1249 */               str11 = "Y";
+/*      */             } else {
+/* 1251 */               str11 = "N";
+/*      */             } 
+/*      */           }
+/*      */           
+/* 1255 */           if (paramString1.equals("Canada and Caribbean North") || paramString1
+/* 1256 */             .equals("US Only")) {
+/* 1257 */             str11 = "N";
+/*      */           }
+/*      */         } 
+/*      */       } else {
+/* 1261 */         str11 = "N";
+/*      */       } 
+/* 1263 */       stringBuffer.append(getValue("FSLM2CF", str11));
+/*      */ 
+/*      */       
+/* 1266 */       stringBuffer.append(getValue("ICESPCC", str6));
+/* 1267 */       stringBuffer.append(getValue("IDORIG", "IBM"));
+/* 1268 */       stringBuffer.append(getValue("IOLCPLM", str4));
+/*      */       
+/* 1270 */       str24 = "000";
+/* 1271 */       str25 = "000";
+/* 1272 */       str26 = "000";
+/*      */       
+/* 1274 */       if (entityItem3 != null && (
+/* 1275 */         paramString1.equals("Latin America") || paramString1.equals("Asia Pacific") || paramString1
+/* 1276 */         .equals("Canada and Caribbean North"))) {
+/* 1277 */         str24 = getNumValue("PCUAHEA", PokUtils.getAttributeValue(entityItem3, "EDUCALLOWMHGHSCH", ",", "", false));
+/* 1278 */         str26 = getNumValue("PCUAUEA", PokUtils.getAttributeValue(entityItem3, "EDUCALLOWMUNVRSTY", ",", "", false));
+/* 1279 */         str25 = getNumValue("PCUASEA", PokUtils.getAttributeValue(entityItem3, "EDUCALLOWMSECONDRYSCH", ",", "", false));
+/*      */       } 
+/*      */ 
+/*      */       
+/* 1283 */       stringBuffer.append(getValue("PCUAHEA", str24));
+/* 1284 */       stringBuffer.append(getValue("PCUASEA", str25));
+/* 1285 */       stringBuffer.append(getValue("PCUAUEA", str26));
+/*      */       
+/* 1287 */       String str49 = PokUtils.getAttributeValue(entityItem1, "INSTALL", "", "");
+/* 1288 */       if (paramString1.equals("Latin America")) {
+/* 1289 */         if (str49.equals("CIF")) {
+/* 1290 */           str12 = "01";
+/* 1291 */         } else if (str49.equals("CE") || str49.equals("N/A") || str49.equals("Does not apply")) {
+/* 1292 */           str12 = "";
+/*      */         } 
+/* 1294 */       } else if (paramString1.equals("Europe/Middle East/Africa")) {
+/* 1295 */         if (str49.equals("CIF")) {
+/* 1296 */           str12 = "01";
+/* 1297 */         } else if (str49.equals("CE") || str49.equals("N/A") || str49.equals("Does not apply")) {
+/* 1298 */           str12 = "";
+/*      */         } 
+/* 1300 */       } else if (paramString1.equals("Asia Pacific")) {
+/* 1301 */         if (str49.equals("CIF")) {
+/* 1302 */           str12 = "10";
+/* 1303 */         } else if (str49.equals("CE") || str49.equals("N/A") || str49.equals("Does not apply")) {
+/* 1304 */           str12 = "";
+/*      */         } 
+/* 1306 */       } else if (paramString1.equals("US Only")) {
+/* 1307 */         if (str49.equals("CIF")) {
+/* 1308 */           str12 = "01";
+/* 1309 */         } else if (str49.equals("CE") || str49.equals("N/A") || str49.equals("Does not apply")) {
+/* 1310 */           str12 = "00";
+/*      */         } 
+/* 1312 */       } else if (paramString1.equals("Canada and Caribbean North")) {
+/* 1313 */         if (str49.equals("CIF")) {
+/* 1314 */           str12 = "01";
+/* 1315 */         } else if (str49.equals("CE") || str49.equals("N/A") || str49.equals("Does not apply")) {
+/* 1316 */           str12 = "";
+/*      */         } 
+/*      */       } 
+/* 1319 */       stringBuffer.append(getValue("QSLMCSU", str12));
+/*      */       
+/* 1321 */       stringBuffer.append(getValue("QSMXANN", str7));
+/* 1322 */       stringBuffer.append(getValue("QSMXESA", "N"));
+/* 1323 */       stringBuffer.append(getValue("QSMXSSA", "N"));
+/*      */       
+/* 1325 */       if (str48.equals("SIU-CPU") || str48.equals("U-System Unit")) {
+/* 1326 */         stringBuffer.append(getValue("SYSDES", PokUtils.getAttributeValue(entityItem1, "MODMKTGDESC", "", "")));
+/*      */       } else {
+/* 1328 */         stringBuffer.append(getValue("SYSDES", "   "));
+/*      */       } 
+/*      */       
+/* 1331 */       String str50 = PokUtils.getAttributeValue(entityItem1, "INVNAME", "", "");
+/* 1332 */       stringBuffer.append(getValue("TSLMDES", removeSpecialChars(str50)));
+/* 1333 */       stringBuffer.append(getValue("TSLTDES", " "));
+/* 1334 */       stringBuffer.append(getValue("TIMSTMP", " "));
+/* 1335 */       stringBuffer.append(getValue("USERID", " "));
+/* 1336 */       stringBuffer.append(getValue("FBRAND", str8));
+/*      */       
+/* 1338 */       if (str31.equals("BTP")) {
+/* 1339 */         str32 = "Y";
+/* 1340 */       } else if (str31.equals("BTO")) {
+/* 1341 */         str32 = "N";
+/*      */       } else {
+/* 1343 */         str32 = "";
+/*      */       } 
+/*      */       
+/* 1346 */       stringBuffer.append(getValue("FSLMHVP", str32));
+/*      */       
+/* 1348 */       if (paramString1.equals("US Only")) {
+/* 1349 */         str38 = "Y";
+/* 1350 */       } else if (paramString1.equals("Latin America") || paramString1.equals("Europe/Middle East/Africa") || paramString1
+/* 1351 */         .equals("Asia Pacific") || paramString1.equals("Canada and Caribbean North")) {
+/* 1352 */         if (str31.equals("BTO")) {
+/* 1353 */           str38 = "Y";
+/* 1354 */         } else if (str31.equals("BTP")) {
+/* 1355 */           str38 = "N";
+/*      */         } else {
+/* 1357 */           str38 = " ";
+/*      */         } 
+/*      */       } 
+/*      */       
+/* 1361 */       stringBuffer.append(getValue("FSLMCVP", str38));
+/*      */       
+/* 1363 */       stringBuffer.append(getValue("FSLMMES", "N"));
+/*      */       
+/* 1365 */       arrayList = new ArrayList();
+/* 1366 */       str15 = "";
+/* 1367 */       str16 = "";
+/* 1368 */       str17 = "";
+/* 1369 */       str18 = "";
+/* 1370 */       str19 = "";
+/* 1371 */       str20 = "";
+/* 1372 */       str21 = "";
+/* 1373 */       str22 = "";
+/*      */       
+/* 1375 */       if (entityItem4 != null) {
+/* 1376 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem4.getAttribute("WARRTYPE");
+/* 1377 */         if (eANFlagAttribute != null) {
+/* 1378 */           if (eANFlagAttribute.isSelected("W0560") || eANFlagAttribute.isSelected("W0570") || eANFlagAttribute.isSelected("W0580")) {
+/* 1379 */             arrayList.add("IOR");
+/*      */           }
+/* 1381 */           if (eANFlagAttribute.isSelected("W0550")) {
+/* 1382 */             arrayList.add("IOE");
+/*      */           }
+/* 1384 */           if (eANFlagAttribute.isSelected("W0390")) {
+/* 1385 */             arrayList.add("COE");
+/*      */           }
+/* 1387 */           if (eANFlagAttribute.isSelected("W0200") || eANFlagAttribute.isSelected("W0240") || eANFlagAttribute.isSelected("W0250")) {
+/* 1388 */             arrayList.add("CCE");
+/*      */           }
+/* 1390 */           if (eANFlagAttribute.isSelected("W0310") || eANFlagAttribute.isSelected("W0330")) {
+/* 1391 */             arrayList.add("CCR");
+/*      */           }
+/* 1393 */           if (eANFlagAttribute.isSelected("W0590")) {
+/* 1394 */             arrayList.add("IOS");
+/*      */           }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */           
+/* 1417 */           for (byte b1 = 0; b1 < arrayList.size(); b1++) {
+/* 1418 */             if (b1 == 0) {
+/* 1419 */               str15 = arrayList.get(b1);
+/* 1420 */             } else if (b1 == 1) {
+/* 1421 */               str16 = arrayList.get(b1);
+/* 1422 */             } else if (b1 == 2) {
+/* 1423 */               str17 = arrayList.get(b1);
+/* 1424 */             } else if (b1 == 3) {
+/* 1425 */               str18 = arrayList.get(b1);
+/* 1426 */             } else if (b1 == 4) {
+/* 1427 */               str19 = arrayList.get(b1);
+/* 1428 */             } else if (b1 == 5) {
+/* 1429 */               str20 = arrayList.get(b1);
+/* 1430 */             } else if (b1 == 6) {
+/* 1431 */               str21 = arrayList.get(b1);
+/* 1432 */             } else if (b1 == 7) {
+/* 1433 */               str22 = arrayList.get(b1);
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */       
+/* 1439 */       stringBuffer.append(getValue("CSLMTM1", str15));
+/* 1440 */       stringBuffer.append(getValue("CSLMTM2", str16));
+/* 1441 */       stringBuffer.append(getValue("CSLMTM3", str17));
+/* 1442 */       stringBuffer.append(getValue("CSLMTM4", str18));
+/* 1443 */       stringBuffer.append(getValue("CSLMTM5", str19));
+/* 1444 */       stringBuffer.append(getValue("CSLMTM6", str20));
+/* 1445 */       stringBuffer.append(getValue("CSLMTM7", str21));
+/* 1446 */       stringBuffer.append(getValue("CSLMTM8", str22));
+/* 1447 */       stringBuffer.append(getValue("FSAPRES", "N"));
+/*      */       
+/* 1449 */       if (paramString1.equals("US Only")) {
+/* 1450 */         String str = PokUtils.getAttributeValue(entityItem1, "MAINTANNBILLELIGINDC", ",", "", false);
+/* 1451 */         if (str.equals("Yes")) {
+/* 1452 */           stringBuffer.append(getValue("CUSAPMS", "Y"));
+/* 1453 */         } else if (str.equals("No")) {
+/* 1454 */           stringBuffer.append(getValue("CUSAPMS", "X"));
+/*      */         } else {
+/* 1456 */           stringBuffer.append(getValue("CUSAPMS", ""));
+/*      */         } 
+/*      */       } else {
+/* 1459 */         stringBuffer.append(getValue("CUSAPMS", ""));
+/*      */       } 
+/*      */       
+/* 1462 */       stringBuffer.append(getValue("DUSALRW", str34));
+/*      */       
+/* 1464 */       stringBuffer.append(getValue("DUSAMDW", "2050-12-31"));
+/* 1465 */       stringBuffer.append(getValue("DUSAWUW", "2050-12-31"));
+/* 1466 */       if (paramString1.equals("US Only")) {
+/* 1467 */         stringBuffer.append(getValue("FSLMCBL", "N"));
+/*      */       } else {
+/* 1469 */         stringBuffer.append(getValue("FSLMCBL", " "));
+/*      */       } 
+/* 1471 */       stringBuffer.append(getValue("FSLMMRR", "N"));
+/* 1472 */       str13 = "";
+/*      */       
+/* 1474 */       if (paramString1.equals("US Only")) {
+/* 1475 */         str13 = "N";
+/*      */         
+/* 1477 */         String str = PokUtils.getAttributeValue(paramEntityItem2, "ORDERSYSNAME", ",", "", false);
+/* 1478 */         if (str.equals("AAS")) {
+/* 1479 */           str13 = "Y";
+/*      */         }
+/*      */       } 
+/* 1482 */       stringBuffer.append(getValue("FUSAAAS", str13));
+/* 1483 */       stringBuffer.append(getValue("FUSAADM", "N"));
+/*      */       
+/* 1485 */       if (paramString1.equals("US Only")) {
+/* 1486 */         stringBuffer.append(getValue("FUSAEDE", str29));
+/*      */       } else {
+/* 1488 */         stringBuffer.append(getValue("FUSAEDE", " "));
+/*      */       } 
+/*      */       
+/* 1491 */       if (paramString1.equals("US Only")) {
+/* 1492 */         str41 = PokUtils.getAttributeValue(entityItem1, "IBMCREDIT", ",", "", false);
+/* 1493 */         addDebug("*****mlm IBMCREDIT=" + str41);
+/* 1494 */         if (str41 != null) {
+/* 1495 */           if (str41.equals("Yes")) {
+/* 1496 */             str14 = "Y";
+/* 1497 */           } else if (str41.equals("No")) {
+/* 1498 */             str14 = "N";
+/*      */           } 
+/*      */         }
+/* 1501 */         stringBuffer.append(getValue("FUSAICC", str14));
+/*      */       } else {
+/* 1503 */         stringBuffer.append(getValue("FUSAICC", " "));
+/*      */       } 
+/*      */       
+/* 1506 */       if (paramString1.equals("US Only")) {
+/* 1507 */         stringBuffer.append(getValue("FUSALEP", PokUtils.getAttributeValue(entityItem1, "MAINTANNBILLELIGINDC", ",", "", false)));
+/*      */       } else {
+/* 1509 */         stringBuffer.append(getValue("FUSALEP", " "));
+/*      */       } 
+/*      */       
+/* 1512 */       stringBuffer.append(getValue("FUSAMRS", "N"));
+/* 1513 */       stringBuffer.append(getValue("FUSAVLM", "N"));
+/* 1514 */       stringBuffer.append(getValue("FUSAXMO", "N"));
+/* 1515 */       stringBuffer.append(getValue("QUSAPOP", "00.0"));
+/* 1516 */       stringBuffer.append(getValue("DSLMEOD", "1950-01-01"));
+/* 1517 */       stringBuffer.append(getValue("FSLMRFM", " "));
+/*      */       
+/* 1519 */       stringBuffer.append(NEWLINE);
+/* 1520 */       paramOutputStreamWriter.write(stringBuffer.toString());
+/* 1521 */       paramOutputStreamWriter.flush();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String removeSpecialChars(String paramString) {
+/* 1528 */     String str = "";
+/* 1529 */     str = paramString.replaceAll("#", "");
+/* 1530 */     str = str.replaceAll("$", "");
+/* 1531 */     str = str.replaceAll("%", "");
+/* 1532 */     str = str.replaceAll("@", "");
+/* 1533 */     str = str.replaceAll("/", "");
+/* 1534 */     str = str.replaceAll("'", "");
+/* 1535 */     str = str.replaceAll("\"", "");
+/* 1536 */     str = str.replaceAll("é¥ï¿½", "");
+/*      */     
+/* 1538 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityItem searchForAvailType(EntityItem paramEntityItem, String paramString) {
+/* 1544 */     EntityItem entityItem = null;
+/*      */ 
+/*      */     
+/* 1547 */     Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(paramEntityItem, "MODELAVAIL", "AVAIL");
+/*      */     
+/* 1549 */     addDebug("*****mlm searchforavail AVAIL " + vector);
+/*      */     
+/* 1551 */     for (byte b = 0; b < vector.size(); b++) {
+/* 1552 */       EntityItem entityItem1 = vector.elementAt(b);
+/*      */       
+/* 1554 */       String str = PokUtils.getAttributeValue(entityItem1, "AVAILTYPE", ",", "", false);
+/* 1555 */       addDebug("*****mlm searchforavail model = " + paramEntityItem.getEntityType() + paramEntityItem.getEntityID() + "avail entity type = " + entityItem1.getEntityType() + " avail type = " + str);
+/* 1556 */       if (paramString.equals(str)) {
+/* 1557 */         entityItem = entityItem1;
+/*      */         
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/* 1562 */     return entityItem;
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private String validateProdstructs(EntityItem paramEntityItem) throws MiddlewareRequestException, SQLException, MiddlewareException {
+/* 1567 */     String str1 = "";
+/* 1568 */     String str2 = null;
+/* 1569 */     Date date = null;
+/*      */     
+/* 1571 */     ExtractActionItem extractActionItem = new ExtractActionItem(null, this.m_db, this.m_prof, getT006FeatureVEName());
+/*      */     
+/* 1573 */     EntityList entityList = this.m_db.getEntityList(this.m_prof, extractActionItem, new EntityItem[] { new EntityItem(null, this.m_prof, paramEntityItem.getEntityType(), paramEntityItem.getEntityID()) });
+/*      */     
+/* 1575 */     EntityGroup entityGroup = entityList.getEntityGroup("PRODSTRUCT");
+/* 1576 */     addDebug("*****mlm feature.id=" + paramEntityItem.getEntityType() + paramEntityItem.getEntityID() + " prodstructcount=" + entityGroup.getEntityItemCount());
+/*      */     
+/* 1578 */     for (int i = 0; i < entityGroup.getEntityItemCount(); i++) {
+/*      */       
+/* 1580 */       EntityItem entityItem = entityGroup.getEntityItem(i);
+/* 1581 */       addDebug("*****mlm prodstruct=" + entityItem.getEntityType() + entityItem.getEntityID());
+/*      */       
+/* 1583 */       String str = PokUtils.getAttributeValue(entityItem, "WTHDRWEFFCTVDATE", ",", "", false);
+/* 1584 */       addDebug("*****mlm oldestdate=" + str2);
+/* 1585 */       addDebug("*****mlm psWdDate=" + str);
+/* 1586 */       if (!str.equals("")) {
+/* 1587 */         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+/*      */         try {
+/* 1589 */           date = simpleDateFormat.parse(str);
+/* 1590 */           if (str2 == null || date.after((Date)str2)) {
+/* 1591 */             addDebug("*****mlm setting odlestdate to psWdDate");
+/* 1592 */             Date date1 = date;
+/* 1593 */             str1 = str;
+/*      */           } 
+/* 1595 */         } catch (ParseException parseException) {
+/* 1596 */           addDebug(parseException.toString());
+/* 1597 */           addDebug("*****mlm error: ParseException, setting date to 2050-12-31 - end");
+/* 1598 */           str1 = "2050-12-31";
+/* 1599 */           i = entityGroup.getEntityItemCount();
+/*      */           break;
+/*      */         } 
+/*      */       } else {
+/* 1603 */         addDebug("*****mlm psWdDate is blank, set date to 2050-12-31 - end");
+/* 1604 */         str1 = "2050-12-31";
+/* 1605 */         i = entityGroup.getEntityItemCount();
+/*      */         
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/* 1610 */     return str1;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createT006Feature(EntityItem paramEntityItem, OutputStreamWriter paramOutputStreamWriter) throws IOException, SQLException, MiddlewareException {
+/* 1623 */     String str1 = "";
+/* 1624 */     boolean bool = false;
+/*      */     
+/* 1626 */     String str2 = PokUtils.getAttributeValue(paramEntityItem, "AVAILTYPE", "", "");
+/* 1627 */     this.m_elist = getEntityList(getT006ProdstructVEName());
+/* 1628 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("AVAIL");
+/* 1629 */     int i = entityGroup.getEntityItemCount();
+/* 1630 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/* 1631 */       EANFlagAttribute eANFlagAttribute = null;
+/* 1632 */       String str = "";
+/*      */       
+/* 1634 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/*      */       
+/* 1636 */       str = PokUtils.getAttributeValue(entityItem, "AVAILTYPE", "", "");
+/* 1637 */       str1 = PokUtils.getAttributeValue(entityItem, "AVAILANNTYPE", "", "");
+/* 1638 */       if (str1.equals("EPIC")) {
+/* 1639 */         bool = true;
+/*      */       }
+/*      */ 
+/*      */       
+/* 1643 */       if (str.equals("Planned Availability") || str
+/* 1644 */         .equals("End of Service") || str
+/* 1645 */         .equals("Last Order")) {
+/* 1646 */         eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("QSMGEO");
+/* 1647 */         if (eANFlagAttribute != null) {
+/* 1648 */           if (eANFlagAttribute.isSelected("6199")) {
+/* 1649 */             createT006FeatureRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Asia Pacific", str, bool);
+/*      */           }
+/* 1651 */           if (eANFlagAttribute.isSelected("6200")) {
+/* 1652 */             createT006FeatureRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Canada and Caribbean North", str, bool);
+/*      */           }
+/* 1654 */           if (eANFlagAttribute.isSelected("6198")) {
+/* 1655 */             createT006FeatureRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Europe/Middle East/Africa", str, bool);
+/*      */           }
+/* 1657 */           if (eANFlagAttribute.isSelected("6204")) {
+/* 1658 */             createT006FeatureRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Latin America", str, bool);
+/*      */           }
+/* 1660 */           if (eANFlagAttribute.isSelected("6221")) {
+/* 1661 */             createT006FeatureRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "US Only", str, bool);
+/*      */           }
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createT006FeatureRecords(EntityItem paramEntityItem1, OutputStreamWriter paramOutputStreamWriter, EntityItem paramEntityItem2, String paramString1, String paramString2, boolean paramBoolean) throws IOException, SQLException, MiddlewareException {
+/* 1714 */     Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(paramEntityItem2, "OOFAVAIL", "PRODSTRUCT");
+/*      */     
+/* 1716 */     for (byte b = 0; b < vector.size(); b++) {
+/* 1717 */       StringBuffer stringBuffer = new StringBuffer();
+/* 1718 */       EntityItem entityItem1 = vector.elementAt(b);
+/*      */       
+/* 1720 */       ExtractActionItem extractActionItem1 = new ExtractActionItem(null, this.m_db, this.m_prof, getT006FeatureVEName());
+/*      */       
+/* 1722 */       EntityList entityList1 = this.m_db.getEntityList(this.m_prof, extractActionItem1, new EntityItem[] { new EntityItem(null, this.m_prof, entityItem1.getEntityType(), entityItem1.getEntityID()) });
+/*      */       
+/* 1724 */       addDebug("EntityList for " + this.m_prof.getValOn() + " extract QSMFULL2 contains the following entities: \n" + 
+/* 1725 */           PokUtils.outputList(entityList1));
+/*      */       
+/* 1727 */       EntityGroup entityGroup1 = entityList1.getEntityGroup("FEATURE");
+/* 1728 */       EntityGroup entityGroup2 = entityList1.getEntityGroup("MODEL");
+/* 1729 */       EntityItem entityItem2 = entityGroup1.getEntityItem(0);
+/* 1730 */       EntityItem entityItem3 = entityGroup2.getEntityItem(0);
+/* 1731 */       Vector<EntityItem> vector1 = PokUtils.getAllLinkedEntities(entityItem1, "PRODSTSTDMT", "STDMAINT");
+/*      */       
+/* 1733 */       ExtractActionItem extractActionItem2 = new ExtractActionItem(null, this.m_db, this.m_prof, getT006ModelLinksVEName());
+/*      */       
+/* 1735 */       EntityList entityList2 = this.m_db.getEntityList(this.m_prof, extractActionItem2, new EntityItem[] { new EntityItem(null, this.m_prof, entityItem3.getEntityType(), entityItem3.getEntityID()) });
+/*      */       
+/* 1737 */       addDebug("EntityList for " + this.m_prof.getValOn() + " extract QSMFULL5 contains the following entities: \n" + 
+/* 1738 */           PokUtils.outputList(entityList2));
+/*      */       
+/* 1740 */       EntityGroup entityGroup3 = entityList2.getEntityGroup("SGMNTACRNYM");
+/* 1741 */       EntityGroup entityGroup4 = entityList2.getEntityGroup("GEOMOD");
+/* 1742 */       EntityGroup entityGroup5 = entityList2.getEntityGroup("WARR");
+/* 1743 */       EntityGroup entityGroup6 = entityList2.getEntityGroup("STDMAINT");
+/*      */       
+/* 1745 */       stringBuffer = new StringBuffer();
+/* 1746 */       String str1 = "";
+/* 1747 */       String str2 = "";
+/* 1748 */       String str3 = "";
+/* 1749 */       String str4 = "";
+/* 1750 */       String str5 = "";
+/* 1751 */       String str6 = "";
+/* 1752 */       String str7 = "";
+/* 1753 */       String str8 = "";
+/* 1754 */       String str9 = "";
+/* 1755 */       String str10 = "";
+/* 1756 */       String str11 = "";
+/* 1757 */       String str12 = "";
+/* 1758 */       String str13 = "";
+/* 1759 */       String str14 = "";
+/* 1760 */       String str15 = "";
+/* 1761 */       String str16 = "";
+/* 1762 */       String str17 = "";
+/* 1763 */       String str18 = "";
+/* 1764 */       String str19 = "";
+/* 1765 */       String str20 = "";
+/* 1766 */       String str21 = "";
+/* 1767 */       String str22 = "";
+/* 1768 */       String str23 = "";
+/* 1769 */       String str24 = "";
+/* 1770 */       String str25 = "";
+/* 1771 */       String str26 = "";
+/* 1772 */       String str27 = "";
+/* 1773 */       String str28 = "";
+/* 1774 */       String str29 = "";
+/* 1775 */       String str30 = "";
+/* 1776 */       String str31 = "";
+/* 1777 */       String str32 = "";
+/* 1778 */       String str33 = "";
+/* 1779 */       String str34 = "";
+/* 1780 */       String str35 = "";
+/*      */       
+/* 1782 */       stringBuffer.append(getValue("IFTYPE", "F"));
+/*      */       
+/* 1784 */       if (paramString1.equals("Latin America")) {
+/* 1785 */         str1 = "601";
+/* 1786 */         str7 = PokUtils.getAttributeValue(paramEntityItem1, "LDOCNO", "", "");
+/* 1787 */         str2 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "ANNNUMBER", "", "");
+/* 1788 */       } else if (paramString1.equals("Europe/Middle East/Africa")) {
+/* 1789 */         str1 = "999";
+/* 1790 */         str7 = PokUtils.getAttributeValue(paramEntityItem1, "EDOCNO", "", "");
+/* 1791 */         str2 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "ANNNUMBER", "", "");
+/* 1792 */       } else if (paramString1.equals("Asia Pacific")) {
+/* 1793 */         str1 = "872";
+/* 1794 */         str7 = PokUtils.getAttributeValue(paramEntityItem1, "ADOCNO", "", "");
+/* 1795 */         str2 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "ANNNUMBER", "", "");
+/* 1796 */       } else if (paramString1.equals("US Only")) {
+/* 1797 */         str1 = "897";
+/* 1798 */         str7 = PokUtils.getAttributeValue(paramEntityItem1, "USDOCNO", "", "");
+/* 1799 */         str2 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "USDOCNO", "", "");
+/* 1800 */       } else if (paramString1.equals("Canada and Caribbean North")) {
+/* 1801 */         str1 = "649";
+/* 1802 */         str7 = PokUtils.getAttributeValue(paramEntityItem1, "CDOCNO", "", "");
+/* 1803 */         str2 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "USDOCNO", "", "");
+/*      */       } 
+/* 1805 */       stringBuffer.append(getValue("IOPUCTY", str1));
+/* 1806 */       stringBuffer.append(getValue("ISLMPAL", str7));
+/* 1807 */       stringBuffer.append(getValue("ISLMRFA", str2));
+/* 1808 */       String str36 = PokUtils.getAttributeValue(entityItem3, "MACHTYPEATR", ",", "", false);
+/* 1809 */       str36 = str36 + PokUtils.getAttributeValue(entityItem2, "FEATURECODE", ",", "", false);
+/* 1810 */       stringBuffer.append(getValue("ISLMPRN", str36));
+/*      */       
+/* 1812 */       str4 = PokUtils.getAttributeValue(entityItem2, "FCTYPE", ",", "", false);
+/* 1813 */       str3 = "MF";
+/* 1814 */       if (str4.equals("RPQ-RLISTED") || str4
+/* 1815 */         .equals("RPQ-ILISTED") || str4
+/* 1816 */         .equals("RPQ-PLISTED")) {
+/* 1817 */         str3 = "MQ";
+/*      */       }
+/*      */       
+/* 1820 */       stringBuffer.append(getValue("CSLMPCI", str3));
+/* 1821 */       stringBuffer.append(getValue("IPRTNUM", ""));
+/* 1822 */       stringBuffer.append(getValue("FPUNINC", "2"));
+/* 1823 */       stringBuffer.append(getValue("CAOAV", ""));
+/* 1824 */       stringBuffer.append(getValue("DSLMCPA", PokUtils.getAttributeValue(paramEntityItem1, "ANNDATE", ",", "", false)));
+/* 1825 */       stringBuffer.append(getValue("DSLMCPO", ""));
+/*      */       
+/* 1827 */       stringBuffer.append(getValue("DSLMGAD", PokUtils.getAttributeValue(paramEntityItem2, "EFFECTIVEDATE", ",", "", false)));
+/*      */       
+/* 1829 */       String str37 = PokUtils.getAttributeValue(entityItem1, "ORDERCODE", ",", "", false);
+/* 1830 */       EntityItem entityItem4 = null;
+/*      */       
+/* 1832 */       if (str37.equals("Both") || str37.equals("MES")) {
+/* 1833 */         Vector<EntityItem> vector3 = PokUtils.getAllLinkedEntities(entityItem1, "OOFAVAIL", "AVAIL");
+/* 1834 */         for (int i = 0; i < vector3.size(); i++) {
+/* 1835 */           EANFlagAttribute eANFlagAttribute = null;
+/* 1836 */           entityItem4 = vector3.elementAt(i);
+/* 1837 */           str32 = PokUtils.getAttributeValue(entityItem4, "AVAILTYPE", ",", "", false);
+/* 1838 */           eANFlagAttribute = (EANFlagAttribute)entityItem4.getAttribute("QSMGEO");
+/* 1839 */           if (isQSMGeoSelected(paramString1, eANFlagAttribute) && str32.equals("MES Planned Availability")) {
+/* 1840 */             str33 = PokUtils.getAttributeValue(entityItem4, "EFFECTIVEDATE", ",", "", false);
+/* 1841 */             i = vector3.size();
+/*      */           } 
+/*      */         } 
+/* 1844 */         if (str33.equals("")) {
+/* 1845 */           str33 = PokUtils.getAttributeValue(paramEntityItem2, "EFFECTIVEDATE", ",", "", false);
+/*      */         }
+/* 1847 */       } else if (str37.equals("Initial")) {
+/* 1848 */         str33 = "2050-12-31";
+/*      */       } 
+/*      */       
+/* 1851 */       if (str33.equals("")) {
+/* 1852 */         str33 = "2050-12-31";
+/*      */       }
+/*      */       
+/* 1855 */       stringBuffer.append(getValue("DSLMMES", str33));
+/*      */       
+/* 1857 */       stringBuffer.append(getValue("QSMEDMW", "2050-12-31"));
+/* 1858 */       stringBuffer.append(getValue("DSLMMVA", PokUtils.getAttributeValue(paramEntityItem1, "ANNDATE", ",", "", false)));
+/*      */       
+/* 1860 */       str5 = validateProdstructs(entityItem2);
+/* 1861 */       stringBuffer.append(getValue("DSLMWDN", str5));
+/*      */       
+/* 1863 */       str23 = PokUtils.getAttributeValue(entityItem2, "PRICEDFEATURE", ",", "", false);
+/*      */       
+/* 1865 */       if (str4.equals("Primary") && str23.equals("No")) {
+/* 1866 */         str22 = "S";
+/*      */       }
+/*      */       
+/* 1869 */       if (paramString1.equals("Asia Pacific")) {
+/* 1870 */         if (str23.equals("No")) {
+/* 1871 */           str21 = "0.00";
+/* 1872 */         } else if (str23.equals("Yes")) {
+/* 1873 */           str21 = "1.00";
+/*      */         } 
+/*      */       } else {
+/* 1876 */         str21 = "1.00";
+/*      */       } 
+/*      */       
+/* 1879 */       stringBuffer.append(getValue("ASLMMVP", str21));
+/*      */       
+/* 1881 */       stringBuffer.append(getValue("CICRY", "N"));
+/* 1882 */       stringBuffer.append(getValue("CIDCJ", "N"));
+/* 1883 */       stringBuffer.append(getValue("CIDXC", "N"));
+/*      */       
+/* 1885 */       if (paramString1.equals("US Only")) {
+/* 1886 */         stringBuffer.append(getValue("CINCA", "N"));
+/*      */       } else {
+/* 1888 */         stringBuffer.append(getValue("CINCA", "Y"));
+/*      */       } 
+/*      */       
+/* 1891 */       String str38 = "";
+/* 1892 */       str28 = PokUtils.getAttributeValue(entityItem2, "PRICEDFEATURE", "", "");
+/* 1893 */       if (paramString1.equals("US Only")) {
+/* 1894 */         str38 = "N";
+/*      */       }
+/* 1896 */       else if (str28.equals("Yes")) {
+/* 1897 */         str38 = "N";
+/* 1898 */       } else if (str28.equals("No")) {
+/* 1899 */         str38 = "Y";
+/*      */       } else {
+/* 1901 */         str38 = "N";
+/*      */       } 
+/*      */ 
+/*      */       
+/* 1905 */       stringBuffer.append(getValue("CINCB", str38));
+/*      */       
+/* 1907 */       EntityItem entityItem5 = null;
+/* 1908 */       if (!vector1.isEmpty()) {
+/* 1909 */         entityItem5 = vector1.elementAt(0);
+/* 1910 */         if (entityItem5 != null) {
+/* 1911 */           str30 = PokUtils.getAttributeValue(entityItem5, "MAINTELIG", "", "");
+/*      */         }
+/* 1913 */         else if (entityGroup6 != null && entityGroup6.hasData()) {
+/* 1914 */           entityItem5 = entityGroup6.getEntityItem(0);
+/*      */         }
+/*      */       
+/*      */       }
+/* 1918 */       else if (entityGroup6 != null && entityGroup6.hasData()) {
+/* 1919 */         entityItem5 = entityGroup6.getEntityItem(0);
+/*      */       } 
+/*      */ 
+/*      */       
+/* 1923 */       if (entityItem5 != null) {
+/* 1924 */         str30 = PokUtils.getAttributeValue(entityItem5, "MAINTELIG", "", "");
+/*      */       }
+/*      */       
+/* 1927 */       if (paramString1.equals("Asia Pacific")) {
+/* 1928 */         str31 = "Y";
+/* 1929 */       } else if (paramString1.equals("US Only") || paramString1.equals("Canada and Caribbean North")) {
+/* 1930 */         str31 = "N";
+/* 1931 */       } else if (paramString1.equals("Europe/Middle East/Africa") || paramString1.equals("Latin America")) {
+/* 1932 */         if (str30.equals("Yes")) {
+/* 1933 */           str31 = "N";
+/* 1934 */         } else if (str30.equals("No")) {
+/* 1935 */           str31 = "Y";
+/*      */         } 
+/*      */       } 
+/*      */       
+/* 1939 */       stringBuffer.append(getValue("CINCC", str31));
+/*      */ 
+/*      */       
+/* 1942 */       stringBuffer.append(getValue("CINPM", "N"));
+/* 1943 */       stringBuffer.append(getValue("CITEM", "N"));
+/* 1944 */       stringBuffer.append(getValue("CISUP", "N"));
+/* 1945 */       if (entityGroup3 != null && entityGroup3.hasData()) {
+/* 1946 */         EntityItem entityItem = entityGroup3.getEntityItem(0);
+/* 1947 */         stringBuffer.append(getValue("CJLBSAC", PokUtils.getAttributeValue(entityItem, "ACRNYM", "", "")));
+/*      */       } else {
+/* 1949 */         stringBuffer.append(getValue("CJLBSAC", "   "));
+/*      */       } 
+/* 1951 */       stringBuffer.append(getValue("CLASSPT", "IHW"));
+/*      */       
+/* 1953 */       str24 = "";
+/*      */       
+/* 1955 */       if (paramString1.equals("Europe/Middle East/Africa") || paramString1.equals("Latin America")) {
+/* 1956 */         if (str22.equals("S")) {
+/* 1957 */           str24 = "CM";
+/*      */         }
+/* 1959 */       } else if (paramString1.equals("Asia Pacific")) {
+/* 1960 */         if (str22.equals("S")) {
+/* 1961 */           str24 = "CM";
+/*      */         }
+/* 1963 */       } else if (paramString1.equals("US Only")) {
+/* 1964 */         str24 = "NF";
+/* 1965 */       } else if (paramString1.equals("Canada and Caribbean North")) {
+/* 1966 */         str24 = "";
+/*      */       } 
+/*      */       
+/* 1969 */       stringBuffer.append(getValue("CSLMFTY", str24));
+/* 1970 */       stringBuffer.append(getValue("CVOAT", ""));
+/*      */ 
+/*      */ 
+/*      */       
+/* 1974 */       if (paramString1.equals("Canada and Caribbean North")) {
+/* 1975 */         str6 = "Y";
+/* 1976 */       } else if (paramString1.equals("Asia Pacific") || paramString1.equals("US Only")) {
+/* 1977 */         str6 = "N";
+/* 1978 */       } else if (paramString1.equals("Europe/Middle East/Africa") || paramString1.equals("Latin America")) {
+/* 1979 */         str6 = str30;
+/*      */       } 
+/*      */       
+/* 1982 */       stringBuffer.append(getValue("FAGRMBE", str6));
+/*      */       
+/* 1984 */       String str39 = "";
+/* 1985 */       EntityItem entityItem6 = null;
+/* 1986 */       if (entityGroup4 != null && entityGroup4.hasData()) {
+/* 1987 */         for (int i = 0; i < entityGroup4.getEntityItemCount(); i++) {
+/* 1988 */           entityItem6 = entityGroup4.getEntityItem(i);
+/* 1989 */           str39 = PokUtils.getAttributeValue(entityItem6, "GENAREASELECTION", "", "");
+/* 1990 */           if (str39.equals(paramString1)) {
+/* 1991 */             str20 = PokUtils.getAttributeValue(entityItem6, "PURCHONLY", "", "");
+/* 1992 */             str29 = PokUtils.getAttributeValue(entityItem6, "EDUCPURCHELIG", "", "");
+/* 1993 */             i = entityGroup4.getEntityItemCount();
+/*      */           } else {
+/* 1995 */             entityItem6 = null;
+/*      */           } 
+/*      */         } 
+/*      */       }
+/*      */       
+/* 2000 */       if (paramString1.equals("Latin America") || paramString1.equals("Europe/Middle East/Africa") || paramString1
+/* 2001 */         .equals("Asia Pacific") || paramString1.equals("Canada and Caribbean North")) {
+/* 2002 */         if (str37.equals("Initial")) {
+/* 2003 */           str26 = "Y";
+/*      */         } else {
+/* 2005 */           str26 = "N";
+/*      */         } 
+/* 2007 */       } else if (paramString1.equals("US Only")) {
+/* 2008 */         str26 = "N";
+/*      */       } 
+/* 2010 */       stringBuffer.append(getValue("FSLMPIO", str26));
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 2025 */       if (paramString1.equals("Latin America") || paramString1
+/* 2026 */         .equals("US Only") || paramString1
+/* 2027 */         .equals("Canada and Caribbean North") || paramString1
+/* 2028 */         .equals("Asia Pacific")) {
+/* 2029 */         stringBuffer.append(getValue("FSLMPOP", "No"));
+/* 2030 */       } else if (paramString1.equals("Europe/Middle East/Africa")) {
+/* 2031 */         stringBuffer.append(getValue("FSLMPOP", "Yes"));
+/*      */       } else {
+/* 2033 */         stringBuffer.append(getValue("FSLMPOP", str20));
+/*      */       } 
+/*      */       
+/* 2036 */       stringBuffer.append(getValue("FSLMSTK", "N"));
+/*      */       
+/* 2038 */       String str40 = "";
+/*      */       
+/* 2040 */       ArrayList<String> arrayList = new ArrayList();
+/*      */       
+/* 2042 */       EntityItem entityItem7 = null;
+/* 2043 */       Vector<EntityItem> vector2 = null;
+/* 2044 */       String str41 = "";
+/*      */       
+/* 2046 */       vector2 = PokUtils.getAllLinkedEntities(entityItem1, "PRODSTRUCTWARR", "WARR");
+/*      */       
+/* 2048 */       if (!vector2.isEmpty()) {
+/* 2049 */         entityItem7 = vector2.elementAt(0);
+/* 2050 */         if (entityItem7 == null) {
+/* 2051 */           if (entityGroup5 != null && entityGroup5.hasData()) {
+/* 2052 */             entityItem7 = entityGroup5.getEntityItem(0);
+/* 2053 */             str41 = PokUtils.getAttributeValue(entityItem7, "WARRID", "", "");
+/* 2054 */             if (str41.equals("WTY0000")) {
+/* 2055 */               if (entityGroup5.getEntityItemCount() > 1) {
+/* 2056 */                 entityItem7 = entityGroup5.getEntityItem(1);
+/*      */               } else {
+/* 2058 */                 entityItem7 = null;
+/*      */               } 
+/*      */             }
+/*      */           } 
+/*      */         } else {
+/* 2063 */           str41 = PokUtils.getAttributeValue(entityItem7, "WARRID", "", "");
+/* 2064 */           if (str41.equals("WTY0000")) {
+/* 2065 */             if (vector2.size() > 1) {
+/* 2066 */               entityItem7 = vector2.elementAt(1);
+/*      */             } else {
+/* 2068 */               entityItem7 = null;
+/*      */             }
+/*      */           
+/*      */           }
+/*      */         } 
+/* 2073 */       } else if (entityGroup5 != null && entityGroup5.hasData()) {
+/* 2074 */         entityItem7 = entityGroup5.getEntityItem(0);
+/* 2075 */         str41 = PokUtils.getAttributeValue(entityItem7, "WARRID", "", "");
+/* 2076 */         if (str41.equals("WTY0000")) {
+/* 2077 */           if (entityGroup5.getEntityItemCount() > 1) {
+/* 2078 */             entityItem7 = entityGroup5.getEntityItem(1);
+/*      */           } else {
+/* 2080 */             entityItem7 = null;
+/*      */           } 
+/*      */         }
+/*      */       } 
+/*      */ 
+/*      */       
+/* 2086 */       if (entityItem7 != null) {
+/* 2087 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem7.getAttribute("WARRTYPE");
+/* 2088 */         if (eANFlagAttribute != null) {
+/* 2089 */           if (paramString1.equals("Europe/Middle East/Africa")) {
+/* 2090 */             if (eANFlagAttribute.isSelected("W0310") || eANFlagAttribute.isSelected("W0330") || eANFlagAttribute
+/* 2091 */               .isSelected("W0200") || eANFlagAttribute.isSelected("W0240") || eANFlagAttribute.isSelected("W0250")) {
+/* 2092 */               str40 = "Y";
+/*      */             } else {
+/* 2094 */               str40 = "N";
+/*      */             } 
+/*      */           }
+/*      */           
+/* 2098 */           if (paramString1.equals("Latin America")) {
+/* 2099 */             if (eANFlagAttribute.isSelected("W0310") || eANFlagAttribute.isSelected("W0330") || eANFlagAttribute
+/* 2100 */               .isSelected("W0560") || eANFlagAttribute.isSelected("W0570") || eANFlagAttribute.isSelected("W0580")) {
+/* 2101 */               str40 = "Y";
+/*      */             } else {
+/* 2103 */               str40 = "N";
+/*      */             } 
+/*      */           }
+/*      */           
+/* 2107 */           if (paramString1.equals("Asia Pacific")) {
+/* 2108 */             if (eANFlagAttribute.isSelected("W0550") || eANFlagAttribute
+/* 2109 */               .isSelected("W0390") || eANFlagAttribute
+/* 2110 */               .isSelected("W0200") || eANFlagAttribute.isSelected("W0240") || eANFlagAttribute.isSelected("W0250") || eANFlagAttribute
+/* 2111 */               .isSelected("W0310") || eANFlagAttribute.isSelected("W0330") || eANFlagAttribute
+/* 2112 */               .isSelected("W0590")) {
+/* 2113 */               str40 = "Y";
+/*      */             } else {
+/* 2115 */               str40 = "N";
+/*      */             } 
+/*      */           }
+/*      */           
+/* 2119 */           if (paramString1.equals("Canada and Caribbean North") || paramString1
+/* 2120 */             .equals("US Only")) {
+/* 2121 */             str40 = "N";
+/*      */           }
+/*      */         } 
+/*      */       } else {
+/* 2125 */         str40 = "N";
+/*      */       } 
+/* 2127 */       stringBuffer.append(getValue("FSLM2CF", str40));
+/*      */       
+/* 2129 */       stringBuffer.append(getValue("IDORIG", "IBM"));
+/* 2130 */       str8 = "000";
+/* 2131 */       str9 = "000";
+/* 2132 */       str10 = "000";
+/* 2133 */       str11 = "000";
+/*      */       
+/* 2135 */       if (paramString1.equals("US Only") || paramString1.equals("Canada and Caribbean North")) {
+/* 2136 */         str8 = "000";
+/* 2137 */         str9 = "000";
+/* 2138 */         str10 = "000";
+/* 2139 */         str11 = "000";
+/* 2140 */       } else if (paramString1.equals("Europe/Middle East/Africa")) {
+/* 2141 */         str8 = " @@";
+/* 2142 */         str9 = " @@";
+/* 2143 */         str10 = " @@";
+/* 2144 */         str11 = " @@";
+/*      */       }
+/* 2146 */       else if (entityItem6 != null) {
+/*      */         
+/* 2148 */         str8 = getNumValue("PCUAEAP", PokUtils.getAttributeValue(entityItem6, "EDUCALLOWMHGHSCH", ",", "", false));
+/* 2149 */         str9 = getNumValue("PCUAHEA", PokUtils.getAttributeValue(entityItem6, "EDUCALLOWMHGHSCH", ",", "", false));
+/* 2150 */         str10 = getNumValue("PCUASEA", PokUtils.getAttributeValue(entityItem6, "EDUCALLOWMSECONDRYSCH", ",", "", false));
+/* 2151 */         str11 = getNumValue("PCUAUEA", PokUtils.getAttributeValue(entityItem6, "EDUCALLOWMUNVRSTY", ",", "", false));
+/*      */       } 
+/*      */ 
+/*      */       
+/* 2155 */       stringBuffer.append(getValue("PCUAEAP", str8));
+/* 2156 */       stringBuffer.append(getValue("PCUAHEA", str9));
+/* 2157 */       stringBuffer.append(getValue("PCUASEA", str10));
+/* 2158 */       stringBuffer.append(getValue("PCUAUEA", str11));
+/*      */       
+/* 2160 */       stringBuffer.append(getValue("POGMES", ""));
+/*      */       
+/* 2162 */       String str42 = PokUtils.getAttributeValue(entityItem1, "INSTALL", "", "");
+/* 2163 */       if (str42.equals("CIF")) {
+/* 2164 */         if (paramString1.equals("Europe/Middle East/Africa") || paramString1
+/* 2165 */           .equals("Latin America")) {
+/* 2166 */           str27 = "01";
+/* 2167 */         } else if (paramString1.equals("Asia Pacific")) {
+/* 2168 */           str27 = "10";
+/* 2169 */         } else if (paramString1.equals("US Only") || paramString1
+/* 2170 */           .equals("Canada and Caribbean North")) {
+/* 2171 */           str27 = "";
+/*      */         } 
+/* 2173 */       } else if (str42.equals("CE") || str42.equals("N/A") || str42.equals("Does not apply")) {
+/* 2174 */         str27 = "";
+/*      */       } 
+/* 2176 */       stringBuffer.append(getValue("QSLMCSU", str27));
+/*      */       
+/* 2178 */       stringBuffer.append(getValue("QSMXESA", "N"));
+/* 2179 */       stringBuffer.append(getValue("QSMXSSA", "N"));
+/*      */       
+/* 2181 */       String str43 = PokUtils.getAttributeValue(entityItem2, "INVNAME", ",", "", false);
+/* 2182 */       stringBuffer.append(getValue("TSLMDES", removeSpecialChars(str43)));
+/*      */       
+/* 2184 */       str25 = "";
+/*      */       
+/* 2186 */       if (str22.equals("S")) {
+/* 2187 */         str25 = "OTH";
+/*      */       }
+/*      */       
+/* 2190 */       stringBuffer.append(getValue("STSPCFT", str25));
+/* 2191 */       stringBuffer.append(getValue("TIMSTMP", ""));
+/* 2192 */       stringBuffer.append(getValue("USERID", ""));
+/*      */       
+/* 2194 */       arrayList = new ArrayList();
+/* 2195 */       str12 = "";
+/* 2196 */       str13 = "";
+/* 2197 */       str14 = "";
+/* 2198 */       str15 = "";
+/* 2199 */       str16 = "";
+/* 2200 */       str17 = "";
+/* 2201 */       str18 = "";
+/* 2202 */       str19 = "";
+/*      */       
+/* 2204 */       if (paramString1.equals("Asia Pacific") && 
+/* 2205 */         entityItem7 != null) {
+/* 2206 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem7.getAttribute("WARRTYPE");
+/* 2207 */         if (eANFlagAttribute != null) {
+/* 2208 */           if (eANFlagAttribute.isSelected("W0560") || eANFlagAttribute.isSelected("W0570") || eANFlagAttribute.isSelected("W0580")) {
+/* 2209 */             arrayList.add("IOR");
+/*      */           }
+/* 2211 */           if (eANFlagAttribute.isSelected("W0550")) {
+/* 2212 */             arrayList.add("IOE");
+/*      */           }
+/* 2214 */           if (eANFlagAttribute.isSelected("W0390")) {
+/* 2215 */             arrayList.add("COE");
+/*      */           }
+/* 2217 */           if (eANFlagAttribute.isSelected("W0200") || eANFlagAttribute.isSelected("W0240") || eANFlagAttribute.isSelected("W0250")) {
+/* 2218 */             arrayList.add("CCE");
+/*      */           }
+/* 2220 */           if (eANFlagAttribute.isSelected("W0310") || eANFlagAttribute.isSelected("W0330")) {
+/* 2221 */             arrayList.add("CCR");
+/*      */           }
+/* 2223 */           if (eANFlagAttribute.isSelected("W0590")) {
+/* 2224 */             arrayList.add("IOS");
+/*      */           }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */           
+/* 2247 */           for (byte b1 = 0; b1 < arrayList.size(); b1++) {
+/* 2248 */             if (b1 == 0) {
+/* 2249 */               str12 = arrayList.get(b1);
+/* 2250 */             } else if (b1 == 1) {
+/* 2251 */               str13 = arrayList.get(b1);
+/* 2252 */             } else if (b1 == 2) {
+/* 2253 */               str14 = arrayList.get(b1);
+/* 2254 */             } else if (b1 == 3) {
+/* 2255 */               str15 = arrayList.get(b1);
+/* 2256 */             } else if (b1 == 4) {
+/* 2257 */               str16 = arrayList.get(b1);
+/* 2258 */             } else if (b1 == 5) {
+/* 2259 */               str17 = arrayList.get(b1);
+/* 2260 */             } else if (b1 == 6) {
+/* 2261 */               str18 = arrayList.get(b1);
+/* 2262 */             } else if (b1 == 7) {
+/* 2263 */               str19 = arrayList.get(b1);
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */ 
+/*      */       
+/* 2270 */       stringBuffer.append(getValue("CSLMTM1", str12));
+/* 2271 */       stringBuffer.append(getValue("CSLMTM2", str13));
+/* 2272 */       stringBuffer.append(getValue("CSLMTM3", str14));
+/* 2273 */       stringBuffer.append(getValue("CSLMTM4", str15));
+/* 2274 */       stringBuffer.append(getValue("CSLMTM5", str16));
+/* 2275 */       stringBuffer.append(getValue("CSLMTM6", str17));
+/* 2276 */       stringBuffer.append(getValue("CSLMTM7", str18));
+/* 2277 */       stringBuffer.append(getValue("CSLMTM8", str19));
+/*      */       
+/* 2279 */       stringBuffer.append(getValue("FSAPRES", "N"));
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 2294 */       if (paramString1.equals("US Only")) {
+/* 2295 */         EntityItem entityItem = null;
+/* 2296 */         str35 = PokUtils.getAttributeValue(entityItem3, "WARRSVCCOVR", "", "");
+/* 2297 */         if (str35 != null) {
+/* 2298 */           if (str35.equals("No Warranty") || str35.equals("")) {
+/* 2299 */             str34 = "Z";
+/*      */           }
+/* 2301 */           else if (entityGroup5 != null && entityGroup5.hasData()) {
+/* 2302 */             entityItem = entityGroup5.getEntityItem(0);
+/*      */             
+/* 2304 */             if (entityItem != null) {
+/* 2305 */               String str = PokUtils.getAttributeValue(entityItem, "WARRID", "", "");
+/* 2306 */               if (str.equals("WTY0000")) {
+/* 2307 */                 if (entityGroup5.getEntityItemCount() > 1) {
+/* 2308 */                   entityItem = entityGroup5.getEntityItem(1);
+/*      */                 } else {
+/* 2310 */                   entityItem = null;
+/*      */                 } 
+/*      */               }
+/*      */             } 
+/*      */             
+/* 2315 */             if (entityItem != null) {
+/* 2316 */               str34 = PokUtils.getAttributeValue(entityItem, "WARRCATG", "", "");
+/*      */             } else {
+/* 2318 */               str34 = "";
+/*      */             } 
+/*      */           } else {
+/* 2321 */             str34 = "";
+/*      */           } 
+/*      */         } else {
+/*      */           
+/* 2325 */           str34 = "Z";
+/*      */         } 
+/*      */       } else {
+/* 2328 */         str34 = "";
+/*      */       } 
+/*      */       
+/* 2331 */       stringBuffer.append(getValue("CSLMWCD", str34));
+/*      */       
+/* 2333 */       if (paramString1.equals("US Only")) {
+/* 2334 */         String str = PokUtils.getAttributeValue(entityItem3, "MAINTANNBILLELIGINDC", ",", "", false);
+/* 2335 */         if (str.equals("Yes")) {
+/* 2336 */           stringBuffer.append(getValue("CUSAPMS", "Y"));
+/* 2337 */         } else if (str.equals("No")) {
+/* 2338 */           stringBuffer.append(getValue("CUSAPMS", "X"));
+/*      */         } else {
+/* 2340 */           stringBuffer.append(getValue("CUSAPMS", ""));
+/*      */         } 
+/*      */       } else {
+/* 2343 */         stringBuffer.append(getValue("CUSAPMS", ""));
+/*      */       } 
+/*      */       
+/* 2346 */       stringBuffer.append(getValue("DUSALRW", "2050-12-31"));
+/* 2347 */       stringBuffer.append(getValue("DUSAMDW", "2050-12-31"));
+/* 2348 */       stringBuffer.append(getValue("DUSAWUW", "2050-12-31"));
+/*      */       
+/* 2350 */       if (paramString1.equals("US Only")) {
+/* 2351 */         stringBuffer.append(getValue("FSLMCBL", "N"));
+/*      */       } else {
+/* 2353 */         stringBuffer.append(getValue("FSLMCBL", ""));
+/*      */       } 
+/*      */       
+/* 2356 */       if (paramString1.equals("US Only")) {
+/* 2357 */         stringBuffer.append(getValue("FUSAAAS", "Y"));
+/*      */       } else {
+/* 2359 */         stringBuffer.append(getValue("FUSAAAS", ""));
+/*      */       } 
+/*      */       
+/* 2362 */       if (paramString1.equals("US Only")) {
+/* 2363 */         stringBuffer.append(getValue("FUSAEDE", str29));
+/*      */       } else {
+/* 2365 */         stringBuffer.append(getValue("FUSAEDE", ""));
+/*      */       } 
+/*      */       
+/* 2368 */       if (paramString1.equals("US Only")) {
+/* 2369 */         stringBuffer.append(getValue("FUSALEP", PokUtils.getAttributeValue(entityItem3, "MAINTANNBILLELIGINDC", ",", "", false)));
+/*      */       } else {
+/* 2371 */         stringBuffer.append(getValue("FUSALEP", " "));
+/*      */       } 
+/*      */       
+/* 2374 */       if (paramString1.equals("US Only")) {
+/* 2375 */         stringBuffer.append(getValue("FUSAIRR", "N"));
+/*      */       } else {
+/* 2377 */         stringBuffer.append(getValue("FUSAIRR", ""));
+/*      */       } 
+/*      */ 
+/*      */       
+/* 2381 */       if (entityItem6 != null) {
+/* 2382 */         stringBuffer.append(getValue("ICESPCC", PokUtils.getAttributeValue(entityItem6, "PERCALLCLS", ",", "", false)));
+/*      */       } else {
+/* 2384 */         stringBuffer.append(getValue("ICESPCC", ""));
+/*      */       } 
+/* 2386 */       stringBuffer.append(getValue("QUSAPOP", "00.0"));
+/* 2387 */       stringBuffer.append(getValue("FSLMRFM", ""));
+/*      */       
+/* 2389 */       stringBuffer.append(NEWLINE);
+/* 2390 */       paramOutputStreamWriter.write(stringBuffer.toString());
+/* 2391 */       paramOutputStreamWriter.flush();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean isQSMGeoSelected(String paramString, EANFlagAttribute paramEANFlagAttribute) {
+/* 2399 */     if (paramEANFlagAttribute != null) {
+/* 2400 */       if (paramString.equals("Asia Pacific") && paramEANFlagAttribute.isSelected("6199")) {
+/* 2401 */         return true;
+/*      */       }
+/*      */       
+/* 2404 */       if (paramString.equals("Canada and Caribbean North") && paramEANFlagAttribute.isSelected("6200")) {
+/* 2405 */         return true;
+/*      */       }
+/*      */       
+/* 2408 */       if (paramString.equals("Europe/Middle East/Africa") && paramEANFlagAttribute.isSelected("6198")) {
+/* 2409 */         return true;
+/*      */       }
+/*      */       
+/* 2412 */       if (paramString.equals("Latin America") && paramEANFlagAttribute.isSelected("6204")) {
+/* 2413 */         return true;
+/*      */       }
+/*      */       
+/* 2416 */       if (paramString.equals("US Only") && paramEANFlagAttribute.isSelected("6221")) {
+/* 2417 */         return true;
+/*      */       }
+/*      */     } 
+/*      */     
+/* 2421 */     addDebug("***** isQSMGeoSelected false");
+/* 2422 */     return false;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createT017ProductCategory(EntityItem paramEntityItem, OutputStreamWriter paramOutputStreamWriter) throws SQLException, MiddlewareException, IOException {
+/* 2438 */     this.m_elist = getEntityList(getModelProdstructVEName());
+/*      */     
+/* 2440 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("AVAIL");
+/*      */     
+/* 2442 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/* 2443 */       EANFlagAttribute eANFlagAttribute = null;
+/*      */       
+/* 2445 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/*      */       
+/* 2447 */       eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("QSMGEO");
+/* 2448 */       if (eANFlagAttribute != null) {
+/* 2449 */         if (eANFlagAttribute.isSelected("6199")) {
+/* 2450 */           createT017ProductCategoryRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Asia Pacific");
+/*      */         }
+/* 2452 */         if (eANFlagAttribute.isSelected("6200")) {
+/* 2453 */           createT017ProductCategoryRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Canada and Caribbean North");
+/*      */         }
+/* 2455 */         if (eANFlagAttribute.isSelected("6198")) {
+/* 2456 */           createT017ProductCategoryRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Europe/Middle East/Africa");
+/*      */         }
+/* 2458 */         if (eANFlagAttribute.isSelected("6204")) {
+/* 2459 */           createT017ProductCategoryRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Latin America");
+/*      */         }
+/* 2461 */         if (eANFlagAttribute.isSelected("6221")) {
+/* 2462 */           createT017ProductCategoryRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "US Only");
+/*      */         }
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createT017ProductCategoryRecords(EntityItem paramEntityItem1, OutputStreamWriter paramOutputStreamWriter, EntityItem paramEntityItem2, String paramString) throws SQLException, MiddlewareException, IOException {
+/* 2483 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("MODEL");
+/*      */     
+/* 2485 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/* 2486 */       StringBuffer stringBuffer = new StringBuffer();
+/* 2487 */       String str1 = "";
+/* 2488 */       String str2 = "";
+/* 2489 */       String str3 = "";
+/*      */       
+/* 2491 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/*      */       
+/* 2493 */       str3 = PokUtils.getAttributeValue(paramEntityItem1, "PRODCATEGORY", ",", "", false);
+/*      */       
+/* 2495 */       if (str3 != null && str3.length() > 0) {
+/* 2496 */         String[] arrayOfString = str3.split(",");
+/* 2497 */         for (byte b1 = 0; b1 < arrayOfString.length; b1++) {
+/*      */           
+/* 2499 */           stringBuffer.append(getValue("IFTYPE", "P"));
+/* 2500 */           stringBuffer.append(getValue("CPDXA", arrayOfString[b1]));
+/* 2501 */           if (paramString.equals("Latin America")) {
+/* 2502 */             str1 = PokUtils.getAttributeValue(paramEntityItem1, "LDOCNO", "", "");
+/* 2503 */           } else if (paramString.equals("Europe/Middle East/Africa")) {
+/* 2504 */             str1 = PokUtils.getAttributeValue(paramEntityItem1, "EDOCNO", "", "");
+/* 2505 */           } else if (paramString.equals("Asia Pacific")) {
+/* 2506 */             str1 = PokUtils.getAttributeValue(paramEntityItem1, "ADOCNO", "", "");
+/* 2507 */           } else if (paramString.equals("US Only")) {
+/* 2508 */             str1 = PokUtils.getAttributeValue(paramEntityItem1, "USDOCNO", "", "");
+/* 2509 */           } else if (paramString.equals("Canada and Caribbean North")) {
+/* 2510 */             str1 = PokUtils.getAttributeValue(paramEntityItem1, "CDOCNO", "", "");
+/*      */           } 
+/* 2512 */           stringBuffer.append(getValue("ISLMPAL", str1));
+/*      */           
+/* 2514 */           str2 = PokUtils.getAttributeValue(entityItem, "MACHTYPEATR", "", "");
+/* 2515 */           str2 = str2 + PokUtils.getAttributeValue(entityItem, "MODELATR", "", "");
+/* 2516 */           stringBuffer.append(getValue("ISLMPRN", str2));
+/*      */           
+/* 2518 */           stringBuffer.append(getValue("TIMSTMP", ""));
+/* 2519 */           stringBuffer.append(getValue("USERID", ""));
+/*      */           
+/* 2521 */           stringBuffer.append(NEWLINE);
+/* 2522 */           paramOutputStreamWriter.write(stringBuffer.toString());
+/* 2523 */           paramOutputStreamWriter.flush();
+/*      */           
+/* 2525 */           Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(entityItem, "PRODSTRUCT", "FEATURE");
+/* 2526 */           for (byte b2 = 0; b2 < vector.size(); b2++) {
+/* 2527 */             EntityItem entityItem1 = vector.elementAt(b2);
+/* 2528 */             stringBuffer = new StringBuffer();
+/*      */             
+/* 2530 */             str2 = "";
+/*      */             
+/* 2532 */             stringBuffer.append(getValue("IFTYPE", "P"));
+/* 2533 */             stringBuffer.append(getValue("CPDXA", PokUtils.getAttributeValue(paramEntityItem1, "PRODCATEGORY", ",", "", false)));
+/*      */             
+/* 2535 */             stringBuffer.append(getValue("ISLMPAL", str1));
+/*      */             
+/* 2537 */             str2 = PokUtils.getAttributeValue(entityItem, "MACHTYPEATR", "", "");
+/* 2538 */             str2 = str2 + PokUtils.getAttributeValue(entityItem1, "FEATURECODE", "", "");
+/* 2539 */             stringBuffer.append(getValue("ISLMPRN", str2));
+/*      */             
+/* 2541 */             stringBuffer.append(getValue("TIMSTMP", ""));
+/* 2542 */             stringBuffer.append(getValue("USERID", ""));
+/*      */             
+/* 2544 */             stringBuffer.append(NEWLINE);
+/* 2545 */             paramOutputStreamWriter.write(stringBuffer.toString());
+/* 2546 */             paramOutputStreamWriter.flush();
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createT020NPMesUpgrade(EntityItem paramEntityItem, OutputStreamWriter paramOutputStreamWriter) throws IOException, SQLException, MiddlewareException {
+/* 2565 */     this.m_elist = getEntityList(getNPMesUpgradeVEName());
+/*      */     
+/* 2567 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("AVAIL");
+/*      */     
+/* 2569 */     String str = "";
+/* 2570 */     boolean bool = false;
+/*      */     
+/* 2572 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/* 2573 */       EANFlagAttribute eANFlagAttribute = null;
+/*      */       
+/* 2575 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/*      */       
+/* 2577 */       str = PokUtils.getAttributeValue(entityItem, "AVAILANNTYPE", "", "");
+/* 2578 */       if (str.equals("EPIC")) {
+/* 2579 */         bool = true;
+/*      */       }
+/*      */       
+/* 2582 */       eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("QSMGEO");
+/* 2583 */       if (eANFlagAttribute != null) {
+/* 2584 */         if (eANFlagAttribute.isSelected("6199")) {
+/* 2585 */           createT020NPMesUpgradeRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Asia Pacific", bool);
+/*      */         }
+/* 2587 */         if (eANFlagAttribute.isSelected("6200")) {
+/* 2588 */           createT020NPMesUpgradeRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Canada and Caribbean North", bool);
+/*      */         }
+/* 2590 */         if (eANFlagAttribute.isSelected("6198")) {
+/* 2591 */           createT020NPMesUpgradeRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Europe/Middle East/Africa", bool);
+/*      */         }
+/* 2593 */         if (eANFlagAttribute.isSelected("6204")) {
+/* 2594 */           createT020NPMesUpgradeRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Latin America", bool);
+/*      */         }
+/* 2596 */         if (eANFlagAttribute.isSelected("6221")) {
+/* 2597 */           createT020NPMesUpgradeRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "US Only", bool);
+/*      */         }
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createT020NPMesUpgradeRecords(EntityItem paramEntityItem1, OutputStreamWriter paramOutputStreamWriter, EntityItem paramEntityItem2, String paramString, boolean paramBoolean) throws IOException, SQLException, MiddlewareException {
+/* 2621 */     StringBuffer stringBuffer = new StringBuffer();
+/* 2622 */     String str1 = "";
+/* 2623 */     String str2 = "";
+/* 2624 */     String str3 = "";
+/* 2625 */     String str4 = "";
+/*      */     
+/* 2627 */     Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(paramEntityItem2, "MODELCONVERTAVAIL", "MODELCONVERT");
+/*      */     
+/* 2629 */     for (byte b = 0; b < vector.size(); b++) {
+/* 2630 */       String str5 = "";
+/* 2631 */       String str6 = "";
+/*      */       
+/* 2633 */       EntityItem entityItem1 = vector.elementAt(b);
+/*      */       
+/* 2635 */       stringBuffer.append(getValue("IFTYPE", "N"));
+/*      */       
+/* 2637 */       if (paramString.equals("Latin America")) {
+/* 2638 */         str3 = "601";
+/* 2639 */         str1 = PokUtils.getAttributeValue(paramEntityItem1, "LDOCNO", "", "");
+/* 2640 */         str4 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "ANNNUMBER", "", "");
+/* 2641 */       } else if (paramString.equals("Europe/Middle East/Africa")) {
+/* 2642 */         str3 = "999";
+/* 2643 */         str1 = PokUtils.getAttributeValue(paramEntityItem1, "EDOCNO", "", "");
+/* 2644 */         str4 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "ANNNUMBER", "", "");
+/* 2645 */       } else if (paramString.equals("Asia Pacific")) {
+/* 2646 */         str3 = "872";
+/* 2647 */         str1 = PokUtils.getAttributeValue(paramEntityItem1, "ADOCNO", "", "");
+/* 2648 */         str4 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "ANNNUMBER", "", "");
+/* 2649 */       } else if (paramString.equals("US Only")) {
+/* 2650 */         str3 = "897";
+/* 2651 */         str1 = PokUtils.getAttributeValue(paramEntityItem1, "USDOCNO", "", "");
+/* 2652 */         str4 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "USDOCNO", "", "");
+/* 2653 */       } else if (paramString.equals("Canada and Caribbean North")) {
+/* 2654 */         str3 = "649";
+/* 2655 */         str1 = PokUtils.getAttributeValue(paramEntityItem1, "CDOCNO", "", "");
+/* 2656 */         str4 = paramBoolean ? PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(paramEntityItem1, "USDOCNO", "", "");
+/*      */       } 
+/* 2658 */       stringBuffer.append(getValue("IOPUCTY", str3));
+/* 2659 */       stringBuffer.append(getValue("ISLMPAL", str1));
+/* 2660 */       stringBuffer.append(getValue("ISLMRFA", str4));
+/*      */       
+/* 2662 */       str2 = PokUtils.getAttributeValue(entityItem1, "TOMACHTYPE", "", "");
+/* 2663 */       str2 = str2 + PokUtils.getAttributeValue(entityItem1, "TOMODEL", "", "");
+/* 2664 */       stringBuffer.append(getValue("ISLMPRN", str2));
+/* 2665 */       stringBuffer.append(getValue("CSLMPCI", "NP"));
+/* 2666 */       stringBuffer.append(getValue("FPUNINC", "2"));
+/* 2667 */       stringBuffer.append(getValue("CAOAV", ""));
+/* 2668 */       stringBuffer.append(getValue("DSLMCPA", PokUtils.getAttributeValue(paramEntityItem1, "ANNDATE", "", "")));
+/* 2669 */       stringBuffer.append(getValue("DSLMCPO", PokUtils.getAttributeValue(paramEntityItem1, "ANNDATE", "", "")));
+/*      */ 
+/*      */       
+/* 2672 */       EntityItem entityItem2 = searchForAvailTypeLO(entityItem1, "Last Order");
+/*      */       
+/* 2674 */       if (entityItem2 != null) {
+/* 2675 */         stringBuffer.append(getValue("DSLMWDN", PokUtils.getAttributeValue(entityItem2, "EFFECTIVEDATE", "", "")));
+/*      */       } else {
+/* 2677 */         stringBuffer.append(getValue("DSLMWDN", "2050-12-31"));
+/*      */       } 
+/*      */       
+/* 2680 */       str5 = PokUtils.getAttributeValue(entityItem1, "FROMMACHTYPE", "", "");
+/* 2681 */       str6 = PokUtils.getAttributeValue(entityItem1, "FROMMODEL", "", "");
+/* 2682 */       stringBuffer.append(getValue("QSMNPMT", str5));
+/* 2683 */       stringBuffer.append(getValue("QSMNPMM", str6));
+/* 2684 */       stringBuffer.append(getValue("TIMSTMP", ""));
+/* 2685 */       stringBuffer.append(getValue("USERID", ""));
+/*      */       
+/* 2687 */       stringBuffer.append(NEWLINE);
+/* 2688 */       paramOutputStreamWriter.write(stringBuffer.toString());
+/* 2689 */       paramOutputStreamWriter.flush();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityItem searchForAvailTypeLO(EntityItem paramEntityItem, String paramString) {
+/* 2697 */     EntityItem entityItem = null;
+/*      */ 
+/*      */     
+/* 2700 */     Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(paramEntityItem, "MODELCONVERTAVAIL", "AVAIL");
+/*      */     
+/* 2702 */     for (byte b = 0; b < vector.size(); b++) {
+/* 2703 */       EntityItem entityItem1 = vector.elementAt(b);
+/*      */       
+/* 2705 */       String str = PokUtils.getAttributeValue(entityItem1, "AVAILTYPE", ",", "", false);
+/*      */       
+/* 2707 */       if (paramString.equals(str)) {
+/* 2708 */         entityItem = entityItem1;
+/*      */         
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/* 2713 */     return entityItem;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createT512ReleaseTo(EntityItem paramEntityItem, OutputStreamWriter paramOutputStreamWriter) throws IOException {
+/* 2719 */     StringBuffer stringBuffer = new StringBuffer();
+/* 2720 */     String str1 = "";
+/* 2721 */     String str2 = "";
+/*      */ 
+/*      */     
+/* 2724 */     EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)paramEntityItem.getAttribute("GENAREASELECTION");
+/* 2725 */     if (eANFlagAttribute != null && (
+/* 2726 */       eANFlagAttribute.isSelected("6199") || eANFlagAttribute.isSelected("1999"))) {
+/* 2727 */       stringBuffer.append(getValue("IFTYPE", "R"));
+/* 2728 */       stringBuffer.append(getValue("IOPUCTY", "872"));
+/* 2729 */       str1 = PokUtils.getAttributeValue(paramEntityItem, "ADOCNO", "", "");
+/* 2730 */       stringBuffer.append(getValue("ISLMPAL", str1));
+/*      */       
+/* 2732 */       str2 = PokUtils.getAttributeValue(paramEntityItem, "ANNNUMBER", "", "");
+/* 2733 */       stringBuffer.append(getValue("ISLMRFA", str2));
+/* 2734 */       stringBuffer.append(getValue("DSLMCPA", PokUtils.getAttributeValue(paramEntityItem, "ANNDATE", "", "")));
+/* 2735 */       stringBuffer.append(getValue("DSLMEFF", PokUtils.getAttributeValue(paramEntityItem, "ANNDATE", "", "")));
+/* 2736 */       stringBuffer.append(getValue("CSLMRCH", ""));
+/* 2737 */       stringBuffer.append(getValue("CSLMNUM", str1));
+/* 2738 */       stringBuffer.append(getValue("FSLMAPG", "Y"));
+/* 2739 */       stringBuffer.append(getValue("FSLMASP", "N"));
+/* 2740 */       stringBuffer.append(getValue("FSLMJAP", "N"));
+/* 2741 */       if (eANFlagAttribute != null) {
+/*      */         
+/* 2743 */         EANFlagAttribute eANFlagAttribute1 = (EANFlagAttribute)paramEntityItem.getAttribute("COUNTRYLIST");
+/*      */         
+/* 2745 */         if (eANFlagAttribute1.isSelected("1439")) {
+/* 2746 */           stringBuffer.append(getValue("FSLMAUS", "Y"));
+/*      */         } else {
+/* 2748 */           stringBuffer.append(getValue("FSLMAUS", "N"));
+/*      */         } 
+/*      */         
+/* 2751 */         if (eANFlagAttribute1.isSelected("1444")) {
+/* 2752 */           stringBuffer.append(getValue("FSLMBGL", "Y"));
+/*      */         } else {
+/* 2754 */           stringBuffer.append(getValue("FSLMBGL", "N"));
+/*      */         } 
+/*      */ 
+/*      */         
+/* 2758 */         stringBuffer.append(getValue("FSLMBRU", "N"));
+/*      */ 
+/*      */ 
+/*      */         
+/* 2762 */         if (eANFlagAttribute1.isSelected("1524")) {
+/* 2763 */           stringBuffer.append(getValue("FSLMHKG", "Y"));
+/*      */         } else {
+/* 2765 */           stringBuffer.append(getValue("FSLMHKG", "N"));
+/*      */         } 
+/* 2767 */         if (eANFlagAttribute1.isSelected("1528")) {
+/* 2768 */           stringBuffer.append(getValue("FSLMIDN", "Y"));
+/*      */         } else {
+/* 2770 */           stringBuffer.append(getValue("FSLMIDN", "N"));
+/*      */         } 
+/* 2772 */         if (eANFlagAttribute1.isSelected("1527")) {
+/* 2773 */           stringBuffer.append(getValue("FSLMIND", "Y"));
+/*      */         } else {
+/* 2775 */           stringBuffer.append(getValue("FSLMIND", "N"));
+/*      */         } 
+/* 2777 */         if (eANFlagAttribute1.isSelected("1541")) {
+/* 2778 */           stringBuffer.append(getValue("FSLMKOR", "Y"));
+/*      */         } else {
+/* 2780 */           stringBuffer.append(getValue("FSLMKOR", "N"));
+/*      */         } 
+/* 2782 */         if (eANFlagAttribute1.isSelected("1553")) {
+/* 2783 */           stringBuffer.append(getValue("FSLMMAC", "Y"));
+/*      */         } else {
+/* 2785 */           stringBuffer.append(getValue("FSLMMAC", "N"));
+/*      */         } 
+/* 2787 */         if (eANFlagAttribute1.isSelected("1557")) {
+/* 2788 */           stringBuffer.append(getValue("FSLMMAL", "Y"));
+/*      */         } else {
+/* 2790 */           stringBuffer.append(getValue("FSLMMAL", "N"));
+/*      */         } 
+/* 2792 */         if (eANFlagAttribute1.isSelected("1574")) {
+/* 2793 */           stringBuffer.append(getValue("FSLMMYA", "Y"));
+/*      */         } else {
+/* 2795 */           stringBuffer.append(getValue("FSLMMYA", "N"));
+/*      */         } 
+/* 2797 */         if (eANFlagAttribute1.isSelected("1581")) {
+/* 2798 */           stringBuffer.append(getValue("FSLMNZL", "Y"));
+/*      */         } else {
+/* 2800 */           stringBuffer.append(getValue("FSLMNZL", "N"));
+/*      */         } 
+/* 2802 */         if (eANFlagAttribute1.isSelected("1597")) {
+/* 2803 */           stringBuffer.append(getValue("FSLMPHI", "Y"));
+/*      */         } else {
+/* 2805 */           stringBuffer.append(getValue("FSLMPHI", "N"));
+/*      */         } 
+/* 2807 */         if (eANFlagAttribute1.isSelected("1470")) {
+/* 2808 */           stringBuffer.append(getValue("FSLMPRC", "Y"));
+/*      */         } else {
+/* 2810 */           stringBuffer.append(getValue("FSLMPRC", "N"));
+/*      */         } 
+/* 2812 */         if (eANFlagAttribute1.isSelected("1627")) {
+/* 2813 */           stringBuffer.append(getValue("FSLMSLA", "Y"));
+/*      */         } else {
+/* 2815 */           stringBuffer.append(getValue("FSLMSLA", "N"));
+/*      */         } 
+/* 2817 */         if (eANFlagAttribute1.isSelected("1619")) {
+/* 2818 */           stringBuffer.append(getValue("FSLMSNG", "Y"));
+/*      */         } else {
+/* 2820 */           stringBuffer.append(getValue("FSLMSNG", "N"));
+/*      */         } 
+/* 2822 */         if (eANFlagAttribute1.isSelected("1635")) {
+/* 2823 */           stringBuffer.append(getValue("FSLMTAI", "Y"));
+/*      */         } else {
+/* 2825 */           stringBuffer.append(getValue("FSLMTAI", "N"));
+/*      */         } 
+/* 2827 */         if (eANFlagAttribute1.isSelected("1638")) {
+/* 2828 */           stringBuffer.append(getValue("FSLMTHA", "Y"));
+/*      */         } else {
+/* 2830 */           stringBuffer.append(getValue("FSLMTHA", "N"));
+/*      */         } 
+/*      */       } 
+/* 2833 */       stringBuffer.append(getValue("TIMSTMP", " "));
+/* 2834 */       stringBuffer.append(getValue("USERID", " "));
+/*      */       
+/* 2836 */       stringBuffer.append(NEWLINE);
+/* 2837 */       paramOutputStreamWriter.write(stringBuffer.toString());
+/* 2838 */       paramOutputStreamWriter.flush();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createT632TypeModelFeatureRelation(EntityItem paramEntityItem, OutputStreamWriter paramOutputStreamWriter) throws IOException, SQLException, MiddlewareException {
+/* 2859 */     String str = "";
+/* 2860 */     boolean bool = false;
+/*      */     
+/* 2862 */     this.m_elist = getEntityList(getT006ProdstructVEName());
+/*      */     
+/* 2864 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("AVAIL");
+/* 2865 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/* 2866 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/*      */ 
+/*      */       
+/* 2869 */       EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("QSMGEO");
+/* 2870 */       if (eANFlagAttribute != null && 
+/* 2871 */         eANFlagAttribute.isSelected("6221")) {
+/*      */         
+/* 2873 */         Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(entityItem, "OOFAVAIL", "PRODSTRUCT");
+/*      */         
+/* 2875 */         String str1 = "";
+/* 2876 */         str1 = PokUtils.getAttributeValue(entityItem, "AVAILTYPE", "", "");
+/* 2877 */         str = PokUtils.getAttributeValue(entityItem, "AVAILANNTYPE", "", "");
+/* 2878 */         if (str.equals("EPIC")) {
+/* 2879 */           bool = true;
+/*      */         }
+/*      */         
+/* 2882 */         for (byte b1 = 0; b1 < vector.size(); b1++) {
+/* 2883 */           StringBuffer stringBuffer = new StringBuffer();
+/* 2884 */           EntityItem entityItem1 = vector.elementAt(b1);
+/*      */           
+/* 2886 */           ExtractActionItem extractActionItem = new ExtractActionItem(null, this.m_db, this.m_prof, getT006FeatureVEName());
+/*      */           
+/* 2888 */           EntityList entityList = this.m_db.getEntityList(this.m_prof, extractActionItem, new EntityItem[] { new EntityItem(null, this.m_prof, entityItem1.getEntityType(), entityItem1.getEntityID()) });
+/*      */           
+/* 2890 */           EntityGroup entityGroup1 = entityList.getEntityGroup("FEATURE");
+/* 2891 */           EntityGroup entityGroup2 = entityList.getEntityGroup("MODEL");
+/* 2892 */           EntityItem entityItem2 = entityGroup1.getEntityItem(0);
+/* 2893 */           EntityItem entityItem3 = entityGroup2.getEntityItem(0);
+/*      */           
+/* 2895 */           stringBuffer = new StringBuffer();
+/* 2896 */           String str2 = "";
+/* 2897 */           String str3 = "";
+/* 2898 */           String str4 = "";
+/* 2899 */           String str5 = "";
+/*      */           
+/* 2901 */           stringBuffer.append(getValue("IFTYPE", "T"));
+/* 2902 */           str3 = PokUtils.getAttributeValue(paramEntityItem, "USDOCNO", "", "");
+/*      */ 
+/*      */ 
+/*      */           
+/* 2906 */           str2 = getRFANumber(paramEntityItem, bool, entityItem);
+/* 2907 */           addDebug("*****mlm ISLMRFA=" + str2);
+/* 2908 */           stringBuffer.append(getValue("IOPUCTY", "897"));
+/* 2909 */           stringBuffer.append(getValue("ISLMPAL", str3));
+/* 2910 */           stringBuffer.append(getValue("ISLMRFA", str2));
+/* 2911 */           stringBuffer.append(getValue("ISLMTYP", PokUtils.getAttributeValue(entityItem3, "MACHTYPEATR", "", "")));
+/* 2912 */           stringBuffer.append(getValue("ISLMMOD", PokUtils.getAttributeValue(entityItem3, "MODELATR", "", "")));
+/* 2913 */           stringBuffer.append(getValue("ISLMFTR", PokUtils.getAttributeValue(entityItem2, "FEATURECODE", "", "")));
+/* 2914 */           stringBuffer.append(getValue("ISLMXX1", ""));
+/* 2915 */           stringBuffer.append(getValue("CSLMPCI", "TR"));
+/* 2916 */           stringBuffer.append(getValue("FPUNINC", "2"));
+/* 2917 */           stringBuffer.append(getValue("CAOAV", ""));
+/* 2918 */           stringBuffer.append(getValue("DSLMCPA", PokUtils.getAttributeValue(paramEntityItem, "ANNDATE", "", "")));
+/* 2919 */           stringBuffer.append(getValue("DSLMCPO", PokUtils.getAttributeValue(paramEntityItem, "ANNDATE", "", "")));
+/* 2920 */           if (str1.equals("Last Order")) {
+/* 2921 */             stringBuffer.append(PokUtils.getAttributeValue(entityItem, "EFFECTIVEDATE", ",", "", false));
+/*      */           } else {
+/* 2923 */             stringBuffer.append(getValue("DSLMWDN", "2050-12-31"));
+/*      */           } 
+/*      */           
+/* 2926 */           str4 = PokUtils.getAttributeValue(entityItem1, "ORDERCODE", "", "");
+/*      */           
+/* 2928 */           if (str4.equals("MES")) {
+/* 2929 */             stringBuffer.append(getValue("FSLMMES", "Y"));
+/*      */           } else {
+/* 2931 */             stringBuffer.append(getValue("FSLMMES", "N"));
+/*      */           } 
+/*      */           
+/* 2934 */           if (str4.equals("Initial")) {
+/* 2935 */             stringBuffer.append(getValue("FSLMPIO", "Y"));
+/*      */           } else {
+/* 2937 */             stringBuffer.append(getValue("FSLMPIO", "N"));
+/*      */           } 
+/*      */           
+/* 2940 */           String str6 = PokUtils.getAttributeValue(entityItem1, "INSTALL", "", "");
+/*      */           
+/* 2942 */           if (str6.equals("CIF")) {
+/* 2943 */             str5 = "01";
+/*      */           } else {
+/* 2945 */             str5 = "00";
+/*      */           } 
+/*      */           
+/* 2948 */           stringBuffer.append(getValue("QSLMCSU", str5));
+/* 2949 */           stringBuffer.append(getValue("TIMSTMP", ""));
+/* 2950 */           stringBuffer.append(getValue("USERID", ""));
+/* 2951 */           stringBuffer.append(getValue("FSLMRFM", ""));
+/*      */           
+/* 2953 */           stringBuffer.append(NEWLINE);
+/* 2954 */           paramOutputStreamWriter.write(stringBuffer.toString());
+/* 2955 */           paramOutputStreamWriter.flush();
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getRFANumber(EntityItem paramEntityItem1, boolean paramBoolean, EntityItem paramEntityItem2) {
+/*      */     String str;
+/* 2965 */     if (paramBoolean) {
+/* 2966 */       str = PokUtils.getAttributeValue(paramEntityItem2, "EPICNUMBER", "", "");
+/*      */     } else {
+/* 2968 */       str = "R" + PokUtils.getAttributeValue(paramEntityItem1, "ANNNUMBER", "", "");
+/*      */     } 
+/*      */ 
+/*      */     
+/* 2972 */     return str;
+/*      */   }
+/*      */   
+/*      */   protected String getValue(String paramString1, String paramString2) {
+/* 2976 */     if (paramString2 == null)
+/* 2977 */       paramString2 = ""; 
+/* 2978 */     int i = (paramString2 == null) ? 0 : paramString2.length();
+/* 2979 */     int j = Integer.parseInt(COLUMN_LENGTH.get(paramString1)
+/* 2980 */         .toString());
+/* 2981 */     if (i == j)
+/* 2982 */       return paramString2; 
+/* 2983 */     if (i > j) {
+/* 2984 */       return paramString2.substring(0, j);
+/*      */     }
+/* 2986 */     return paramString2 + getBlank(j - i);
+/*      */   }
+/*      */   
+/*      */   protected String getBlank(int paramInt) {
+/* 2990 */     StringBuffer stringBuffer = new StringBuffer();
+/* 2991 */     while (paramInt > 0) {
+/* 2992 */       stringBuffer.append(" ");
+/* 2993 */       paramInt--;
+/*      */     } 
+/* 2995 */     return stringBuffer.toString();
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private String getNumValue(String paramString1, String paramString2) {
+/* 3000 */     if (paramString2 == null)
+/* 3001 */       paramString2 = ""; 
+/* 3002 */     int i = (paramString2 == null) ? 0 : paramString2.length();
+/* 3003 */     int j = Integer.parseInt(COLUMN_LENGTH.get(paramString1)
+/* 3004 */         .toString());
+/* 3005 */     if (i == j)
+/* 3006 */       return paramString2; 
+/* 3007 */     if (i > j) {
+/* 3008 */       return paramString2.substring(0, j);
+/*      */     }
+/* 3010 */     paramString2 = paramString2.trim();
+/* 3011 */     int k = i;
+/* 3012 */     while (k < j) {
+/* 3013 */       paramString2 = "0" + paramString2;
+/* 3014 */       k++;
+/*      */     } 
+/*      */     
+/* 3017 */     return paramString2;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityList getEntityList(String paramString) throws SQLException, MiddlewareException {
+/* 3028 */     ExtractActionItem extractActionItem = new ExtractActionItem(null, this.m_db, this.m_prof, paramString);
+/*      */     
+/* 3030 */     EntityList entityList = this.m_db.getEntityList(this.m_prof, extractActionItem, new EntityItem[] { new EntityItem(null, this.m_prof, this.rootEntity.getEntityType(), this.rootEntity.getEntityID()) });
+/*      */     
+/* 3032 */     addDebug("EntityList for " + this.m_prof.getValOn() + " extract " + paramString + " contains the following entities: \n" + 
+/* 3033 */         PokUtils.outputList(entityList));
+/* 3034 */     return entityList;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getT002ModelVEName() {
+/* 3042 */     return "QSMFULL";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getT006FeatureVEName() {
+/* 3050 */     return "QSMFULL2";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getT006ProdstructVEName() {
+/* 3058 */     return "QSMFULL1";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getModelProdstructVEName() {
+/* 3066 */     return "QSMFULL3";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getNPMesUpgradeVEName() {
+/* 3074 */     return "QSMFULL4";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getT006ModelLinksVEName() {
+/* 3082 */     return "QSMFULL5";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public boolean exeFtpShell(String paramString) {
+/* 3090 */     String str1 = ABRServerProperties.getValue(this.abrcode, "_script", null) + " -f " + paramString;
+/* 3091 */     String str2 = ABRServerProperties.getValue(this.abrcode, "_inipath", null);
+/* 3092 */     if (str2 != null)
+/* 3093 */       str1 = str1 + " -i " + str2; 
+/* 3094 */     if (this.dir != null)
+/* 3095 */       str1 = str1 + " -d " + this.dir; 
+/* 3096 */     if (this.fileprefix != null)
+/* 3097 */       str1 = str1 + " -p " + this.fileprefix; 
+/* 3098 */     String str3 = ABRServerProperties.getValue(this.abrcode, "_targetfilename", null);
+/* 3099 */     if (str3 != null)
+/* 3100 */       str1 = str1 + " -t " + str3; 
+/* 3101 */     String str4 = ABRServerProperties.getValue(this.abrcode, "_logpath", null);
+/* 3102 */     if (str4 != null)
+/* 3103 */       str1 = str1 + " -l " + str4; 
+/* 3104 */     String str5 = ABRServerProperties.getValue(this.abrcode, "_backuppath", null);
+/* 3105 */     if (str5 != null)
+/* 3106 */       str1 = str1 + " -b " + str5; 
+/* 3107 */     Runtime runtime = Runtime.getRuntime();
+/* 3108 */     String str6 = "";
+/* 3109 */     BufferedReader bufferedReader = null;
+/* 3110 */     BufferedInputStream bufferedInputStream = null;
+/*      */     
+/*      */     try {
+/* 3113 */       Process process = runtime.exec(str1);
+/* 3114 */       if (process.waitFor() != 0) {
+/* 3115 */         return false;
+/*      */       }
+/* 3117 */       bufferedInputStream = new BufferedInputStream(process.getInputStream());
+/* 3118 */       bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream));
+/* 3119 */       while ((this.lineStr = bufferedReader.readLine()) != null) {
+/* 3120 */         str6 = str6 + this.lineStr;
+/* 3121 */         if (this.lineStr.indexOf("FAILD") > -1) {
+/* 3122 */           return false;
+/*      */         }
+/*      */       } 
+/* 3125 */     } catch (Exception exception) {
+/* 3126 */       exception.printStackTrace();
+/* 3127 */       return false;
+/*      */     } finally {
+/* 3129 */       if (bufferedReader != null) {
+/*      */         try {
+/* 3131 */           bufferedReader.close();
+/* 3132 */           bufferedInputStream.close();
+/* 3133 */         } catch (IOException iOException) {
+/* 3134 */           iOException.printStackTrace();
+/*      */         } 
+/*      */       }
+/*      */     } 
+/* 3138 */     return !(str6 == null);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addOutput(String paramString) {
+/* 3145 */     this.rptSb.append("<p>" + paramString + "</p>" + NEWLINE);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addOutput(String paramString, Object[] paramArrayOfObject) {
+/* 3153 */     String str = getBundle().getString(paramString);
+/* 3154 */     if (paramArrayOfObject != null) {
+/* 3155 */       MessageFormat messageFormat = new MessageFormat(str);
+/* 3156 */       str = messageFormat.format(paramArrayOfObject);
+/*      */     } 
+/*      */     
+/* 3159 */     addOutput(str);
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   protected void addDebug(String paramString) {
+/* 3164 */     this.rptSb.append("<!-- " + paramString + " -->" + NEWLINE);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addError(String paramString) {
+/* 3170 */     addOutput(paramString);
+/* 3171 */     setReturnCode(-1);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addError(String paramString, Object[] paramArrayOfObject) {
+/* 3184 */     EntityGroup entityGroup = this.m_elist.getParentEntityGroup();
+/* 3185 */     setReturnCode(-1);
+/*      */ 
+/*      */     
+/* 3188 */     MessageFormat messageFormat = new MessageFormat(getBundle().getString("ERROR_PREFIX"));
+/* 3189 */     Object[] arrayOfObject = new Object[2];
+/* 3190 */     arrayOfObject[0] = entityGroup.getLongDescription();
+/* 3191 */     arrayOfObject[1] = this.navName;
+/*      */     
+/* 3193 */     addMessage(messageFormat.format(arrayOfObject), paramString, paramArrayOfObject);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addMessage(String paramString1, String paramString2, Object[] paramArrayOfObject) {
+/* 3202 */     String str = getBundle().getString(paramString2);
+/*      */     
+/* 3204 */     if (paramArrayOfObject != null) {
+/* 3205 */       MessageFormat messageFormat = new MessageFormat(str);
+/* 3206 */       str = messageFormat.format(paramArrayOfObject);
+/*      */     } 
+/*      */     
+/* 3209 */     addOutput(paramString1 + " " + str);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getNavigationName() throws SQLException, MiddlewareException {
+/* 3219 */     return getNavigationName(this.m_elist.getParentEntityGroup().getEntityItem(0));
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getNavigationName(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 3229 */     StringBuffer stringBuffer = new StringBuffer();
+/*      */ 
+/*      */     
+/* 3232 */     EANList eANList = (EANList)this.metaTbl.get(paramEntityItem.getEntityType());
+/* 3233 */     if (eANList == null) {
+/*      */       
+/* 3235 */       EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, paramEntityItem.getEntityType(), "Navigate");
+/* 3236 */       eANList = entityGroup.getMetaAttribute();
+/* 3237 */       this.metaTbl.put(paramEntityItem.getEntityType(), eANList);
+/*      */     } 
+/* 3239 */     for (byte b = 0; b < eANList.size(); b++) {
+/*      */       
+/* 3241 */       EANMetaAttribute eANMetaAttribute = (EANMetaAttribute)eANList.getAt(b);
+/* 3242 */       stringBuffer.append(PokUtils.getAttributeValue(paramEntityItem, eANMetaAttribute.getAttributeCode(), ", ", "", false));
+/* 3243 */       if (b + 1 < eANList.size()) {
+/* 3244 */         stringBuffer.append(" ");
+/*      */       }
+/*      */     } 
+/*      */     
+/* 3248 */     return stringBuffer.toString();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getABRVersion() {
+/* 3258 */     return "1.0";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getDescription() {
+/* 3267 */     return "QSMFULLABR";
+/*      */   }
+/*      */ }
 
-package COM.ibm.eannounce.abr.sg;
 
-import java.io.*;
-import java.nio.channels.FileChannel;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import javax.xml.transform.TransformerConfigurationException;
-
-import org.xml.sax.SAXException;
-
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.opicmpdh.middleware.*;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
-import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
-
-/**********************************************************************************
-* From "QSM Extract.doc" 
-**********************************************************************************/
-//$Log: QSMFULLABR.java,v $
-//Revision 1.1  2018/09/14 08:27:04  whwyue
-//QSM full ABR (for not withdrawal data)
-//
-//Revision 1.99  2018/03/13 06:47:04  whwyue
-//Fix defect CINCC
-//
-//Revision 1.97  2018/03/07 15:25:02  whwyue
-//Fix defect 1809759
-//
-//Revision 1.95  2018/03/05 08:58:57  whwyue
-//Add debug check FUSAICC
-//
-//Revision 1.94  2018/03/02 13:10:31  whwyue
-//Fix defect FUSAICC
-//
-//Revision 1.93  2018/02/06 11:52:52  whwyue
-//Change special char
-//
-//Revision 1.90  2018/02/05 09:28:24  whwyue
-//Fix for ISLMRFA fields where IFTYPE='T'
-//
-//Revision 1.88  2018/02/02 08:39:00  whwyue
-//Fix ISLMRFA
-//
-//Revision 1.87  2018/02/02 06:27:26  whwyue
-//Fix for ISLMRFA fields where IFTYPE='T'
-//
-//Revision 1.86  2018/01/22 14:39:03  mmiotto
-//Updates to CSLMWCD attribute
-//
-//Revision 1.84  2018/01/18 20:07:27  mmiotto
-//Fix for CPDXA, CSLMWCD, ISLMRFA and FAGRMBE fields
-//
-//Revision 1.83  2018/01/04 19:30:07  mmiotto
-//Update to feature.CSLMWCD code
-//
-//Revision 1.82  2017/12/21 17:56:36  mmiotto
-//Fix to CSLMWCD field
-//
-//Revision 1.81  2017/12/13 18:01:23  mmiotto
-//Restore the code to the most recent version with the removal of special chars and defect fixes
-//
-//Revision 1.79  2017/12/05 17:25:47  mmiotto
-//Restore the most current version, remove special chars
-//
-//Revision 1.77  2017/09/06 13:47:31  mmiotto
-//Remove special chars
-//Changes requested by the team
-//
-//Revision 1.76  2017/06/21 19:02:38  mmiotto
-//Minor fix to removeSpecialChars method
-//
-//Revision 1.75  2017/06/21 19:01:04  mmiotto
-//Fix to removeSpecialChars method
-//
-//Revision 1.74  2017/06/20 18:07:30  mmiotto
-//Update to the removal of special chars from invname
-//
-//Revision 1.73  2017/06/14 19:56:02  mmiotto
-//Remove special chars from INVNAME
-//
-//Revision 1.72  2017/03/22 14:44:26  mmiotto
-//Fix for EPIC
-//
-//Revision 1.71  2017/03/22 13:54:19  mmiotto
-//Code fix for EPIC for US and CCN - add EPIC logic
-//
-//Revision 1.70  2017/03/16 01:17:00  mmiotto
-//Updates to support AVAIL EPIC
-//
-//Revision 1.69  2017/03/03 13:15:17  mmiotto
-//Tests for t006 feature
-//
-//Revision 1.68  2017/03/02 20:42:54  mmiotto
-//Add tests to t006Feature
-//
-//Revision 1.67  2017/02/23 17:17:15  mmiotto
-//DSLMWDN fixed for T006FEATURE, remove debug statements
-//Code changes to T020NPMesUpgrade.DSLMWDN
-//
-//Revision 1.66  2017/02/23 14:43:03  mmiotto
-//Code updates for validateProdstructs
-//
-//Revision 1.65  2017/02/23 13:35:18  mmiotto
-//Updates to validateProdstructs method
-//
-//Revision 1.64  2017/02/22 18:48:22  mmiotto
-//Code tests
-//
-//Revision 1.63  2017/02/22 18:11:43  mmiotto
-//Code test
-//
-//Revision 1.62  2017/02/22 17:17:31  mmiotto
-//Test different way to pull PRODSTRUCTs from a FEATURE
-//
-//Revision 1.61  2017/02/22 14:14:37  mmiotto
-//Add debug statements
-//
-//Revision 1.60  2017/02/21 17:55:20  mmiotto
-//Add debug statements
-//
-//Revision 1.59  2017/02/21 15:42:26  mmiotto
-//Updates to MODEL.QSMEDMW and MODEL.DUSALRW
-//
-//Revision 1.58  2017/02/20 18:58:17  mmiotto
-//Updates to FEATURE.DSLDSLMWDN
-//
-//Revision 1.56  2017/02/17 15:19:08  mmiotto
-//Updates to FEATURE.PRODSTRUCT withdrawal date
-//
-//Revision 1.53  2017/02/09 19:55:32  mmiotto
-//Withdrawal and Last Order RPQs
-//
-//Revision 1.52  2017/01/19 19:19:16  mmiotto
-//Updates to End of Service and Last Order logic
-//
-//Revision 1.50  2016/12/20 10:12:08  mmiotto
-//Add End of Service and Last Order avail
-//
-//Revision 1.49  2016/12/02 15:53:07  mmiotto
-//Remove debug statements
-//
-//Revision 1.48  2016/12/01 14:18:23  mmiotto
-//Major changes requested by the user
-//
-//Revision 1.47  2016/11/30 16:22:56  mmiotto
-//Updates to FAGRMBE as requested by the user
-//
-//Revision 1.46  2016/11/29 17:01:10  mmiotto
-//Fix DSLMMES logic
-//
-//Revision 1.45  2016/11/29 16:51:44  mmiotto
-//Fix DSLMMES logic
-//
-//Revision 1.44  2016/11/29 14:38:02  mmiotto
-//Add debug for DSLMMES
-//
-//Revision 1.43  2016/11/28 21:12:12  mmiotto
-//Fix for some attributes
-//Added file handling - create in one dir, copy to ftp dir when complete
-//
-//Revision 1.42  2016/11/11 18:50:01  mmiotto
-//Fix output file name
-//
-//Revision 1.41  2016/11/11 16:03:09  mmiotto
-//Update output file name.
-//Remove checks on GENAREA and replace by checks on QSMGEO
-//
-//Revision 1.40  2016/11/11 00:55:19  mmiotto
-//Updates requested by the user to:
-//SYSDES
-//DSLMMES
-//and QSMGEO attribute
-//
-//Revision 1.39  2016/11/04 15:15:17  mmiotto
-//Changes requested by the user
-//
-//Revision 1.38  2016/11/03 20:32:47  mmiotto
-//Changes requested by the user
-//
-//Revision 1.37  2016/11/03 11:21:37  mmiotto
-//Updates requested by the user to FSLMMES, QSLMCSU, DSLMGAD and SYSDES
-//
-//Revision 1.36  2016/10/20 22:36:05  mmiotto
-//Minor fix for t006 feature
-//
-//Revision 1.35  2016/10/20 21:34:10  mmiotto
-//Fix to a date attribute
-//
-//Revision 1.34  2016/10/20 19:15:02  mmiotto
-//Changes requested by the user
-//
-//Revision 1.33  2016/10/19 21:04:47  mmiotto
-//Last set of updates requested by the user
-//Add logic for PRODID new flag values
-//Add logic for METHPROD attribute
-//
-//Revision 1.32  2016/10/19 19:09:00  mmiotto
-//Changes requested by the user for INSTALL attribute
-//
-//Revision 1.31  2016/10/19 17:41:56  mmiotto
-//Fix to model and geomod attribute mapping
-//
-//Revision 1.30  2016/10/19 17:14:51  mmiotto
-//Fix for GEOMOD attributes and getNumValue method
-//
-//Revision 1.29  2016/10/19 01:08:45  mmiotto
-//Code changes to t017
-//
-//Revision 1.28  2016/10/19 00:23:44  mmiotto
-//Code fix to t017 record
-//
-//Revision 1.27  2016/10/18 23:19:52  mmiotto
-//Added debug statements
-//
-//Revision 1.26  2016/10/18 22:34:00  mmiotto
-//Code reorg to work with new VEs
-//
-//Revision 1.25  2016/10/18 19:40:30  mmiotto
-//Test version - updates to use EntityGroup instead of vector
-//
-//Revision 1.24  2016/10/18 13:02:50  mmiotto
-//Test version with some fixes
-//
-//Revision 1.23  2016/10/18 12:33:36  mmiotto
-//Test version
-//
-//Revision 1.22  2016/10/11 17:01:23  mmiotto
-//Remove debug statements - code cleanup
-//
-//Revision 1.21  2016/10/11 13:42:01  mmiotto
-//User requested changes
-//
-//Revision 1.20  2016/10/08 22:46:40  mmiotto
-//Code cleanup
-//
-//Revision 1.19  2016/09/30 20:42:47  mmiotto
-//Debug WARR entity and Type Feature FUSAEDE attribute
-//
-//Revision 1.18  2016/09/30 00:04:41  mmiotto
-//Fix Release To date field
-//
-//Revision 1.17  2016/09/27 02:41:15  mmiotto
-//Remove lock when completed
-//
-//Revision 1.16  2016/09/26 23:59:16  mmiotto
-//Fix geoModVect for loop
-//
-//Revision 1.15  2016/09/26 23:08:44  mmiotto
-//Add debug PokUtils.outputList to display what is returned by each VE
-//
-//Revision 1.14  2016/09/26 21:32:14  mmiotto
-//Minor changes to the code, analysing the empty report issue
-//
-//Revision 1.13  2016/09/26 15:24:20  mmiotto
-//Remove debug statements
-//
-//Revision 1.12  2016/09/25 02:16:42  mmiotto
-//Fixes to GEOMOD entity selection
-//Multiple fixes to T002 MODEL
-//Multiple fixes to T006 FEATURE
-//Minor fixes to MODELCONVERT
-//Minor fixes to T632 TMF
-//
-//Revision 1.11  2016/09/24 04:26:46  mmiotto
-//Fix Warranty ID to be ignored
-//Changes to MODELGEOMOD logic for T002
-//
-//Revision 1.10  2016/09/24 03:14:37  mmiotto
-//Fixed MODEL to WARR, STDMAINT and SGMNTACRNYM relators
-//Fix to MODELCONVERT
-//Fix to FUSAEDE field
-//
-//Revision 1.9  2016/09/22 06:02:30  mmiotto
-//List of fixes
-//- Multiple GEOs selected for an AVAIL for all record types
-//- ISLMRFA value for all record types
-//- Multiple fixes for Type Model
-//
-//Revision 1.8  2016/09/11 21:49:28  mmiotto
-//Update the code to use AVAIL.GENAREASELECTION
-//Code update to handle Worlwide GEO
-//
-//Revision 1.7  2016/09/08 19:57:25  mmiotto
-//Add cvs log
-//Following changes according to ePIMS code
-//1 - Type R is only sent for AP
-//2 - Type T is only sent for US
-//
-// Revision 1.1  2016-05-27 16:38:00  mmiotto
-// OIM Simplification project is to sunset ePIMS HW   and MMLC (SAP) systems. In order to sunset ePIMS HW we need to replace ePIMS HW -> QSM feed to EACM.
-//
-//
-/**
- * @author mmiotto
- *
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\QSMFULLABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class QSMFULLABR extends PokBaseABR
-{
-    private StringBuffer rptSb = new StringBuffer();
-    private static final char[] FOOL_JTEST = {'\n'};
-    static final String NEWLINE = new String(FOOL_JTEST);
-    
-    private ResourceBundle rsBundle = null;
-    private Hashtable metaTbl = new Hashtable();
-    private String navName = "";
-    
-    private String ffFileName = null; 
-    private String ffPathName = null; 
-    private String ffFTPPathName = null; 
-	private String dir = null;
-	private String dirDest = null;
-	private final String QSMRPTPATH = "_rptpath";
-	private final String QSMGENPATH = "_genpath";
-	private final String QSMFTPPATH = "_ftppath";
-	private int abr_debuglvl=D.EBUG_ERR;
-
-	private static final String CREFINIPATH = "_inipath";
-	private static final String FTPSCRPATH = "_script";
-	private static final String TARGETFILENAME = "_targetfilename";
-	private static final String LOGPATH = "_logpath";
-	private static final String BACKUPPATH = "_backuppath";
-	private String fileprefix = null;
-	private String lineStr = "";
-	private String abrcode = "";
-	private EntityItem rootEntity;
-	private static final String FAILD = "FAILD";
-	private static final String IFTYPE  = "IFTYPE";
-	private static final String IOPUCTY = "IOPUCTY";
-	private static final String ISLMPAL = "ISLMPAL";
-	private static final String ISLMRFA = "ISLMRFA";
-	private static final String ISLMPRN = "ISLMPRN";
-	private static final String CSLMPCI = "CSLMPCI";
-	private static final String IPRTNUM = "IPRTNUM";
-	private static final String FPUNINC = "FPUNINC";
-	private static final String CAOAV = "CAOAV";
-	private static final String DSLMCPA = "DSLMCPA";
-	private static final String DSLMCPO = "DSLMCPO";
-	private static final String DSLMGAD = "DSLMGAD";
-	private static final String DSLMMVA = "DSLMMVA";
-	private static final String DSLMOPD = "DSLMOPD";
-	private static final String DSLMWDN = "DSLMWDN";
-	private static final String QSMEDMW = "QSMEDMW";
-	private static final String ASLMMVP = "ASLMMVP";
-	private static final String CCUOICR = "CCUOICR";
-	private static final String CICIB = "CICIB";
-	private static final String CICIC = "CICIC";
-	private static final String CICRY = "CICRY";
-	private static final String CIDCJ = "CIDCJ";
-	private static final String CIDXF = "CIDXF";
-	private static final String CINCA = "CINCA";
-	private static final String CINCB = "CINCB";
-	private static final String CINCC = "CINCC";
-	private static final String CINPM = "CINPM";
-	private static final String CISUP = "CISUP";
-	private static final String CITEM = "CITEM";
-	private static final String CJLBIC1 = "CJLBIC1";
-	private static final String CJLBIDS = "CJLBIDS";
-	private static final String CJLBOEM = "CJLBOEM";
-	private static final String CJLBPOF = "CJLBPOF";
-	private static final String CJLBSAC = "CJLBSAC";
-	private static final String CLASSPT = "CLASSPT";
-	private static final String CPDAA = "CPDAA";
-	private static final String CSLMFCC = "CSLMFCC";
-	private static final String CSLMGGC = "CSLMGGC";
-	private static final String CSLMIDP = "CSLMIDP";
-	private static final String CSLMLRP = "CSLMLRP";
-	private static final String CSLMSAS = "CSLMSAS";
-	private static final String CSLMSYT = "CSLMSYT";
-	private static final String CSLMWCD = "CSLMWCD";
-	private static final String FAGRMBE = "FAGRMBE";
-	private static final String FCUOCNF = "FCUOCNF";
-	private static final String FSLMCLS = "FSLMCLS";
-	private static final String FSLMCPU = "FSLMCPU";
-	private static final String FSLMIOP = "FSLMIOP";
-	private static final String FSLMLGS = "FSLMLGS";
-	private static final String FSLMMLC = "FSLMMLC";
-	private static final String FSLMPOP = "FSLMPOP";
-	private static final String FSLMVDE = "FSLMVDE";
-	private static final String FSLMVTS = "FSLMVTS";
-	private static final String FSLM2CF = "FSLM2CF";
-	private static final String ICESPCC = "ICESPCC";
-	private static final String IDORIG = "IDORIG";
-	private static final String IOLCPLM = "IOLCPLM";
-	private static final String PCUAHEA = "PCUAHEA";
-	private static final String PCUASEA = "PCUASEA";
-	private static final String PCUAUEA = "PCUAUEA";
-	private static final String QSLMCSU = "QSLMCSU";
-	private static final String QSMXANN = "QSMXANN";
-	private static final String QSMXESA = "QSMXESA";
-	private static final String QSMXSSA = "QSMXSSA";
-	private static final String SYSDES = "SYSDES";
-	private static final String TSLMDES = "TSLMDES";
-	private static final String TSLTDES = "TSLTDES";
-	private static final String TIMSTMP = "TIMSTMP";
-	private static final String USERID = "USERID";
-	private static final String FBRAND = "FBRAND";
-	private static final String FSLMHVP = "FSLMHVP";
-	private static final String FSLMCVP = "FSLMCVP";
-	private static final String FSLMMES = "FSLMMES";
-	private static final String CSLMTM1 = "CSLMTM1";
-	private static final String CSLMTM2 = "CSLMTM2";
-	private static final String CSLMTM3 = "CSLMTM3";
-	private static final String CSLMTM4 = "CSLMTM4";
-	private static final String CSLMTM5 = "CSLMTM5";
-	private static final String CSLMTM6 = "CSLMTM6";
-	private static final String CSLMTM7 = "CSLMTM7";
-	private static final String CSLMTM8 = "CSLMTM8";
-	private static final String FSAPRES = "FSAPRES";
-	private static final String CUSAPMS = "CUSAPMS";
-	private static final String DUSALRW = "DUSALRW";
-	private static final String DUSAMDW = "DUSAMDW";
-	private static final String DUSAWUW = "DUSAWUW";
-	private static final String FSLMCBL = "FSLMCBL";
-	private static final String FSLMMRR = "FSLMMRR";
-	private static final String FUSAAAS = "FUSAAAS";
-	private static final String FUSAADM = "FUSAADM";
-	private static final String FUSAEDE = "FUSAEDE";
-	private static final String FUSAICC = "FUSAICC";
-	private static final String FUSALEP = "FUSALEP";
-	private static final String FUSAMRS = "FUSAMRS";
-	private static final String FUSAVLM = "FUSAVLM";
-	private static final String FUSAXMO = "FUSAXMO";
-	private static final String QUSAPOP = "QUSAPOP";
-	private static final String DSLMEOD = "DSLMEOD";
-	private static final String FSLMRFM = "FSLMRFM";
-	private static final Hashtable COLUMN_LENGTH;
-
-	private static final String DSLMMES = "DSLMMES";
-	private static final String CIDXC = "CIDXC";
-	private static final String CSLMFTY = "CSLMFTY";
-	private static final String CVOAT = "CVOAT";
-	private static final String FSLMPIO = "FSLMPIO";
-	private static final String FSLMSTK = "FSLMSTK";
-	private static final String PCUAEAP = "PCUAEAP";
-	private static final String POGMES = "POGMES";
-	private static final String STSPCFT = "STSPCFT";
-	private static final String FUSAIRR = "FUSAIRR";
-	private static final String CPDXA = "CPDXA";
-	private static final String DSLMEFF = "DSLMEFF";
-	private static final String CSLMRCH = "CSLMRCH";
-	private static final String CSLMNUM = "CSLMNUM";
-	private static final String FSLMAPG = "FSLMAPG";
-	private static final String FSLMASP = "FSLMASP";
-	private static final String FSLMJAP = "FSLMJAP";
-	private static final String FSLMAUS = "FSLMAUS";
-	private static final String FSLMBGL = "FSLMBGL";
-	private static final String FSLMBRU = "FSLMBRU";
-	private static final String FSLMHKG = "FSLMHKG";
-	private static final String FSLMIDN = "FSLMIDN";
-	private static final String FSLMIND = "FSLMIND";
-	private static final String FSLMKOR = "FSLMKOR";
-	private static final String FSLMMAC = "FSLMMAC";
-	private static final String FSLMMAL = "FSLMMAL";
-	private static final String FSLMMYA = "FSLMMYA";
-	private static final String FSLMNZL = "FSLMNZL";
-	private static final String FSLMPHI = "FSLMPHI";
-	private static final String FSLMPRC = "FSLMPRC";
-	private static final String FSLMSLA = "FSLMSLA";
-	private static final String FSLMSNG = "FSLMSNG";
-	private static final String FSLMTAI = "FSLMTAI";
-	private static final String FSLMTHA = "FSLMTHA";
-	private static final String ISLMTYP = "ISLMTYP";
-	private static final String ISLMMOD = "ISLMMOD";
-	private static final String ISLMFTR = "ISLMFTR";
-	private static final String ISLMXX1 = "ISLMXX1";
-	private static final String QSMNPMT = "QSMNPMT";
-	private static final String QSMNPMM = "QSMNPMM";
-	private static final List geoWWList = Collections.unmodifiableList(
-			new ArrayList(){{
-				add("Asia Pacific");
-				add("Canada and Caribbean North");
-				add("Europe/Middle East/Africa");
-				add("Latin America");
-				add("US Only");
-			}}
-	);
-	
-	/**
-	 * Record format defintion
-	 * Form (record name), (record length), <starting postion>, <type>
-	 */ 		
-	static {
-		COLUMN_LENGTH = new Hashtable();
-		COLUMN_LENGTH.put(IFTYPE, "1");
-		COLUMN_LENGTH.put(IOPUCTY, "3");
-		COLUMN_LENGTH.put(ISLMPAL, "8");
-		COLUMN_LENGTH.put(ISLMRFA, "6");
-		COLUMN_LENGTH.put(ISLMPRN, "14");
-		COLUMN_LENGTH.put(CSLMPCI, "2");
-		COLUMN_LENGTH.put(IPRTNUM, "12");
-		COLUMN_LENGTH.put(FPUNINC, "1");
-		COLUMN_LENGTH.put(CAOAV, "1");
-		COLUMN_LENGTH.put(DSLMCPA, "10");
-		COLUMN_LENGTH.put(DSLMCPO, "10");
-		COLUMN_LENGTH.put(DSLMGAD, "10");
-		COLUMN_LENGTH.put(DSLMMVA, "10");
-		COLUMN_LENGTH.put(DSLMOPD, "10");
-		COLUMN_LENGTH.put(DSLMWDN, "10");
-		COLUMN_LENGTH.put(QSMEDMW, "10");
-		COLUMN_LENGTH.put(ASLMMVP, "4");
-		COLUMN_LENGTH.put(CCUOICR, "1");
-		COLUMN_LENGTH.put(CICIB, "1");
-		COLUMN_LENGTH.put(CICIC, "1");
-		COLUMN_LENGTH.put(CICRY, "1");
-		COLUMN_LENGTH.put(CIDCJ, "1");
-		COLUMN_LENGTH.put(CIDXF, "1");
-		COLUMN_LENGTH.put(CINCA, "1");
-		COLUMN_LENGTH.put(CINCB, "1");
-		COLUMN_LENGTH.put(CINCC, "1");
-		COLUMN_LENGTH.put(CINPM, "1");
-		COLUMN_LENGTH.put(CISUP, "1");
-		COLUMN_LENGTH.put(CITEM, "1");
-		COLUMN_LENGTH.put(CJLBIC1, "2");
-		COLUMN_LENGTH.put(CJLBIDS, "1");
-		COLUMN_LENGTH.put(CJLBOEM, "1");
-		COLUMN_LENGTH.put(CJLBPOF, "1");
-		COLUMN_LENGTH.put(CJLBSAC, "3");
-		COLUMN_LENGTH.put(CLASSPT, "3");
-		COLUMN_LENGTH.put(CPDAA, "1");
-		COLUMN_LENGTH.put(CSLMFCC, "4");
-		COLUMN_LENGTH.put(CSLMGGC, "2");
-		COLUMN_LENGTH.put(CSLMIDP, "1");
-		COLUMN_LENGTH.put(CSLMLRP, "1");
-		COLUMN_LENGTH.put(CSLMSAS, "1");
-		COLUMN_LENGTH.put(CSLMSYT, "5");
-		COLUMN_LENGTH.put(CSLMWCD, "1");
-		COLUMN_LENGTH.put(FAGRMBE, "1");
-		COLUMN_LENGTH.put(FCUOCNF, "1");
-		COLUMN_LENGTH.put(FSLMCLS, "1");
-		COLUMN_LENGTH.put(FSLMCPU, "1");
-		COLUMN_LENGTH.put(FSLMIOP, "1");
-		COLUMN_LENGTH.put(FSLMLGS, "1");
-		COLUMN_LENGTH.put(FSLMMLC, "1");
-		COLUMN_LENGTH.put(FSLMPOP, "1");
-		COLUMN_LENGTH.put(FSLMVDE, "1");
-		COLUMN_LENGTH.put(FSLMVTS, "1");
-		COLUMN_LENGTH.put(FSLM2CF, "1");
-		COLUMN_LENGTH.put(ICESPCC, "1");
-		COLUMN_LENGTH.put(IDORIG, "3");
-		COLUMN_LENGTH.put(IOLCPLM, "2");
-		COLUMN_LENGTH.put(PCUAHEA, "3");
-		COLUMN_LENGTH.put(PCUASEA, "3");
-		COLUMN_LENGTH.put(PCUAUEA, "3");
-		COLUMN_LENGTH.put(QSLMCSU, "2");
-		COLUMN_LENGTH.put(QSMXANN, "1");
-		COLUMN_LENGTH.put(QSMXESA, "1");
-		COLUMN_LENGTH.put(QSMXSSA, "1");
-		COLUMN_LENGTH.put(SYSDES, "30");
-		COLUMN_LENGTH.put(TSLMDES, "30");
-		COLUMN_LENGTH.put(TSLTDES, "56");
-		COLUMN_LENGTH.put(TIMSTMP, "26");
-		COLUMN_LENGTH.put(USERID, "8");
-		COLUMN_LENGTH.put(FBRAND, "1");
-		COLUMN_LENGTH.put(FSLMHVP, "1");
-		COLUMN_LENGTH.put(FSLMCVP, "1");
-		COLUMN_LENGTH.put(FSLMMES, "1");
-		COLUMN_LENGTH.put(CSLMTM1, "3");
-		COLUMN_LENGTH.put(CSLMTM2, "3");
-		COLUMN_LENGTH.put(CSLMTM3, "3");
-		COLUMN_LENGTH.put(CSLMTM4, "3");
-		COLUMN_LENGTH.put(CSLMTM5, "3");
-		COLUMN_LENGTH.put(CSLMTM6, "3");
-		COLUMN_LENGTH.put(CSLMTM7, "3");
-		COLUMN_LENGTH.put(CSLMTM8, "3");
-		COLUMN_LENGTH.put(FSAPRES, "1");
-		COLUMN_LENGTH.put(CUSAPMS, "1");
-		COLUMN_LENGTH.put(DUSALRW, "10");
-		COLUMN_LENGTH.put(DUSAMDW, "10");
-		COLUMN_LENGTH.put(DUSAWUW, "10");
-		COLUMN_LENGTH.put(FSLMCBL, "1");
-		COLUMN_LENGTH.put(FSLMMRR, "1");
-		COLUMN_LENGTH.put(FUSAAAS, "1");
-		COLUMN_LENGTH.put(FUSAADM, "1");
-		COLUMN_LENGTH.put(FUSAEDE, "1");
-		COLUMN_LENGTH.put(FUSAICC, "1");
-		COLUMN_LENGTH.put(FUSALEP, "1");
-		COLUMN_LENGTH.put(FUSAMRS, "1");
-		COLUMN_LENGTH.put(FUSAVLM, "1");
-		COLUMN_LENGTH.put(FUSAXMO, "1");
-		COLUMN_LENGTH.put(QUSAPOP, "4");
-		COLUMN_LENGTH.put(DSLMEOD, "10");
-		COLUMN_LENGTH.put(FSLMRFM, "1");
-		COLUMN_LENGTH.put(DSLMMES, "10");
-		COLUMN_LENGTH.put(CIDXC, "1");
-		COLUMN_LENGTH.put(CSLMFTY, "2");
-		COLUMN_LENGTH.put(CVOAT, "1");
-		COLUMN_LENGTH.put(FSLMPIO, "1");
-		COLUMN_LENGTH.put(FSLMSTK, "1");
-		COLUMN_LENGTH.put(PCUAEAP, "3");
-		COLUMN_LENGTH.put(POGMES, "10");
-		COLUMN_LENGTH.put(STSPCFT, "4");
-		COLUMN_LENGTH.put(FUSAIRR, "1");
-		COLUMN_LENGTH.put(CPDXA, "2");
-		COLUMN_LENGTH.put(DSLMEFF, "10");
-		COLUMN_LENGTH.put(CSLMRCH, "1");
-		COLUMN_LENGTH.put(CSLMNUM, "6");
-		COLUMN_LENGTH.put(FSLMAPG, "1");
-		COLUMN_LENGTH.put(FSLMASP, "1");
-		COLUMN_LENGTH.put(FSLMJAP, "1");
-		COLUMN_LENGTH.put(FSLMAUS, "1");
-		COLUMN_LENGTH.put(FSLMBGL, "1");
-		COLUMN_LENGTH.put(FSLMBRU, "1");
-		COLUMN_LENGTH.put(FSLMHKG, "1");
-		COLUMN_LENGTH.put(FSLMIDN, "1");
-		COLUMN_LENGTH.put(FSLMIND, "1");
-		COLUMN_LENGTH.put(FSLMKOR, "1");
-		COLUMN_LENGTH.put(FSLMMAC, "1");
-		COLUMN_LENGTH.put(FSLMMAL, "1");
-		COLUMN_LENGTH.put(FSLMMYA, "1");
-		COLUMN_LENGTH.put(FSLMNZL, "1");
-		COLUMN_LENGTH.put(FSLMPHI, "1");
-		COLUMN_LENGTH.put(FSLMPRC, "1");
-		COLUMN_LENGTH.put(FSLMSLA, "1");
-		COLUMN_LENGTH.put(FSLMSNG, "1");
-		COLUMN_LENGTH.put(FSLMTAI, "1");
-		COLUMN_LENGTH.put(FSLMTHA, "1");
-		COLUMN_LENGTH.put(ISLMTYP, "4");
-		COLUMN_LENGTH.put(ISLMMOD, "3");
-		COLUMN_LENGTH.put(ISLMFTR, "6");
-		COLUMN_LENGTH.put(ISLMXX1, "1");
-		COLUMN_LENGTH.put(QSMNPMT, "4");
-		COLUMN_LENGTH.put(QSMNPMM, "3");
-	}
-	
-    /**********************************
-    * get the resource bundle
-    */
-    protected ResourceBundle getBundle() {
-        return rsBundle;
-    }
-
-    /**********************************
-     *  Execute ABR.
-     *
-     */
-    
-    public void processThis(QSMFULLABRSTATUS abr, Profile m_prof,Database m_db, String abri,
- 			EntityItem rootEntity, StringBuffer rpt) throws Exception {
-     	try {
-  this.m_prof = m_prof;
-  this.m_db = m_db;
-  abrcode = abri;
-  this.rootEntity=rootEntity;
-             //Default set to pass
-             setReturnCode(PASS);
-             
-             rptSb = rpt;
-            m_elist = getEntityList(getT002ModelVEName());      
-//             EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-
-             if (m_elist.getEntityGroupCount() > 0){
-            	 addDebug("QSMfull abr running");
-         		//NAME is navigate attributes - only used if error rpt is generated
-                 navName = getNavigationName();
-     			setDGTitle(navName);
-     			setDGString(getABRReturnCode());
-     			setDGRptName("QSMFULLABR"); // Set the report name
-     			setDGRptClass(getABRCode()); // Set the report class
-     			generateFlatFile(rootEntity);
-     			exeFtpShell(ffPathName);								
-             }
-         	
- 		} catch (IOException e) {
- 			// TODO Auto-generated catch block
- 			e.printStackTrace();
- 		} catch (ParseException e) {
- 			// TODO Auto-generated catch block
- 			e.printStackTrace();
- 		}
-     }
-    
-    /******************************************** 
-     *  CQ00016165
-     *  The Files will be named as follows:
-1.	'EACMFEEDQSMABR_'
-2.	The DB2 DTS for T2 with spaces and special characters replaced with an underscore
-3.	'.txt'
-     */
-    private void setFileName(EntityItem rootEntity){
-		// FILE_PREFIX=EACMFEEDQSMFULLABR_
-		fileprefix = ABRServerProperties.getFilePrefix(abrcode);
-		// ABRServerProperties.getOutputPath()
-		// ABRServerProperties.get
-		StringBuffer sb = new StringBuffer(fileprefix.trim());
-		 DatePackage dbNow;
-		try {
-			dbNow = m_db.getDates();
-			String dts = dbNow.getNow();
-			// replace special characters
-			dts = dts.replace(' ', '_');
-			sb.append(rootEntity.getEntityType() + rootEntity.getEntityID() + "_");
-			sb.append(dts + ".txt");
-		    dir = ABRServerProperties.getValue(abrcode, QSMGENPATH, "/Dgq");
-		    if (!dir.endsWith("/")){
-		    	dir=dir+"/";
-		    }
-			ffFileName = sb.toString();
-			ffPathName = dir + ffFileName;
-		} catch (MiddlewareException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        
-    } 
-
-    /********************************************
-     * Build a text file using all 
-	 * The records are data based on the type of data described above.
-     * @throws IOException 
-     * @throws MiddlewareException 
-     * @throws SQLException 
-     * @throws ParseException 
-     */
-    private void generateFlatFile(EntityItem rootEntity) throws IOException, SQLException, MiddlewareException, ParseException
-    {
-    	FileChannel sourceChannel = null;
-    	FileChannel destChannel = null;
-    	
-    	// generate file name
-    	setFileName(rootEntity);
-    	
-    	FileOutputStream fos = new FileOutputStream(ffPathName);
-    	// OutputStreamWriter will convert from characters to bytes using
-    	// the specified character encoding or the platform default if none
-    	// is specified.  Output as unicode
-    	OutputStreamWriter wOut = new OutputStreamWriter(fos, "UTF-8");
-   	
-    	// build the text file 	
-  	
-		createT002Model(rootEntity, wOut);
-		createT006Feature(rootEntity, wOut);
-		createT017ProductCategory(rootEntity, wOut);
-		createT020NPMesUpgrade(rootEntity, wOut);
-		createT512ReleaseTo(rootEntity, wOut);
-		createT632TypeModelFeatureRelation(rootEntity, wOut);
-
-		wOut.close();
-		
-    	dirDest = ABRServerProperties.getValue(abrcode, QSMFTPPATH, "/Dgq");
-    	if (!dirDest.endsWith("/")){
-    		dirDest=dirDest+"/";
-    	}
-    	
-    	ffFTPPathName = dirDest + ffFileName;
-    	addDebug("******* " + ffFTPPathName);
-
-    	try {
-        	sourceChannel = new FileInputStream(ffPathName).getChannel();
-        	destChannel = new FileOutputStream(ffFTPPathName).getChannel();
-        	destChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
-    	} finally {
-    		sourceChannel.close();
-    		destChannel.close();
-    	}
-
-    }
-    
-    /*
-     * Create T002 model records
-     * @throws IOException
-     */
-	private void createT002Model(EntityItem rootEntity, OutputStreamWriter wOut) throws IOException {
-		EntityGroup availGrp = m_elist.getEntityGroup("AVAIL");
-		String strAvailType = "";
-		String strAvailAnnType = "";
-		boolean isEpic = false;
-		
-		for (int availI = 0; availI < availGrp.getEntityItemCount(); availI++){
-
-			EntityItem availEI = availGrp.getEntityItem(availI);
-
-			strAvailType = PokUtils.getAttributeValue(availEI, "AVAILTYPE", "", "");
-			strAvailAnnType = PokUtils.getAttributeValue(availEI, "AVAILANNTYPE", "", "");
-			if (strAvailAnnType.equals("EPIC")){
-				isEpic = true;
-			}
-
-			//******* NEW *******
-			if((strAvailType.equals("Planned Availability"))
-				|| (strAvailType.equals("End of Service"))
-				|| (strAvailType.equals("Last Order"))){
-				EANFlagAttribute qsmGeoList = (EANFlagAttribute)availEI.getAttribute("QSMGEO");
-	
-				if(qsmGeoList != null){
-					if (qsmGeoList.isSelected("6199")){
-						createT002ModelRecords(rootEntity, wOut, availEI, "Asia Pacific", strAvailType, isEpic);
-					}
-					if (qsmGeoList.isSelected("6200")){
-						createT002ModelRecords(rootEntity, wOut, availEI, "Canada and Caribbean North", strAvailType, isEpic);
-					}
-					if (qsmGeoList.isSelected("6198")){
-						createT002ModelRecords(rootEntity, wOut, availEI, "Europe/Middle East/Africa", strAvailType, isEpic);
-					}
-					if (qsmGeoList.isSelected("6204")){
-						createT002ModelRecords(rootEntity, wOut, availEI, "Latin America", strAvailType, isEpic);
-					}
-					if (qsmGeoList.isSelected("6221")){
-						createT002ModelRecords(rootEntity, wOut, availEI, "US Only", strAvailType, isEpic);
-					}
-				}
-			}
-		}
-	}
-
-    /*
-     * Create records for ANNOUNCEMENT -> AVAIL -> MODELAVAIL -> MODEL
-     * @throws IOException
-     */
-	private void createT002ModelRecords(EntityItem rootEntity, OutputStreamWriter wOut, EntityItem availEI, String strAvailGenAreaSel, String strMainAvailType, boolean isEpic) throws IOException {
-		
-		StringBuffer sb;
-		String geoModGraduatedCharge;
-		String ccuoicrValue;
-		String geoModPurchOnly;
-		String geoModPlntofmr;
-		String geoModIntegratedmodel;
-		String geoModPercallcls;
-		String geoModAnnualMaint;
-		String geoModEmeaBrandCode;
-		String strIOPUCTY;
-		String strISLMPAL;
-		String strFSLM2CF;
-		String strQSLMCSU;
-		String strFUSAAAS;
-		String strFUSAICC;
-		String strCSLMTM1;
-		String strCSLMTM2;
-		String strCSLMTM3;
-		String strCSLMTM4;
-		String strCSLMTM5;
-		String strCSLMTM6;
-		String strCSLMTM7;
-		String strCSLMTM8;
-		String strFAGRMBE;
-		String strPCUAHEA;
-		String strPCUASEA;
-		String strPCUAUEA;
-		String strPrcIndc;
-		String strISLMRFA;
-		String strFUSAEDE;
-		String strCSLMIDP;
-		String geoModMethodProd;
-		String strFSLMHVP;
-//		String strCINCC;
-		String strQSMEDMW;
-		String strDUSALRW;
-		String strDSLMWDN;
-		String strDSLMOPD;
-		String strCPDAA;
-		String strFSLMCVP;
-		String strCSLMWCD;
-		String strWARRSVCCOVR;
-		String strIBMCREDIT;
-		String strWTHDRWEFFCTVDATE;
-
-		Vector modelAvailVect = PokUtils.getAllLinkedEntities(availEI, "MODELAVAIL", "MODEL");
-
-		for(int i = 0; i < modelAvailVect.size(); i++){
-			sb = new StringBuffer();
-			geoModGraduatedCharge = "";
-			ccuoicrValue = "";
-			geoModPurchOnly = "";
-			geoModPlntofmr = "";
-			geoModIntegratedmodel = "";
-			geoModPercallcls = "";
-			geoModAnnualMaint = "";
-			geoModEmeaBrandCode = "";
-			strIOPUCTY = "";
-			strISLMPAL = "";
-			strFSLM2CF = "";
-			strQSLMCSU = "";
-			strFUSAAAS = "";
-			strFUSAICC = "";
-			strCSLMTM1 = "";
-			strCSLMTM2 = "";
-			strCSLMTM3 = "";
-			strCSLMTM4 = "";
-			strCSLMTM5 = "";
-			strCSLMTM6 = "";
-			strCSLMTM7 = "";
-			strCSLMTM8 = "";
-			strFAGRMBE = "";
-			strPCUAHEA = "";
-			strPCUASEA = "";
-			strPCUAUEA = "";
-			strPrcIndc = "";
-			strISLMRFA = "";
-			strFUSAEDE = "";
-			strCSLMIDP = "";
-			geoModMethodProd = "";
-			strFSLMHVP = "";
-//			strCINCC = "";
-			strQSMEDMW = "";
-			strDUSALRW = "";
-			strDSLMWDN = "";
-			strDSLMOPD = "";
-			strCPDAA = "";
-			strFSLMCVP = "";
-			strCSLMWCD = "";
-			strWARRSVCCOVR = "";
-			strIBMCREDIT = "";
-			strWTHDRWEFFCTVDATE = "";
-
-			EntityItem eiModel = (EntityItem) modelAvailVect.elementAt(i);
-			
-			EntityItem eiSearchAvail = null;
-
-			if (strAvailGenAreaSel.equals("Asia Pacific") ||
-				strAvailGenAreaSel.equals("US Only") ||
-				strAvailGenAreaSel.equals("Canada and Caribbean North")) { 
-				strFAGRMBE = "N";
-//				strCINCC = "N";
-			} else {
-				Vector modelStdMaintVect = PokUtils.getAllLinkedEntities(eiModel, "MODELSTDMAINT", "STDMAINT");
-				if (!modelStdMaintVect.isEmpty()){
-					EntityItem eiStdMaint = (EntityItem)modelStdMaintVect.elementAt(0);
-					if (eiStdMaint != null){
-						strFAGRMBE = PokUtils.getAttributeValue(eiStdMaint, "MAINTELIG", "", "");
-					}
-				}
-//				if(strFAGRMBE.equals("Yes")){
-//					strCINCC = "N";
-//				} else if (strFAGRMBE.equals("No")){
-//					strCINCC = "Y";
-//				}
-			}
-
-			sb.append(getValue(IFTYPE, "M"));
-			
-			if (strAvailGenAreaSel.equals("Latin America")) {
-				strIOPUCTY = "601";
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "LDOCNO", "", "");
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-			} else if (strAvailGenAreaSel.equals("Europe/Middle East/Africa")) {
-				strIOPUCTY = "999";
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "EDOCNO", "", "");
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-			} else if (strAvailGenAreaSel.equals("Asia Pacific")) {
-				strIOPUCTY = "872";
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "ADOCNO", "", "");
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-			} else if (strAvailGenAreaSel.equals("US Only")) {
-				strIOPUCTY = "897";
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "USDOCNO", "", "");
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "USDOCNO", "", "");
-			} else if (strAvailGenAreaSel.equals("Canada and Caribbean North")) {
-				strIOPUCTY = "649";
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "CDOCNO", "", "");
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "USDOCNO", "", "");
-			}
-			sb.append(getValue(IOPUCTY, strIOPUCTY));
-			
-			sb.append(getValue(ISLMPAL, strISLMPAL));
-			sb.append(getValue(ISLMRFA, strISLMRFA));
-			String description = PokUtils.getAttributeValue(eiModel, "MACHTYPEATR", "", "");
-			description += PokUtils.getAttributeValue(eiModel, "MODELATR", "", "");
-			sb.append(getValue(ISLMPRN, description));
-			sb.append(getValue(CSLMPCI, "MM"));
-			sb.append(getValue(IPRTNUM, "            "));
-			sb.append(getValue(FPUNINC, "2"));
-			sb.append(getValue(CAOAV, ""));
-
-			sb.append(getValue(DSLMCPA, PokUtils.getAttributeValue(rootEntity, "ANNDATE", ",", "", false)));
-			sb.append(getValue(DSLMCPO, ""));
-			sb.append(getValue(DSLMGAD, PokUtils.getAttributeValue(availEI, "EFFECTIVEDATE", ",", "", false)));
-			sb.append(getValue(DSLMMVA, PokUtils.getAttributeValue(rootEntity, "ANNDATE", ",", "", false)));
-
-			eiSearchAvail = searchForAvailType(eiModel, "Last Order");
-			if (eiSearchAvail != null) {
-//				strDSLMWDN = PokUtils.getAttributeValue(eiSearchAvail, "EFFECTIVEDATE", "", "");
-				strDSLMOPD = PokUtils.getAttributeValue(eiSearchAvail, "EFFECTIVEDATE", "", "");
-				strCPDAA = "O";
-			} else {
-//				strDSLMWDN = "2050-12-31";
-				strDSLMOPD = "2050-12-31";
-				strCPDAA = "N";
-			}
-			
-			strWTHDRWEFFCTVDATE = PokUtils.getAttributeValue(eiModel, "WTHDRWEFFCTVDATE", "", "");
-			
-			if (strWTHDRWEFFCTVDATE != null){
-				if (strWTHDRWEFFCTVDATE.equals("")){
-					strDSLMWDN = "2050-12-31";
-				} else {
-					strDSLMWDN = strWTHDRWEFFCTVDATE;
-				}
-			} else {
-				strDSLMWDN = "2050-12-31";
-			}
-			
-			sb.append(getValue(DSLMOPD, strDSLMOPD));
-			sb.append(getValue(DSLMWDN, strDSLMWDN));
-			
-			eiSearchAvail = searchForAvailType(eiModel, "End of Service");
-			if(eiSearchAvail != null){
-				strQSMEDMW = PokUtils.getAttributeValue(availEI, "EFFECTIVEDATE", ",", "", false);
-				strDUSALRW = PokUtils.getAttributeValue(availEI, "EFFECTIVEDATE", ",", "", false);
-			} else {
-				strQSMEDMW = "2050-12-31";
-				strDUSALRW = "2050-12-31";
-			}
-			
-			sb.append(getValue(QSMEDMW, strQSMEDMW));
-
-			sb.append(getValue(ASLMMVP, "01.0"));
-			ccuoicrValue = PokUtils.getAttributeValue(eiModel, "ICRCATEGORY", "", "");
-			sb.append(getValue(CCUOICR, ccuoicrValue));
-			sb.append(getValue(CICIB, "N"));
-			sb.append(getValue(CICIC, "N"));
-			sb.append(getValue(CICRY, "N"));
-			sb.append(getValue(CIDCJ, "N"));
-			sb.append(getValue(CIDXF, PokUtils.getAttributeValue(eiModel, "LICNSINTERCD", "", "")));
-			
-			String strCINCA = "";
-			String geoModGeo = "";
-			EntityItem eiModGeoMod = null;
-			Vector geoModVect = PokUtils.getAllLinkedEntities(eiModel, "MODELGEOMOD", "GEOMOD");
-			if (geoModVect.size() > 0){
-				for(int igm = 0; igm < geoModVect.size(); igm++){
-					eiModGeoMod = (EntityItem)geoModVect.elementAt(igm);
-					geoModGeo = PokUtils.getAttributeValue(eiModGeoMod, "GENAREASELECTION", "", "");
-					if(geoModGeo.equals(strAvailGenAreaSel)) {
-						strCINCA = PokUtils.getAttributeValue(eiModGeoMod, "NOCHRGRENT", "", "");
-						geoModGraduatedCharge = PokUtils.getAttributeValue(eiModGeoMod, "GRADUATEDCHARGE", "", "");
-						geoModPurchOnly = PokUtils.getAttributeValue(eiModGeoMod, "PURCHONLY", "", "");
-						geoModPlntofmr = PokUtils.getAttributeValue(eiModGeoMod, "PLNTOFMFR", "", "");
-						geoModIntegratedmodel = PokUtils.getAttributeValue(eiModGeoMod, "INTEGRATEDMODEL", "", "");
-						geoModPercallcls = PokUtils.getAttributeValue(eiModGeoMod, "PERCALLCLS", "", "");
-						geoModEmeaBrandCode = PokUtils.getAttributeValue(eiModGeoMod, "EMEABRANDCD", "", "");
-						geoModAnnualMaint = PokUtils.getAttributeValue(eiModGeoMod, "ANNUALMAINT", "", "");
-						geoModMethodProd = PokUtils.getAttributeValue(eiModGeoMod, "METHODPROD", "", "");
-						strFUSAEDE = PokUtils.getAttributeValue(eiModGeoMod, "EDUCPURCHELIG", "", "");
-						
-						igm = geoModVect.size();
-					} else {
-						eiModGeoMod = null;
-					}
-				}
-			}
-			
-			sb.append(getValue(CINCA, strCINCA));
-
-			strPrcIndc = PokUtils.getAttributeValue(eiModel, "PRCINDC", "", "");
-			if (strPrcIndc.equals("Yes")){
-				sb.append(getValue(CINCB, "N"));
-			} else if (strPrcIndc.equals("No")){
-				sb.append(getValue(CINCB, "Y"));
-			} else {
-				sb.append(getValue(CINCB, "N"));
-			}
-
-			sb.append(getValue(CINCC, "N"));
-			sb.append(getValue(CINPM, PokUtils.getAttributeValue(eiModel, "NETPRICEMES", "", "")));
-
-			sb.append(getValue(CISUP, "N"));
-
-			sb.append(getValue(CITEM, "N"));
-			String annIndDefnCatg = PokUtils.getAttributeValue(rootEntity, "INDDEFNCATG", ",", "", false);
-			if (annIndDefnCatg.length() >= 2){
-				sb.append(getValue(CJLBIC1, annIndDefnCatg.substring(0, 2)));
-			} else {
-				sb.append(getValue(CJLBIC1, ""));
-			}
-			if (annIndDefnCatg.length() >= 3){
-				sb.append(getValue(CJLBIDS, annIndDefnCatg.substring(2)));
-			} else {
-				sb.append(getValue(CJLBIDS, ""));
-			}
-			sb.append(getValue(CJLBOEM, PokUtils.getAttributeValue(eiModel, "SPECMODDESGN", "", "")));
-
-			sb.append(getValue(CJLBPOF, ""));
-			
-			Vector sgmntAcrnymVect = PokUtils.getAllLinkedEntities(eiModel, "MODELSGMTACRONYMA", "SGMNTACRNYM");
-			if (!sgmntAcrnymVect.isEmpty()){
-				EntityItem sgmntAcrnymEI = (EntityItem) sgmntAcrnymVect.elementAt(0);
-				if (sgmntAcrnymEI != null){
-					sb.append(getValue(CJLBSAC, PokUtils.getAttributeValue(sgmntAcrnymEI, "ACRNYM", "", "")));
-				} else {
-					sb.append(getValue(CJLBSAC, "   "));
-				}
-			} else {
-				sb.append(getValue(CJLBSAC, "   "));
-			}
-
-			sb.append(getValue(CLASSPT, "IHW"));
-			
-			if (strMainAvailType.equals("Last Order")){
-				sb.append(getValue(CPDAA, "O"));
-			} else {
-				sb.append(getValue(CPDAA, "N"));
-			}
-
-			sb.append(getValue(CSLMFCC, PokUtils.getAttributeValue(eiModel, "FUNCCLS", "", "")));
-			
-			if(strAvailGenAreaSel.equals("Asia Pacific")){
-				sb.append(getValue(CSLMGGC, geoModGraduatedCharge));
-			} else {
-				sb.append(getValue(CSLMGGC, " "));
-			}
-			
-			String strProdID = PokUtils.getAttributeValue(eiModel, "PRODID", "", "");
-			if(strProdID.equals("0-CPU")){
-				strCSLMIDP = "0";
-			} else if(strProdID.equals("1-Unit Record Equipm.")){
-				strCSLMIDP = "1";
-			} else if(strProdID.equals("2-System Component")){
-				strCSLMIDP = "2";
-			} else if(strProdID.equals("3-Stand Alone Material")){
-				strCSLMIDP = "3";
-			} else if(strProdID.equals("4-System Control")){
-				strCSLMIDP = "4";
-			} else if(strProdID.equals("5-Program Product")){
-				strCSLMIDP = "5";
-			} else if(strProdID.equals("6-Special Program")){
-				strCSLMIDP = "6";
-			} else if(strProdID.equals("7-Control Unit")){
-				strCSLMIDP = "7";
-			} else if(strProdID.equals("8-Disk Packs")){
-				strCSLMIDP = "8";
-			} else {
-				strCSLMIDP = "";
-			}
-			
-			sb.append(getValue(CSLMIDP, strCSLMIDP));
-			sb.append(getValue(CSLMLRP, "0"));
-			sb.append(getValue(CSLMSAS, "0"));
-			sb.append(getValue(CSLMSYT, PokUtils.getAttributeValue(eiModel, "SYSTEMTYPE", "", "")));
-
-			EntityItem eiWarr = null;
-			strWARRSVCCOVR = PokUtils.getAttributeValue(eiModel, "WARRSVCCOVR", "", "");
-			if(strWARRSVCCOVR != null){
-				if (strWARRSVCCOVR.equals("No Warranty") || strWARRSVCCOVR.equals("")) {
-					strCSLMWCD = "Z";
-				} else {
-					Vector warrVect = PokUtils.getAllLinkedEntities(eiModel, "MODELWARR", "WARR");
-					if (!warrVect.isEmpty()){
-						eiWarr = (EntityItem)warrVect.elementAt(0);
-						if(eiWarr != null){
-							String strWarrID = PokUtils.getAttributeValue(eiWarr, "WARRID", "", "");
-							if (strWarrID.equals("WTY0000")){
-								if(warrVect.size() > 1){
-									eiWarr = (EntityItem) warrVect.elementAt(1);
-								} else {
-									eiWarr = null;
-								}
-							}
-						}
-							 /** code changed as requested */
-						if (eiWarr != null){
-							strCSLMWCD = PokUtils.getAttributeValue(eiWarr, "WARRCATG", "", "");
-						} else {
-							strCSLMWCD = "";
-						}
-					} else {
-						strCSLMWCD = "";
-					}
-				}
-			} else {
-				strCSLMWCD = "Z";
-			}
-			sb.append(getValue(CSLMWCD, strCSLMWCD));
-			
-			sb.append(getValue(FAGRMBE, strFAGRMBE));
-
-			if (ccuoicrValue.equals("1") || ccuoicrValue.equals("2")){
-				sb.append(getValue(FCUOCNF, "N"));
-			} else if (ccuoicrValue.equals("3")){
-				sb.append(getValue(FCUOCNF, "Y"));
-			} else {
-				sb.append(getValue(FCUOCNF, "N"));
-			}
-			
-			sb.append(getValue(FSLMCLS, "N"));
-			
-			String modelSysIdUnit = PokUtils.getAttributeValue(eiModel, "SYSIDUNIT", "", "");
-			if (modelSysIdUnit.equals("SIU-CPU")) {
-				sb.append(getValue(FSLMCPU, "Y"));
-			} else {
-				sb.append(getValue(FSLMCPU, "N"));
-			}
-
-			sb.append(getValue(FSLMIOP, geoModIntegratedmodel));
-			sb.append(getValue(FSLMLGS, "N"));
-			sb.append(getValue(FSLMMLC, PokUtils.getAttributeValue(eiModel, "MACHLVLCNTRL", "", "")));
-
-			if (strAvailGenAreaSel.equals("Latin America")
-					|| strAvailGenAreaSel.equals("US Only")
-					|| strAvailGenAreaSel.equals("Canada and Caribbean North")) {
-				sb.append(getValue(FSLMPOP, "No"));
-			} else if (strAvailGenAreaSel.equals("Europe/Middle East/Africa")) {
-				sb.append(getValue(FSLMPOP, "Yes"));
-			} else if (strAvailGenAreaSel.equals("Asia Pacific")) {
-				if (strPrcIndc.equals("Yes")){
-					sb.append(getValue(FSLMPOP, "Y"));
-				} else if (strPrcIndc.equals("No")){
-					sb.append(getValue(FSLMPOP, "N"));
-				} else {
-					sb.append(getValue(FSLMPOP, " "));
-				}
-			} else {
-				sb.append(getValue(FSLMPOP, " "));
-			}
-
-			sb.append(getValue(FSLMVDE, PokUtils.getAttributeValue(eiModel, "VOLUMEDISCOUNTELIG", "", "")));
-			sb.append(getValue(FSLMVTS, "N"));
-			
-			ArrayList warrTypeArray = new ArrayList();
-			if (eiWarr != null) {
-				EANFlagAttribute warrTypeList = (EANFlagAttribute)eiWarr.getAttribute("WARRTYPE");
-				if(warrTypeList != null){
-					if (strAvailGenAreaSel.equals("Europe/Middle East/Africa")){
-						if (warrTypeList.isSelected("W0310") || warrTypeList.isSelected("W0330")
-								|| warrTypeList.isSelected("W0200") || warrTypeList.isSelected("W0240") || warrTypeList.isSelected("W0250")){
-							strFSLM2CF = "Y";
-						} else {
-							strFSLM2CF = "N";
-						}
-					}
-					
-					if(strAvailGenAreaSel.equals("Latin America")){
-						if (warrTypeList.isSelected("W0310") || warrTypeList.isSelected("W0330")
-								|| warrTypeList.isSelected("W0560") || warrTypeList.isSelected("W0570") || warrTypeList.isSelected("W0580")){
-							strFSLM2CF = "Y";
-						} else {
-							strFSLM2CF = "N";
-						}
-					}
-					
-					if (strAvailGenAreaSel.equals("Asia Pacific")){
-						if(warrTypeList.isSelected("W0550") 
-								|| warrTypeList.isSelected("W0390")
-								|| warrTypeList.isSelected("W0200") || warrTypeList.isSelected("W0240") || warrTypeList.isSelected("W0250")
-								|| warrTypeList.isSelected("W0310") || warrTypeList.isSelected("W0330")
-								|| warrTypeList.isSelected("W0590")) {
-							strFSLM2CF = "Y";
-						} else {
-							strFSLM2CF = "N";
-						}
-					}
-					
-					if (strAvailGenAreaSel.equals("Canada and Caribbean North")
-							|| strAvailGenAreaSel.equals("US Only")){
-						strFSLM2CF = "N";
-					}
-				}
-			} else {
-				strFSLM2CF = "N";
-			}
-			sb.append(getValue(FSLM2CF, strFSLM2CF));
-			
-			
-			sb.append(getValue(ICESPCC, geoModPercallcls));
-			sb.append(getValue(IDORIG, "IBM"));
-			sb.append(getValue(IOLCPLM, geoModPlntofmr));
-
-			strPCUAHEA = "000";
-			strPCUASEA = "000";
-			strPCUAUEA = "000";
-			
-			if (eiModGeoMod != null){
-				if (strAvailGenAreaSel.equals("Latin America") || strAvailGenAreaSel.equals("Asia Pacific")
-						|| strAvailGenAreaSel.equals("Canada and Caribbean North")){
-					strPCUAHEA = getNumValue(PCUAHEA, PokUtils.getAttributeValue(eiModGeoMod, "EDUCALLOWMHGHSCH", ",", "", false));
-					strPCUAUEA = getNumValue(PCUAUEA, PokUtils.getAttributeValue(eiModGeoMod, "EDUCALLOWMUNVRSTY", ",", "", false));
-					strPCUASEA = getNumValue(PCUASEA, PokUtils.getAttributeValue(eiModGeoMod, "EDUCALLOWMSECONDRYSCH", ",", "", false));
-				}
-			}
-
-			sb.append(getValue(PCUAHEA, strPCUAHEA));
-			sb.append(getValue(PCUASEA, strPCUASEA));
-			sb.append(getValue(PCUAUEA, strPCUAUEA));
-			
-			String mdlInstall = PokUtils.getAttributeValue(eiModel, "INSTALL", "", "");
-			if (strAvailGenAreaSel.equals("Latin America")) {
-				if (mdlInstall.equals("CIF")){
-					strQSLMCSU = "01";
-				} else if (mdlInstall.equals("CE") || mdlInstall.equals("N/A") || mdlInstall.equals("Does not apply")){
-					strQSLMCSU = "";
-				}
-			} else if (strAvailGenAreaSel.equals("Europe/Middle East/Africa")) {
-				if (mdlInstall.equals("CIF")){
-					strQSLMCSU = "01";
-				} else if (mdlInstall.equals("CE") || mdlInstall.equals("N/A") || mdlInstall.equals("Does not apply")){
-					strQSLMCSU = "";
-				}
-			} else if (strAvailGenAreaSel.equals("Asia Pacific")) {
-				if (mdlInstall.equals("CIF")){
-					strQSLMCSU = "10";
-				} else if (mdlInstall.equals("CE") || mdlInstall.equals("N/A") || mdlInstall.equals("Does not apply")){
-					strQSLMCSU = "";
-				}
-			} else if (strAvailGenAreaSel.equals("US Only")) {
-				if (mdlInstall.equals("CIF")){
-					strQSLMCSU = "01";
-				} else if (mdlInstall.equals("CE") || mdlInstall.equals("N/A") || mdlInstall.equals("Does not apply")){
-					strQSLMCSU = "00";
-				}
-			} else if (strAvailGenAreaSel.equals("Canada and Caribbean North")) {
-				if (mdlInstall.equals("CIF")){
-					strQSLMCSU = "01";
-				} else if (mdlInstall.equals("CE") || mdlInstall.equals("N/A") || mdlInstall.equals("Does not apply")){
-					strQSLMCSU = "";
-				}
-			}
-			sb.append(getValue(QSLMCSU, strQSLMCSU));
-
-			sb.append(getValue(QSMXANN, geoModAnnualMaint));
-			sb.append(getValue(QSMXESA, "N"));
-			sb.append(getValue(QSMXSSA, "N"));
-
-			if (modelSysIdUnit.equals("SIU-CPU") || modelSysIdUnit.equals("U-System Unit")) {
-				sb.append(getValue(SYSDES, PokUtils.getAttributeValue(eiModel, "MODMKTGDESC", "", "")));
-			} else {
-				sb.append(getValue(SYSDES, "   "));
-			}
-
-			String strInvname = PokUtils.getAttributeValue(eiModel, "INVNAME", "", "");
-			sb.append(getValue(TSLMDES, removeSpecialChars(strInvname)));
-			sb.append(getValue(TSLTDES, " "));
-			sb.append(getValue(TIMSTMP, " "));
-			sb.append(getValue(USERID, " "));
-			sb.append(getValue(FBRAND, geoModEmeaBrandCode));
-			
-			if(geoModMethodProd.equals("BTP")){
-				strFSLMHVP = "Y";
-			} else if(geoModMethodProd.equals("BTO")){
-				strFSLMHVP = "N";
-			} else {
-				strFSLMHVP = "";
-			}
-			
-			sb.append(getValue(FSLMHVP, strFSLMHVP));
-
-			if (strAvailGenAreaSel.equals("US Only")) {
-				strFSLMCVP = "Y";
-			} else if (strAvailGenAreaSel.equals("Latin America") || strAvailGenAreaSel.equals("Europe/Middle East/Africa")
-						|| strAvailGenAreaSel.equals("Asia Pacific") || strAvailGenAreaSel.equals("Canada and Caribbean North")) {
-				if (geoModMethodProd.equals("BTO")) {
-					strFSLMCVP = "Y";
-				} else if (geoModMethodProd.equals("BTP")) {
-					strFSLMCVP = "N";
-				} else {
-					strFSLMCVP = " ";
-				}
-			}
-
-			sb.append(getValue(FSLMCVP, strFSLMCVP));
-			
-			sb.append(getValue(FSLMMES, "N"));
-
-			warrTypeArray = new ArrayList();
-			strCSLMTM1 = "";
-			strCSLMTM2 = "";
-			strCSLMTM3 = "";
-			strCSLMTM4 = "";
-			strCSLMTM5 = "";
-			strCSLMTM6 = "";
-			strCSLMTM7 = "";
-			strCSLMTM8 = "";
-			
-			if (eiWarr != null) {
-				EANFlagAttribute warrTypeList = (EANFlagAttribute)eiWarr.getAttribute("WARRTYPE");
-				if(warrTypeList != null){
-					if (warrTypeList.isSelected("W0560") || warrTypeList.isSelected("W0570") || warrTypeList.isSelected("W0580")) {
-						warrTypeArray.add("IOR");
-					}
-					if (warrTypeList.isSelected("W0550")) {
-						warrTypeArray.add("IOE");
-					}
-					if (warrTypeList.isSelected("W0390")) {
-						warrTypeArray.add("COE");
-					}
-					if (warrTypeList.isSelected("W0200") || warrTypeList.isSelected("W0240") || warrTypeList.isSelected("W0250")) {
-						warrTypeArray.add("CCE");
-					}
-					if (warrTypeList.isSelected("W0310") || warrTypeList.isSelected("W0330")) {
-						warrTypeArray.add("CCR");
-					}
-					if (warrTypeList.isSelected("W0590")) {
-						warrTypeArray.add("IOS");
-					}
-					//TODO - ICE - IBM Courier Exchange - VALUE DOES NOT EXIST IN EACM
-					//if (warrTypeList.isSelected("W0310") || warrTypeList.isSelected("W0330")) {
-					//  warrTypeArray.add("ICE");
-					//}
-					//TODO - ICS - IBM Courier Service - VALUE DOES NOT EXIST IN EACM
-					//if (warrTypeList.isSelected("W0310") || warrTypeList.isSelected("W0330")) {
-					//  warrTypeArray.add("ICS");
-					//}
-					//TODO - IE8 - Annual Minimum Maintenance Next Day 9x5 - VALUE DOES NOT EXIST IN EACM
-					//if (warrTypeList.isSelected("W0310") || warrTypeList.isSelected("W0330")) {
-					//  warrTypeArray.add("IE8");
-					//}
-					//TODO - CES - Depot Exchange Offering - VALUE DOES NOT EXIST IN EACM
-					//if (warrTypeList.isSelected("W0310") || warrTypeList.isSelected("W0330")) {
-					//  warrTypeArray.add("CES");
-					//}
-					//TODO - CFM - Central Facility Maintenance - VALUE DOES NOT EXIST IN EACM
-					//if (warrTypeList.isSelected("W0310") || warrTypeList.isSelected("W0330")) {
-					//  warrTypeArray.add("CFM");
-					//}
-					
-					for (int w = 0; w < warrTypeArray.size(); w++){
-						if (w == 0) {
-							strCSLMTM1 = (String)warrTypeArray.get(w);
-						} else if (w == 1){
-							strCSLMTM2 = (String)warrTypeArray.get(w);
-						} else if (w == 2){
-							strCSLMTM3 = (String)warrTypeArray.get(w);
-						} else if (w == 3){
-							strCSLMTM4 = (String)warrTypeArray.get(w);
-						} else if (w == 4){
-							strCSLMTM5 = (String)warrTypeArray.get(w);
-						} else if (w == 5){
-							strCSLMTM6 = (String)warrTypeArray.get(w);
-						} else if (w == 6){
-							strCSLMTM7 = (String)warrTypeArray.get(w);
-						} else if (w == 7){
-							strCSLMTM8 = (String)warrTypeArray.get(w);
-						}
-					}
-				}
-			}
-			
-			sb.append(getValue(CSLMTM1, strCSLMTM1));
-			sb.append(getValue(CSLMTM2, strCSLMTM2));
-			sb.append(getValue(CSLMTM3, strCSLMTM3));
-			sb.append(getValue(CSLMTM4, strCSLMTM4));
-			sb.append(getValue(CSLMTM5, strCSLMTM5));
-			sb.append(getValue(CSLMTM6, strCSLMTM6));
-			sb.append(getValue(CSLMTM7, strCSLMTM7));
-			sb.append(getValue(CSLMTM8, strCSLMTM8));
-			sb.append(getValue(FSAPRES, "N"));
-
-			if (strAvailGenAreaSel.equals("US Only")) {
-				String strCUSAPMS = PokUtils.getAttributeValue(eiModel, "MAINTANNBILLELIGINDC", ",", "", false);
-				if (strCUSAPMS.equals("Yes")) {
-					sb.append(getValue(CUSAPMS, "Y"));
-				} else if (strCUSAPMS.equals("No")) {
-					sb.append(getValue(CUSAPMS, "X"));
-				} else {
-					sb.append(getValue(CUSAPMS, ""));
-				}
-			} else {
-				sb.append(getValue(CUSAPMS, ""));
-			}
-			
-			sb.append(getValue(DUSALRW, strDUSALRW));
-			
-			sb.append(getValue(DUSAMDW, "2050-12-31"));
-			sb.append(getValue(DUSAWUW, "2050-12-31"));
-			if(strAvailGenAreaSel.equals("US Only")) {
-				sb.append(getValue(FSLMCBL, "N"));
-			} else {
-				sb.append(getValue(FSLMCBL, " "));
-			}
-			sb.append(getValue(FSLMMRR, "N"));
-			strFUSAAAS = "";
-//			strFUSAICC = "N";
-			if (strAvailGenAreaSel.equals("US Only")) {
-				strFUSAAAS = "N";
-//				strFUSAICC = "Y";
-				String strOrderSysName = PokUtils.getAttributeValue(availEI, "ORDERSYSNAME", ",", "", false);
-				if (strOrderSysName.equals("AAS")){
-					strFUSAAAS = "Y";
-				}
-			}
-			sb.append(getValue(FUSAAAS, strFUSAAAS));
-			sb.append(getValue(FUSAADM, "N"));
-
-			if(strAvailGenAreaSel.equals("US Only")) {
-				sb.append(getValue(FUSAEDE, strFUSAEDE));
-			} else {
-				sb.append(getValue(FUSAEDE, " "));
-			}
-			
-			if (strAvailGenAreaSel.equals("US Only")){
-			strIBMCREDIT = PokUtils.getAttributeValue(eiModel, "IBMCREDIT", ",", "", false);
-			addDebug("*****mlm IBMCREDIT=" + strIBMCREDIT);
-			if (strIBMCREDIT != null){
-				if (strIBMCREDIT.equals("Yes")){
-					strFUSAICC = "Y";
-				} else if (strIBMCREDIT.equals("No")){
-					strFUSAICC = "N";
-				}
-			}			
-			sb.append(getValue(FUSAICC, strFUSAICC));
-			} else{
-				sb.append(getValue(FUSAICC, " "));
-			}
-
-			if(strAvailGenAreaSel.equals("US Only")) {
-				sb.append(getValue(FUSALEP, PokUtils.getAttributeValue(eiModel, "MAINTANNBILLELIGINDC", ",", "", false)));
-			} else {
-				sb.append(getValue(FUSALEP, " "));
-			}
-			
-			sb.append(getValue(FUSAMRS, "N"));
-			sb.append(getValue(FUSAVLM, "N"));
-			sb.append(getValue(FUSAXMO, "N"));
-			sb.append(getValue(QUSAPOP, "00.0"));
-			sb.append(getValue(DSLMEOD, "1950-01-01"));
-			sb.append(getValue(FSLMRFM, " "));
-			
-			sb.append(NEWLINE);
-			wOut.write(sb.toString());
-			wOut.flush();
-			
-		}
-	}
-	
-	private String removeSpecialChars(String in){
-		
-		String out = "";
-		out = in.replaceAll("#", "");
-		out = out.replaceAll("$", "");
-		out = out.replaceAll("%", "");
-		out = out.replaceAll("@", "");
-		out = out.replaceAll("/", "");
-		out = out.replaceAll("'", "");
-		out = out.replaceAll("\"", "");
-		out = out.replaceAll("鈥�", "");
-		
-		return out;
-		
-	}
-
-	private EntityItem searchForAvailType(EntityItem eiModel, String strSearchAvailType){
-		
-		EntityItem eiReturn = null;
-		String strAvailType;
-
-		Vector availVect = PokUtils.getAllLinkedEntities(eiModel, "MODELAVAIL", "AVAIL");
-		
-		addDebug("*****mlm searchforavail AVAIL " + availVect);
-		
-		for(int i = 0; i < availVect.size(); i++){
-			EntityItem eiAvail = (EntityItem) availVect.elementAt(i);
-
-			strAvailType = PokUtils.getAttributeValue(eiAvail, "AVAILTYPE", ",", "", false);
-			addDebug("*****mlm searchforavail model = " + eiModel.getEntityType()+eiModel.getEntityID() + "avail entity type = " + eiAvail.getEntityType() + " avail type = " + strAvailType);
-			if (strSearchAvailType.equals(strAvailType)) {
-				eiReturn = eiAvail;
-				break;
-			}
-		}
-		
-		return eiReturn;
-	}
-	
-	private String validateProdstructs(EntityItem eiFeature) throws MiddlewareRequestException, SQLException, MiddlewareException {
-		
-		String strReturnDate = "";
-		Date oldestDate = null;
-		Date psDate = null;
-
-		ExtractActionItem eaItem = new ExtractActionItem(null, m_db, m_prof, getT006FeatureVEName());
-
-		EntityList list = m_db.getEntityList(m_prof, eaItem, new EntityItem[] { new EntityItem(null, m_prof, eiFeature.getEntityType(), eiFeature.getEntityID())});
-		
-	    EntityGroup prodStructGrp = list.getEntityGroup("PRODSTRUCT");
-		addDebug("*****mlm feature.id=" + eiFeature.getEntityType() + eiFeature.getEntityID() + " prodstructcount=" + prodStructGrp.getEntityItemCount());
-		
-		for (int i = 0; i < prodStructGrp.getEntityItemCount(); i++){
-
-			EntityItem eiProdstruct = prodStructGrp.getEntityItem(i);
-			addDebug("*****mlm prodstruct=" + eiProdstruct.getEntityType() + eiProdstruct.getEntityID());
-
-			String psWdDate = PokUtils.getAttributeValue(eiProdstruct, "WTHDRWEFFCTVDATE", ",", "", false);
-			addDebug("*****mlm oldestdate=" + oldestDate);
-			addDebug("*****mlm psWdDate=" + psWdDate);
-			if (!psWdDate.equals("")){
-				DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-				try {
-					psDate = df.parse(psWdDate);
-					if((oldestDate == null) || (psDate.after(oldestDate))) {
-						addDebug("*****mlm setting odlestdate to psWdDate");
-						oldestDate = psDate;
-						strReturnDate = psWdDate;
-					}
-				} catch (ParseException e) {
-					addDebug(e.toString());
-					addDebug("*****mlm error: ParseException, setting date to 2050-12-31 - end");
-					strReturnDate = "2050-12-31";
-					i = prodStructGrp.getEntityItemCount();
-					break;
-				}
-			} else {
-				addDebug("*****mlm psWdDate is blank, set date to 2050-12-31 - end");
-				strReturnDate = "2050-12-31";
-				i = prodStructGrp.getEntityItemCount();
-				break;
-			}
-		}
-		
-		return strReturnDate;
-	}
-	
-    /*
-     * Create records for ANNOUNCEMENT -> AVAIL -> OOFAVAIL -> PRODSTRUCT -> MODEL
-     * @throws IOException
-     * @throws SQLException
-     * @throws MiddlewareException
-     */
-	private void createT006Feature(EntityItem rootEntity, OutputStreamWriter wOut) throws IOException, SQLException, MiddlewareException {
-		
-		EANFlagAttribute qsmGeoList;
-		String strAvailType;
-		String strAvailAnnType = "";
-		boolean isEpic = false;
-		String Anntype;		
-		Anntype= PokUtils.getAttributeValue(rootEntity, "AVAILTYPE", "", "");
-		m_elist = getEntityList(getT006ProdstructVEName()); 
-		EntityGroup availGrp = m_elist.getEntityGroup("AVAIL");
-		int availm = availGrp.getEntityItemCount();
-		for (int availI = 0; availI < availGrp.getEntityItemCount(); availI++){
-			qsmGeoList = null;
-			strAvailType = "";
-			
-			EntityItem availEI = availGrp.getEntityItem(availI);
-			
-			strAvailType = PokUtils.getAttributeValue(availEI, "AVAILTYPE", "", "");
-			strAvailAnnType = PokUtils.getAttributeValue(availEI, "AVAILANNTYPE", "", "");
-			if (strAvailAnnType.equals("EPIC")){
-				isEpic = true;
-			}
-
-			//******* NEW *******
-			if((strAvailType.equals("Planned Availability"))
-				|| (strAvailType.equals("End of Service"))
-				|| (strAvailType.equals("Last Order"))){
-				qsmGeoList = (EANFlagAttribute)availEI.getAttribute("QSMGEO");
-				if(qsmGeoList != null){
-					if (qsmGeoList.isSelected("6199")){
-						createT006FeatureRecords(rootEntity, wOut, availEI, "Asia Pacific", strAvailType, isEpic);
-					}
-					if (qsmGeoList.isSelected("6200")){
-						createT006FeatureRecords(rootEntity, wOut, availEI, "Canada and Caribbean North", strAvailType, isEpic);
-					}
-					if (qsmGeoList.isSelected("6198")){
-						createT006FeatureRecords(rootEntity, wOut, availEI, "Europe/Middle East/Africa", strAvailType, isEpic);
-					}
-					if (qsmGeoList.isSelected("6204")){
-						createT006FeatureRecords(rootEntity, wOut, availEI, "Latin America", strAvailType, isEpic);
-					}
-					if (qsmGeoList.isSelected("6221")){
-						createT006FeatureRecords(rootEntity, wOut, availEI, "US Only", strAvailType, isEpic);
-					}
-				}
-			}
-		}
-	}
-	
-    /*
-     * Create records for ANNOUNCEMENT -> AVAIL -> OOFAVAIL -> PRODSTRUCT -> MODEL
-     * @throws IOException
-     * @throws SQLException
-     * @throws MiddlewareException
-     */
-	private void createT006FeatureRecords(EntityItem rootEntity, OutputStreamWriter wOut, EntityItem availEI, String strAvailGenAreaSel, String strMainAvailType, boolean isEpic) throws IOException, SQLException, MiddlewareException {
-		
-		StringBuffer sb;
-		String strIOPUCTY;
-		String strISLMRFA;
-		String strCSLMPCI;
-		String strFCTYPE;
-		String strDSLMWDN;
-		String strFAGRMBE;
-		String strISLMPAL;
-		String strPCUAEAP;
-		String strPCUAHEA;
-		String strPCUASEA;
-		String strPCUAUEA;
-		String strCSLMTM1;
-		String strCSLMTM2;
-		String strCSLMTM3;
-		String strCSLMTM4;
-		String strCSLMTM5;
-		String strCSLMTM6;
-		String strCSLMTM7;
-		String strCSLMTM8;
-		String geoModPurchOnly;
-		String strASLMMVP;
-		String strFeatureType;
-		String strPricedFeature;
-		String strCSLMFTY;
-		String strSTSPCFT;
-		String strFSLMPIO;
-		String strQSLMCSU;
-		String strPrcIndc;
-		String strFUSAEDE;
-		String strMaintElig;
-		String strCINCC;
-		String strAvailType;
-		String strDSLMMES;
-		String strCSLMWCD;
-		String strWARRSVCCOVR;
-		
-		
-		Vector prodstructVect = PokUtils.getAllLinkedEntities(availEI, "OOFAVAIL", "PRODSTRUCT");
-		
-		for(int i = 0; i < prodstructVect.size(); i++){
-			sb = new StringBuffer();
-			EntityItem eiProdstruct = (EntityItem) prodstructVect.elementAt(i);
-			
-		    ExtractActionItem eaItem = new ExtractActionItem(null, m_db, m_prof, getT006FeatureVEName());
-
-			EntityList list = m_db.getEntityList(m_prof, eaItem, new EntityItem[] { new EntityItem(null, m_prof, eiProdstruct.getEntityType(), eiProdstruct.getEntityID())});
-			
-		    addDebug("EntityList for "+m_prof.getValOn()+" extract QSMFULL2 contains the following entities: \n"+
-			  		  PokUtils.outputList(list));
-
-			EntityGroup featureGrp = list.getEntityGroup("FEATURE");
-			EntityGroup modelGrp = list.getEntityGroup("MODEL");
-			EntityItem eiFeature = featureGrp.getEntityItem(0);
-			EntityItem eiModel = modelGrp.getEntityItem(0);
-			Vector psStdMaintVect = PokUtils.getAllLinkedEntities(eiProdstruct, "PRODSTSTDMT", "STDMAINT");
-
-		    ExtractActionItem eaItem1 = new ExtractActionItem(null, m_db, m_prof, getT006ModelLinksVEName());
-
-			EntityList list1 = m_db.getEntityList(m_prof, eaItem1, new EntityItem[] { new EntityItem(null, m_prof, eiModel.getEntityType(), eiModel.getEntityID())});
-
-		    addDebug("EntityList for "+m_prof.getValOn()+" extract QSMFULL5 contains the following entities: \n"+
-			  		  PokUtils.outputList(list1));
-
-			EntityGroup sgmntAcrnymGrp = list1.getEntityGroup("SGMNTACRNYM");
-			EntityGroup geoModGrp = list1.getEntityGroup("GEOMOD");
-			EntityGroup modelWarrGrp = list1.getEntityGroup("WARR");
-			EntityGroup modelStdMaintGrp = list1.getEntityGroup("STDMAINT");
-			
-			sb = new StringBuffer();
-			strIOPUCTY = "";
-			strISLMRFA = "";
-			strCSLMPCI = "";
-			strFCTYPE = "";
-			strDSLMWDN = "";
-			strFAGRMBE = "";
-			strISLMPAL = "";
-			strPCUAEAP = "";
-			strPCUAHEA = "";
-			strPCUASEA = "";
-			strPCUAUEA = "";
-			strCSLMTM1 = "";
-			strCSLMTM2 = "";
-			strCSLMTM3 = "";
-			strCSLMTM4 = "";
-			strCSLMTM5 = "";
-			strCSLMTM6 = "";
-			strCSLMTM7 = "";
-			strCSLMTM8 = "";
-			geoModPurchOnly = "";
-			strASLMMVP = "";
-			strFeatureType = "";
-			strPricedFeature = "";
-			strCSLMFTY = "";
-			strSTSPCFT = "";
-			strFSLMPIO = "";
-			strQSLMCSU = "";
-			strPrcIndc = "";
-			strFUSAEDE = "";
-			strMaintElig = "";
-			strCINCC = "";
-			strAvailType = "";
-			strDSLMMES = "";
-			strCSLMWCD = "";
-			strWARRSVCCOVR = "";
-
-			sb.append(getValue(IFTYPE, "F"));
-			
-			if (strAvailGenAreaSel.equals("Latin America")) {
-				strIOPUCTY = "601";
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "LDOCNO", "", "");
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-			} else if (strAvailGenAreaSel.equals("Europe/Middle East/Africa")) {
-				strIOPUCTY = "999";
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "EDOCNO", "", "");
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-			} else if (strAvailGenAreaSel.equals("Asia Pacific")) {
-				strIOPUCTY = "872";
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "ADOCNO", "", "");
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-			} else if (strAvailGenAreaSel.equals("US Only")) {
-				strIOPUCTY = "897";
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "USDOCNO", "", "");
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "USDOCNO", "", "");
-			} else if (strAvailGenAreaSel.equals("Canada and Caribbean North")) {
-				strIOPUCTY = "649";
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "CDOCNO", "", "");
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "USDOCNO", "", "");
-			}
-			sb.append(getValue(IOPUCTY, strIOPUCTY));
-			sb.append(getValue(ISLMPAL, strISLMPAL));
-			sb.append(getValue(ISLMRFA, strISLMRFA));
-			String strISLMPRN = PokUtils.getAttributeValue(eiModel, "MACHTYPEATR", ",", "", false);
-			strISLMPRN += PokUtils.getAttributeValue(eiFeature, "FEATURECODE", ",", "", false);
-			sb.append(getValue(ISLMPRN, strISLMPRN));
-			
-			strFCTYPE = PokUtils.getAttributeValue(eiFeature, "FCTYPE", ",", "", false);
-			strCSLMPCI = "MF";
-			if (strFCTYPE.equals("RPQ-RLISTED") ||
-				strFCTYPE.equals("RPQ-ILISTED") ||
-				strFCTYPE.equals("RPQ-PLISTED")) {
-				strCSLMPCI = "MQ";
-			}
-			
-			sb.append(getValue(CSLMPCI, strCSLMPCI));
-			sb.append(getValue(IPRTNUM, ""));
-			sb.append(getValue(FPUNINC, "2"));
-			sb.append(getValue(CAOAV, ""));
-			sb.append(getValue(DSLMCPA, PokUtils.getAttributeValue(rootEntity, "ANNDATE", ",", "", false)));
-			sb.append(getValue(DSLMCPO, ""));
-
-			sb.append(getValue(DSLMGAD, PokUtils.getAttributeValue(availEI, "EFFECTIVEDATE", ",", "", false)));
-			
-			String strOrderCode = PokUtils.getAttributeValue(eiProdstruct, "ORDERCODE", ",", "", false);
-			EntityItem oofAvail = null;
-			EANFlagAttribute availQSMGeoList;
-			if (strOrderCode.equals("Both") || strOrderCode.equals("MES")){
-				Vector availVec = PokUtils.getAllLinkedEntities(eiProdstruct, "OOFAVAIL", "AVAIL");
-				for(int iA=0; iA < availVec.size(); iA++){
-					availQSMGeoList = null;
-					oofAvail = (EntityItem)availVec.elementAt(iA);
-					strAvailType = PokUtils.getAttributeValue(oofAvail, "AVAILTYPE", ",", "", false);
-					availQSMGeoList = (EANFlagAttribute)oofAvail.getAttribute("QSMGEO");
-					if(isQSMGeoSelected(strAvailGenAreaSel, availQSMGeoList) && strAvailType.equals("MES Planned Availability")){
-						strDSLMMES = PokUtils.getAttributeValue(oofAvail, "EFFECTIVEDATE", ",", "", false);
-						iA = availVec.size();
-					}
-				}
-				if(strDSLMMES.equals("")){
-					strDSLMMES = PokUtils.getAttributeValue(availEI, "EFFECTIVEDATE", ",", "", false);
-				}
-			} else if (strOrderCode.equals("Initial")){
-				strDSLMMES = "2050-12-31";
-			}
-			
-			if (strDSLMMES.equals("")){
-				strDSLMMES = "2050-12-31";
-			}
-
-			sb.append(getValue(DSLMMES, strDSLMMES));
-			
-			sb.append(getValue(QSMEDMW, "2050-12-31"));
-			sb.append(getValue(DSLMMVA, PokUtils.getAttributeValue(rootEntity, "ANNDATE", ",", "", false)));
-
-			strDSLMWDN = validateProdstructs(eiFeature);
-			sb.append(getValue(DSLMWDN, strDSLMWDN));
-			
-			strPricedFeature = PokUtils.getAttributeValue(eiFeature, "PRICEDFEATURE", ",", "", false);
-			
-			if (strFCTYPE.equals("Primary") && strPricedFeature.equals("No")){
-				strFeatureType = "S";
-			}
-			
-			if (strAvailGenAreaSel.equals("Asia Pacific")) {
-				if (strPricedFeature.equals("No")) {
-					strASLMMVP = "0.00";
-				} else if (strPricedFeature.equals("Yes")) {
-					strASLMMVP = "1.00";
-				}
-			} else {
-				strASLMMVP = "1.00";
-			}
-			
-			sb.append(getValue(ASLMMVP, strASLMMVP));
-			
-			sb.append(getValue(CICRY, "N"));
-			sb.append(getValue(CIDCJ, "N"));
-			sb.append(getValue(CIDXC, "N"));
-			
-			if (strAvailGenAreaSel.equals("US Only")) {
-				sb.append(getValue(CINCA, "N"));
-			} else {
-				sb.append(getValue(CINCA, "Y"));
-			}
-
-			String strCINCB = "";
-			strPrcIndc = PokUtils.getAttributeValue(eiFeature, "PRICEDFEATURE", "", "");
-			if (strAvailGenAreaSel.equals("US Only")) {
-				strCINCB = "N";
-			} else {
-				if (strPrcIndc.equals("Yes")){
-					strCINCB = "N";
-				} else if (strPrcIndc.equals("No")){
-					strCINCB = "Y";
-				} else {
-					strCINCB = "N";
-				}
-			}
-			
-			sb.append(getValue(CINCB, strCINCB));
-
-			EntityItem eiStdMaint = null;
-			if (!psStdMaintVect.isEmpty()){
-				eiStdMaint = (EntityItem)psStdMaintVect.elementAt(0);
-				if (eiStdMaint != null){
-					strMaintElig = PokUtils.getAttributeValue(eiStdMaint, "MAINTELIG", "", "");
-				} else {
-					if (modelStdMaintGrp != null && modelStdMaintGrp.hasData()){
-						eiStdMaint = modelStdMaintGrp.getEntityItem(0);
-					}
-				}
-			} else {
-				if (modelStdMaintGrp != null && modelStdMaintGrp.hasData()){
-					eiStdMaint = modelStdMaintGrp.getEntityItem(0);
-				}
-			}
-			
-			if (eiStdMaint != null){
-				strMaintElig = PokUtils.getAttributeValue(eiStdMaint, "MAINTELIG", "", "");
-			}
-			
-			if (strAvailGenAreaSel.equals("Asia Pacific")) {
-				strCINCC = "Y";
-			} else if (strAvailGenAreaSel.equals("US Only") || strAvailGenAreaSel.equals("Canada and Caribbean North")) {
-				strCINCC = "N";
-			} else if (strAvailGenAreaSel.equals("Europe/Middle East/Africa") || strAvailGenAreaSel.equals("Latin America")){
-				if(strMaintElig.equals("Yes")){
-					strCINCC = "N";
-				} else if (strMaintElig.equals("No")){
-					strCINCC = "Y";
-				}
-			}
-			
-			sb.append(getValue(CINCC, strCINCC));
-			
-			
-			sb.append(getValue(CINPM, "N"));
-			sb.append(getValue(CITEM, "N"));
-			sb.append(getValue(CISUP, "N"));
-			if (sgmntAcrnymGrp!= null && sgmntAcrnymGrp.hasData()){
-				EntityItem sgmntAcrnymEI = sgmntAcrnymGrp.getEntityItem(0);
-				sb.append(getValue(CJLBSAC, PokUtils.getAttributeValue(sgmntAcrnymEI, "ACRNYM", "", "")));
-			} else {
-				sb.append(getValue(CJLBSAC, "   "));
-			}
-			sb.append(getValue(CLASSPT, "IHW"));
-			
-			strCSLMFTY = "";
-			
-			if (strAvailGenAreaSel.equals("Europe/Middle East/Africa") || strAvailGenAreaSel.equals("Latin America")) {
-				if (strFeatureType.equals("S")) {
-					strCSLMFTY = "CM";
-				}
-			} else if (strAvailGenAreaSel.equals("Asia Pacific")) {
-				if (strFeatureType.equals("S")) {
-					strCSLMFTY = "CM";
-				}
-			} else if (strAvailGenAreaSel.equals("US Only")) {
-				strCSLMFTY = "NF";
-			} else if (strAvailGenAreaSel.equals("Canada and Caribbean North")) {
-				strCSLMFTY = "";
-			}
-
-			sb.append(getValue(CSLMFTY, strCSLMFTY));
-			sb.append(getValue(CVOAT, ""));
-			
-			//PokUtils.getAttributeValue(eiModel, "MACHTYPEATR", ",", "", false);
-			
-			if (strAvailGenAreaSel.equals("Canada and Caribbean North")) {
-				strFAGRMBE = "Y";
-			} else if (strAvailGenAreaSel.equals("Asia Pacific") || strAvailGenAreaSel.equals("US Only")) {
-				strFAGRMBE = "N";
-			} else if (strAvailGenAreaSel.equals("Europe/Middle East/Africa") || strAvailGenAreaSel.equals("Latin America")){
-				strFAGRMBE = strMaintElig;
-			}
-
-			sb.append(getValue(FAGRMBE, strFAGRMBE));
-
-			String geoModGeo = "";
-			EntityItem eiModGeoMod = null;
-			if(geoModGrp != null && geoModGrp.hasData()){
-				for(int igm = 0; igm < geoModGrp.getEntityItemCount(); igm++){
-					eiModGeoMod = geoModGrp.getEntityItem(igm);
-					geoModGeo = PokUtils.getAttributeValue(eiModGeoMod, "GENAREASELECTION", "", "");
-					if(geoModGeo.equals(strAvailGenAreaSel)){
-						geoModPurchOnly = PokUtils.getAttributeValue(eiModGeoMod, "PURCHONLY", "", "");
-						strFUSAEDE = PokUtils.getAttributeValue(eiModGeoMod, "EDUCPURCHELIG", "", "");
-						igm = geoModGrp.getEntityItemCount();
-					} else {
-						eiModGeoMod = null;
-					}
-				}
-			}
-
-			if (strAvailGenAreaSel.equals("Latin America") || strAvailGenAreaSel.equals("Europe/Middle East/Africa")
-					|| strAvailGenAreaSel.equals("Asia Pacific") ||strAvailGenAreaSel.equals("Canada and Caribbean North")) {
-				if (strOrderCode.equals("Initial")){
-					strFSLMPIO = "Y";
-				} else {
-					strFSLMPIO = "N";
-				}
-			} else if (strAvailGenAreaSel.equals("US Only")) {
-				strFSLMPIO = "N";
-			}
-			sb.append(getValue(FSLMPIO, strFSLMPIO));
-
-			/*
-			if (strAvailGenAreaSel.equals("US Only") || strAvailGenAreaSel.equals("Asia Pacific")
-				|| strAvailGenAreaSel.equals("Canada and Caribbean North")) {
-				strFSLMPOP = "N";
-			} else {
-				if (eiModGeoMod != null){
-					strFSLMPOP = geoModPurchOnly;
-				} else {
-					strFSLMPOP = "";
-				}
-			}
-			*/
-			
-			if (strAvailGenAreaSel.equals("Latin America")
-					|| strAvailGenAreaSel.equals("US Only")
-					|| strAvailGenAreaSel.equals("Canada and Caribbean North")
-					|| strAvailGenAreaSel.equals("Asia Pacific")) {
-				sb.append(getValue(FSLMPOP, "No"));
-			} else if (strAvailGenAreaSel.equals("Europe/Middle East/Africa")) {
-				sb.append(getValue(FSLMPOP, "Yes"));
-			} else {
-				sb.append(getValue(FSLMPOP, geoModPurchOnly));
-			}
-
-			sb.append(getValue(FSLMSTK, "N"));
-
-			String strFSLM2CF = "";
-
-			ArrayList warrTypeArray = new ArrayList();
-			
-			EntityItem eiWarr = null;
-			Vector warrVect = null;
-			String strWarrID = "";
-			
-			warrVect = PokUtils.getAllLinkedEntities(eiProdstruct, "PRODSTRUCTWARR", "WARR");
-			
-			if (!warrVect.isEmpty()){
-				eiWarr = (EntityItem)warrVect.elementAt(0);
-				if(eiWarr == null){
-					if(modelWarrGrp != null && modelWarrGrp.hasData()){
-						eiWarr = modelWarrGrp.getEntityItem(0);
-						strWarrID = PokUtils.getAttributeValue(eiWarr, "WARRID", "", "");
-						if (strWarrID.equals("WTY0000")){
-							if (modelWarrGrp.getEntityItemCount() > 1){
-								eiWarr = modelWarrGrp.getEntityItem(1);
-							} else {
-								eiWarr = null;
-							}
-						}
-					}
-				} else {
-					strWarrID = PokUtils.getAttributeValue(eiWarr, "WARRID", "", "");
-					if (strWarrID.equals("WTY0000")){
-						if (warrVect.size() > 1){
-							eiWarr = (EntityItem) warrVect.elementAt(1);
-						} else {
-							eiWarr = null;
-						}
-					}
-				}
-			} else {
-				if(modelWarrGrp != null && modelWarrGrp.hasData()){
-					eiWarr = modelWarrGrp.getEntityItem(0);
-					strWarrID = PokUtils.getAttributeValue(eiWarr, "WARRID", "", "");
-					if (strWarrID.equals("WTY0000")){
-						if (modelWarrGrp.getEntityItemCount() > 1){
-							eiWarr = modelWarrGrp.getEntityItem(1);
-						} else {
-							eiWarr = null;
-						}
-					}
-				}
-			}
-
-			if (eiWarr != null) {
-				EANFlagAttribute warrTypeList = (EANFlagAttribute)eiWarr.getAttribute("WARRTYPE");
-				if(warrTypeList != null){
-					if (strAvailGenAreaSel.equals("Europe/Middle East/Africa")){
-						if (warrTypeList.isSelected("W0310") || warrTypeList.isSelected("W0330")
-								|| warrTypeList.isSelected("W0200") || warrTypeList.isSelected("W0240") || warrTypeList.isSelected("W0250")){
-							strFSLM2CF = "Y";
-						} else {
-							strFSLM2CF = "N";
-						}
-					}
-					
-					if(strAvailGenAreaSel.equals("Latin America")){
-						if (warrTypeList.isSelected("W0310") || warrTypeList.isSelected("W0330")
-								|| warrTypeList.isSelected("W0560") || warrTypeList.isSelected("W0570") || warrTypeList.isSelected("W0580")){
-							strFSLM2CF = "Y";
-						} else {
-							strFSLM2CF = "N";
-						}
-					}
-					
-					if (strAvailGenAreaSel.equals("Asia Pacific")){
-						if(warrTypeList.isSelected("W0550") 
-								|| warrTypeList.isSelected("W0390")
-								|| warrTypeList.isSelected("W0200") || warrTypeList.isSelected("W0240") || warrTypeList.isSelected("W0250")
-								|| warrTypeList.isSelected("W0310") || warrTypeList.isSelected("W0330")
-								|| warrTypeList.isSelected("W0590")) {
-							strFSLM2CF = "Y";
-						} else {
-							strFSLM2CF = "N";
-						}
-					}
-					
-					if (strAvailGenAreaSel.equals("Canada and Caribbean North")
-							|| strAvailGenAreaSel.equals("US Only")){
-						strFSLM2CF = "N";
-					}
-				}
-			} else {
-				strFSLM2CF = "N";
-			}
-			sb.append(getValue(FSLM2CF, strFSLM2CF));
-			//sb.append(getValue(IDORIG, PokUtils.getAttributeValue(rootEntity, "ANNTYPE", ",", "", false)));
-			sb.append(getValue(IDORIG, "IBM"));
-			strPCUAEAP = "000";
-			strPCUAHEA = "000";
-			strPCUASEA = "000";
-			strPCUAUEA = "000";
-
-			if (strAvailGenAreaSel.equals("US Only") || strAvailGenAreaSel.equals("Canada and Caribbean North")) {
-				strPCUAEAP = "000";
-				strPCUAHEA = "000";
-				strPCUASEA = "000";
-				strPCUAUEA = "000";
-			} else if (strAvailGenAreaSel.equals("Europe/Middle East/Africa")) {
-				strPCUAEAP = " @@";
-				strPCUAHEA = " @@";
-				strPCUASEA = " @@";
-				strPCUAUEA = " @@";
-			} else {
-				if (eiModGeoMod != null){
-					//strPCUAEAP = PokUtils.getAttributeValue(eiModGeoMod, "EDUCPURCHELIG", ",", "", false);
-					strPCUAEAP = getNumValue(PCUAEAP, PokUtils.getAttributeValue(eiModGeoMod, "EDUCALLOWMHGHSCH", ",", "", false));
-					strPCUAHEA = getNumValue(PCUAHEA, PokUtils.getAttributeValue(eiModGeoMod, "EDUCALLOWMHGHSCH", ",", "", false));
-					strPCUASEA = getNumValue(PCUASEA, PokUtils.getAttributeValue(eiModGeoMod, "EDUCALLOWMSECONDRYSCH", ",", "", false));
-					strPCUAUEA = getNumValue(PCUAUEA, PokUtils.getAttributeValue(eiModGeoMod, "EDUCALLOWMUNVRSTY", ",", "", false));
-				}
-			}
-			
-			sb.append(getValue(PCUAEAP, strPCUAEAP));
-			sb.append(getValue(PCUAHEA, strPCUAHEA));
-			sb.append(getValue(PCUASEA, strPCUASEA));
-			sb.append(getValue(PCUAUEA, strPCUAUEA));
-
-			sb.append(getValue(POGMES, ""));
-			
-			String psInstall = PokUtils.getAttributeValue(eiProdstruct, "INSTALL", "", "");
-			if (psInstall.equals("CIF")){
-				if (strAvailGenAreaSel.equals("Europe/Middle East/Africa")
-						|| strAvailGenAreaSel.equals("Latin America")) {
-					strQSLMCSU = "01";
-				} else if (strAvailGenAreaSel.equals("Asia Pacific")){
-					strQSLMCSU = "10";
-				} else if (strAvailGenAreaSel.equals("US Only")
-						|| strAvailGenAreaSel.equals("Canada and Caribbean North")) {
-					strQSLMCSU = "";
-				}
-			} else if (psInstall.equals("CE") || psInstall.equals("N/A") || psInstall.equals("Does not apply")){
-					strQSLMCSU = "";
-			}
-			sb.append(getValue(QSLMCSU, strQSLMCSU));
-
-			sb.append(getValue(QSMXESA, "N"));
-			sb.append(getValue(QSMXSSA, "N"));
-			
-			String strInvname = PokUtils.getAttributeValue(eiFeature, "INVNAME", ",", "", false);
-			sb.append(getValue(TSLMDES, removeSpecialChars(strInvname)));
-
-			strSTSPCFT = "";
-			
-			if (strFeatureType.equals("S")){
-				strSTSPCFT = "OTH";
-			}
-			
-			sb.append(getValue(STSPCFT, strSTSPCFT));
-			sb.append(getValue(TIMSTMP, ""));
-			sb.append(getValue(USERID, ""));
-			
-			warrTypeArray = new ArrayList();
-			strCSLMTM1 = "";
-			strCSLMTM2 = "";
-			strCSLMTM3 = "";
-			strCSLMTM4 = "";
-			strCSLMTM5 = "";
-			strCSLMTM6 = "";
-			strCSLMTM7 = "";
-			strCSLMTM8 = "";
-
-			if (strAvailGenAreaSel.equals("Asia Pacific")) {
-				if (eiWarr != null) {
-					EANFlagAttribute warrTypeList = (EANFlagAttribute)eiWarr.getAttribute("WARRTYPE");
-					if(warrTypeList != null){
-						if (warrTypeList.isSelected("W0560") || warrTypeList.isSelected("W0570") || warrTypeList.isSelected("W0580")) {
-							warrTypeArray.add("IOR");
-						}
-						if (warrTypeList.isSelected("W0550")) {
-							warrTypeArray.add("IOE");
-						}
-						if (warrTypeList.isSelected("W0390")) {
-							warrTypeArray.add("COE");
-						}
-						if (warrTypeList.isSelected("W0200") || warrTypeList.isSelected("W0240") || warrTypeList.isSelected("W0250")) {
-							warrTypeArray.add("CCE");
-						}
-						if (warrTypeList.isSelected("W0310") || warrTypeList.isSelected("W0330")) {
-							warrTypeArray.add("CCR");
-						}
-						if (warrTypeList.isSelected("W0590")) {
-							warrTypeArray.add("IOS");
-						}
-						//TODO - ICE - IBM Courier Exchange - VALUE DOES NOT EXIST IN EACM
-						//if (warrTypeList.isSelected("W0310") || warrTypeList.isSelected("W0330")) {
-						//  warrTypeArray.add("ICE");
-						//}
-						//TODO - ICS - IBM Courier Service - VALUE DOES NOT EXIST IN EACM
-						//if (warrTypeList.isSelected("W0310") || warrTypeList.isSelected("W0330")) {
-						//  warrTypeArray.add("ICS");
-						//}
-						//TODO - IE8 - Annual Minimum Maintenance Next Day 9x5 - VALUE DOES NOT EXIST IN EACM
-						//if (warrTypeList.isSelected("W0310") || warrTypeList.isSelected("W0330")) {
-						//  warrTypeArray.add("IE8");
-						//}
-						//TODO - CES - Depot Exchange Offering - VALUE DOES NOT EXIST IN EACM
-						//if (warrTypeList.isSelected("W0310") || warrTypeList.isSelected("W0330")) {
-						//  warrTypeArray.add("CES");
-						//}
-						//TODO - CFM - Central Facility Maintenance - VALUE DOES NOT EXIST IN EACM
-						//if (warrTypeList.isSelected("W0310") || warrTypeList.isSelected("W0330")) {
-						//  warrTypeArray.add("CFM");
-						//}
-						
-						for (int w = 0; w < warrTypeArray.size(); w++){
-							if (w == 0) {
-								strCSLMTM1 = (String)warrTypeArray.get(w);
-							} else if (w == 1){
-								strCSLMTM2 = (String)warrTypeArray.get(w);
-							} else if (w == 2){
-								strCSLMTM3 = (String)warrTypeArray.get(w);
-							} else if (w == 3){
-								strCSLMTM4 = (String)warrTypeArray.get(w);
-							} else if (w == 4){
-								strCSLMTM5 = (String)warrTypeArray.get(w);
-							} else if (w == 5){
-								strCSLMTM6 = (String)warrTypeArray.get(w);
-							} else if (w == 6){
-								strCSLMTM7 = (String)warrTypeArray.get(w);
-							} else if (w == 7){
-								strCSLMTM8 = (String)warrTypeArray.get(w);
-							}
-						}
-					}
-				}
-			}
-			
-			sb.append(getValue(CSLMTM1, strCSLMTM1));
-			sb.append(getValue(CSLMTM2, strCSLMTM2));
-			sb.append(getValue(CSLMTM3, strCSLMTM3));
-			sb.append(getValue(CSLMTM4, strCSLMTM4));
-			sb.append(getValue(CSLMTM5, strCSLMTM5));
-			sb.append(getValue(CSLMTM6, strCSLMTM6));
-			sb.append(getValue(CSLMTM7, strCSLMTM7));
-			sb.append(getValue(CSLMTM8, strCSLMTM8));
-			
-			sb.append(getValue(FSAPRES, "N"));
-
-			/*
-			 * Code changed as requested
-			if (eiWarr != null){
-				if (strAvailGenAreaSel.equals("US Only")) {
-					sb.append(getValue(CSLMWCD, PokUtils.getAttributeValue(eiWarr, "WARRCATG", "", "")));
-				} else {
-					sb.append(getValue(CSLMWCD, " "));
-				}
-			} else {
-				sb.append(getValue(CSLMWCD, " "));
-			}
-			*/
-			
-			if (strAvailGenAreaSel.equals("US Only")) {
-				EntityItem eiWarr1 = null;
-				strWARRSVCCOVR = PokUtils.getAttributeValue(eiModel, "WARRSVCCOVR", "", "");
-				if(strWARRSVCCOVR != null){
-					if (strWARRSVCCOVR.equals("No Warranty") || strWARRSVCCOVR.equals("")) {
-						strCSLMWCD = "Z";
-					} else {
-						if(modelWarrGrp != null && modelWarrGrp.hasData()){
-							eiWarr1 = modelWarrGrp.getEntityItem(0);
-						//Vector warrVect1 = PokUtils.getAllLinkedEntities(eiModel, "MODELWARR", "WARR");
-							if(eiWarr1 != null){
-								String strWarrID1 = PokUtils.getAttributeValue(eiWarr1, "WARRID", "", "");
-								if (strWarrID1.equals("WTY0000")){
-									if(modelWarrGrp.getEntityItemCount() > 1){
-										eiWarr1 = modelWarrGrp.getEntityItem(1);
-									} else {
-										eiWarr1 = null;
-									}
-								}
-							}
-								 /** code changed as requested */
-							if (eiWarr1 != null){
-								strCSLMWCD = PokUtils.getAttributeValue(eiWarr1, "WARRCATG", "", "");
-							} else {
-								strCSLMWCD = "";
-							}
-						} else {
-							strCSLMWCD = "";
-						}
-					}
-				} else {
-					strCSLMWCD = "Z";
-				} 
-			} else {
-				strCSLMWCD = "";
-			}
-
-			sb.append(getValue(CSLMWCD, strCSLMWCD));
-
-			if (strAvailGenAreaSel.equals("US Only")) {
-				String strCUSAPMS = PokUtils.getAttributeValue(eiModel, "MAINTANNBILLELIGINDC", ",", "", false);
-				if (strCUSAPMS.equals("Yes")) {
-					sb.append(getValue(CUSAPMS, "Y"));
-				} else if (strCUSAPMS.equals("No")) {
-					sb.append(getValue(CUSAPMS, "X"));
-				} else {
-					sb.append(getValue(CUSAPMS, ""));
-				}
-			} else {
-				sb.append(getValue(CUSAPMS, ""));
-			}
-
-			sb.append(getValue(DUSALRW, "2050-12-31"));
-			sb.append(getValue(DUSAMDW, "2050-12-31"));
-			sb.append(getValue(DUSAWUW, "2050-12-31"));
-
-			if(strAvailGenAreaSel.equals("US Only")){
-				sb.append(getValue(FSLMCBL, "N"));
-			} else {
-				sb.append(getValue(FSLMCBL, ""));
-			}
-			
-			if(strAvailGenAreaSel.equals("US Only")){
-				sb.append(getValue(FUSAAAS, "Y"));
-			} else {
-				sb.append(getValue(FUSAAAS, ""));
-			}
-
-			if(strAvailGenAreaSel.equals("US Only")){
-				sb.append(getValue(FUSAEDE, strFUSAEDE));
-			} else {
-				sb.append(getValue(FUSAEDE, ""));	
-			}
-			
-			if(strAvailGenAreaSel.equals("US Only")) {
-				sb.append(getValue(FUSALEP, PokUtils.getAttributeValue(eiModel, "MAINTANNBILLELIGINDC", ",", "", false)));
-			} else {
-				sb.append(getValue(FUSALEP, " "));
-			}
-			
-			if(strAvailGenAreaSel.equals("US Only")){
-				sb.append(getValue(FUSAIRR, "N"));
-			} else {
-				sb.append(getValue(FUSAIRR, ""));
-			}
-			//sb.append(getValue(FUSAIRR, PokUtils.getAttributeValue(eiProdstruct, "RETURNEDPARTS", ",", "", false)));
-			
-			if (eiModGeoMod != null) {
-				sb.append(getValue(ICESPCC, PokUtils.getAttributeValue(eiModGeoMod, "PERCALLCLS", ",", "", false)));
-			} else {
-				sb.append(getValue(ICESPCC, ""));
-			}
-			sb.append(getValue(QUSAPOP, "00.0"));
-			sb.append(getValue(FSLMRFM, ""));
-			
-			sb.append(NEWLINE);
-			wOut.write(sb.toString());
-			wOut.flush();
-
-		}
-	}
-	
-    private boolean isQSMGeoSelected(String strAvailGeo,
-			EANFlagAttribute availGeoList) {
-    	
-    	if (availGeoList != null){
-        	if(strAvailGeo.equals("Asia Pacific") && availGeoList.isSelected("6199")){
-        		return true;
-        	}
-    		
-        	if(strAvailGeo.equals("Canada and Caribbean North") && availGeoList.isSelected("6200")){
-        		return true;
-        	}
-    		
-        	if(strAvailGeo.equals("Europe/Middle East/Africa") && availGeoList.isSelected("6198")){
-        		return true;
-        	}
-    		
-        	if(strAvailGeo.equals("Latin America") && availGeoList.isSelected("6204")){
-        		return true;
-        	}
-    		
-        	if(strAvailGeo.equals("US Only") && availGeoList.isSelected("6221")){
-        		return true;
-        	}
-    	}
-		
-		addDebug("***** isQSMGeoSelected false");
-    	return false;
-
-    }
-
-	/********
-     * Create T017 Records - ANNOUNCEMENT -> AVAIL -> MODELAVAIL -> MODEL -> PRODSTRUCT -> FEATURE
-     * @param rootEntity
-     * @param wOut 
-     * @throws IOException
-     * @throws MiddlewareException
-     * @throws SQLException
-     */
-	private void createT017ProductCategory(EntityItem rootEntity, OutputStreamWriter wOut) throws SQLException, MiddlewareException, IOException {
-
-		EANFlagAttribute qsmGeoList;
-		
-		m_elist = getEntityList(getModelProdstructVEName());
-		
-		EntityGroup availGrp = (EntityGroup)m_elist.getEntityGroup("AVAIL");
-		
-		for (int iAvail = 0; iAvail < availGrp.getEntityItemCount(); iAvail++){
-			qsmGeoList = null;
-
-			EntityItem eiAvail = availGrp.getEntityItem(iAvail);
-			
-			qsmGeoList = (EANFlagAttribute)eiAvail.getAttribute("QSMGEO");
-			if(qsmGeoList != null){
-				if (qsmGeoList.isSelected("6199")){
-					createT017ProductCategoryRecords(rootEntity, wOut, eiAvail, "Asia Pacific");
-				}
-				if (qsmGeoList.isSelected("6200")){
-					createT017ProductCategoryRecords(rootEntity, wOut, eiAvail, "Canada and Caribbean North");
-				}
-				if (qsmGeoList.isSelected("6198")){
-					createT017ProductCategoryRecords(rootEntity, wOut, eiAvail, "Europe/Middle East/Africa");
-				}
-				if (qsmGeoList.isSelected("6204")){
-					createT017ProductCategoryRecords(rootEntity, wOut, eiAvail, "Latin America");
-				}
-				if (qsmGeoList.isSelected("6221")){
-					createT017ProductCategoryRecords(rootEntity, wOut, eiAvail, "US Only");
-				}
-			}
-		}
-	}
-	
-    /********
-     * Create T017 Records - ANNOUNCEMENT -> AVAIL -> MODELAVAIL -> MODEL -> PRODSTRUCT -> FEATURE
-     * @param rootEntity
-     * @param wOut 
-     * @throws IOException
-     * @throws MiddlewareException
-     * @throws SQLException
-     */
-	private void createT017ProductCategoryRecords(EntityItem rootEntity, OutputStreamWriter wOut, EntityItem eiAvail, String strAvailGenAreaSel) throws SQLException, MiddlewareException, IOException {
-
-		StringBuffer sb;
-		String strISLMPAL;
-		String strISLMPRN;
-		String tmp;
-
-		EntityGroup modelGrp = m_elist.getEntityGroup("MODEL");
-	
-		for (int i = 0; i < modelGrp.getEntityItemCount(); i++){
-			sb = new StringBuffer();
-			strISLMPAL = "";
-			strISLMPRN = "";
-			tmp = "";
-			//EntityItem eiModel = (EntityItem) modelVec.elementAt(i);
-			EntityItem eiModel = modelGrp.getEntityItem(i);
-			
-			tmp = PokUtils.getAttributeValue(rootEntity, "PRODCATEGORY", ",", "", false);
-			
-			if (tmp != null && tmp.length() > 0){
-				String[] prodCategoryArray = tmp.split(",");
-				for (int j = 0; j < prodCategoryArray.length; j++){
-
-					sb.append(getValue(IFTYPE, "P"));
-					sb.append(getValue(CPDXA, prodCategoryArray[j]));
-					if (strAvailGenAreaSel.equals("Latin America")) {
-						strISLMPAL = PokUtils.getAttributeValue(rootEntity, "LDOCNO", "", "");
-					} else if (strAvailGenAreaSel.equals("Europe/Middle East/Africa")) {
-						strISLMPAL = PokUtils.getAttributeValue(rootEntity, "EDOCNO", "", "");
-					} else if (strAvailGenAreaSel.equals("Asia Pacific")) {
-						strISLMPAL = PokUtils.getAttributeValue(rootEntity, "ADOCNO", "", "");
-					} else if (strAvailGenAreaSel.equals("US Only")) {
-						strISLMPAL = PokUtils.getAttributeValue(rootEntity, "USDOCNO", "", "");
-					} else if (strAvailGenAreaSel.equals("Canada and Caribbean North")) {
-						strISLMPAL = PokUtils.getAttributeValue(rootEntity, "CDOCNO", "", "");
-					}
-					sb.append(getValue(ISLMPAL, strISLMPAL));
-					
-					strISLMPRN = PokUtils.getAttributeValue(eiModel, "MACHTYPEATR", "", "");
-					strISLMPRN += PokUtils.getAttributeValue(eiModel, "MODELATR", "", "");
-					sb.append(getValue(ISLMPRN, strISLMPRN));
-					
-					sb.append(getValue(TIMSTMP, ""));
-					sb.append(getValue(USERID, ""));
-				
-					sb.append(NEWLINE);
-					wOut.write(sb.toString());
-					wOut.flush();
-
-					Vector featVect = PokUtils.getAllLinkedEntities(eiModel, "PRODSTRUCT", "FEATURE");
-					for (int iFeat = 0; iFeat < featVect.size(); iFeat++){
-						EntityItem eiFeature = (EntityItem) featVect.elementAt(iFeat);
-						sb = new StringBuffer();
-						//strISLMPAL = "";
-						strISLMPRN = "";
-
-						sb.append(getValue(IFTYPE, "P"));
-						sb.append(getValue(CPDXA, PokUtils.getAttributeValue(rootEntity, "PRODCATEGORY", ",", "", false)));
-						
-						sb.append(getValue(ISLMPAL, strISLMPAL));
-						
-						strISLMPRN = PokUtils.getAttributeValue(eiModel, "MACHTYPEATR", "", "");
-						strISLMPRN += PokUtils.getAttributeValue(eiFeature, "FEATURECODE", "", "");
-						sb.append(getValue(ISLMPRN, strISLMPRN));
-						
-						sb.append(getValue(TIMSTMP, ""));
-						sb.append(getValue(USERID, ""));
-					
-						sb.append(NEWLINE);
-						wOut.write(sb.toString());
-						wOut.flush();
-					}
-				}
-			}
-		}
-	}
-	
-	/******
-	 * Create T020 NP Mes Upgrade records
-	 * @param rootEntity
-	 * @param wOut
-	 * @throws IOException
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 */
-	private void createT020NPMesUpgrade(EntityItem rootEntity, OutputStreamWriter wOut) throws IOException, SQLException, MiddlewareException{
-
-		EANFlagAttribute qsmGeoList;
-		
-		m_elist = getEntityList(getNPMesUpgradeVEName()); 
-		
-		EntityGroup availGrp = m_elist.getEntityGroup("AVAIL");
-		
-		String strAvailAnnType = "";
-		boolean isEpic = false;
-		
-		for (int iAvail = 0; iAvail < availGrp.getEntityItemCount(); iAvail++){
-			qsmGeoList = null;
-			
-			EntityItem eiAvail = (EntityItem)availGrp.getEntityItem(iAvail);
-			
-			strAvailAnnType = PokUtils.getAttributeValue(eiAvail, "AVAILANNTYPE", "", "");
-			if (strAvailAnnType.equals("EPIC")){
-				isEpic = true;
-			}
-
-			qsmGeoList = (EANFlagAttribute)eiAvail.getAttribute("QSMGEO");
-			if (qsmGeoList != null) {
-				if (qsmGeoList.isSelected("6199")){
-					createT020NPMesUpgradeRecords(rootEntity, wOut, eiAvail, "Asia Pacific", isEpic);
-				}
-				if (qsmGeoList.isSelected("6200")){
-					createT020NPMesUpgradeRecords(rootEntity, wOut, eiAvail, "Canada and Caribbean North", isEpic);
-				}
-				if (qsmGeoList.isSelected("6198")){
-					createT020NPMesUpgradeRecords(rootEntity, wOut, eiAvail, "Europe/Middle East/Africa", isEpic);
-				}
-				if (qsmGeoList.isSelected("6204")){
-					createT020NPMesUpgradeRecords(rootEntity, wOut, eiAvail, "Latin America", isEpic);
-				}
-				if (qsmGeoList.isSelected("6221")){
-					createT020NPMesUpgradeRecords(rootEntity, wOut, eiAvail, "US Only", isEpic);
-				}
-			}
-		}
-	}
-	
-	/******
-	 * Create T020 NP Mes Upgrade records
-	 * @param rootEntity
-	 * @param wOut
-	 * @throws IOException
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 */
-	private void createT020NPMesUpgradeRecords(EntityItem rootEntity, OutputStreamWriter wOut, EntityItem eiAvail, String strAvailGenAreaSel, boolean isEpic) throws IOException, SQLException, MiddlewareException{
-
-		StringBuffer sb;
-		String strISLMPAL;
-		String strISLMPRN;
-		String strIOPUCTY;
-		String strISLMRFA;
-		String strFromMachType;
-		String strFromModel;
-
-		sb = new StringBuffer();
-		strISLMPAL = "";
-		strISLMPRN = "";
-		strIOPUCTY = "";
-		strISLMRFA = "";
-		
-		Vector modelConvertVect = PokUtils.getAllLinkedEntities(eiAvail, "MODELCONVERTAVAIL", "MODELCONVERT");
-
-		for (int indM = 0; indM < modelConvertVect.size(); indM++){
-			strFromMachType = "";
-			strFromModel = "";
-			
-			EntityItem eiModelConvert = (EntityItem)modelConvertVect.elementAt(indM);
-			
-			sb.append(getValue(IFTYPE, "N"));
-
-			if (strAvailGenAreaSel.equals("Latin America")) {
-				strIOPUCTY = "601";
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "LDOCNO", "", "");
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(eiAvail, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-			} else if (strAvailGenAreaSel.equals("Europe/Middle East/Africa")) {
-				strIOPUCTY = "999";
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "EDOCNO", "", "");
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(eiAvail, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-			} else if (strAvailGenAreaSel.equals("Asia Pacific")) {
-				strIOPUCTY = "872";
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "ADOCNO", "", "");
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(eiAvail, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-			} else if (strAvailGenAreaSel.equals("US Only")) {
-				strIOPUCTY = "897";
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "USDOCNO", "", "");
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(eiAvail, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "USDOCNO", "", "");
-			} else if (strAvailGenAreaSel.equals("Canada and Caribbean North")) {
-				strIOPUCTY = "649";
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "CDOCNO", "", "");
-				strISLMRFA = isEpic ? PokUtils.getAttributeValue(eiAvail, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "USDOCNO", "", "");
-			}
-			sb.append(getValue(IOPUCTY, strIOPUCTY));
-			sb.append(getValue(ISLMPAL, strISLMPAL));
-			sb.append(getValue(ISLMRFA, strISLMRFA));
-
-			strISLMPRN = PokUtils.getAttributeValue(eiModelConvert, "TOMACHTYPE", "", "");
-			strISLMPRN += PokUtils.getAttributeValue(eiModelConvert, "TOMODEL", "", "");
-			sb.append(getValue(ISLMPRN, strISLMPRN));
-			sb.append(getValue(CSLMPCI, "NP"));
-			sb.append(getValue(FPUNINC, "2"));
-			sb.append(getValue(CAOAV, ""));
-			sb.append(getValue(DSLMCPA, PokUtils.getAttributeValue(rootEntity, "ANNDATE", "", "")));
-			sb.append(getValue(DSLMCPO, PokUtils.getAttributeValue(rootEntity, "ANNDATE", "", "")));
-			
-			
-			EntityItem searchAvail = searchForAvailTypeLO(eiModelConvert, "Last Order");
-			
-			if(searchAvail != null){
-				sb.append(getValue(DSLMWDN, PokUtils.getAttributeValue(searchAvail, "EFFECTIVEDATE", "", "")));
-			} else {
-				sb.append(getValue(DSLMWDN, "2050-12-31"));
-			}
-			
-			strFromMachType = PokUtils.getAttributeValue(eiModelConvert, "FROMMACHTYPE", "", "");
-			strFromModel = PokUtils.getAttributeValue(eiModelConvert, "FROMMODEL", "", "");
-			sb.append(getValue(QSMNPMT, strFromMachType));
-			sb.append(getValue(QSMNPMM, strFromModel));
-			sb.append(getValue(TIMSTMP, ""));
-			sb.append(getValue(USERID, ""));
-			
-			sb.append(NEWLINE);
-			wOut.write(sb.toString());
-			wOut.flush();
-
-		}
-	}
-	
-	
-	private EntityItem searchForAvailTypeLO(EntityItem eiModelConvert, String strSearchAvailType){
-		
-		EntityItem eiReturn = null;
-		String strAvailType;
-
-		Vector availVect = PokUtils.getAllLinkedEntities(eiModelConvert, "MODELCONVERTAVAIL", "AVAIL");
-		
-		for(int i = 0; i < availVect.size(); i++){
-			EntityItem eiAvail = (EntityItem) availVect.elementAt(i);
-
-			strAvailType = PokUtils.getAttributeValue(eiAvail, "AVAILTYPE", ",", "", false);
-			
-			if (strSearchAvailType.equals(strAvailType)) {
-				eiReturn = eiAvail;
-				break;
-			}
-		}
-		
-		return eiReturn;
-	}
-
-	
-	private void createT512ReleaseTo(EntityItem rootEntity, OutputStreamWriter wOut) throws IOException {
-
-		StringBuffer sb = new StringBuffer();
-		String strISLMPAL = "";
-		String strISLMRFA = "";
-
-		//Create T512 / R records only for AP and Worldwide Geos
-		EANFlagAttribute genAreaList = (EANFlagAttribute)rootEntity.getAttribute("GENAREASELECTION");
-		if(genAreaList != null){
-			if (genAreaList.isSelected("6199") || genAreaList.isSelected("1999")) {
-				sb.append(getValue(IFTYPE, "R"));
-				sb.append(getValue(IOPUCTY, "872"));
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "ADOCNO", "", "");
-				sb.append(getValue(ISLMPAL, strISLMPAL));
-
-				strISLMRFA = PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-				sb.append(getValue(ISLMRFA, strISLMRFA));
-				sb.append(getValue(DSLMCPA, PokUtils.getAttributeValue(rootEntity, "ANNDATE", "", "")));
-				sb.append(getValue(DSLMEFF, PokUtils.getAttributeValue(rootEntity, "ANNDATE", "", "")));
-				sb.append(getValue(CSLMRCH, ""));
-				sb.append(getValue(CSLMNUM, strISLMPAL));
-				sb.append(getValue(FSLMAPG, "Y"));
-				sb.append(getValue(FSLMASP, "N"));
-				sb.append(getValue(FSLMJAP, "N"));
-				if(genAreaList != null){
-
-					EANFlagAttribute cntryList = (EANFlagAttribute)rootEntity.getAttribute("COUNTRYLIST");
-					
-					if (cntryList.isSelected("1439")) {
-						sb.append(getValue(FSLMAUS, "Y"));
-					} else {
-						sb.append(getValue(FSLMAUS, "N"));
-					}
-
-					if (cntryList.isSelected("1444")) {
-						sb.append(getValue(FSLMBGL, "Y"));
-					} else {
-						sb.append(getValue(FSLMBGL, "N"));
-					}
-					//TODO countrylist Brunai doesn't exit, please check - set to N
-					//if (cntryList.isSelected("?")) {
-						sb.append(getValue(FSLMBRU, "N"));
-					//} else {
-						//sb.append(getValue(FSLMBRU, "N"));
-					//}
-					if (cntryList.isSelected("1524")) {
-						sb.append(getValue(FSLMHKG, "Y"));
-					} else {
-						sb.append(getValue(FSLMHKG, "N"));
-					}
-					if (cntryList.isSelected("1528")) {
-						sb.append(getValue(FSLMIDN, "Y"));
-					} else {
-						sb.append(getValue(FSLMIDN, "N"));
-					}
-					if (cntryList.isSelected("1527")) {
-						sb.append(getValue(FSLMIND, "Y"));
-					} else {
-						sb.append(getValue(FSLMIND, "N"));
-					}
-					if (cntryList.isSelected("1541")) {
-						sb.append(getValue(FSLMKOR, "Y"));
-					} else {
-						sb.append(getValue(FSLMKOR, "N"));
-					}
-					if (cntryList.isSelected("1553")) {
-						sb.append(getValue(FSLMMAC, "Y"));
-					} else {
-						sb.append(getValue(FSLMMAC, "N"));
-					}
-					if (cntryList.isSelected("1557")) {
-						sb.append(getValue(FSLMMAL, "Y"));
-					} else {
-						sb.append(getValue(FSLMMAL, "N"));
-					}
-					if (cntryList.isSelected("1574")) {
-						sb.append(getValue(FSLMMYA, "Y"));
-					} else {
-						sb.append(getValue(FSLMMYA, "N"));
-					}
-					if (cntryList.isSelected("1581")) {
-						sb.append(getValue(FSLMNZL, "Y"));
-					} else {
-						sb.append(getValue(FSLMNZL, "N"));
-					}
-					if (cntryList.isSelected("1597")) {
-						sb.append(getValue(FSLMPHI, "Y"));
-					} else {
-						sb.append(getValue(FSLMPHI, "N"));
-					}
-					if (cntryList.isSelected("1470")) {
-						sb.append(getValue(FSLMPRC, "Y"));
-					} else {
-						sb.append(getValue(FSLMPRC, "N"));
-					}
-					if (cntryList.isSelected("1627")) {
-						sb.append(getValue(FSLMSLA, "Y"));
-					} else {
-						sb.append(getValue(FSLMSLA, "N"));
-					}
-					if (cntryList.isSelected("1619")) {
-						sb.append(getValue(FSLMSNG, "Y"));
-					} else {
-						sb.append(getValue(FSLMSNG, "N"));
-					}
-					if (cntryList.isSelected("1635")) {
-						sb.append(getValue(FSLMTAI, "Y"));
-					} else {
-						sb.append(getValue(FSLMTAI, "N"));
-					}
-					if (cntryList.isSelected("1638")) {
-						sb.append(getValue(FSLMTHA, "Y"));
-					} else {
-						sb.append(getValue(FSLMTHA, "N"));
-					}
-				}
-				sb.append(getValue(TIMSTMP, " "));
-				sb.append(getValue(USERID, " "));
-
-				sb.append(NEWLINE);
-				wOut.write(sb.toString());
-				wOut.flush();
-			}
-		}
-	}
-
-	/******
-	 * Create T632 records
-	 * @param rootEntity
-	 * @param wOut
-	 * @throws IOException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	private void createT632TypeModelFeatureRelation(EntityItem rootEntity, OutputStreamWriter wOut) throws IOException, SQLException, MiddlewareException {
-
-		StringBuffer sb;
-		String strISLMRFA;
-		String strISLMPAL;
-		String strOrderCode;
-		String strQSLMCSU;
-		String strAvailType;
-		String strAvailAnnType = "";
-		boolean isEpic = false; 
-		
-		m_elist = getEntityList(getT006ProdstructVEName()); 
-
-		EntityGroup availGrp = m_elist.getEntityGroup("AVAIL");
-		for (int availI = 0; availI < availGrp.getEntityItemCount(); availI++){
-			EntityItem availEI = availGrp.getEntityItem(availI);
-
-			//Create T632 records only for US ONLY and WorldWide GEOs
-			EANFlagAttribute qsmGeoList = (EANFlagAttribute)availEI.getAttribute("QSMGEO");
-			if(qsmGeoList != null){
-				if (qsmGeoList.isSelected("6221")) {
-
-					Vector prodstructVect = PokUtils.getAllLinkedEntities(availEI, "OOFAVAIL", "PRODSTRUCT");
-					
-					strAvailType = "";
-					strAvailType = PokUtils.getAttributeValue(availEI, "AVAILTYPE", "", "");
-					strAvailAnnType = PokUtils.getAttributeValue(availEI, "AVAILANNTYPE", "", "");
-					if (strAvailAnnType.equals("EPIC")){
-						isEpic = true;
-					}  
-					
-					for(int i = 0; i < prodstructVect.size(); i++){
-						sb = new StringBuffer();
-						EntityItem eiProdstruct = (EntityItem) prodstructVect.elementAt(i);
-						
-					    ExtractActionItem eaItem = new ExtractActionItem(null, m_db, m_prof, getT006FeatureVEName());
-	
-						EntityList list = m_db.getEntityList(m_prof, eaItem, new EntityItem[] { new EntityItem(null, m_prof, eiProdstruct.getEntityType(), eiProdstruct.getEntityID())});
-						  
-						EntityGroup featureGrp = list.getEntityGroup("FEATURE");
-						EntityGroup modelGrp = list.getEntityGroup("MODEL");
-						EntityItem eiFeature = featureGrp.getEntityItem(0);
-						EntityItem eiModel = modelGrp.getEntityItem(0);
-	
-						sb = new StringBuffer();
-						strISLMRFA = "";
-						strISLMPAL = "";
-						strOrderCode = "";
-						strQSLMCSU = "";
-	
-						sb.append(getValue(IFTYPE, "T"));
-						strISLMPAL = PokUtils.getAttributeValue(rootEntity, "USDOCNO", "", "");
-//						strISLMRFA = PokUtils.getAttributeValue(rootEntity, "USDOCNO", "", "");
-// Code updated as requested						
-//						strISLMRFA = PokUtils.getAttributeValue(rootEntity, "EPICNUMBER", "", "");
-						strISLMRFA = getRFANumber(rootEntity, isEpic, availEI);
-						addDebug("*****mlm ISLMRFA=" + strISLMRFA);
-						sb.append(getValue(IOPUCTY, "897"));
-						sb.append(getValue(ISLMPAL, strISLMPAL));
-						sb.append(getValue(ISLMRFA, strISLMRFA));
-						sb.append(getValue(ISLMTYP, PokUtils.getAttributeValue(eiModel, "MACHTYPEATR", "", "")));
-						sb.append(getValue(ISLMMOD, PokUtils.getAttributeValue(eiModel, "MODELATR", "", "")));
-						sb.append(getValue(ISLMFTR, PokUtils.getAttributeValue(eiFeature, "FEATURECODE", "", "")));
-						sb.append(getValue(ISLMXX1, ""));
-						sb.append(getValue(CSLMPCI, "TR"));
-						sb.append(getValue(FPUNINC, "2"));
-						sb.append(getValue(CAOAV, ""));
-						sb.append(getValue(DSLMCPA, PokUtils.getAttributeValue(rootEntity, "ANNDATE", "", "")));
-						sb.append(getValue(DSLMCPO, PokUtils.getAttributeValue(rootEntity, "ANNDATE", "", "")));
-						if (strAvailType.equals("Last Order")) {
-							sb.append(PokUtils.getAttributeValue(availEI, "EFFECTIVEDATE", ",", "", false));
-						} else {
-							sb.append(getValue(DSLMWDN, "2050-12-31"));
-						}
-
-						strOrderCode = PokUtils.getAttributeValue(eiProdstruct, "ORDERCODE", "", "");
-
-						if(strOrderCode.equals("MES")){
-							sb.append(getValue(FSLMMES, "Y"));
-						} else {
-							sb.append(getValue(FSLMMES, "N"));
-						}
-						
-						if(strOrderCode.equals("Initial")) {
-							sb.append(getValue(FSLMPIO, "Y"));
-						} else {
-							sb.append(getValue(FSLMPIO, "N"));
-						}
-						
-						String psInstall = PokUtils.getAttributeValue(eiProdstruct, "INSTALL", "", "");
-						
-						if (psInstall.equals("CIF")){
-							strQSLMCSU = "01";
-						} else {
-							strQSLMCSU = "00";
-						}
-						
-						sb.append(getValue(QSLMCSU, strQSLMCSU));
-						sb.append(getValue(TIMSTMP, ""));
-						sb.append(getValue(USERID, ""));
-						sb.append(getValue(FSLMRFM, ""));
-						
-						sb.append(NEWLINE);
-						wOut.write(sb.toString());
-						wOut.flush();
-
-					}
-				}
-			}
-		}
-	}
-
-	private String getRFANumber(EntityItem rootEntity, boolean isEpic, EntityItem availEI) {
-		String strISLMRFA;
-		if(isEpic){
-			strISLMRFA = PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "");
-		}else{
-			strISLMRFA = "R"+ PokUtils.getAttributeValue(rootEntity, "ANNNUMBER", "", "");
-		}
-		
-		//strISLMRFA = isEpic ? PokUtils.getAttributeValue(availEI, "EPICNUMBER", "", "") : PokUtils.getAttributeValue(rootEntity, "R"+"ANNNUMBER", "", "");
-		return strISLMRFA;
-	}
-	
-	protected String getValue(String column, String columnValue) {
-		if (columnValue == null)
-			columnValue = "";
-		int columnValueLength = columnValue == null ? 0 : columnValue.length();
-		int columnLength = Integer.parseInt(COLUMN_LENGTH.get(column)
-				.toString());
-		if (columnValueLength == columnLength)
-			return columnValue;
-		if (columnValueLength > columnLength)
-			return columnValue.substring(0, columnLength);
-
-		return columnValue + getBlank(columnLength - columnValueLength);
-	}
-
-	protected String getBlank(int count) {
-		StringBuffer sb = new StringBuffer();
-		while (count > 0) {
-			sb.append(" ");
-			count--;
-		}
-		return sb.toString();
-	}
-
-	private String getNumValue(String column, String columnValue) {
-
-		if (columnValue == null)
-			columnValue = "";
-		int columnValueLength = columnValue == null ? 0 : columnValue.length();
-		int columnLength = Integer.parseInt(COLUMN_LENGTH.get(column)
-				.toString());
-		if (columnValueLength == columnLength)
-			return columnValue;
-		if (columnValueLength > columnLength)
-			return columnValue.substring(0, columnLength);
-
-		columnValue = columnValue.trim();
-		int count = columnValueLength;
-		while (count < columnLength) {
-			columnValue = "0" + columnValue;
-			count++;
-		}
-		
-		return columnValue;
-
-	}
-	
-	/******************************************
-	* get entitylist used for compares
-	*/
-	private EntityList getEntityList(String veName) throws
-	java.sql.SQLException,
-	COM.ibm.opicmpdh.middleware.MiddlewareException
-	{
-	      ExtractActionItem eaItem = new ExtractActionItem(null, m_db, m_prof,veName);
-
-	      EntityList list = m_db.getEntityList(m_prof, eaItem, new EntityItem[] { new EntityItem(null, m_prof, rootEntity.getEntityType(), rootEntity.getEntityID())});
-
-		  addDebug("EntityList for "+m_prof.getValOn()+" extract "+veName+" contains the following entities: \n"+
-				PokUtils.outputList(list));
-		return list;
-	}
-	
-	/**********************************
-	 * get the name of the VE to use for MODEL records 
-	 * @return java.lang.String
-	 */
-	public String getT002ModelVEName() { 
-		return "QSMFULL";
-	}
-	
-	/**********************************
-	 * get the name of the VE to use for FEATURE records 
-	 * @return java.lang.String
-	 */
-	public String getT006FeatureVEName() { 
-		return "QSMFULL2";
-	}
-	
-	/**********************************
-	 * get the name of the VE to use for FEATURE records 
-	 * @return java.lang.String
-	 */
-	public String getT006ProdstructVEName() { 
-		return "QSMFULL1";
-	}
-	
-	/**********************************
-	 * get the name of the VE to use for FEATURE records 
-	 * @return java.lang.String
-	 */
-	public String getModelProdstructVEName() { 
-		return "QSMFULL3";
-	}
-	
-	/**********************************
-	 * get the name of the VE to use for FEATURE records 
-	 * @return java.lang.String
-	 */
-	public String getNPMesUpgradeVEName() { 
-		return "QSMFULL4";
-	}
-	
-	/**********************************
-	 * get the name of the VE to use for FEATURE records 
-	 * @return java.lang.String
-	 */
-	public String getT006ModelLinksVEName() { 
-		return "QSMFULL5";
-	}
-	
-	public boolean exeFtpShell(String fileName) {
-		// String cmd =
-		// "/usr/bin/rsync -av /var/log/www.solive.kv/access_log
-		// testuser@10.0.1.219::store --password-file=/etc/client/rsync.pwd";
-
-		String cmd = ABRServerProperties.getValue(abrcode, FTPSCRPATH, null) + " -f " + fileName;
-		String ibiinipath = ABRServerProperties.getValue(abrcode, CREFINIPATH, null);
-		if (ibiinipath != null)
-			cmd += " -i " + ibiinipath;
-		if (dir != null)
-			cmd += " -d " + dir;
-		if (fileprefix != null)
-			cmd += " -p " + fileprefix;
-		String targetFilePath = ABRServerProperties.getValue(abrcode, TARGETFILENAME, null);
-		if (targetFilePath != null)
-			cmd += " -t " + targetFilePath;
-		String logPath = ABRServerProperties.getValue(abrcode, LOGPATH, null);
-		if (logPath != null)
-			cmd += " -l " + logPath;
-		String backupPath = ABRServerProperties.getValue(abrcode, BACKUPPATH, null);
-		if (backupPath != null)
-			cmd += " -b " + backupPath;
-		Runtime run = Runtime.getRuntime();
-		String result = "";
-		BufferedReader br = null;
-		BufferedInputStream in = null;
-		//addDebug("cmd:" + cmd);
-		try {
-			Process p = run.exec(cmd);
-			if (p.waitFor() != 0) {
-				return false;
-			}
-			in = new BufferedInputStream(p.getInputStream());
-			br = new BufferedReader(new InputStreamReader(in));
-			while ((lineStr = br.readLine()) != null) {
-				result += lineStr;
-				if (lineStr.indexOf(FAILD) > -1) {
-					return false;
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-					in.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return result == null ? false : true;
-	}
-	
-	
-    /**********************************
-    * add msg to report output
-    */
-    protected void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
-
-    /**********************************
-     * used for output
-     *
-     */
-    protected void addOutput(String resrcCode, Object args[])
-    {
-    	String msg = getBundle().getString(resrcCode);
-    	if (args != null){
-    		MessageFormat msgf = new MessageFormat(msg);
-    		msg = msgf.format(args);
-    	}
-
-    	addOutput(msg);
-    }
-    /**********************************
-    * add debug info as html comment
-    */
-    protected void addDebug(String msg) { rptSb.append("<!-- "+msg+" -->"+NEWLINE);}
-
-    /**********************************
-    * add error info and fail abr
-    */
-    protected void addError(String msg) {
-        addOutput(msg);
-        setReturnCode(FAIL);
-    }
-
-    /**********************************
-    * used for error output
-    * Prefix with LD(EntityType) NDN(EntityType) of the EntityType that the ABR is checking
-    * (root EntityType)
-    *
-    * The entire message should be prefixed with 'Error: '
-    *
-    */
-    protected void addError(String errCode, Object args[])
-    {
-		EntityGroup eGrp = m_elist.getParentEntityGroup();
-		setReturnCode(FAIL);
-
-		//ERROR_PREFIX = Error: &quot;{0} {1}&quot;
-		MessageFormat msgf = new MessageFormat(getBundle().getString("ERROR_PREFIX"));
-		Object args2[] = new Object[2];
-		args2[0] = eGrp.getLongDescription();
-		args2[1] = navName;
-
-		addMessage(msgf.format(args2), errCode, args);
-	}
-
-    /**********************************
-    * used for warning or error output
-    *
-    */
-    private void addMessage(String msgPrefix, String errCode, Object args[])
-    {
-		String msg = getBundle().getString(errCode);
-		// get message to output
-		if (args!=null){
-			MessageFormat msgf = new MessageFormat(msg);
-			msg = msgf.format(args);
-		}
-
-		addOutput(msgPrefix+" "+msg);
-	}
-
-    /**********************************************************************************
-    *  Get Name based on navigation attributes for root entity
-    *
-    *@return java.lang.String
-    */
-    private String getNavigationName() throws java.sql.SQLException, MiddlewareException
-    {
-        return getNavigationName(m_elist.getParentEntityGroup().getEntityItem(0));
-    }
-
-    /**********************************************************************************
-    *  Get Name based on navigation attributes for specified entity
-    *
-    *@return java.lang.String
-    */
-    private String getNavigationName(EntityItem theItem) throws java.sql.SQLException, MiddlewareException
-    {
-        StringBuffer navName = new StringBuffer();
-        // NAME is navigate attributes
-        // check hashtable to see if we already got this meta
-        EANList metaList = (EANList)metaTbl.get(theItem.getEntityType());
-        if (metaList==null)
-        {
-            EntityGroup eg = new EntityGroup(null, m_db, m_prof, theItem.getEntityType(), "Navigate");
-            metaList = eg.getMetaAttribute();  // iterator does not maintain navigate order
-            metaTbl.put(theItem.getEntityType(), metaList);
-        }
-        for (int ii=0; ii<metaList.size(); ii++)
-        {
-            EANMetaAttribute ma = (EANMetaAttribute)metaList.getAt(ii);
-            navName.append(PokUtils.getAttributeValue(theItem, ma.getAttributeCode(),", ", "", false));
-            if (ii+1<metaList.size()){
-                navName.append(" ");
-            }
-        }
-
-        return navName.toString();
-    }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getABRVersion()
-    {
-        return "1.0";
-    }
-    /***********************************************
-    *  Get ABR description
-    *
-    *@return java.lang.String
-    */
-    public String getDescription()
-    {
-        return "QSMFULLABR";
-    }
-
-}

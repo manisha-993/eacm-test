@@ -1,8851 +1,8855 @@
-//  (c) Copyright International Business Machines Corporation, 2001
-//  All Rights Reserved.</pre>
-//
-//$Log: RFA_IGSSVS.java,v $
-//Revision 1.157  2008/03/19 19:30:44  wendy
-//Clean up RSA warnings
-//
-//Revision 1.156  2007/06/06 19:25:20  bala
-//1 more
-//
-//Revision 1.155  2007/06/06 18:24:22  bala
-//tweaks to header in 153 and 155
-//
-//Revision 1.154  2007/05/31 17:52:03  bala
-//change col width for autobahn number
-//
-//Revision 1.153  2007/05/15 17:28:10  bala
-//fix headers 153,155
-//
-//Revision 1.152  2007/05/07 20:58:55  bala
-//Updates for RFA release 22.04
-//
-//Revision 1.151  2007/04/16 20:37:40  bala
-//change Russia to Russian Federation for Q219
-//
-//Revision 1.150  2007/04/11 17:26:26  bala
-//219 - ignore AVAIL geo since we are checking for individual countries
-//
-//Revision 1.149  2007/03/14 01:03:47  bala
-//format fix for 219
-//
-//Revision 1.148  2007/02/27 17:59:55  bala
-//fix for 219 and 182,183
-//
-//Revision 1.147  2007/02/22 20:52:53  bala
-//fix for q219 and printsuppMktfininfo
-//
-//Revision 1.146  2007/02/16 00:33:27  bala
-//fixes to 153 and 219
-//
-//Revision 1.145  2007/01/23 22:45:05  bala
-//complete changes for Q219
-//
-//Revision 1.144  2007/01/23 21:31:02  bala
-//updates for 21.10
-//
-//Revision 1.143  2006/10/12 20:39:30  bala
-//more Q130 changes 27839116,25715789
-//
-//Revision 1.142  2006/09/26 21:23:55  bala
-//MN26599023: bullets for Q182,183 etc
-//
-//Revision 1.141  2006/08/31 18:42:27  wendy
-//MN29166812  A153 data missing because of SOFAVAIL checks
-//
-//Revision 1.140  2006/08/28 22:06:02  wendy
-//MN29121594 fixes
-//
-//Revision 1.139  2006/08/11 18:32:42  wendy
-//continuation of MN# 28837752 Q153 had no output
-//
-//Revision 1.138  2006/08/07 20:50:56  bala
-//more bug fixes for printInternal
-//
-//Revision 1.137  2006/08/02 21:44:38  bala
-//more fixes for 153
-//
-//Revision 1.136  2006/08/02 18:00:39  bala
-//fix printInternalLetter
-//
-//Revision 1.135  2006/07/31 23:03:32  bala
-//fix ArrayIndexOutOfBoundsException for Q153
-//
-//Revision 1.134  2006/06/15 15:42:07  bala
-//dont print autobahn proj number if sof not linked to avail
-//
-//Revision 1.133  2006/06/09 19:40:37  wendy
-//updates for TIR 6QKKNN
-//
-//Revision 1.132  2006/05/29 23:27:03  bala
-//more updates
-//
-//Revision 1.131  2006/03/21 21:42:21  bala
-//updates for RFA guide 20.10.
-//
-//Revision 1.130  2006/03/02 21:22:15  bala
-//remover reference to constants.java (stylesheets)
-//
-//Revision 1.129  2005/08/23 21:41:02  yang
-//more syntax
-//
-//Revision 1.128  2005/08/23 21:29:03  yang
-//syntax
-//
-//Revision 1.127  2005/08/23 21:12:47  yang
-//more logs
-//
-//Revision 1.126  2005/08/23 20:58:27  yang
-//adding method searchEntityVectorLink1
-//
-//Revision 1.125  2005/08/23 20:45:27  yang
-//more fixes
-//
-//Revision 1.124  2005/08/23 20:35:43  yang
-//adding more log messages
-//
-//Revision 1.123  2005/08/23 20:21:16  yang
-//more syntax
-//
-//Revision 1.122  2005/08/23 19:56:37  yang
-//syntax
-//
-//Revision 1.121  2005/08/23 19:46:27  yang
-//more fixes
-//
-//Revision 1.120  2005/08/23 18:37:33  yang
-//more logs
-//
-//Revision 1.119  2005/08/23 17:15:53  yang
-//more changes to question 15A
-//
-//Revision 1.118  2005/08/23 16:59:18  yang
-//*** empty log message ***
- //
- //Revision 1.117  2005/08/23 16:57:59  yang
- //fixes
- //
- //Revision 1.116  2005/08/23 00:45:36  yang
- //more logs
- //
- //Revision 1.115  2005/08/22 23:09:03  yang
- //additional logs
- //
- //Revision 1.114  2005/08/22 22:30:07  yang
- //adding changes to CR 0822055510 (IGS Business Partner)
- //
- //Revision 1.113  2005/07/13 19:10:14  bala
- // q220 Ucase KOREA
- //
- //Revision 1.112  2005/07/11 17:32:01  bala
- //add korea to 220
- //
- //Revision 1.111  2005/07/08 20:45:04  bala
- //more changes to q220
- //
- //Revision 1.110  2005/07/01 17:03:05  bala
- //fix for q200..change TAIWAN to..
- //
- //Revision 1.109  2005/06/23 20:25:57  bala
- //fix for 15A
- //
- //Revision 1.108  2005/06/23 18:20:32  bala
- //fix nullpointer in 800
- //
- //Revision 1.107  2005/06/21 17:34:34  bala
- //q800 fix
- //
- //Revision 1.106  2005/06/20 19:32:50  bala
- //Fixes for Q155, 800,158
- //
- //Revision 1.105  2005/05/18 19:20:26  bala
- //remove extra tag from crossell/upsell Q119
- //
- //Revision 1.104  2005/05/12 20:15:37  bala
- //fix for 15A
- //
- //Revision 1.103  2005/05/12 01:36:21  bala
- //_15A fix and sorting of marketingmessages (RFASort)
- //
- //Revision 1.102  2005/05/09 18:59:24  bala
- //fix heading for Q154
- //
- //Revision 1.101  2005/05/05 16:24:49  bala
- //change the column width of report for q154 to be within 69 chars
- //
- //Revision 1.100  2005/05/05 16:14:48  bala
- //change FEATUREID to FEATURENUMBER in q155
- //
- //Revision 1.99  2005/05/04 20:56:04  bala
- //fix for 105
- //
- //Revision 1.98  2005/05/02 21:06:32  bala
- //add xmp exmp tags for q220
- //
- //Revision 1.97  2005/04/28 17:53:18  bala
- //change the RFA version
- //
- //Revision 1.96  2005/04/26 21:16:01  bala
- //suppress "Benefit" when no benefit found MN:23709175
- //
- //Revision 1.95  2005/04/22 16:05:25  bala
- //typo
- //
- //Revision 1.94  2005/04/22 15:54:05  bala
- //195,104,102
- //
- //Revision 1.93  2005/04/15 15:45:29  bala
- //Services RFA  Guide Update - 19.10 and 20.04
- //
- //Revision 1.92  2005/03/09 19:12:28  bala
- //fix for 208..not sorting by date since it was changed to 'RFA Format' before sort
- //
- //Revision 1.91  2005/03/07 18:07:18  bala
- //MN 23064407 for q_130
- //
- //Revision 1.90  2005/02/24 22:26:34  bala
- //fix for q126 and q800
- //
- //Revision 1.89  2005/02/08 18:29:12  joan
- //changes for Jtest
- //
- //Revision 1.88  2005/02/03 22:40:07  bala
- //'final' fixes to q130
- //
- //Revision 1.87  2005/01/25 20:38:42  bala
- //more fixes GEO tags for q130
- //
- //Revision 1.86  2005/01/20 22:42:17  bala
- //Q130 fix
- //
- //Revision 1.85  2004/12/09 23:41:46  bala
- //some more tag changes for q_126
- //
- //Revision 1.84  2004/11/23 22:42:25  bala
- //fix nullpointer for Q_116
- //
- //Revision 1.83  2004/11/19 19:00:31  bala
- //q 126, child mkt name has to print with the gml tags when there are multiple
- //multiple child data elements are present
- //
- //Revision 1.82  2004/11/09 16:48:09  bala
- //CR0916041642- change email to E-mail
- //
- //Revision 1.81  2004/11/05 22:54:47  bala
- //fix for 800 and 126
- //
- //Revision 1.80  2004/10/20 15:53:57  bala
- //fix colwidth for q800
- //
- //Revision 1.79  2004/10/06 20:24:03  bala
- //fix for printFeatureBenefit - not printing Mktname for 1 instance
- //
- //Revision 1.78  2004/09/22 21:31:31  bala
- //change format for q_148
- //
- //Revision 1.77  2004/08/16 20:37:00  bala
- //add .exmp for 130
- //
- //Revision 1.76  2004/07/22 23:51:55  bala
- //change to 130 again!
- //
- //Revision 1.75  2004/07/16 20:46:51  bala
- //more adjustements to 130
- //
- //Revision 1.74  2004/07/15 23:12:40  bala
- //add .xmp to 130
- //
- //Revision 1.73  2004/07/15 01:37:10  bala
- //spec change for q_130
- //
- //Revision 1.72  2004/07/01 21:12:32  bala
- //enable printing of offering name when only 1 instance of offering is found
- //
- //Revision 1.71  2004/06/23 17:01:51  bala
- //change date location for 208 and fix geo tag break
- //
- //Revision 1.70  2004/06/17 22:15:57  bala
- //116
- //
- //Revision 1.69  2004/06/15 20:21:40  bala
- //fixes for 208,155,15 series
- //
- //Revision 1.68  2004/06/09 21:41:03  bala
- //fixes for 208,155
- //
- //Revision 1.67  2004/06/08 17:08:02  bala
- //do not print question tags for _110 if no data exists, also changes for Q14A,b, 15 series and 16series
- //
- //Revision 1.66  2004/06/07 17:56:32  bala
- //add EMEA check for channel in q110
- //
- //Revision 1.65  2004/06/03 18:50:48  bala
- //change to Q110
- //
- //Revision 1.64  2004/05/17 21:56:20  bala
- //cosmetic changes
- //
- //Revision 1.63  2004/05/13 21:18:41  bala
- //swap columns for 153
- //
- //Revision 1.62  2004/05/13 20:18:30  bala
- //fix tag imbalance in Q130
- //
- //Revision 1.61  2004/05/13 17:24:02  bala
- //getRFADateFormat - print month in its entirety
- //
- //Revision 1.60  2004/05/11 20:56:11  bala
- //formatting fixes for 148 and removing .p in others
- //
- //Revision 1.59  2004/05/07 21:02:56  bala
- //fix 148, version tag, 200, 208
- //
- //Revision 1.58  2004/05/06 21:52:07  bala
- //fix rfadateformat for 208 for feature and component
- //
- //Revision 1.57  2004/04/29 22:47:47  bala
- //fix for 155
- //
- //Revision 1.56  2004/04/23 23:28:26  bala
- //fix for q110, 170
- //
- //Revision 1.55  2004/04/14 18:36:06  bala
- //change for q170
- //
- //Revision 1.54  2004/04/08 20:24:55  bala
- //deleted xmp and kpoff tags for question 40 because of script error
- //
- //Revision 1.53  2004/04/02 22:45:40  bala
- //fixed bug in getFeatureToSofMktMsg
- //
- //Revision 1.52  2004/04/01 23:30:29  bala
- //fixed nullpointer bug
- //
- //Revision 1.51  2004/03/31 23:33:23  bala
- //changes for 1.3, added getRFADateFormat method
- //
- //Revision 1.50  2004/03/02 22:31:42  bala
- //Alans change to get geo tags from multiple AVAIL's  linked to an offering
- //
- //Revision 1.49  2004/01/23 23:34:32  bala
- //one more fix to 800
- //
- //Revision 1.48  2004/01/23 01:08:06  bala
- //more changes to 800
- //
- //Revision 1.47  2004/01/21 00:08:57  bala
- //fix 110,126
- //
- //Revision 1.46  2004/01/15 19:54:00  bala
- //fix possible null pointers
- //
- //Revision 1.45  2004/01/15 18:47:44  bala
- //Q130 and Q800 changes
- //
- //Revision 1.44  2004/01/14 00:01:36  bala
- //Q130 change formatting, print all ops for offering
- //
- //Revision 1.43  2004/01/12 19:26:40  bala
- //dont suppress duplicates for Q130
- //
- //Revision 1.42  2004/01/12 18:35:39  bala
- //fix for Q 130 - change formatting
- //
- //Revision 1.41  2004/01/09 00:57:13  bala
- //fix for crossell/upsell navigation to its child offerings
- //
- //Revision 1.40  2004/01/06 03:09:18  bala
- //eod commit
- //
- //Revision 1.39  2003/12/31 22:34:19  bala
- //After Alans last minute changes
- //
- //Revision 1.38  2003/12/30 22:25:04  bala
- //eod commit
- //
- //Revision 1.37  2003/12/23 18:52:20  bala
- //fix for 155
- //
- //Revision 1.36  2003/12/18 00:40:01  bala
- //fixes
- //
- //Revision 1.35  2003/12/08 23:13:03  bala
- //change printFeatureBenefit to get crossell/upsell
- //
- //Revision 1.34  2003/12/02 18:49:06  bala
- //more tweaking for 110
- //
- //Revision 1.33  2003/12/01 23:45:59  bala
- //Mike Slocums tag fix for 110
- //
- //Revision 1.32  2003/12/01 20:16:03  bala
- //some more fixes
- //
- //Revision 1.31  2003/11/26 21:46:17  bala
- //more formatting changes
- //
- //Revision 1.30  2003/11/26 01:00:50  bala
- //fix for 110,148,155,208
- //
- //Revision 1.29  2003/11/24 19:38:08  bala
- //fix 208
- //
- //Revision 1.28  2003/11/19 01:23:14  bala
- //208,800
- //
- //Revision 1.27  2003/11/15 00:56:19  bala
- //170,153 and 154
- //
- //Revision 1.26  2003/11/13 23:19:26  bala
- //11/12 EOD commit
- //
- //Revision 1.25  2003/11/12 18:43:20  bala
- //Fix the tag problems as per Alans to get a clean extract
- //
- //Revision 1.24  2003/11/07 00:14:03  bala
- //Correct 1E
- //
- //Revision 1.23  2003/11/06 21:38:51  bala
- //plug in report type
- //
- //Revision 1.22  2003/11/06 03:57:45  bala
- //EOD commit
- //
- //Revision 1.20  2003/11/03 23:58:11  bala
- //EOD commit
- //
- //Revision 1.19  2003/11/01 01:45:23  bala
- //EOD drop
- //
- //Revision 1.18  2003/10/31 02:32:44  bala
- //EOD drop
- //
- //Revision 1.17  2003/10/29 02:27:23  bala
- //EOD commit
- //
- //Revision 1.16  2003/10/27 00:01:38  bala
- //EOD commit
- //
- //Revision 1.15  2003/10/25 23:32:02  bala
- //eod commit
- //
- //Revision 1.14  2003/10/24 00:46:22  bala
- //EOD commit
- //
- //Revision 1.13  2003/10/23 02:09:44  bala
- //eod commit
- //
- //Revision 1.12  2003/10/21 01:17:20  bala
- //Fix 130,4B,44
- //
- //Revision 1.11  2003/10/20 18:23:18  bala
- //fix 130,4B
- //
- //Revision 1.10  2003/10/17 23:34:31  bala
- //fix 045
- //
- //Revision 1.9  2003/10/16 23:54:07  bala
- //simply getLinkedentityItem
- //
- //Revision 1.8  2003/10/16 22:16:29  bala
- //fix compiler error
- //
- //Revision 1.7  2003/10/16 22:07:36  bala
- //sort mktmsg, Q49, add DISTRTYPE checking
- //
- //Revision 1.6  2003/10/15 19:56:54  bala
- //fix linked entityitem
- //
- //Revision 1.5  2003/10/15 16:52:42  bala
- //fix avail navigation and null pointer
- //
- //Revision 1.4  2003/10/13 18:04:39  bala
- //fix one more
- //
- //Revision 1.3  2003/10/10 21:15:11  bala
- //fix null pointer.
- //
- //Revision 1.2  2003/09/25 23:50:48  bala
- //add return statement
- //
- //Revision 1.1  2003/09/25 23:36:03  bala
- //RFA for Services
- //
+/*      */ package COM.ibm.eannounce.abr.rfa;
+/*      */ 
+/*      */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*      */ import COM.ibm.eannounce.abr.util.ReportFormatter;
+/*      */ import COM.ibm.eannounce.abr.util.XMLtoGML;
+/*      */ import COM.ibm.eannounce.objects.EntityGroup;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.GeneralAreaGroup;
+/*      */ import COM.ibm.eannounce.objects.GeneralAreaItem;
+/*      */ import COM.ibm.eannounce.objects.GeneralAreaList;
+/*      */ import COM.ibm.opicmpdh.middleware.D;
+/*      */ import COM.ibm.opicmpdh.middleware.SortUtil;
+/*      */ import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+/*      */ import java.io.ByteArrayOutputStream;
+/*      */ import java.io.PrintWriter;
+/*      */ import java.io.StringReader;
+/*      */ import java.io.StringWriter;
+/*      */ import java.text.DateFormat;
+/*      */ import java.text.SimpleDateFormat;
+/*      */ import java.util.Arrays;
+/*      */ import java.util.Calendar;
+/*      */ import java.util.Date;
+/*      */ import java.util.Enumeration;
+/*      */ import java.util.Hashtable;
+/*      */ import java.util.Iterator;
+/*      */ import java.util.Set;
+/*      */ import java.util.StringTokenizer;
+/*      */ import java.util.TreeMap;
+/*      */ import java.util.Vector;
+/*      */ import javax.xml.transform.stream.StreamSource;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public class RFA_IGSSVS
+/*      */   extends PokBaseABR
+/*      */ {
+/*  519 */   private final String DTDFILEPATH = ABRServerProperties.getDTDFilePath("RFA_IGSSVS");
+/*  520 */   private final String BREAK_INDICATOR = "$$BREAKHERE$$";
+/*  521 */   private final String strWorldwideTag = "US, AP, CAN, EMEA, LA";
+/*      */   
+/*  523 */   EntityGroup grpAnnouncement = null;
+/*  524 */   EntityItem eiAnnounce = null;
+/*  525 */   EntityGroup grpAnnDeliv = null;
+/*  526 */   EntityItem eiAnnDeliv = null;
+/*  527 */   EntityGroup grpAnnPara = null;
+/*  528 */   EntityItem eiAnnPara = null;
+/*  529 */   EntityGroup grpAnnDepend = null;
+/*  530 */   EntityItem eiAnnDepend = null;
+/*  531 */   EntityGroup grpParamCode = null;
+/*  532 */   EntityItem eiParamCode = null;
+/*  533 */   EntityGroup grpDependCode = null;
+/*  534 */   EntityItem eiDependCode = null;
+/*  535 */   EntityGroup grpAnnProj = null;
+/*  536 */   EntityItem eiAnnProj = null;
+/*  537 */   EntityGroup grpErrataCause = null;
+/*  538 */   EntityItem eiErrataCause = null;
+/*  539 */   EntityGroup grpOrganUnit = null;
+/*  540 */   EntityItem eiOrganUnit = null;
+/*  541 */   EntityGroup grpOP = null;
+/*  542 */   EntityItem eiOP = null;
+/*  543 */   EntityGroup grpChannel = null;
+/*  544 */   EntityItem eiChannel = null;
+/*  545 */   EntityGroup grpPDSQuestions = null;
+/*  546 */   EntityItem eiPDSQuestions = null;
+/*  547 */   EntityGroup grpPriceInfo = null;
+/*  548 */   EntityItem eiPriceInfo = null;
+/*  549 */   EntityGroup grpCommOffInfo = null;
+/*  550 */   EntityItem eiCommOffInfo = null;
+/*  551 */   EntityGroup grpDerive = null;
+/*  552 */   EntityItem eiDerive = null;
+/*  553 */   EntityGroup grpAnnReview = null;
+/*  554 */   EntityItem eiAnnReview = null;
+/*  555 */   EntityGroup grpConfigurator = null;
+/*  556 */   EntityItem eiConfigurator = null;
+/*  557 */   EntityGroup grpAnnToConfig = null;
+/*  558 */   EntityItem eiAnnToConfig = null;
+/*  559 */   EntityGroup grpAnnToOrgUnit = null;
+/*  560 */   EntityItem eiAnnToOrgUnit = null;
+/*  561 */   EntityGroup grpAnnToOP = null;
+/*  562 */   EntityItem eiAnnToOP = null;
+/*  563 */   EntityGroup grpCofAvail = null;
+/*  564 */   EntityItem eiCofAvail = null;
+/*  565 */   EntityGroup egSof = null;
+/*  566 */   EntityItem eiSof = null;
+/*  567 */   EntityGroup grpPdsQuestions = null;
+/*  568 */   EntityItem eiPdsQuestions = null;
+/*  569 */   EntityGroup grpCommOfIvo = null;
+/*  570 */   EntityItem eiCommOfIvo = null;
+/*  571 */   EntityGroup grpCommOF = null;
+/*  572 */   EntityItem eiCommOF = null;
+/*  573 */   EntityGroup grpRelatedANN = null;
+/*  574 */   EntityItem eiRelatedANN = null;
+/*  575 */   EntityGroup grpGeneralArea = null;
+/*  576 */   EntityItem eiGeneralArea = null;
+/*  577 */   EntityGroup grpAvail = null;
+/*  578 */   EntityItem eiAvail = null;
+/*  579 */   EntityGroup grpOrderOF = null;
+/*  580 */   EntityItem eiOrderOF = null;
+/*  581 */   EntityGroup grpCrossSell = null;
+/*  582 */   EntityItem eiCrossSell = null;
+/*  583 */   EntityGroup grpUpSell = null;
+/*  584 */   EntityItem eiUpSell = null;
+/*  585 */   EntityGroup grpStdAmendText = null;
+/*  586 */   EntityItem eiStdAmendText = null;
+/*  587 */   EntityGroup grpCOFCrypto = null;
+/*  588 */   EntityItem eiCOFCrypto = null;
+/*  589 */   EntityGroup grpOOFCrypto = null;
+/*  590 */   EntityItem eiOOFCrypto = null;
+/*  591 */   EntityGroup grpCrypto = null;
+/*  592 */   EntityItem eiCrypto = null;
+/*  593 */   EntityGroup grpCofOrganUnit = null;
+/*  594 */   EntityItem eiCofOrganUnit = null;
+/*  595 */   EntityGroup grpIndividual = null;
+/*  596 */   EntityItem eiIndividual = null;
+/*  597 */   EntityGroup grpPublication = null;
+/*  598 */   EntityItem eiPublication = null;
+/*  599 */   EntityGroup grpEducation = null;
+/*  600 */   EntityItem eiEducation = null;
+/*  601 */   EntityGroup grpAnnEducation = null;
+/*  602 */   EntityItem eiAnnEducation = null;
+/*  603 */   EntityGroup grpIvocat = null;
+/*  604 */   EntityItem eiIvocat = null;
+/*  605 */   EntityGroup grpBoilPlateText = null;
+/*  606 */   EntityItem eiBoilPlateText = null;
+/*  607 */   EntityGroup grpCatIncl = null;
+/*  608 */   EntityItem eiCatIncl = null;
+/*  609 */   EntityGroup grpAlternateOF = null;
+/*  610 */   EntityItem eiAlternateOF = null;
+/*  611 */   EntityGroup grpCofBPExhibit = null;
+/*  612 */   EntityItem eiCofBPExhibit = null;
+/*  613 */   EntityGroup grpBPExhibit = null;
+/*  614 */   EntityItem eiBPExhibit = null;
+/*  615 */   EntityGroup grpCofPubs = null;
+/*  616 */   EntityItem eiCofPubs = null;
+/*  617 */   EntityGroup grpEnvirinfo = null;
+/*  618 */   EntityItem eiEnvirinfo = null;
+/*  619 */   EntityGroup grpAltEnvirinfo = null;
+/*  620 */   EntityItem eiAltEnvirinfo = null;
+/*  621 */   EntityGroup grpPackaging = null;
+/*  622 */   EntityItem eiPackaging = null;
+/*  623 */   EntityGroup grpSalesmanchg = null;
+/*  624 */   EntityItem eiSalesmanchg = null;
+/*  625 */   EntityGroup grpAnnSalesmanchg = null;
+/*  626 */   EntityItem eiAnnSalesmanchg = null;
+/*  627 */   EntityGroup grpOrderOFAvail = null;
+/*  628 */   EntityItem eiOrderOFAvail = null;
+/*  629 */   EntityGroup grpOrganUnitIndiv = null;
+/*  630 */   EntityItem eiOrganUnitIndiv = null;
+/*  631 */   EntityGroup grpAnnToAnnDeliv = null;
+/*  632 */   EntityItem eiAnnToAnnDeliv = null;
+/*  633 */   EntityGroup grpAnnDelReqTrans = null;
+/*  634 */   EntityItem eiAnnDelReqTrans = null;
+/*  635 */   EntityGroup grpEmeaTranslation = null;
+/*  636 */   EntityItem eiEmeaTranslation = null;
+/*  637 */   EntityGroup grpAnnToDescArea = null;
+/*  638 */   EntityItem eiAnnToDescArea = null;
+/*  639 */   EntityGroup grpCofPrice = null;
+/*  640 */   EntityItem eiCofPrice = null;
+/*  641 */   EntityGroup grpCofChannel = null;
+/*  642 */   EntityItem eiCofChannel = null;
+/*  643 */   EntityItem eiCofCofMgmtGrp = null;
+/*  644 */   EntityItem eiCofOofMgmtGrp = null;
+/*  645 */   EntityItem eiOofMemberCofOmg = null;
+/*  646 */   EntityItem eiCofMemberCofOmg = null;
+/*  647 */   EntityItem eiCofShip = null;
+/*  648 */   EntityItem eiShipInfo = null;
+/*  649 */   EntityItem eiAnnCofa = null;
+/*  650 */   EntityGroup grpAnnCofa = null;
+/*  651 */   EntityGroup grpAnnCofOffMgmtGrpa = null;
+/*  652 */   EntityItem eiAnnCofOffMgmtGrpa = null;
+/*  653 */   EntityGroup grpAnnAvail = null;
+/*  654 */   EntityItem eiAnnAvail = null;
+/*  655 */   EntityGroup grpOpsys = null;
+/*  656 */   EntityItem eiOpsys = null;
+/*  657 */   EntityGroup grpAnnOp = null;
+/*  658 */   EntityItem eiAnnOp = null;
+/*  659 */   EntityGroup egComponent = null;
+/*  660 */   EntityItem eiComponent = null;
+/*  661 */   EntityGroup egFeature = null;
+/*  662 */   EntityItem eiFeature = null;
+/*  663 */   EntityGroup egFinof = null;
+/*  664 */   EntityItem eiFinof = null;
+/*      */   
+/*  666 */   ReportFormatter rfaReport = null;
+/*  667 */   XMLtoGML x2g = new XMLtoGML();
+/*      */   
+/*  669 */   String strSplit = null;
+/*  670 */   int intSplitLen = 0;
+/*  671 */   int intSplitAt = 0;
+/*  672 */   int iTemp = 0;
+/*  673 */   int i = 0;
+/*  674 */   int j = 0;
+/*  675 */   int k = 0;
+/*  676 */   int[] iColWidths = null;
+/*  677 */   String strCondition1 = null;
+/*  678 */   String strCondition2 = null;
+/*  679 */   String strCondition3 = null;
+/*  680 */   String strCondition4 = null;
+/*  681 */   String strCondition5 = null;
+/*  682 */   String strCondition6 = null;
+/*      */   boolean bConditionOK = false;
+/*      */   boolean bConditionOK1 = false;
+/*      */   boolean bIsAnnITS = false;
+/*  686 */   EntityItem eiNextItem = null;
+/*  687 */   EntityItem eiNextItem1 = null;
+/*  688 */   EntityItem eiNextItem2 = null;
+/*  689 */   EntityItem eiNextItem3 = null;
+/*  690 */   EntityGroup grpNextGroup = null;
+/*  691 */   String[] strParamList1 = null;
+/*  692 */   String[] strParamList2 = null;
+/*  693 */   String[] strFilterAttr = null;
+/*  694 */   String[] strFilterValue = null;
+/*  695 */   String[] strFilterAttr1 = null;
+/*  696 */   String[] strFilterValue1 = null;
+/*  697 */   String[] strEntityTypes = null;
+/*  698 */   Object[] strAnswers = null;
+/*  699 */   String[] strFeatureToSof = null;
+/*  700 */   String[] strCmptToSof = null;
+/*  701 */   String[] strSofToCmpt = new String[] { "SOFRELCMPNT", "CMPNT" };
+/*      */   
+/*  703 */   String[] strHeader = null;
+/*  704 */   String[] strFeatureToCmpt = new String[] { "CMPNTFEATURE", "CMPNT" };
+/*      */   
+/*  706 */   String m_strSpaces = "                                                                                          ";
+/*  707 */   Vector vReturnEntities1 = new Vector();
+/*  708 */   Vector vReturnEntities2 = new Vector();
+/*  709 */   Vector vReturnEntities3 = new Vector();
+/*  710 */   Vector vReturnEntities4 = new Vector();
+/*  711 */   Vector vReturnEntities5 = new Vector();
+/*  712 */   Vector vAvailEntities = new Vector();
+/*  713 */   Vector vSofFrmSofAvail = new Vector();
+/*  714 */   Vector vCmpntFrmCmpntAvail = new Vector();
+/*  715 */   Vector vFeatureFrmFeatureAvail = new Vector();
+/*  716 */   Vector vSofSortedbyMkt = new Vector();
+/*  717 */   Vector vFeatureSortedbyMkt = new Vector();
+/*  718 */   Vector vCmptSortedbyMkt = new Vector();
+/*  719 */   Vector vAllSortedOfferings = new Vector();
+/*      */   
+/*  721 */   Vector vPrintDetails = new Vector();
+/*  722 */   Vector vPrintDetails1 = new Vector();
+/*  723 */   Vector vPrintDetails2 = new Vector();
+/*  724 */   Vector vPrintDetails3 = new Vector();
+/*  725 */   Hashtable hNoDupeLines = new Hashtable<>();
+/*  726 */   Enumeration hKeys = null;
+/*      */   
+/*  728 */   StringTokenizer st = null;
+/*  729 */   GeneralAreaList m_geList = null;
+/*      */   
+/*  731 */   SortUtil mySort = new SortUtil();
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void execute_run() {
+/*      */     try {
+/*  738 */       start_ABRBuild();
+/*  739 */       setReturnCode(0);
+/*      */       
+/*  741 */       logMessage("VE Dump********************");
+/*  742 */       logMessage(this.m_elist.dump(false));
+/*  743 */       logMessage("End VE Dump********************");
+/*      */       
+/*  745 */       this.m_geList = new GeneralAreaList(getDatabase(), getProfile());
+/*  746 */       this.m_geList.buildTree();
+/*      */       
+/*  748 */       logMessage("Starting General area dump*********************************");
+/*  749 */       logMessage(this.m_geList.dump(false));
+/*  750 */       logMessage("Ending dump***********************************");
+/*      */       
+/*  752 */       this.grpAnnouncement = this.m_elist.getParentEntityGroup();
+/*  753 */       logMessage("************Root Entity Type and id " + getEntityType() + ":" + getEntityID());
+/*  754 */       this.vReturnEntities1 = null;
+/*  755 */       this.vReturnEntities2 = null;
+/*      */       
+/*  757 */       if (this.grpAnnouncement == null) {
+/*  758 */         logMessage("****************Announcement Not found ");
+/*  759 */         setReturnCode(-1);
+/*      */       }
+/*      */       else {
+/*      */         
+/*  763 */         logMessage(this.grpAnnouncement.getEntityItemCount() + " Announcements found!");
+/*  764 */         this.eiAnnounce = this.grpAnnouncement.getEntityItem(0);
+/*      */ 
+/*      */ 
+/*      */         
+/*  768 */         this.grpAnnDeliv = this.m_elist.getEntityGroup("ANNDELIVERABLE");
+/*  769 */         this.eiAnnDeliv = null;
+/*  770 */         if (this.grpAnnDeliv != null) {
+/*  771 */           this.eiAnnDeliv = this.grpAnnDeliv.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  774 */           logMessage("**************ANNDELIVERABLE not found in list**");
+/*      */         } 
+/*  776 */         this.grpParamCode = this.m_elist.getEntityGroup("PARAMETERCODE");
+/*  777 */         this.eiParamCode = null;
+/*  778 */         if (this.grpParamCode != null) {
+/*  779 */           this.eiParamCode = this.grpParamCode.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  782 */           logMessage("**************PARAMETERCODE not found in list**");
+/*      */         } 
+/*      */         
+/*  785 */         this.grpDependCode = this.m_elist.getEntityGroup("DEPENDENCYCODE");
+/*  786 */         this.eiDependCode = null;
+/*  787 */         if (this.grpDependCode != null) {
+/*  788 */           this.eiDependCode = this.grpDependCode.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  791 */           logMessage("**************DEPENDENCYCODE not found in list**");
+/*      */         } 
+/*      */         
+/*  794 */         this.grpAnnProj = this.m_elist.getEntityGroup("ANNPROJ");
+/*  795 */         this.eiAnnProj = null;
+/*  796 */         if (this.grpAnnProj != null) {
+/*  797 */           this.eiAnnProj = this.grpAnnProj.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  800 */           logMessage("**************ANNPROJ not found in list**");
+/*      */         } 
+/*      */         
+/*  803 */         this.grpErrataCause = this.m_elist.getEntityGroup("ERRATACAUSE");
+/*  804 */         this.eiErrataCause = null;
+/*  805 */         if (this.grpErrataCause != null) {
+/*  806 */           this.eiErrataCause = this.grpErrataCause.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  809 */           logMessage("**************ERRATACAUSE not found in list**");
+/*      */         } 
+/*      */         
+/*  812 */         this.grpOrganUnit = this.m_elist.getEntityGroup("ORGANUNIT");
+/*  813 */         this.eiOrganUnit = null;
+/*  814 */         if (this.grpOrganUnit != null) {
+/*  815 */           this.eiOrganUnit = this.grpOrganUnit.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  818 */           logMessage("**************ORGANUNIT not found in list**");
+/*      */         } 
+/*      */         
+/*  821 */         this.grpOP = this.m_elist.getEntityGroup("OP");
+/*  822 */         this.eiOP = null;
+/*  823 */         if (this.grpOP != null) {
+/*  824 */           this.eiOP = this.grpOP.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  827 */           logMessage("**************OP not found in list**");
+/*      */         } 
+/*      */         
+/*  830 */         this.grpChannel = this.m_elist.getEntityGroup("CHANNEL");
+/*  831 */         this.eiChannel = null;
+/*  832 */         if (this.grpChannel != null) {
+/*  833 */           this.eiChannel = this.grpChannel.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  836 */           logMessage("**************CHANNEL not found in list**");
+/*      */         } 
+/*      */         
+/*  839 */         this.grpPDSQuestions = this.m_elist.getEntityGroup("PDSQUESTIONS");
+/*  840 */         this.eiPDSQuestions = null;
+/*  841 */         if (this.grpPDSQuestions != null) {
+/*  842 */           this.eiPDSQuestions = this.grpPDSQuestions.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  845 */           logMessage("**************PDSQUESTIONS not found in list**");
+/*      */         } 
+/*      */         
+/*  848 */         this.grpPriceInfo = this.m_elist.getEntityGroup("PRICEFININFO");
+/*  849 */         this.eiPriceInfo = null;
+/*  850 */         if (this.grpPriceInfo != null) {
+/*  851 */           this.eiPriceInfo = this.grpPriceInfo.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  854 */           logMessage("**************PRICEFININFO not found in list**");
+/*      */         } 
+/*      */         
+/*  857 */         this.grpCommOffInfo = this.m_elist.getEntityGroup("COMMERCIALOFINFO");
+/*  858 */         this.eiCommOffInfo = null;
+/*  859 */         if (this.grpCommOffInfo != null) {
+/*  860 */           this.eiCommOffInfo = this.grpCommOffInfo.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  863 */           logMessage("**************COMMERCIALOFINFO not found in list**");
+/*      */         } 
+/*      */         
+/*  866 */         this.grpDerive = this.m_elist.getEntityGroup("DERIVE");
+/*  867 */         this.eiDerive = null;
+/*  868 */         if (this.grpDerive != null) {
+/*  869 */           this.eiDerive = this.grpDerive.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  872 */           logMessage("**************DERIVE not found in list**");
+/*      */         } 
+/*      */         
+/*  875 */         this.grpAnnReview = this.m_elist.getEntityGroup("ANNREVIEW");
+/*  876 */         this.eiAnnReview = null;
+/*  877 */         if (this.grpAnnReview != null) {
+/*  878 */           this.eiAnnReview = this.grpAnnReview.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  881 */           logMessage("**************ANNREVIEW not found in list**");
+/*      */         } 
+/*      */         
+/*  884 */         this.grpConfigurator = this.m_elist.getEntityGroup("CONFIGURATOR");
+/*  885 */         this.eiConfigurator = null;
+/*  886 */         if (this.grpConfigurator != null) {
+/*  887 */           this.eiConfigurator = this.grpConfigurator.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  890 */           logMessage("**************CONFIGURATOR not found in list**");
+/*      */         } 
+/*      */         
+/*  893 */         this.grpAnnToConfig = this.m_elist.getEntityGroup("ANNTOCONFIG");
+/*  894 */         this.eiAnnToConfig = null;
+/*  895 */         if (this.grpAnnToConfig != null) {
+/*  896 */           this.eiAnnToConfig = this.grpAnnToConfig.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  899 */           logMessage("**************ANNTOCONFIG not found in list**");
+/*      */         } 
+/*      */         
+/*  902 */         this.grpAnnToOrgUnit = this.m_elist.getEntityGroup("ANNORGANUNIT");
+/*  903 */         this.eiAnnToOrgUnit = null;
+/*  904 */         if (this.grpAnnToConfig != null) {
+/*  905 */           this.eiAnnToOrgUnit = this.grpAnnToOrgUnit.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  908 */           logMessage("**************ANNORGANUNIT not found in list**");
+/*      */         } 
+/*      */         
+/*  911 */         this.grpAnnToOP = this.m_elist.getEntityGroup("ANNOP");
+/*  912 */         this.eiAnnToOP = null;
+/*  913 */         if (this.grpAnnToOP != null) {
+/*  914 */           this.eiAnnToOP = this.grpAnnToOP.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  917 */           logMessage("**************ANNOP not found in list**");
+/*      */         } 
+/*      */         
+/*  920 */         this.grpCofAvail = this.m_elist.getEntityGroup("COMMERCIALOFAVAIL");
+/*  921 */         this.eiCofAvail = null;
+/*  922 */         if (this.grpCofAvail != null) {
+/*  923 */           this.eiCofAvail = this.grpCofAvail.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  926 */           logMessage("**************COMMERCIALOFAVAIL not found in list**");
+/*      */         } 
+/*      */         
+/*  929 */         this.grpPdsQuestions = this.m_elist.getEntityGroup("PDSQUESTIONS");
+/*  930 */         this.eiPdsQuestions = null;
+/*  931 */         if (this.grpPdsQuestions != null) {
+/*  932 */           this.eiPdsQuestions = this.grpPdsQuestions.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  935 */           logMessage("**************PDSQUESTIONS not found in list**");
+/*      */         } 
+/*      */         
+/*  938 */         this.grpCommOfIvo = this.m_elist.getEntityGroup("COMMERCIALOFIVO");
+/*  939 */         this.eiCommOfIvo = null;
+/*  940 */         if (this.grpCommOfIvo != null) {
+/*  941 */           this.eiCommOfIvo = this.grpCommOfIvo.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  944 */           logMessage("**************COMMERCIALOFIVO not found in list**");
+/*      */         } 
+/*      */         
+/*  947 */         this.grpCommOF = this.m_elist.getEntityGroup("COMMERCIALOF");
+/*  948 */         this.eiCommOF = null;
+/*  949 */         if (this.grpCommOF != null) {
+/*  950 */           this.eiCommOF = this.grpCommOF.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  953 */           logMessage("**************COMMERCIALOF not found in list**");
+/*      */         } 
+/*      */         
+/*  956 */         this.grpRelatedANN = this.m_elist.getEntityGroup("RELATEDANN");
+/*  957 */         this.eiRelatedANN = null;
+/*  958 */         if (this.grpRelatedANN != null) {
+/*  959 */           this.eiRelatedANN = this.grpRelatedANN.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  962 */           logMessage("**************RELATEDANN not found in list**");
+/*      */         } 
+/*      */         
+/*  965 */         this.grpGeneralArea = this.m_elist.getEntityGroup("GENERALAREA");
+/*  966 */         this.eiGeneralArea = null;
+/*  967 */         if (this.grpGeneralArea != null) {
+/*  968 */           this.eiGeneralArea = this.grpGeneralArea.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  971 */           logMessage("**************GENERALAREA not found in list**");
+/*      */         } 
+/*      */         
+/*  974 */         this.grpAvail = this.m_elist.getEntityGroup("AVAIL");
+/*  975 */         this.eiAvail = null;
+/*  976 */         if (this.grpAvail != null) {
+/*  977 */           this.eiAvail = this.grpAvail.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  980 */           logMessage("**************AVAIL not found in list**");
+/*      */         } 
+/*      */         
+/*  983 */         this.grpOrderOF = this.m_elist.getEntityGroup("ORDEROF");
+/*  984 */         this.eiOrderOF = null;
+/*  985 */         if (this.grpOrderOF != null) {
+/*  986 */           this.eiOrderOF = this.grpOrderOF.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  989 */           logMessage("**************ORDEROF not found in list**");
+/*      */         } 
+/*      */         
+/*  992 */         this.grpCrossSell = this.m_elist.getEntityGroup("CROSSSELL");
+/*  993 */         this.eiCrossSell = null;
+/*  994 */         if (this.grpCrossSell != null) {
+/*  995 */           this.eiCrossSell = this.grpCrossSell.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/*  998 */           logMessage("**************CROSSSELL not found in list**");
+/*      */         } 
+/*      */         
+/* 1001 */         this.grpUpSell = this.m_elist.getEntityGroup("UPSELL");
+/* 1002 */         this.eiUpSell = null;
+/* 1003 */         if (this.grpUpSell != null) {
+/* 1004 */           this.eiUpSell = this.grpUpSell.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1007 */           logMessage("**************UPSELL not found in list**");
+/*      */         } 
+/*      */         
+/* 1010 */         this.grpStdAmendText = this.m_elist.getEntityGroup("STANDAMENDTEXT");
+/* 1011 */         this.eiStdAmendText = null;
+/* 1012 */         if (this.grpStdAmendText != null) {
+/* 1013 */           this.eiStdAmendText = this.grpStdAmendText.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1016 */           logMessage("**************STANDAMENDTEXT not found in list**");
+/*      */         } 
+/*      */         
+/* 1019 */         this.grpCOFCrypto = this.m_elist.getEntityGroup("COFCRYPTO");
+/* 1020 */         this.eiCOFCrypto = null;
+/* 1021 */         if (this.grpCOFCrypto != null) {
+/* 1022 */           this.eiCOFCrypto = this.grpCOFCrypto.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1025 */           logMessage("**************COFCRYPTO not found in list**");
+/*      */         } 
+/*      */         
+/* 1028 */         this.grpOOFCrypto = this.m_elist.getEntityGroup("OOFCRYPTO");
+/* 1029 */         this.eiOOFCrypto = null;
+/* 1030 */         if (this.grpOOFCrypto != null) {
+/* 1031 */           this.eiOOFCrypto = this.grpOOFCrypto.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1034 */           logMessage("**************OOFCRYPTO not found in list**");
+/*      */         } 
+/*      */         
+/* 1037 */         this.grpCrypto = this.m_elist.getEntityGroup("CRYPTO");
+/* 1038 */         this.eiCrypto = null;
+/* 1039 */         if (this.grpCrypto != null) {
+/* 1040 */           this.eiCrypto = this.grpCrypto.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1043 */           logMessage("**************CRYPTO not found in list**");
+/*      */         } 
+/*      */         
+/* 1046 */         this.grpCofOrganUnit = this.m_elist.getEntityGroup("COFORGANUNIT");
+/* 1047 */         this.eiCofOrganUnit = null;
+/* 1048 */         if (this.grpCofOrganUnit != null) {
+/* 1049 */           this.eiCofOrganUnit = this.grpCofOrganUnit.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1052 */           logMessage("**************COFORGANUNIT not found in list**");
+/*      */         } 
+/*      */         
+/* 1055 */         this.grpIndividual = this.m_elist.getEntityGroup("INDIVIDUAL");
+/* 1056 */         this.eiIndividual = null;
+/* 1057 */         if (this.grpIndividual != null) {
+/* 1058 */           this.eiIndividual = this.grpIndividual.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1061 */           logMessage("**************INDIVIDUAL not found in list**");
+/*      */         } 
+/*      */         
+/* 1064 */         this.grpPublication = this.m_elist.getEntityGroup("PUBLICATION");
+/* 1065 */         this.eiPublication = null;
+/* 1066 */         if (this.grpPublication != null) {
+/* 1067 */           this.eiPublication = this.grpPublication.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1070 */           logMessage("**************PUBLICATION not found in list**");
+/*      */         } 
+/*      */         
+/* 1073 */         this.grpEducation = this.m_elist.getEntityGroup("EDUCATION");
+/* 1074 */         this.eiEducation = null;
+/* 1075 */         if (this.grpEducation != null) {
+/* 1076 */           this.eiEducation = this.grpEducation.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1079 */           logMessage("**************EDUCATION not found in list**");
+/*      */         } 
+/*      */         
+/* 1082 */         this.grpAnnEducation = this.m_elist.getEntityGroup("ANNEDUCATION");
+/* 1083 */         this.eiAnnEducation = null;
+/* 1084 */         if (this.grpAnnEducation != null) {
+/* 1085 */           this.eiAnnEducation = this.grpAnnEducation.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1088 */           logMessage("**************ANNEDUCATION not found in list**");
+/*      */         } 
+/*      */         
+/* 1091 */         this.grpIvocat = this.m_elist.getEntityGroup("IVOCAT");
+/* 1092 */         this.eiIvocat = null;
+/* 1093 */         if (this.grpIvocat != null) {
+/* 1094 */           this.eiIvocat = this.grpIvocat.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1097 */           logMessage("**************IVOCAT not found in list**");
+/*      */         } 
+/*      */         
+/* 1100 */         this.grpBoilPlateText = this.m_elist.getEntityGroup("BOILPLATETEXT");
+/* 1101 */         this.eiBoilPlateText = null;
+/* 1102 */         if (this.grpBoilPlateText != null) {
+/* 1103 */           this.eiBoilPlateText = this.grpBoilPlateText.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1106 */           logMessage("**************BOILPLATETEXT not found in list**");
+/*      */         } 
+/*      */         
+/* 1109 */         this.grpCatIncl = this.m_elist.getEntityGroup("CATINCL");
+/* 1110 */         this.eiCatIncl = null;
+/* 1111 */         if (this.grpCatIncl != null) {
+/* 1112 */           this.eiCatIncl = this.grpCatIncl.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1115 */           logMessage("**************CATINCL not found in list**");
+/*      */         } 
+/*      */         
+/* 1118 */         this.grpAlternateOF = this.m_elist.getEntityGroup("ALTERNATEOF");
+/* 1119 */         this.eiAlternateOF = null;
+/* 1120 */         if (this.grpAlternateOF != null) {
+/* 1121 */           this.eiAlternateOF = this.grpAlternateOF.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1124 */           logMessage("**************ALTERNATEOF not found in list**");
+/*      */         } 
+/*      */         
+/* 1127 */         this.grpCofBPExhibit = this.m_elist.getEntityGroup("COFBPEXHIBIT");
+/* 1128 */         this.eiCofBPExhibit = null;
+/* 1129 */         if (this.grpCofBPExhibit != null) {
+/* 1130 */           this.eiCofBPExhibit = this.grpCofBPExhibit.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1133 */           logMessage("**************COFBPEXHIBIT not found in list**");
+/*      */         } 
+/*      */         
+/* 1136 */         this.grpBPExhibit = this.m_elist.getEntityGroup("BPEXHIBIT");
+/* 1137 */         this.eiBPExhibit = null;
+/* 1138 */         if (this.grpBPExhibit != null) {
+/* 1139 */           this.eiBPExhibit = this.grpBPExhibit.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1142 */           logMessage("**************BPEXHIBIT not found in list**");
+/*      */         } 
+/*      */         
+/* 1145 */         this.grpCofPubs = this.m_elist.getEntityGroup("COFPUBS");
+/* 1146 */         this.eiCofPubs = null;
+/* 1147 */         if (this.grpCofPubs != null) {
+/* 1148 */           this.eiCofPubs = this.grpCofPubs.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1151 */           logMessage("**************COFPUBS not found in list**");
+/*      */         } 
+/*      */         
+/* 1154 */         this.grpEnvirinfo = this.m_elist.getEntityGroup("ENVIRINFO");
+/* 1155 */         this.eiEnvirinfo = null;
+/* 1156 */         if (this.grpEnvirinfo != null) {
+/* 1157 */           this.eiEnvirinfo = this.grpEnvirinfo.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1160 */           logMessage("**************ENVIRINFO not found in list**");
+/*      */         } 
+/*      */         
+/* 1163 */         this.grpAltEnvirinfo = this.m_elist.getEntityGroup("ALTDEPENENVIRINFO");
+/* 1164 */         this.eiAltEnvirinfo = null;
+/* 1165 */         if (this.grpAltEnvirinfo != null) {
+/* 1166 */           this.eiAltEnvirinfo = this.grpAltEnvirinfo.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1169 */           logMessage("**************ALTDEPENENVIRINFO not found in list**");
+/*      */         } 
+/*      */         
+/* 1172 */         this.grpPackaging = this.m_elist.getEntityGroup("PACKAGING");
+/* 1173 */         this.eiPackaging = null;
+/* 1174 */         if (this.grpPackaging != null) {
+/* 1175 */           this.eiPackaging = this.grpPackaging.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1178 */           logMessage("**************PACKAGING not found in list**");
+/*      */         } 
+/*      */         
+/* 1181 */         this.grpAnnSalesmanchg = this.m_elist.getEntityGroup("ANNSALESMANCHG");
+/* 1182 */         this.eiAnnSalesmanchg = null;
+/* 1183 */         if (this.grpAnnSalesmanchg != null) {
+/* 1184 */           this.eiAnnSalesmanchg = this.grpAnnSalesmanchg.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1187 */           logMessage("**************ANNSALESMANCHG not found in list**");
+/*      */         } 
+/* 1189 */         this.grpSalesmanchg = this.m_elist.getEntityGroup("SALESMANCHG");
+/* 1190 */         this.eiSalesmanchg = null;
+/* 1191 */         if (this.grpSalesmanchg != null) {
+/* 1192 */           this.eiSalesmanchg = this.grpSalesmanchg.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1195 */           logMessage("**************SALESMANCHG not found in list**");
+/*      */         } 
+/*      */         
+/* 1198 */         this.grpOrderOFAvail = this.m_elist.getEntityGroup("OOFAVAIL");
+/* 1199 */         this.eiOrderOFAvail = null;
+/* 1200 */         if (this.grpOrderOFAvail != null) {
+/* 1201 */           this.eiOrderOFAvail = this.grpOrderOFAvail.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1204 */           logMessage("**************OOFAVAIL not found in list**");
+/*      */         } 
+/*      */         
+/* 1207 */         this.grpAnnToAnnDeliv = this.m_elist.getEntityGroup("ANNTOANNDELIVER");
+/* 1208 */         this.eiAnnToAnnDeliv = null;
+/* 1209 */         if (this.grpAnnToAnnDeliv != null) {
+/* 1210 */           this.eiAnnToAnnDeliv = this.grpAnnToAnnDeliv.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1213 */           logMessage("**************ANNTOANNDELIVER not found in list**");
+/*      */         } 
+/*      */         
+/* 1216 */         this.grpAnnDelReqTrans = this.m_elist.getEntityGroup("ANNDELREQTRANS");
+/* 1217 */         this.eiAnnDelReqTrans = null;
+/* 1218 */         if (this.grpAnnDelReqTrans != null) {
+/* 1219 */           this.eiAnnDelReqTrans = this.grpAnnDelReqTrans.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1222 */           logMessage("**************ANNDELREQTRANS not found in list**");
+/*      */         } 
+/*      */         
+/* 1225 */         this.grpAnnToDescArea = this.m_elist.getEntityGroup("ANNTODESCAREA");
+/* 1226 */         this.eiAnnToDescArea = null;
+/* 1227 */         if (this.grpAnnToDescArea != null) {
+/* 1228 */           this.eiAnnToDescArea = this.grpAnnToDescArea.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1231 */           logMessage("**************ANNTODESCAREA not found in list**");
+/*      */         } 
+/*      */         
+/* 1234 */         this.grpCofPrice = this.m_elist.getEntityGroup("COFPRICE");
+/* 1235 */         this.eiCofPrice = null;
+/* 1236 */         if (this.grpCofPrice != null) {
+/* 1237 */           this.eiCofPrice = this.grpCofPrice.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1240 */           logMessage("**************COFPRICE not found in list**");
+/*      */         } 
+/*      */         
+/* 1243 */         this.grpAnnPara = this.m_elist.getEntityGroup("ANNPARAA");
+/* 1244 */         this.eiAnnPara = null;
+/* 1245 */         if (this.grpAnnPara != null) {
+/* 1246 */           this.eiAnnPara = this.grpAnnPara.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1249 */           logMessage("**************ANNPARAA not found in list**");
+/*      */         } 
+/*      */         
+/* 1252 */         this.grpDependCode = this.m_elist.getEntityGroup("ANNDEPA");
+/* 1253 */         this.eiDependCode = null;
+/* 1254 */         if (this.grpDependCode != null) {
+/* 1255 */           this.eiDependCode = this.grpDependCode.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1258 */           logMessage("**************ANNDEPA not found in list**");
+/*      */         } 
+/*      */         
+/* 1261 */         this.grpCofChannel = this.m_elist.getEntityGroup("COFCHANNEL");
+/* 1262 */         this.eiCofChannel = null;
+/* 1263 */         if (this.grpCofChannel != null) {
+/* 1264 */           this.eiCofChannel = this.grpCofChannel.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1267 */           logMessage("**************COFCHANNEL not found in list**");
+/*      */         } 
+/*      */         
+/* 1270 */         this.grpAnnCofa = this.m_elist.getEntityGroup("ANNCOFA");
+/* 1271 */         this.eiAnnCofa = null;
+/* 1272 */         if (this.grpAnnCofa != null) {
+/* 1273 */           this.eiAnnCofa = this.grpAnnCofa.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1276 */           logMessage("**************ANNCOFA not found in list**");
+/*      */         } 
+/*      */         
+/* 1279 */         this.grpAnnCofOffMgmtGrpa = this.m_elist.getEntityGroup("ANNCOFOOFMGMTGRPA");
+/* 1280 */         this.eiAnnCofOffMgmtGrpa = null;
+/* 1281 */         if (this.grpAnnCofOffMgmtGrpa != null) {
+/* 1282 */           this.eiAnnCofOffMgmtGrpa = this.grpAnnCofOffMgmtGrpa.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1285 */           logMessage("**************ANNCOFOOFMGMTGRPA not found in list**");
+/*      */         } 
+/*      */         
+/* 1288 */         this.grpAnnAvail = this.m_elist.getEntityGroup("ANNAVAILA");
+/* 1289 */         this.eiAnnAvail = null;
+/* 1290 */         if (this.grpAnnAvail != null) {
+/* 1291 */           this.eiAnnAvail = this.grpAnnAvail.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1294 */           logMessage("**************ANNAVAILA not found in list**");
+/*      */         } 
+/*      */         
+/* 1297 */         this.grpAnnOp = this.m_elist.getEntityGroup("ANNOP");
+/* 1298 */         this.eiAnnOp = null;
+/* 1299 */         if (this.grpAnnOp != null) {
+/* 1300 */           this.eiAnnOp = this.grpAnnOp.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1303 */           logMessage("**************ANNOP not found in list**");
+/*      */         } 
+/*      */         
+/* 1306 */         this.egComponent = this.m_elist.getEntityGroup("CMPNT");
+/* 1307 */         this.eiComponent = null;
+/* 1308 */         if (this.egComponent != null) {
+/* 1309 */           this.eiComponent = this.egComponent.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1312 */           logMessage("**************CMPNT not found in list**");
+/*      */         } 
+/*      */         
+/* 1315 */         this.egSof = this.m_elist.getEntityGroup("SOF");
+/* 1316 */         this.eiSof = null;
+/* 1317 */         if (this.egSof != null) {
+/* 1318 */           this.eiSof = this.egSof.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1321 */           logMessage("**************SOF not found in list**");
+/*      */         } 
+/*      */         
+/* 1324 */         this.egFeature = this.m_elist.getEntityGroup("FEATURE");
+/* 1325 */         this.eiFeature = null;
+/* 1326 */         if (this.egFeature != null) {
+/* 1327 */           this.eiFeature = this.egFeature.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1330 */           logMessage("**************FEATURE not found in list**");
+/*      */         } 
+/*      */         
+/* 1333 */         this.egFinof = this.m_elist.getEntityGroup("FINOF");
+/* 1334 */         this.eiFinof = null;
+/* 1335 */         if (this.egFinof != null) {
+/* 1336 */           this.eiFinof = this.egFinof.getEntityItem(0);
+/*      */         } else {
+/*      */           
+/* 1339 */           logMessage("**************FINOF not found in list**");
+/*      */         } 
+/*      */         
+/* 1342 */         this.rfaReport = new ReportFormatter();
+/* 1343 */         this.rfaReport.setABRItem(getABRItem());
+/*      */ 
+/*      */         
+/* 1346 */         DateFormat dateFormat = DateFormat.getDateInstance();
+/* 1347 */         dateFormat.setCalendar(Calendar.getInstance());
+/* 1348 */         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+/* 1349 */         simpleDateFormat.setCalendar(Calendar.getInstance());
+/* 1350 */         String str = simpleDateFormat.format(new Date());
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1355 */         println(".*$REQUESTTYPE_BEGIN");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1372 */         this.strCondition1 = getAttributeFlagEnabledValue(this.eiAnnounce, "LOB");
+/* 1373 */         logMessage("**************Announcement LOB is " + this.strCondition1);
+/* 1374 */         this.bIsAnnITS = (this.strCondition1 != null) ? this.strCondition1.equals("101") : false;
+/*      */ 
+/*      */         
+/* 1377 */         this.strCondition1 = getAttributeFlagEnabledValue(this.eiAnnounce, "DISTRTYPE");
+/* 1378 */         if (!this.strCondition1.equals("720")) {
+/* 1379 */           this.strCondition1 = getAttributeValue(this.eiAnnounce, "SENDTOMAINMENU", "NoValuefoundSENDTOMAINMENU");
+/*      */           
+/* 1381 */           if (this.strCondition1.equals("Yes")) {
+/*      */             
+/* 1383 */             this.strCondition1 = getAttributeFlagEnabledValue(this.eiAnnounce, "ANCYCLESTATUS");
+/* 1384 */             this.strCondition1 = this.strCondition1.substring((this.strCondition1.indexOf("|") == -1) ? 0 : (this.strCondition1
+/* 1385 */                 .indexOf("|") + 1));
+/* 1386 */             this.strCondition2 = getAttributeValue(this.eiAnnounce, "ANNDATE", "");
+/* 1387 */             this.i = Integer.valueOf(this.strCondition1).intValue();
+/* 1388 */             this.bConditionOK = true;
+/* 1389 */             switch (this.i) {
+/*      */               case 112:
+/*      */               case 114:
+/*      */               case 115:
+/* 1393 */                 this.strCondition3 = "preEdit";
+/*      */                 break;
+/*      */               case 116:
+/*      */               case 117:
+/* 1397 */                 if (this.strCondition2.compareTo(str) > 0) {
+/* 1398 */                   this.strCondition3 = "final";
+/*      */                   break;
+/*      */                 } 
+/* 1401 */                 this.strCondition3 = "correction";
+/*      */                 break;
+/*      */               
+/*      */               default:
+/* 1405 */                 println("ANCYCLESTATUS returned unexpected flag value");
+/*      */                 break;
+/*      */             } 
+/*      */           
+/*      */           } else {
+/* 1410 */             this.strCondition3 = "return";
+/*      */           } 
+/*      */         } else {
+/*      */           
+/* 1414 */           this.strCondition3 = "finalEdit";
+/*      */         } 
+/* 1416 */         println(this.strCondition3);
+/* 1417 */         println(".*$REQUESTTYPE_END");
+/* 1418 */         println(".*$USERIDS_BEGIN");
+/* 1419 */         println("'" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "USERTOKEN", "") : "'") + "'");
+/* 1420 */         println(".*$USERIDS_END");
+/* 1421 */         println(".*$VARIABLES_BEGIN");
+/* 1422 */         processShortAnswers();
+/* 1423 */         println(".*$ANSWERS_BEGIN");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1430 */         processLongTo100();
+/* 1431 */         processLongTo200();
+/* 1432 */         processLongTo300();
+/* 1433 */         processLongTo400();
+/* 1434 */         processLongTo500();
+/* 1435 */         processLongTo600();
+/* 1436 */         processLongTo700();
+/* 1437 */         processLongTo800();
+/* 1438 */         processLongTo900();
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1444 */         println(".*$ANSWERS_END");
+/*      */       
+/*      */       }
+/*      */     
+/*      */     }
+/* 1449 */     catch (Exception exception) {
+/*      */       
+/* 1451 */       println("Error in " + this.m_abri.getABRCode() + ":" + exception.getMessage());
+/* 1452 */       println("" + exception);
+/* 1453 */       logError(exception, "");
+/* 1454 */       StringWriter stringWriter = new StringWriter();
+/*      */       
+/* 1456 */       exception.printStackTrace(new PrintWriter(stringWriter));
+/*      */       
+/* 1458 */       String str3 = stringWriter.toString();
+/*      */       
+/* 1460 */       println(str3);
+/*      */ 
+/*      */       
+/* 1463 */       if (getABRReturnCode() != -2) {
+/* 1464 */         setReturnCode(-3);
+/*      */       }
+/*      */     } finally {
+/*      */       
+/* 1468 */       String str1 = this.eiAnnounce.getNavAttrDescription();
+/*      */       
+/* 1470 */       if (str1.length() > 34) {
+/* 1471 */         str1 = str1.substring(0, 34);
+/*      */       }
+/*      */       
+/* 1474 */       String str2 = "Extract for " + str1 + " | " + ((getReturnCode() == 0) ? "Passed" : "Failed") + " | Complete";
+/*      */       
+/* 1476 */       setDGTitle(str2);
+/*      */       
+/* 1478 */       setDGRptName("RFA_IGSSVS");
+/* 1479 */       setDGRptClass("RFA_IGSSVS");
+/* 1480 */       printDGSubmitString();
+/*      */ 
+/*      */       
+/* 1483 */       setDGString(getABRReturnCode());
+/*      */       
+/* 1485 */       if (!isReadOnly()) {
+/* 1486 */         clearSoftLock();
+/*      */       }
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getLinkedEntityAttrValue(EntityItem paramEntityItem, String[] paramArrayOfString, String paramString, boolean paramBoolean) {
+/* 1507 */     return getLinkedEntityAttrValue(paramEntityItem, paramArrayOfString, paramString, paramBoolean, (String[])null, (String[])null);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getLinkedEntityAttrValue(EntityItem paramEntityItem, String[] paramArrayOfString1, String paramString, boolean paramBoolean, String[] paramArrayOfString2, String[] paramArrayOfString3) {
+/* 1523 */     String str = null;
+/* 1524 */     EntityItem entityItem = null;
+/* 1525 */     if (paramArrayOfString2 == null) {
+/* 1526 */       entityItem = getLinkedEntityItem(paramEntityItem, paramArrayOfString1, paramBoolean);
+/*      */     } else {
+/*      */       
+/* 1529 */       entityItem = getLinkedEntityItem(paramEntityItem, paramArrayOfString1, paramBoolean, paramArrayOfString2, paramArrayOfString3);
+/*      */     } 
+/* 1531 */     str = getAttributeValue(entityItem, paramString, " ");
+/*      */     
+/* 1533 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getDownlinkedEntityAttrValue(EntityItem paramEntityItem, String[] paramArrayOfString, String paramString) {
+/* 1545 */     return getLinkedEntityAttrValue(paramEntityItem, paramArrayOfString, paramString, true);
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private String getDownlinkedEntityAttrValue(EntityItem paramEntityItem, String[] paramArrayOfString1, String paramString, String[] paramArrayOfString2, String[] paramArrayOfString3) {
+/* 1550 */     return getLinkedEntityAttrValue(paramEntityItem, paramArrayOfString1, paramString, true, paramArrayOfString2, paramArrayOfString3);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getUplinkedEntityAttrValue(EntityItem paramEntityItem, String[] paramArrayOfString, String paramString) {
+/* 1579 */     return getLinkedEntityAttrValue(paramEntityItem, paramArrayOfString, paramString, false);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityItem getLinkedEntityItem(EntityItem paramEntityItem, String[] paramArrayOfString, boolean paramBoolean) {
+/* 1591 */     return getLinkedEntityItem(paramEntityItem, paramArrayOfString, paramBoolean, (String[])null, (String[])null);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityItem getLinkedEntityItem(EntityItem paramEntityItem, String[] paramArrayOfString1, boolean paramBoolean, String[] paramArrayOfString2, String[] paramArrayOfString3) {
+/* 1610 */     D.ebug(4, "In getLinkedEntityItem :" + paramEntityItem.getKey());
+/*      */     
+/* 1612 */     EntityItem entityItem1 = paramEntityItem;
+/* 1613 */     String str = paramArrayOfString1[paramArrayOfString1.length - 1];
+/* 1614 */     EntityItem entityItem2 = null;
+/* 1615 */     Vector<EntityItem> vector = new Vector();
+/* 1616 */     D.ebug(4, "In getLinkedEntityItem 1");
+/* 1617 */     for (byte b = 0; b < paramArrayOfString1.length; b++) {
+/* 1618 */       if (paramArrayOfString2 == null) {
+/* 1619 */         vector = searchEntityItemLink(entityItem1, (String[])null, (String[])null, true, paramBoolean, paramArrayOfString1[b]);
+/*      */       
+/*      */       }
+/* 1622 */       else if (b == paramArrayOfString1.length - 1) {
+/* 1623 */         D.ebug(4, "getLinkedEntityItem: matching from " + entityItem1
+/* 1624 */             .getKey() + " to target " + paramArrayOfString1[b] + " for values " + paramArrayOfString2
+/* 1625 */             .toString() + " == " + paramArrayOfString3.toString());
+/* 1626 */         vector = searchEntityItemLink(entityItem1, paramArrayOfString2, paramArrayOfString3, true, paramBoolean, paramArrayOfString1[b]);
+/*      */       }
+/*      */       else {
+/*      */         
+/* 1630 */         vector = searchEntityItemLink(entityItem1, (String[])null, (String[])null, true, paramBoolean, paramArrayOfString1[b]);
+/*      */       } 
+/*      */       
+/* 1633 */       D.ebug(4, "getLinkedEntityItem: Navigating " + entityItem1.getKey() + " to " + paramArrayOfString1[b]);
+/* 1634 */       if (vector.size() > 0) {
+/* 1635 */         entityItem1 = vector.elementAt(0);
+/*      */       }
+/*      */     } 
+/* 1638 */     entityItem2 = entityItem1;
+/*      */     
+/* 1640 */     if (!entityItem2.getEntityType().equals(str)) {
+/* 1641 */       D.ebug(4, "getLinkedEntityItem: could not find target ETYPE:" + str + " start " + paramEntityItem
+/* 1642 */           .getKey() + ":" + paramArrayOfString1
+/* 1643 */           .toString());
+/* 1644 */       entityItem2 = null;
+/*      */     } 
+/* 1646 */     return entityItem2;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityItem getDownlinkedEntityItem(EntityItem paramEntityItem, String[] paramArrayOfString) {
+/* 1671 */     return getLinkedEntityItem(paramEntityItem, paramArrayOfString, true);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityItem getUplinkedEntityItem(EntityItem paramEntityItem, String[] paramArrayOfString) {
+/* 1682 */     D.ebug(4, "In getUplinkedEntityItem :" + paramEntityItem.getKey());
+/* 1683 */     return getLinkedEntityItem(paramEntityItem, paramArrayOfString, false);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector searchEntityGroup(EntityGroup paramEntityGroup, String[] paramArrayOfString1, String[] paramArrayOfString2, boolean paramBoolean) {
+/* 1715 */     Vector<EntityItem> vector = new Vector();
+/*      */ 
+/*      */     
+/* 1718 */     EntityItem entityItem = null;
+/* 1719 */     for (byte b = 0; b < paramEntityGroup.getEntityItemCount(); b++) {
+/* 1720 */       entityItem = paramEntityGroup.getEntityItem(b);
+/* 1721 */       if (paramArrayOfString1 != null) {
+/* 1722 */         if (foundInEntity(entityItem, paramArrayOfString1, paramArrayOfString2, paramBoolean)) {
+/* 1723 */           vector.add(entityItem);
+/*      */         }
+/*      */       } else {
+/*      */         
+/* 1727 */         vector.add(entityItem);
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */     
+/* 1732 */     return vector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector searchEntityVectorLink(Vector<EntityItem> paramVector, String[] paramArrayOfString1, String[] paramArrayOfString2, boolean paramBoolean1, boolean paramBoolean2, String paramString) {
+/* 1749 */     Vector<EntityItem> vector = new Vector();
+/*      */ 
+/*      */     
+/* 1752 */     EntityItem entityItem1 = null;
+/* 1753 */     EntityItem entityItem2 = null;
+/* 1754 */     int i = 0;
+/* 1755 */     if (paramVector.size() == 0) {
+/* 1756 */       logMessage("searchEntityVectorLink:NO ITEMS FOUND");
+/*      */     }
+/* 1758 */     for (byte b = 0; b < paramVector.size(); b++) {
+/* 1759 */       entityItem1 = paramVector.elementAt(b);
+/* 1760 */       if (paramBoolean2) {
+/* 1761 */         i = entityItem1.getDownLinkCount();
+/*      */       } else {
+/*      */         
+/* 1764 */         i = entityItem1.getUpLinkCount();
+/*      */       } 
+/* 1766 */       for (byte b1 = 0; b1 < i; b1++) {
+/* 1767 */         if (paramBoolean2) {
+/* 1768 */           entityItem2 = (EntityItem)entityItem1.getDownLink(b1);
+/*      */         } else {
+/*      */           
+/* 1771 */           entityItem2 = (EntityItem)entityItem1.getUpLink(b1);
+/*      */         } 
+/* 1773 */         if (entityItem2 != null && 
+/* 1774 */           entityItem2.getEntityType().equals(paramString)) {
+/* 1775 */           D.ebug(4, "searchEntityVectorLink:Linking from :" + entityItem1
+/* 1776 */               .getKey() + " to " + entityItem2.getKey());
+/* 1777 */           if (paramArrayOfString1 != null) {
+/* 1778 */             if (foundInEntity(entityItem2, paramArrayOfString1, paramArrayOfString2, paramBoolean1) && 
+/* 1779 */               !vector.contains(entityItem2)) {
+/* 1780 */               vector.add(entityItem2);
+/*      */             
+/*      */             }
+/*      */           
+/*      */           }
+/* 1785 */           else if (!vector.contains(entityItem2)) {
+/* 1786 */             vector.add(entityItem2);
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */     
+/* 1793 */     return vector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector searchEntityVectorLink1(Vector<EntityItem> paramVector, String[] paramArrayOfString1, String[] paramArrayOfString2, boolean paramBoolean, String paramString) {
+/* 1809 */     Vector<EntityItem> vector = new Vector();
+/*      */ 
+/*      */     
+/* 1812 */     EntityItem entityItem = null;
+/*      */     
+/* 1814 */     D.ebug(4, "searchEntityVectorLink1-- _vEntItems.size(): " + paramVector.size() + "_strCheckAttribute: " + paramArrayOfString1 + "_strCheckValues: " + paramArrayOfString2 + "_bAllTrue: " + paramBoolean + "_strLinkEtype: " + paramString);
+/*      */ 
+/*      */     
+/* 1817 */     if (paramVector.size() == 0) {
+/* 1818 */       logMessage("searchEntityVectorLink for searchEntityVectorLink1:NO ITEMS FOUND");
+/*      */     }
+/* 1820 */     for (byte b = 0; b < paramVector.size(); b++) {
+/* 1821 */       entityItem = paramVector.elementAt(b);
+/* 1822 */       D.ebug(4, "eiCurrentItem" + entityItem + ": " + entityItem.getKey());
+/* 1823 */       D.ebug(4, "searchEntityVectorLink1 mystuff for i" + b + "of: " + paramVector.size());
+/* 1824 */       if (entityItem != null && 
+/* 1825 */         entityItem.getEntityType().equals(paramString)) {
+/* 1826 */         D.ebug(4, "searchEntityVectorLink1:Linking from: " + entityItem.getKey());
+/* 1827 */         if (paramArrayOfString1 != null) {
+/* 1828 */           D.ebug(4, "We're getting here: " + entityItem.getKey() + ": " + paramArrayOfString1 + ": " + paramArrayOfString2 + ": " + paramBoolean);
+/*      */           
+/* 1830 */           if (foundInEntity(entityItem, paramArrayOfString1, paramArrayOfString2, paramBoolean)) {
+/* 1831 */             D.ebug(4, "We're getting here2");
+/* 1832 */             if (!vector.contains(entityItem)) {
+/* 1833 */               D.ebug(4, "We're getting here3");
+/* 1834 */               vector.add(entityItem);
+/*      */             }
+/*      */           
+/*      */           }
+/*      */         
+/* 1839 */         } else if (!vector.contains(entityItem)) {
+/* 1840 */           D.ebug(4, "We're getting here4");
+/* 1841 */           vector.add(entityItem);
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */     
+/* 1847 */     return vector;
+/*      */   }
+/*      */   
+/*      */   private Vector searchInGeo(Vector paramVector, String paramString) {
+/* 1851 */     String[] arrayOfString = { paramString };
+/*      */     
+/* 1853 */     return searchInGeo(paramVector, arrayOfString);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector searchInGeo(Vector<EntityItem> paramVector, String[] paramArrayOfString) {
+/* 1864 */     Vector<EntityItem> vector = new Vector();
+/* 1865 */     EntityItem entityItem = null;
+/* 1866 */     Hashtable<Object, Object> hashtable = new Hashtable<>();
+/*      */     
+/* 1868 */     boolean bool = false;
+/*      */     
+/* 1870 */     for (byte b = 0; b < paramVector.size(); b++) {
+/* 1871 */       entityItem = paramVector.elementAt(b);
+/* 1872 */       String str = null;
+/* 1873 */       bool = false;
+/* 1874 */       for (byte b1 = 0; b1 < paramArrayOfString.length; b1++) {
+/* 1875 */         str = paramArrayOfString[b1];
+/*      */         
+/* 1877 */         if (str.equals("US")) {
+/* 1878 */           bool = this.m_geList.isRfaGeoUS(entityItem);
+/*      */           
+/*      */           break;
+/*      */         } 
+/* 1882 */         if (str.equals("AP")) {
+/* 1883 */           bool = this.m_geList.isRfaGeoAP(entityItem);
+/*      */           
+/*      */           break;
+/*      */         } 
+/* 1887 */         if (str.equals("CAN")) {
+/* 1888 */           bool = this.m_geList.isRfaGeoCAN(entityItem);
+/*      */           
+/*      */           break;
+/*      */         } 
+/* 1892 */         if (str.equals("EMEA")) {
+/* 1893 */           bool = this.m_geList.isRfaGeoEMEA(entityItem);
+/*      */           
+/*      */           break;
+/*      */         } 
+/* 1897 */         if (str.equals("LA")) {
+/* 1898 */           bool = this.m_geList.isRfaGeoLA(entityItem);
+/*      */           
+/*      */           break;
+/*      */         } 
+/*      */       } 
+/* 1903 */       if (bool && 
+/* 1904 */         !hashtable.containsKey(entityItem.getKey())) {
+/* 1905 */         hashtable.put(entityItem.getKey(), entityItem);
+/* 1906 */         vector.add(entityItem);
+/* 1907 */         D.ebug(4, "searchInGeo:checking for GEO:Adding:" + entityItem.getKey());
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */     
+/* 1912 */     return vector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getAllGeoTags(Vector<EntityItem> paramVector) {
+/* 1921 */     String str = "";
+/* 1922 */     EntityItem entityItem = null;
+/* 1923 */     boolean bool1 = false;
+/* 1924 */     boolean bool2 = false;
+/* 1925 */     boolean bool3 = false;
+/* 1926 */     boolean bool4 = false;
+/* 1927 */     boolean bool5 = false;
+/* 1928 */     D.ebug(4, "getAllGeoTags:Vector is ");
+/* 1929 */     displayContents(paramVector);
+/* 1930 */     for (byte b = 0; b < paramVector.size(); b++) {
+/* 1931 */       entityItem = paramVector.elementAt(b);
+/*      */       
+/* 1933 */       if (this.m_geList == null) {
+/* 1934 */         logMessage("getGeoTags:GE List is null!");
+/*      */       }
+/* 1936 */       if (!bool1 && 
+/* 1937 */         this.m_geList.isRfaGeoUS(entityItem)) {
+/* 1938 */         bool1 = true;
+/*      */       }
+/*      */       
+/* 1941 */       if (!bool2 && 
+/* 1942 */         this.m_geList.isRfaGeoAP(entityItem)) {
+/* 1943 */         bool2 = true;
+/*      */       }
+/*      */       
+/* 1946 */       if (!bool3 && 
+/* 1947 */         this.m_geList.isRfaGeoCAN(entityItem)) {
+/* 1948 */         bool3 = true;
+/*      */       }
+/*      */       
+/* 1951 */       if (!bool4 && 
+/* 1952 */         this.m_geList.isRfaGeoEMEA(entityItem)) {
+/* 1953 */         bool4 = true;
+/*      */       }
+/*      */       
+/* 1956 */       if (!bool5 && 
+/* 1957 */         this.m_geList.isRfaGeoLA(entityItem)) {
+/* 1958 */         bool5 = true;
+/*      */       }
+/*      */     } 
+/*      */     
+/* 1962 */     if (bool1) {
+/* 1963 */       str = "US";
+/*      */     }
+/*      */     
+/* 1966 */     if (bool2) {
+/* 1967 */       if (str.length() > 0) {
+/* 1968 */         str = str + ", AP";
+/*      */       } else {
+/*      */         
+/* 1971 */         str = "AP";
+/*      */       } 
+/*      */     }
+/*      */     
+/* 1975 */     if (bool3) {
+/* 1976 */       if (str.length() > 0) {
+/* 1977 */         str = str + ", CAN";
+/*      */       } else {
+/*      */         
+/* 1980 */         str = "CAN";
+/*      */       } 
+/*      */     }
+/* 1983 */     if (bool4) {
+/* 1984 */       if (str.length() > 0) {
+/* 1985 */         str = str + ", EMEA";
+/*      */       } else {
+/*      */         
+/* 1988 */         str = "EMEA";
+/*      */       } 
+/*      */     }
+/* 1991 */     if (bool5) {
+/* 1992 */       if (str.length() > 0) {
+/* 1993 */         str = str + ", LA";
+/*      */       } else {
+/*      */         
+/* 1996 */         str = "LA";
+/*      */       } 
+/*      */     }
+/* 1999 */     logMessage("getAllGeoTags:returning GEO tag :" + str);
+/* 2000 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getGeoTags(EntityItem paramEntityItem) {
+/* 2010 */     String str = "";
+/* 2011 */     if (this.m_geList == null) {
+/* 2012 */       logMessage("getGeoTags:GE List is null!");
+/*      */     }
+/* 2014 */     if (this.m_geList.isRfaGeoUS(paramEntityItem)) {
+/* 2015 */       str = "US";
+/*      */     }
+/* 2017 */     if (this.m_geList.isRfaGeoAP(paramEntityItem)) {
+/* 2018 */       if (str.length() > 0) {
+/* 2019 */         str = str + ", AP";
+/*      */       } else {
+/*      */         
+/* 2022 */         str = "AP";
+/*      */       } 
+/*      */     }
+/* 2025 */     if (this.m_geList.isRfaGeoCAN(paramEntityItem)) {
+/* 2026 */       if (str.length() > 0) {
+/* 2027 */         str = str + ", CAN";
+/*      */       } else {
+/*      */         
+/* 2030 */         str = "CAN";
+/*      */       } 
+/*      */     }
+/* 2033 */     if (this.m_geList.isRfaGeoEMEA(paramEntityItem)) {
+/* 2034 */       if (str.length() > 0) {
+/* 2035 */         str = str + ", EMEA";
+/*      */       } else {
+/*      */         
+/* 2038 */         str = "EMEA";
+/*      */       } 
+/*      */     }
+/* 2041 */     if (this.m_geList.isRfaGeoLA(paramEntityItem)) {
+/* 2042 */       if (str.length() > 0) {
+/* 2043 */         str = str + ", LA";
+/*      */       } else {
+/*      */         
+/* 2046 */         str = "LA";
+/*      */       } 
+/*      */     }
+/* 2049 */     logMessage("getGeoTags:returning GEO tag for entity:" + paramEntityItem.getKey() + ":" + str);
+/* 2050 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector searchEntityGroupLink(EntityGroup paramEntityGroup, String[] paramArrayOfString1, String[] paramArrayOfString2, boolean paramBoolean1, boolean paramBoolean2, String paramString) {
+/* 2070 */     Vector<EntityItem> vector = new Vector();
+/* 2071 */     if (paramEntityGroup == null) {
+/* 2072 */       logMessage("pASSED NULL ENTITYGROUP");
+/* 2073 */       return vector;
+/*      */     } 
+/* 2075 */     D.ebug(4, "searchEntityGroupLink..Group is " + paramEntityGroup.getEntityType());
+/*      */ 
+/*      */     
+/* 2078 */     EntityItem entityItem1 = null;
+/* 2079 */     EntityItem entityItem2 = null;
+/* 2080 */     int i = 0;
+/* 2081 */     for (byte b = 0; b < paramEntityGroup.getEntityItemCount(); b++) {
+/* 2082 */       entityItem1 = paramEntityGroup.getEntityItem(b);
+/* 2083 */       D.ebug(4, "Searching " + entityItem1 + getEntityType() + ":" + entityItem1.getEntityID());
+/* 2084 */       if (paramBoolean2) {
+/* 2085 */         i = entityItem1.getDownLinkCount();
+/*      */       } else {
+/*      */         
+/* 2088 */         i = entityItem1.getUpLinkCount();
+/*      */       } 
+/* 2090 */       for (byte b1 = 0; b1 < i; b1++) {
+/* 2091 */         if (paramBoolean2) {
+/* 2092 */           entityItem2 = (EntityItem)entityItem1.getDownLink(b1);
+/* 2093 */           D.ebug(4, "Getting Downlinked " + entityItem2 + getEntityType() + ":" + entityItem2.getEntityID());
+/*      */         } else {
+/*      */           
+/* 2096 */           entityItem2 = (EntityItem)entityItem1.getUpLink(b1);
+/*      */         } 
+/* 2098 */         if (entityItem2 != null && 
+/* 2099 */           entityItem2.getEntityType().equals(paramString)) {
+/* 2100 */           if (paramArrayOfString1 != null) {
+/* 2101 */             if (foundInEntity(entityItem2, paramArrayOfString1, paramArrayOfString2, paramBoolean1)) {
+/* 2102 */               vector.add(entityItem2);
+/*      */             }
+/*      */           } else {
+/*      */             
+/* 2106 */             vector.add(entityItem2);
+/*      */           } 
+/*      */         }
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 2112 */     return vector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector searchEntityItemLink(EntityItem paramEntityItem, String[] paramArrayOfString1, String[] paramArrayOfString2, boolean paramBoolean1, boolean paramBoolean2, String paramString) {
+/* 2130 */     Vector<EntityItem> vector = new Vector();
+/*      */ 
+/*      */     
+/* 2133 */     EntityItem entityItem = null;
+/* 2134 */     int i = 0;
+/* 2135 */     D.ebug(4, "searchEntityItemLink: searching for " + paramString + (paramBoolean2 ? " downlinks " : " uplinks ") + " from " + paramEntityItem
+/*      */         
+/* 2137 */         .getKey());
+/* 2138 */     if (paramEntityItem == null) {
+/* 2139 */       return vector;
+/*      */     }
+/* 2141 */     if (paramBoolean2) {
+/* 2142 */       i = paramEntityItem.getDownLinkCount();
+/*      */     } else {
+/*      */       
+/* 2145 */       i = paramEntityItem.getUpLinkCount();
+/*      */     } 
+/* 2147 */     D.ebug(4, "searchEntityItemLink: found " + i + (paramBoolean2 ? " downlinks " : " uplinks ") + " from " + paramEntityItem
+/*      */         
+/* 2149 */         .getKey());
+/* 2150 */     for (byte b = 0; b < i; b++) {
+/* 2151 */       if (paramBoolean2) {
+/* 2152 */         entityItem = (EntityItem)paramEntityItem.getDownLink(b);
+/*      */       } else {
+/*      */         
+/* 2155 */         entityItem = (EntityItem)paramEntityItem.getUpLink(b);
+/*      */       } 
+/* 2157 */       if (entityItem != null && 
+/* 2158 */         entityItem.getEntityType().equals(paramString)) {
+/* 2159 */         if (paramArrayOfString1 != null) {
+/* 2160 */           if (foundInEntity(entityItem, paramArrayOfString1, paramArrayOfString2, paramBoolean1)) {
+/* 2161 */             D.ebug(4, "searchEntityItemLink:adding to vector");
+/* 2162 */             vector.add(entityItem);
+/*      */           } 
+/*      */         } else {
+/*      */           
+/* 2166 */           vector.add(entityItem);
+/*      */         } 
+/*      */       }
+/*      */     } 
+/*      */ 
+/*      */     
+/* 2172 */     return vector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void printShortValueListInItem(EntityItem paramEntityItem, String[] paramArrayOfString, String paramString) {
+/* 2185 */     int i = paramArrayOfString.length;
+/* 2186 */     String str = null;
+/* 2187 */     for (byte b = 0; b < i; b++) {
+/* 2188 */       if (paramArrayOfString[b].trim().length() > 0) {
+/*      */         
+/* 2190 */         str = getAttributeShortFlagDesc(paramEntityItem.getEntityType(), paramEntityItem.getEntityID(), paramArrayOfString[b], paramString);
+/*      */ 
+/*      */         
+/* 2193 */         if (i > 1) {
+/* 2194 */           this.vPrintDetails.add(str);
+/*      */         }
+/* 2196 */         else if (!str.equals(paramString)) {
+/* 2197 */           this.vPrintDetails.add(str);
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void printValueListInItem(EntityItem paramEntityItem, String[] paramArrayOfString, String paramString, boolean paramBoolean) {
+/* 2212 */     int i = paramArrayOfString.length;
+/* 2213 */     String str = null;
+/* 2214 */     for (byte b = 0; b < i; b++) {
+/* 2215 */       if (paramArrayOfString[b].trim().length() > 0) {
+/* 2216 */         str = getAttributeValue(paramEntityItem.getEntityType(), paramEntityItem.getEntityID(), paramArrayOfString[b], paramString);
+/* 2217 */         if (str != null && 
+/* 2218 */           paramBoolean && str.trim().length() > 0) {
+/* 2219 */           str = transformXML(str);
+/*      */         }
+/*      */ 
+/*      */         
+/* 2223 */         if (i > 1) {
+/* 2224 */           this.vPrintDetails.add(str);
+/*      */         }
+/* 2226 */         else if (!str.equals(paramString)) {
+/* 2227 */           this.vPrintDetails.add(str);
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void printValueListInGroup(EntityGroup paramEntityGroup, String[] paramArrayOfString, String paramString1, String paramString2, String paramString3, boolean paramBoolean) {
+/* 2245 */     EntityItem entityItem = null;
+/*      */     
+/* 2247 */     if (paramEntityGroup != null) {
+/* 2248 */       for (byte b = 0; b < paramEntityGroup.getEntityItemCount(); b++) {
+/* 2249 */         entityItem = paramEntityGroup.getEntityItem(b);
+/* 2250 */         if (paramString1 != null) {
+/* 2251 */           if (foundInEntity(entityItem, new String[] { paramString1 }, new String[] { paramString2 }, true)) {
+/* 2252 */             printValueListInItem(entityItem, paramArrayOfString, paramString3, paramBoolean);
+/*      */           }
+/*      */         } else {
+/*      */           
+/* 2256 */           printValueListInItem(entityItem, paramArrayOfString, paramString3, paramBoolean);
+/*      */         } 
+/*      */       } 
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void printValueListInVector(Vector<EntityItem> paramVector, String[] paramArrayOfString, String paramString, boolean paramBoolean1, boolean paramBoolean2) {
+/* 2273 */     EntityItem entityItem = null;
+/*      */     
+/* 2275 */     if (paramVector != null) {
+/* 2276 */       for (byte b = 0; b < paramVector.size(); b++) {
+/* 2277 */         entityItem = paramVector.elementAt(b);
+/* 2278 */         if (paramBoolean1) {
+/* 2279 */           printValueListInItem(entityItem, paramArrayOfString, paramString, paramBoolean2);
+/*      */         } else {
+/*      */           
+/* 2282 */           printShortValueListInItem(entityItem, paramArrayOfString, paramString);
+/*      */         } 
+/*      */       } 
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean foundInEntity(EntityItem paramEntityItem, String[] paramArrayOfString1, String[] paramArrayOfString2, boolean paramBoolean) {
+/* 2410 */     boolean bool = false;
+/* 2411 */     String str = null;
+/* 2412 */     if (paramEntityItem == null) {
+/* 2413 */       logMessage("Passing null entity item to search");
+/* 2414 */       return false;
+/*      */     } 
+/*      */     
+/* 2417 */     for (byte b = 0; b < paramArrayOfString1.length; b++) {
+/*      */ 
+/*      */       
+/* 2420 */       if (paramArrayOfString2[b].toLowerCase().equals(paramArrayOfString2[b].toUpperCase())) {
+/* 2421 */         if (flagvalueEquals(paramEntityItem.getEntityType(), paramEntityItem.getEntityID(), paramArrayOfString1[b], paramArrayOfString2[b])) {
+/*      */           
+/* 2423 */           bool = true;
+/*      */         } else {
+/*      */           
+/* 2426 */           bool = false;
+/*      */         } 
+/*      */       } else {
+/*      */         
+/* 2430 */         str = getAttributeValue(paramEntityItem, paramArrayOfString1[b], "");
+/* 2431 */         if (str.indexOf(paramArrayOfString2[b]) > -1) {
+/* 2432 */           bool = true;
+/*      */         }
+/*      */         else {
+/*      */           
+/* 2436 */           bool = false;
+/*      */         } 
+/*      */       } 
+/*      */       
+/* 2440 */       if (bool ? 
+/* 2441 */         !paramBoolean : 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 2446 */         paramBoolean) {
+/*      */         break;
+/*      */       }
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/* 2453 */     return bool;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected String getABREntityDesc(String paramString, int paramInt) {
+/* 2464 */     return null;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getDescription() {
+/* 2474 */     return "<br /><br />";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getRevision() {
+/* 2483 */     return new String("$Revision: 1.157 $");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void printReport(boolean paramBoolean, String[] paramArrayOfString, int[] paramArrayOfint, Vector<String> paramVector) {
+/* 2510 */     if (paramArrayOfint.length > 1 || paramBoolean) {
+/* 2511 */       this.rfaReport.printHeaders(paramBoolean);
+/* 2512 */       this.rfaReport.setHeader(paramArrayOfString);
+/* 2513 */       this.rfaReport.setColWidth(paramArrayOfint);
+/* 2514 */       this.rfaReport.setDetail(paramVector);
+/* 2515 */       if (paramVector.size() > 0) {
+/* 2516 */         this.rfaReport.printReport();
+/*      */       }
+/* 2518 */       this.rfaReport.setOffset(0);
+/*      */     } else {
+/*      */       
+/* 2521 */       if (paramArrayOfint[0] == 69) {
+/* 2522 */         for (byte b = 0; b < paramVector.size(); b++) {
+/* 2523 */           prettyPrint(paramVector.elementAt(b), paramArrayOfint[0]);
+/*      */         }
+/*      */       }
+/* 2526 */       else if (paramVector.size() > 0) {
+/* 2527 */         this.rfaReport.printHeaders(paramBoolean);
+/* 2528 */         this.rfaReport.setColWidth(paramArrayOfint);
+/* 2529 */         this.rfaReport.setDetail(paramVector);
+/* 2530 */         this.rfaReport.printReport();
+/*      */       } 
+/* 2532 */       this.rfaReport.setOffset(0);
+/* 2533 */       this.rfaReport.setColumnSeparator(" ");
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void resetPrintvars() {
+/* 2541 */     this.vPrintDetails.removeAllElements();
+/* 2542 */     this.vPrintDetails = null;
+/* 2543 */     this.vPrintDetails = new Vector();
+/* 2544 */     this.rfaReport.setSortable(false);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void displayContents(Vector<EntityItem> paramVector) {
+/* 2554 */     EntityItem entityItem = null;
+/* 2555 */     for (byte b = 0; b < paramVector.size(); b++) {
+/* 2556 */       entityItem = paramVector.elementAt(b);
+/* 2557 */       logMessage("ET:" + entityItem.getEntityType() + ":EI:" + entityItem.getEntityID());
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void processShortAnswers() {
+/* 2565 */     if (this.eiAnnounce == null) {
+/* 2566 */       println("Announce EntityItem IS NULL!");
+/*      */     }
+/* 2568 */     println("CNTLNO = '" + getAttributeValue(this.eiAnnounce, "ANNNUMBER", "Not Populated") + "'");
+/* 2569 */     println("TYPE = '" + getAttributeValue(this.eiAnnounce, "OFANNTYPE", "Not Populated") + "'");
+/*      */     
+/* 2571 */     println("VERSION = '22.04'");
+/* 2572 */     this.strSplit = "";
+/* 2573 */     logMessage("_1A*******************");
+/* 2574 */     this.strFilterAttr = new String[] { "DELIVERABLETYPE" };
+/*      */     
+/* 2576 */     this.strFilterValue = new String[] { "860" };
+/*      */     
+/* 2578 */     this.vReturnEntities1 = searchEntityGroup(this.grpAnnDeliv, this.strFilterAttr, this.strFilterValue, true);
+/* 2579 */     this.eiAnnDeliv = (this.vReturnEntities1.size() > 0) ? this.vReturnEntities1.elementAt(0) : null;
+/* 2580 */     this.bConditionOK = false;
+/* 2581 */     if (this.eiAnnDeliv != null) {
+/* 2582 */       this.bConditionOK = true;
+/* 2583 */       this.strSplit = (this.eiAnnDeliv != null) ? getAttributeValue(this.eiAnnDeliv, "SUBJECTLINE_1", "") : "ANNDELIVERABLE NOT LINKED";
+/*      */     } 
+/* 2585 */     println(".*$P_1A = '" + this.strSplit + "'");
+/* 2586 */     this.strSplit = "";
+/* 2587 */     if (this.bConditionOK)
+/*      */     {
+/* 2589 */       this.strSplit = (this.eiAnnDeliv != null) ? getAttributeValue(this.eiAnnDeliv, "SUBJECTLINE_2", "") : "ANNDELIVERABLE NOT LINKED";
+/*      */     }
+/* 2591 */     println(".*$P_1B = '" + this.strSplit + "'");
+/*      */     
+/* 2593 */     this.strCondition2 = "";
+/* 2594 */     this.vReturnEntities1 = searchEntityGroupLink(this.grpAnnPara, (String[])null, (String[])null, true, true, "PARAMETERCODE");
+/* 2595 */     print(".*$P_1C = '");
+/* 2596 */     if (this.vReturnEntities1.size() > 0) {
+/* 2597 */       this.bConditionOK = false;
+/* 2598 */       for (this.i = 0; this.i < this.vReturnEntities1.size(); this.i++) {
+/* 2599 */         this.eiParamCode = this.vReturnEntities1.elementAt(this.i);
+/* 2600 */         this.strCondition1 = getAttributeValue(this.eiParamCode, "PARAMETERCODENUMBER", "");
+/* 2601 */         if (!this.bConditionOK) {
+/* 2602 */           this.bConditionOK = true;
+/* 2603 */           this.strCondition2 = this.strCondition1;
+/*      */         } else {
+/*      */           
+/* 2606 */           this.strCondition2 += "," + this.strCondition1;
+/*      */         } 
+/* 2608 */         if (this.i == 1) {
+/*      */           break;
+/*      */         }
+/*      */       } 
+/*      */     } 
+/* 2613 */     println(this.strCondition2 + "'");
+/*      */     
+/* 2615 */     this.vReturnEntities1 = searchEntityGroupLink(this.grpDependCode, (String[])null, (String[])null, true, true, "DEPENDENCYCODE");
+/* 2616 */     print(".*$P_1D = '");
+/* 2617 */     if (this.vReturnEntities1.size() > 0) {
+/* 2618 */       this.bConditionOK = false;
+/* 2619 */       for (this.i = 0; this.i < this.vReturnEntities1.size(); this.i++) {
+/* 2620 */         this.eiDependCode = this.vReturnEntities1.elementAt(this.i);
+/* 2621 */         this.strCondition1 = getAttributeValue(this.eiDependCode, "DEPENCODENUMBER", "Not Populated");
+/* 2622 */         if (!this.bConditionOK) {
+/* 2623 */           this.bConditionOK = true;
+/* 2624 */           this.strCondition2 = this.strCondition1;
+/*      */         } else {
+/*      */           
+/* 2627 */           this.strCondition2 += ", " + this.strCondition1;
+/*      */         } 
+/* 2629 */         if (this.i == 8) {
+/*      */           break;
+/*      */         }
+/*      */       } 
+/*      */     } 
+/* 2634 */     println(this.strCondition2 + "'");
+/*      */     
+/* 2636 */     this.strCondition2 = "";
+/* 2637 */     this.vReturnEntities1 = searchEntityGroupLink(this.grpDependCode, (String[])null, (String[])null, true, true, "DEPENDENCYCODE");
+/* 2638 */     print(".*$P_1E = '");
+/* 2639 */     if (this.vReturnEntities1.size() > 8) {
+/* 2640 */       this.bConditionOK = false;
+/* 2641 */       for (this.i = 9; this.i < this.vReturnEntities1.size(); this.i++) {
+/* 2642 */         this.eiDependCode = this.vReturnEntities1.elementAt(this.i);
+/* 2643 */         this.strCondition1 = getAttributeValue(this.eiDependCode, "DEPENCODENUMBER", "Not Populated");
+/* 2644 */         if (!this.bConditionOK) {
+/* 2645 */           this.bConditionOK = true;
+/* 2646 */           this.strCondition2 = this.strCondition1;
+/*      */         } else {
+/*      */           
+/* 2649 */           this.strCondition2 += ", " + this.strCondition1;
+/*      */         } 
+/* 2651 */         if (this.i == 17) {
+/*      */           break;
+/*      */         }
+/*      */       } 
+/*      */     } 
+/* 2656 */     println(this.strCondition2 + "'");
+/*      */     
+/* 2658 */     print(".*$P_1F = '");
+/* 2659 */     this.strCondition2 = "";
+/* 2660 */     if (this.vReturnEntities1.size() > 16) {
+/* 2661 */       this.bConditionOK = false;
+/* 2662 */       for (this.i = 17; this.i < this.vReturnEntities1.size(); this.i++) {
+/* 2663 */         this.eiDependCode = this.vReturnEntities1.elementAt(this.i);
+/* 2664 */         this.strCondition1 = getAttributeValue(this.eiDependCode, "DEPENCODENUMBER", "Not Populated");
+/* 2665 */         if (!this.bConditionOK) {
+/* 2666 */           this.bConditionOK = true;
+/* 2667 */           this.strCondition2 = this.strCondition1;
+/*      */         } else {
+/*      */           
+/* 2670 */           this.strCondition2 += ", " + this.strCondition1;
+/*      */         } 
+/* 2672 */         if (this.i == 25) {
+/*      */           break;
+/*      */         }
+/*      */       } 
+/*      */     } 
+/* 2677 */     println(this.strCondition2 + "'");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 2690 */     this
+/* 2691 */       .strCondition1 = (this.eiAnnReview != null) ? getAttributeValue(this.eiAnnReview.getEntityType(), this.eiAnnReview.getEntityID(), "ANREVIEW", "") : "";
+/* 2692 */     this.strSplit = "";
+/* 2693 */     this.strFilterAttr = new String[] { "ANNREVIEWDEF" };
+/*      */     
+/* 2695 */     this.strFilterValue = new String[] { "101" };
+/*      */     
+/* 2697 */     this.vReturnEntities1 = searchEntityGroup(this.grpAnnReview, this.strFilterAttr, this.strFilterValue, true);
+/* 2698 */     this.eiAnnReview = (this.vReturnEntities1.size() > 0) ? this.vReturnEntities1.elementAt(0) : null;
+/* 2699 */     this
+/* 2700 */       .strSplit = (this.eiAnnReview != null) ? getAttributeValue(this.eiAnnReview.getEntityType(), this.eiAnnReview.getEntityID(), "ANREVDATE", "") : "";
+/* 2701 */     println(".*$P_3A = '" + this.strSplit + "'");
+/* 2702 */     this.strSplit = "";
+/* 2703 */     this.strFilterAttr = new String[] { "ANNREVIEWDEF" };
+/*      */     
+/* 2705 */     this.strFilterValue = new String[] { "102" };
+/*      */     
+/* 2707 */     this.vReturnEntities1 = searchEntityGroup(this.grpAnnReview, this.strFilterAttr, this.strFilterValue, true);
+/* 2708 */     this.eiAnnReview = (this.vReturnEntities1.size() > 0) ? this.vReturnEntities1.elementAt(0) : null;
+/* 2709 */     this
+/* 2710 */       .strSplit = (this.eiAnnReview != null) ? getAttributeValue(this.eiAnnReview.getEntityType(), this.eiAnnReview.getEntityID(), "ANREVDATE", "") : "";
+/* 2711 */     println(".*$P_3B = '" + this.strSplit + "'");
+/* 2712 */     println(".*$P_3C = '" + ((this.grpAnnouncement != null) ? getAttributeValue(this.eiAnnounce, "ANNDATE", "") : "") + "'");
+/*      */ 
+/*      */     
+/* 2715 */     println(".*$P_4A = '0'");
+/* 2716 */     println(".*$P_4B = '" + ((this.grpAnnouncement != null) ? getAttributeValue(this.eiAnnounce, "REVISIONLEVEL", "") : "'") + "'");
+/*      */ 
+/*      */ 
+/*      */     
+/* 2720 */     println(".*$P_6A = '0'");
+/*      */     
+/* 2722 */     println(".*$P_6B = '0'");
+/* 2723 */     println(".*$P_6C = '0'");
+/* 2724 */     println(".*$P_6D = '0'");
+/* 2725 */     println(".*$P_6E = '0'");
+/* 2726 */     println(".*$P_6F = '0'");
+/* 2727 */     println(".*$P_6G = '0'");
+/* 2728 */     println(".*$P_6H = '0'");
+/* 2729 */     println(".*$P_6I = '0'");
+/* 2730 */     println(".*$P_6J = '0'");
+/* 2731 */     println(".*$P_6K = '0'");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 2742 */     this.strCondition1 = getAttributeValue(this.eiAnnounce, "EXECAPPREADY", "0");
+/* 2743 */     println(".*$P_7A = '" + (this.strCondition1.equalsIgnoreCase("Yes") ? "1" : "0") + "'");
+/* 2744 */     println(".*$P_7B = '" + ((this.grpAnnouncement != null) ? getAttributeValue(this.eiAnnounce, "EXECAPPRDATE_T", "") : "") + "'");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 2749 */     this.bConditionOK = false;
+/* 2750 */     this.strFilterAttr = new String[] { "ORGANUNITTYPE" };
+/*      */     
+/* 2752 */     this.strFilterValue = new String[] { "4156" };
+/*      */     
+/* 2754 */     this.vReturnEntities1 = searchEntityGroup(this.grpOrganUnit, this.strFilterAttr, this.strFilterValue, false);
+/* 2755 */     if (this.vReturnEntities1.size() > 0) {
+/* 2756 */       this.eiOrganUnit = this.vReturnEntities1.elementAt(0);
+/* 2757 */       this.bConditionOK = true;
+/*      */     } 
+/* 2759 */     this.strCondition1 = this.bConditionOK ? getAttributeValue(this.eiOrganUnit, "NAME", "") : "";
+/* 2760 */     println(".*$P_7C = '" + this.strCondition1.trim() + "'");
+/* 2761 */     this.strCondition1 = this.bConditionOK ? getAttributeValue(this.eiOrganUnit, "INITIALS", "") : "";
+/* 2762 */     println(".*$P_7D = '" + this.strCondition1.trim() + "'");
+/* 2763 */     this.strCondition1 = this.bConditionOK ? getAttributeValue(this.eiOrganUnit, "STREETADDRESS", "") : "";
+/*      */     
+/* 2765 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiOrganUnit, "CITY", "") : "";
+/*      */     
+/* 2767 */     this.strCondition1 += (this.strCondition1.length() > 0 && this.strCondition2.length() > 0) ? ("," + this.strCondition2.trim()) : "";
+/*      */     
+/* 2769 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiOrganUnit, "STATE", "") : "";
+/* 2770 */     this.strCondition1 += (this.strCondition1.length() > 0 && this.strCondition2.length() > 0) ? ("," + this.strCondition2.trim()) : "";
+/*      */     
+/* 2772 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiOrganUnit, "COUNTRY", "") : "";
+/* 2773 */     this.strCondition1 += (this.strCondition1.length() > 0 && this.strCondition2.length() > 0) ? ("," + this.strCondition2.trim()) : "";
+/*      */     
+/* 2775 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiOrganUnit, "ZIPCODE", "") : "";
+/* 2776 */     this.strCondition1 += (this.strCondition1.length() > 0 && this.strCondition2.length() > 0) ? ("," + this.strCondition2.trim()) : "";
+/* 2777 */     println(".*$P_7E = '" + this.strCondition1 + "'");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 2782 */     this.eiAnnToOP = null;
+/* 2783 */     this.eiOP = null;
+/* 2784 */     this.bConditionOK = false;
+/* 2785 */     for (this.i = 0; this.i < this.grpAnnToOP.getEntityItemCount(); this.i++) {
+/* 2786 */       this.eiAnnToOP = this.grpAnnToOP.getEntityItem(this.i);
+/* 2787 */       if (flagvalueEquals(this.eiAnnToOP.getEntityType(), this.eiAnnToOP.getEntityID(), "ANNROLETYPE", "15")) {
+/* 2788 */         this.eiOP = (EntityItem)this.eiAnnToOP.getDownLink(0);
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/* 2792 */     println(".*$P_8A = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "USERNAME", "") : "") + "'");
+/* 2793 */     println(".*$P_8B = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "STREETADDRESS", "") : "") + "'");
+/* 2794 */     this.strSplit = (this.eiOP != null) ? getAttributeValue(this.eiOP, "CITY", "") : "";
+/* 2795 */     this.strSplit += ", " + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "STATE", "") : "");
+/* 2796 */     this.strSplit += ", " + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "COUNTRY", "") : "");
+/* 2797 */     println(".*$P_8C = '" + this.strSplit + "'");
+/*      */     
+/* 2799 */     println(".*$P_9A = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "SITE", "") : "") + "'");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 2804 */     this.eiAnnToOP = null;
+/* 2805 */     this.eiOP = null;
+/* 2806 */     this.bConditionOK = false;
+/* 2807 */     for (this.i = 0; this.i < this.grpAnnToOP.getEntityItemCount(); this.i++) {
+/* 2808 */       this.eiAnnToOP = this.grpAnnToOP.getEntityItem(this.i);
+/* 2809 */       if (flagvalueEquals(this.eiAnnToOP.getEntityType(), this.eiAnnToOP.getEntityID(), "ANNROLETYPE", "4")) {
+/* 2810 */         this.eiOP = (EntityItem)this.eiAnnToOP.getDownLink(0);
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/* 2814 */     println(".*$P_9B = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "USERNAME", "") : "") + "'");
+/* 2815 */     println(".*$P_9C = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "VNETUID", "") : "") + "'");
+/* 2816 */     println(".*$P_9D = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "VNETNODE", "") : "") + "'");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 2821 */     this.eiAnnToOP = null;
+/* 2822 */     this.eiOP = null;
+/* 2823 */     this.bConditionOK = false;
+/* 2824 */     for (this.i = 0; this.i < this.grpAnnToOP.getEntityItemCount(); this.i++) {
+/* 2825 */       this.eiAnnToOP = this.grpAnnToOP.getEntityItem(this.i);
+/* 2826 */       if (flagvalueEquals(this.eiAnnToOP.getEntityType(), this.eiAnnToOP.getEntityID(), "ANNROLETYPE", "9")) {
+/* 2827 */         this.eiOP = (EntityItem)this.eiAnnToOP.getDownLink(0);
+/*      */         
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/* 2832 */     println(".*$P_10A = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "USERNAME", "") : "") + "'");
+/* 2833 */     println(".*$P_10B = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "JOBTITLE", "") : "") + "'");
+/* 2834 */     println(".*$P_10C = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "TIELINE", "") : "") + "'");
+/* 2835 */     this.strSplit = (this.eiOP != null) ? getAttributeValue(this.eiOP, "VNETNODE", "") : "";
+/* 2836 */     this.strSplit += "/" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "VNETUID", "") : "");
+/* 2837 */     println(".*$P_10D = '" + this.strSplit + "'");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 2842 */     this.eiAnnToOP = null;
+/* 2843 */     this.eiOP = null;
+/* 2844 */     this.bConditionOK = false;
+/* 2845 */     for (this.i = 0; this.i < this.grpAnnToOP.getEntityItemCount(); this.i++) {
+/* 2846 */       this.eiAnnToOP = this.grpAnnToOP.getEntityItem(this.i);
+/* 2847 */       if (flagvalueEquals(this.eiAnnToOP.getEntityType(), this.eiAnnToOP.getEntityID(), "ANNROLETYPE", "7")) {
+/* 2848 */         this.eiOP = (EntityItem)this.eiAnnToOP.getDownLink(0);
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/* 2852 */     println(".*$P_11A = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "USERNAME", "") : "") + "'");
+/* 2853 */     println(".*$P_11B = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "TELEPHONE", "") : "") + "'");
+/* 2854 */     println(".*$P_11C = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "VNETUID", "") : "") + "'");
+/* 2855 */     println(".*$P_11D = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "VNETNODE", "") : "") + "'");
+/* 2856 */     println(".*$P_11E = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "EMAIL", "") : "") + "'");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 2861 */     this.eiAnnToOP = null;
+/* 2862 */     this.eiOP = null;
+/* 2863 */     this.bConditionOK = false;
+/* 2864 */     for (this.i = 0; this.i < this.grpAnnToOP.getEntityItemCount(); this.i++) {
+/* 2865 */       this.eiAnnToOP = this.grpAnnToOP.getEntityItem(this.i);
+/* 2866 */       if (flagvalueEquals(this.eiAnnToOP.getEntityType(), this.eiAnnToOP.getEntityID(), "ANNROLETYPE", "3")) {
+/* 2867 */         this.eiOP = (EntityItem)this.eiAnnToOP.getDownLink(0);
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/* 2871 */     println(".*$P_11F = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "USERNAME", "") : "") + "'");
+/* 2872 */     println(".*$P_11G = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "TELEPHONE", "") : "") + "'");
+/* 2873 */     println(".*$P_11H = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "EMAIL", "") : "") + "'");
+/* 2874 */     println(".*$P_11I = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "VNETNODE", "") : "") + "'");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 2879 */     this.eiAnnToOP = null;
+/* 2880 */     this.eiOP = null;
+/* 2881 */     this.bConditionOK = false;
+/* 2882 */     for (this.i = 0; this.i < this.grpAnnToOP.getEntityItemCount(); this.i++) {
+/* 2883 */       this.eiAnnToOP = this.grpAnnToOP.getEntityItem(this.i);
+/* 2884 */       if (flagvalueEquals(this.eiAnnToOP.getEntityType(), this.eiAnnToOP.getEntityID(), "ANNROLETYPE", "6")) {
+/* 2885 */         this.eiOP = (EntityItem)this.eiAnnToOP.getDownLink(0);
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/* 2889 */     println(".*$P_13A = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "USERNAME", "") : "") + "'");
+/* 2890 */     println(".*$P_13B = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "TELEPHONE", "") : "") + "'");
+/* 2891 */     println(".*$P_13C = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "VNETUID", "") : "") + "'");
+/* 2892 */     println(".*$P_13D = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "VNETNODE", "") : "") + "'");
+/* 2893 */     println(".*$P_13E = '" + ((this.eiOP != null) ? getAttributeValue(this.eiOP, "SITE", "") : "") + "'");
+/* 2894 */     this.bConditionOK = false;
+/* 2895 */     this.eiChannel = null;
+/* 2896 */     this.strFilterAttr = new String[] { "AVAILTYPE" };
+/*      */     
+/* 2898 */     this.strFilterValue = new String[] { "146" };
+/*      */ 
+/*      */     
+/* 2901 */     this.vReturnEntities1 = searchEntityGroupLink(this.grpAnnAvail, this.strFilterAttr, this.strFilterValue, true, true, "AVAIL");
+/* 2902 */     logMessage("****AVAIL*****");
+/* 2903 */     displayContents(this.vReturnEntities1);
+/* 2904 */     this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, false, "SOFAVAIL");
+/* 2905 */     logMessage("****SOFAVAIL*****");
+/* 2906 */     displayContents(this.vReturnEntities2);
+/* 2907 */     this.vSofFrmSofAvail = searchEntityVectorLink(this.vReturnEntities2, (String[])null, (String[])null, true, false, "SOF");
+/* 2908 */     logMessage("****SOF*****");
+/* 2909 */     displayContents(this.vSofFrmSofAvail);
+/*      */ 
+/*      */ 
+/*      */     
+/* 2913 */     this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, false, "CMPNTAVAIL");
+/* 2914 */     logMessage("****CMPNTAVAIL*****");
+/* 2915 */     displayContents(this.vReturnEntities2);
+/*      */     
+/* 2917 */     this.vCmpntFrmCmpntAvail = searchEntityVectorLink(this.vReturnEntities2, (String[])null, (String[])null, true, false, "CMPNT");
+/* 2918 */     logMessage("****CMPNT*****");
+/* 2919 */     displayContents(this.vCmpntFrmCmpntAvail);
+/*      */ 
+/*      */     
+/* 2922 */     this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, false, "FEATUREAVAIL");
+/* 2923 */     logMessage("****FEATUREAVAIL*****");
+/* 2924 */     displayContents(this.vReturnEntities2);
+/*      */     
+/* 2926 */     this.vFeatureFrmFeatureAvail = searchEntityVectorLink(this.vReturnEntities2, (String[])null, (String[])null, true, false, "FEATURE");
+/* 2927 */     logMessage("****FEATURE*****");
+/* 2928 */     displayContents(this.vFeatureFrmFeatureAvail);
+/*      */     
+/* 2930 */     this.vSofSortedbyMkt = sortEntities(this.vSofFrmSofAvail, new String[] { "MKTGNAME" });
+/* 2931 */     this.vReturnEntities5 = new Vector();
+/* 2932 */     this.vReturnEntities5.addAll(this.vSofFrmSofAvail);
+/* 2933 */     this.vReturnEntities5.addAll(this.vCmpntFrmCmpntAvail);
+/* 2934 */     this.vReturnEntities5.addAll(this.vFeatureFrmFeatureAvail);
+/*      */ 
+/*      */     
+/* 2937 */     this.strCmptToSof = new String[] { "SOFCMPNT", "SOF" };
+/*      */     
+/* 2939 */     this.vCmptSortedbyMkt = sortEntities(this.vCmpntFrmCmpntAvail, new String[] { "MKTGNAME" });
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 2944 */     this.vFeatureSortedbyMkt = sortEntities(this.vFeatureFrmFeatureAvail, new String[] { "MKTGNAME" });
+/*      */     
+/* 2946 */     this.vAllSortedOfferings = RFAsort(this.vReturnEntities5);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 3036 */     this.strFilterAttr = new String[] { "CHANNELNAME", "ROUTESTOMKTG" };
+/*      */     
+/* 3038 */     this.strFilterValue = new String[] { "374", "110" };
+/*      */     
+/* 3040 */     this.vReturnEntities2 = searchEntityVectorLink(this.vSofFrmSofAvail, (String[])null, (String[])null, true, true, "SOFCHANNEL");
+/* 3041 */     logMessage("14B****SOFCHANNEL*****");
+/* 3042 */     displayContents(this.vReturnEntities2);
+/* 3043 */     this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, this.strFilterAttr, this.strFilterValue, false, true, "CHANNEL");
+/* 3044 */     logMessage("14B****CHANNEL*****");
+/* 3045 */     displayContents(this.vReturnEntities3);
+/* 3046 */     this.strCondition1 = getAllGeoTags(this.vReturnEntities3);
+/* 3047 */     if (this.strCondition1.indexOf("US") <= -1 && this.strCondition1.indexOf("LA") <= -1 && this.strCondition1.indexOf("CAN") <= -1)
+/*      */     {
+/*      */       
+/* 3050 */       this.vReturnEntities3 = new Vector();
+/*      */     }
+/* 3052 */     if (this.vReturnEntities3.size() == 0) {
+/* 3053 */       this.vReturnEntities2 = searchEntityVectorLink(this.vCmpntFrmCmpntAvail, (String[])null, (String[])null, true, true, "CMPNTCHANNEL");
+/* 3054 */       logMessage("14B****CMPNTCHANNEL*****");
+/* 3055 */       displayContents(this.vReturnEntities2);
+/* 3056 */       this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, this.strFilterAttr, this.strFilterValue, true, true, "CHANNEL");
+/* 3057 */       logMessage("14B****CHANNEL*****");
+/* 3058 */       displayContents(this.vReturnEntities3);
+/* 3059 */       this.strCondition1 = getAllGeoTags(this.vReturnEntities3);
+/* 3060 */       if (this.strCondition1.indexOf("US") <= -1 && this.strCondition1.indexOf("LA") <= -1 && this.strCondition1.indexOf("CAN") <= -1)
+/*      */       {
+/*      */         
+/* 3063 */         this.vReturnEntities3 = new Vector();
+/*      */       }
+/*      */     } 
+/* 3066 */     if (this.vReturnEntities3.size() == 0) {
+/* 3067 */       this.vReturnEntities2 = searchEntityVectorLink(this.vFeatureFrmFeatureAvail, (String[])null, (String[])null, true, true, "FEATURECHANNEL");
+/* 3068 */       logMessage("14B****FEATURECHANNEL*****");
+/* 3069 */       displayContents(this.vReturnEntities2);
+/* 3070 */       this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, this.strFilterAttr, this.strFilterValue, true, true, "CHANNEL");
+/* 3071 */       logMessage("14B****CHANNEL*****");
+/* 3072 */       displayContents(this.vReturnEntities3);
+/* 3073 */       this.strCondition1 = getAllGeoTags(this.vReturnEntities3);
+/* 3074 */       if (this.strCondition1.indexOf("US") <= -1 && this.strCondition1.indexOf("LA") <= -1 && this.strCondition1.indexOf("CAN") <= -1)
+/*      */       {
+/*      */         
+/* 3077 */         this.vReturnEntities3 = new Vector();
+/*      */       }
+/*      */     } 
+/* 3080 */     if (this.vReturnEntities3.size() > 0) {
+/* 3081 */       println(".*$P_14B = '1'");
+/*      */     } else {
+/*      */       
+/* 3084 */       println(".*$P_14B = '0'");
+/*      */     } 
+/*      */     
+/* 3087 */     this.strFilterAttr = new String[] { "CHANNELNAME", "CHANNELNAME", "CHANNELNAME", "CHANNELNAME", "CHANNELNAME", "CHANNELNAME", "CHANNELNAME", "CHANNELNAME", "CHANNELNAME", "CHANNELNAME", "CHANNELNAME", "CHANNELNAME", "CHANNELNAME" };
+/*      */ 
+/*      */ 
+/*      */     
+/* 3091 */     this.strFilterValue = new String[] { "375", "379", "380", "382", "383", "384", "385", "386", "387", "388", "1000", "1100", "1200" };
+/*      */ 
+/*      */     
+/* 3094 */     this.vReturnEntities2 = searchEntityVectorLink(this.vSofFrmSofAvail, (String[])null, (String[])null, true, true, "SOFCHANNEL");
+/* 3095 */     logMessage("15A****SOFCHANNEL*****" + this.vReturnEntities2);
+/* 3096 */     displayContents(this.vReturnEntities2);
+/* 3097 */     this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, this.strFilterAttr, this.strFilterValue, false, true, "CHANNEL");
+/* 3098 */     displayContents(this.vReturnEntities3);
+/* 3099 */     logMessage("15A****CHANNEL from SOF*****" + this.vReturnEntities3 + "strFilterAttr: " + this.strFilterAttr + "strFilterValue: " + this.strFilterValue + "vReturnEntities3.size" + this.vReturnEntities3
+/* 3100 */         .size());
+/*      */     
+/* 3102 */     if (this.vReturnEntities3.size() > 0) {
+/* 3103 */       this.strFilterAttr1 = new String[] { "ROUTESTOMKTG" };
+/*      */       
+/* 3105 */       this.strFilterValue1 = new String[] { "110" };
+/*      */       
+/* 3107 */       logMessage("15A****CHANNEL from SOF vReturnEntities3");
+/* 3108 */       displayContents(this.vReturnEntities3);
+/* 3109 */       this.vReturnEntities3 = searchEntityVectorLink1(this.vReturnEntities3, this.strFilterAttr1, this.strFilterValue1, true, "CHANNEL");
+/* 3110 */       logMessage("15A****CHANNEL from SOF checking for ROUTESTOMKTG*****" + this.vReturnEntities2 + "strFilterAttr1: " + this.strFilterAttr1 + "strFilterValue1: " + this.strFilterValue1 + "vReturnEntities3.size: " + this.vReturnEntities3
+/*      */           
+/* 3112 */           .size());
+/* 3113 */       displayContents(this.vReturnEntities3);
+/*      */     } else {
+/*      */       
+/* 3116 */       this.vReturnEntities3 = new Vector();
+/*      */     } 
+/*      */     
+/* 3119 */     this.strCondition1 = getAllGeoTags(this.vReturnEntities3);
+/* 3120 */     if (this.strCondition1.indexOf("US") <= -1 && this.strCondition1.indexOf("LA") <= -1 && this.strCondition1.indexOf("CAN") <= -1)
+/*      */     {
+/*      */       
+/* 3123 */       this.vReturnEntities3 = new Vector();
+/*      */     }
+/* 3125 */     if (this.vReturnEntities3.size() == 0) {
+/* 3126 */       this.vReturnEntities2 = searchEntityVectorLink(this.vCmpntFrmCmpntAvail, (String[])null, (String[])null, true, true, "CMPNTCHANNEL");
+/* 3127 */       logMessage("15A****CMPNTCHANNEL*****" + this.vReturnEntities2);
+/* 3128 */       displayContents(this.vReturnEntities2);
+/* 3129 */       this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, this.strFilterAttr, this.strFilterValue, false, true, "CHANNEL");
+/* 3130 */       logMessage("15A****CHANNEL from CMPNT*****" + this.vReturnEntities3 + "strFilterAttr: " + this.strFilterAttr + "strFilterValue: " + this.strFilterValue + "vReturnEntities3.size" + this.vReturnEntities3
+/* 3131 */           .size());
+/* 3132 */       displayContents(this.vReturnEntities3);
+/*      */       
+/* 3134 */       if (this.vReturnEntities3.size() > 0) {
+/* 3135 */         this.strFilterAttr1 = new String[] { "ROUTESTOMKTG" };
+/*      */         
+/* 3137 */         this.strFilterValue1 = new String[] { "110" };
+/*      */         
+/* 3139 */         logMessage("15A****CHANNEL from CMPNT vReturnEntities3");
+/* 3140 */         displayContents(this.vReturnEntities3);
+/* 3141 */         this.vReturnEntities3 = searchEntityVectorLink1(this.vReturnEntities3, this.strFilterAttr1, this.strFilterValue1, true, "CHANNEL");
+/* 3142 */         logMessage("15A****CHANNEL from CMPNT checking for ROUTESTOMKTG*****" + this.vReturnEntities2 + "strFilterAttr1: " + this.strFilterAttr1 + "strFilterValue1: " + this.strFilterValue1 + "vReturnEntities3.size: " + this.vReturnEntities3
+/*      */             
+/* 3144 */             .size());
+/* 3145 */         displayContents(this.vReturnEntities3);
+/*      */       } else {
+/*      */         
+/* 3148 */         this.vReturnEntities3 = new Vector();
+/*      */       } 
+/*      */       
+/* 3151 */       this.strCondition1 = getAllGeoTags(this.vReturnEntities3);
+/* 3152 */       if (this.strCondition1.indexOf("US") <= -1 && this.strCondition1.indexOf("LA") <= -1 && this.strCondition1.indexOf("CAN") <= -1)
+/*      */       {
+/*      */         
+/* 3155 */         this.vReturnEntities3 = new Vector();
+/*      */       }
+/*      */     } 
+/* 3158 */     if (this.vReturnEntities3.size() == 0) {
+/* 3159 */       this.vReturnEntities2 = searchEntityVectorLink(this.vFeatureFrmFeatureAvail, (String[])null, (String[])null, true, true, "FEATURECHANNEL");
+/* 3160 */       logMessage("15A****FEATURECHANNEL*****" + this.vReturnEntities2);
+/* 3161 */       displayContents(this.vReturnEntities2);
+/* 3162 */       this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, this.strFilterAttr, this.strFilterValue, false, true, "CHANNEL");
+/* 3163 */       logMessage("15A****CHANNEL from FEATURE*****" + this.vReturnEntities3 + "strFilterAttr: " + this.strFilterAttr + "strFilterValue: " + this.strFilterValue + "vReturnEntities3.size" + this.vReturnEntities3
+/* 3164 */           .size());
+/* 3165 */       displayContents(this.vReturnEntities3);
+/*      */       
+/* 3167 */       if (this.vReturnEntities3.size() > 0) {
+/* 3168 */         this.strFilterAttr1 = new String[] { "ROUTESTOMKTG" };
+/*      */         
+/* 3170 */         this.strFilterValue1 = new String[] { "110" };
+/*      */         
+/* 3172 */         logMessage("15A****CHANNEL from SOF vReturnEntities3");
+/* 3173 */         displayContents(this.vReturnEntities3);
+/* 3174 */         this.vReturnEntities3 = searchEntityVectorLink1(this.vReturnEntities3, this.strFilterAttr1, this.strFilterValue1, true, "CHANNEL");
+/* 3175 */         logMessage("15A****CHANNEL from SOF checking for ROUTESTOMKTG*****" + this.vReturnEntities2 + "strFilterAttr1: " + this.strFilterAttr1 + "strFilterValue1: " + this.strFilterValue1 + "vReturnEntities3.size" + this.vReturnEntities3
+/*      */             
+/* 3177 */             .size());
+/* 3178 */         displayContents(this.vReturnEntities3);
+/*      */       } else {
+/*      */         
+/* 3181 */         this.vReturnEntities3 = new Vector();
+/*      */       } 
+/*      */       
+/* 3184 */       this.strCondition1 = getAllGeoTags(this.vReturnEntities3);
+/* 3185 */       if (this.strCondition1.indexOf("US") <= -1 && this.strCondition1.indexOf("LA") <= -1 && this.strCondition1.indexOf("CAN") <= -1)
+/*      */       {
+/*      */         
+/* 3188 */         this.vReturnEntities3 = new Vector();
+/*      */       }
+/*      */     } 
+/*      */     
+/* 3192 */     logMessage("15A****vReturnEntities3.size()*****: " + this.vReturnEntities3.size());
+/* 3193 */     if (this.vReturnEntities3.size() > 0) {
+/* 3194 */       println(".*$P_15A = '1'");
+/*      */     } else {
+/*      */       
+/* 3197 */       println(".*$P_15A = '0'");
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 3275 */     this.strFilterAttr = new String[] { "CHANNELNAME", "ROUTESTOMKTG" };
+/*      */     
+/* 3277 */     this.strFilterValue = new String[] { "381", "110" };
+/*      */     
+/* 3279 */     this.vReturnEntities2 = searchEntityVectorLink(this.vSofFrmSofAvail, (String[])null, (String[])null, true, true, "SOFCHANNEL");
+/* 3280 */     logMessage("15G****SOFCHANNEL*****");
+/* 3281 */     displayContents(this.vReturnEntities2);
+/* 3282 */     this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, this.strFilterAttr, this.strFilterValue, true, true, "CHANNEL");
+/* 3283 */     logMessage("15G****CHANNEL*****");
+/* 3284 */     displayContents(this.vReturnEntities3);
+/* 3285 */     this.strCondition1 = getAllGeoTags(this.vReturnEntities3);
+/* 3286 */     if (this.strCondition1.indexOf("US") <= -1 && this.strCondition1.indexOf("LA") <= -1 && this.strCondition1.indexOf("CAN") <= -1)
+/*      */     {
+/*      */       
+/* 3289 */       this.vReturnEntities3 = new Vector();
+/*      */     }
+/* 3291 */     if (this.vReturnEntities3.size() == 0) {
+/* 3292 */       this.vReturnEntities2 = searchEntityVectorLink(this.vCmpntFrmCmpntAvail, (String[])null, (String[])null, true, true, "CMPNTCHANNEL");
+/* 3293 */       logMessage("15G****CMPNTCHANNEL*****");
+/* 3294 */       displayContents(this.vReturnEntities2);
+/* 3295 */       this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, this.strFilterAttr, this.strFilterValue, true, true, "CHANNEL");
+/* 3296 */       logMessage("15G****CHANNEL*****");
+/* 3297 */       displayContents(this.vReturnEntities3);
+/* 3298 */       this.strCondition1 = getAllGeoTags(this.vReturnEntities3);
+/* 3299 */       if (this.strCondition1.indexOf("US") <= -1 && this.strCondition1.indexOf("LA") <= -1 && this.strCondition1.indexOf("CAN") <= -1)
+/*      */       {
+/*      */         
+/* 3302 */         this.vReturnEntities3 = new Vector();
+/*      */       }
+/*      */     } 
+/* 3305 */     if (this.vReturnEntities3.size() == 0) {
+/* 3306 */       this.vReturnEntities2 = searchEntityVectorLink(this.vFeatureFrmFeatureAvail, (String[])null, (String[])null, true, true, "FEATURECHANNEL");
+/* 3307 */       logMessage("15G****FEATURECHANNEL*****");
+/* 3308 */       displayContents(this.vReturnEntities2);
+/* 3309 */       this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, this.strFilterAttr, this.strFilterValue, true, true, "CHANNEL");
+/* 3310 */       logMessage("15G****CHANNEL*****");
+/* 3311 */       displayContents(this.vReturnEntities3);
+/* 3312 */       this.strCondition1 = getAllGeoTags(this.vReturnEntities3);
+/* 3313 */       if (this.strCondition1.indexOf("US") <= -1 && this.strCondition1.indexOf("LA") <= -1 && this.strCondition1.indexOf("CAN") <= -1)
+/*      */       {
+/*      */         
+/* 3316 */         this.vReturnEntities3 = new Vector();
+/*      */       }
+/*      */     } 
+/* 3319 */     if (this.vReturnEntities3.size() > 0) {
+/* 3320 */       println(".*$P_15G = '1'");
+/*      */     } else {
+/*      */       
+/* 3323 */       println(".*$P_15G = '0'");
+/*      */     } 
+/*      */     
+/* 3326 */     this
+/* 3327 */       .strCondition1 = (this.grpAnnouncement != null) ? getAttributeFlagEnabledValue(this.eiAnnounce.getEntityType(), this.eiAnnounce.getEntityID(), "GENAREANAMEINCL", "") : "";
+/*      */ 
+/*      */     
+/* 3330 */     this.strCondition2 = "0";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 3339 */     println(".*$P_15H = '" + (this.m_geList.isRfaGeoUS(this.eiAnnounce) ? "1" : "0") + "'");
+/* 3340 */     println(".*$P_15I = '" + (this.m_geList.isRfaGeoLA(this.eiAnnounce) ? "1" : "0") + "'");
+/* 3341 */     println(".*$P_15J = '" + (this.m_geList.isRfaGeoCAN(this.eiAnnounce) ? "1" : "0") + "'");
+/* 3342 */     println(".*$P_15K = '" + (this.m_geList.isRfaGeoEMEA(this.eiAnnounce) ? "1" : "0") + "'");
+/* 3343 */     println(".*$P_15L = '" + (this.m_geList.isRfaGeoAP(this.eiAnnounce) ? "1" : "0") + "'");
+/*      */ 
+/*      */ 
+/*      */     
+/* 3347 */     this.strCondition1 = getAttributeFlagEnabledValue(this.eiAnnounce, "COUNTRYLIST");
+/* 3348 */     this.st = new StringTokenizer(this.strCondition1, "|");
+/* 3349 */     this.bConditionOK = false;
+/* 3350 */     while (this.st.hasMoreTokens()) {
+/* 3351 */       this.strCondition2 = this.st.nextToken().trim();
+/* 3352 */       logMessage("_15M:Got Country:" + this.i + ":" + this.strCondition2);
+/* 3353 */       if (this.strCondition2.equals("1438") || this.strCondition2.equals("1642") || this.strCondition2
+/* 3354 */         .equals("1629") || this.strCondition2.equals("1579") || this.strCondition2
+/* 3355 */         .equals("1534") || this.strCondition2.equals("1513") || this.strCondition2
+/* 3356 */         .equals("1450") || this.strCondition2.equals("1442") || this.strCondition2
+/* 3357 */         .equals("1445")) {
+/* 3358 */         this.bConditionOK = true;
+/*      */         
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/* 3363 */     println(".*$P_15M = '" + (this.bConditionOK ? "1" : "0") + "'");
+/*      */     
+/* 3365 */     println(".*$P_16A = '0'");
+/* 3366 */     println(".*$P_16B = '0'");
+/*      */     
+/* 3368 */     this.strCondition1 = getAttributeValue(this.eiAnnounce, "CROSSPLATFORM", "");
+/* 3369 */     println(".*$P_17A = '" + ((this.strCondition1.indexOf("Yes") > -1) ? "1" : "0") + "'");
+/*      */     
+/* 3371 */     println(".*$P_17B = '" + (flagvalueEquals(this.eiAnnounce, "PLATFORM", "4767") ? "1" : "0") + "'");
+/* 3372 */     println(".*$P_17C = '" + (flagvalueEquals(this.eiAnnounce, "PLATFORM", "4770") ? "1" : "0") + "'");
+/* 3373 */     println(".*$P_17D = '" + (flagvalueEquals(this.eiAnnounce, "PLATFORM", "4769") ? "1" : "0") + "'");
+/* 3374 */     println(".*$P_17E = '" + (flagvalueEquals(this.eiAnnounce, "PLATFORM", "4772") ? "1" : "0") + "'");
+/* 3375 */     println(".*$P_17F = '" + (flagvalueEquals(this.eiAnnounce, "PLATFORM", "4764") ? "1" : "0") + "'");
+/* 3376 */     println(".*$P_17G = '" + (flagvalueEquals(this.eiAnnounce, "PLATFORM", "4768") ? "1" : "0") + "'");
+/* 3377 */     println(".*$P_17H = '" + (flagvalueEquals(this.eiAnnounce, "PLATFORM", "4766") ? "1" : "0") + "'");
+/* 3378 */     println(".*$P_17I = '" + (flagvalueEquals(this.eiAnnounce, "PLATFORM", "4773") ? "1" : "0") + "'");
+/*      */     
+/* 3380 */     println(".*$P_17J = '" + (flagvalueEquals(this.eiAnnounce, "OFFERINGTYPES", "2907") ? "1" : "0") + "'");
+/*      */ 
+/*      */     
+/* 3383 */     println(".*$P_17L = '" + (flagvalueEquals(this.eiAnnounce, "ELECTRONICSERVICE", "010") ? "1" : "0") + "'");
+/* 3384 */     println(".*$P_17M = '" + (flagvalueEquals(this.eiAnnounce, "ELECTRONICSERVICE", "011") ? "1" : "0") + "'");
+/*      */     
+/* 3386 */     println(".*$P_18A = '" + (flagvalueEquals(this.eiAnnounce, "CONFIGSUPPORT", "677") ? "1" : "0") + "'");
+/* 3387 */     println(".*$P_18B = '" + (flagvalueEquals(this.eiAnnounce, "CONFIGSUPPORT", "675") ? "1" : "0") + "'");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 3392 */     this.bConditionOK = false;
+/* 3393 */     this.vReturnEntities2 = new Vector();
+/* 3394 */     for (this.i = 0; this.i < this.grpAnnToConfig.getEntityItemCount(); this.i++) {
+/* 3395 */       this.eiAnnToConfig = this.grpAnnToConfig.getEntityItem(this.i);
+/* 3396 */       this.eiConfigurator = (EntityItem)this.eiAnnToConfig.getDownLink(0);
+/* 3397 */       if (this.m_geList.isRfaGeoUS(this.eiConfigurator)) {
+/* 3398 */         logMessage("P_19A US Configurator" + this.eiConfigurator.getEntityType() + ":" + this.eiConfigurator.getEntityID());
+/* 3399 */         this.bConditionOK = true;
+/* 3400 */         this.vReturnEntities2.addElement(this.eiConfigurator);
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */     
+/* 3405 */     this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(0) : null;
+/*      */     
+/* 3407 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3408 */     println(".*$P_19A = '" + this.strCondition2 + "'");
+/* 3409 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3410 */     println(".*$P_19B = '" + this.strCondition2 + "'");
+/*      */     
+/* 3412 */     if (this.vReturnEntities2.size() > 1) {
+/* 3413 */       this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(1) : null;
+/*      */     } else {
+/*      */       
+/* 3416 */       this.bConditionOK = false;
+/*      */     } 
+/*      */     
+/* 3419 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3420 */     println(".*$P_19C = '" + this.strCondition2 + "'");
+/* 3421 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3422 */     println(".*$P_19D = '" + this.strCondition2 + "'");
+/*      */     
+/* 3424 */     if (this.vReturnEntities2.size() > 2) {
+/* 3425 */       this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(2) : null;
+/*      */     } else {
+/*      */       
+/* 3428 */       this.bConditionOK = false;
+/*      */     } 
+/*      */     
+/* 3431 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3432 */     println(".*$P_19E = '" + this.strCondition2 + "'");
+/* 3433 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3434 */     println(".*$P_19F = '" + this.strCondition2 + "'");
+/*      */     
+/* 3436 */     if (this.vReturnEntities2.size() > 3) {
+/* 3437 */       this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(2) : null;
+/*      */     } else {
+/*      */       
+/* 3440 */       this.bConditionOK = false;
+/*      */     } 
+/*      */     
+/* 3443 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3444 */     println(".*$P_19G= '" + this.strCondition2 + "'");
+/* 3445 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3446 */     println(".*$P_19H = '" + this.strCondition2 + "'");
+/*      */     
+/* 3448 */     if (this.vReturnEntities2.size() > 4) {
+/* 3449 */       this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(2) : null;
+/*      */     } else {
+/*      */       
+/* 3452 */       this.bConditionOK = false;
+/*      */     } 
+/*      */     
+/* 3455 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3456 */     println(".*$P_19I= '" + this.strCondition2 + "'");
+/* 3457 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3458 */     println(".*$P_19J = '" + this.strCondition2 + "'");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 3463 */     this.bConditionOK = false;
+/* 3464 */     this.vReturnEntities2 = new Vector();
+/* 3465 */     for (this.i = 0; this.i < this.grpAnnToConfig.getEntityItemCount(); this.i++) {
+/* 3466 */       this.eiAnnToConfig = this.grpAnnToConfig.getEntityItem(this.i);
+/* 3467 */       this.eiConfigurator = (EntityItem)this.eiAnnToConfig.getDownLink(0);
+/* 3468 */       if (this.m_geList.isRfaGeoAP(this.eiConfigurator)) {
+/* 3469 */         logMessage("P_20A ap Configurator" + this.eiConfigurator.getEntityType() + ":" + this.eiConfigurator.getEntityID());
+/* 3470 */         this.bConditionOK = true;
+/* 3471 */         this.vReturnEntities2.addElement(this.eiConfigurator);
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */     
+/* 3476 */     this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(0) : null;
+/*      */     
+/* 3478 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3479 */     println(".*$P_20A = '" + this.strCondition2 + "'");
+/* 3480 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3481 */     println(".*$P_20B = '" + this.strCondition2 + "'");
+/*      */     
+/* 3483 */     if (this.vReturnEntities2.size() > 1) {
+/* 3484 */       this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(1) : null;
+/*      */     } else {
+/*      */       
+/* 3487 */       this.bConditionOK = false;
+/*      */     } 
+/*      */     
+/* 3490 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3491 */     println(".*$P_20C = '" + this.strCondition2 + "'");
+/* 3492 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3493 */     println(".*$P_20D = '" + this.strCondition2 + "'");
+/*      */     
+/* 3495 */     if (this.vReturnEntities2.size() > 2) {
+/* 3496 */       this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(2) : null;
+/*      */     } else {
+/*      */       
+/* 3499 */       this.bConditionOK = false;
+/*      */     } 
+/*      */     
+/* 3502 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3503 */     println(".*$P_20E = '" + this.strCondition2 + "'");
+/* 3504 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3505 */     println(".*$P_20F = '" + this.strCondition2 + "'");
+/*      */     
+/* 3507 */     if (this.vReturnEntities2.size() > 3) {
+/* 3508 */       this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(2) : null;
+/*      */     } else {
+/*      */       
+/* 3511 */       this.bConditionOK = false;
+/*      */     } 
+/*      */     
+/* 3514 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3515 */     println(".*$P_20G= '" + this.strCondition2 + "'");
+/* 3516 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3517 */     println(".*$P_20H = '" + this.strCondition2 + "'");
+/*      */     
+/* 3519 */     if (this.vReturnEntities2.size() > 4) {
+/* 3520 */       this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(2) : null;
+/*      */     } else {
+/*      */       
+/* 3523 */       this.bConditionOK = false;
+/*      */     } 
+/*      */     
+/* 3526 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3527 */     println(".*$P_20I= '" + this.strCondition2 + "'");
+/* 3528 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3529 */     println(".*$P_20J = '" + this.strCondition2 + "'");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 3534 */     this.bConditionOK = false;
+/* 3535 */     this.vReturnEntities2 = new Vector();
+/* 3536 */     for (this.i = 0; this.i < this.grpAnnToConfig.getEntityItemCount(); this.i++) {
+/* 3537 */       this.eiAnnToConfig = this.grpAnnToConfig.getEntityItem(this.i);
+/* 3538 */       this.eiConfigurator = (EntityItem)this.eiAnnToConfig.getDownLink(0);
+/* 3539 */       if (this.m_geList.isRfaGeoLA(this.eiConfigurator)) {
+/* 3540 */         logMessage("P_21A LA Configurator" + this.eiConfigurator.getEntityType() + ":" + this.eiConfigurator.getEntityID());
+/* 3541 */         this.bConditionOK = true;
+/* 3542 */         this.vReturnEntities2.addElement(this.eiConfigurator);
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */     
+/* 3547 */     this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(0) : null;
+/*      */     
+/* 3549 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3550 */     println(".*$P_21A = '" + this.strCondition2 + "'");
+/* 3551 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3552 */     println(".*$P_21B = '" + this.strCondition2 + "'");
+/*      */     
+/* 3554 */     if (this.vReturnEntities2.size() > 1) {
+/* 3555 */       this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(1) : null;
+/*      */     } else {
+/*      */       
+/* 3558 */       this.bConditionOK = false;
+/*      */     } 
+/*      */     
+/* 3561 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3562 */     println(".*$P_21C = '" + this.strCondition2 + "'");
+/* 3563 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3564 */     println(".*$P_21D = '" + this.strCondition2 + "'");
+/*      */     
+/* 3566 */     if (this.vReturnEntities2.size() > 2) {
+/* 3567 */       this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(2) : null;
+/*      */     } else {
+/*      */       
+/* 3570 */       this.bConditionOK = false;
+/*      */     } 
+/*      */     
+/* 3573 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3574 */     println(".*$P_21E = '" + this.strCondition2 + "'");
+/* 3575 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3576 */     println(".*$P_21F = '" + this.strCondition2 + "'");
+/*      */     
+/* 3578 */     if (this.vReturnEntities2.size() > 3) {
+/* 3579 */       this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(2) : null;
+/*      */     } else {
+/*      */       
+/* 3582 */       this.bConditionOK = false;
+/*      */     } 
+/*      */     
+/* 3585 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3586 */     println(".*$P_21G= '" + this.strCondition2 + "'");
+/* 3587 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3588 */     println(".*$P_21H = '" + this.strCondition2 + "'");
+/*      */     
+/* 3590 */     if (this.vReturnEntities2.size() > 4) {
+/* 3591 */       this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(2) : null;
+/*      */     } else {
+/*      */       
+/* 3594 */       this.bConditionOK = false;
+/*      */     } 
+/*      */     
+/* 3597 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3598 */     println(".*$P_21I= '" + this.strCondition2 + "'");
+/* 3599 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3600 */     println(".*$P_21J = '" + this.strCondition2 + "'");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 3605 */     this.bConditionOK = false;
+/* 3606 */     this.vReturnEntities2 = new Vector();
+/* 3607 */     for (this.i = 0; this.i < this.grpAnnToConfig.getEntityItemCount(); this.i++) {
+/* 3608 */       this.eiAnnToConfig = this.grpAnnToConfig.getEntityItem(this.i);
+/* 3609 */       this.eiConfigurator = (EntityItem)this.eiAnnToConfig.getDownLink(0);
+/* 3610 */       if (this.m_geList.isRfaGeoCAN(this.eiConfigurator)) {
+/* 3611 */         logMessage("P_22a CANConfigurator" + this.eiConfigurator.getEntityType() + ":" + this.eiConfigurator.getEntityID());
+/* 3612 */         this.bConditionOK = true;
+/* 3613 */         this.vReturnEntities2.addElement(this.eiConfigurator);
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */     
+/* 3618 */     this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(0) : null;
+/*      */     
+/* 3620 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3621 */     println(".*$P_22A = '" + this.strCondition2 + "'");
+/* 3622 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3623 */     println(".*$P_22B = '" + this.strCondition2 + "'");
+/*      */     
+/* 3625 */     if (this.vReturnEntities2.size() > 1) {
+/* 3626 */       this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(1) : null;
+/*      */     } else {
+/*      */       
+/* 3629 */       this.bConditionOK = false;
+/*      */     } 
+/*      */     
+/* 3632 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3633 */     println(".*$P_22C = '" + this.strCondition2 + "'");
+/* 3634 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3635 */     println(".*$P_22D = '" + this.strCondition2 + "'");
+/*      */     
+/* 3637 */     if (this.vReturnEntities2.size() > 2) {
+/* 3638 */       this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(2) : null;
+/*      */     } else {
+/*      */       
+/* 3641 */       this.bConditionOK = false;
+/*      */     } 
+/*      */     
+/* 3644 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3645 */     println(".*$P_22E = '" + this.strCondition2 + "'");
+/* 3646 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3647 */     println(".*$P_22F = '" + this.strCondition2 + "'");
+/*      */     
+/* 3649 */     if (this.vReturnEntities2.size() > 3) {
+/* 3650 */       this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(2) : null;
+/*      */     } else {
+/*      */       
+/* 3653 */       this.bConditionOK = false;
+/*      */     } 
+/*      */     
+/* 3656 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3657 */     println(".*$P_22G= '" + this.strCondition2 + "'");
+/* 3658 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3659 */     println(".*$P_22H = '" + this.strCondition2 + "'");
+/*      */     
+/* 3661 */     if (this.vReturnEntities2.size() > 4) {
+/* 3662 */       this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(2) : null;
+/*      */     } else {
+/*      */       
+/* 3665 */       this.bConditionOK = false;
+/*      */     } 
+/*      */     
+/* 3668 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3669 */     println(".*$P_22I= '" + this.strCondition2 + "'");
+/* 3670 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3671 */     println(".*$P_22J = '" + this.strCondition2 + "'");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 3676 */     this.bConditionOK = false;
+/* 3677 */     this.vReturnEntities2 = new Vector();
+/* 3678 */     for (this.i = 0; this.i < this.grpAnnToConfig.getEntityItemCount(); this.i++) {
+/* 3679 */       this.eiAnnToConfig = this.grpAnnToConfig.getEntityItem(this.i);
+/* 3680 */       this.eiConfigurator = (EntityItem)this.eiAnnToConfig.getDownLink(0);
+/* 3681 */       if (this.m_geList.isRfaGeoEMEA(this.eiConfigurator)) {
+/* 3682 */         logMessage("P_23A EMEA Configurator" + this.eiConfigurator.getEntityType() + ":" + this.eiConfigurator.getEntityID());
+/* 3683 */         this.bConditionOK = true;
+/* 3684 */         this.vReturnEntities2.addElement(this.eiConfigurator);
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */     
+/* 3689 */     this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(0) : null;
+/*      */     
+/* 3691 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3692 */     println(".*$P_23A = '" + this.strCondition2 + "'");
+/* 3693 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3694 */     println(".*$P_23B = '" + this.strCondition2 + "'");
+/*      */     
+/* 3696 */     if (this.vReturnEntities2.size() > 1) {
+/* 3697 */       this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(1) : null;
+/*      */     } else {
+/*      */       
+/* 3700 */       this.bConditionOK = false;
+/*      */     } 
+/*      */     
+/* 3703 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3704 */     println(".*$P_23C = '" + this.strCondition2 + "'");
+/* 3705 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3706 */     println(".*$P_23D = '" + this.strCondition2 + "'");
+/*      */     
+/* 3708 */     if (this.vReturnEntities2.size() > 2) {
+/* 3709 */       this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(2) : null;
+/*      */     } else {
+/*      */       
+/* 3712 */       this.bConditionOK = false;
+/*      */     } 
+/*      */     
+/* 3715 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3716 */     println(".*$P_23E = '" + this.strCondition2 + "'");
+/* 3717 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3718 */     println(".*$P_23F = '" + this.strCondition2 + "'");
+/*      */     
+/* 3720 */     if (this.vReturnEntities2.size() > 3) {
+/* 3721 */       this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(2) : null;
+/*      */     } else {
+/*      */       
+/* 3724 */       this.bConditionOK = false;
+/*      */     } 
+/*      */     
+/* 3727 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3728 */     println(".*$P_23G= '" + this.strCondition2 + "'");
+/* 3729 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3730 */     println(".*$P_23H = '" + this.strCondition2 + "'");
+/*      */     
+/* 3732 */     if (this.vReturnEntities2.size() > 4) {
+/* 3733 */       this.eiConfigurator = this.bConditionOK ? this.vReturnEntities2.elementAt(2) : null;
+/*      */     } else {
+/*      */       
+/* 3736 */       this.bConditionOK = false;
+/*      */     } 
+/*      */     
+/* 3739 */     this.strCondition2 = this.bConditionOK ? getAttributeShortFlagDesc(this.eiConfigurator, "CONFIGNAME", "") : "";
+/* 3740 */     println(".*$P_23I= '" + this.strCondition2 + "'");
+/* 3741 */     this.strCondition2 = this.bConditionOK ? getAttributeValue(this.eiAnnToConfig, "CONFIGAVAILDATE", "") : "";
+/* 3742 */     println(".*$P_23J = '" + this.strCondition2 + "'");
+/*      */     
+/* 3744 */     this.strCondition1 = getAttributeValue(this.eiAnnounce, "OFFERINGACCESS", "");
+/* 3745 */     println(".*$P_30A = '" + (this.strCondition1.equals("Yes") ? "1" : "0") + "'");
+/* 3746 */     this.strCondition1 = getAttributeValue(this.eiAnnounce, "MARKETEDIBMLOGO", "");
+/* 3747 */     println(".*$P_30B = '" + (this.strCondition1.equals("Yes") ? "1" : "0") + "'");
+/* 3748 */     println(".*$P_30C = '" + (flagvalueEquals(this.eiAnnounce, "LOGOACCESSREQTS", "2833") ? "1" : "0") + "'");
+/* 3749 */     println(".*$P_30D = '" + (flagvalueEquals(this.eiAnnounce, "LOGOACCESSREQTS", "2834") ? "1" : "0") + "'");
+/* 3750 */     this.strCondition1 = getAttributeShortFlagDesc(this.eiAnnounce, "TGTCUSTOMERAUD", "");
+/*      */     
+/* 3752 */     this.strFilterAttr = new String[] { "CHANNELNAME", "ROUTESTOMKTG" };
+/*      */     
+/* 3754 */     this.strFilterValue = new String[] { "381", "110" };
+/*      */     
+/* 3756 */     this.vReturnEntities2 = searchEntityVectorLink(this.vSofFrmSofAvail, (String[])null, (String[])null, true, true, "SOFCHANNEL");
+/* 3757 */     logMessage("****SOFCHANNEL*****");
+/* 3758 */     displayContents(this.vReturnEntities2);
+/* 3759 */     this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, this.strFilterAttr, this.strFilterValue, true, true, "CHANNEL");
+/* 3760 */     logMessage("****CHANNEL*****");
+/* 3761 */     displayContents(this.vReturnEntities3);
+/* 3762 */     if (this.vReturnEntities3.size() == 0) {
+/* 3763 */       this.vReturnEntities2 = searchEntityVectorLink(this.vCmpntFrmCmpntAvail, (String[])null, (String[])null, true, true, "CMPNTCHANNEL");
+/* 3764 */       logMessage("****CMPNTCHANNEL*****");
+/* 3765 */       displayContents(this.vReturnEntities2);
+/* 3766 */       this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, this.strFilterAttr, this.strFilterValue, true, true, "CHANNEL");
+/* 3767 */       logMessage("****CHANNEL*****");
+/* 3768 */       displayContents(this.vReturnEntities3);
+/*      */     } 
+/* 3770 */     if (this.vReturnEntities3.size() == 0) {
+/* 3771 */       this.vReturnEntities2 = searchEntityVectorLink(this.vFeatureFrmFeatureAvail, (String[])null, (String[])null, true, true, "FEATURECHANNEL");
+/* 3772 */       logMessage("****FEATURECHANNEL*****");
+/* 3773 */       displayContents(this.vReturnEntities1);
+/* 3774 */       this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, this.strFilterAttr, this.strFilterValue, true, true, "CHANNEL");
+/* 3775 */       logMessage("****CHANNEL*****");
+/* 3776 */       displayContents(this.vReturnEntities3);
+/*      */     } 
+/* 3778 */     println(".*$P_31A = '" + ((this.vReturnEntities3.size() > 0) ? "1" : "0") + "'");
+/*      */     
+/* 3780 */     println(".*$P_43A = '" + ((this.strCondition1.length() > 61) ? this.strCondition1.substring(0, 61) : this.strCondition1) + "'");
+/* 3781 */     println(".*$VARIABLES_END");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void processLongTo100() {
+/* 3788 */     println(".*$A_007_Begin");
+/* 3789 */     println(getAttributeValue(this.eiAnnounce, "ANNIMAGES", " "));
+/* 3790 */     println(".*$A_007_End");
+/* 3791 */     println(".*$A_040_Begin");
+/*      */ 
+/*      */ 
+/*      */     
+/* 3795 */     this.strHeader = new String[] { "Role Type", "Name", "Telephone", "Node/ID" };
+/*      */     
+/* 3797 */     this.iColWidths = new int[] { 15, 18, 12, 17 };
+/*      */     
+/* 3799 */     this.strFilterAttr = new String[] { "ANNROLETYPE", "ANNROLETYPE", "ANNROLETYPE", "ANNROLETYPE" };
+/*      */     
+/* 3801 */     this.strFilterValue = new String[] { "11", "12", "13", "14" };
+/*      */     
+/* 3803 */     this.vReturnEntities1 = searchEntityGroup(this.grpAnnToOP, this.strFilterAttr, this.strFilterValue, false);
+/* 3804 */     for (this.i = 0; this.i < this.vReturnEntities1.size(); this.i++) {
+/* 3805 */       this.eiAnnToOP = this.vReturnEntities1.elementAt(this.i);
+/* 3806 */       this.eiOP = (EntityItem)this.eiAnnToOP.getDownLink(0);
+/* 3807 */       this.strCondition1 = getAttributeValue(this.eiAnnToOP, "ANNROLETYPE", " ");
+/* 3808 */       this.vPrintDetails.add((this.strCondition1.length() >= 14) ? this.strCondition1.substring(0, 14) : this.strCondition1
+/* 3809 */           .substring(0, this.strCondition1.length()));
+/* 3810 */       this.strCondition1 = getAttributeValue(this.eiOP, "FIRSTNAME", " ").substring(0, 1) + ". ";
+/* 3811 */       this.strCondition1 += getAttributeValue(this.eiOP, "LASTNAME", " ");
+/* 3812 */       this.vPrintDetails.add(this.strCondition1);
+/* 3813 */       this.vPrintDetails.add(getAttributeValue(this.eiOP, "TELEPHONE", " "));
+/* 3814 */       this.strCondition1 = getAttributeValue(this.eiOP, "VNETNODE", " ") + "/";
+/* 3815 */       this.strCondition1 += getAttributeValue(this.eiOP, "VNETUID", " ");
+/* 3816 */       this.vPrintDetails.add(this.strCondition1);
+/*      */     } 
+/* 3818 */     if (this.vPrintDetails.size() > 0) {
+/* 3819 */       println("This RFA and its requested schedule hae been reviewed with the");
+/* 3820 */       println("following functional representatives");
+/* 3821 */       println(":xmp.");
+/* 3822 */       printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails);
+/* 3823 */       resetPrintvars();
+/* 3824 */       println(":exmp.");
+/*      */     } 
+/* 3826 */     println(".*$A_040_End");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 3832 */     println(".*$A_044_Begin");
+/* 3833 */     println(":xmp.");
+/* 3834 */     println(".in 0");
+/* 3835 */     println(".kp off");
+/* 3836 */     for (this.i = 0; this.i < this.grpRelatedANN.getEntityItemCount(); this.i++) {
+/* 3837 */       this.eiRelatedANN = this.grpRelatedANN.getEntityItem(this.i);
+/*      */       
+/* 3839 */       for (this.j = 0; this.j < this.eiRelatedANN.getDownLinkCount(); this.j++) {
+/* 3840 */         this.eiNextItem = (EntityItem)this.eiRelatedANN.getDownLink(this.j);
+/* 3841 */         logMessage("**********_044 next item" + this.eiNextItem.getEntityType() + this.eiNextItem.getEntityID());
+/* 3842 */         this.vPrintDetails.add(getAttributeValue(this.eiNextItem, "ANNTITLE", " "));
+/* 3843 */         this.vPrintDetails.add(getAttributeValue(this.eiNextItem, "ANNNUMBER", " "));
+/*      */       } 
+/*      */     } 
+/* 3846 */     this.strHeader = new String[] { "Announcement Title", "Announcement Number" };
+/*      */     
+/* 3848 */     this.iColWidths = new int[] { 50, 19 };
+/*      */     
+/* 3850 */     printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails);
+/* 3851 */     resetPrintvars();
+/* 3852 */     println("");
+/*      */     
+/* 3854 */     println(":exmp.");
+/* 3855 */     println(".*$A_044_End");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 3860 */     println(".*$A_045_Begin");
+/* 3861 */     println(":xmp.");
+/* 3862 */     println(".in 0");
+/* 3863 */     println(":hp2.Being released to::ehp2.");
+/* 3864 */     println(".kp off");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 3869 */     this.vReturnEntities4 = searchEntityVectorLink(this.vSofFrmSofAvail, (String[])null, (String[])null, true, true, "SOFADMINOP");
+/* 3870 */     logMessage("****SOFADMINOP*****");
+/* 3871 */     displayContents(this.vReturnEntities4);
+/*      */     
+/* 3873 */     this.vReturnEntities2.removeAllElements();
+/* 3874 */     this.vReturnEntities2.addAll(this.vReturnEntities4);
+/* 3875 */     this.vReturnEntities3 = searchInGeo(this.vReturnEntities2, "US");
+/* 3876 */     this.vReturnEntities1 = searchEntityVectorLink(this.vReturnEntities3, (String[])null, (String[])null, true, true, "OP");
+/* 3877 */     logMessage("****OP*****");
+/* 3878 */     displayContents(this.vReturnEntities1);
+/*      */     
+/* 3880 */     resetPrintvars();
+/* 3881 */     this.strEntityTypes = new String[] { "SOFADMINOP" };
+/*      */     
+/* 3883 */     for (this.i = 0; this.i < this.vReturnEntities1.size(); this.i++) {
+/* 3884 */       this.eiOP = this.vReturnEntities1.elementAt(this.i);
+/* 3885 */       logMessage("_045 US" + this.eiOP.getKey());
+/* 3886 */       this.eiNextItem = getUplinkedEntityItem(this.eiOP, this.strEntityTypes);
+/* 3887 */       this.strCondition1 = getGeoTags(this.eiNextItem);
+/* 3888 */       logMessage("_045 US" + this.eiOP.getKey() + this.strCondition1);
+/* 3889 */       if (!this.strCondition1.equals("US, AP, CAN, EMEA, LA")) {
+/*      */ 
+/*      */ 
+/*      */         
+/* 3893 */         logMessage("_045 US" + this.eiNextItem.getKey());
+/* 3894 */         this.vPrintDetails.add(getAttributeValue(this.eiNextItem, "GENAREASELECTION", " "));
+/* 3895 */         this.strCondition1 = getAttributeValue(this.eiOP, "FIRSTNAME", " ").substring(0, 1) + ". ";
+/* 3896 */         this.strCondition1 += getAttributeValue(this.eiOP, "LASTNAME", " ");
+/* 3897 */         this.vPrintDetails.add(this.strCondition1);
+/* 3898 */         this.vPrintDetails.add(getAttributeValue(this.eiOP, "TELEPHONE", " "));
+/* 3899 */         this.strCondition1 = getAttributeValue(this.eiOP, "VNETNODE", " ") + "/";
+/* 3900 */         this.strCondition1 += getAttributeValue(this.eiOP, "VNETUID", " ");
+/* 3901 */         this.vPrintDetails.add(this.strCondition1);
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 3905 */     this.vReturnEntities2.removeAllElements();
+/* 3906 */     this.vReturnEntities2.addAll(this.vReturnEntities4);
+/* 3907 */     this.vReturnEntities3 = searchInGeo(this.vReturnEntities2, "EMEA");
+/* 3908 */     this.vReturnEntities1 = searchEntityVectorLink(this.vReturnEntities3, (String[])null, (String[])null, true, true, "OP");
+/* 3909 */     logMessage("****OP*****");
+/* 3910 */     displayContents(this.vReturnEntities1);
+/* 3911 */     for (this.i = 0; this.i < this.vReturnEntities1.size(); this.i++) {
+/* 3912 */       this.eiOP = this.vReturnEntities1.elementAt(this.i);
+/* 3913 */       this.eiNextItem = getUplinkedEntityItem(this.eiOP, this.strEntityTypes);
+/* 3914 */       this.strCondition1 = getGeoTags(this.eiNextItem);
+/* 3915 */       logMessage("_045 EMEA" + this.eiOP.getKey() + this.strCondition1);
+/* 3916 */       if (!this.strCondition1.equals("US, AP, CAN, EMEA, LA")) {
+/*      */ 
+/*      */         
+/* 3919 */         logMessage("_045 EMEA" + this.eiNextItem.getKey());
+/* 3920 */         this.vPrintDetails.add(getAttributeValue(this.eiNextItem, "GENAREASELECTION", " "));
+/* 3921 */         this.strCondition1 = getAttributeValue(this.eiOP, "FIRSTNAME", " ").substring(0, 1) + ". ";
+/* 3922 */         this.strCondition1 += getAttributeValue(this.eiOP, "LASTNAME", " ");
+/* 3923 */         this.vPrintDetails.add(this.strCondition1);
+/* 3924 */         this.vPrintDetails.add(getAttributeValue(this.eiOP, "TELEPHONE", " "));
+/* 3925 */         this.strCondition1 = getAttributeValue(this.eiOP, "VNETNODE", " ") + "/";
+/* 3926 */         this.strCondition1 += getAttributeValue(this.eiOP, "VNETUID", " ");
+/* 3927 */         this.vPrintDetails.add(this.strCondition1);
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 3931 */     this.vReturnEntities2.removeAllElements();
+/* 3932 */     this.vReturnEntities2.addAll(this.vReturnEntities4);
+/* 3933 */     this.vReturnEntities3 = searchInGeo(this.vReturnEntities2, "AP");
+/* 3934 */     this.vReturnEntities1 = searchEntityVectorLink(this.vReturnEntities3, (String[])null, (String[])null, true, true, "OP");
+/* 3935 */     logMessage("****OP*****");
+/* 3936 */     displayContents(this.vReturnEntities1);
+/* 3937 */     for (this.i = 0; this.i < this.vReturnEntities1.size(); this.i++) {
+/* 3938 */       this.eiOP = this.vReturnEntities1.elementAt(this.i);
+/* 3939 */       this.eiNextItem = getUplinkedEntityItem(this.eiOP, this.strEntityTypes);
+/* 3940 */       this.strCondition1 = getGeoTags(this.eiNextItem);
+/* 3941 */       logMessage("_045 AP" + this.eiOP.getKey() + this.strCondition1);
+/* 3942 */       if (!this.strCondition1.equals("US, AP, CAN, EMEA, LA")) {
+/*      */ 
+/*      */         
+/* 3945 */         logMessage("_045 AP" + this.eiNextItem.getKey());
+/* 3946 */         this.vPrintDetails.add(getAttributeValue(this.eiNextItem, "GENAREASELECTION", " "));
+/* 3947 */         this.strCondition1 = getAttributeValue(this.eiOP, "FIRSTNAME", " ").substring(0, 1) + ". ";
+/* 3948 */         this.strCondition1 += getAttributeValue(this.eiOP, "LASTNAME", " ");
+/* 3949 */         this.vPrintDetails.add(this.strCondition1);
+/* 3950 */         this.vPrintDetails.add(getAttributeValue(this.eiOP, "TELEPHONE", " "));
+/* 3951 */         this.strCondition1 = getAttributeValue(this.eiOP, "VNETNODE", " ") + "/";
+/* 3952 */         this.strCondition1 += getAttributeValue(this.eiOP, "VNETUID", " ");
+/* 3953 */         this.vPrintDetails.add(this.strCondition1);
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 3957 */     this.vReturnEntities2.removeAllElements();
+/* 3958 */     this.vReturnEntities2.addAll(this.vReturnEntities4);
+/* 3959 */     this.vReturnEntities3 = searchInGeo(this.vReturnEntities2, "LA");
+/* 3960 */     this.vReturnEntities1 = searchEntityVectorLink(this.vReturnEntities3, (String[])null, (String[])null, true, true, "OP");
+/* 3961 */     logMessage("****OP*****");
+/* 3962 */     displayContents(this.vReturnEntities1);
+/* 3963 */     for (this.i = 0; this.i < this.vReturnEntities1.size(); this.i++) {
+/* 3964 */       this.eiOP = this.vReturnEntities1.elementAt(this.i);
+/* 3965 */       this.eiNextItem = getUplinkedEntityItem(this.eiOP, this.strEntityTypes);
+/* 3966 */       this.strCondition1 = getGeoTags(this.eiNextItem);
+/* 3967 */       logMessage("_045 LA" + this.eiOP.getKey() + this.strCondition1);
+/* 3968 */       if (!this.strCondition1.equals("US, AP, CAN, EMEA, LA")) {
+/*      */ 
+/*      */         
+/* 3971 */         logMessage("_045 LA" + this.eiNextItem.getKey());
+/* 3972 */         this.vPrintDetails.add(getAttributeValue(this.eiNextItem, "GENAREASELECTION", " "));
+/* 3973 */         this.strCondition1 = getAttributeValue(this.eiOP, "FIRSTNAME", " ").substring(0, 1) + ". ";
+/* 3974 */         this.strCondition1 += getAttributeValue(this.eiOP, "LASTNAME", " ");
+/* 3975 */         this.vPrintDetails.add(this.strCondition1);
+/* 3976 */         this.vPrintDetails.add(getAttributeValue(this.eiOP, "TELEPHONE", " "));
+/* 3977 */         this.strCondition1 = getAttributeValue(this.eiOP, "VNETNODE", " ") + "/";
+/* 3978 */         this.strCondition1 += getAttributeValue(this.eiOP, "VNETUID", " ");
+/* 3979 */         this.vPrintDetails.add(this.strCondition1);
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 3983 */     this.vReturnEntities2.removeAllElements();
+/* 3984 */     this.vReturnEntities2.addAll(this.vReturnEntities4);
+/* 3985 */     this.vReturnEntities3 = searchInGeo(this.vReturnEntities2, "CA");
+/* 3986 */     this.vReturnEntities1 = searchEntityVectorLink(this.vReturnEntities3, (String[])null, (String[])null, true, true, "OP");
+/* 3987 */     logMessage("****OP*****");
+/* 3988 */     displayContents(this.vReturnEntities1);
+/* 3989 */     for (this.i = 0; this.i < this.vReturnEntities1.size(); this.i++) {
+/* 3990 */       this.eiOP = this.vReturnEntities1.elementAt(this.i);
+/* 3991 */       this.eiNextItem = getUplinkedEntityItem(this.eiOP, this.strEntityTypes);
+/* 3992 */       this.strCondition1 = getGeoTags(this.eiNextItem);
+/* 3993 */       logMessage("_045 CA" + this.eiOP.getKey());
+/* 3994 */       if (!this.strCondition1.equals("US, AP, CAN, EMEA, LA")) {
+/*      */ 
+/*      */         
+/* 3997 */         logMessage("_045 CA" + this.eiNextItem.getKey());
+/* 3998 */         this.vPrintDetails.add(getAttributeValue(this.eiNextItem, "GENAREASELECTION", " "));
+/* 3999 */         this.strCondition1 = getAttributeValue(this.eiOP, "FIRSTNAME", " ").substring(0, 1) + ". ";
+/* 4000 */         this.strCondition1 += getAttributeValue(this.eiOP, "LASTNAME", " ");
+/* 4001 */         this.vPrintDetails.add(this.strCondition1);
+/* 4002 */         this.vPrintDetails.add(getAttributeValue(this.eiOP, "TELEPHONE", " "));
+/* 4003 */         this.strCondition1 = getAttributeValue(this.eiOP, "VNETNODE", " ") + "/";
+/* 4004 */         this.strCondition1 += getAttributeValue(this.eiOP, "VNETUID", " ");
+/* 4005 */         this.vPrintDetails.add(this.strCondition1);
+/*      */       } 
+/*      */     } 
+/* 4008 */     this.strHeader = new String[] { "Geography", "Product Administrator", " Telephone", "    Node/Userid" };
+/*      */     
+/* 4010 */     this.iColWidths = new int[] { 10, 21, 12, 17 };
+/*      */     
+/* 4012 */     printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails);
+/* 4013 */     resetPrintvars();
+/*      */     
+/* 4015 */     println(":exmp.");
+/* 4016 */     println(".*$A_045_End");
+/*      */     
+/* 4018 */     println(".*$A_046_Begin");
+/* 4019 */     println(getAttributeShortFlagDesc(this.eiAnnounce, "TELECOMMEQ", " "));
+/* 4020 */     println(".*$A_046_End");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 4025 */     println(".*$A_049_Begin");
+/* 4026 */     println(":xmp.");
+/* 4027 */     println(".kp off");
+/* 4028 */     this.eiAnnToOP = null;
+/* 4029 */     this.eiOP = null;
+/* 4030 */     this.strFilterAttr = new String[] { "ANNROLETYPE" };
+/*      */     
+/* 4032 */     this.strFilterValue = new String[] { "5" };
+/*      */     
+/* 4034 */     this.vReturnEntities1 = searchEntityGroup(this.grpAnnToOP, this.strFilterAttr, this.strFilterValue, true);
+/* 4035 */     this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, true, "OP");
+/* 4036 */     this.strFilterAttr = new String[] { "ORGANUNITTYPE", "ORGANUNITTYPE" };
+/*      */     
+/* 4038 */     this.strFilterValue = new String[] { "4156", "4157" };
+/*      */     
+/* 4040 */     this.vReturnEntities3 = searchEntityGroupLink(this.grpAnnToOrgUnit, this.strFilterAttr, this.strFilterValue, false, true, "ORGANUNIT");
+/*      */     
+/* 4042 */     for (this.i = 0; this.i < this.vReturnEntities2.size(); this.i++) {
+/* 4043 */       this.eiOP = this.vReturnEntities2.elementAt(this.i);
+/* 4044 */       this.strCondition2 = getAttributeValue(this.eiOP, "FIRSTNAME", " ");
+/* 4045 */       this.strCondition1 = getAttributeValue(this.eiOP, "MIDDLENAME", " ");
+/* 4046 */       this.strCondition2 += this.strCondition1.equals(" ") ? "" : (" " + this.strCondition1 + ".");
+/* 4047 */       this.strCondition1 = getAttributeValue(this.eiOP, "LASTNAME", " ");
+/* 4048 */       this.strCondition2 += this.strCondition1.equals(" ") ? "" : (" " + this.strCondition1);
+/* 4049 */       println("                     " + this.strCondition2);
+/* 4050 */       println("                     " + getAttributeValue(this.eiOP, "JOBTITLE", " "));
+/* 4051 */       for (this.j = 0; this.j < this.vReturnEntities3.size(); this.j++) {
+/* 4052 */         this.eiOrganUnit = this.vReturnEntities3.elementAt(this.j);
+/* 4053 */         println("                     " + getAttributeValue(this.eiOrganUnit, "NAME", " "));
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 4063 */     println(":exmp.");
+/* 4064 */     println(".*$A_049_End");
+/*      */     
+/* 4066 */     println(".*$A_100_Begin");
+/* 4067 */     prettyPrint(getAttributeValue(this.eiAnnounce, "ANNTITLE", " "), 69);
+/* 4068 */     println(".*$A_100_End");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void processLongTo200() {
+/* 4081 */     println(".*$A_104_Begin");
+/* 4082 */     printVanillaSVSReport("FEATUREBENEFIT", true, false);
+/* 4083 */     println(".*$A_104_End");
+/*      */ 
+/*      */     
+/* 4086 */     println(".*$A_106_Begin");
+/* 4087 */     printVanillaSVSReport("DIFFEATURESBENEFITS", true, false);
+/* 4088 */     println(".*$A_106_End");
+/*      */     
+/* 4090 */     this.eiChannel = null;
+/* 4091 */     this.strFilterAttr = new String[] { "AVAILTYPE" };
+/*      */     
+/* 4093 */     this.strFilterValue = new String[] { "146" };
+/*      */     
+/* 4095 */     this.vReturnEntities1 = searchEntityGroupLink(this.grpAnnAvail, this.strFilterAttr, this.strFilterValue, true, true, "AVAIL");
+/* 4096 */     logMessage("_108****AVAIL*****");
+/* 4097 */     displayContents(this.vReturnEntities1);
+/*      */     
+/* 4099 */     this.vReturnEntities2.removeAllElements();
+/* 4100 */     this.vReturnEntities2 = searchInGeo(this.vReturnEntities1, new String[] { "US", "CAN", "LA", "AP" });
+/*      */     
+/* 4102 */     logMessage("_108****AVAIL-US/CAN/LA/AP*****");
+/* 4103 */     displayContents(this.vReturnEntities2);
+/* 4104 */     this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, (String[])null, (String[])null, true, false, "SOFAVAIL");
+/* 4105 */     logMessage("****SOFAVAIL*****");
+/* 4106 */     displayContents(this.vReturnEntities3);
+/* 4107 */     this.vReturnEntities5 = searchEntityVectorLink(this.vReturnEntities3, (String[])null, (String[])null, true, false, "SOF");
+/* 4108 */     logMessage("_108****SOF*****");
+/* 4109 */     displayContents(this.vReturnEntities5);
+/*      */     
+/* 4111 */     this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, (String[])null, (String[])null, true, false, "CMPNTAVAIL");
+/* 4112 */     logMessage("****CMPNTAVAIL*****");
+/* 4113 */     displayContents(this.vReturnEntities3);
+/* 4114 */     this.vReturnEntities4 = searchEntityVectorLink(this.vReturnEntities3, (String[])null, (String[])null, true, false, "CMPNT");
+/* 4115 */     logMessage("_108****CMPNT*****");
+/* 4116 */     displayContents(this.vReturnEntities4);
+/* 4117 */     this.vReturnEntities5.addAll(this.vReturnEntities4);
+/*      */     
+/* 4119 */     this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, (String[])null, (String[])null, true, false, "FEATUREAVAIL");
+/* 4120 */     logMessage("****FEATUREAVAIL*****");
+/* 4121 */     displayContents(this.vReturnEntities3);
+/* 4122 */     this.vReturnEntities4 = searchEntityVectorLink(this.vReturnEntities3, (String[])null, (String[])null, true, false, "FEATURE");
+/* 4123 */     logMessage("_108****FEATURE*****");
+/* 4124 */     displayContents(this.vReturnEntities4);
+/*      */     
+/* 4126 */     this.vReturnEntities5.addAll(this.vReturnEntities4);
+/* 4127 */     logMessage("_108****SOFCMPNTFEATURE*****");
+/* 4128 */     displayContents(this.vReturnEntities5);
+/*      */     
+/* 4130 */     this.vReturnEntities4 = sortEntities(this.vReturnEntities5, new String[] { "MKTGNAME" });
+/* 4131 */     this.bConditionOK = false;
+/* 4132 */     this.bConditionOK1 = false;
+/* 4133 */     for (this.i = 0; this.i < this.vReturnEntities4.size(); this.i++) {
+/* 4134 */       this.eiNextItem = this.vReturnEntities4.elementAt(this.i);
+/* 4135 */       logMessage("_108****SOFCMPNTFEATURE*****" + this.eiNextItem.getKey());
+/* 4136 */       this.strCondition2 = this.eiNextItem.getEntityType();
+/* 4137 */       if (this.strCondition2.equals("SOF")) {
+/* 4138 */         this.vReturnEntities3 = searchEntityItemLink(this.eiNextItem, (String[])null, (String[])null, true, true, "SOFCHANNEL");
+/* 4139 */         this.strCondition3 = getSOFMktName(this.eiNextItem);
+/*      */       }
+/* 4141 */       else if (this.strCondition2.equals("CMPNT")) {
+/* 4142 */         this.vReturnEntities3 = searchEntityItemLink(this.eiNextItem, (String[])null, (String[])null, true, true, "CMPNTCHANNEL");
+/* 4143 */         this.strCondition3 = getCmptToSofMktMsg(this.eiNextItem);
+/*      */       
+/*      */       }
+/* 4146 */       else if (this.strCondition2.equals("FEATURE")) {
+/* 4147 */         this.vReturnEntities3 = searchEntityItemLink(this.eiNextItem, (String[])null, (String[])null, true, true, "FEATURECHANNEL");
+/* 4148 */         this.strCondition3 = getfeatureToSofMktMsg(this.eiNextItem);
+/*      */       } 
+/*      */ 
+/*      */       
+/* 4152 */       for (byte b = 0; b < this.vReturnEntities3.size(); b++) {
+/* 4153 */         this.eiNextItem1 = this.vReturnEntities3.elementAt(b);
+/* 4154 */         this.eiChannel = (EntityItem)this.eiNextItem1.getDownLink(0);
+/* 4155 */         if (flagvalueEquals(this.eiChannel, "ROUTESTOMKTG", "110")) {
+/*      */ 
+/*      */ 
+/*      */           
+/* 4159 */           this.strCondition1 = getGeoTags(this.eiChannel);
+/*      */           
+/* 4161 */           logMessage("A_108:" + this.eiNextItem.getKey() + ":" + this.eiChannel.getKey() + this.strCondition1);
+/* 4162 */           if (!this.strCondition1.equals("US, AP, CAN, EMEA, LA") && (this.m_geList
+/* 4163 */             .isRfaGeoUS(this.eiChannel) || this.m_geList.isRfaGeoAP(this.eiChannel) || this.m_geList.isRfaGeoCAN(this.eiChannel) || this.m_geList
+/* 4164 */             .isRfaGeoLA(this.eiChannel))) {
+/* 4165 */             if (!this.bConditionOK) {
+/* 4166 */               println(".*$A_108_Begin");
+/* 4167 */               this.bConditionOK = true;
+/* 4168 */               this.bConditionOK1 = true;
+/*      */             } 
+/* 4170 */             println("");
+/* 4171 */             prettyPrint(this.strCondition3, 69);
+/* 4172 */             println("");
+/* 4173 */             this.strCondition1 = getAttributeValue(this.eiChannel, "CHANNELNAME", " ");
+/* 4174 */             if (this.strCondition1.indexOf("*") > -1) {
+/* 4175 */               println(":ul compact.");
+/* 4176 */               this.st = new StringTokenizer(this.strCondition1, "*");
+/* 4177 */               while (this.st.hasMoreTokens()) {
+/* 4178 */                 println(":li." + this.st.nextToken().trim());
+/*      */               }
+/* 4180 */               println(":eul.");
+/*      */             } 
+/*      */           } else {
+/*      */             
+/* 4184 */             logMessage("_108:Bypassing " + this.eiChannel.getKey() + ":Tag is :" + this.strCondition1);
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/* 4189 */     if (this.bConditionOK1) {
+/* 4190 */       println(".*$A_108_End");
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 4225 */     this.eiChannel = null;
+/* 4226 */     this.strFilterAttr = new String[] { "AVAILTYPE" };
+/*      */     
+/* 4228 */     this.strFilterValue = new String[] { "146" };
+/*      */     
+/* 4230 */     this.vReturnEntities1 = searchEntityGroupLink(this.grpAnnAvail, this.strFilterAttr, this.strFilterValue, true, true, "AVAIL");
+/* 4231 */     logMessage("_110****AVAIL*****");
+/* 4232 */     displayContents(this.vReturnEntities1);
+/*      */     
+/* 4234 */     this.vReturnEntities2.removeAllElements();
+/* 4235 */     this.vReturnEntities2 = searchInGeo(this.vReturnEntities1, "EMEA");
+/* 4236 */     logMessage("_110****AVAIL-EMEA*****");
+/* 4237 */     displayContents(this.vReturnEntities2);
+/* 4238 */     this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, (String[])null, (String[])null, true, false, "SOFAVAIL");
+/* 4239 */     logMessage("****SOFAVAIL*****");
+/* 4240 */     displayContents(this.vReturnEntities3);
+/* 4241 */     this.vReturnEntities5 = searchEntityVectorLink(this.vReturnEntities3, (String[])null, (String[])null, true, false, "SOF");
+/* 4242 */     logMessage("_110****SOF*****");
+/* 4243 */     displayContents(this.vReturnEntities5);
+/*      */     
+/* 4245 */     this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, (String[])null, (String[])null, true, false, "CMPNTAVAIL");
+/* 4246 */     logMessage("****CMPNTAVAIL*****");
+/* 4247 */     displayContents(this.vReturnEntities3);
+/* 4248 */     this.vReturnEntities4 = searchEntityVectorLink(this.vReturnEntities3, (String[])null, (String[])null, true, false, "CMPNT");
+/* 4249 */     logMessage("_110****CMPNT*****");
+/* 4250 */     displayContents(this.vReturnEntities4);
+/* 4251 */     this.vReturnEntities5.addAll(this.vReturnEntities4);
+/*      */     
+/* 4253 */     this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, (String[])null, (String[])null, true, false, "FEATUREAVAIL");
+/* 4254 */     logMessage("****FEATUREAVAIL*****");
+/* 4255 */     displayContents(this.vReturnEntities3);
+/* 4256 */     this.vReturnEntities4 = searchEntityVectorLink(this.vReturnEntities3, (String[])null, (String[])null, true, false, "FEATURE");
+/* 4257 */     logMessage("_110****FEATURE*****");
+/* 4258 */     displayContents(this.vReturnEntities4);
+/*      */     
+/* 4260 */     this.vReturnEntities5.addAll(this.vReturnEntities4);
+/* 4261 */     logMessage("_110****SOFCMPNTFEATURE*****");
+/* 4262 */     displayContents(this.vReturnEntities5);
+/*      */     
+/* 4264 */     this.vReturnEntities4 = sortEntities(this.vReturnEntities5, new String[] { "MKTGNAME" });
+/* 4265 */     this.bConditionOK = false;
+/* 4266 */     this.bConditionOK1 = false;
+/* 4267 */     for (this.i = 0; this.i < this.vReturnEntities4.size(); this.i++) {
+/* 4268 */       this.eiNextItem = this.vReturnEntities4.elementAt(this.i);
+/* 4269 */       logMessage("_110****SOFCMPNTFEATURE*****" + this.eiNextItem.getKey());
+/* 4270 */       this.strCondition2 = this.eiNextItem.getEntityType();
+/* 4271 */       if (this.strCondition2.equals("SOF")) {
+/* 4272 */         this.vReturnEntities3 = searchEntityItemLink(this.eiNextItem, (String[])null, (String[])null, true, true, "SOFCHANNEL");
+/* 4273 */         this.strCondition3 = getSOFMktName(this.eiNextItem);
+/*      */       }
+/* 4275 */       else if (this.strCondition2.equals("CMPNT")) {
+/* 4276 */         this.vReturnEntities3 = searchEntityItemLink(this.eiNextItem, (String[])null, (String[])null, true, true, "CMPNTCHANNEL");
+/* 4277 */         this.strCondition3 = getCmptToSofMktMsg(this.eiNextItem);
+/*      */       
+/*      */       }
+/* 4280 */       else if (this.strCondition2.equals("FEATURE")) {
+/* 4281 */         this.vReturnEntities3 = searchEntityItemLink(this.eiNextItem, (String[])null, (String[])null, true, true, "FEATURECHANNEL");
+/* 4282 */         this.strCondition3 = getfeatureToSofMktMsg(this.eiNextItem);
+/*      */       } 
+/*      */ 
+/*      */       
+/* 4286 */       for (byte b = 0; b < this.vReturnEntities3.size(); b++) {
+/* 4287 */         this.eiNextItem1 = this.vReturnEntities3.elementAt(b);
+/* 4288 */         this.eiChannel = (EntityItem)this.eiNextItem1.getDownLink(0);
+/* 4289 */         if (flagvalueEquals(this.eiChannel, "ROUTESTOMKTG", "110")) {
+/*      */ 
+/*      */ 
+/*      */           
+/* 4293 */           this.strCondition1 = getGeoTags(this.eiChannel);
+/* 4294 */           logMessage("A_110:" + this.eiNextItem.getKey() + ":" + this.eiChannel.getKey() + this.strCondition1);
+/* 4295 */           if (!this.strCondition1.equals("US, AP, CAN, EMEA, LA") && this.m_geList.isRfaGeoEMEA(this.eiChannel)) {
+/* 4296 */             if (!this.bConditionOK) {
+/* 4297 */               println(".*$A_110_Begin");
+/* 4298 */               this.bConditionOK = true;
+/* 4299 */               this.bConditionOK1 = true;
+/*      */             } 
+/* 4301 */             println("");
+/* 4302 */             prettyPrint(this.strCondition3, 69);
+/* 4303 */             println("");
+/* 4304 */             this.strCondition1 = getAttributeValue(this.eiChannel, "CHANNELNAME", " ");
+/* 4305 */             if (this.strCondition1.indexOf("*") > -1) {
+/* 4306 */               println(":ul compact.");
+/* 4307 */               this.st = new StringTokenizer(this.strCondition1, "*");
+/* 4308 */               while (this.st.hasMoreTokens()) {
+/* 4309 */                 println(":li." + this.st.nextToken().trim());
+/*      */               }
+/* 4311 */               println(":eul.");
+/*      */             } 
+/*      */           } else {
+/*      */             
+/* 4315 */             logMessage("_110:Tag is :" + this.strCondition1);
+/* 4316 */             logMessage("_110:EMEA is " + this.m_geList.isRfaGeoEMEA(this.eiChannel));
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/* 4321 */     if (this.bConditionOK1) {
+/* 4322 */       println(".*$A_110_End");
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 4328 */     println(".*$A_116_Begin");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 4346 */     resetPrintvars();
+/* 4347 */     println(":xmp.");
+/* 4348 */     println(".kp off");
+/* 4349 */     this.iTemp = this.vSofFrmSofAvail.size();
+/* 4350 */     this.eiSof = (this.vSofFrmSofAvail.size() > 0) ? this.vSofFrmSofAvail.elementAt(0) : null;
+/* 4351 */     this.strCondition1 = (this.eiSof != null) ? getSOFMktName(this.eiSof) : " ";
+/* 4352 */     logMessage("****SOF*****");
+/* 4353 */     displayContents(this.vReturnEntities1);
+/*      */     
+/* 4355 */     this.vReturnEntities2 = searchEntityVectorLink(this.vSofFrmSofAvail, (String[])null, (String[])null, true, true, "SOFCHANNEL");
+/* 4356 */     logMessage("****SOFCHANNEL*****");
+/* 4357 */     displayContents(this.vReturnEntities2);
+/*      */     
+/* 4359 */     this.strFilterAttr = new String[] { "ROUTESTOMKTG" };
+/*      */     
+/* 4361 */     this.strFilterValue = new String[] { "100" };
+/*      */ 
+/*      */     
+/* 4364 */     this.vReturnEntities1 = searchEntityVectorLink(this.vReturnEntities2, this.strFilterAttr, this.strFilterValue, true, true, "CHANNEL");
+/* 4365 */     logMessage("****CHANNEL*****");
+/* 4366 */     displayContents(this.vReturnEntities1);
+/* 4367 */     this.bConditionOK = false;
+/* 4368 */     for (this.i = 0; this.i < this.vReturnEntities1.size(); this.i++) {
+/* 4369 */       this.eiChannel = this.vReturnEntities1.elementAt(this.i);
+/* 4370 */       logMessage("_116" + this.eiChannel.getKey() + ":" + getGeoTags(this.eiChannel));
+/* 4371 */       this.vPrintDetails.add(getAttributeValue(this.eiChannel, "CHANNELNAME", " ") + " ");
+/* 4372 */       this
+/*      */         
+/* 4374 */         .bConditionOK = (this.m_geList.isRfaGeoAP(this.eiChannel) && this.m_geList.isRfaGeoCAN(this.eiChannel) && this.m_geList.isRfaGeoUS(this.eiChannel) && this.m_geList.isRfaGeoEMEA(this.eiChannel) && this.m_geList.isRfaGeoLA(this.eiChannel));
+/* 4375 */       this.vPrintDetails.add(this.bConditionOK ? "X" : " ");
+/* 4376 */       this.vPrintDetails.add((this.m_geList.isRfaGeoAP(this.eiChannel) && !this.bConditionOK) ? "X" : " ");
+/* 4377 */       this.vPrintDetails.add((this.m_geList.isRfaGeoCAN(this.eiChannel) && !this.bConditionOK) ? "X" : " ");
+/* 4378 */       this.vPrintDetails.add((this.m_geList.isRfaGeoUS(this.eiChannel) && !this.bConditionOK) ? "X" : " ");
+/* 4379 */       this.vPrintDetails.add((this.m_geList.isRfaGeoEMEA(this.eiChannel) && !this.bConditionOK) ? "X" : " ");
+/* 4380 */       this.vPrintDetails.add((this.m_geList.isRfaGeoLA(this.eiChannel) && !this.bConditionOK) ? "X" : " ");
+/*      */     } 
+/* 4382 */     if (this.vPrintDetails.size() > 0) {
+/* 4383 */       this.strHeader = new String[] { "Route Description", "WW", "AP", "CAN", "US", "EMEA", "LA" };
+/*      */       
+/* 4385 */       this.iColWidths = new int[] { 26, 2, 2, 3, 2, 4, 2 };
+/*      */       
+/* 4387 */       this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, false, "SOFCHANNEL");
+/* 4388 */       for (this.i = 0; this.i < this.vReturnEntities2.size(); this.i++) {
+/* 4389 */         this.eiNextItem = this.vReturnEntities2.elementAt(this.i);
+/* 4390 */         logMessage("_116 :Finally:" + this.eiNextItem.getKey());
+/* 4391 */         this.eiSof = (EntityItem)this.eiNextItem.getUpLink(0);
+/* 4392 */         logMessage("_116 :Finally:" + this.eiSof.getKey());
+/* 4393 */         this.strCondition1 = getSOFMktName(this.eiSof);
+/* 4394 */         println(this.strCondition1);
+/*      */       } 
+/* 4396 */       printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails);
+/* 4397 */       resetPrintvars();
+/* 4398 */       println("");
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 4404 */     this.iTemp = this.vCmpntFrmCmpntAvail.size();
+/* 4405 */     this.eiComponent = (this.vCmpntFrmCmpntAvail.size() > 0) ? this.vCmpntFrmCmpntAvail.elementAt(0) : null;
+/* 4406 */     this.strCondition1 = (this.vCmpntFrmCmpntAvail.size() > 0) ? getCmptToSofMktMsg(this.eiComponent) : " ";
+/*      */     
+/* 4408 */     this.vReturnEntities2 = searchEntityVectorLink(this.vCmpntFrmCmpntAvail, (String[])null, (String[])null, true, true, "CMPNTCHANNEL");
+/* 4409 */     logMessage("****_116 CMPNTCHANNEL*****");
+/* 4410 */     displayContents(this.vReturnEntities2);
+/* 4411 */     this.strFilterAttr = new String[] { "ROUTESTOMKTG" };
+/*      */     
+/* 4413 */     this.strFilterValue = new String[] { "100" };
+/*      */ 
+/*      */     
+/* 4416 */     this.vReturnEntities1 = searchEntityVectorLink(this.vReturnEntities2, this.strFilterAttr, this.strFilterValue, true, true, "CHANNEL");
+/* 4417 */     logMessage("****_116 CHANNEL*****");
+/* 4418 */     displayContents(this.vReturnEntities1);
+/*      */     
+/* 4420 */     for (this.i = 0; this.i < this.vReturnEntities1.size(); this.i++) {
+/* 4421 */       this.eiChannel = this.vReturnEntities1.elementAt(this.i);
+/* 4422 */       logMessage("_116 from CMPNT" + this.eiChannel.getKey());
+/* 4423 */       this.vPrintDetails.add(getAttributeValue(this.eiChannel, "CHANNELNAME", " ") + " ");
+/* 4424 */       this.strCondition1 = getGeoTags(this.eiChannel);
+/* 4425 */       logMessage("_116" + this.eiChannel.getKey() + ":" + getGeoTags(this.eiChannel));
+/*      */       
+/* 4427 */       this.bConditionOK = this.strCondition1.equals("US, AP, CAN, EMEA, LA");
+/*      */       
+/* 4429 */       this.vPrintDetails.add(this.bConditionOK ? "X" : " ");
+/* 4430 */       this.vPrintDetails.add((this.m_geList.isRfaGeoAP(this.eiChannel) && !this.bConditionOK) ? "X" : " ");
+/* 4431 */       this.vPrintDetails.add((this.m_geList.isRfaGeoCAN(this.eiChannel) && !this.bConditionOK) ? "X" : " ");
+/* 4432 */       this.vPrintDetails.add((this.m_geList.isRfaGeoUS(this.eiChannel) && !this.bConditionOK) ? "X" : " ");
+/* 4433 */       this.vPrintDetails.add((this.m_geList.isRfaGeoEMEA(this.eiChannel) && !this.bConditionOK) ? "X" : " ");
+/* 4434 */       this.vPrintDetails.add((this.m_geList.isRfaGeoLA(this.eiChannel) && !this.bConditionOK) ? "X" : " ");
+/*      */     } 
+/* 4436 */     this.strHeader = new String[] { "Route Description", "WW", "AP", "CAN", "US", "EMEA", "LA" };
+/*      */     
+/* 4438 */     this.iColWidths = new int[] { 26, 2, 2, 3, 2, 4, 2 };
+/*      */     
+/* 4440 */     if (this.vReturnEntities1.size() > 0) {
+/* 4441 */       this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, false, "CMPNTCHANNEL");
+/* 4442 */       for (this.i = 0; this.i < this.vReturnEntities2.size(); this.i++) {
+/* 4443 */         this.eiNextItem = this.vReturnEntities2.elementAt(this.i);
+/* 4444 */         logMessage("_116 :Finally:" + this.eiNextItem.getKey());
+/* 4445 */         this.eiComponent = (EntityItem)this.eiNextItem.getUpLink(0);
+/* 4446 */         logMessage("_116 :Finally:" + this.eiComponent.getKey());
+/* 4447 */         this.strCondition1 = getCmptToSofMktMsg(this.eiComponent);
+/* 4448 */         println(this.strCondition1);
+/*      */       } 
+/*      */     } 
+/* 4451 */     printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails);
+/* 4452 */     resetPrintvars();
+/* 4453 */     println("");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 4458 */     this.iTemp = this.vFeatureFrmFeatureAvail.size();
+/* 4459 */     this.eiFeature = (this.vFeatureFrmFeatureAvail.size() > 0) ? this.vFeatureFrmFeatureAvail.elementAt(0) : null;
+/* 4460 */     this.strCondition1 = (this.eiFeature != null) ? getfeatureToSofMktMsg(this.eiFeature) : " ";
+/*      */     
+/* 4462 */     this.vReturnEntities2 = searchEntityVectorLink(this.vFeatureFrmFeatureAvail, (String[])null, (String[])null, true, true, "FEATURECHANNEL");
+/* 4463 */     logMessage("****FEATURECHANNEL*****");
+/* 4464 */     displayContents(this.vReturnEntities1);
+/* 4465 */     this.strFilterAttr = new String[] { "ROUTESTOMKTG" };
+/*      */     
+/* 4467 */     this.strFilterValue = new String[] { "100" };
+/*      */ 
+/*      */     
+/* 4470 */     this.vReturnEntities1 = searchEntityVectorLink(this.vReturnEntities2, this.strFilterAttr, this.strFilterValue, true, true, "CHANNEL");
+/* 4471 */     logMessage("****_116 from FEATURE CHANNEL*****");
+/* 4472 */     displayContents(this.vReturnEntities1);
+/* 4473 */     for (this.i = 0; this.i < this.vReturnEntities1.size(); this.i++) {
+/* 4474 */       this.eiChannel = this.vReturnEntities1.elementAt(this.i);
+/* 4475 */       logMessage("_116 from FEATURE:" + this.eiChannel.getKey());
+/* 4476 */       logMessage("_116" + this.eiChannel.getKey() + ":" + getGeoTags(this.eiChannel));
+/* 4477 */       this.vPrintDetails.add(getAttributeValue(this.eiChannel, "CHANNELNAME", " ") + " ");
+/* 4478 */       this.strCondition1 = getGeoTags(this.eiChannel);
+/* 4479 */       this.bConditionOK = this.strCondition1.equals("US, AP, CAN, EMEA, LA");
+/* 4480 */       this.vPrintDetails.add(this.bConditionOK ? "X" : " ");
+/* 4481 */       this.vPrintDetails.add((this.m_geList.isRfaGeoAP(this.eiChannel) && !this.bConditionOK) ? "X" : " ");
+/* 4482 */       this.vPrintDetails.add((this.m_geList.isRfaGeoCAN(this.eiChannel) && !this.bConditionOK) ? "X" : " ");
+/* 4483 */       this.vPrintDetails.add((this.m_geList.isRfaGeoUS(this.eiChannel) && !this.bConditionOK) ? "X" : " ");
+/* 4484 */       this.vPrintDetails.add((this.m_geList.isRfaGeoEMEA(this.eiChannel) && !this.bConditionOK) ? "X" : " ");
+/* 4485 */       this.vPrintDetails.add((this.m_geList.isRfaGeoLA(this.eiChannel) && !this.bConditionOK) ? "X" : " ");
+/*      */     } 
+/* 4487 */     this.strHeader = new String[] { "Route Description", "WW", "AP", "CAN", "US", "EMEA", "LA" };
+/*      */     
+/* 4489 */     this.iColWidths = new int[] { 26, 2, 2, 3, 2, 4, 2 };
+/*      */     
+/* 4491 */     if (this.vReturnEntities1.size() > 0) {
+/* 4492 */       this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, false, "FEATURECHANNEL");
+/* 4493 */       for (this.i = 0; this.i < this.vReturnEntities2.size(); this.i++) {
+/* 4494 */         this.eiNextItem = this.vReturnEntities2.elementAt(this.i);
+/* 4495 */         logMessage("_116 :Finally:" + this.eiNextItem.getKey());
+/* 4496 */         this.eiFeature = (EntityItem)this.eiNextItem.getUpLink(0);
+/* 4497 */         logMessage("_116 :Finally:" + this.eiFeature.getKey());
+/* 4498 */         this.strCondition1 = getfeatureToSofMktMsg(this.eiFeature);
+/* 4499 */         println(this.strCondition1);
+/*      */       } 
+/*      */     } 
+/* 4502 */     printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails);
+/* 4503 */     resetPrintvars();
+/*      */     
+/* 4505 */     println(":exmp.");
+/*      */     
+/* 4507 */     println(".*$A_116_End");
+/*      */     
+/* 4509 */     println(".*$A_118_Begin");
+/* 4510 */     printVanillaSVSReport("MKTGSTRATEGY", true, false);
+/* 4511 */     println(".*$A_118_End");
+/*      */     
+/* 4513 */     println(".*$A_119_Begin");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 4521 */     printFeatureBenefit("110", "_119", true, true);
+/*      */     
+/* 4523 */     println(".*$A_119_End");
+/*      */     
+/* 4525 */     println(".*$A_120_Begin");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 4535 */     printFeatureBenefit("100", "_120", true, true);
+/*      */     
+/* 4537 */     println(".*$A_120_End");
+/*      */     
+/* 4539 */     println(".*$A_122_Begin");
+/* 4540 */     printVanillaSVSReport("CUSTWANTSNEEDS", true, false);
+/* 4541 */     println(".*$A_122_End");
+/*      */     
+/* 4543 */     println(".*$A_123_Begin");
+/* 4544 */     printVanillaSVSReport("CUSTPAINPT", true, false);
+/* 4545 */     println(".*$A_123_End");
+/*      */     
+/* 4547 */     println(".*$A_124_Begin");
+/* 4548 */     printVanillaSVSReport("RESOURSKILLSET", true, false);
+/* 4549 */     println(".*$A_124_End");
+/*      */     
+/* 4551 */     println(".*$A_126_Begin");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 4560 */     printFeatureBenefit("120", "_126", false, true);
+/*      */     
+/* 4562 */     println(".*$A_126_End");
+/*      */     
+/* 4564 */     println(".*$A_128_Begin");
+/* 4565 */     printVanillaSVSReport("OTHERMKTGINFO", true, false);
+/*      */     
+/* 4567 */     println(".*$A_128_End");
+/*      */     
+/* 4569 */     println(".*$A_130_Begin");
+/* 4570 */     this.strCondition2 = "";
+/* 4571 */     this.strCondition4 = "";
+/* 4572 */     resetPrintvars();
+/* 4573 */     this.bConditionOK = false;
+/* 4574 */     this.strHeader = new String[] { "Contact Name", "Telephone", "E-mail" };
+/*      */     
+/* 4576 */     this.iColWidths = new int[] { 25, 12, 29 };
+/*      */     
+/* 4578 */     this.strEntityTypes = new String[] { "SOFSALESCNTCTOP", "SOF" };
+/*      */     
+/* 4580 */     this.strCondition2 = "";
+/*      */     
+/* 4582 */     this.rfaReport.setPrintDupeLines(false);
+/*      */     
+/* 4584 */     logMessage("_130 Begin********************");
+/* 4585 */     for (this.i = 0; this.i < this.vSofSortedbyMkt.size(); this.i++) {
+/* 4586 */       this.eiSof = this.vSofSortedbyMkt.elementAt(this.i);
+/*      */       
+/* 4588 */       this.vReturnEntities2 = searchEntityItemLink(this.eiSof, (String[])null, (String[])null, true, true, "SOFSALESCNTCTOP");
+/* 4589 */       logMessage("****SOFSALESCNTCTOP*****");
+/* 4590 */       displayContents(this.vReturnEntities2);
+/* 4591 */       this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, (String[])null, (String[])null, true, true, "OP");
+/* 4592 */       logMessage("****OP*****");
+/* 4593 */       displayContents(this.vReturnEntities3);
+/* 4594 */       if (this.vReturnEntities3.size() != 0) {
+/*      */ 
+/*      */         
+/* 4597 */         this.vReturnEntities4 = sortEntities(this.vReturnEntities3, new String[] { "LASTNAME", "FIRSTNAME" });
+/*      */         
+/* 4599 */         this.strCondition4 = getAttributeValue(this.eiSof, "MKTGNAME") + " ";
+/* 4600 */         for (this.j = 0; this.j < this.vReturnEntities4.size(); this.j++) {
+/* 4601 */           this.eiOP = this.vReturnEntities4.elementAt(this.j);
+/*      */           
+/* 4603 */           this.vReturnEntities2 = searchEntityItemLink(this.eiOP, (String[])null, (String[])null, true, false, "SOFSALESCNTCTOP");
+/* 4604 */           for (byte b = 0; b < this.vReturnEntities2.size(); b++) {
+/* 4605 */             this.eiNextItem = this.vReturnEntities2.elementAt(b);
+/* 4606 */             this.eiNextItem1 = (EntityItem)this.eiNextItem.getUpLink(0);
+/* 4607 */             if (this.eiNextItem1.getKey().equals(this.eiSof.getKey())) {
+/*      */               break;
+/*      */             }
+/*      */           } 
+/* 4611 */           this.strCondition1 = getGeoTags(this.eiNextItem);
+/* 4612 */           logMessage("Getting GEO :" + this.strCondition1 + ":for:" + this.eiNextItem.getKey());
+/* 4613 */           if (!this.strCondition1.equals(this.strCondition2)) {
+/*      */             
+/* 4615 */             if (!this.strCondition2.equals("US, AP, CAN, EMEA, LA") && 
+/* 4616 */               this.strCondition2.length() > 0) {
+/* 4617 */               this.vPrintDetails.add("$$BREAKHERE$$.br;:hp2.<---" + this.strCondition2 + ":ehp2.");
+/* 4618 */               this.vPrintDetails.add("");
+/* 4619 */               this.vPrintDetails.add("");
+/*      */             } 
+/*      */ 
+/*      */             
+/* 4623 */             if (this.strCondition4.trim().length() > 0) {
+/* 4624 */               this.vPrintDetails.add("");
+/* 4625 */               this.vPrintDetails.add("");
+/* 4626 */               this.vPrintDetails.add("");
+/* 4627 */               this.vPrintDetails.add("$$BREAKHERE$$" + this.strCondition4 + ":p.");
+/* 4628 */               logMessage("_130 $$BREAKHERE$$ " + this.strCondition4 + ":p.");
+/* 4629 */               this.vPrintDetails.add("");
+/* 4630 */               this.vPrintDetails.add("");
+/*      */               
+/* 4632 */               this.vPrintDetails.add("");
+/* 4633 */               this.vPrintDetails.add("");
+/* 4634 */               this.vPrintDetails.add("");
+/* 4635 */               this.strCondition4 = "";
+/*      */             } 
+/*      */             
+/* 4638 */             if (!this.strCondition1.equals("US, AP, CAN, EMEA, LA") && 
+/* 4639 */               this.strCondition1.trim().length() > 0) {
+/* 4640 */               this.vPrintDetails.add("$$BREAKHERE$$:p.:hp2." + this.strCondition1 + "--->:ehp2.");
+/* 4641 */               this.vPrintDetails.add("");
+/* 4642 */               this.vPrintDetails.add("");
+/*      */             } 
+/*      */             
+/* 4645 */             this.strCondition2 = this.strCondition1;
+/*      */           
+/*      */           }
+/* 4648 */           else if (this.strCondition4.trim().length() > 0) {
+/* 4649 */             this.vPrintDetails.add("");
+/* 4650 */             this.vPrintDetails.add("");
+/* 4651 */             this.vPrintDetails.add("");
+/* 4652 */             this.vPrintDetails.add("$$BREAKHERE$$" + this.strCondition4 + ":p.");
+/* 4653 */             logMessage("_130 $$BREAKHERE$$ " + this.strCondition4 + ":p.");
+/* 4654 */             this.vPrintDetails.add("");
+/* 4655 */             this.vPrintDetails.add("");
+/*      */             
+/* 4657 */             this.vPrintDetails.add("");
+/* 4658 */             this.vPrintDetails.add("");
+/* 4659 */             this.vPrintDetails.add("");
+/* 4660 */             this.strCondition4 = "";
+/*      */           } 
+/*      */ 
+/*      */ 
+/*      */           
+/* 4665 */           this.strCondition3 = getAttributeValue(this.eiOP, "FIRSTNAME", " ");
+/* 4666 */           this.strCondition3 += " " + getAttributeValue(this.eiOP, "LASTNAME", " ");
+/* 4667 */           this.vPrintDetails.add(this.strCondition3);
+/* 4668 */           this.vPrintDetails.add(getAttributeValue(this.eiOP, "TELEPHONE", " "));
+/* 4669 */           this.vPrintDetails.add(getAttributeValue(this.eiOP, "EMAIL", " "));
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/* 4673 */     if (!this.strCondition2.equals("US, AP, CAN, EMEA, LA")) {
+/* 4674 */       if (this.strCondition2.length() > 0) {
+/* 4675 */         this.vPrintDetails.add("$$BREAKHERE$$.br;:hp2.<---" + this.strCondition2 + ":ehp2.");
+/* 4676 */         this.vPrintDetails.add("");
+/* 4677 */         this.vPrintDetails.add("");
+/*      */       } 
+/* 4679 */       this.strCondition2 = this.strCondition1;
+/*      */     } 
+/*      */     
+/* 4682 */     this.strEntityTypes = new String[] { "CMPNTSALESCNTCTOP", "CMPNT" };
+/*      */     
+/* 4684 */     this.strCondition2 = "";
+/*      */     
+/* 4686 */     logMessage("_130 Begin CMPNT********************");
+/* 4687 */     for (this.i = 0; this.i < this.vCmptSortedbyMkt.size(); this.i++) {
+/* 4688 */       this.eiComponent = this.vCmptSortedbyMkt.elementAt(this.i);
+/*      */       
+/* 4690 */       this.vReturnEntities2 = searchEntityItemLink(this.eiComponent, (String[])null, (String[])null, true, true, "CMPNTSALESCNTCTOP");
+/* 4691 */       logMessage("****CMPNTSALESCNTCTOP*****");
+/* 4692 */       displayContents(this.vReturnEntities2);
+/* 4693 */       this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, (String[])null, (String[])null, true, true, "OP");
+/* 4694 */       logMessage("****OP*****");
+/* 4695 */       displayContents(this.vReturnEntities3);
+/* 4696 */       if (this.vReturnEntities3.size() != 0) {
+/*      */ 
+/*      */         
+/* 4699 */         this.vReturnEntities4 = sortEntities(this.vReturnEntities3, new String[] { "LASTNAME", "FIRSTNAME" });
+/*      */         
+/* 4701 */         this.strCondition4 = getCmptToSofMktMsg(this.eiComponent);
+/* 4702 */         for (this.j = 0; this.j < this.vReturnEntities4.size(); this.j++) {
+/* 4703 */           this.eiOP = this.vReturnEntities4.elementAt(this.j);
+/*      */           
+/* 4705 */           this.vReturnEntities2 = searchEntityItemLink(this.eiOP, (String[])null, (String[])null, true, false, "CMPNTSALESCNTCTOP");
+/* 4706 */           for (byte b = 0; b < this.vReturnEntities2.size(); b++) {
+/* 4707 */             this.eiNextItem = this.vReturnEntities2.elementAt(b);
+/* 4708 */             this.eiNextItem1 = (EntityItem)this.eiNextItem.getUpLink(0);
+/* 4709 */             if (this.eiNextItem1.getKey().equals(this.eiComponent.getKey())) {
+/*      */               break;
+/*      */             }
+/*      */           } 
+/* 4713 */           this.strCondition1 = getGeoTags(this.eiNextItem);
+/* 4714 */           logMessage("Getting GEO :" + this.strCondition1 + ":for:" + this.eiNextItem.getKey());
+/* 4715 */           if (!this.strCondition1.equals(this.strCondition2)) {
+/* 4716 */             if (!this.strCondition2.equals("US, AP, CAN, EMEA, LA") && 
+/* 4717 */               this.strCondition2.length() > 0) {
+/* 4718 */               this.vPrintDetails.add("$$BREAKHERE$$.br;:hp2.<---" + this.strCondition2 + ":ehp2.");
+/* 4719 */               this.vPrintDetails.add("");
+/* 4720 */               this.vPrintDetails.add("");
+/*      */             } 
+/*      */             
+/* 4723 */             if (this.strCondition4.trim().length() > 0) {
+/* 4724 */               this.vPrintDetails.add("");
+/* 4725 */               this.vPrintDetails.add("");
+/* 4726 */               this.vPrintDetails.add("");
+/* 4727 */               this.vPrintDetails.add("$$BREAKHERE$$" + this.strCondition4 + ":p.");
+/* 4728 */               logMessage("_130 $$BREAKHERE$$ " + this.strCondition4 + ":p.");
+/* 4729 */               this.vPrintDetails.add("");
+/* 4730 */               this.vPrintDetails.add("");
+/*      */               
+/* 4732 */               this.vPrintDetails.add("$$BREAKHERE$$");
+/* 4733 */               this.vPrintDetails.add("");
+/* 4734 */               this.vPrintDetails.add("");
+/* 4735 */               this.strCondition4 = "";
+/*      */             } 
+/* 4737 */             if (!this.strCondition1.equals("US, AP, CAN, EMEA, LA") && 
+/* 4738 */               this.strCondition1.trim().length() > 0) {
+/* 4739 */               this.vPrintDetails.add("$$BREAKHERE$$:p.:hp2." + this.strCondition1 + "--->:ehp2.");
+/* 4740 */               this.vPrintDetails.add("");
+/* 4741 */               this.vPrintDetails.add("");
+/*      */             } 
+/*      */             
+/* 4744 */             this.strCondition2 = this.strCondition1;
+/*      */           
+/*      */           }
+/* 4747 */           else if (this.strCondition4.trim().length() > 0) {
+/* 4748 */             this.vPrintDetails.add("");
+/* 4749 */             this.vPrintDetails.add("");
+/* 4750 */             this.vPrintDetails.add("");
+/* 4751 */             this.vPrintDetails.add("$$BREAKHERE$$" + this.strCondition4 + ":p.");
+/* 4752 */             logMessage("_130 $$BREAKHERE$$ " + this.strCondition4 + ":p.");
+/* 4753 */             this.vPrintDetails.add("");
+/* 4754 */             this.vPrintDetails.add("");
+/*      */             
+/* 4756 */             this.vPrintDetails.add("");
+/* 4757 */             this.vPrintDetails.add("");
+/* 4758 */             this.vPrintDetails.add("");
+/* 4759 */             this.strCondition4 = "";
+/*      */           } 
+/*      */ 
+/*      */ 
+/*      */           
+/* 4764 */           this.strCondition3 = getAttributeValue(this.eiOP, "FIRSTNAME", " ");
+/* 4765 */           this.strCondition3 += " " + getAttributeValue(this.eiOP, "LASTNAME", " ");
+/* 4766 */           logMessage("_130: OP is " + this.strCondition1 + "->" + this.strCondition2 + ":OP" + this.strCondition3);
+/* 4767 */           this.vPrintDetails.add(this.strCondition3);
+/* 4768 */           this.vPrintDetails.add(getAttributeValue(this.eiOP, "TELEPHONE", " "));
+/* 4769 */           this.vPrintDetails.add(getAttributeValue(this.eiOP, "EMAIL", " "));
+/*      */         } 
+/*      */       } 
+/* 4772 */     }  if (!this.strCondition2.equals("US, AP, CAN, EMEA, LA")) {
+/* 4773 */       if (this.strCondition2.length() > 0) {
+/* 4774 */         this.vPrintDetails.add("$$BREAKHERE$$.br;:hp2.<---" + this.strCondition2 + ":ehp2.");
+/* 4775 */         this.vPrintDetails.add("");
+/* 4776 */         this.vPrintDetails.add("");
+/*      */       } 
+/* 4778 */       this.strCondition2 = this.strCondition1;
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/* 4783 */     this.vReturnEntities2 = searchEntityVectorLink(this.vFeatureSortedbyMkt, (String[])null, (String[])null, true, true, "FEATRSALESCNTCTOP");
+/* 4784 */     logMessage("****FEATRSALESCNTCTOP*****");
+/* 4785 */     displayContents(this.vReturnEntities2);
+/* 4786 */     this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, (String[])null, (String[])null, true, true, "OP");
+/* 4787 */     logMessage("****OP*****");
+/* 4788 */     displayContents(this.vReturnEntities3);
+/* 4789 */     this.strHeader = new String[] { "Contact Name", "Telephone", "E-mail" };
+/*      */     
+/* 4791 */     this.iColWidths = new int[] { 25, 12, 29 };
+/*      */     
+/* 4793 */     this.strEntityTypes = new String[] { "FEATRSALESCNTCTOP", "FEATURE" };
+/*      */     
+/* 4795 */     logMessage("_130 Begin FEATURE********************");
+/* 4796 */     this.strCondition2 = "";
+/* 4797 */     for (this.i = 0; this.i < this.vFeatureSortedbyMkt.size(); this.i++) {
+/* 4798 */       this.eiFeature = this.vFeatureSortedbyMkt.elementAt(this.i);
+/*      */       
+/* 4800 */       this.vReturnEntities2 = searchEntityItemLink(this.eiFeature, (String[])null, (String[])null, true, true, "FEATRSALESCNTCTOP");
+/* 4801 */       logMessage("****FEATRSALESCNTCTOP*****");
+/* 4802 */       displayContents(this.vReturnEntities2);
+/* 4803 */       this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, (String[])null, (String[])null, true, true, "OP");
+/* 4804 */       logMessage("****OP*****");
+/* 4805 */       displayContents(this.vReturnEntities3);
+/* 4806 */       if (this.vReturnEntities3.size() != 0) {
+/*      */ 
+/*      */         
+/* 4809 */         this.vReturnEntities4 = sortEntities(this.vReturnEntities3, new String[] { "LASTNAME", "FIRSTNAME" });
+/*      */         
+/* 4811 */         this.strCondition4 = getfeatureToSofMktMsg(this.eiFeature);
+/* 4812 */         for (this.j = 0; this.j < this.vReturnEntities4.size(); this.j++) {
+/* 4813 */           this.eiOP = this.vReturnEntities4.elementAt(this.j);
+/*      */           
+/* 4815 */           this.vReturnEntities2 = searchEntityItemLink(this.eiOP, (String[])null, (String[])null, true, false, "FEATRSALESCNTCTOP");
+/* 4816 */           for (byte b = 0; b < this.vReturnEntities2.size(); b++) {
+/* 4817 */             this.eiNextItem = this.vReturnEntities2.elementAt(b);
+/* 4818 */             this.eiNextItem1 = (EntityItem)this.eiNextItem.getUpLink(0);
+/* 4819 */             if (this.eiNextItem1.getKey().equals(this.eiFeature.getKey())) {
+/*      */               break;
+/*      */             }
+/*      */           } 
+/* 4823 */           this.strCondition1 = getGeoTags(this.eiNextItem);
+/* 4824 */           logMessage("Getting GEO :" + this.strCondition1 + ":for:" + this.eiNextItem.getKey());
+/* 4825 */           if (!this.strCondition1.equals(this.strCondition2)) {
+/*      */             
+/* 4827 */             if (!this.strCondition2.equals("US, AP, CAN, EMEA, LA") && 
+/* 4828 */               this.strCondition2.length() > 0) {
+/* 4829 */               this.vPrintDetails.add("$$BREAKHERE$$.br;:hp2.<---" + this.strCondition2 + ":ehp2.");
+/* 4830 */               this.vPrintDetails.add("");
+/* 4831 */               this.vPrintDetails.add("");
+/*      */             } 
+/*      */             
+/* 4834 */             if (this.strCondition4.trim().length() > 0) {
+/* 4835 */               this.vPrintDetails.add("");
+/* 4836 */               this.vPrintDetails.add("");
+/* 4837 */               this.vPrintDetails.add("");
+/* 4838 */               this.vPrintDetails.add("$$BREAKHERE$$" + this.strCondition4 + ":p.");
+/* 4839 */               logMessage("_130 $$BREAKHERE$$ " + this.strCondition4 + ":p.");
+/* 4840 */               this.vPrintDetails.add("");
+/* 4841 */               this.vPrintDetails.add("");
+/*      */               
+/* 4843 */               this.vPrintDetails.add("");
+/* 4844 */               this.vPrintDetails.add("");
+/* 4845 */               this.vPrintDetails.add("");
+/* 4846 */               this.strCondition4 = "";
+/*      */             } 
+/* 4848 */             if (!this.strCondition1.equals("US, AP, CAN, EMEA, LA") && 
+/* 4849 */               this.strCondition1.trim().length() > 0) {
+/* 4850 */               this.vPrintDetails.add("$$BREAKHERE$$:p.:hp2." + this.strCondition1 + "--->:ehp2.");
+/* 4851 */               this.vPrintDetails.add("");
+/* 4852 */               this.vPrintDetails.add("");
+/*      */             } 
+/*      */             
+/* 4855 */             this.strCondition2 = this.strCondition1;
+/*      */           
+/*      */           }
+/* 4858 */           else if (this.strCondition4.trim().length() > 0) {
+/* 4859 */             this.vPrintDetails.add("");
+/* 4860 */             this.vPrintDetails.add("");
+/* 4861 */             this.vPrintDetails.add("");
+/* 4862 */             this.vPrintDetails.add("$$BREAKHERE$$" + this.strCondition4 + ":p.");
+/* 4863 */             logMessage("_130 $$BREAKHERE$$ " + this.strCondition4 + ":p.");
+/* 4864 */             this.vPrintDetails.add("");
+/* 4865 */             this.vPrintDetails.add("");
+/*      */             
+/* 4867 */             this.vPrintDetails.add("");
+/* 4868 */             this.vPrintDetails.add("");
+/* 4869 */             this.vPrintDetails.add("");
+/* 4870 */             this.strCondition4 = "";
+/*      */           } 
+/*      */ 
+/*      */           
+/* 4874 */           this.strCondition3 = getAttributeValue(this.eiOP, "FIRSTNAME", " ");
+/* 4875 */           this.strCondition3 += " " + getAttributeValue(this.eiOP, "LASTNAME", " ");
+/* 4876 */           this.vPrintDetails.add(this.strCondition3);
+/* 4877 */           this.vPrintDetails.add(getAttributeValue(this.eiOP, "TELEPHONE", " "));
+/* 4878 */           this.vPrintDetails.add(getAttributeValue(this.eiOP, "EMAIL", " "));
+/*      */         } 
+/*      */       } 
+/* 4881 */     }  if (!this.strCondition2.equals("US, AP, CAN, EMEA, LA")) {
+/* 4882 */       if (this.strCondition2.length() > 0) {
+/* 4883 */         this.vPrintDetails.add("$$BREAKHERE$$.br;:hp2.<---" + this.strCondition2 + ":ehp2.");
+/* 4884 */         this.vPrintDetails.add("");
+/* 4885 */         this.vPrintDetails.add("");
+/*      */       } 
+/* 4887 */       this.strCondition2 = this.strCondition1;
+/*      */     } 
+/* 4889 */     if (this.vPrintDetails.size() > 0) {
+/* 4890 */       println(":xmp.");
+/* 4891 */       println(".kp off");
+/* 4892 */       println(".in 0");
+/*      */     } 
+/* 4894 */     printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails);
+/* 4895 */     this.rfaReport.setPrintDupeLines(true);
+/* 4896 */     if (this.vPrintDetails.size() > 0) {
+/* 4897 */       println(":exmp.");
+/*      */     }
+/* 4899 */     resetPrintvars();
+/* 4900 */     println(".*$A_130_End");
+/*      */     
+/* 4902 */     println(".*$A_132_Begin");
+/*      */     
+/* 4904 */     printVanillaSVSReport("SALESACTREQ", true, false);
+/*      */ 
+/*      */     
+/* 4907 */     println(".*$A_132_End");
+/*      */     
+/* 4909 */     println(".*$A_134_Begin");
+/*      */     
+/* 4911 */     printVanillaSVSReport("SALESAPPROACH", true, false);
+/*      */     
+/* 4913 */     println(".*$A_134_End");
+/*      */     
+/* 4915 */     println(".*$A_136_Begin");
+/* 4916 */     printVanillaSVSReport("CUSTCANDGUIDELINES", true, false);
+/* 4917 */     println(".*$A_136_End");
+/*      */     
+/* 4919 */     println(".*$A_138_Begin");
+/* 4920 */     printVanillaSVSReport("CUSTRESTRICTIONS", true, false);
+/*      */     
+/* 4922 */     println(".*$A_138_End");
+/*      */     
+/* 4924 */     println(".*$A_140_Begin");
+/* 4925 */     printVanillaSVSReport("HANDOBJECTIONS", true, false);
+/* 4926 */     println(".*$A_140_End");
+/*      */     
+/* 4928 */     println(".*$A_144_Begin");
+/* 4929 */     printVanillaSVSReport("COMPETITIVEOF", true, false);
+/* 4930 */     println(".*$A_144_End");
+/*      */     
+/* 4932 */     println(".*$A_146_Begin");
+/* 4933 */     printVanillaSVSReport("STRENGTHWEAKNESS", true, false);
+/* 4934 */     println(".*$A_146_End");
+/*      */     
+/* 4936 */     println(".*$A_148_Begin");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 4942 */     this.strHeader = new String[] { "Offering Name" };
+/*      */     
+/* 4944 */     this.iColWidths = new int[] { 69 };
+/*      */ 
+/*      */     
+/* 4947 */     this.vReturnEntities1 = searchEntityVectorLink(this.vSofFrmSofAvail, (String[])null, (String[])null, true, true, "SOFPRICE");
+/*      */     
+/* 4949 */     this.vReturnEntities2 = new Vector();
+/* 4950 */     logMessage("A_148:From SOF");
+/* 4951 */     displayContents(this.vReturnEntities1);
+/* 4952 */     for (this.i = 0; this.i < this.vReturnEntities1.size(); this.i++) {
+/* 4953 */       this.eiNextItem = this.vReturnEntities1.elementAt(this.i);
+/* 4954 */       logMessage("A_148:" + this.eiNextItem.getKey());
+/* 4955 */       this.eiSof = (EntityItem)this.eiNextItem.getUpLink(0);
+/* 4956 */       this.eiPriceInfo = (EntityItem)this.eiNextItem.getDownLink(0);
+/* 4957 */       logMessage("A_148:" + this.eiSof.getKey());
+/* 4958 */       logMessage("A_148:" + this.eiPriceInfo.getKey());
+/* 4959 */       this.strCondition1 = getAttributeValue(this.eiPriceInfo, "BILLINGAPP", " ");
+/* 4960 */       this.strCondition1 += ":" + this.eiSof.getKey();
+/*      */       
+/* 4962 */       this.vReturnEntities2.add(this.strCondition1);
+/*      */     } 
+/*      */     
+/* 4965 */     this.vReturnEntities1 = searchEntityVectorLink(this.vCmpntFrmCmpntAvail, (String[])null, (String[])null, true, true, "CMPNTPRICE");
+/* 4966 */     logMessage("A_148:From CMPNTPRICE");
+/* 4967 */     displayContents(this.vReturnEntities1);
+/* 4968 */     for (this.i = 0; this.i < this.vReturnEntities1.size(); this.i++) {
+/* 4969 */       this.eiNextItem = this.vReturnEntities1.elementAt(this.i);
+/* 4970 */       logMessage("A_148:" + this.eiNextItem.getKey());
+/* 4971 */       this.eiComponent = (EntityItem)this.eiNextItem.getUpLink(0);
+/* 4972 */       this.eiPriceInfo = (EntityItem)this.eiNextItem.getDownLink(0);
+/* 4973 */       logMessage("A_148:" + this.eiComponent.getKey());
+/* 4974 */       logMessage("A_148:" + this.eiPriceInfo.getKey());
+/* 4975 */       this.strCondition1 = getAttributeValue(this.eiPriceInfo, "BILLINGAPP", " ");
+/* 4976 */       this.strCondition1 += ":" + this.eiComponent.getKey();
+/*      */       
+/* 4978 */       this.vReturnEntities2.add(this.strCondition1);
+/*      */     } 
+/*      */     
+/* 4981 */     this.vReturnEntities1 = searchEntityVectorLink(this.vFeatureFrmFeatureAvail, (String[])null, (String[])null, true, true, "FEATUREPRICE");
+/* 4982 */     logMessage("A_148:From CMPNTPRICE");
+/* 4983 */     displayContents(this.vReturnEntities1);
+/* 4984 */     for (this.i = 0; this.i < this.vReturnEntities1.size(); this.i++) {
+/* 4985 */       this.eiNextItem = this.vReturnEntities1.elementAt(this.i);
+/* 4986 */       logMessage("A_148:" + this.eiNextItem.getKey());
+/* 4987 */       this.eiFeature = (EntityItem)this.eiNextItem.getUpLink(0);
+/* 4988 */       this.eiPriceInfo = (EntityItem)this.eiNextItem.getDownLink(0);
+/* 4989 */       logMessage("A_148:" + this.eiFeature.getKey());
+/* 4990 */       logMessage("A_148:" + this.eiPriceInfo.getKey());
+/* 4991 */       this.strCondition1 = getAttributeValue(this.eiPriceInfo, "BILLINGAPP", " ");
+/* 4992 */       this.strCondition1 += ":" + this.eiFeature.getKey();
+/*      */       
+/* 4994 */       this.vReturnEntities2.add(this.strCondition1);
+/*      */     } 
+/*      */     
+/* 4997 */     resetPrintvars();
+/*      */     
+/* 4999 */     this.vReturnEntities3 = this.mySort.alphabetizeVector(this.vReturnEntities2);
+/* 5000 */     if (this.vReturnEntities3.size() > 0) {
+/* 5001 */       println(":xmp.");
+/* 5002 */       println(".kp off");
+/* 5003 */       println(".in 0");
+/* 5004 */       println("");
+/* 5005 */       resetPrintvars();
+/* 5006 */       this.strCondition1 = this.vReturnEntities3.elementAt(0);
+/* 5007 */       if (this.strCondition1.indexOf(":CMPNT") > 0) {
+/* 5008 */         this.strCondition2 = this.strCondition1.substring(0, this.strCondition1.indexOf(":CMPNT"));
+/*      */       }
+/* 5010 */       else if (this.strCondition1.indexOf(":FEATURE") > 0) {
+/* 5011 */         this.strCondition2 = this.strCondition1.substring(0, this.strCondition1.indexOf(":FEATURE"));
+/*      */       }
+/* 5013 */       else if (this.strCondition1.indexOf(":SOF") > 0) {
+/* 5014 */         this.strCondition2 = this.strCondition1.substring(0, this.strCondition1.indexOf(":SOF"));
+/*      */       } 
+/* 5016 */       print("Billing Application: ");
+/* 5017 */       this.bConditionOK = false;
+/* 5018 */       if (this.strCondition2.indexOf("*") > -1) {
+/* 5019 */         this.st = new StringTokenizer(this.strCondition2, "*");
+/* 5020 */         while (this.st.hasMoreTokens()) {
+/* 5021 */           if (this.bConditionOK) {
+/* 5022 */             print("                     ");
+/*      */           }
+/* 5024 */           this.bConditionOK = true;
+/* 5025 */           println(this.st.nextToken().trim());
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 5030 */     for (this.i = 0; this.i < this.vReturnEntities3.size(); this.i++) {
+/* 5031 */       logMessage("A_148:Sorted Vector returning: " + this.strCondition1);
+/* 5032 */       this.strCondition1 = this.vReturnEntities3.elementAt(this.i);
+/* 5033 */       if (this.strCondition1.indexOf(":CMPNT") > 0) {
+/* 5034 */         this.strCondition4 = this.strCondition1.substring(0, this.strCondition1.indexOf(":CMPNT"));
+/*      */       }
+/* 5036 */       else if (this.strCondition1.indexOf(":FEATURE") > 0) {
+/* 5037 */         this.strCondition4 = this.strCondition1.substring(0, this.strCondition1.indexOf(":FEATURE"));
+/*      */       }
+/* 5039 */       else if (this.strCondition1.indexOf(":SOF") > 0) {
+/* 5040 */         this.strCondition4 = this.strCondition1.substring(0, this.strCondition1.indexOf(":SOF"));
+/*      */       } 
+/* 5042 */       logMessage("A_148 Current Mkt:" + this.strCondition4);
+/* 5043 */       logMessage("A_148 Prev Mkt :" + this.strCondition2);
+/* 5044 */       if (!this.strCondition2.equals(this.strCondition4)) {
+/* 5045 */         logMessage("A_148 Current < New");
+/* 5046 */         this.strCondition2 = this.strCondition4;
+/* 5047 */         printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails);
+/* 5048 */         println("");
+/* 5049 */         print("Billing Application: ");
+/* 5050 */         this.bConditionOK = false;
+/* 5051 */         if (this.strCondition2.indexOf("*") > -1) {
+/* 5052 */           this.st = new StringTokenizer(this.strCondition2, "*");
+/* 5053 */           while (this.st.hasMoreTokens()) {
+/* 5054 */             if (this.bConditionOK) {
+/* 5055 */               print("                     ");
+/*      */             }
+/* 5057 */             println(this.st.nextToken().trim());
+/* 5058 */             this.bConditionOK = true;
+/*      */           } 
+/*      */         } 
+/* 5061 */         resetPrintvars();
+/*      */       } 
+/*      */       
+/* 5064 */       if (this.strCondition1.indexOf(":CMPNT") > 0) {
+/* 5065 */         this.strCondition5 = this.strCondition1.substring(this.strCondition1.indexOf(":CMPNT") + 1);
+/* 5066 */         logMessage("A_155:Parsed out" + this.strCondition5);
+/* 5067 */         this.eiComponent = this.egComponent.getEntityItem(this.strCondition5);
+/* 5068 */         this.strCondition1 = getCmptToSofMktMsg(this.eiComponent);
+/* 5069 */         this.vPrintDetails.add(this.strCondition1);
+/* 5070 */         logMessage("A_148:Print:" + this.strCondition1);
+/*      */         
+/* 5072 */         logMessage("A_148:Print:" + getAttributeValue(this.eiComponent, "COMPONENTID", ""));
+/*      */       }
+/* 5074 */       else if (this.strCondition1.indexOf(":FEATURE") > 0) {
+/* 5075 */         this.strCondition5 = this.strCondition1.substring(this.strCondition1.indexOf(":FEATURE") + 1);
+/* 5076 */         logMessage("A_155:Parsed out" + this.strCondition5);
+/* 5077 */         this.eiFeature = this.egFeature.getEntityItem(this.strCondition5);
+/* 5078 */         this.strCondition1 = getfeatureToSofMktMsg(this.eiFeature);
+/* 5079 */         this.vPrintDetails.add(this.strCondition1);
+/*      */ 
+/*      */         
+/* 5082 */         logMessage("A_148:Print:" + this.strCondition1);
+/*      */       }
+/* 5084 */       else if (this.strCondition1.indexOf(":SOF") > 0) {
+/* 5085 */         this.strCondition5 = this.strCondition1.substring(this.strCondition1.indexOf(":SOF") + 1);
+/* 5086 */         logMessage("A_148:Parsed out" + this.strCondition5);
+/* 5087 */         this.eiSof = this.egSof.getEntityItem(this.strCondition5);
+/* 5088 */         this.strCondition1 = getSOFMktName(this.eiSof);
+/* 5089 */         this.vPrintDetails.add(this.strCondition1);
+/*      */ 
+/*      */         
+/* 5092 */         logMessage("A_148:Print:" + this.strCondition1);
+/* 5093 */         logMessage("A_148:Print:" + getAttributeValue(this.eiSof, "OFIDNUMBER", " "));
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 5097 */     if (this.vPrintDetails.size() > 0) {
+/* 5098 */       printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails);
+/* 5099 */       resetPrintvars();
+/*      */     } 
+/*      */     
+/* 5102 */     if (this.vReturnEntities3.size() > 0) {
+/* 5103 */       println(":exmp.");
+/*      */     }
+/*      */     
+/* 5106 */     println(".*$A_148_End");
+/*      */     
+/* 5108 */     println(".*$A_150_Begin");
+/* 5109 */     this.strParamList1 = new String[] { "STANDARDAMENDTEXT" };
+/*      */     
+/* 5111 */     printValueListInGroup(this.grpStdAmendText, this.strParamList1, "STANDARDAMENDTEXT_TYPE", "110", "", true);
+/* 5112 */     this.iColWidths = new int[] { 69 };
+/*      */     
+/* 5114 */     printReport(false, (String[])null, this.iColWidths, this.vPrintDetails);
+/* 5115 */     resetPrintvars();
+/* 5116 */     println(".*$A_150_End");
+/*      */     
+/* 5118 */     println(".*$A_151_Begin");
+/*      */     
+/* 5120 */     this.strFilterAttr = new String[] { "DELIVERABLETYPE" };
+/*      */     
+/* 5122 */     this.strFilterValue = new String[] { "852" };
+/*      */     
+/* 5124 */     this.vReturnEntities1 = searchEntityGroup(this.grpAnnDeliv, this.strFilterAttr, this.strFilterValue, true);
+/* 5125 */     logMessage("A_151****ANNDELIVERABLE");
+/* 5126 */     displayContents(this.vReturnEntities1);
+/* 5127 */     this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, true, "ANNDELREQTRANS");
+/* 5128 */     logMessage("A_151****ANNDELREQTRANS");
+/* 5129 */     displayContents(this.vReturnEntities2);
+/* 5130 */     this.strFilterAttr = new String[] { "LANGUAGES", "LANGUAGES", "LANGUAGES", "LANGUAGES" };
+/*      */     
+/* 5132 */     this.strFilterValue = new String[] { "2802", "2803", "2797", "2796" };
+/*      */     
+/* 5134 */     this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, this.strFilterAttr, this.strFilterValue, false, true, "EMEATRANSLATION");
+/*      */     
+/* 5136 */     logMessage("A_151****EMEATRANSLATION");
+/* 5137 */     displayContents(this.vReturnEntities3);
+/* 5138 */     this.vReturnEntities4 = searchEntityVectorLink(this.vReturnEntities3, (String[])null, (String[])null, true, true, "TRANSDELREVIEW");
+/* 5139 */     logMessage("A_151****TRANSDELREVIEW");
+/* 5140 */     displayContents(this.vReturnEntities4);
+/* 5141 */     for (this.i = 0; this.i < this.vReturnEntities4.size(); this.i++) {
+/* 5142 */       this.eiNextItem = this.vReturnEntities4.elementAt(this.i);
+/* 5143 */       logMessage("A_287****" + this.eiNextItem.getEntityType() + ":" + this.eiNextItem.getEntityID());
+/* 5144 */       this.eiEmeaTranslation = (EntityItem)this.eiNextItem.getUpLink(0);
+/* 5145 */       this.eiOP = (EntityItem)this.eiNextItem.getDownLink(0);
+/* 5146 */       this.vPrintDetails.add(getAttributeValue(this.eiEmeaTranslation, "LANGUAGES", " "));
+/* 5147 */       this.strCondition1 = getAttributeValue(this.eiOP, "FIRSTNAME", " ").substring(0, 1);
+/* 5148 */       this.strCondition1 += ". " + getAttributeValue(this.eiOP, "LASTNAME", " ");
+/* 5149 */       this.vPrintDetails.add(this.strCondition1);
+/* 5150 */       this.strCondition1 = getAttributeValue(this.eiOP, "VNETNODE", " ");
+/* 5151 */       this.strCondition1 += "/" + getAttributeValue(this.eiOP, "VNETUID", " ");
+/* 5152 */       this.vPrintDetails.add(this.strCondition1);
+/*      */     } 
+/*      */     
+/* 5155 */     this.strHeader = new String[] { "Language", "Brand Reviewer Name", "  Node/Userid" };
+/*      */     
+/* 5157 */     this.iColWidths = new int[] { 17, 30, 17 };
+/*      */     
+/* 5159 */     println(":h4.Worldwide Customer Letter Translation");
+/* 5160 */     println(":xmp.");
+/* 5161 */     println(".kp off");
+/* 5162 */     printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails);
+/* 5163 */     resetPrintvars();
+/* 5164 */     println(":exmp.");
+/* 5165 */     println(":p.Note: This section is deleted at PLET generation time.");
+/* 5166 */     println(".*$A_151_End");
+/*      */     
+/* 5168 */     println(".*$A_152_Begin");
+/*      */ 
+/*      */     
+/* 5171 */     this.strFilterAttr = new String[] { "DELIVERABLETYPE" };
+/*      */     
+/* 5173 */     this.strFilterValue = new String[] { "856" };
+/*      */     
+/* 5175 */     this.vReturnEntities1 = searchEntityGroup(this.grpAnnDeliv, this.strFilterAttr, this.strFilterValue, true);
+/* 5176 */     logMessage("A_152****ANNDELIVERABLE");
+/* 5177 */     displayContents(this.vReturnEntities1);
+/* 5178 */     this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, true, "ANNDELREQTRANS");
+/* 5179 */     logMessage("A_152****ANNDELREQTRANS");
+/* 5180 */     displayContents(this.vReturnEntities2);
+/* 5181 */     this.strFilterAttr = new String[] { "LANGUAGES", "LANGUAGES", "LANGUAGES", "LANGUAGES" };
+/*      */     
+/* 5183 */     this.strFilterValue = new String[] { "2802", "2803", "2797", "2796" };
+/*      */     
+/* 5185 */     this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities2, this.strFilterAttr, this.strFilterValue, false, true, "EMEATRANSLATION");
+/*      */     
+/* 5187 */     logMessage("A_152****EMEATRANSLATION");
+/* 5188 */     displayContents(this.vReturnEntities3);
+/* 5189 */     this.vReturnEntities4 = searchEntityVectorLink(this.vReturnEntities3, (String[])null, (String[])null, true, true, "TRANSDELREVIEW");
+/* 5190 */     logMessage("A_152****TRANSDELREVIEW");
+/* 5191 */     displayContents(this.vReturnEntities4);
+/* 5192 */     this.vPrintDetails1 = new Vector();
+/* 5193 */     for (this.i = 0; this.i < this.vReturnEntities4.size(); this.i++) {
+/* 5194 */       this.eiNextItem = this.vReturnEntities4.elementAt(this.i);
+/* 5195 */       this.eiEmeaTranslation = (EntityItem)this.eiNextItem.getUpLink(0);
+/* 5196 */       this.eiOP = (EntityItem)this.eiNextItem.getDownLink(0);
+/* 5197 */       logMessage("A_152****" + this.eiNextItem.getEntityType() + ":" + this.eiNextItem.getEntityID());
+/* 5198 */       this.vPrintDetails.add(getAttributeValue(this.eiEmeaTranslation, "LANGUAGES", " "));
+/* 5199 */       this.strCondition1 = getAttributeValue(this.eiOP, "FIRSTNAME", " ").substring(0, 1);
+/* 5200 */       this.strCondition1 += ". " + getAttributeValue(this.eiOP, "LASTNAME", " ");
+/* 5201 */       this.vPrintDetails.add(this.strCondition1);
+/* 5202 */       this.strCondition1 = getAttributeValue(this.eiOP, "VNETNODE", " ");
+/* 5203 */       this.strCondition1 += "/" + getAttributeValue(this.eiOP, "VNETUID", " ");
+/* 5204 */       this.vPrintDetails.add(this.strCondition1);
+/* 5205 */       this.vPrintDetails1.add(getAttributeValue(this.eiNextItem, "PROPOSALINSERTID", " "));
+/*      */     } 
+/*      */     
+/* 5208 */     this.strHeader = new String[] { "Language", "Brand Reviewer Name", "  Node/Userid" };
+/*      */     
+/* 5210 */     this.iColWidths = new int[] { 17, 30, 17 };
+/*      */     
+/* 5212 */     println(":xmp.");
+/* 5213 */     println(".kp off");
+/* 5214 */     printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails);
+/* 5215 */     resetPrintvars();
+/* 5216 */     this.strCondition1 = "";
+/* 5217 */     for (this.i = 0, this.j = 0; this.i < this.vPrintDetails1.size(); this.i++) {
+/* 5218 */       this.strCondition1 += "PINo: " + (String)this.vPrintDetails1.elementAt(this.i) + "    ";
+/* 5219 */       if (this.j == 3) {
+/* 5220 */         println("Proposal Insert Document Ids");
+/* 5221 */         println(this.strCondition1);
+/* 5222 */         this.strCondition1 = "";
+/* 5223 */         this.j = 0;
+/*      */       } 
+/*      */     } 
+/* 5226 */     if (this.i < 3) {
+/* 5227 */       println("Proposal Insert Document Ids");
+/*      */     }
+/*      */     
+/* 5230 */     println(this.strCondition1);
+/* 5231 */     println(":exmp.");
+/* 5232 */     println(":p.Note: This section is deleted at PLET generation time.");
+/*      */     
+/* 5234 */     println(".*$A_152_End");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 5243 */     println(".*$A_153_Begin");
+/* 5244 */     logMessage("A_153_Begin");
+/*      */ 
+/*      */     
+/* 5247 */     printA153();
+/* 5248 */     resetPrintvars();
+/* 5249 */     println(".*$A_153_End");
+/*      */     
+/* 5251 */     println(".*$A_154_Begin");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 5257 */     this.strCondition2 = "";
+/* 5258 */     this.vReturnEntities1 = searchEntityVectorLink(this.vCmpntFrmCmpntAvail, (String[])null, (String[])null, true, false, "SOFCMPNT");
+/* 5259 */     this.vReturnEntities2 = new Vector();
+/* 5260 */     this.strSofToCmpt = new String[] { "SOFCMPNT", "CMPNT" };
+/*      */     
+/* 5262 */     logMessage("A_154:From Component");
+/* 5263 */     displayContents(this.vReturnEntities1);
+/* 5264 */     for (this.i = 0; this.i < this.vReturnEntities1.size(); this.i++) {
+/* 5265 */       this.eiNextItem = this.vReturnEntities1.elementAt(this.i);
+/* 5266 */       logMessage("A_154:" + this.eiNextItem.getKey());
+/* 5267 */       this.eiSof = (EntityItem)this.eiNextItem.getUpLink(0);
+/* 5268 */       this.strCondition1 = getSOFMktName(this.eiSof, false);
+/* 5269 */       logMessage("A_154:" + this.eiSof.getKey());
+/* 5270 */       this.eiComponent = (EntityItem)this.eiNextItem.getDownLink(0);
+/* 5271 */       logMessage("A_154:" + this.eiComponent.getKey());
+/* 5272 */       this.strCondition1 += ":" + this.eiComponent.getKey();
+/*      */       
+/* 5274 */       this.vReturnEntities2.add(this.strCondition1);
+/*      */     } 
+/*      */     
+/* 5277 */     this.vReturnEntities1 = searchEntityVectorLink(this.vFeatureFrmFeatureAvail, (String[])null, (String[])null, true, false, "CMPNTFEATURE");
+/* 5278 */     logMessage("A_154:From Feature");
+/* 5279 */     displayContents(this.vReturnEntities1);
+/* 5280 */     for (this.i = 0; this.i < this.vReturnEntities1.size(); this.i++) {
+/* 5281 */       this.eiNextItem = this.vReturnEntities1.elementAt(this.i);
+/* 5282 */       logMessage("A_154:" + this.eiNextItem.getKey());
+/* 5283 */       this.eiComponent = (EntityItem)this.eiNextItem.getUpLink(0);
+/* 5284 */       logMessage("A_154:" + this.eiComponent.getKey());
+/* 5285 */       this.eiFeature = (EntityItem)this.eiNextItem.getDownLink(0);
+/* 5286 */       logMessage("A_154:" + this.eiFeature.getKey());
+/*      */       
+/* 5288 */       this.eiSof = getUplinkedEntityItem(this.eiComponent, new String[] { "SOFCMPNT", "SOF" });
+/* 5289 */       this.strCondition1 = getSOFMktName(this.eiSof, false);
+/*      */       
+/* 5291 */       logMessage("A_154:Mktname" + this.strCondition1);
+/* 5292 */       this.strCondition1 += ":" + this.eiFeature.getKey();
+/*      */       
+/* 5294 */       this.vReturnEntities2.add(this.strCondition1);
+/*      */     } 
+/*      */     
+/* 5297 */     resetPrintvars();
+/*      */     
+/* 5299 */     this.vReturnEntities3 = this.mySort.alphabetizeVector(this.vReturnEntities2);
+/* 5300 */     if (this.vReturnEntities3.size() > 0) {
+/* 5301 */       println(":xmp.");
+/* 5302 */       println(".kp off");
+/* 5303 */       println("");
+/* 5304 */       this.strHeader = new String[] { "Service Product/Component Name", "Component ID", "Number" };
+/*      */       
+/* 5306 */       this.iColWidths = new int[] { 45, 13, 10 };
+/*      */       
+/* 5308 */       resetPrintvars();
+/* 5309 */       this.strCondition1 = this.vReturnEntities3.elementAt(0);
+/* 5310 */       if (this.strCondition1.indexOf(":CMPNT") > 0) {
+/* 5311 */         this.strCondition2 = this.strCondition1.substring(0, this.strCondition1.indexOf(":CMPNT"));
+/*      */       }
+/* 5313 */       else if (this.strCondition1.indexOf(":FEATURE") > 0) {
+/* 5314 */         this.strCondition2 = this.strCondition1.substring(0, this.strCondition1.indexOf(":FEATURE"));
+/*      */       } 
+/* 5316 */       println(this.strCondition2);
+/*      */     } 
+/*      */     
+/* 5319 */     for (this.i = 0; this.i < this.vReturnEntities3.size(); this.i++) {
+/* 5320 */       logMessage("A_154:Sorted Vector returning: " + this.strCondition1);
+/* 5321 */       this.strCondition1 = this.vReturnEntities3.elementAt(this.i);
+/* 5322 */       if (this.strCondition1.indexOf(":CMPNT") > 0) {
+/* 5323 */         this.strCondition4 = this.strCondition1.substring(0, this.strCondition1.indexOf(":CMPNT"));
+/*      */       }
+/* 5325 */       else if (this.strCondition1.indexOf(":FEATURE") > 0) {
+/* 5326 */         this.strCondition4 = this.strCondition1.substring(0, this.strCondition1.indexOf(":FEATURE"));
+/*      */       } 
+/* 5328 */       logMessage("A_154 Current Mkt:" + this.strCondition4);
+/* 5329 */       logMessage("A_154 Prev Mkt :" + this.strCondition2);
+/* 5330 */       if (!this.strCondition2.equals(this.strCondition4)) {
+/* 5331 */         logMessage("A_154 Current < New checking");
+/* 5332 */         this.strCondition2 = this.strCondition4;
+/* 5333 */         println("                                                            Autobahn");
+/* 5334 */         println("                                                            Project");
+/*      */         
+/* 5336 */         printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails);
+/* 5337 */         println("");
+/* 5338 */         println(this.strCondition2);
+/* 5339 */         resetPrintvars();
+/*      */       } 
+/*      */       
+/* 5342 */       if (this.strCondition1.indexOf(":CMPNT") > 0) {
+/* 5343 */         this.strCondition5 = this.strCondition1.substring(this.strCondition1.indexOf(":CMPNT") + 1);
+/* 5344 */         logMessage("A_154:Parsed out" + this.strCondition5);
+/* 5345 */         this.eiComponent = this.egComponent.getEntityItem(this.strCondition5);
+/* 5346 */         this.strCondition3 = getAttributeValue(this.eiComponent, "ITSCMPNTCATNAME", "");
+/* 5347 */         this
+/* 5348 */           .strCondition3 = ((this.strCondition3.length() > 0) ? (this.strCondition3 + " ") : "") + getAttributeValue(this.eiComponent, "MKTGNAME", " ");
+/* 5349 */         logMessage(":CMPNT :" + this.strCondition3);
+/*      */         
+/* 5351 */         this.vPrintDetails.add(this.strCondition3);
+/*      */         
+/* 5353 */         this.strCondition3 = getAttributeValue(this.eiComponent, "COMPONENTID", "No Value" + this.eiComponent.getKey());
+/* 5354 */         this.vPrintDetails.add(this.strCondition3);
+/*      */ 
+/*      */         
+/* 5357 */         this.eiSof = getUplinkedEntityItem(this.eiComponent, this.strCmptToSof);
+/*      */         
+/* 5359 */         this.vReturnEntities1 = searchEntityItemLink(this.eiSof, (String[])null, (String[])null, true, true, "SOFAVAIL");
+/* 5360 */         this.strCondition3 = " ";
+/* 5361 */         if (this.vReturnEntities1.size() > 0) {
+/*      */ 
+/*      */ 
+/*      */           
+/* 5365 */           this.vReturnEntities4 = searchEntityItemLink(this.eiComponent, (String[])null, (String[])null, true, false, "OFDEVLPROJCMPNT");
+/* 5366 */           if (this.vReturnEntities4.size() > 0) {
+/* 5367 */             this.eiNextItem2 = this.vReturnEntities4.elementAt(0);
+/* 5368 */             this.eiNextItem3 = (EntityItem)this.eiNextItem2.getUpLink(0);
+/* 5369 */             this.strCondition3 = getAttributeValue(this.eiNextItem3, "PROJNUMBER", "No Value" + this.eiNextItem3.getKey());
+/*      */           } 
+/*      */         } 
+/*      */ 
+/*      */         
+/* 5374 */         this.vPrintDetails.add(this.strCondition3);
+/*      */       
+/*      */       }
+/* 5377 */       else if (this.strCondition1.indexOf(":FEATURE") > 0) {
+/* 5378 */         this.strCondition5 = this.strCondition1.substring(this.strCondition1.indexOf(":FEATURE") + 1);
+/* 5379 */         logMessage("A_154:Parsed out" + this.strCondition5);
+/* 5380 */         this.eiFeature = this.egFeature.getEntityItem(this.strCondition5);
+/*      */         
+/* 5382 */         this.eiNextItem1 = getUplinkedEntityItem(this.eiFeature, this.strFeatureToCmpt);
+/*      */ 
+/*      */         
+/* 5385 */         this.strCondition3 = getAttributeValue(this.eiNextItem1, "ITSCMPNTCATNAME", "");
+/* 5386 */         this
+/* 5387 */           .strCondition3 = ((this.strCondition3.length() > 0) ? (this.strCondition3 + " ") : "") + getAttributeValue(this.eiNextItem1, "MKTGNAME", " ");
+/* 5388 */         logMessage(":Feature :" + this.strCondition3);
+/* 5389 */         this.vPrintDetails.add(this.strCondition3);
+/* 5390 */         this.vPrintDetails.add(getAttributeValue(this.eiNextItem1, "COMPONENTID", "No Value" + this.eiFeature.getKey()));
+/*      */ 
+/*      */         
+/* 5393 */         this.eiComponent = getUplinkedEntityItem(this.eiFeature, this.strFeatureToCmpt);
+/* 5394 */         this.strCondition3 = " ";
+/* 5395 */         if (this.eiComponent == null) {
+/* 5396 */           this.vReturnEntities1.removeAllElements();
+/*      */         }
+/*      */         else {
+/*      */           
+/* 5400 */           this.eiSof = getUplinkedEntityItem(this.eiComponent, this.strCmptToSof);
+/*      */           
+/* 5402 */           this.vReturnEntities1 = searchEntityItemLink(this.eiSof, (String[])null, (String[])null, true, true, "SOFAVAIL");
+/*      */         } 
+/* 5404 */         if (this.vReturnEntities1.size() > 0) {
+/*      */ 
+/*      */           
+/* 5407 */           this.vReturnEntities4 = searchEntityItemLink(this.eiNextItem1, (String[])null, (String[])null, true, false, "OFDEVLPROJCMPNT");
+/* 5408 */           if (this.vReturnEntities4.size() > 0) {
+/* 5409 */             this.eiNextItem2 = this.vReturnEntities4.elementAt(0);
+/* 5410 */             this.eiNextItem3 = (EntityItem)this.eiNextItem2.getUpLink(0);
+/* 5411 */             this.strCondition3 = getAttributeValue(this.eiNextItem3, "PROJNUMBER", "No Value" + this.eiNextItem3.getKey());
+/*      */           } 
+/*      */         } 
+/*      */ 
+/*      */         
+/* 5416 */         this.vPrintDetails.add(this.strCondition3);
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */     
+/* 5421 */     if (this.vPrintDetails.size() > 0) {
+/* 5422 */       println("                                              Service       Autobahn");
+/* 5423 */       println("                                              Product/      Project");
+/* 5424 */       printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails);
+/* 5425 */       resetPrintvars();
+/*      */     } 
+/*      */     
+/* 5428 */     if (this.vReturnEntities3.size() > 0) {
+/* 5429 */       println(":exmp.");
+/*      */     }
+/* 5431 */     this.strSofToCmpt = new String[] { "SOFRELCMPNT", "CMPNT" };
+/*      */ 
+/*      */     
+/* 5434 */     println(".*$A_154_End");
+/*      */     
+/* 5436 */     println(".*$A_155_Begin");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 5446 */     this.strCondition2 = "";
+/*      */     
+/* 5448 */     this.vReturnEntities1 = searchEntityVectorLink(this.vFeatureFrmFeatureAvail, (String[])null, (String[])null, true, false, "CMPNTFEATURE");
+/* 5449 */     logMessage("A_155:From Feature");
+/* 5450 */     displayContents(this.vReturnEntities1);
+/* 5451 */     for (this.i = 0; this.i < this.vReturnEntities1.size(); this.i++) {
+/* 5452 */       this.eiNextItem = this.vReturnEntities1.elementAt(this.i);
+/* 5453 */       logMessage("A_155:" + this.eiNextItem.getKey());
+/* 5454 */       this.eiComponent = (EntityItem)this.eiNextItem.getUpLink(0);
+/* 5455 */       logMessage("A_155:" + this.eiComponent.getKey());
+/* 5456 */       this.eiFeature = (EntityItem)this.eiNextItem.getDownLink(0);
+/* 5457 */       logMessage("A_155:" + this.eiFeature.getKey());
+/*      */       
+/* 5459 */       this.eiSof = getUplinkedEntityItem(this.eiComponent, new String[] { "SOFCMPNT", "SOF" });
+/* 5460 */       this.strCondition1 = getSOFMktName(this.eiSof, false);
+/*      */       
+/* 5462 */       logMessage("A_155:Mktname" + this.strCondition1);
+/* 5463 */       this.strCondition1 += ":" + this.eiFeature.getKey();
+/*      */       
+/* 5465 */       this.vReturnEntities2.add(this.strCondition1);
+/*      */     } 
+/*      */     
+/* 5468 */     resetPrintvars();
+/*      */     
+/* 5470 */     this.vReturnEntities3 = this.mySort.alphabetizeVector(this.vReturnEntities2);
+/* 5471 */     if (this.vReturnEntities3.size() > 0) {
+/* 5472 */       println(":xmp.");
+/* 5473 */       println(".kp off");
+/* 5474 */       println("");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 5487 */       this.strHeader = new String[] { "Feature Name", "Feature Id", "Number" };
+/*      */       
+/* 5489 */       this.iColWidths = new int[] { 45, 11, 10 };
+/*      */ 
+/*      */       
+/* 5492 */       resetPrintvars();
+/* 5493 */       this.strCondition1 = this.vReturnEntities3.elementAt(0);
+/* 5494 */       if (this.strCondition1.indexOf(":CMPNT") > 0) {
+/* 5495 */         this.strCondition2 = this.strCondition1.substring(0, this.strCondition1.indexOf(":CMPNT"));
+/*      */       }
+/* 5497 */       else if (this.strCondition1.indexOf(":FEATURE") > 0) {
+/* 5498 */         this.strCondition2 = this.strCondition1.substring(0, this.strCondition1.indexOf(":FEATURE"));
+/*      */       } 
+/* 5500 */       println(this.strCondition2);
+/*      */     } 
+/*      */     
+/* 5503 */     for (this.i = 0; this.i < this.vReturnEntities3.size(); this.i++) {
+/* 5504 */       logMessage("A_155:Sorted Vector returning: " + this.strCondition1);
+/* 5505 */       this.strCondition1 = this.vReturnEntities3.elementAt(this.i);
+/* 5506 */       if (this.strCondition1.indexOf(":CMPNT") > 0) {
+/* 5507 */         this.strCondition4 = this.strCondition1.substring(0, this.strCondition1.indexOf(":CMPNT"));
+/*      */       }
+/* 5509 */       else if (this.strCondition1.indexOf(":FEATURE") > 0) {
+/* 5510 */         this.strCondition4 = this.strCondition1.substring(0, this.strCondition1.indexOf(":FEATURE"));
+/*      */       } 
+/* 5512 */       logMessage("A_155 Current Mkt:" + this.strCondition4);
+/* 5513 */       logMessage("A_155 Prev Mkt :" + this.strCondition2);
+/* 5514 */       if (!this.strCondition2.equals(this.strCondition4)) {
+/* 5515 */         logMessage("A_155 Current < New");
+/* 5516 */         this.strCondition2 = this.strCondition4;
+/* 5517 */         println("                                              Service/    Autobahn");
+/* 5518 */         println("Service Component/                            Component   Project");
+/* 5519 */         printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails);
+/* 5520 */         println("");
+/* 5521 */         println(this.strCondition2);
+/* 5522 */         resetPrintvars();
+/*      */       } 
+/*      */       
+/* 5525 */       if (this.strCondition1.indexOf(":CMPNT") > 0) {
+/* 5526 */         this.strCondition5 = this.strCondition1.substring(this.strCondition1.indexOf(":CMPNT") + 1);
+/* 5527 */         logMessage("A_155:Parsed out" + this.strCondition5);
+/* 5528 */         this.eiComponent = this.egComponent.getEntityItem(this.strCondition5);
+/* 5529 */         logMessage(":CMPNT :" + this.strCondition3);
+/* 5530 */         this.strCondition3 = getCmptToSofMktMsg(this.eiComponent);
+/* 5531 */         this.vPrintDetails.add(this.strCondition3);
+/* 5532 */         this.strCondition3 = getAttributeValue(this.eiComponent, "COMPONENTID", "No Value" + this.eiComponent.getKey());
+/* 5533 */         this.vPrintDetails.add(this.strCondition3);
+/*      */ 
+/*      */         
+/* 5536 */         this.eiSof = getUplinkedEntityItem(this.eiComponent, this.strCmptToSof);
+/*      */         
+/* 5538 */         this.vReturnEntities1 = searchEntityItemLink(this.eiSof, (String[])null, (String[])null, true, true, "SOFAVAIL");
+/*      */         
+/* 5540 */         this.strCondition3 = " ";
+/* 5541 */         if (this.vReturnEntities1.size() > 0) {
+/*      */ 
+/*      */           
+/* 5544 */           this.vReturnEntities4 = searchEntityItemLink(this.eiComponent, (String[])null, (String[])null, true, false, "OFDEVLPROJCMPNT");
+/* 5545 */           if (this.vReturnEntities4.size() > 0) {
+/* 5546 */             this.eiNextItem2 = this.vReturnEntities4.elementAt(0);
+/* 5547 */             this.eiNextItem3 = (EntityItem)this.eiNextItem2.getUpLink(0);
+/* 5548 */             this.strCondition3 = getAttributeValue(this.eiNextItem3, "PROJNUMBER", "No Value" + this.eiNextItem3.getKey());
+/*      */           } 
+/*      */         } 
+/*      */ 
+/*      */         
+/* 5553 */         this.vPrintDetails.add(this.strCondition3);
+/*      */       
+/*      */       }
+/* 5556 */       else if (this.strCondition1.indexOf(":FEATURE") > 0) {
+/* 5557 */         this.strCondition5 = this.strCondition1.substring(this.strCondition1.indexOf(":FEATURE") + 1);
+/* 5558 */         logMessage("A_155 in FEATURE:Parsed out" + this.strCondition5);
+/* 5559 */         this.eiFeature = this.egFeature.getEntityItem(this.strCondition5);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 5566 */         this.strCondition3 = getAttributeValue(this.eiFeature, "MKTGNAME", " ");
+/* 5567 */         logMessage(":Feature :" + this.strCondition3);
+/* 5568 */         this.vPrintDetails.add(this.strCondition3);
+/* 5569 */         this.vPrintDetails.add(getAttributeValue(this.eiFeature, "FEATURENUMBER", "No Value" + this.eiFeature.getKey()));
+/*      */ 
+/*      */         
+/* 5572 */         this.eiComponent = getUplinkedEntityItem(this.eiFeature, this.strFeatureToCmpt);
+/*      */         
+/* 5574 */         this.strCondition3 = " ";
+/* 5575 */         if (this.eiComponent == null) {
+/* 5576 */           this.vReturnEntities1.removeAllElements();
+/*      */         }
+/*      */         else {
+/*      */           
+/* 5580 */           this.eiSof = getUplinkedEntityItem(this.eiComponent, this.strCmptToSof);
+/*      */           
+/* 5582 */           this.vReturnEntities1 = searchEntityItemLink(this.eiSof, (String[])null, (String[])null, true, true, "SOFAVAIL");
+/*      */         } 
+/* 5584 */         if (this.vReturnEntities1.size() > 0) {
+/*      */ 
+/*      */ 
+/*      */           
+/* 5588 */           this.vReturnEntities4 = searchEntityItemLink(this.eiComponent, (String[])null, (String[])null, true, false, "OFDEVLPROJCMPNT");
+/* 5589 */           if (this.vReturnEntities4.size() > 0) {
+/* 5590 */             this.eiNextItem2 = this.vReturnEntities4.elementAt(0);
+/* 5591 */             this.eiNextItem3 = (EntityItem)this.eiNextItem2.getUpLink(0);
+/* 5592 */             this.strCondition3 = getAttributeValue(this.eiNextItem3, "PROJNUMBER", "No Value" + this.eiNextItem3.getKey());
+/*      */           } 
+/*      */         } 
+/*      */ 
+/*      */         
+/* 5597 */         this.vPrintDetails.add(this.strCondition3);
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */     
+/* 5602 */     if (this.vPrintDetails.size() > 0) {
+/* 5603 */       println("                                              Service/    Autobahn");
+/* 5604 */       println("Service Component/                            Component   Project");
+/* 5605 */       printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails);
+/* 5606 */       resetPrintvars();
+/*      */     } 
+/*      */     
+/* 5609 */     if (this.vReturnEntities3.size() > 0) {
+/* 5610 */       println(":exmp.");
+/*      */     }
+/*      */     
+/* 5613 */     println(".*$A_155_End");
+/*      */     
+/* 5615 */     println(".*$A_156_Begin");
+/* 5616 */     this.strParamList1 = new String[] { "STANDARDAMENDTEXT" };
+/*      */ 
+/*      */     
+/* 5619 */     printValueListInGroup(this.grpStdAmendText, this.strParamList1, "STANDARDAMENDTEXT_TYPE", "120", "", true);
+/* 5620 */     this.iColWidths = new int[] { 69 };
+/*      */     
+/* 5622 */     printReport(false, (String[])null, this.iColWidths, this.vPrintDetails);
+/* 5623 */     resetPrintvars();
+/* 5624 */     println(".*$A_156_End");
+/*      */     
+/* 5626 */     println(".*$A_157_Begin");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 5631 */     this.bConditionOK = false;
+/* 5632 */     this.vReturnEntities1 = searchEntityVectorLink(this.vSofFrmSofAvail, (String[])null, (String[])null, true, true, "SOFCATINCL");
+/* 5633 */     this.strFilterAttr = new String[] { "CATALOGNAME" };
+/*      */     
+/* 5635 */     this.strFilterValue = new String[] { "321" };
+/*      */     
+/* 5637 */     this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, this.strFilterAttr, this.strFilterValue, true, true, "CATINCL");
+/* 5638 */     if (this.vReturnEntities2.size() > 0) {
+/* 5639 */       this.bConditionOK = true;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 5645 */     if (!this.bConditionOK) {
+/* 5646 */       this.vReturnEntities1 = searchEntityVectorLink(this.vCmpntFrmCmpntAvail, (String[])null, (String[])null, true, true, "CMPNTCATINCL");
+/* 5647 */       this.strFilterAttr = new String[] { "CATALOGNAME" };
+/*      */       
+/* 5649 */       this.strFilterValue = new String[] { "321" };
+/*      */       
+/* 5651 */       this.vReturnEntities3 = searchEntityVectorLink(this.vReturnEntities1, this.strFilterAttr, this.strFilterValue, true, true, "CATINCL");
+/* 5652 */       if (this.vReturnEntities3.size() > 0) {
+/* 5653 */         this.bConditionOK = true;
+/*      */       }
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 5660 */     if (!this.bConditionOK) {
+/* 5661 */       this.vReturnEntities1 = searchEntityVectorLink(this.vFeatureFrmFeatureAvail, (String[])null, (String[])null, true, true, "FEATURECATINCL");
+/* 5662 */       this.strFilterAttr = new String[] { "CATALOGNAME" };
+/*      */       
+/* 5664 */       this.strFilterValue = new String[] { "321" };
+/*      */       
+/* 5666 */       this.vReturnEntities4 = searchEntityVectorLink(this.vReturnEntities1, this.strFilterAttr, this.strFilterValue, true, true, "CATINCL");
+/* 5667 */       if (this.vReturnEntities4.size() > 0) {
+/* 5668 */         this.bConditionOK = true;
+/*      */       }
+/*      */     } 
+/* 5671 */     if (this.bConditionOK) {
+/* 5672 */       println("Yes");
+/*      */     } else {
+/*      */       
+/* 5675 */       println("No");
+/*      */     } 
+/*      */     
+/* 5678 */     println(".*$A_157_End");
+/*      */     
+/* 5680 */     println(".*$A_158_Begin");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 5689 */     printQ158(this.bConditionOK);
+/*      */     
+/* 5691 */     println(".*$A_158_End");
+/*      */     
+/* 5693 */     println(".*$A_160_Begin");
+/* 5694 */     println(transformXML(getAttributeValue(this.eiAnnounce, "ACCESPEOWDISABLE", " ")));
+/* 5695 */     println(".*$A_160_End");
+/*      */     
+/* 5697 */     println(".*$A_161_Begin");
+/* 5698 */     println(transformXML(getAttributeValue(this.eiAnnounce, "ACCESPEOWDISABLECONSID", " ")));
+/* 5699 */     println(".*$A_161_End");
+/*      */     
+/* 5701 */     println(".*$A_162_Begin");
+/* 5702 */     println(transformXML(getAttributeValue(this.eiAnnounce, "USSEC508", " ")));
+/* 5703 */     println(".*$A_162_End");
+/*      */     
+/* 5705 */     println(".*$A_163_Begin");
+/* 5706 */     println(transformXML(getAttributeValue(this.eiAnnounce, "USSEC508LOGO", " ")));
+/* 5707 */     println(".*$A_163_End");
+/*      */     
+/* 5709 */     println(".*$A_170_Begin");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 5714 */     this.vPrintDetails1 = new Vector();
+/* 5715 */     this.vPrintDetails2 = new Vector();
+/* 5716 */     this.vPrintDetails3 = new Vector();
+/* 5717 */     logMessage("170 vSofFrmSofAvail");
+/* 5718 */     displayContents(this.vSofFrmSofAvail);
+/* 5719 */     for (this.i = 0; this.i < this.vSofFrmSofAvail.size(); this.i++) {
+/* 5720 */       this.eiSof = this.vSofFrmSofAvail.elementAt(this.i);
+/*      */       
+/* 5722 */       this.vReturnEntities2 = searchEntityItemLink(this.eiSof, (String[])null, (String[])null, true, true, "SOFGBTA");
+/* 5723 */       logMessage("A_170_1");
+/* 5724 */       displayContents(this.vReturnEntities2);
+/* 5725 */       this.eiNextItem = null;
+/* 5726 */       this.eiNextItem1 = null;
+/* 5727 */       if (this.vReturnEntities2.size() > 0) {
+/* 5728 */         this.eiNextItem = this.vReturnEntities2.elementAt(0);
+/* 5729 */         this.eiNextItem1 = (this.eiNextItem.getDownLinkCount() > 0) ? (EntityItem)this.eiNextItem.getDownLink(0) : null;
+/*      */       } 
+/* 5731 */       if (this.eiNextItem1 != null) {
+/* 5732 */         this.vPrintDetails.add(getAttributeValue(this.eiSof, "OFIDNUMBER", " "));
+/* 5733 */         this.vPrintDetails.add(getAttributeValue(this.eiNextItem1, "GBNAME", " "));
+/* 5734 */         this.vPrintDetails.add((this.eiNextItem1 != null) ? getAttributeValue(this.eiNextItem1, "SAPPRIMBRANDCODE", " ") : " ");
+/*      */         
+/* 5736 */         this.vPrintDetails1.add((this.eiNextItem1 != null) ? getAttributeValue(this.eiNextItem1, "SAPPRODFAMCODE", " ") : " ");
+/* 5737 */         this.vPrintDetails1.add((this.eiNextItem1 != null) ? getAttributeValue(this.eiNextItem1, "OMBRANDCODE", " ") : " ");
+/* 5738 */         this.vPrintDetails1.add((this.eiNextItem1 != null) ? getAttributeValue(this.eiNextItem1, "OMPRODFAMCODE", " ") : " ");
+/* 5739 */         this.vPrintDetails1.add((this.eiNextItem1 != null) ? getAttributeValue(this.eiNextItem1, "BPDBBRANDCODE", " ") : " ");
+/*      */         
+/* 5741 */         this.vPrintDetails2.add(getAttributeValue(this.eiSof, "OFIDNUMBER", " "));
+/* 5742 */         this.vPrintDetails2.add(getAttributeValue(this.eiSof, "MATACCGRP", " "));
+/* 5743 */         this.vPrintDetails2.add(getAttributeValue(this.eiSof, "ASSORTMODULE", " "));
+/*      */         
+/* 5745 */         this.vReturnEntities3 = searchEntityItemLink(this.eiSof, (String[])null, (String[])null, true, true, "SOFOFDEVLPROJA");
+/* 5746 */         if (this.vReturnEntities3.size() > 0) {
+/* 5747 */           this.eiNextItem = this.vReturnEntities3.elementAt(0);
+/* 5748 */           this.eiNextItem1 = (this.eiNextItem.getDownLinkCount() > 0) ? (EntityItem)this.eiNextItem.getDownLink(0) : null;
+/* 5749 */           this.vPrintDetails2.add((this.eiNextItem1 != null) ? getAttributeValue(this.eiNextItem1, "DEVDIV", " ") : " ");
+/*      */         } else {
+/*      */           
+/* 5752 */           this.vPrintDetails2.add(" ");
+/*      */         } 
+/*      */       } 
+/*      */ 
+/*      */ 
+/*      */       
+/* 5758 */       this.vReturnEntities3 = searchEntityItemLink(this.eiSof, (String[])null, (String[])null, true, true, "SOFPRICE");
+/* 5759 */       if (this.vReturnEntities3.size() > 0) {
+/* 5760 */         this.eiNextItem = this.vReturnEntities3.elementAt(0);
+/* 5761 */         this.eiPriceInfo = (this.eiNextItem.getDownLinkCount() > 0) ? (EntityItem)this.eiNextItem.getDownLink(0) : null;
+/* 5762 */         this.vPrintDetails3.add((this.eiPriceInfo != null) ? getAttributeValue(this.eiPriceInfo, "AMORTIZATIONSTART", " ") : " ");
+/* 5763 */         this.vPrintDetails3.add((this.eiPriceInfo != null) ? getAttributeValue(this.eiPriceInfo, "AMORTIZATIONLENGTH", " ") : " ");
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */     
+/* 5768 */     logMessage("170 vCmpntFrmCmpntAvail");
+/* 5769 */     displayContents(this.vCmpntFrmCmpntAvail);
+/* 5770 */     for (this.i = 0; this.i < this.vCmpntFrmCmpntAvail.size(); this.i++) {
+/* 5771 */       this.eiComponent = this.vCmpntFrmCmpntAvail.elementAt(this.i);
+/*      */ 
+/*      */       
+/* 5774 */       this.eiNextItem = null;
+/* 5775 */       this.eiNextItem1 = null;
+/* 5776 */       this.eiSof = getUplinkedEntityItem(this.eiComponent, this.strCmptToSof);
+/* 5777 */       if (this.eiSof != null) {
+/* 5778 */         this.vReturnEntities2 = searchEntityItemLink(this.eiSof, (String[])null, (String[])null, true, true, "SOFGBTA");
+/* 5779 */         logMessage("A_170_2");
+/* 5780 */         displayContents(this.vReturnEntities2);
+/* 5781 */         if (this.vReturnEntities2.size() > 0) {
+/* 5782 */           this.eiNextItem = this.vReturnEntities2.elementAt(0);
+/* 5783 */           this.eiNextItem1 = (this.eiNextItem.getDownLinkCount() > 0) ? (EntityItem)this.eiNextItem.getDownLink(0) : null;
+/*      */         } 
+/*      */       } 
+/* 5786 */       if (this.eiNextItem1 != null) {
+/* 5787 */         this.vPrintDetails.add(getAttributeValue(this.eiSof, "OFIDNUMBER", " "));
+/* 5788 */         this.vPrintDetails.add(getAttributeValue(this.eiNextItem1, "GBNAME", " "));
+/* 5789 */         this.vPrintDetails.add((this.eiNextItem1 != null) ? getAttributeValue(this.eiNextItem1, "SAPPRIMBRANDCODE", " ") : " ");
+/*      */         
+/* 5791 */         this.vPrintDetails1.add((this.eiNextItem1 != null) ? getAttributeValue(this.eiNextItem1, "SAPPRODFAMCODE", " ") : " ");
+/* 5792 */         this.vPrintDetails1.add((this.eiNextItem1 != null) ? getAttributeValue(this.eiNextItem1, "OMBRANDCODE", " ") : " ");
+/* 5793 */         this.vPrintDetails1.add((this.eiNextItem1 != null) ? getAttributeValue(this.eiNextItem1, "OMPRODFAMCODE", " ") : " ");
+/* 5794 */         this.vPrintDetails1.add((this.eiNextItem1 != null) ? getAttributeValue(this.eiNextItem1, "BPDBBRANDCODE", " ") : " ");
+/*      */         
+/* 5796 */         this.vPrintDetails2.add(getAttributeValue(this.eiSof, "OFIDNUMBER", " "));
+/* 5797 */         this.vPrintDetails2.add(getAttributeValue(this.eiSof, "MATACCGRP", " "));
+/* 5798 */         this.vPrintDetails2.add(getAttributeValue(this.eiSof, "ASSORTMODULE", " "));
+/*      */         
+/* 5800 */         this.vReturnEntities3 = searchEntityItemLink(this.eiSof, (String[])null, (String[])null, true, true, "SOFOFDEVLPROJA");
+/* 5801 */         if (this.vReturnEntities3.size() > 0) {
+/* 5802 */           this.eiNextItem = this.vReturnEntities3.elementAt(0);
+/* 5803 */           this.eiNextItem1 = (this.eiNextItem.getDownLinkCount() > 0) ? (EntityItem)this.eiNextItem.getDownLink(0) : null;
+/* 5804 */           this.vPrintDetails2.add((this.eiNextItem1 != null) ? getAttributeValue(this.eiNextItem1, "DEVDIV", " ") : " ");
+/*      */         } else {
+/*      */           
+/* 5807 */           this.vPrintDetails2.add(" ");
+/*      */         } 
+/*      */       } 
+/*      */ 
+/*      */ 
+/*      */       
+/* 5813 */       this.vReturnEntities3 = searchEntityItemLink(this.eiComponent, (String[])null, (String[])null, true, true, "CMPNTPRICE");
+/* 5814 */       if (this.vReturnEntities3.size() > 0) {
+/* 5815 */         this.eiNextItem = this.vReturnEntities3.elementAt(0);
+/* 5816 */         this.eiPriceInfo = (this.eiNextItem.getDownLinkCount() > 0) ? (EntityItem)this.eiNextItem.getDownLink(0) : null;
+/* 5817 */         this.vPrintDetails3.add((this.eiPriceInfo != null) ? getAttributeValue(this.eiPriceInfo, "AMORTIZATIONSTART", " ") : " ");
+/* 5818 */         this.vPrintDetails3.add((this.eiPriceInfo != null) ? getAttributeValue(this.eiPriceInfo, "AMORTIZATIONLENGTH", " ") : " ");
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 5825 */     if (this.vPrintDetails.size() > 0) {
+/* 5826 */       println(":xmp.");
+/* 5827 */       println(".kp off");
+/* 5828 */       println("Offering Id          Description                        Primary Brand");
+/* 5829 */       this.strHeader = new String[] { "", "", "   Code" };
+/*      */       
+/* 5831 */       this.iColWidths = new int[] { 19, 34, 14 };
+/*      */       
+/* 5833 */       printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails);
+/* 5834 */       resetPrintvars();
+/* 5835 */       println("");
+/* 5836 */       println("");
+/* 5837 */       println("Product Family OM Brand OM Product Family BPDP Brand");
+/* 5838 */       this.strHeader = new String[] { "   Code", "Code", "     Code", "   Code" };
+/*      */       
+/* 5840 */       this.iColWidths = new int[] { 14, 8, 17, 10 };
+/*      */       
+/* 5842 */       printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails1);
+/* 5843 */       this.vPrintDetails1 = new Vector();
+/* 5844 */       println("");
+/* 5845 */       println("");
+/* 5846 */       println("                    Material Account   Assortment Development");
+/* 5847 */       this.strHeader = new String[] { "Offering ID", "Assignment Group", "  Module", " Division" };
+/*      */       
+/* 5849 */       this.iColWidths = new int[] { 19, 17, 11, 11 };
+/*      */       
+/* 5851 */       printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails2);
+/* 5852 */       this.vPrintDetails2 = new Vector();
+/*      */       
+/* 5854 */       if (this.vPrintDetails3.size() > 0) {
+/* 5855 */         println("");
+/* 5856 */         println("");
+/* 5857 */         this.strHeader = new String[] { "Amortization Start", "Amortization Length" };
+/*      */         
+/* 5859 */         this.iColWidths = new int[] { 18, 20 };
+/*      */         
+/* 5861 */         printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails3);
+/* 5862 */         this.vPrintDetails3 = new Vector();
+/*      */       } 
+/* 5864 */       println(":exmp.");
+/*      */     } 
+/*      */     
+/* 5867 */     println(".*$A_170_End");
+/*      */     
+/* 5869 */     println(".*$A_181_Begin");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 5876 */     this.bConditionOK = false;
+/* 5877 */     this.vReturnEntities1 = searchEntityGroupLink(this.egComponent, (String[])null, (String[])null, true, true, "CMPNTFINOF");
+/* 5878 */     if (this.vReturnEntities1.size() > 0) {
+/* 5879 */       this.bConditionOK = true;
+/*      */     } else {
+/*      */       
+/* 5882 */       this.vReturnEntities1 = searchEntityGroupLink(this.egFeature, (String[])null, (String[])null, true, true, "FEATUREFINOF");
+/* 5883 */       if (this.vReturnEntities1.size() > 0) {
+/* 5884 */         this.bConditionOK = true;
+/*      */       }
+/*      */     } 
+/* 5887 */     if (this.bConditionOK) {
+/* 5888 */       println("Yes");
+/*      */     } else {
+/*      */       
+/* 5891 */       println("No");
+/*      */     } 
+/*      */     
+/* 5894 */     println(".*$A_181_End");
+/*      */     
+/* 5896 */     println(".*$A_182_Begin");
+/* 5897 */     printIntSuppMktFinInfo("MKTGMSGINTERNAL");
+/* 5898 */     println(".*$A_182_End");
+/*      */     
+/* 5900 */     println(".*$A_183_Begin");
+/* 5901 */     printIntSuppMktFinInfo("MKTGMESEXTERNAL");
+/* 5902 */     println(".*$A_183_End");
+/*      */     
+/* 5904 */     println(".*$A_184_Begin");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 5911 */     resetPrintvars();
+/* 5912 */     this.bConditionOK = false;
+/* 5913 */     this.strParamList1 = new String[] { "PROMOELIGIBILITYTCS" };
+/*      */     
+/* 5915 */     this.vReturnEntities1 = searchEntityGroupLink(this.egComponent, (String[])null, (String[])null, true, true, "CMPNTFINOF");
+/* 5916 */     if (this.vReturnEntities1.size() > 0) {
+/* 5917 */       this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, true, "FINOF");
+/* 5918 */       printValueListInVector(this.vReturnEntities3, this.strParamList1, " ", true, false);
+/* 5919 */       if (this.vPrintDetails.size() > 0) {
+/* 5920 */         this.bConditionOK = true;
+/*      */       }
+/*      */     } else {
+/*      */       
+/* 5924 */       this.vReturnEntities1 = searchEntityGroupLink(this.egFeature, (String[])null, (String[])null, true, true, "FEATUREFINOF");
+/* 5925 */       this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, true, "FINOF");
+/* 5926 */       printValueListInVector(this.vReturnEntities3, this.strParamList1, " ", true, false);
+/* 5927 */       if (this.vPrintDetails.size() > 0) {
+/* 5928 */         this.bConditionOK = true;
+/*      */       }
+/*      */     } 
+/* 5931 */     if (this.bConditionOK) {
+/* 5932 */       println("Yes");
+/*      */     } else {
+/*      */       
+/* 5935 */       println("No");
+/*      */     } 
+/* 5937 */     resetPrintvars();
+/* 5938 */     println(".*$A_184_End");
+/*      */     
+/* 5940 */     println(".*$A_185_Begin");
+/*      */ 
+/*      */     
+/* 5943 */     printIntSuppMktFinInfo("PROMOELIGIBILITYTCS");
+/*      */     
+/* 5945 */     println(".*$A_185_End");
+/*      */     
+/* 5947 */     println(".*$A_186_Begin");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 5953 */     resetPrintvars();
+/* 5954 */     this.bConditionOK = false;
+/* 5955 */     this.strParamList1 = new String[] { "MONTHLYPAYMENT" };
+/*      */     
+/* 5957 */     this.vReturnEntities1 = searchEntityGroupLink(this.egComponent, (String[])null, (String[])null, true, true, "CMPNTFINOF");
+/* 5958 */     if (this.vReturnEntities1.size() > 0) {
+/* 5959 */       this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, true, "FINOF");
+/* 5960 */       printValueListInVector(this.vReturnEntities3, this.strParamList1, " ", true, false);
+/* 5961 */       if (this.vPrintDetails.size() > 0) {
+/* 5962 */         this.bConditionOK = true;
+/*      */       }
+/*      */     } else {
+/*      */       
+/* 5966 */       this.vReturnEntities1 = searchEntityGroupLink(this.egFeature, (String[])null, (String[])null, true, true, "FEATUREFINOF");
+/* 5967 */       this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, true, "FINOF");
+/* 5968 */       printValueListInVector(this.vReturnEntities3, this.strParamList1, " ", true, false);
+/* 5969 */       if (this.vPrintDetails.size() > 0) {
+/* 5970 */         this.bConditionOK = true;
+/*      */       }
+/*      */     } 
+/* 5973 */     if (this.bConditionOK) {
+/* 5974 */       println("Yes");
+/*      */     } else {
+/*      */       
+/* 5977 */       println("No");
+/*      */     } 
+/* 5979 */     resetPrintvars();
+/*      */     
+/* 5981 */     println(".*$A_186_End");
+/*      */     
+/* 5983 */     println(".*$A_187_Begin");
+/* 5984 */     printIntSuppMktFinInfo("MONTHLYPAYMENT", false);
+/*      */     
+/* 5986 */     println(".*$A_187_End");
+/*      */     
+/* 5988 */     println(".*$A_188_Begin");
+/*      */ 
+/*      */     
+/* 5991 */     printIntSuppMktFinInfo("PAYMENTTERM", false);
+/*      */     
+/* 5993 */     println(".*$A_188_End");
+/*      */     
+/* 5995 */     println(".*$A_189_Begin");
+/* 5996 */     printIntSuppMktFinInfo("ELIGIBILITYTCS");
+/* 5997 */     println(".*$A_189_End");
+/*      */     
+/* 5999 */     println(".*$A_195_Begin");
+/* 6000 */     this.strParamList1 = new String[] { "STANDARDAMENDTEXT" };
+/*      */     
+/* 6002 */     printValueListInGroup(this.grpStdAmendText, this.strParamList1, "STANDARDAMENDTEXT_TYPE", "200", "", true);
+/* 6003 */     this.iColWidths = new int[] { 69 };
+/*      */     
+/* 6005 */     printReport(false, (String[])null, this.iColWidths, this.vPrintDetails);
+/* 6006 */     resetPrintvars();
+/* 6007 */     println(".*$A_195_End");
+/*      */ 
+/*      */     
+/* 6010 */     println(".*$A_200_Begin");
+/* 6011 */     prettyPrint(transformXML(getAttributeValue(this.eiAnnounce, "ATAGLANCE", " ")), 69);
+/* 6012 */     println(".*$A_200_End");
+/*      */ 
+/*      */     
+/* 6015 */     println(".*$A_202_Begin");
+/* 6016 */     prettyPrint(transformXML(getAttributeValue(this.eiAnnounce, "OVERVIEWABSTRACT", " ")), 69);
+/* 6017 */     printVanillaSVSReport("OVERVIEWABSTRACT", true, false);
+/* 6018 */     println(".*$A_202_End");
+/*      */     
+/* 6020 */     println(".*$A_204_Begin");
+/* 6021 */     printVanillaSVSReport("PREREQCOREQ", true, false);
+/* 6022 */     println(".*$A_204_End");
+/*      */     
+/* 6024 */     println(".*$A_208_Begin");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 6031 */     this.strFilterAttr = new String[] { "AVAILTYPE" };
+/*      */     
+/* 6033 */     this.strFilterValue = new String[] { "146" };
+/*      */     
+/* 6035 */     this.vReturnEntities1 = searchEntityGroupLink(this.grpAnnAvail, this.strFilterAttr, this.strFilterValue, true, true, "AVAIL");
+/* 6036 */     logMessage("****AVAIL*****");
+/* 6037 */     displayContents(this.vReturnEntities1);
+/* 6038 */     this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, false, "SOFAVAIL");
+/* 6039 */     displayContents(this.vReturnEntities1);
+/* 6040 */     this.strCondition1 = "";
+/* 6041 */     this.strCondition2 = "";
+/* 6042 */     this.strCondition4 = "";
+/* 6043 */     this.vReturnEntities4 = new Vector();
+/* 6044 */     this.iTemp = this.vSofFrmSofAvail.size() + this.vCmpntFrmCmpntAvail.size() + this.vFeatureFrmFeatureAvail.size();
+/* 6045 */     logMessage("_208:Array Size=" + this.iTemp);
+/*      */ 
+/*      */     
+/* 6048 */     this.i = 0;
+/* 6049 */     logMessage("_208:SOFAVAIL");
+/* 6050 */     displayContents(this.vReturnEntities2);
+/* 6051 */     for (this.i = 0; this.i < this.vReturnEntities2.size(); this.i++) {
+/* 6052 */       this.eiNextItem = this.vReturnEntities2.elementAt(this.i);
+/* 6053 */       this.eiSof = (EntityItem)this.eiNextItem.getUpLink(0);
+/* 6054 */       this.eiAvail = (EntityItem)this.eiNextItem.getDownLink(0);
+/* 6055 */       this.strCondition1 = getGeoTags(this.eiAvail);
+/* 6056 */       this.strCondition4 = getAttributeValue(this.eiAvail, "EFFECTIVEDATE", " ");
+/* 6057 */       this.strCondition3 = getSOFMktName(this.eiSof);
+/*      */       
+/* 6059 */       this.vReturnEntities4.add(this.strCondition4 + "|" + this.strCondition3 + "|" + this.strCondition1);
+/*      */     } 
+/* 6061 */     this.j = (this.i > 0) ? (this.i - 1) : this.i;
+/* 6062 */     logMessage("_208:After SOFAVAIL Ctr=" + this.j);
+/*      */     
+/* 6064 */     this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, false, "CMPNTAVAIL");
+/* 6065 */     this.strCondition1 = "";
+/* 6066 */     this.strCondition2 = "";
+/* 6067 */     this.strCondition4 = "";
+/* 6068 */     logMessage("_208:CMPNTAVAIL");
+/* 6069 */     displayContents(this.vReturnEntities2);
+/* 6070 */     for (this.i = 0; this.i < this.vReturnEntities2.size(); this.i++) {
+/* 6071 */       this.eiNextItem = this.vReturnEntities2.elementAt(this.i);
+/* 6072 */       this.eiComponent = (EntityItem)this.eiNextItem.getUpLink(0);
+/* 6073 */       this.eiAvail = (EntityItem)this.eiNextItem.getDownLink(0);
+/* 6074 */       this.strCondition1 = getGeoTags(this.eiAvail);
+/* 6075 */       this.strCondition4 = getAttributeValue(this.eiAvail, "EFFECTIVEDATE", " ");
+/* 6076 */       this.strCondition3 = getCmptToSofMktMsg(this.eiComponent);
+/*      */       
+/* 6078 */       this.vReturnEntities4.add(this.strCondition4 + "|" + this.strCondition3 + "|" + this.strCondition1);
+/*      */     } 
+/* 6080 */     this.j = (this.i + this.j > 0) ? (this.i + this.j - 1) : 0;
+/* 6081 */     logMessage("_208:After CMPNTAVAIL Ctr=" + this.j);
+/* 6082 */     this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, false, "FEATUREAVAIL");
+/* 6083 */     this.strCondition1 = "";
+/* 6084 */     this.strCondition2 = "";
+/* 6085 */     this.strCondition4 = "";
+/* 6086 */     logMessage("_208:FEATUREAVAIL");
+/* 6087 */     displayContents(this.vReturnEntities2);
+/* 6088 */     for (this.i = 0; this.i < this.vReturnEntities2.size(); this.i++) {
+/* 6089 */       this.eiNextItem = this.vReturnEntities2.elementAt(this.i);
+/* 6090 */       logMessage("_208:FEATUREAVAIL" + this.eiNextItem.getKey());
+/* 6091 */       this.eiFeature = (EntityItem)this.eiNextItem.getUpLink(0);
+/* 6092 */       logMessage("_208:FEATURE" + this.eiAvail.getKey());
+/* 6093 */       this.eiAvail = (EntityItem)this.eiNextItem.getDownLink(0);
+/* 6094 */       this.strCondition1 = getGeoTags(this.eiAvail);
+/* 6095 */       this.strCondition4 = getAttributeValue(this.eiAvail, "EFFECTIVEDATE", " ");
+/* 6096 */       this.strCondition3 = getfeatureToSofMktMsg(this.eiFeature);
+/* 6097 */       logMessage("_208: FEATUREAVAIL Setting =" + (this.i + this.j));
+/*      */       
+/* 6099 */       this.vReturnEntities4.add(this.strCondition4 + "|" + this.strCondition3 + "|" + this.strCondition1);
+/*      */     } 
+/* 6101 */     this.strAnswers = this.vReturnEntities4.toArray();
+/*      */     
+/* 6103 */     Arrays.sort(this.strAnswers);
+/* 6104 */     this.strCondition5 = "";
+/* 6105 */     resetPrintvars();
+/*      */     
+/* 6107 */     for (this.i = 0; this.i < this.strAnswers.length; this.i++) {
+/* 6108 */       this.strCondition1 = (String)this.strAnswers[this.i];
+/* 6109 */       logMessage("String stored at " + this.i + ":" + this.strCondition1);
+/* 6110 */       this.iTemp = this.strCondition1.indexOf("|");
+/* 6111 */       this.strCondition2 = this.strCondition1.substring(0, this.iTemp);
+/* 6112 */       this.strCondition1 = this.strCondition1.substring(this.iTemp + 1);
+/* 6113 */       logMessage("Found | at   " + this.iTemp);
+/* 6114 */       logMessage("Parsed Date  " + this.strCondition2);
+/* 6115 */       this.iTemp = this.strCondition1.indexOf("|");
+/* 6116 */       this.strCondition3 = this.strCondition1.substring(0, this.iTemp);
+/* 6117 */       this.strCondition1 = this.strCondition1.substring(this.iTemp + 1);
+/* 6118 */       logMessage("Found | at   " + this.iTemp);
+/* 6119 */       logMessage("Parsed  MktName " + this.strCondition3);
+/*      */       
+/* 6121 */       this.strCondition4 = this.strCondition1;
+/* 6122 */       logMessage("Parsed GEO  " + this.strCondition4);
+/*      */     } 
+/*      */ 
+/*      */     
+/* 6126 */     this.strCondition6 = "";
+/* 6127 */     if (this.strAnswers.length > 0) {
+/* 6128 */       println(":xmp.");
+/* 6129 */       println(".kp off");
+/*      */     } 
+/*      */     
+/* 6132 */     int i = 0;
+/* 6133 */     for (this.i = 0; this.i < this.strAnswers.length; this.i++) {
+/* 6134 */       this.strCondition1 = (String)this.strAnswers[this.i];
+/* 6135 */       logMessage("String stored at " + this.i + ":" + this.strCondition1);
+/* 6136 */       i = this.strCondition1.indexOf("|");
+/* 6137 */       this.strCondition2 = this.strCondition1.substring(0, i);
+/* 6138 */       this.strCondition1 = this.strCondition1.substring(i + 1);
+/* 6139 */       logMessage("Found | at   " + i);
+/* 6140 */       logMessage("Parsed Date  " + this.strCondition2);
+/* 6141 */       i = this.strCondition1.indexOf("|");
+/* 6142 */       this.strCondition3 = this.strCondition1.substring(0, i);
+/* 6143 */       this.strCondition1 = this.strCondition1.substring(i + 1);
+/* 6144 */       logMessage("Found | at   " + i);
+/* 6145 */       logMessage("Parsed  MktName " + this.strCondition3);
+/*      */       
+/* 6147 */       this.strCondition4 = this.strCondition1;
+/* 6148 */       logMessage("Parsed GEO  " + this.strCondition4);
+/*      */       
+/* 6150 */       if (!this.strCondition4.equals(this.strCondition5)) {
+/* 6151 */         if (!this.strCondition5.equals("US, AP, CAN, EMEA, LA") && 
+/* 6152 */           this.strCondition5.trim().length() > 0) {
+/* 6153 */           logMessage("Ending GEO Break  " + this.strCondition5);
+/* 6154 */           println(".br;:hp2.<---" + this.strCondition5 + ":ehp2.");
+/* 6155 */           println("");
+/*      */         } 
+/*      */ 
+/*      */         
+/* 6159 */         if (!this.strCondition4.equals("US, AP, CAN, EMEA, LA") && 
+/* 6160 */           this.strCondition4.trim().length() > 0) {
+/* 6161 */           logMessage("Starting GEO Break  " + this.strCondition4);
+/* 6162 */           println(":p.:hp2." + this.strCondition4 + "--->:ehp2.");
+/* 6163 */           i = 0;
+/* 6164 */           this.strCondition6 = this.strCondition2;
+/* 6165 */           println(getRFADateFormat(this.strCondition2) + "");
+/*      */         } 
+/*      */         
+/* 6168 */         this.strCondition5 = this.strCondition4;
+/*      */       } 
+/*      */       
+/* 6171 */       if (!this.strCondition6.equals(this.strCondition2)) {
+/* 6172 */         this.strCondition6 = this.strCondition2;
+/* 6173 */         if (i == 1) {
+/* 6174 */           println(".p");
+/*      */         }
+/* 6176 */         i = 0;
+/* 6177 */         println(getRFADateFormat(this.strCondition2) + "");
+/*      */       } 
+/*      */       
+/* 6180 */       prettyPrint(this.strCondition3, 69);
+/* 6181 */       i++;
+/*      */     } 
+/*      */     
+/* 6184 */     if (!this.strCondition5.equals("US, AP, CAN, EMEA, LA") && 
+/* 6185 */       this.strCondition5.trim().length() > 0) {
+/* 6186 */       logMessage("Final Ending GEO Break  " + this.strCondition5);
+/* 6187 */       println(".br;:hp2.<---" + this.strCondition5 + ":ehp2.");
+/* 6188 */       println("");
+/*      */     } 
+/*      */     
+/* 6191 */     if (this.strAnswers.length > 0) {
+/* 6192 */       println(":exmp.");
+/* 6193 */       resetPrintvars();
+/*      */     } 
+/*      */     
+/* 6196 */     println(".*$A_208_End");
+/*      */     
+/* 6198 */     println(".*$A_210_Begin");
+/*      */     
+/* 6200 */     prettyPrint(transformXML(getAttributeValue(this.eiAnnounce, "DESCRIPTION", " ")), 69);
+/* 6201 */     printVanillaSVSReport("DESCRIPTION", true, false);
+/* 6202 */     println(".*$A_210_End");
+/*      */     
+/* 6204 */     println(".*$A_212_Begin");
+/*      */     
+/* 6206 */     this.strParamList1 = new String[] { "STANDARDAMENDTEXT" };
+/*      */     
+/* 6208 */     printValueListInGroup(this.grpStdAmendText, this.strParamList1, "STANDARDAMENDTEXT_TYPE", "130", "", true);
+/* 6209 */     this.iColWidths = new int[] { 69 };
+/*      */     
+/* 6211 */     printReport(false, (String[])null, this.iColWidths, this.vPrintDetails);
+/* 6212 */     resetPrintvars();
+/* 6213 */     println(".*$A_212_End");
+/*      */     
+/* 6215 */     println(".*$A_214_Begin");
+/* 6216 */     printVanillaSVSReport("CHARGES", true, true);
+/*      */     
+/* 6218 */     println(".*$A_214_End");
+/*      */     
+/* 6220 */     println(".*$A_218_Begin");
+/* 6221 */     printVanillaSVSReport("BILLINGPERIOD", false, true);
+/*      */     
+/* 6223 */     println(".*$A_218_End");
+/*      */     
+/* 6225 */     println(".*$A_219_Begin");
+/* 6226 */     GeneralAreaGroup generalAreaGroup = this.m_geList.getRfaGeoEMEAInclusion(this.eiAnnounce);
+/* 6227 */     logMessage("A_219_Begin returned GEItemcount" + generalAreaGroup.getGeneralAreaItemCount());
+/* 6228 */     this.vReturnEntities1 = searchEntityGroupLink(this.grpAnnAvail, (String[])null, (String[])null, true, true, "AVAIL");
+/* 6229 */     displayContents(this.vReturnEntities1);
+/*      */ 
+/*      */     
+/* 6232 */     this.vReturnEntities2 = new Vector();
+/* 6233 */     this.bConditionOK = false;
+/*      */     
+/* 6235 */     if (this.vReturnEntities1.size() > 0) {
+/* 6236 */       Hashtable<Object, Object> hashtable = new Hashtable<>();
+/* 6237 */       for (byte b = 0; b < this.vReturnEntities1.size(); b++) {
+/* 6238 */         this.eiAvail = this.vReturnEntities1.elementAt(b);
+/*      */         
+/* 6240 */         this.strCondition2 = getRFADateFormat(getAttributeValue(this.eiAvail, "EFFECTIVEDATE", ""));
+/* 6241 */         if (b == 0) {
+/* 6242 */           this.strCondition6 = this.strCondition2;
+/* 6243 */         } else if (!this.strCondition2.equals(this.strCondition6)) {
+/* 6244 */           this.bConditionOK = true;
+/*      */         } 
+/* 6246 */         this.strCondition3 = getAttributeLongFlagDesc(this.eiAvail, "COUNTRYLIST");
+/* 6247 */         if (this.strCondition3 == null) {
+/*      */           break;
+/*      */         }
+/* 6250 */         StringTokenizer stringTokenizer = new StringTokenizer(this.strCondition3, "|");
+/*      */         
+/* 6252 */         for (byte b1 = 0; stringTokenizer.hasMoreTokens(); b1++) {
+/*      */           
+/* 6254 */           this.strCondition1 = stringTokenizer.nextToken().trim();
+/* 6255 */           logMessage("_219:Got Country:" + b1 + ":" + this.strCondition1);
+/* 6256 */           if (this.strCondition1.compareToIgnoreCase("Austria") == 0 || this.strCondition1.compareToIgnoreCase("Belgium") == 0 || this.strCondition1
+/* 6257 */             .compareToIgnoreCase("Bulgaria") == 0 || this.strCondition1.compareToIgnoreCase("Croatia") == 0 || this.strCondition1
+/* 6258 */             .compareToIgnoreCase("Czech Republic") == 0 || this.strCondition1
+/* 6259 */             .compareToIgnoreCase("Denmark") == 0 || this.strCondition1.compareToIgnoreCase("Finland") == 0 || this.strCondition1
+/* 6260 */             .compareToIgnoreCase("France") == 0 || this.strCondition1.compareToIgnoreCase("Germany") == 0 || this.strCondition1
+/* 6261 */             .compareToIgnoreCase("Greece") == 0 || this.strCondition1.compareToIgnoreCase("Hungary") == 0 || this.strCondition1
+/* 6262 */             .compareToIgnoreCase("Ireland") == 0 || this.strCondition1.compareToIgnoreCase("Israel") == 0 || this.strCondition1
+/* 6263 */             .compareToIgnoreCase("Italy") == 0 || this.strCondition1.compareToIgnoreCase("Luxembourg") == 0 || this.strCondition1
+/* 6264 */             .compareToIgnoreCase("Netherlands") == 0 || this.strCondition1.compareToIgnoreCase("Norway") == 0 || this.strCondition1
+/* 6265 */             .compareToIgnoreCase("Poland") == 0 || this.strCondition1.compareToIgnoreCase("Portugal") == 0 || this.strCondition1
+/* 6266 */             .compareToIgnoreCase("Romania") == 0 || this.strCondition1.compareToIgnoreCase("Russian Federation") == 0 || this.strCondition1
+/* 6267 */             .compareToIgnoreCase("Slovakia") == 0 || this.strCondition1.compareToIgnoreCase("Slovenia") == 0 || this.strCondition1
+/* 6268 */             .compareToIgnoreCase("South Africa") == 0 || this.strCondition1.compareToIgnoreCase("Spain") == 0 || this.strCondition1
+/* 6269 */             .compareToIgnoreCase("Switzerland") == 0 || this.strCondition1.compareToIgnoreCase("Sweden") == 0 || this.strCondition1
+/* 6270 */             .compareToIgnoreCase("Turkey") == 0 || this.strCondition1
+/* 6271 */             .compareToIgnoreCase("United Kingdom") == 0) {
+/* 6272 */             if (this.strCondition1.compareToIgnoreCase("United Kingdom") == 0) {
+/* 6273 */               this.vReturnEntities2.add("United Kingdom**");
+/* 6274 */               hashtable.put("United Kingdom**", this.strCondition2);
+/*      */             }
+/* 6276 */             else if (this.strCondition1.compareToIgnoreCase("France") == 0) {
+/* 6277 */               this.vReturnEntities2.add("France*");
+/* 6278 */               hashtable.put("France*", this.strCondition2);
+/*      */             } else {
+/*      */               
+/* 6281 */               this.vReturnEntities2.add(this.strCondition1);
+/* 6282 */               hashtable.put(this.strCondition1, this.strCondition2);
+/*      */             } 
+/*      */ 
+/*      */             
+/* 6286 */             logMessage("_219:MATCHED Country" + this.strCondition1);
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */       
+/* 6291 */       this.vReturnEntities3 = this.mySort.alphabetizeVector(this.vReturnEntities2);
+/* 6292 */       this.strCondition1 = "";
+/* 6293 */       for (this.i = 0; this.i < this.vReturnEntities3.size(); this.i++) {
+/* 6294 */         this.vPrintDetails.add(this.vReturnEntities3.elementAt(this.i));
+/* 6295 */         this.strCondition2 = (String)hashtable.get(this.vReturnEntities3.elementAt(this.i));
+/* 6296 */         if (!this.bConditionOK) {
+/* 6297 */           this.vPrintDetails.add("");
+/*      */         } else {
+/*      */           
+/* 6300 */           this.vPrintDetails.add(this.strCondition2);
+/*      */         } 
+/*      */       } 
+/*      */ 
+/*      */       
+/* 6305 */       this.strHeader = new String[] { "Country", "Availability Date" };
+/*      */       
+/* 6307 */       this.iColWidths = new int[] { 35, 17 };
+/*      */       
+/* 6309 */       if (this.vPrintDetails.size() > 0) {
+/* 6310 */         println(":xmp.");
+/* 6311 */         println(".kp off");
+/* 6312 */         printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails);
+/* 6313 */         resetPrintvars();
+/* 6314 */         println("* Except overseas territories");
+/* 6315 */         println("** UK Mainland Only");
+/* 6316 */         println(":exmp.");
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 6320 */     println(".*$A_219_End");
+/*      */     
+/* 6322 */     println(".*$A_220_Begin");
+/* 6323 */     println("AP DISTRIBUTION:  TO ALL ASIA PACIFIC COUNTRIES FOR RELEASE.");
+/* 6324 */     TreeMap<Object, Object> treeMap = new TreeMap<>();
+/* 6325 */     treeMap.put("ASEAN *", "No");
+/* 6326 */     treeMap.put("India/South Asia**", "No");
+/* 6327 */     treeMap.put("AUSTRALIA", "No");
+/* 6328 */     treeMap.put("People's Republic of China", "No");
+/* 6329 */     treeMap.put("HONG KONG S.A.R of the PRC", "No");
+/* 6330 */     treeMap.put("Macao S.A.R of the PRC", "No");
+/* 6331 */     treeMap.put("TAIWAN", "No");
+/* 6332 */     treeMap.put("KOREA", "No");
+/* 6333 */     treeMap.put("JAPAN", "No");
+/* 6334 */     treeMap.put("NEW ZEALAND", "No");
+/*      */     
+/* 6336 */     if (this.m_geList.isRfaGeoAP(this.eiAnnounce)) {
+/* 6337 */       GeneralAreaGroup generalAreaGroup1 = this.m_geList.getRfaGeoAPInclusion(this.eiAnnounce);
+/* 6338 */       for (byte b = 0; b < generalAreaGroup1.getGeneralAreaItemCount(); b++) {
+/* 6339 */         GeneralAreaItem generalAreaItem = generalAreaGroup1.getGeneralAreaItem(b);
+/* 6340 */         this.strCondition1 = generalAreaItem.getName().toUpperCase();
+/* 6341 */         logMessage("_220:Found country" + this.strCondition1);
+/* 6342 */         if (this.strCondition1.equals("DARUSSALAM") || this.strCondition1.equals("BRUNEI") || this.strCondition1.equals("MYANMAR") || this.strCondition1
+/* 6343 */           .equals("MALAYSIA") || this.strCondition1.equals("PHILIPPINES") || this.strCondition1.equals("SINGAPORE") || this.strCondition1
+/* 6344 */           .equals("CAMBODIA") || this.strCondition1.equals("LAO PEOPLES DEMOCRATIC REPUBLIC") || this.strCondition1
+/* 6345 */           .equals("THAILAND") || this.strCondition1.equals("VIETNAM")) {
+/* 6346 */           treeMap.put("ASEAN *", "Yes");
+/*      */         
+/*      */         }
+/* 6349 */         else if (this.strCondition1.equals("KOREA, REPUBLIC OF") || this.strCondition1
+/* 6350 */           .equals("KOREA, DEMOCRATIC PEOPLES REPUBLIC OF")) {
+/* 6351 */           treeMap.put("KOREA", "Yes");
+/*      */         }
+/* 6353 */         else if (this.strCondition1.equals("MALDIVES") || this.strCondition1.equals("AFGHANISTAN") || this.strCondition1
+/* 6354 */           .equals("SRI LANKA") || this.strCondition1.equals("INDIA") || this.strCondition1.equals("BANGLADESH") || this.strCondition1
+/* 6355 */           .equals("NEPAL") || this.strCondition1.equals("BHUTAN")) {
+/* 6356 */           treeMap.put("India/South Asia**", "Yes");
+/*      */         
+/*      */         }
+/* 6359 */         else if (this.strCondition1.equals("HONG KONG")) {
+/* 6360 */           treeMap.put("HONG KONG S.A.R of the PRC", "Yes");
+/*      */         }
+/* 6362 */         else if (this.strCondition1.equals("MACAO")) {
+/* 6363 */           treeMap.put("Macao S.A.R of the PRC", "Yes");
+/*      */         
+/*      */         }
+/* 6366 */         else if (this.strCondition1.equals("CHINA")) {
+/* 6367 */           treeMap.put("People's Republic of China", "Yes");
+/*      */         }
+/* 6369 */         else if (this.strCondition1.equals("TAIWAN, PROVINCE OF CHINA")) {
+/* 6370 */           treeMap.put("TAIWAN", "Yes");
+/*      */         }
+/* 6372 */         else if (treeMap.containsKey(this.strCondition1)) {
+/* 6373 */           treeMap.put(this.strCondition1, "Yes");
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/* 6377 */     Set set = treeMap.keySet();
+/* 6378 */     Iterator<String> iterator = set.iterator();
+/* 6379 */     resetPrintvars();
+/* 6380 */     while (iterator.hasNext()) {
+/* 6381 */       this.strCondition1 = iterator.next();
+/* 6382 */       this.vPrintDetails.add(this.strCondition1);
+/* 6383 */       this.vPrintDetails.add((String)treeMap.get(this.strCondition1));
+/*      */     } 
+/* 6385 */     treeMap.clear();
+/* 6386 */     treeMap = null;
+/* 6387 */     this.strHeader = new String[] { "CTRY/Region", "ANNOUNCED" };
+/*      */     
+/* 6389 */     this.iColWidths = new int[] { 32, 20 };
+/*      */     
+/* 6391 */     println(":xmp.");
+/*      */     
+/* 6393 */     printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails);
+/* 6394 */     resetPrintvars();
+/* 6395 */     println("* Brunei Darussalam, Indonesia, Cambodia, Lao People's Democratic ");
+/* 6396 */     println("Republic, Myanmar, Malaysia, Philippines, Singapore, Thailand, Vietnam ");
+/* 6397 */     println("**Bangladesh, Bhutan, India, Sri Lanka, Maldives, Nepal, Afghanistan ");
+/* 6398 */     println(":exmp.");
+/*      */     
+/* 6400 */     println(".*$A_220_End");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void processLongTo300() {
+/* 6408 */     println(".*$A_300_Begin");
+/* 6409 */     prettyPrint(getAttributeValue(this.eiAnnounce, "AMCALLCENTER", " "), 69);
+/* 6410 */     println(".*$A_300_End");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void processLongTo400() {}
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void processLongTo500() {}
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void processLongTo600() {}
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void processLongTo700() {
+/* 6439 */     println(".*$A_725_Begin");
+/*      */     
+/* 6441 */     prettyPrint(transformXML(getAttributeValue(this.eiAnnounce, "IBMGRENLTR", " ")), 69);
+/*      */     
+/* 6443 */     println(".*$A_725_End");
+/*      */     
+/* 6445 */     println(".*$A_726_Begin");
+/* 6446 */     prettyPrint(transformXML(getAttributeValue(this.eiAnnounce, "LENOVOGRENLTR", " ")), 69);
+/* 6447 */     println(".*$A_726_End");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void processLongTo800() {
+/* 6456 */     println(".*$A_800_Begin");
+/* 6457 */     this.strParamList1 = new String[] { "STANDARDAMENDTEXT" };
+/*      */     
+/* 6459 */     printValueListInGroup(this.grpStdAmendText, this.strParamList1, "STANDARDAMENDTEXT_TYPE", "150", "", true);
+/* 6460 */     this.iColWidths = new int[] { 69 };
+/*      */     
+/* 6462 */     printReport(false, (String[])null, this.iColWidths, this.vPrintDetails);
+/* 6463 */     resetPrintvars();
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 6469 */     this.vReturnEntities5 = new Vector();
+/* 6470 */     this.vReturnEntities1 = searchEntityVectorLink(this.vSofFrmSofAvail, (String[])null, (String[])null, true, true, "SOFPRICE");
+/* 6471 */     this.vReturnEntities5.addAll(this.vReturnEntities1);
+/* 6472 */     this.vReturnEntities1 = searchEntityVectorLink(this.vCmpntFrmCmpntAvail, (String[])null, (String[])null, true, true, "CMPNTPRICE");
+/* 6473 */     this.vReturnEntities5.addAll(this.vReturnEntities1);
+/* 6474 */     this.vReturnEntities1 = searchEntityVectorLink(this.vFeatureFrmFeatureAvail, (String[])null, (String[])null, true, true, "FEATUREPRICE");
+/* 6475 */     this.vReturnEntities5.addAll(this.vReturnEntities1);
+/* 6476 */     if (this.vReturnEntities5.size() > 0) {
+/* 6477 */       logMessage("A_800:SOFPRICE");
+/* 6478 */       this.strCondition1 = "";
+/* 6479 */       for (this.i = 0; this.i < this.vSofFrmSofAvail.size(); this.i++) {
+/* 6480 */         this.eiSof = this.vSofFrmSofAvail.elementAt(this.i);
+/* 6481 */         logMessage("_800" + this.eiSof.getKey());
+/* 6482 */         this.eiPriceInfo = getDownlinkedEntityItem(this.eiSof, new String[] { "SOFPRICE", "PRICEFININFO" });
+/* 6483 */         if (this.eiPriceInfo != null) {
+/*      */ 
+/*      */           
+/* 6486 */           logMessage("_800" + this.eiPriceInfo.getKey());
+/*      */ 
+/*      */           
+/* 6489 */           this.strCondition1 = getAttributeValue(this.eiPriceInfo, "LPFEE", " ");
+/* 6490 */           this.strCondition1 += getAttributeValue(this.eiPriceInfo, "CONTRACTCLOSEFEE", " ");
+/* 6491 */           this.strCondition1 += getAttributeValue(this.eiPriceInfo, "REMKTGDISCOUNT", " ");
+/* 6492 */           this.strCondition1 += getAttributeValue(this.eiSof, "DISTRCODE", " ");
+/*      */           
+/* 6494 */           this.strCondition1 += getAttributeValue(this.eiSof, "VAE", " ");
+/* 6495 */           logMessage("_800 Value of strCondition1:" + this.strCondition1 + ":");
+/* 6496 */           if (this.strCondition1.trim().length() > 0) {
+/* 6497 */             this.vPrintDetails.add(getAttributeValue(this.eiSof, "MKTGNAME", " "));
+/* 6498 */             this.vPrintDetails.add(getAttributeValue(this.eiSof, "OFIDNUMBER", " "));
+/* 6499 */             this.vPrintDetails.add(getAttributeValue(this.eiSof, "MKTGNAME", " "));
+/* 6500 */             this.vPrintDetails.add(getAttributeValue(this.eiPriceInfo, "LPFEE", " "));
+/* 6501 */             this.vPrintDetails.add(getAttributeValue(this.eiPriceInfo, "CONTRACTCLOSEFEE", " "));
+/* 6502 */             this.vPrintDetails.add(getAttributeValue(this.eiPriceInfo, "REMKTGDISCOUNT", " "));
+/* 6503 */             this.vPrintDetails.add(getAttributeValue(this.eiSof, "DISTRCODE", " "));
+/*      */             
+/* 6505 */             this.vPrintDetails.add(getAttributeValue(this.eiSof, "VAE", " "));
+/*      */           } else {
+/*      */             
+/* 6508 */             logMessage("_800:Skipping " + this.strCondition1 + " for " + this.eiSof.getKey() + ":Downlinked:" + this.eiPriceInfo.getKey());
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 6517 */       this.vReturnEntities1 = searchEntityVectorLink(this.vCmpntFrmCmpntAvail, (String[])null, (String[])null, true, true, "CMPNTPRICE");
+/* 6518 */       logMessage("A_800:CMPNTPRICE");
+/* 6519 */       if (this.vReturnEntities1.size() > 0) {
+/* 6520 */         this.strCondition1 = "";
+/* 6521 */         for (this.i = 0; this.i < this.vCmpntFrmCmpntAvail.size(); this.i++) {
+/* 6522 */           this.eiComponent = this.vCmpntFrmCmpntAvail.elementAt(this.i);
+/* 6523 */           logMessage("_800" + this.eiComponent.getKey());
+/* 6524 */           this.eiSof = getUplinkedEntityItem(this.eiComponent, new String[] { "SOFCMPNT", "SOF" });
+/* 6525 */           if (this.eiSof == null) {
+/* 6526 */             logMessage("_800 No linked SOF found from " + this.eiComponent.getKey());
+/*      */           } else {
+/*      */             
+/* 6529 */             logMessage("_800" + this.eiSof.getKey());
+/*      */           } 
+/* 6531 */           this.eiPriceInfo = getDownlinkedEntityItem(this.eiComponent, new String[] { "CMPNTPRICE", "PRICEFININFO" });
+/* 6532 */           if (this.eiPriceInfo != null) {
+/*      */ 
+/*      */             
+/* 6535 */             logMessage("_800" + this.eiPriceInfo.getKey());
+/*      */ 
+/*      */             
+/* 6538 */             this.strCondition1 = getAttributeValue(this.eiPriceInfo, "LPFEE", " ");
+/* 6539 */             this.strCondition1 += getAttributeValue(this.eiPriceInfo, "CONTRACTCLOSEFEE", " ");
+/* 6540 */             this.strCondition1 += getAttributeValue(this.eiPriceInfo, "REMKTGDISCOUNT", " ");
+/* 6541 */             this.strCondition1 += getAttributeValue(this.eiComponent, "DISTRCODE", " ");
+/*      */             
+/* 6543 */             this.strCondition1 += getAttributeValue(this.eiComponent, "VAE", " ");
+/* 6544 */             if (this.strCondition1.trim().length() > 0) {
+/* 6545 */               this.vPrintDetails.add(getQ800SOFMktName(this.eiComponent, this.eiSof));
+/* 6546 */               if (this.bIsAnnITS) {
+/* 6547 */                 this.strCondition2 = getAttributeShortFlagDesc(this.eiComponent, "ITSCMPNTCATNAME");
+/* 6548 */                 if (this.strCondition2 == null) {
+/* 6549 */                   this.strCondition2 = "";
+/*      */                 }
+/* 6551 */                 if (this.strCondition2.trim().length() > 0) {
+/* 6552 */                   this.vPrintDetails.add(getDownlinkedEntityAttrValue(this.eiComponent, new String[] { "CMPNTITSCMPNTCATA", "ITSCMPNTCAT" }, "ITSCMPNTCATID"));
+/*      */                 }
+/*      */                 else {
+/*      */                   
+/* 6556 */                   this.vPrintDetails.add(getAttributeValue(this.eiSof, "OFIDNUMBER", " "));
+/*      */                 } 
+/*      */               } else {
+/*      */                 
+/* 6560 */                 this.vPrintDetails.add(getAttributeValue(this.eiSof, "OFIDNUMBER", " "));
+/*      */               } 
+/* 6562 */               this.strCondition1 = getCmptToSofMktMsg(this.eiComponent);
+/* 6563 */               this.vPrintDetails.add(this.strCondition1);
+/* 6564 */               this.vPrintDetails.add(getAttributeValue(this.eiPriceInfo, "LPFEE", " "));
+/* 6565 */               this.vPrintDetails.add(getAttributeValue(this.eiPriceInfo, "CONTRACTCLOSEFEE", " "));
+/* 6566 */               this.vPrintDetails.add(getAttributeValue(this.eiPriceInfo, "REMKTGDISCOUNT", " "));
+/* 6567 */               this.vPrintDetails.add(getAttributeValue(this.eiComponent, "DISTRCODE", " "));
+/*      */               
+/* 6569 */               this.vPrintDetails.add(getAttributeValue(this.eiComponent, "VAE", " "));
+/*      */             } else {
+/*      */               
+/* 6572 */               logMessage("_800:Skipping " + this.strCondition1 + " for " + this.eiComponent.getKey() + ":Downlinked:" + this.eiPriceInfo
+/* 6573 */                   .getKey());
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/* 6578 */       this.vReturnEntities1 = searchEntityVectorLink(this.vFeatureFrmFeatureAvail, (String[])null, (String[])null, true, true, "FEATUREPRICE");
+/* 6579 */       if (this.vReturnEntities1.size() > 0) {
+/* 6580 */         this.strCondition1 = "";
+/* 6581 */         for (this.i = 0; this.i < this.vFeatureFrmFeatureAvail.size(); this.i++) {
+/* 6582 */           this.eiFeature = this.vFeatureFrmFeatureAvail.elementAt(this.i);
+/* 6583 */           logMessage("_800" + this.eiFeature.getKey());
+/* 6584 */           this.eiSof = getUplinkedEntityItem(this.eiFeature, this.strFeatureToSof);
+/* 6585 */           if (this.eiSof == null) {
+/* 6586 */             logMessage("_800 No linked SOF found from " + this.eiFeature.getKey());
+/*      */           } else {
+/*      */             
+/* 6589 */             logMessage("_800" + this.eiSof.getKey());
+/*      */           } 
+/* 6591 */           this.eiComponent = getUplinkedEntityItem(this.eiFeature, this.strFeatureToCmpt);
+/* 6592 */           logMessage("_800" + this.eiComponent.getKey());
+/*      */           
+/* 6594 */           this.eiPriceInfo = getDownlinkedEntityItem(this.eiFeature, new String[] { "FEATUREPRICE", "PRICEFININFO" });
+/* 6595 */           if (this.eiPriceInfo != null) {
+/*      */ 
+/*      */             
+/* 6598 */             logMessage("_800" + this.eiPriceInfo.getKey());
+/*      */ 
+/*      */             
+/* 6601 */             this.strCondition1 = getAttributeValue(this.eiPriceInfo, "LPFEE", " ");
+/* 6602 */             this.strCondition1 += getAttributeValue(this.eiPriceInfo, "CONTRACTCLOSEFEE", " ");
+/* 6603 */             this.strCondition1 += getAttributeValue(this.eiPriceInfo, "REMKTGDISCOUNT", " ");
+/* 6604 */             this.strCondition1 += getAttributeValue(this.eiComponent, "DISTRCODE", " ");
+/*      */             
+/* 6606 */             this.strCondition1 += getAttributeValue(this.eiComponent, "VAE", " ");
+/* 6607 */             if (this.strCondition1.trim().length() > 0) {
+/* 6608 */               this.vPrintDetails.add(getQ800SOFMktName(this.eiComponent, this.eiSof));
+/* 6609 */               if (this.bIsAnnITS) {
+/* 6610 */                 this.strCondition2 = getAttributeShortFlagDesc(this.eiComponent, "ITSCMPNTCATNAME");
+/* 6611 */                 if (this.strCondition2 == null) {
+/* 6612 */                   this.strCondition2 = "";
+/*      */                 }
+/* 6614 */                 if (this.strCondition2.trim().length() > 0) {
+/* 6615 */                   this.vPrintDetails.add(getDownlinkedEntityAttrValue(this.eiComponent, new String[] { "CMPNTITSCMPNTCATA", "ITSCMPNTCAT" }, "ITSCMPNTCATID"));
+/*      */                 }
+/*      */                 else {
+/*      */                   
+/* 6619 */                   this.vPrintDetails.add(getAttributeValue(this.eiSof, "OFIDNUMBER", " "));
+/*      */                 } 
+/*      */               } else {
+/*      */                 
+/* 6623 */                 this.vPrintDetails.add(getAttributeValue(this.eiSof, "OFIDNUMBER", " "));
+/*      */               } 
+/* 6625 */               this.strCondition1 = getCmptToSofMktMsg(this.eiComponent);
+/* 6626 */               this.vPrintDetails.add(this.strCondition1);
+/* 6627 */               this.vPrintDetails.add(getAttributeValue(this.eiPriceInfo, "LPFEE", " "));
+/* 6628 */               this.vPrintDetails.add(getAttributeValue(this.eiPriceInfo, "CONTRACTCLOSEFEE", " "));
+/* 6629 */               this.vPrintDetails.add(getAttributeValue(this.eiPriceInfo, "REMKTGDISCOUNT", " "));
+/* 6630 */               this.vPrintDetails.add(getAttributeValue(this.eiComponent, "DISTRCODE", " "));
+/*      */               
+/* 6632 */               this.vPrintDetails.add(getAttributeValue(this.eiComponent, "VAE", " "));
+/*      */             } else {
+/*      */               
+/* 6635 */               logMessage("_800:Skipping " + this.strCondition1 + " for " + this.eiFeature.getKey() + ":Downlinked:" + this.eiPriceInfo
+/* 6636 */                   .getKey());
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/* 6641 */       if (this.vPrintDetails.size() > 0) {
+/*      */         
+/* 6643 */         this.strHeader = new String[] { "Offering", "ID", "Description", "fee", "fee", "disc", "Dist", " E" };
+/*      */         
+/* 6645 */         this.iColWidths = new int[] { 15, 8, 20, 3, 5, 5, 4, 3 };
+/*      */         
+/* 6647 */         println(":xmp.");
+/* 6648 */         println("                                                  Close             V");
+/* 6649 */         println("                                              L/P cont  Remkt       A");
+/*      */         
+/* 6651 */         printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails);
+/* 6652 */         resetPrintvars();
+/* 6653 */         println(":exmp.");
+/*      */       } 
+/*      */     } else {
+/*      */       
+/* 6657 */       logMessage("Q800..no links to priceinfo found..");
+/*      */     } 
+/*      */     
+/* 6660 */     println(".*$A_800_End");
+/*      */     
+/* 6662 */     println(".*$A_801_Begin");
+/* 6663 */     prettyPrint(transformXML(getAttributeValue(this.eiAnnounce, "LENOVOBUSPRTNRATTCH", " ")), 69);
+/* 6664 */     println(".*$A_801_End");
+/*      */     
+/* 6666 */     println(".*$A_805_Begin");
+/* 6667 */     this.strParamList1 = new String[] { "STANDARDAMENDTEXT" };
+/*      */     
+/* 6669 */     printValueListInGroup(this.grpStdAmendText, this.strParamList1, "STANDARDAMENDTEXT_TYPE", "210", "", true);
+/* 6670 */     this.iColWidths = new int[] { 69 };
+/*      */     
+/* 6672 */     printReport(false, (String[])null, this.iColWidths, this.vPrintDetails);
+/* 6673 */     resetPrintvars();
+/* 6674 */     println(".*$A_805_End");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void processLongTo900() {}
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String transformXML(String paramString) {
+/* 6691 */     ByteArrayOutputStream byteArrayOutputStream = null;
+/* 6692 */     paramString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> <!DOCTYPE eAnnounceData SYSTEM \"file:/" + this.DTDFILEPATH + "\" ><eAnnounceData>" + paramString + "</eAnnounceData>";
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     try {
+/* 6697 */       StringReader stringReader = new StringReader(paramString);
+/* 6698 */       StreamSource streamSource = new StreamSource(stringReader);
+/* 6699 */       streamSource.setSystemId(paramString);
+/*      */       
+/* 6701 */       byteArrayOutputStream = (ByteArrayOutputStream)this.x2g.transform(streamSource);
+/*      */     }
+/* 6703 */     catch (Exception exception) {
+/* 6704 */       println("Error: " + exception + "\n");
+/* 6705 */       println("The following is the Offending xml");
+/* 6706 */       println(paramString);
+/* 6707 */       logError("Exception!" + exception.getMessage() + "\n:***:" + paramString + ":***:");
+/*      */     } 
+/*      */     
+/* 6710 */     return (byteArrayOutputStream != null) ? byteArrayOutputStream.toString() : "";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public static String getVersion() {
+/* 6719 */     return "$Id: RFA_IGSSVS.java,v 1.157 2008/03/19 19:30:44 wendy Exp $";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getABRVersion() {
+/* 6728 */     return getVersion();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void printVanillaSVSReport(String paramString, boolean paramBoolean1, boolean paramBoolean2) {
+/* 6748 */     logMessage("printVanillaSVSReport: for " + paramString);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 6754 */     this.bConditionOK = false;
+/* 6755 */     if (paramBoolean2) {
+/* 6756 */       this.vReturnEntities1 = searchEntityVectorLink(this.vSofSortedbyMkt, (String[])null, (String[])null, true, true, "SOFPRICE");
+/* 6757 */       this.bConditionOK = (this.vReturnEntities1.size() > 0);
+/* 6758 */       this.vReturnEntities1 = searchEntityVectorLink(this.vCmptSortedbyMkt, (String[])null, (String[])null, true, true, "CMPNTPRICE");
+/* 6759 */       this.bConditionOK = !this.bConditionOK ? ((this.vReturnEntities1.size() > 0)) : this.bConditionOK;
+/* 6760 */       this.vReturnEntities1 = searchEntityVectorLink(this.vFeatureSortedbyMkt, (String[])null, (String[])null, true, true, "FEATUREPRICE");
+/* 6761 */       this.bConditionOK = !this.bConditionOK ? ((this.vReturnEntities1.size() > 0)) : this.bConditionOK;
+/* 6762 */       if (!this.bConditionOK) {
+/* 6763 */         logMessage("No Priceinfo links found for " + paramString);
+/*      */         
+/*      */         return;
+/*      */       } 
+/*      */     } 
+/* 6768 */     this.strCondition4 = "";
+/* 6769 */     this.strCondition2 = "";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 6774 */     String str1 = null;
+/* 6775 */     String str2 = null;
+/*      */     
+/* 6777 */     int i = this.vSofSortedbyMkt.size();
+/* 6778 */     i += this.vCmptSortedbyMkt.size();
+/* 6779 */     i += this.vFeatureSortedbyMkt.size();
+/*      */     
+/* 6781 */     logMessage("vSofSortedbyMkt" + this.vSofSortedbyMkt.size());
+/* 6782 */     logMessage("vCmptSortedbyMkt" + this.vCmptSortedbyMkt.size());
+/* 6783 */     logMessage("vFeatureSortedbyMkt" + this.vFeatureSortedbyMkt.size());
+/*      */     
+/* 6785 */     if (!paramBoolean2) {
+/* 6786 */       this.strParamList1 = new String[] { paramString };
+/*      */       
+/* 6788 */       printValueListInVector(this.vSofSortedbyMkt, this.strParamList1, " ", true, false);
+/*      */       
+/* 6790 */       resetPrintvars();
+/*      */       
+/* 6792 */       printValueListInVector(this.vCmptSortedbyMkt, this.strParamList1, " ", true, false);
+/*      */       
+/* 6794 */       resetPrintvars();
+/*      */       
+/* 6796 */       printValueListInVector(this.vFeatureSortedbyMkt, this.strParamList1, " ", true, false);
+/*      */       
+/* 6798 */       resetPrintvars();
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/* 6803 */     this.i = 0;
+/* 6804 */     this.strFilterAttr = new String[] { "AVAILTYPE" };
+/*      */     
+/* 6806 */     this.strFilterValue = new String[] { "146" };
+/*      */     
+/* 6808 */     this.strCondition4 = "";
+/* 6809 */     for (this.i = 0; this.i < this.vAllSortedOfferings.size(); this.i++) {
+/* 6810 */       logMessage("  printVanillaSVSReport:I is" + this.i);
+/* 6811 */       this.eiNextItem = this.vAllSortedOfferings.elementAt(this.i);
+/* 6812 */       str2 = this.eiNextItem.getEntityType();
+/* 6813 */       if (str2.equals("SOF")) {
+/* 6814 */         this.eiSof = this.vAllSortedOfferings.elementAt(this.i);
+/* 6815 */         logMessage("printVanillaSVSReport After sof" + this.eiSof.getKey());
+/* 6816 */         if (!paramBoolean2) {
+/* 6817 */           this.strCondition1 = getAttributeValue(this.eiSof, paramString, " ");
+/* 6818 */           this.bConditionOK = (this.strCondition1.trim().length() > 0);
+/*      */         } else {
+/*      */           
+/* 6821 */           this.strEntityTypes = new String[] { "SOFPRICE", "PRICEFININFO" };
+/*      */           
+/* 6823 */           this.strCondition1 = getDownlinkedEntityAttrValue(this.eiSof, this.strEntityTypes, paramString);
+/* 6824 */           this.bConditionOK = (this.strCondition1.trim().length() > 0);
+/*      */         } 
+/* 6826 */         if (this.bConditionOK) {
+/*      */           
+/* 6828 */           this.vReturnEntities1 = searchEntityItemLink(this.eiSof, (String[])null, (String[])null, true, true, "SOFAVAIL");
+/*      */           
+/* 6830 */           this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, true, "AVAIL");
+/* 6831 */           if (this.vReturnEntities2.size() > 0) {
+/* 6832 */             this.strCondition1 = getAllGeoTags(this.vReturnEntities2);
+/* 6833 */             if (!this.strCondition1.equals(this.strCondition2)) {
+/* 6834 */               if (!this.strCondition2.equals("US, AP, CAN, EMEA, LA") && 
+/* 6835 */                 this.strCondition2.length() > 0) {
+/* 6836 */                 println(".br;:hp2.<---" + this.strCondition2 + ":ehp2.");
+/*      */               }
+/*      */               
+/* 6839 */               if (!this.strCondition1.equals("US, AP, CAN, EMEA, LA")) {
+/* 6840 */                 println("");
+/* 6841 */                 println(":p.:hp2." + this.strCondition1 + "--->:ehp2.");
+/*      */               } 
+/* 6843 */               this.strCondition2 = this.strCondition1;
+/*      */             } 
+/* 6845 */             str1 = getSOFMktName(this.eiSof);
+/*      */             
+/* 6847 */             logMessage("Marketing Msg :" + str1);
+/* 6848 */             prettyPrint(str1, 69);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */             
+/* 6855 */             if (paramBoolean1) {
+/* 6856 */               if (!paramBoolean2) {
+/* 6857 */                 prettyPrint(transformXML(getAttributeValue(this.eiSof, paramString, " ")), 69);
+/*      */               }
+/*      */               else {
+/*      */                 
+/* 6861 */                 this.strEntityTypes = new String[] { "SOFPRICE", "PRICEFININFO" };
+/*      */                 
+/* 6863 */                 prettyPrint(transformXML(getDownlinkedEntityAttrValue(this.eiSof, this.strEntityTypes, paramString)), 69);
+/*      */               
+/*      */               }
+/*      */             
+/*      */             }
+/* 6868 */             else if (!paramBoolean2) {
+/* 6869 */               prettyPrint(getAttributeValue(this.eiSof, paramString, " "), 69);
+/*      */             } else {
+/*      */               
+/* 6872 */               prettyPrint(getDownlinkedEntityAttrValue(this.eiSof, this.strEntityTypes, paramString), 69);
+/*      */             }
+/*      */           
+/*      */           } else {
+/*      */             
+/* 6877 */             logMessage("printVanillaSVSReport: NO AVAIL found for " + this.eiSof.getKey());
+/*      */           } 
+/*      */         } else {
+/*      */           
+/* 6881 */           logMessage("printVanillaSVSReport:Attribute not returned for " + this.eiSof.getKey());
+/*      */         } 
+/* 6883 */         println("");
+/*      */       } 
+/*      */       
+/* 6886 */       if (str2.equals("CMPNT")) {
+/* 6887 */         this.eiComponent = this.vAllSortedOfferings.elementAt(this.i);
+/* 6888 */         logMessage("after component" + this.eiComponent.getKey());
+/* 6889 */         if (!paramBoolean2) {
+/* 6890 */           this.strCondition1 = getAttributeValue(this.eiComponent, paramString, " ");
+/* 6891 */           this.bConditionOK = (this.strCondition1.trim().length() > 0);
+/*      */         } else {
+/*      */           
+/* 6894 */           this.strEntityTypes = new String[] { "CMPNTPRICE", "PRICEFININFO" };
+/*      */           
+/* 6896 */           this.strCondition1 = getDownlinkedEntityAttrValue(this.eiComponent, this.strEntityTypes, paramString);
+/* 6897 */           this.bConditionOK = (this.strCondition1.trim().length() > 0);
+/*      */         } 
+/* 6899 */         if (this.bConditionOK) {
+/*      */           
+/* 6901 */           this.vReturnEntities1 = searchEntityItemLink(this.eiComponent, (String[])null, (String[])null, true, true, "CMPNTAVAIL");
+/*      */           
+/* 6903 */           this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, true, "AVAIL");
+/* 6904 */           if (this.vReturnEntities2.size() > 0) {
+/* 6905 */             this.strCondition1 = getAllGeoTags(this.vReturnEntities2);
+/* 6906 */             if (!this.strCondition1.equals(this.strCondition2)) {
+/* 6907 */               if (!this.strCondition2.equals("US, AP, CAN, EMEA, LA") && 
+/* 6908 */                 this.strCondition2.length() > 0) {
+/* 6909 */                 println(".br;:hp2.<---" + this.strCondition2 + ":ehp2.");
+/*      */               }
+/*      */               
+/* 6912 */               if (!this.strCondition1.equals("US, AP, CAN, EMEA, LA")) {
+/* 6913 */                 println("");
+/* 6914 */                 println(":p.:hp2." + this.strCondition1 + "--->:ehp2.");
+/*      */               } 
+/* 6916 */               this.strCondition2 = this.strCondition1;
+/*      */             } 
+/*      */             
+/* 6919 */             str1 = getCmptToSofMktMsg(this.eiComponent);
+/*      */             
+/* 6921 */             logMessage("1) Marketing Msg :" + str1);
+/* 6922 */             prettyPrint(str1, 69);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */             
+/* 6927 */             if (paramBoolean1) {
+/* 6928 */               if (!paramBoolean2) {
+/* 6929 */                 prettyPrint(transformXML(getAttributeValue(this.eiComponent, paramString, " ")), 69);
+/*      */               }
+/*      */               else {
+/*      */                 
+/* 6933 */                 this.strEntityTypes = new String[] { "CMPNTPRICE", "PRICEFININFO" };
+/*      */                 
+/* 6935 */                 prettyPrint(transformXML(getDownlinkedEntityAttrValue(this.eiComponent, this.strEntityTypes, paramString)), 69);
+/*      */               
+/*      */               }
+/*      */ 
+/*      */             
+/*      */             }
+/* 6941 */             else if (!paramBoolean2) {
+/* 6942 */               prettyPrint(getAttributeValue(this.eiComponent, paramString, " "), 69);
+/*      */             } else {
+/*      */               
+/* 6945 */               this.strEntityTypes = new String[] { "CMPNTPRICE", "PRICEFININFO" };
+/*      */               
+/* 6947 */               prettyPrint(getDownlinkedEntityAttrValue(this.eiComponent, this.strEntityTypes, paramString), 69);
+/*      */             }
+/*      */           
+/*      */           } else {
+/*      */             
+/* 6952 */             logMessage("printVanillaSVSReport: No AVAIL found for " + this.eiComponent.getKey());
+/*      */           } 
+/*      */         } else {
+/*      */           
+/* 6956 */           logMessage("printVanillaSVSReport:Attribute not returned for " + this.eiComponent.getKey());
+/*      */         } 
+/* 6958 */         println("");
+/*      */       } 
+/*      */       
+/* 6961 */       if (str2.equals("FEATURE")) {
+/* 6962 */         this.eiFeature = this.vAllSortedOfferings.elementAt(this.i);
+/* 6963 */         logMessage("After feature " + this.eiFeature.getKey());
+/* 6964 */         if (!paramBoolean2) {
+/* 6965 */           this.strCondition1 = getAttributeValue(this.eiFeature, paramString, " ");
+/* 6966 */           this.bConditionOK = (this.strCondition1.trim().length() > 0);
+/*      */         } else {
+/*      */           
+/* 6969 */           this.strEntityTypes = new String[] { "FEATUREPRICE", "PRICEFININFO" };
+/*      */           
+/* 6971 */           this.strCondition1 = getDownlinkedEntityAttrValue(this.eiFeature, this.strEntityTypes, paramString);
+/* 6972 */           this.bConditionOK = (this.strCondition1.trim().length() > 0);
+/*      */         } 
+/* 6974 */         if (this.bConditionOK) {
+/*      */           
+/* 6976 */           this.vReturnEntities1 = searchEntityItemLink(this.eiFeature, (String[])null, (String[])null, true, true, "FEATUREAVAIL");
+/*      */           
+/* 6978 */           this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, true, "AVAIL");
+/* 6979 */           if (this.vReturnEntities2.size() > 0) {
+/* 6980 */             this.strCondition1 = getAllGeoTags(this.vReturnEntities2);
+/* 6981 */             if (!this.strCondition1.equals(this.strCondition2)) {
+/* 6982 */               if (!this.strCondition2.equals("US, AP, CAN, EMEA, LA") && 
+/* 6983 */                 this.strCondition2.length() > 0) {
+/* 6984 */                 println(".br;:hp2.<---" + this.strCondition2 + ":ehp2.");
+/*      */               }
+/*      */               
+/* 6987 */               if (!this.strCondition1.equals("US, AP, CAN, EMEA, LA")) {
+/* 6988 */                 println("");
+/* 6989 */                 println(":p.:hp2." + this.strCondition1 + "--->:ehp2.");
+/*      */               } 
+/* 6991 */               this.strCondition2 = this.strCondition1;
+/*      */             } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */             
+/* 7004 */             str1 = getfeatureToSofMktMsg(this.eiFeature);
+/* 7005 */             logMessage("2) Marketing Msg :" + str1);
+/* 7006 */             prettyPrint(str1, 69);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */             
+/* 7011 */             if (paramBoolean1) {
+/* 7012 */               if (!paramBoolean2) {
+/* 7013 */                 prettyPrint(transformXML(getAttributeValue(this.eiFeature, paramString, " ")), 69);
+/*      */               }
+/*      */               else {
+/*      */                 
+/* 7017 */                 this.strEntityTypes = new String[] { "FEATUREPRICE", "PRICEFININFO" };
+/*      */                 
+/* 7019 */                 prettyPrint(transformXML(getDownlinkedEntityAttrValue(this.eiFeature, this.strEntityTypes, paramString)), 69);
+/*      */               
+/*      */               }
+/*      */             
+/*      */             }
+/* 7024 */             else if (!paramBoolean2) {
+/* 7025 */               prettyPrint(getAttributeValue(this.eiFeature, paramString, " "), 69);
+/*      */             } else {
+/*      */               
+/* 7028 */               this.strEntityTypes = new String[] { "CMPNTPRICE", "PRICEFININFO" };
+/*      */               
+/* 7030 */               prettyPrint(getDownlinkedEntityAttrValue(this.eiFeature, this.strEntityTypes, paramString), 69);
+/*      */             }
+/*      */           
+/*      */           } else {
+/*      */             
+/* 7035 */             logMessage("printVanillaSVSReport:No AVAIL found for " + this.eiFeature.getKey());
+/*      */           } 
+/*      */         } else {
+/*      */           
+/* 7039 */           logMessage("printVanillaSVSReport:Attribute not returned for " + this.eiFeature.getKey());
+/*      */         } 
+/* 7041 */         println("");
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */     
+/* 7046 */     if (!this.strCondition2.equals("US, AP, CAN, EMEA, LA") && 
+/* 7047 */       this.strCondition2.length() > 0) {
+/* 7048 */       println(".br;:hp2.<---" + this.strCondition2 + ":ehp2.");
+/*      */     }
+/*      */ 
+/*      */     
+/* 7052 */     println("");
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private void printIntSuppMktFinInfo(String paramString) {
+/* 7057 */     printIntSuppMktFinInfo(paramString, true);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void printIntSuppMktFinInfo(String paramString, boolean paramBoolean) {
+/* 7068 */     logMessage("printIntSuppMktFinInfo for " + paramString);
+/*      */     
+/* 7070 */     this.bConditionOK = false;
+/* 7071 */     this.vReturnEntities1 = searchEntityVectorLink(this.vCmpntFrmCmpntAvail, (String[])null, (String[])null, true, true, "CMPNTFINOF");
+/* 7072 */     this.bConditionOK = (this.vReturnEntities1.size() > 0);
+/* 7073 */     this.vReturnEntities1 = searchEntityVectorLink(this.vFeatureFrmFeatureAvail, (String[])null, (String[])null, true, true, "FEATUREFINOF");
+/* 7074 */     this.bConditionOK = !this.bConditionOK ? ((this.vReturnEntities1.size() > 0)) : this.bConditionOK;
+/* 7075 */     if (!this.bConditionOK) {
+/* 7076 */       logMessage("No Fininfo links found for " + paramString);
+/*      */       
+/*      */       return;
+/*      */     } 
+/* 7080 */     boolean bool1 = (this.vCmpntFrmCmpntAvail.size() == 0) ? true : false;
+/* 7081 */     boolean bool2 = (this.vFeatureFrmFeatureAvail.size() == 0) ? true : false;
+/* 7082 */     boolean bool3 = (bool1 && bool2) ? true : false;
+/*      */     
+/* 7084 */     int i = this.vCmpntFrmCmpntAvail.size();
+/* 7085 */     i += this.vFeatureFrmFeatureAvail.size();
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 7093 */     String str = null;
+/*      */     
+/* 7095 */     this.strCondition4 = "";
+/*      */     
+/* 7097 */     logMessage("vComponents" + this.vCmpntFrmCmpntAvail.size());
+/* 7098 */     logMessage("vFeatures" + this.vFeatureFrmFeatureAvail.size());
+/*      */     
+/* 7100 */     this.i = 0;
+/* 7101 */     while (!bool3) {
+/*      */       
+/* 7103 */       if (!bool1) {
+/* 7104 */         this.eiComponent = this.vCmpntFrmCmpntAvail.elementAt(this.i);
+/* 7105 */         logMessage("printIntSuppMktFinInfo after component" + this.eiComponent.getKey());
+/*      */ 
+/*      */ 
+/*      */         
+/* 7109 */         str = getCmptToSofMktMsg(this.eiComponent);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 7116 */         this.vReturnEntities1 = searchEntityItemLink(this.eiComponent, (String[])null, (String[])null, true, true, "CMPNTFINOF");
+/* 7117 */         this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, true, "FINOF");
+/*      */         
+/* 7119 */         if (this.vReturnEntities2.size() > 0) {
+/* 7120 */           logMessage("1) printIntSuppMktFinInfo Marketing Msg :" + str);
+/* 7121 */           if (i > 1) {
+/* 7122 */             println("Component Offerings");
+/* 7123 */             prettyPrint(str, 69);
+/* 7124 */             if (this.vReturnEntities2.size() > 0 && paramBoolean) {
+/* 7125 */               println("The financing will enable:");
+/*      */             }
+/*      */           } 
+/*      */           
+/* 7129 */           for (this.j = 0; this.j < this.vReturnEntities2.size(); this.j++) {
+/* 7130 */             this.eiFinof = this.vReturnEntities2.elementAt(this.j);
+/* 7131 */             this.strCondition1 = transformXML(getAttributeValue(this.eiFinof, paramString, " "));
+/*      */             
+/* 7133 */             if (this.strCondition1.trim().length() > 0)
+/*      */             {
+/* 7135 */               prettyPrint(this.strCondition1, 69);
+/*      */             }
+/*      */           } 
+/*      */           
+/* 7139 */           println("");
+/*      */         } else {
+/*      */           
+/* 7142 */           logMessage("No info returned for attr:" + this.eiComponent.getKey() + ":" + paramString);
+/*      */         } 
+/* 7144 */         println("");
+/*      */       } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 7150 */       if (!bool2) {
+/* 7151 */         this.eiFeature = this.vFeatureFrmFeatureAvail.elementAt(this.i);
+/* 7152 */         logMessage("printIntSuppMktFinInfo after feature" + this.eiFeature.getKey());
+/*      */         
+/* 7154 */         str = getfeatureToSofMktMsg(this.eiFeature);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 7161 */         this.vReturnEntities1 = searchEntityItemLink(this.eiFeature, (String[])null, (String[])null, true, true, "FEATUREFINOF");
+/* 7162 */         this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, true, "FINOF");
+/* 7163 */         if (this.vReturnEntities2.size() > 0) {
+/* 7164 */           logMessage("2) printIntSuppMktFinInfo Marketing Msg :" + str);
+/* 7165 */           if (i > 1) {
+/* 7166 */             println("Feature ");
+/* 7167 */             prettyPrint(str, 69);
+/* 7168 */             if (this.vReturnEntities2.size() > 0 && paramBoolean) {
+/* 7169 */               println("The financing will enable:");
+/*      */             }
+/*      */           } 
+/*      */ 
+/*      */           
+/* 7174 */           for (this.j = 0; this.j < this.vReturnEntities2.size(); this.j++) {
+/* 7175 */             this.eiFinof = this.vReturnEntities2.elementAt(this.j);
+/* 7176 */             this.strCondition1 = transformXML(getAttributeValue(this.eiFinof, paramString, " "));
+/* 7177 */             if (this.strCondition1.trim().length() > 0)
+/*      */             {
+/* 7179 */               prettyPrint(this.strCondition1, 69);
+/*      */             }
+/*      */           } 
+/*      */           
+/* 7183 */           println("");
+/*      */         } else {
+/*      */           
+/* 7186 */           logMessage("No info returned for attr:" + this.eiFeature.getKey() + ":" + paramString);
+/*      */         } 
+/* 7188 */         println("");
+/*      */       } 
+/*      */       
+/* 7191 */       this.i++;
+/* 7192 */       bool1 = (this.vCmpntFrmCmpntAvail.size() <= this.i) ? true : false;
+/* 7193 */       bool2 = (this.vFeatureFrmFeatureAvail.size() <= this.i) ? true : false;
+/*      */       
+/* 7195 */       bool3 = (bool1 && bool2) ? true : false;
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void printFeatureBenefit(String paramString1, String paramString2, boolean paramBoolean1, boolean paramBoolean2) {
+/* 7223 */     logMessage("printFeatureBenefit:" + paramString1 + ":Q:" + paramString2);
+/* 7224 */     this.bConditionOK = false;
+/* 7225 */     boolean bool1 = false;
+/* 7226 */     boolean bool2 = false;
+/* 7227 */     boolean bool3 = false;
+/* 7228 */     String[] arrayOfString1 = { "TYPE" };
+/*      */     
+/* 7230 */     String[] arrayOfString2 = { paramString1 };
+/*      */     
+/* 7232 */     String str1 = null;
+/*      */     
+/* 7234 */     int i = this.vSofSortedbyMkt.size();
+/* 7235 */     i += this.vCmptSortedbyMkt.size();
+/* 7236 */     i += this.vFeatureSortedbyMkt.size();
+/*      */     
+/* 7238 */     String str2 = paramString1.equals("110") ? "CROSSELL" : "UPSELL";
+/* 7239 */     str2 = paramString1.equals("120") ? "" : str2;
+/*      */     
+/* 7241 */     if (paramBoolean1 && !paramBoolean2) {
+/* 7242 */       this.vReturnEntities1 = searchEntityVectorLink(this.vSofSortedbyMkt, arrayOfString1, arrayOfString2, true, false, "SOFRELSOF");
+/* 7243 */       this.bConditionOK = (this.vReturnEntities1.size() > 0);
+/* 7244 */       this.vReturnEntities1 = searchEntityVectorLink(this.vCmptSortedbyMkt, arrayOfString1, arrayOfString2, true, false, "CMPNTRELCMPNT");
+/* 7245 */       this.bConditionOK = !this.bConditionOK ? ((this.vReturnEntities1.size() > 0)) : this.bConditionOK;
+/* 7246 */       this.vReturnEntities1 = searchEntityVectorLink(this.vFeatureSortedbyMkt, arrayOfString1, arrayOfString2, true, false, "FEATURERELFEATURE");
+/*      */       
+/* 7248 */       this.bConditionOK = !this.bConditionOK ? ((this.vReturnEntities1.size() > 0)) : this.bConditionOK;
+/* 7249 */       if (!this.bConditionOK) {
+/* 7250 */         logMessage("No Parent links found for Q" + paramString2);
+/*      */         
+/*      */         return;
+/*      */       } 
+/*      */     } 
+/* 7255 */     if (paramBoolean2) {
+/* 7256 */       this.vReturnEntities1 = searchEntityVectorLink(this.vSofSortedbyMkt, arrayOfString1, arrayOfString2, true, true, "SOFRELSOF");
+/* 7257 */       this.bConditionOK = (this.vReturnEntities1.size() > 0);
+/* 7258 */       bool2 = (this.vReturnEntities1.size() > 1) ? true : false;
+/* 7259 */       this.vReturnEntities1 = searchEntityVectorLink(this.vSofSortedbyMkt, arrayOfString1, arrayOfString2, true, true, "SOFRELCMPNT");
+/* 7260 */       this.bConditionOK = !this.bConditionOK ? ((this.vReturnEntities1.size() > 0)) : this.bConditionOK;
+/* 7261 */       bool2 = !bool2 ? ((this.vReturnEntities1.size() > 1) ? true : false) : bool2;
+/* 7262 */       this.vReturnEntities1 = searchEntityVectorLink(this.vSofSortedbyMkt, arrayOfString1, arrayOfString2, true, true, "SOFRELFEATURE");
+/* 7263 */       this.bConditionOK = !this.bConditionOK ? ((this.vReturnEntities1.size() > 0)) : this.bConditionOK;
+/* 7264 */       bool2 = !bool2 ? ((this.vReturnEntities1.size() > 1) ? true : false) : bool2;
+/* 7265 */       if (!this.bConditionOK) {
+/* 7266 */         logMessage("No Children links found for SOF Q" + paramString2);
+/*      */       }
+/* 7268 */       this.bConditionOK1 = false;
+/* 7269 */       this.vReturnEntities1 = searchEntityVectorLink(this.vCmptSortedbyMkt, arrayOfString1, arrayOfString2, true, true, "CMPNTRELCMPNT");
+/*      */       
+/* 7271 */       this.bConditionOK1 = !this.bConditionOK1 ? ((this.vReturnEntities1.size() > 0)) : this.bConditionOK1;
+/* 7272 */       bool1 = (this.vReturnEntities1.size() > 1) ? true : false;
+/* 7273 */       this.vReturnEntities1 = searchEntityVectorLink(this.vCmptSortedbyMkt, arrayOfString1, arrayOfString2, true, true, "CMPNTRELFEATURE");
+/* 7274 */       this.bConditionOK1 = !this.bConditionOK1 ? ((this.vReturnEntities1.size() > 0)) : this.bConditionOK1;
+/* 7275 */       bool1 = !bool1 ? ((this.vReturnEntities1.size() > 1) ? true : false) : bool1;
+/* 7276 */       this.vReturnEntities1 = searchEntityVectorLink(this.vCmptSortedbyMkt, arrayOfString1, arrayOfString2, true, true, "CMPNTRELSOF");
+/* 7277 */       this.bConditionOK1 = !this.bConditionOK1 ? ((this.vReturnEntities1.size() > 0)) : this.bConditionOK1;
+/* 7278 */       bool1 = !bool1 ? ((this.vReturnEntities1.size() > 1) ? true : false) : bool1;
+/* 7279 */       if (!this.bConditionOK1) {
+/* 7280 */         logMessage("No Children links found for CMPNT Q" + paramString2);
+/*      */       }
+/* 7282 */       this.bConditionOK = !this.bConditionOK ? this.bConditionOK1 : this.bConditionOK;
+/*      */       
+/* 7284 */       this.vReturnEntities1 = searchEntityVectorLink(this.vFeatureSortedbyMkt, arrayOfString1, arrayOfString2, true, true, "FEATURERELFEATURE");
+/* 7285 */       this.bConditionOK1 = !this.bConditionOK1 ? ((this.vReturnEntities1.size() > 0)) : this.bConditionOK1;
+/* 7286 */       bool3 = (this.vReturnEntities1.size() > 1) ? true : false;
+/* 7287 */       this.vReturnEntities1 = searchEntityVectorLink(this.vFeatureSortedbyMkt, arrayOfString1, arrayOfString2, true, true, "FEATURERELCMPNT");
+/* 7288 */       this.bConditionOK1 = !this.bConditionOK1 ? ((this.vReturnEntities1.size() > 0)) : this.bConditionOK1;
+/* 7289 */       bool3 = !bool3 ? ((this.vReturnEntities1.size() > 1) ? true : false) : bool3;
+/* 7290 */       this.vReturnEntities1 = searchEntityVectorLink(this.vFeatureSortedbyMkt, arrayOfString1, arrayOfString2, true, true, "FEATURERELSOF");
+/* 7291 */       this.bConditionOK1 = !this.bConditionOK1 ? ((this.vReturnEntities1.size() > 0)) : this.bConditionOK1;
+/* 7292 */       bool3 = !bool3 ? ((this.vReturnEntities1.size() > 1) ? true : false) : bool3;
+/* 7293 */       if (!this.bConditionOK) {
+/* 7294 */         logMessage("No Children links found for Q" + paramString2);
+/*      */       }
+/*      */     } 
+/*      */     
+/* 7298 */     this.bConditionOK = false;
+/* 7299 */     this.bConditionOK1 = false;
+/* 7300 */     resetPrintvars();
+/* 7301 */     this.strFilterAttr = new String[] { "AVAILTYPE" };
+/*      */     
+/* 7303 */     this.strFilterValue = new String[] { "146" };
+/*      */ 
+/*      */     
+/* 7306 */     this.strCondition4 = "";
+/* 7307 */     this.strCondition2 = "";
+/* 7308 */     this.strCondition1 = "";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 7315 */     String str3 = null;
+/* 7316 */     this.i = 0;
+/* 7317 */     for (this.i = 0; this.i < this.vAllSortedOfferings.size(); this.i++) {
+/* 7318 */       logMessage("  printFeatureBenefit:I is" + this.i);
+/* 7319 */       this.eiNextItem = this.vAllSortedOfferings.elementAt(this.i);
+/* 7320 */       str1 = this.eiNextItem.getEntityType();
+/* 7321 */       if (str1.equals("SOF")) {
+/* 7322 */         this.eiSof = this.vAllSortedOfferings.elementAt(this.i);
+/* 7323 */         logMessage("printFeatureBenefit After sof" + this.eiSof.getKey());
+/* 7324 */         this.strEntityTypes = new String[] { "SOFRELSOF" };
+/*      */         
+/* 7326 */         this.strCondition4 = getDownlinkedEntityAttrValue(this.eiSof, this.strEntityTypes, "BENEFIT", arrayOfString1, arrayOfString2);
+/*      */         
+/* 7328 */         if (paramBoolean2) {
+/* 7329 */           this.strCondition4 = getAttributeValue(this.eiSof, str2, " ");
+/* 7330 */           if (this.strCondition4.trim().length() == 0) {
+/* 7331 */             this.vReturnEntities1 = searchEntityItemLink(this.eiSof, arrayOfString1, arrayOfString2, true, true, "SOFRELSOF");
+/* 7332 */             this.bConditionOK = (this.vReturnEntities1.size() > 0);
+/* 7333 */             this.vReturnEntities1 = searchEntityItemLink(this.eiSof, arrayOfString1, arrayOfString2, true, true, "SOFRELCMPNT");
+/* 7334 */             this.bConditionOK = !this.bConditionOK ? ((this.vReturnEntities1.size() > 0)) : this.bConditionOK;
+/* 7335 */             this.vReturnEntities1 = searchEntityItemLink(this.eiSof, arrayOfString1, arrayOfString2, true, true, "SOFRELFEATURE");
+/* 7336 */             this.bConditionOK = !this.bConditionOK ? ((this.vReturnEntities1.size() > 0)) : this.bConditionOK;
+/* 7337 */             if (this.bConditionOK) {
+/* 7338 */               this.strCondition4 = ".";
+/*      */             }
+/*      */           } 
+/*      */         } 
+/* 7342 */         if (this.strCondition4.trim().length() > 0) {
+/*      */           
+/* 7344 */           this.vReturnEntities1 = searchEntityItemLink(this.eiSof, (String[])null, (String[])null, true, true, "SOFAVAIL");
+/*      */           
+/* 7346 */           this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, true, "AVAIL");
+/* 7347 */           if (this.vReturnEntities2.size() > 0) {
+/* 7348 */             this.strCondition1 = getAllGeoTags(this.vReturnEntities2);
+/* 7349 */             if (!this.strCondition1.equals(this.strCondition2)) {
+/* 7350 */               if (!this.strCondition2.equals("US, AP, CAN, EMEA, LA") && 
+/* 7351 */                 this.strCondition2.length() > 0) {
+/* 7352 */                 println(".br;:hp2.<---" + this.strCondition2 + ":ehp2.");
+/*      */               }
+/*      */               
+/* 7355 */               if (!this.strCondition1.equals("US, AP, CAN, EMEA, LA")) {
+/* 7356 */                 println("");
+/* 7357 */                 println(":p.:hp2." + this.strCondition1 + "--->:ehp2.");
+/*      */               } 
+/* 7359 */               this.strCondition2 = this.strCondition1;
+/*      */             } 
+/* 7361 */             str3 = getSOFMktName(this.eiSof);
+/* 7362 */             logMessage("Marketing Msg :" + str3);
+/* 7363 */             if (i > 1 || bool2) {
+/* 7364 */               prettyPrint(str3, 69);
+/* 7365 */               println(":p.");
+/* 7366 */               println(":ul c.");
+/*      */             } else {
+/*      */               
+/* 7369 */               println(":p.");
+/* 7370 */               prettyPrint(str3, 69);
+/*      */             } 
+/* 7372 */             if (paramBoolean2 && !str2.equals("")) {
+/* 7373 */               this.strCondition4 = transformXML(getAttributeValue(this.eiSof, str2, " "));
+/*      */               
+/* 7375 */               if (this.strCondition4.trim().length() > 0)
+/*      */               {
+/* 7377 */                 prettyPrint(this.strCondition4, 69);
+/*      */               }
+/*      */             } 
+/*      */             
+/* 7381 */             if (paramBoolean2) {
+/*      */               
+/* 7383 */               this.strEntityTypes = new String[] { "SOFRELSOF" };
+/*      */               
+/* 7385 */               this.vReturnEntities1 = searchEntityItemLink(this.eiSof, arrayOfString1, arrayOfString2, true, true, "SOFRELSOF");
+/* 7386 */               if (this.vReturnEntities1.size() > 0) {
+/* 7387 */                 for (this.j = 0; this.j < this.vReturnEntities1.size(); this.j++) {
+/* 7388 */                   this.eiNextItem = this.vReturnEntities1.elementAt(this.j);
+/* 7389 */                   this.eiNextItem1 = (EntityItem)this.eiNextItem.getDownLink(0);
+/* 7390 */                   this.strCondition4 = getSOFMktName(this.eiNextItem1);
+/* 7391 */                   logMessage("0) Child Marketing Msg for SOFRELSOF" + this.eiNextItem.getKey() + " Downlinked from " + this.eiSof
+/* 7392 */                       .getKey() + " is " + this.strCondition4);
+/*      */                   
+/* 7394 */                   if ((i > 1 || this.vReturnEntities1.size() > 1) && this.strCondition4.trim().length() > 0) {
+/* 7395 */                     prettyPrint(":li." + this.strCondition4, 69);
+/*      */ 
+/*      */                   
+/*      */                   }
+/* 7399 */                   else if (this.strCondition4.trim().length() > 0) {
+/* 7400 */                     println(":p.");
+/* 7401 */                     prettyPrint(this.strCondition4, 69);
+/*      */                   }
+/*      */                 
+/*      */                 } 
+/*      */               } else {
+/*      */                 
+/* 7407 */                 logMessage("0)  No Child Marketing Msg for SOFRELSOF" + this.eiSof.getKey());
+/*      */               } 
+/*      */               
+/* 7410 */               this.strEntityTypes = new String[] { "SOFRELCMPNT" };
+/*      */               
+/* 7412 */               this.vReturnEntities1 = searchEntityItemLink(this.eiSof, arrayOfString1, arrayOfString2, true, true, "SOFRELCMPNT");
+/* 7413 */               if (this.vReturnEntities1.size() > 0) {
+/* 7414 */                 for (this.j = 0; this.j < this.vReturnEntities1.size(); this.j++) {
+/* 7415 */                   this.eiNextItem = this.vReturnEntities1.elementAt(this.j);
+/* 7416 */                   this.eiNextItem1 = (EntityItem)this.eiNextItem.getDownLink(0);
+/* 7417 */                   this.strCondition4 = getCmptToSofMktMsg(this.eiNextItem1);
+/* 7418 */                   logMessage("0)  Child Marketing Msg for SOFRELCMPNT" + this.eiNextItem.getKey() + " Downlinked from " + this.eiSof
+/* 7419 */                       .getKey() + " is " + this.strCondition4);
+/* 7420 */                   if ((i > 1 || this.vReturnEntities1.size() > 1) && this.strCondition4.trim().length() > 0) {
+/* 7421 */                     prettyPrint(":li." + this.strCondition4, 69);
+/*      */ 
+/*      */                   
+/*      */                   }
+/* 7425 */                   else if (this.strCondition4.trim().length() > 0) {
+/* 7426 */                     println(":p.");
+/* 7427 */                     prettyPrint(this.strCondition4, 69);
+/*      */                   }
+/*      */                 
+/*      */                 } 
+/*      */               } else {
+/*      */                 
+/* 7433 */                 logMessage("0)  No Child Marketing Msg for SOFRELCMPNT" + this.eiSof.getKey());
+/*      */               } 
+/*      */               
+/* 7436 */               this.strEntityTypes = new String[] { "SOFRELFEATURE" };
+/*      */               
+/* 7438 */               this.vReturnEntities1 = searchEntityItemLink(this.eiSof, arrayOfString1, arrayOfString2, true, true, "SOFRELFEATURE");
+/* 7439 */               if (this.vReturnEntities1.size() > 0) {
+/* 7440 */                 for (this.j = 0; this.j < this.vReturnEntities1.size(); this.j++) {
+/* 7441 */                   this.eiNextItem = this.vReturnEntities1.elementAt(this.j);
+/* 7442 */                   this.eiNextItem1 = (EntityItem)this.eiNextItem.getDownLink(0);
+/* 7443 */                   this.strCondition4 = getfeatureToSofMktMsg(this.eiNextItem1);
+/* 7444 */                   logMessage("0)  Child Marketing Msg for SOFRELFEATURE" + this.eiNextItem.getKey() + " Downlinked from " + this.eiSof
+/* 7445 */                       .getKey() + " is " + this.strCondition4);
+/*      */                   
+/* 7447 */                   if ((i > 1 || this.vReturnEntities1.size() > 1) && this.strCondition4.trim().length() > 0) {
+/* 7448 */                     prettyPrint(":li." + this.strCondition4, 69);
+/*      */ 
+/*      */                   
+/*      */                   }
+/* 7452 */                   else if (this.strCondition4.trim().length() > 0) {
+/* 7453 */                     println(":p.");
+/* 7454 */                     prettyPrint(this.strCondition4, 69);
+/*      */                   }
+/*      */                 
+/*      */                 } 
+/*      */               } else {
+/*      */                 
+/* 7460 */                 logMessage("0)  No Child Marketing Msg for SOFRELFEATURE" + this.eiSof.getKey());
+/*      */               } 
+/*      */               
+/* 7463 */               if (i > 1 || bool2) {
+/* 7464 */                 println(":eul.");
+/*      */               }
+/*      */             } 
+/*      */ 
+/*      */             
+/* 7469 */             if (paramBoolean1) {
+/* 7470 */               this.strEntityTypes = new String[] { "SOFRELSOF" };
+/*      */               
+/* 7472 */               if (paramBoolean2) {
+/* 7473 */                 this.strCondition4 = transformXML(getDownlinkedEntityAttrValue(this.eiSof, this.strEntityTypes, "BENEFIT", arrayOfString1, arrayOfString2));
+/*      */                 
+/* 7475 */                 if (this.strCondition4.trim().length() > 0) {
+/* 7476 */                   prettyPrint("Benefit:" + this.strCondition4, 69);
+/*      */                 }
+/* 7478 */                 this.strEntityTypes = new String[] { "SOFRELCMPNT" };
+/*      */                 
+/* 7480 */                 this.strCondition4 = transformXML(getDownlinkedEntityAttrValue(this.eiSof, this.strEntityTypes, "BENEFIT", arrayOfString1, arrayOfString2));
+/*      */                 
+/* 7482 */                 if (this.strCondition4.trim().length() > 0) {
+/* 7483 */                   prettyPrint("Benefit:" + this.strCondition4, 69);
+/*      */                 }
+/* 7485 */                 this.strEntityTypes = new String[] { "SOFRELFEATURE" };
+/*      */                 
+/* 7487 */                 this.strCondition4 = transformXML(getDownlinkedEntityAttrValue(this.eiSof, this.strEntityTypes, "BENEFIT", arrayOfString1, arrayOfString2));
+/*      */                 
+/* 7489 */                 if (this.strCondition4.trim().length() > 0) {
+/* 7490 */                   prettyPrint("Benefit:" + this.strCondition4, 69);
+/*      */                 }
+/*      */               } else {
+/*      */                 
+/* 7494 */                 this.strCondition4 = transformXML(getDownlinkedEntityAttrValue(this.eiSof, this.strEntityTypes, "BENEFIT", arrayOfString1, arrayOfString2));
+/*      */                 
+/* 7496 */                 if (this.strCondition4.trim().length() > 0) {
+/* 7497 */                   prettyPrint("Benefit:" + this.strCondition4, 69);
+/*      */                 }
+/*      */               } 
+/*      */             } 
+/*      */           } 
+/*      */         } else {
+/*      */           
+/* 7504 */           logMessage("No related rows found for " + this.eiSof.getKey());
+/*      */         } 
+/* 7506 */         println("");
+/*      */       } 
+/*      */ 
+/*      */       
+/* 7510 */       if (str1.equals("CMPNT")) {
+/* 7511 */         this.eiComponent = this.vAllSortedOfferings.elementAt(this.i);
+/* 7512 */         logMessage("after component" + this.eiComponent.getKey());
+/*      */         
+/* 7514 */         this.strEntityTypes = new String[] { "CMPNTRELCMPNT" };
+/*      */         
+/* 7516 */         this.strCondition4 = ".";
+/* 7517 */         if (paramBoolean2) {
+/* 7518 */           this.strCondition4 = getAttributeValue(this.eiComponent, str2, "");
+/* 7519 */           logMessage("Value of " + str2 + " is |" + this.strCondition4 + "|");
+/* 7520 */           if (this.strCondition4.trim().length() == 0) {
+/* 7521 */             logMessage("Checking for relators from " + this.eiComponent.getKey());
+/* 7522 */             this.vReturnEntities1 = searchEntityItemLink(this.eiComponent, arrayOfString1, arrayOfString2, true, true, "CMPNTRELSOF");
+/* 7523 */             this.bConditionOK = (this.vReturnEntities1.size() > 0);
+/* 7524 */             this.vReturnEntities1 = searchEntityItemLink(this.eiComponent, arrayOfString1, arrayOfString2, true, true, "CMPNTRELCMPNT");
+/* 7525 */             this.bConditionOK = !this.bConditionOK ? ((this.vReturnEntities1.size() > 0)) : this.bConditionOK;
+/* 7526 */             this.vReturnEntities1 = searchEntityItemLink(this.eiComponent, arrayOfString1, arrayOfString2, true, true, "CMPNTRELFEATURE");
+/* 7527 */             this.bConditionOK = !this.bConditionOK ? ((this.vReturnEntities1.size() > 0)) : this.bConditionOK;
+/* 7528 */             if (this.bConditionOK) {
+/* 7529 */               this.strCondition4 = ".";
+/*      */             }
+/*      */           } 
+/*      */         } else {
+/*      */           
+/* 7534 */           this.strCondition4 = getDownlinkedEntityAttrValue(this.eiComponent, this.strEntityTypes, "BENEFIT", arrayOfString1, arrayOfString2);
+/*      */         } 
+/* 7536 */         if (this.strCondition4.trim().length() > 0) {
+/*      */           
+/* 7538 */           this.vReturnEntities1 = searchEntityItemLink(this.eiComponent, (String[])null, (String[])null, true, true, "CMPNTAVAIL");
+/*      */           
+/* 7540 */           this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, true, "AVAIL");
+/* 7541 */           if (this.vReturnEntities2.size() > 0) {
+/* 7542 */             this.strCondition1 = getAllGeoTags(this.vReturnEntities2);
+/* 7543 */             if (!this.strCondition1.equals(this.strCondition2)) {
+/* 7544 */               if (!this.strCondition2.equals("US, AP, CAN, EMEA, LA") && 
+/* 7545 */                 this.strCondition2.length() > 0) {
+/* 7546 */                 println(".br;:hp2.<---" + this.strCondition2 + ":ehp2.");
+/*      */               }
+/*      */               
+/* 7549 */               if (!this.strCondition1.equals("US, AP, CAN, EMEA, LA")) {
+/* 7550 */                 println("");
+/* 7551 */                 println(":p.:hp2." + this.strCondition1 + "--->:ehp2.");
+/*      */               } 
+/* 7553 */               this.strCondition2 = this.strCondition1;
+/*      */             } 
+/* 7555 */             str3 = getCmptToSofMktMsg(this.eiComponent);
+/* 7556 */             logMessage("1) Marketing Msg :" + str3);
+/* 7557 */             if (i > 1 || bool1) {
+/* 7558 */               prettyPrint(str3, 69);
+/* 7559 */               println(":p.");
+/* 7560 */               println(":ul c.");
+/*      */             } else {
+/*      */               
+/* 7563 */               println(":p.");
+/* 7564 */               prettyPrint(str3, 69);
+/*      */             } 
+/*      */             
+/* 7567 */             if (paramBoolean2 && !str2.equals("")) {
+/* 7568 */               this.strCondition4 = transformXML(getAttributeValue(this.eiComponent, str2, " "));
+/* 7569 */               if (this.strCondition4.trim().length() > 0)
+/*      */               {
+/* 7571 */                 prettyPrint("       " + this.strCondition4, 69);
+/*      */               }
+/*      */             } 
+/* 7574 */             if (paramBoolean2) {
+/* 7575 */               this.strEntityTypes = new String[] { "CMPNTRELCMPNT" };
+/*      */               
+/* 7577 */               this.vReturnEntities1 = searchEntityItemLink(this.eiComponent, arrayOfString1, arrayOfString2, true, true, "CMPNTRELCMPNT");
+/* 7578 */               if (this.vReturnEntities1.size() > 0) {
+/* 7579 */                 for (this.j = 0; this.j < this.vReturnEntities1.size(); this.j++) {
+/* 7580 */                   this.eiNextItem = this.vReturnEntities1.elementAt(this.j);
+/* 7581 */                   this.eiNextItem1 = (EntityItem)this.eiNextItem.getDownLink(0);
+/* 7582 */                   this.strCondition4 = getCmptToSofMktMsg(this.eiNextItem1);
+/* 7583 */                   logMessage("1)  Child Marketing Msg for CMPNTRELCMPNT" + this.eiNextItem.getKey() + " Downlinked from " + this.eiComponent
+/* 7584 */                       .getKey() + " is " + this.strCondition4);
+/*      */                   
+/* 7586 */                   if ((i > 1 || this.vReturnEntities1.size() > 1) && this.strCondition4.trim().length() > 0) {
+/* 7587 */                     prettyPrint(":li." + this.strCondition4, 69);
+/*      */ 
+/*      */                   
+/*      */                   }
+/* 7591 */                   else if (this.strCondition4.trim().length() > 0) {
+/* 7592 */                     println(":p.");
+/* 7593 */                     prettyPrint(this.strCondition4, 69);
+/*      */                   }
+/*      */                 
+/*      */                 } 
+/*      */               } else {
+/*      */                 
+/* 7599 */                 logMessage("1)  No Child Marketing Msg for CMPNTRELCMPNT" + this.eiComponent.getKey());
+/*      */               } 
+/*      */               
+/* 7602 */               this.strEntityTypes = new String[] { "CMPNTRELFEATURE" };
+/*      */               
+/* 7604 */               this.vReturnEntities1 = searchEntityItemLink(this.eiComponent, arrayOfString1, arrayOfString2, true, true, "CMPNTRELFEATURE");
+/* 7605 */               if (this.vReturnEntities1.size() > 0) {
+/* 7606 */                 for (this.j = 0; this.j < this.vReturnEntities1.size(); this.j++) {
+/* 7607 */                   this.eiNextItem = this.vReturnEntities1.elementAt(this.j);
+/* 7608 */                   this.eiNextItem1 = (EntityItem)this.eiNextItem.getDownLink(0);
+/* 7609 */                   this.strCondition4 = getfeatureToSofMktMsg(this.eiNextItem1);
+/* 7610 */                   logMessage("1)  Child Marketing Msg for CMPNTRELFEATURE" + this.eiNextItem.getKey() + " Downlinked from " + this.eiComponent
+/* 7611 */                       .getKey() + " is " + this.strCondition4);
+/*      */                   
+/* 7613 */                   if ((i > 1 || this.vReturnEntities1.size() > 1) && this.strCondition4.trim().length() > 0) {
+/* 7614 */                     prettyPrint(":li." + this.strCondition4, 69);
+/*      */ 
+/*      */                   
+/*      */                   }
+/* 7618 */                   else if (this.strCondition4.trim().length() > 0) {
+/* 7619 */                     println(":p.");
+/* 7620 */                     prettyPrint(this.strCondition4, 69);
+/*      */                   }
+/*      */                 
+/*      */                 } 
+/*      */               } else {
+/*      */                 
+/* 7626 */                 logMessage("1)  No Child Marketing Msg for CMPNTRELFEATURE" + this.eiComponent.getKey());
+/*      */               } 
+/*      */               
+/* 7629 */               this.strEntityTypes = new String[] { "CMPNTRELSOF" };
+/*      */               
+/* 7631 */               this.vReturnEntities1 = searchEntityItemLink(this.eiComponent, arrayOfString1, arrayOfString2, true, true, "CMPNTRELSOF");
+/* 7632 */               if (this.vReturnEntities1.size() > 0) {
+/* 7633 */                 for (this.j = 0; this.j < this.vReturnEntities1.size(); this.j++) {
+/* 7634 */                   this.eiNextItem = this.vReturnEntities1.elementAt(this.j);
+/* 7635 */                   logMessage("****1) " + this.eiNextItem.getKey());
+/* 7636 */                   this.eiNextItem1 = (EntityItem)this.eiNextItem.getDownLink(0);
+/* 7637 */                   logMessage("****1) Downlinked from CMPTRELSOF" + this.eiNextItem1.getKey());
+/* 7638 */                   this.strCondition4 = getSOFMktName(this.eiNextItem1);
+/* 7639 */                   logMessage("1)  Child Marketing Msg for CMPNTRELSOF" + this.eiNextItem.getKey() + " Downlinked from " + this.eiComponent
+/* 7640 */                       .getKey() + " is " + this.strCondition4);
+/*      */                   
+/* 7642 */                   if ((i > 1 || this.vReturnEntities1.size() > 1) && this.strCondition4.trim().length() > 0) {
+/* 7643 */                     prettyPrint(":li." + this.strCondition4, 69);
+/*      */ 
+/*      */                   
+/*      */                   }
+/* 7647 */                   else if (this.strCondition4.trim().length() > 0) {
+/* 7648 */                     println(":p.");
+/* 7649 */                     prettyPrint(this.strCondition4, 69);
+/*      */                   }
+/*      */                 
+/*      */                 }
+/*      */               
+/*      */               } else {
+/*      */                 
+/* 7656 */                 logMessage("1)  No Child Marketing Msg for CMPNTRELSOF" + this.eiComponent.getKey());
+/*      */               } 
+/* 7658 */               if (i > 1 || bool1) {
+/* 7659 */                 println(":eul.");
+/*      */               }
+/*      */             } 
+/*      */ 
+/*      */             
+/* 7664 */             if (paramBoolean1) {
+/* 7665 */               if (paramBoolean2) {
+/* 7666 */                 this.strEntityTypes = new String[] { "CMPNTRELCMPNT" };
+/*      */                 
+/* 7668 */                 this.strCondition4 = transformXML(getDownlinkedEntityAttrValue(this.eiComponent, this.strEntityTypes, "BENEFIT", arrayOfString1, arrayOfString2));
+/*      */                 
+/* 7670 */                 logMessage("CMPNTRELCMPNT BENEFIT" + this.strCondition4);
+/* 7671 */                 if (this.strCondition4.trim().length() > 0) {
+/* 7672 */                   prettyPrint("Benefit:" + this.strCondition4, 69);
+/*      */                 }
+/*      */                 
+/* 7675 */                 this.strEntityTypes = new String[] { "CMPNTRELFEATURE" };
+/*      */                 
+/* 7677 */                 this.strCondition4 = transformXML(getDownlinkedEntityAttrValue(this.eiComponent, this.strEntityTypes, "BENEFIT", arrayOfString1, arrayOfString2));
+/*      */                 
+/* 7679 */                 logMessage("CMPNTRELFEATURE BENEFIT" + this.strCondition4);
+/* 7680 */                 if (this.strCondition4.trim().length() > 0) {
+/* 7681 */                   prettyPrint("Benefit:" + this.strCondition4, 69);
+/*      */                 }
+/*      */                 
+/* 7684 */                 this.strEntityTypes = new String[] { "CMPNTRELSOF" };
+/*      */                 
+/* 7686 */                 this.strCondition4 = transformXML(getDownlinkedEntityAttrValue(this.eiComponent, this.strEntityTypes, "BENEFIT", arrayOfString1, arrayOfString2));
+/*      */                 
+/* 7688 */                 logMessage("CMPNTRELSOF BENEFIT" + this.strCondition4);
+/* 7689 */                 if (this.strCondition4.trim().length() > 0) {
+/* 7690 */                   prettyPrint("Benefit:" + this.strCondition4, 69);
+/*      */                 }
+/*      */               } else {
+/*      */                 
+/* 7694 */                 this.strEntityTypes = new String[] { "CMPNTRELCMPNT" };
+/*      */                 
+/* 7696 */                 this.strCondition4 = transformXML(getDownlinkedEntityAttrValue(this.eiComponent, this.strEntityTypes, "BENEFIT", arrayOfString1, arrayOfString2));
+/*      */                 
+/* 7698 */                 if (this.strCondition4.trim().length() > 0) {
+/* 7699 */                   prettyPrint("Benefit:" + this.strCondition4, 69);
+/*      */                 }
+/*      */               }
+/*      */             
+/*      */             }
+/*      */           } 
+/*      */         } else {
+/*      */           
+/* 7707 */           logMessage("No related rows found for " + this.eiComponent.getKey());
+/*      */         } 
+/* 7709 */         println("");
+/*      */       } 
+/*      */ 
+/*      */       
+/* 7713 */       if (str1.equals("FEATURE")) {
+/* 7714 */         this.eiFeature = this.vAllSortedOfferings.elementAt(this.i);
+/* 7715 */         logMessage("After feature " + this.eiFeature.getKey());
+/* 7716 */         this.strEntityTypes = new String[] { "FEATURERELFEATURE" };
+/*      */         
+/* 7718 */         if (paramBoolean2) {
+/* 7719 */           this.strCondition4 = getAttributeValue(this.eiFeature, str2, "");
+/* 7720 */           if (this.strCondition4.trim().length() == 0) {
+/* 7721 */             this.vReturnEntities1 = searchEntityItemLink(this.eiFeature, arrayOfString1, arrayOfString2, true, true, "FEATURERELSOF");
+/* 7722 */             this.bConditionOK = (this.vReturnEntities1.size() > 0);
+/* 7723 */             this.vReturnEntities1 = searchEntityItemLink(this.eiFeature, arrayOfString1, arrayOfString2, true, true, "FEATURERELCMPNT");
+/* 7724 */             this.bConditionOK = !this.bConditionOK ? ((this.vReturnEntities1.size() > 0)) : this.bConditionOK;
+/* 7725 */             this.vReturnEntities1 = searchEntityItemLink(this.eiFeature, arrayOfString1, arrayOfString2, true, true, "FEATURERELFEATURE");
+/* 7726 */             this.bConditionOK = !this.bConditionOK ? ((this.vReturnEntities1.size() > 0)) : this.bConditionOK;
+/* 7727 */             if (this.bConditionOK) {
+/* 7728 */               this.strCondition4 = ".";
+/*      */             }
+/*      */           } 
+/*      */         } else {
+/*      */           
+/* 7733 */           this.strCondition4 = getDownlinkedEntityAttrValue(this.eiFeature, this.strEntityTypes, "BENEFIT", arrayOfString1, arrayOfString2);
+/*      */         } 
+/* 7735 */         if (this.strCondition4.trim().length() > 0) {
+/*      */ 
+/*      */           
+/* 7738 */           this.vReturnEntities1 = searchEntityItemLink(this.eiFeature, (String[])null, (String[])null, true, true, "FEATUREAVAIL");
+/*      */           
+/* 7740 */           this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, true, "AVAIL");
+/* 7741 */           if (this.vReturnEntities2.size() > 0) {
+/* 7742 */             this.strCondition1 = getAllGeoTags(this.vReturnEntities2);
+/* 7743 */             if (!this.strCondition1.equals(this.strCondition2)) {
+/* 7744 */               if (!this.strCondition2.equals("US, AP, CAN, EMEA, LA") && 
+/* 7745 */                 this.strCondition2.length() > 0) {
+/* 7746 */                 println(".br;:hp2.<---" + this.strCondition2 + ":ehp2.");
+/*      */               }
+/*      */               
+/* 7749 */               if (!this.strCondition1.equals("US, AP, CAN, EMEA, LA")) {
+/* 7750 */                 println("");
+/* 7751 */                 println(":p.:hp2." + this.strCondition1 + "--->:ehp2.");
+/*      */               } 
+/* 7753 */               this.strCondition2 = this.strCondition1;
+/*      */             } 
+/* 7755 */             str3 = getfeatureToSofMktMsg(this.eiFeature);
+/* 7756 */             logMessage("2) Marketing Msg :" + str3);
+/* 7757 */             if (i > 1 || bool3) {
+/* 7758 */               prettyPrint(str3, 69);
+/* 7759 */               println(":p.");
+/* 7760 */               println(":ul c.");
+/*      */             } else {
+/*      */               
+/* 7763 */               println(":p.");
+/* 7764 */               prettyPrint(str3, 69);
+/*      */             } 
+/* 7766 */             if (paramBoolean2 && !str2.equals("")) {
+/* 7767 */               this.strCondition4 = transformXML(getAttributeValue(this.eiFeature, str2, " "));
+/* 7768 */               if (this.strCondition4.trim().length() > 0)
+/*      */               {
+/* 7770 */                 prettyPrint("       " + this.strCondition4, 69);
+/*      */               }
+/*      */             } 
+/*      */             
+/* 7774 */             if (paramBoolean2) {
+/* 7775 */               this.strEntityTypes = new String[] { "FEATURERELFEATURE" };
+/*      */               
+/* 7777 */               this.vReturnEntities1 = searchEntityItemLink(this.eiFeature, arrayOfString1, arrayOfString2, true, true, "FEATURERELFEATURE");
+/* 7778 */               if (this.vReturnEntities1.size() > 0) {
+/* 7779 */                 for (this.j = 0; this.j < this.vReturnEntities1.size(); this.j++) {
+/* 7780 */                   this.eiNextItem = this.vReturnEntities1.elementAt(this.j);
+/* 7781 */                   this.eiNextItem1 = (EntityItem)this.eiNextItem.getDownLink(0);
+/* 7782 */                   this.strCondition4 = getfeatureToSofMktMsg(this.eiNextItem1);
+/* 7783 */                   logMessage("2)  Child Marketing Msg for FEATURERELFEATURE" + this.eiNextItem.getKey() + " Downlinked from " + this.eiFeature
+/* 7784 */                       .getKey() + " is " + this.strCondition4);
+/* 7785 */                   if ((i > 1 || this.vReturnEntities1.size() > 1) && this.strCondition4.trim().length() > 0) {
+/* 7786 */                     prettyPrint(":li." + this.strCondition4, 69);
+/*      */ 
+/*      */                   
+/*      */                   }
+/* 7790 */                   else if (this.strCondition4.trim().length() > 0) {
+/* 7791 */                     println(":p.");
+/* 7792 */                     prettyPrint(this.strCondition4, 69);
+/*      */                   }
+/*      */                 
+/*      */                 } 
+/*      */               } else {
+/*      */                 
+/* 7798 */                 logMessage("2)  No Child Marketing Msg for FEATURERELFEATURE" + this.eiFeature.getKey());
+/*      */               } 
+/*      */               
+/* 7801 */               this.strEntityTypes = new String[] { "FEATURERELCMPNT" };
+/*      */               
+/* 7803 */               this.vReturnEntities1 = searchEntityItemLink(this.eiFeature, arrayOfString1, arrayOfString2, true, true, "FEATURERELCMPNT");
+/* 7804 */               if (this.vReturnEntities1.size() > 0) {
+/* 7805 */                 for (this.j = 0; this.j < this.vReturnEntities1.size(); this.j++) {
+/* 7806 */                   this.eiNextItem = this.vReturnEntities1.elementAt(this.j);
+/* 7807 */                   this.eiNextItem1 = (EntityItem)this.eiNextItem.getDownLink(0);
+/* 7808 */                   this.strCondition4 = getCmptToSofMktMsg(this.eiNextItem1);
+/* 7809 */                   logMessage("2)  Child Marketing Msg for FEATURERELCMPNT" + this.eiNextItem.getKey() + " Downlinked from " + this.eiFeature
+/* 7810 */                       .getKey() + " is " + this.strCondition4);
+/* 7811 */                   if ((i > 1 || this.vReturnEntities1.size() > 1) && this.strCondition4.trim().length() > 0) {
+/* 7812 */                     prettyPrint(":li." + this.strCondition4, 69);
+/*      */ 
+/*      */                   
+/*      */                   }
+/* 7816 */                   else if (this.strCondition4.trim().length() > 0) {
+/* 7817 */                     println("");
+/* 7818 */                     prettyPrint(this.strCondition4, 69);
+/*      */                   }
+/*      */                 
+/*      */                 } 
+/*      */               } else {
+/*      */                 
+/* 7824 */                 logMessage("2)  No Child Marketing Msg for FEATURERELCMPNT" + this.eiFeature.getKey());
+/*      */               } 
+/*      */               
+/* 7827 */               this.strEntityTypes = new String[] { "FEATURERELSOF" };
+/*      */               
+/* 7829 */               this.vReturnEntities1 = searchEntityItemLink(this.eiFeature, arrayOfString1, arrayOfString2, true, true, "FEATURERELSOF");
+/* 7830 */               if (this.vReturnEntities1.size() > 0) {
+/* 7831 */                 for (this.j = 0; this.j < this.vReturnEntities1.size(); this.j++) {
+/* 7832 */                   this.eiNextItem = this.vReturnEntities1.elementAt(this.j);
+/* 7833 */                   this.eiNextItem1 = (EntityItem)this.eiNextItem.getDownLink(0);
+/* 7834 */                   this.strCondition4 = getSOFMktName(this.eiNextItem1);
+/* 7835 */                   logMessage("2)  Child Marketing Msg for FEATURERELSOF" + this.eiNextItem.getKey() + " Downlinked from " + this.eiFeature
+/* 7836 */                       .getKey() + " is " + this.strCondition4);
+/* 7837 */                   if ((i > 1 || this.vReturnEntities1.size() > 1) && this.strCondition4.trim().length() > 0) {
+/* 7838 */                     prettyPrint(":li." + this.strCondition4, 69);
+/*      */ 
+/*      */                   
+/*      */                   }
+/* 7842 */                   else if (this.strCondition4.trim().length() > 0) {
+/* 7843 */                     println(":p.");
+/* 7844 */                     prettyPrint(this.strCondition4, 69);
+/*      */                   }
+/*      */                 
+/*      */                 } 
+/*      */               } else {
+/*      */                 
+/* 7850 */                 logMessage("2)  No Child Marketing Msg for FEATURERELSOF" + this.eiFeature.getKey());
+/*      */               } 
+/* 7852 */               if (i > 1 || bool3) {
+/* 7853 */                 println(":eul.");
+/*      */               }
+/*      */             } 
+/*      */ 
+/*      */             
+/* 7858 */             if (paramBoolean1) {
+/* 7859 */               this.strEntityTypes = new String[] { "FEATURERELFEATURE" };
+/*      */               
+/* 7861 */               if (paramBoolean2) {
+/* 7862 */                 this.strCondition4 = transformXML(getDownlinkedEntityAttrValue(this.eiFeature, this.strEntityTypes, "BENEFIT", arrayOfString1, arrayOfString2));
+/*      */                 
+/* 7864 */                 if (this.strCondition4.trim().length() > 0) {
+/* 7865 */                   prettyPrint("Benefit:" + this.strCondition4, 69);
+/*      */                 }
+/*      */                 
+/* 7868 */                 this.strEntityTypes = new String[] { "FEATURERELCMPNT" };
+/*      */                 
+/* 7870 */                 this.strCondition4 = transformXML(getDownlinkedEntityAttrValue(this.eiFeature, this.strEntityTypes, "BENEFIT", arrayOfString1, arrayOfString2));
+/*      */                 
+/* 7872 */                 if (this.strCondition4.trim().length() > 0) {
+/* 7873 */                   prettyPrint("Benefit:" + this.strCondition4, 69);
+/*      */                 }
+/*      */                 
+/* 7876 */                 this.strEntityTypes = new String[] { "FEATURERELSOF" };
+/*      */                 
+/* 7878 */                 this.strCondition4 = transformXML(getDownlinkedEntityAttrValue(this.eiFeature, this.strEntityTypes, "BENEFIT", arrayOfString1, arrayOfString2));
+/*      */                 
+/* 7880 */                 if (this.strCondition4.trim().length() > 0) {
+/* 7881 */                   prettyPrint("Benefit:" + this.strCondition4, 69);
+/*      */                 }
+/*      */               } else {
+/*      */                 
+/* 7885 */                 this.strCondition4 = transformXML(getDownlinkedEntityAttrValue(this.eiFeature, this.strEntityTypes, "BENEFIT", arrayOfString1, arrayOfString2));
+/*      */                 
+/* 7887 */                 if (this.strCondition4.trim().length() > 0) {
+/* 7888 */                   prettyPrint("Benefit:" + this.strCondition4, 69);
+/*      */                 }
+/*      */               }
+/*      */             
+/*      */             }
+/*      */           
+/*      */           } 
+/*      */         } else {
+/*      */           
+/* 7897 */           logMessage("No related rows found for " + this.eiFeature.getKey());
+/*      */         } 
+/* 7899 */         println("");
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 7903 */     if (!this.strCondition2.equals("US, AP, CAN, EMEA, LA") && 
+/* 7904 */       this.strCondition2.length() > 0) {
+/* 7905 */       println(".br;:hp2.<---" + this.strCondition2 + ":ehp2.");
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void printQ158(boolean paramBoolean) {
+/* 7922 */     Vector<EntityItem> vector1 = new Vector();
+/* 7923 */     Vector<EntityItem> vector2 = new Vector();
+/* 7924 */     Vector<EntityItem> vector3 = new Vector();
+/* 7925 */     this.bConditionOK = false;
+/* 7926 */     this.vReturnEntities1 = searchEntityVectorLink(this.vSofFrmSofAvail, (String[])null, (String[])null, true, true, "SOFCATINCL");
+/* 7927 */     this.strFilterAttr = new String[] { "CATALOGNAME" };
+/*      */     
+/* 7929 */     this.strFilterValue = new String[] { "321" };
+/*      */     
+/* 7931 */     vector1 = searchEntityVectorLink(this.vReturnEntities1, this.strFilterAttr, this.strFilterValue, true, true, "CATINCL");
+/*      */     
+/* 7933 */     this.vReturnEntities1 = searchEntityVectorLink(this.vCmpntFrmCmpntAvail, (String[])null, (String[])null, true, true, "CMPNTCATINCL");
+/* 7934 */     vector2 = searchEntityVectorLink(this.vReturnEntities1, this.strFilterAttr, this.strFilterValue, true, true, "CATINCL");
+/*      */     
+/* 7936 */     this.vReturnEntities1 = searchEntityVectorLink(this.vFeatureFrmFeatureAvail, (String[])null, (String[])null, true, true, "FEATURECATINCL");
+/* 7937 */     vector3 = searchEntityVectorLink(this.vReturnEntities1, this.strFilterAttr, this.strFilterValue, true, true, "CATINCL");
+/*      */     
+/* 7939 */     this.strCondition4 = "";
+/* 7940 */     this.strCondition2 = "";
+/* 7941 */     boolean bool1 = (vector1.size() == 0) ? true : false;
+/* 7942 */     boolean bool2 = (vector2.size() == 0) ? true : false;
+/* 7943 */     boolean bool3 = (vector3.size() == 0) ? true : false;
+/* 7944 */     boolean bool4 = (bool1 && bool2 && bool3) ? true : false;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 7950 */     int i = vector1.size();
+/* 7951 */     i += vector2.size();
+/* 7952 */     i += vector3.size();
+/*      */     
+/* 7954 */     logMessage("vSofCats" + vector1.size());
+/* 7955 */     logMessage("vCmptCats" + vector2.size());
+/* 7956 */     logMessage("vFeatCats" + vector3.size());
+/*      */     
+/* 7958 */     this.i = 0;
+/* 7959 */     this.strFilterAttr = new String[] { "AVAILTYPE" };
+/*      */     
+/* 7961 */     this.strFilterValue = new String[] { "146" };
+/*      */     
+/* 7963 */     this.strCondition4 = "";
+/* 7964 */     while (!bool4) {
+/* 7965 */       logMessage("  printQ158:I is" + this.i);
+/* 7966 */       if (!bool1) {
+/* 7967 */         this.eiCatIncl = vector1.elementAt(this.i);
+/* 7968 */         this.strEntityTypes = new String[] { "SOFCATINCL", "SOF" };
+/*      */         
+/* 7970 */         this.eiSof = getUplinkedEntityItem(this.eiCatIncl, this.strEntityTypes);
+/* 7971 */         logMessage("after SOF" + this.eiSof.getKey());
+/*      */         
+/* 7973 */         this.vReturnEntities1 = searchEntityItemLink(this.eiSof, (String[])null, (String[])null, true, true, "SOFAVAIL");
+/*      */         
+/* 7975 */         this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, true, "AVAIL");
+/* 7976 */         this.strCondition1 = getAllGeoTags(this.vReturnEntities2);
+/*      */         
+/* 7978 */         if (!this.strCondition1.equals(this.strCondition2)) {
+/* 7979 */           if (!this.strCondition2.equals("US, AP, CAN, EMEA, LA") && 
+/* 7980 */             this.strCondition2.length() > 0) {
+/* 7981 */             println(".br;:hp2.<---" + this.strCondition2 + ":ehp2.");
+/*      */           }
+/*      */           
+/* 7984 */           if (!this.strCondition1.equals("US, AP, CAN, EMEA, LA")) {
+/* 7985 */             println("");
+/* 7986 */             println(":p.:hp2." + this.strCondition1 + "--->:ehp2.");
+/*      */           } 
+/* 7988 */           this.strCondition2 = this.strCondition1;
+/*      */         } 
+/* 7990 */         if (paramBoolean) {
+/* 7991 */           this.strCondition4 = getSOFMktName(this.eiSof);
+/* 7992 */           logMessage("printQ158:" + this.strCondition4);
+/* 7993 */           prettyPrint(this.strCondition4, 69);
+/*      */         } 
+/* 7995 */         this.strCondition4 = transformXML(getAttributeValue(this.eiCatIncl, "CATALOGTAXONOMY", " "));
+/* 7996 */         prettyPrint(":p.:hp2." + this.strCondition4 + ":ehp2.", 69);
+/* 7997 */         println("");
+/*      */       } 
+/*      */       
+/* 8000 */       if (!bool2) {
+/*      */         
+/* 8002 */         this.eiCatIncl = vector2.elementAt(this.i);
+/* 8003 */         this.strEntityTypes = new String[] { "CMPNTCATINCL", "CMPNT" };
+/*      */         
+/* 8005 */         this.eiComponent = getUplinkedEntityItem(this.eiCatIncl, this.strEntityTypes);
+/* 8006 */         logMessage("after component" + this.eiComponent.getKey());
+/*      */ 
+/*      */         
+/* 8009 */         this.vReturnEntities1 = searchEntityItemLink(this.eiComponent, (String[])null, (String[])null, true, true, "CMPNTAVAIL");
+/*      */         
+/* 8011 */         this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, true, "AVAIL");
+/* 8012 */         this.strCondition1 = getAllGeoTags(this.vReturnEntities2);
+/* 8013 */         if (!this.strCondition1.equals(this.strCondition2)) {
+/* 8014 */           if (!this.strCondition2.equals("US, AP, CAN, EMEA, LA") && 
+/* 8015 */             this.strCondition2.length() > 0) {
+/* 8016 */             println(".br;:hp2.<---" + this.strCondition2 + ":ehp2.");
+/*      */           }
+/*      */           
+/* 8019 */           if (!this.strCondition1.equals("US, AP, CAN, EMEA, LA")) {
+/* 8020 */             println("");
+/* 8021 */             println(":p.:hp2." + this.strCondition1 + "--->:ehp2.");
+/*      */           } 
+/* 8023 */           this.strCondition2 = this.strCondition1;
+/*      */         } 
+/* 8025 */         if (paramBoolean) {
+/* 8026 */           this.strCondition4 = getCmptToSofMktMsg(this.eiComponent);
+/* 8027 */           logMessage("printQ158:1:" + this.strCondition4);
+/* 8028 */           prettyPrint(this.strCondition4, 69);
+/*      */         } 
+/* 8030 */         this.strCondition4 = transformXML(getAttributeValue(this.eiCatIncl, "CATALOGTAXONOMY", " "));
+/* 8031 */         prettyPrint(":p.:hp2." + this.strCondition4 + ":ehp2.", 69);
+/* 8032 */         println("");
+/*      */       } 
+/*      */       
+/* 8035 */       if (!bool3) {
+/* 8036 */         this.eiCatIncl = vector3.elementAt(this.i);
+/* 8037 */         this.strEntityTypes = new String[] { "FEATURECATINCL", "FEATURE" };
+/*      */         
+/* 8039 */         this.eiFeature = getUplinkedEntityItem(this.eiCatIncl, this.strEntityTypes);
+/* 8040 */         logMessage("After feature " + this.eiFeature.getKey());
+/*      */ 
+/*      */         
+/* 8043 */         this.vReturnEntities1 = searchEntityItemLink(this.eiFeature, (String[])null, (String[])null, true, true, "FEATUREAVAIL");
+/*      */         
+/* 8045 */         this.vReturnEntities2 = searchEntityVectorLink(this.vReturnEntities1, (String[])null, (String[])null, true, true, "AVAIL");
+/* 8046 */         this.strCondition1 = getAllGeoTags(this.vReturnEntities2);
+/* 8047 */         if (!this.strCondition1.equals(this.strCondition2)) {
+/* 8048 */           if (!this.strCondition2.equals("US, AP, CAN, EMEA, LA") && 
+/* 8049 */             this.strCondition2.length() > 0) {
+/* 8050 */             println(".br;:hp2.<---" + this.strCondition2 + ":ehp2.");
+/*      */           }
+/*      */           
+/* 8053 */           if (!this.strCondition1.equals("US, AP, CAN, EMEA, LA")) {
+/* 8054 */             println("");
+/* 8055 */             println(":p.:hp2." + this.strCondition1 + "--->:ehp2.");
+/*      */           } 
+/* 8057 */           this.strCondition2 = this.strCondition1;
+/*      */         } 
+/* 8059 */         if (paramBoolean) {
+/* 8060 */           this.strCondition4 = getfeatureToSofMktMsg(this.eiFeature);
+/* 8061 */           logMessage("printQ158:2:" + this.strCondition4);
+/* 8062 */           prettyPrint(this.strCondition4, 69);
+/*      */         } 
+/* 8064 */         this.strCondition4 = transformXML(getAttributeValue(this.eiCatIncl, "CATALOGTAXONOMY", " "));
+/* 8065 */         prettyPrint(":p.:hp2." + this.strCondition4 + ":ehp2.", 69);
+/* 8066 */         println("");
+/*      */       } 
+/*      */       
+/* 8069 */       if (bool1 && bool2 && bool3) {
+/* 8070 */         bool4 = true;
+/*      */       }
+/*      */       
+/* 8073 */       this.i++;
+/* 8074 */       bool1 = (vector1.size() <= this.i) ? true : false;
+/* 8075 */       bool2 = (vector2.size() <= this.i) ? true : false;
+/* 8076 */       bool3 = (vector3.size() <= this.i) ? true : false;
+/*      */     } 
+/*      */     
+/* 8079 */     if (!this.strCondition2.equals("US, AP, CAN, EMEA, LA") && 
+/* 8080 */       this.strCondition2.length() > 0) {
+/* 8081 */       println(".br;:hp2.<---" + this.strCondition2 + ":ehp2.");
+/*      */     }
+/*      */ 
+/*      */     
+/* 8085 */     println("");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void printA153() {
+/* 8096 */     String str = "OFIDNUMBER";
+/*      */     
+/* 8098 */     logMessage("printA153: entered vAllSortedOfferings " + this.vAllSortedOfferings.size());
+/* 8099 */     displayContents(this.vAllSortedOfferings);
+/*      */     
+/*      */     byte b;
+/* 8102 */     for (b = 0; b < this.vAllSortedOfferings.size(); b++) {
+/*      */ 
+/*      */ 
+/*      */       
+/* 8106 */       this.eiNextItem = this.vAllSortedOfferings.elementAt(b);
+/* 8107 */       logMessage("printA153: loop [" + b + "] " + this.eiNextItem.getKey());
+/*      */       
+/* 8109 */       if (this.eiNextItem.getEntityType().equals("SOF")) {
+/* 8110 */         this.eiSof = this.eiNextItem;
+/* 8111 */         logMessage("printA153: in SOF " + this.eiSof.getKey());
+/*      */ 
+/*      */         
+/* 8114 */         String str1 = getSOFMktName(this.eiSof);
+/* 8115 */         if (str1.trim().length() > 0) {
+/* 8116 */           logMessage("printA153: " + this.eiSof.getKey() + " Adding Marketing Msg :" + str1);
+/* 8117 */           this.vPrintDetails.add(str1);
+/*      */           
+/* 8119 */           String str2 = getAttributeValue(this.eiSof, str, " ");
+/* 8120 */           logMessage("printA153: Adding " + str + " :" + str2);
+/* 8121 */           this.vPrintDetails.add(str2);
+/*      */ 
+/*      */           
+/* 8124 */           String str3 = " ";
+/* 8125 */           this.vReturnEntities4 = searchEntityItemLink(this.eiSof, (String[])null, (String[])null, true, true, "SOFPRA");
+/* 8126 */           logMessage("printA153: Number of SOFPRA links found =" + this.vReturnEntities4.size());
+/*      */           
+/* 8128 */           if (this.vReturnEntities4.size() > 0) {
+/*      */             
+/* 8130 */             this.eiNextItem2 = this.vReturnEntities4.elementAt(0);
+/* 8131 */             this.eiNextItem3 = (EntityItem)this.eiNextItem2.getDownLink(0);
+/* 8132 */             str3 = getAttributeValue(this.eiNextItem3, "PROJNUMBER", "No Value" + this.eiNextItem3.getKey());
+/*      */           } 
+/*      */           
+/* 8135 */           logMessage("printA153: Adding PROJNUMBER:" + str3);
+/* 8136 */           this.vPrintDetails.add(str3);
+/*      */         }
+/*      */         else {
+/*      */           
+/* 8140 */           logMessage("printA153: No Marketing Msg found. Skipping " + this.eiSof.getKey());
+/*      */         } 
+/*      */       } 
+/*      */       
+/* 8144 */       if (this.eiNextItem.getEntityType().equals("CMPNT")) {
+/* 8145 */         this.eiComponent = this.vAllSortedOfferings.elementAt(b);
+/* 8146 */         logMessage("printA153 After component" + this.eiComponent.getKey());
+/* 8147 */         this.eiSof = getUplinkedEntityItem(this.eiComponent, this.strCmptToSof);
+/* 8148 */         if (this.eiSof != null) {
+/*      */           
+/* 8150 */           String str1 = getSOFMktName(this.eiSof);
+/* 8151 */           if (str1.trim().length() > 0) {
+/*      */             
+/* 8153 */             logMessage("printA153 " + this.eiSof.getKey() + " for " + this.eiComponent.getKey() + " Adding Marketing Msg :" + str1);
+/*      */             
+/* 8155 */             this.vPrintDetails.add(str1);
+/*      */             
+/* 8157 */             String str2 = getAttributeValue(this.eiSof, str, " ");
+/* 8158 */             logMessage("printA153: Adding " + str + " :" + str2);
+/* 8159 */             this.vPrintDetails.add(str2);
+/*      */ 
+/*      */             
+/* 8162 */             this.vReturnEntities4 = searchEntityItemLink(this.eiSof, (String[])null, (String[])null, true, true, "SOFPRA");
+/* 8163 */             logMessage("printA153 Number of SOFPRA links found =" + this.vReturnEntities4.size());
+/*      */             
+/* 8165 */             String str3 = " ";
+/*      */             
+/* 8167 */             if (this.vReturnEntities4.size() > 0) {
+/*      */               
+/* 8169 */               this.eiNextItem2 = this.vReturnEntities4.elementAt(0);
+/* 8170 */               this.eiNextItem3 = (EntityItem)this.eiNextItem2.getDownLink(0);
+/* 8171 */               str3 = getAttributeValue(this.eiNextItem3, "PROJNUMBER", "No Value" + this.eiNextItem3.getKey());
+/*      */             } 
+/*      */             
+/* 8174 */             logMessage("printA153 adding PROJNUMBER :" + str3);
+/* 8175 */             this.vPrintDetails.add(str3);
+/*      */           }
+/*      */           else {
+/*      */             
+/* 8179 */             logMessage("printA153 No Marketing msg found on " + this.eiSof.getKey() + " for " + this.eiComponent.getKey());
+/*      */           } 
+/*      */         } else {
+/*      */           
+/* 8183 */           logMessage("printA153 No SOF for " + this.eiComponent.getKey());
+/*      */         } 
+/*      */       } 
+/*      */       
+/* 8187 */       if (this.eiNextItem.getEntityType().equals("FEATURE")) {
+/* 8188 */         this.strFeatureToSof = new String[] { "CMPNTFEATURE", "CMPNT", "SOFCMPNT", "SOF" };
+/*      */         
+/* 8190 */         this.eiFeature = this.vAllSortedOfferings.elementAt(b);
+/* 8191 */         logMessage("printA153 After feature" + this.eiFeature.getKey());
+/* 8192 */         this.eiSof = getUplinkedEntityItem(this.eiFeature, this.strFeatureToSof);
+/* 8193 */         if (this.eiSof != null) {
+/*      */           
+/* 8195 */           String str1 = getSOFMktName(this.eiSof);
+/* 8196 */           if (str1.trim().length() > 0) {
+/*      */             
+/* 8198 */             logMessage("printA153 " + this.eiSof.getKey() + " for " + this.eiFeature.getKey() + " Adding Marketing Msg :" + str1);
+/*      */             
+/* 8200 */             this.vPrintDetails.add(str1);
+/*      */             
+/* 8202 */             String str2 = getAttributeValue(this.eiSof, str, " ");
+/* 8203 */             logMessage("printA153: Adding " + str + " :" + str2);
+/* 8204 */             this.vPrintDetails.add(str2);
+/*      */ 
+/*      */             
+/* 8207 */             this.vReturnEntities4 = searchEntityItemLink(this.eiSof, (String[])null, (String[])null, true, true, "SOFPRA");
+/* 8208 */             logMessage("printA153 Number of SOFPRA links found =" + this.vReturnEntities4.size());
+/*      */             
+/* 8210 */             String str3 = " ";
+/*      */             
+/* 8212 */             if (this.vReturnEntities4.size() > 0) {
+/*      */               
+/* 8214 */               this.eiNextItem2 = this.vReturnEntities4.elementAt(0);
+/* 8215 */               this.eiNextItem3 = (EntityItem)this.eiNextItem2.getDownLink(0);
+/* 8216 */               str3 = getAttributeValue(this.eiNextItem3, "PROJNUMBER", "No Value" + this.eiNextItem3.getKey());
+/*      */             } 
+/*      */             
+/* 8219 */             logMessage("printA153 adding PROJNUMBER :" + str3);
+/* 8220 */             this.vPrintDetails.add(str3);
+/*      */           }
+/*      */           else {
+/*      */             
+/* 8224 */             logMessage("printA153 No Marketing msg found on " + this.eiSof.getKey() + " for " + this.eiFeature.getKey());
+/*      */           } 
+/*      */         } else {
+/*      */           
+/* 8228 */           logMessage("printA153 No SOF found for " + this.eiFeature.getKey());
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 8233 */     if (this.vPrintDetails.size() > 0) {
+/* 8234 */       for (b = 0; b < this.vPrintDetails.size(); b++) {
+/* 8235 */         logMessage("printA153 Printvector :" + b + ":" + (String)this.vPrintDetails.elementAt(b));
+/*      */       }
+/*      */       
+/* 8238 */       println(":xmp.");
+/* 8239 */       println(".kp off");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 8251 */       this.strHeader = new String[] { "Name", "ID", "Number" };
+/*      */       
+/* 8253 */       this.iColWidths = new int[] { 47, 16, 10 };
+/*      */       
+/* 8255 */       this.rfaReport.setSortColumns(new int[] { 1 });
+/* 8256 */       this.rfaReport.setSortable(true);
+/* 8257 */       println("                                                                 Autobahn");
+/* 8258 */       println("Service/Offering                                Service/Offering Project");
+/* 8259 */       printReport(true, this.strHeader, this.iColWidths, this.vPrintDetails);
+/* 8260 */       println(":exmp.");
+/* 8261 */       resetPrintvars();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getfeatureToSofMktMsg(EntityItem paramEntityItem) {
+/* 8651 */     String str1 = "";
+/* 8652 */     String str2 = "";
+/* 8653 */     if (paramEntityItem == null) {
+/* 8654 */       return "";
+/*      */     }
+/*      */     
+/* 8657 */     str1 = getAttributeValue(paramEntityItem, "MKTGNAME", " ");
+/* 8658 */     logMessage("getfeatureToSofMktMsg:Feature :" + str1);
+/*      */     
+/* 8660 */     this.eiNextItem1 = getUplinkedEntityItem(paramEntityItem, this.strFeatureToCmpt);
+/* 8661 */     str2 = getAttributeValue(this.eiNextItem1, "MKTGNAME", " ");
+/* 8662 */     logMessage("getfeatureToSofMktMsg:Component :" + str2);
+/* 8663 */     str1 = str2 + " " + str1;
+/*      */     
+/* 8665 */     str2 = "";
+/* 8666 */     if (this.bIsAnnITS && this.eiNextItem1 != null) {
+/* 8667 */       str2 = getAttributeValue(this.eiNextItem1, "ITSCMPNTCATNAME", "");
+/* 8668 */       logMessage("getfeatureToSofMktMsg:ITSCMPNTCATNAME is: " + str2);
+/*      */     } 
+/* 8670 */     if (str2.trim().length() == 0 && this.eiNextItem1 != null) {
+/* 8671 */       str2 = getUplinkedEntityAttrValue(this.eiNextItem1, this.strCmptToSof, "MKTGNAME");
+/* 8672 */       logMessage("getfeatureToSofMktMsg:ITSCMPNTCATNAME is empty...getting SOF MTGNAME: " + str2);
+/*      */     } 
+/* 8674 */     logMessage("getfeatureToSofMktMsg:Sof :" + str2);
+/* 8675 */     str1 = str2 + " " + str1;
+/* 8676 */     return str1;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getCmptToSofMktMsg(EntityItem paramEntityItem) {
+/* 8686 */     String str1 = "";
+/* 8687 */     String str2 = "";
+/* 8688 */     if (paramEntityItem == null) {
+/* 8689 */       return "";
+/*      */     }
+/* 8691 */     str1 = getAttributeValue(paramEntityItem, "MKTGNAME", " ");
+/* 8692 */     logMessage("getCmptToSofMktMsg:Component :" + str1);
+/*      */     
+/* 8694 */     if (this.bIsAnnITS) {
+/* 8695 */       str2 = getAttributeValue(paramEntityItem, "ITSCMPNTCATNAME", "");
+/* 8696 */       logMessage("getCmptToSofMktMsg:ITSCMPNTCATNAME is: " + str2);
+/*      */     } 
+/* 8698 */     if (str2.trim().length() == 0) {
+/* 8699 */       str2 = getUplinkedEntityAttrValue(paramEntityItem, this.strCmptToSof, "MKTGNAME");
+/* 8700 */       logMessage("getCmptToSofMktMsg:ITSCMPNTCATNAME is empty...getting SOF MTGNAME: " + str2);
+/*      */     } 
+/* 8702 */     logMessage("getCmptToSofMktMsg:Sof :" + str2);
+/* 8703 */     str1 = str2 + " " + str1;
+/* 8704 */     return str1;
+/*      */   }
+/*      */   
+/*      */   private String getSOFMktName(EntityItem paramEntityItem) {
+/* 8708 */     return getSOFMktName(paramEntityItem, true);
+/*      */   }
+/*      */   
+/*      */   private String getSOFMktName(EntityItem paramEntityItem, boolean paramBoolean) {
+/* 8712 */     if (paramEntityItem == null) {
+/* 8713 */       return "";
+/*      */     }
+/* 8715 */     String str = "";
+/* 8716 */     if (this.bIsAnnITS && paramBoolean) {
+/* 8717 */       logMessage("getSOFMktName:Getting downlinked cmpt from " + paramEntityItem.getKey());
+/* 8718 */       str = getDownlinkedEntityAttrValue(paramEntityItem, this.strSofToCmpt, "ITSCMPNTCATNAME");
+/* 8719 */       logMessage("getSOFMktName:ITSCMPNTCATNAME is: " + str);
+/*      */     } 
+/* 8721 */     if (str.trim().length() == 0 || !paramBoolean) {
+/* 8722 */       str = getAttributeValue(paramEntityItem, "MKTGNAME", " ");
+/* 8723 */       logMessage("getSOFMktName:ITSCMPNTCATNAME is empty...getting SOF MTGNAME: " + str);
+/*      */     } 
+/* 8725 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getQ800SOFMktName(EntityItem paramEntityItem1, EntityItem paramEntityItem2) {
+/* 8750 */     if (paramEntityItem1 == null) {
+/* 8751 */       return "";
+/*      */     }
+/* 8753 */     String str = "";
+/* 8754 */     if (this.bIsAnnITS) {
+/* 8755 */       str = getAttributeShortFlagDesc(paramEntityItem1, "ITSCMPNTCATNAME");
+/* 8756 */       logMessage("getQ800SOFMktName ShortaName:ITSCMPNTCATNAME is: " + str);
+/* 8757 */       if (str == null) {
+/* 8758 */         str = "";
+/*      */       }
+/*      */     } 
+/* 8761 */     if (str.trim().length() == 0) {
+/* 8762 */       str = getAttributeValue(paramEntityItem2, "MKTGNAME", " ");
+/* 8763 */       logMessage("getQ800SOFMktName:ITSCMPNTCATNAME is empty...getting SOF MTGNAME: " + str);
+/*      */     } 
+/* 8765 */     return str;
+/*      */   }
+/*      */   
+/*      */   private String getRFADateFormat(String paramString) {
+/* 8769 */     String str = "";
+/* 8770 */     if (paramString.trim().length() == 0) {
+/* 8771 */       return " ";
+/*      */     }
+/* 8773 */     SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+/* 8774 */     SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("MMMMMMMMM dd, yyyy");
+/*      */     try {
+/* 8776 */       Date date = simpleDateFormat1.parse(paramString);
+/* 8777 */       str = simpleDateFormat2.format(date);
+/*      */     
+/*      */     }
+/* 8780 */     catch (Exception exception) {
+/* 8781 */       System.out.println(exception.getMessage());
+/*      */     } 
+/*      */     
+/* 8784 */     return str;
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private Vector RFAsort(Vector paramVector) {
+/* 8789 */     EntityItem[] arrayOfEntityItem = getEntityArray(paramVector);
+/* 8790 */     RFAsort(arrayOfEntityItem);
+/* 8791 */     return getEntityVector(arrayOfEntityItem);
+/*      */   }
+/*      */   
+/*      */   private void RFAsort(EntityItem[] paramArrayOfEntityItem) {
+/* 8795 */     EntityItem entityItem1 = null;
+/* 8796 */     EntityItem entityItem2 = null;
+/* 8797 */     EntityItem entityItem3 = null;
+/* 8798 */     String str1 = null;
+/* 8799 */     String str2 = null;
+/* 8800 */     String str3 = null;
+/* 8801 */     String str4 = null;
+/* 8802 */     if (paramArrayOfEntityItem == null) {
+/*      */       return;
+/*      */     }
+/*      */     
+/* 8806 */     for (int i = paramArrayOfEntityItem.length; --i >= 0; ) {
+/* 8807 */       boolean bool = false;
+/*      */       
+/* 8809 */       for (byte b = 0; b < i; b++) {
+/* 8810 */         entityItem1 = paramArrayOfEntityItem[b];
+/* 8811 */         entityItem2 = paramArrayOfEntityItem[b + 1];
+/* 8812 */         str3 = entityItem1.getEntityType();
+/* 8813 */         str4 = entityItem1.getEntityType();
+/*      */         
+/* 8815 */         if (str3.equals("SOF")) {
+/* 8816 */           str1 = getSOFMktName(entityItem1);
+/*      */         }
+/* 8818 */         else if (str3.equals("CMPNT")) {
+/* 8819 */           str1 = getCmptToSofMktMsg(entityItem1);
+/*      */         }
+/* 8821 */         else if (str3.equals("FEATURE")) {
+/* 8822 */           str1 = getfeatureToSofMktMsg(entityItem1);
+/*      */         } 
+/*      */         
+/* 8825 */         if (str4.equals("SOF")) {
+/* 8826 */           str2 = getSOFMktName(entityItem2);
+/*      */         }
+/* 8828 */         else if (str4.equals("CMPNT")) {
+/* 8829 */           str2 = getCmptToSofMktMsg(entityItem2);
+/*      */         }
+/* 8831 */         else if (str4.equals("FEATURE")) {
+/* 8832 */           str2 = getfeatureToSofMktMsg(entityItem2);
+/*      */         } 
+/*      */         
+/* 8835 */         logMessage("RFASort:Comparing:" + entityItem1.getKey() + ":" + str1 + ":with:" + entityItem2.getKey() + ":" + str2);
+/*      */         
+/* 8837 */         if (str1.compareTo(str2) > 0) {
+/* 8838 */           entityItem3 = paramArrayOfEntityItem[b];
+/* 8839 */           paramArrayOfEntityItem[b] = paramArrayOfEntityItem[b + 1];
+/* 8840 */           paramArrayOfEntityItem[b + 1] = entityItem3;
+/* 8841 */           bool = true;
+/*      */         } 
+/*      */       } 
+/*      */       
+/* 8845 */       if (!bool)
+/*      */         return; 
+/*      */     } 
+/*      */   }
+/*      */ }
 
-package COM.ibm.eannounce.abr.rfa;
 
-// Imported TraX classes
-import javax.xml.transform.stream.StreamSource;
-
-// Imported java classes
-import java.util.*;
-import java.text.*;
-import java.util.Hashtable;
-import java.io.*;
-//import java.io.StringReader;
-//import java.io.InputStream;
-//import java.io.ByteArrayOutputStream;
-
-//Middleware Stuff
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.opicmpdh.middleware.taskmaster.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.eannounce.abr.util.*;
-
-/**
- *  This will extract the RFA (Request for Announcement) information from the
- *  ANNOUNCEMENT entity through its related entities. All the smarts are in the
- *  EXTRACT (Virtual Entity) which is set up in the metalinkattr Table The
- *  extract id is EXTRFA01. To understand how this works, you will need to know
- *  how the PDH entities are set up in the PDH; basically, the cascading
- *  relationships and associations starting from the ANNOUNCEMENT entity. The
- *  Extract set up for this will mirror what is required from these
- *  relationships. This program will basically query the EntityList object
- *  returned by the Extract and print the information with the static text as
- *  required for the VM system which is downstream This is not the FINAL report
- *  at this moment in time, but just a sample... many other ABR's will be
- *  written which will check for the completeness of the information required
- *  for the FINAL RFA. This report is for the PACKAGED ANSWERS DATA STREAM
- *
- *@author     Bala
- *@created    September 16, 2003
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\rfa\RFA_IGSSVS.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class RFA_IGSSVS
-    extends PokBaseABR {
-  /**
-   *  Execute ABR.
-   */
-
-  private final String DTDFILEPATH = ABRServerProperties.getDTDFilePath("RFA_IGSSVS");
-  private final String BREAK_INDICATOR = "$$BREAKHERE$$";
-  private final String strWorldwideTag = "US, AP, CAN, EMEA, LA";
-
-  EntityGroup grpAnnouncement = null;
-  EntityItem eiAnnounce = null;
-  EntityGroup grpAnnDeliv = null;
-  EntityItem eiAnnDeliv = null;
-  EntityGroup grpAnnPara = null;
-  EntityItem eiAnnPara = null;
-  EntityGroup grpAnnDepend = null;
-  EntityItem eiAnnDepend = null;
-  EntityGroup grpParamCode = null;
-  EntityItem eiParamCode = null;
-  EntityGroup grpDependCode = null;
-  EntityItem eiDependCode = null;
-  EntityGroup grpAnnProj = null;
-  EntityItem eiAnnProj = null;
-  EntityGroup grpErrataCause = null;
-  EntityItem eiErrataCause = null;
-  EntityGroup grpOrganUnit = null;
-  EntityItem eiOrganUnit = null;
-  EntityGroup grpOP = null;
-  EntityItem eiOP = null;
-  EntityGroup grpChannel = null;
-  EntityItem eiChannel = null;
-  EntityGroup grpPDSQuestions = null;
-  EntityItem eiPDSQuestions = null;
-  EntityGroup grpPriceInfo = null;
-  EntityItem eiPriceInfo = null;
-  EntityGroup grpCommOffInfo = null;
-  EntityItem eiCommOffInfo = null;
-  EntityGroup grpDerive = null;
-  EntityItem eiDerive = null;
-  EntityGroup grpAnnReview = null;
-  EntityItem eiAnnReview = null;
-  EntityGroup grpConfigurator = null;
-  EntityItem eiConfigurator = null;
-  EntityGroup grpAnnToConfig = null;
-  EntityItem eiAnnToConfig = null;
-  EntityGroup grpAnnToOrgUnit = null;
-  EntityItem eiAnnToOrgUnit = null;
-  EntityGroup grpAnnToOP = null;
-  EntityItem eiAnnToOP = null;
-  EntityGroup grpCofAvail = null;
-  EntityItem eiCofAvail = null;
-  EntityGroup egSof = null;
-  EntityItem eiSof = null;
-  EntityGroup grpPdsQuestions = null;
-  EntityItem eiPdsQuestions = null;
-  EntityGroup grpCommOfIvo = null;
-  EntityItem eiCommOfIvo = null;
-  EntityGroup grpCommOF = null;
-  EntityItem eiCommOF = null;
-  EntityGroup grpRelatedANN = null;
-  EntityItem eiRelatedANN = null;
-  EntityGroup grpGeneralArea = null;
-  EntityItem eiGeneralArea = null;
-  EntityGroup grpAvail = null;
-  EntityItem eiAvail = null;
-  EntityGroup grpOrderOF = null;
-  EntityItem eiOrderOF = null;
-  EntityGroup grpCrossSell = null;
-  EntityItem eiCrossSell = null;
-  EntityGroup grpUpSell = null;
-  EntityItem eiUpSell = null;
-  EntityGroup grpStdAmendText = null;
-  EntityItem eiStdAmendText = null;
-  EntityGroup grpCOFCrypto = null;
-  EntityItem eiCOFCrypto = null;
-  EntityGroup grpOOFCrypto = null;
-  EntityItem eiOOFCrypto = null;
-  EntityGroup grpCrypto = null;
-  EntityItem eiCrypto = null;
-  EntityGroup grpCofOrganUnit = null;
-  EntityItem eiCofOrganUnit = null;
-  EntityGroup grpIndividual = null;
-  EntityItem eiIndividual = null;
-  EntityGroup grpPublication = null;
-  EntityItem eiPublication = null;
-  EntityGroup grpEducation = null;
-  EntityItem eiEducation = null;
-  EntityGroup grpAnnEducation = null;
-  EntityItem eiAnnEducation = null;
-  EntityGroup grpIvocat = null;
-  EntityItem eiIvocat = null;
-  EntityGroup grpBoilPlateText = null;
-  EntityItem eiBoilPlateText = null;
-  EntityGroup grpCatIncl = null;
-  EntityItem eiCatIncl = null;
-  EntityGroup grpAlternateOF = null;
-  EntityItem eiAlternateOF = null;
-  EntityGroup grpCofBPExhibit = null;
-  EntityItem eiCofBPExhibit = null;
-  EntityGroup grpBPExhibit = null;
-  EntityItem eiBPExhibit = null;
-  EntityGroup grpCofPubs = null;
-  EntityItem eiCofPubs = null;
-  EntityGroup grpEnvirinfo = null;
-  EntityItem eiEnvirinfo = null;
-  EntityGroup grpAltEnvirinfo = null;
-  EntityItem eiAltEnvirinfo = null;
-  EntityGroup grpPackaging = null;
-  EntityItem eiPackaging = null;
-  EntityGroup grpSalesmanchg = null;
-  EntityItem eiSalesmanchg = null;
-  EntityGroup grpAnnSalesmanchg = null;
-  EntityItem eiAnnSalesmanchg = null;
-  EntityGroup grpOrderOFAvail = null;
-  EntityItem eiOrderOFAvail = null;
-  EntityGroup grpOrganUnitIndiv = null;
-  EntityItem eiOrganUnitIndiv = null;
-  EntityGroup grpAnnToAnnDeliv = null;
-  EntityItem eiAnnToAnnDeliv = null;
-  EntityGroup grpAnnDelReqTrans = null;
-  EntityItem eiAnnDelReqTrans = null;
-  EntityGroup grpEmeaTranslation = null;
-  EntityItem eiEmeaTranslation = null;
-  EntityGroup grpAnnToDescArea = null;
-  EntityItem eiAnnToDescArea = null;
-  EntityGroup grpCofPrice = null;
-  EntityItem eiCofPrice = null;
-  EntityGroup grpCofChannel = null;
-  EntityItem eiCofChannel = null;
-  EntityItem eiCofCofMgmtGrp = null;
-  EntityItem eiCofOofMgmtGrp = null;
-  EntityItem eiOofMemberCofOmg = null;
-  EntityItem eiCofMemberCofOmg = null;
-  EntityItem eiCofShip = null;
-  EntityItem eiShipInfo = null;
-  EntityItem eiAnnCofa = null;
-  EntityGroup grpAnnCofa = null;
-  EntityGroup grpAnnCofOffMgmtGrpa = null;
-  EntityItem eiAnnCofOffMgmtGrpa = null;
-  EntityGroup grpAnnAvail = null;
-  EntityItem eiAnnAvail = null;
-  EntityGroup grpOpsys = null;
-  EntityItem eiOpsys = null;
-  EntityGroup grpAnnOp = null;
-  EntityItem eiAnnOp = null;
-  EntityGroup egComponent = null;
-  EntityItem eiComponent = null;
-  EntityGroup egFeature = null;
-  EntityItem eiFeature = null;
-  EntityGroup egFinof = null;
-  EntityItem eiFinof = null;
-
-  ReportFormatter rfaReport = null;
-  XMLtoGML x2g = new XMLtoGML(); // create gml transformer
-
-  String strSplit = null;
-  int intSplitLen = 0;
-  int intSplitAt = 0;
-  int iTemp = 0;
-  int i = 0;
-  int j = 0;
-  int k = 0;
-  int iColWidths[] = null;
-  String strCondition1 = null;
-  String strCondition2 = null;
-  String strCondition3 = null;
-  String strCondition4 = null;
-  String strCondition5 = null;
-  String strCondition6 = null;
-  boolean bConditionOK = false;
-  boolean bConditionOK1 = false;
-  boolean bIsAnnITS = false;
-  EntityItem eiNextItem = null;
-  EntityItem eiNextItem1 = null;
-  EntityItem eiNextItem2 = null;
-  EntityItem eiNextItem3 = null;
-  EntityGroup grpNextGroup = null;
-  String[] strParamList1 = null;
-  String[] strParamList2 = null;
-  String[] strFilterAttr = null;
-  String[] strFilterValue = null;
-  String[] strFilterAttr1 = null;
-  String[] strFilterValue1 = null;
-  String[] strEntityTypes = null;
-  Object[] strAnswers = null;
-  String[] strFeatureToSof = null;
-  String[] strCmptToSof = null;
-  String[] strSofToCmpt = new String[] {
-      "SOFRELCMPNT", "CMPNT"};
-  String[] strHeader = null;
-  String[] strFeatureToCmpt = new String[] {
-      "CMPNTFEATURE", "CMPNT"};
-  String m_strSpaces = "                                                                                          ";
-  Vector vReturnEntities1 = new Vector();
-  Vector vReturnEntities2 = new Vector();
-  Vector vReturnEntities3 = new Vector();
-  Vector vReturnEntities4 = new Vector();
-  Vector vReturnEntities5 = new Vector();
-  Vector vAvailEntities = new Vector();
-  Vector vSofFrmSofAvail = new Vector();
-  Vector vCmpntFrmCmpntAvail = new Vector();
-  Vector vFeatureFrmFeatureAvail = new Vector();
-  Vector vSofSortedbyMkt = new Vector();
-  Vector vFeatureSortedbyMkt = new Vector();
-  Vector vCmptSortedbyMkt = new Vector();
-  Vector vAllSortedOfferings = new Vector();
-
-  Vector vPrintDetails = new Vector();
-  Vector vPrintDetails1 = new Vector();
-  Vector vPrintDetails2 = new Vector();
-  Vector vPrintDetails3 = new Vector();
-  Hashtable hNoDupeLines = new Hashtable();
-  Enumeration hKeys = null;
-
-  StringTokenizer st = null;
-  GeneralAreaList m_geList = null;
-
-  SortUtil mySort = new SortUtil();
-
-  /**
-   *  Description of the Method
-   */
-  public void execute_run() {
-    try {
-      start_ABRBuild();
-      setReturnCode(PASS); //Set this to pass, will change it when it fails
-
-      logMessage("VE Dump********************");
-      logMessage(m_elist.dump(false));
-      logMessage("End VE Dump********************");
-      //Build a new General Area tree
-      m_geList = new GeneralAreaList(getDatabase(), getProfile());
-      m_geList.buildTree();
-
-      logMessage("Starting General area dump*********************************");
-      logMessage(m_geList.dump(false));
-      logMessage("Ending dump***********************************");
-
-      grpAnnouncement = m_elist.getParentEntityGroup(); //This will be for announcement
-      logMessage("************Root Entity Type and id " + getEntityType() + ":" + getEntityID());
-      vReturnEntities1 = null;
-      vReturnEntities2 = null;
-
-      if (grpAnnouncement == null) {
-        logMessage("****************Announcement Not found ");
-        setReturnCode(FAIL);
-
-      }
-      else {
-        logMessage(grpAnnouncement.getEntityItemCount() + " Announcements found!");
-        eiAnnounce = grpAnnouncement.getEntityItem(0); //Get the first Announcement
-        /*
-         *  Now go get the rest of the stuff
-         */
-        grpAnnDeliv = m_elist.getEntityGroup("ANNDELIVERABLE");
-        eiAnnDeliv = null;
-        if (grpAnnDeliv != null) {
-          eiAnnDeliv = grpAnnDeliv.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ANNDELIVERABLE not found in list**");
-        }
-        grpParamCode = m_elist.getEntityGroup("PARAMETERCODE");
-        eiParamCode = null;
-        if (grpParamCode != null) {
-          eiParamCode = grpParamCode.getEntityItem(0);
-        }
-        else {
-          logMessage("**************PARAMETERCODE not found in list**");
-        }
-
-        grpDependCode = m_elist.getEntityGroup("DEPENDENCYCODE");
-        eiDependCode = null;
-        if (grpDependCode != null) {
-          eiDependCode = grpDependCode.getEntityItem(0);
-        }
-        else {
-          logMessage("**************DEPENDENCYCODE not found in list**");
-        }
-
-        grpAnnProj = m_elist.getEntityGroup("ANNPROJ");
-        eiAnnProj = null;
-        if (grpAnnProj != null) {
-          eiAnnProj = grpAnnProj.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ANNPROJ not found in list**");
-        }
-
-        grpErrataCause = m_elist.getEntityGroup("ERRATACAUSE");
-        eiErrataCause = null;
-        if (grpErrataCause != null) {
-          eiErrataCause = grpErrataCause.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ERRATACAUSE not found in list**");
-        }
-
-        grpOrganUnit = m_elist.getEntityGroup("ORGANUNIT");
-        eiOrganUnit = null;
-        if (grpOrganUnit != null) {
-          eiOrganUnit = grpOrganUnit.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ORGANUNIT not found in list**");
-        }
-
-        grpOP = m_elist.getEntityGroup("OP");
-        eiOP = null;
-        if (grpOP != null) {
-          eiOP = grpOP.getEntityItem(0);
-        }
-        else {
-          logMessage("**************OP not found in list**");
-        }
-
-        grpChannel = m_elist.getEntityGroup("CHANNEL");
-        eiChannel = null;
-        if (grpChannel != null) {
-          eiChannel = grpChannel.getEntityItem(0);
-        }
-        else {
-          logMessage("**************CHANNEL not found in list**");
-        }
-
-        grpPDSQuestions = m_elist.getEntityGroup("PDSQUESTIONS");
-        eiPDSQuestions = null;
-        if (grpPDSQuestions != null) {
-          eiPDSQuestions = grpPDSQuestions.getEntityItem(0);
-        }
-        else {
-          logMessage("**************PDSQUESTIONS not found in list**");
-        }
-
-        grpPriceInfo = m_elist.getEntityGroup("PRICEFININFO");
-        eiPriceInfo = null;
-        if (grpPriceInfo != null) {
-          eiPriceInfo = grpPriceInfo.getEntityItem(0);
-        }
-        else {
-          logMessage("**************PRICEFININFO not found in list**");
-        }
-
-        grpCommOffInfo = m_elist.getEntityGroup("COMMERCIALOFINFO");
-        eiCommOffInfo = null;
-        if (grpCommOffInfo != null) {
-          eiCommOffInfo = grpCommOffInfo.getEntityItem(0);
-        }
-        else {
-          logMessage("**************COMMERCIALOFINFO not found in list**");
-        }
-
-        grpDerive = m_elist.getEntityGroup("DERIVE");
-        eiDerive = null;
-        if (grpDerive != null) {
-          eiDerive = grpDerive.getEntityItem(0);
-        }
-        else {
-          logMessage("**************DERIVE not found in list**");
-        }
-
-        grpAnnReview = m_elist.getEntityGroup("ANNREVIEW");
-        eiAnnReview = null;
-        if (grpAnnReview != null) {
-          eiAnnReview = grpAnnReview.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ANNREVIEW not found in list**");
-        }
-
-        grpConfigurator = m_elist.getEntityGroup("CONFIGURATOR");
-        eiConfigurator = null;
-        if (grpConfigurator != null) {
-          eiConfigurator = grpConfigurator.getEntityItem(0);
-        }
-        else {
-          logMessage("**************CONFIGURATOR not found in list**");
-        }
-
-        grpAnnToConfig = m_elist.getEntityGroup("ANNTOCONFIG");
-        eiAnnToConfig = null;
-        if (grpAnnToConfig != null) {
-          eiAnnToConfig = grpAnnToConfig.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ANNTOCONFIG not found in list**");
-        }
-
-        grpAnnToOrgUnit = m_elist.getEntityGroup("ANNORGANUNIT");
-        eiAnnToOrgUnit = null;
-        if (grpAnnToConfig != null) {
-          eiAnnToOrgUnit = grpAnnToOrgUnit.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ANNORGANUNIT not found in list**");
-        }
-
-        grpAnnToOP = m_elist.getEntityGroup("ANNOP");
-        eiAnnToOP = null;
-        if (grpAnnToOP != null) {
-          eiAnnToOP = grpAnnToOP.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ANNOP not found in list**");
-        }
-
-        grpCofAvail = m_elist.getEntityGroup("COMMERCIALOFAVAIL");
-        eiCofAvail = null;
-        if (grpCofAvail != null) {
-          eiCofAvail = grpCofAvail.getEntityItem(0);
-        }
-        else {
-          logMessage("**************COMMERCIALOFAVAIL not found in list**");
-        }
-
-        grpPdsQuestions = m_elist.getEntityGroup("PDSQUESTIONS");
-        eiPdsQuestions = null;
-        if (grpPdsQuestions != null) {
-          eiPdsQuestions = grpPdsQuestions.getEntityItem(0);
-        }
-        else {
-          logMessage("**************PDSQUESTIONS not found in list**");
-        }
-
-        grpCommOfIvo = m_elist.getEntityGroup("COMMERCIALOFIVO");
-        eiCommOfIvo = null;
-        if (grpCommOfIvo != null) {
-          eiCommOfIvo = grpCommOfIvo.getEntityItem(0);
-        }
-        else {
-          logMessage("**************COMMERCIALOFIVO not found in list**");
-        }
-
-        grpCommOF = m_elist.getEntityGroup("COMMERCIALOF");
-        eiCommOF = null;
-        if (grpCommOF != null) {
-          eiCommOF = grpCommOF.getEntityItem(0);
-        }
-        else {
-          logMessage("**************COMMERCIALOF not found in list**");
-        }
-
-        grpRelatedANN = m_elist.getEntityGroup("RELATEDANN");
-        eiRelatedANN = null;
-        if (grpRelatedANN != null) {
-          eiRelatedANN = grpRelatedANN.getEntityItem(0);
-        }
-        else {
-          logMessage("**************RELATEDANN not found in list**");
-        }
-
-        grpGeneralArea = m_elist.getEntityGroup("GENERALAREA");
-        eiGeneralArea = null;
-        if (grpGeneralArea != null) {
-          eiGeneralArea = grpGeneralArea.getEntityItem(0);
-        }
-        else {
-          logMessage("**************GENERALAREA not found in list**");
-        }
-
-        grpAvail = m_elist.getEntityGroup("AVAIL");
-        eiAvail = null;
-        if (grpAvail != null) {
-          eiAvail = grpAvail.getEntityItem(0);
-        }
-        else {
-          logMessage("**************AVAIL not found in list**");
-        }
-
-        grpOrderOF = m_elist.getEntityGroup("ORDEROF");
-        eiOrderOF = null;
-        if (grpOrderOF != null) {
-          eiOrderOF = grpOrderOF.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ORDEROF not found in list**");
-        }
-
-        grpCrossSell = m_elist.getEntityGroup("CROSSSELL");
-        eiCrossSell = null;
-        if (grpCrossSell != null) {
-          eiCrossSell = grpCrossSell.getEntityItem(0);
-        }
-        else {
-          logMessage("**************CROSSSELL not found in list**");
-        }
-
-        grpUpSell = m_elist.getEntityGroup("UPSELL");
-        eiUpSell = null;
-        if (grpUpSell != null) {
-          eiUpSell = grpUpSell.getEntityItem(0);
-        }
-        else {
-          logMessage("**************UPSELL not found in list**");
-        }
-
-        grpStdAmendText = m_elist.getEntityGroup("STANDAMENDTEXT");
-        eiStdAmendText = null;
-        if (grpStdAmendText != null) {
-          eiStdAmendText = grpStdAmendText.getEntityItem(0);
-        }
-        else {
-          logMessage("**************STANDAMENDTEXT not found in list**");
-        }
-
-        grpCOFCrypto = m_elist.getEntityGroup("COFCRYPTO");
-        eiCOFCrypto = null;
-        if (grpCOFCrypto != null) {
-          eiCOFCrypto = grpCOFCrypto.getEntityItem(0);
-        }
-        else {
-          logMessage("**************COFCRYPTO not found in list**");
-        }
-
-        grpOOFCrypto = m_elist.getEntityGroup("OOFCRYPTO");
-        eiOOFCrypto = null;
-        if (grpOOFCrypto != null) {
-          eiOOFCrypto = grpOOFCrypto.getEntityItem(0);
-        }
-        else {
-          logMessage("**************OOFCRYPTO not found in list**");
-        }
-
-        grpCrypto = m_elist.getEntityGroup("CRYPTO");
-        eiCrypto = null;
-        if (grpCrypto != null) {
-          eiCrypto = grpCrypto.getEntityItem(0);
-        }
-        else {
-          logMessage("**************CRYPTO not found in list**");
-        }
-
-        grpCofOrganUnit = m_elist.getEntityGroup("COFORGANUNIT");
-        eiCofOrganUnit = null;
-        if (grpCofOrganUnit != null) {
-          eiCofOrganUnit = grpCofOrganUnit.getEntityItem(0);
-        }
-        else {
-          logMessage("**************COFORGANUNIT not found in list**");
-        }
-
-        grpIndividual = m_elist.getEntityGroup("INDIVIDUAL");
-        eiIndividual = null;
-        if (grpIndividual != null) {
-          eiIndividual = grpIndividual.getEntityItem(0);
-        }
-        else {
-          logMessage("**************INDIVIDUAL not found in list**");
-        }
-
-        grpPublication = m_elist.getEntityGroup("PUBLICATION");
-        eiPublication = null;
-        if (grpPublication != null) {
-          eiPublication = grpPublication.getEntityItem(0);
-        }
-        else {
-          logMessage("**************PUBLICATION not found in list**");
-        }
-
-        grpEducation = m_elist.getEntityGroup("EDUCATION");
-        eiEducation = null;
-        if (grpEducation != null) {
-          eiEducation = grpEducation.getEntityItem(0);
-        }
-        else {
-          logMessage("**************EDUCATION not found in list**");
-        }
-
-        grpAnnEducation = m_elist.getEntityGroup("ANNEDUCATION");
-        eiAnnEducation = null;
-        if (grpAnnEducation != null) {
-          eiAnnEducation = grpAnnEducation.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ANNEDUCATION not found in list**");
-        }
-
-        grpIvocat = m_elist.getEntityGroup("IVOCAT");
-        eiIvocat = null;
-        if (grpIvocat != null) {
-          eiIvocat = grpIvocat.getEntityItem(0);
-        }
-        else {
-          logMessage("**************IVOCAT not found in list**");
-        }
-
-        grpBoilPlateText = m_elist.getEntityGroup("BOILPLATETEXT");
-        eiBoilPlateText = null;
-        if (grpBoilPlateText != null) {
-          eiBoilPlateText = grpBoilPlateText.getEntityItem(0);
-        }
-        else {
-          logMessage("**************BOILPLATETEXT not found in list**");
-        }
-
-        grpCatIncl = m_elist.getEntityGroup("CATINCL");
-        eiCatIncl = null;
-        if (grpCatIncl != null) {
-          eiCatIncl = grpCatIncl.getEntityItem(0);
-        }
-        else {
-          logMessage("**************CATINCL not found in list**");
-        }
-
-        grpAlternateOF = m_elist.getEntityGroup("ALTERNATEOF");
-        eiAlternateOF = null;
-        if (grpAlternateOF != null) {
-          eiAlternateOF = grpAlternateOF.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ALTERNATEOF not found in list**");
-        }
-
-        grpCofBPExhibit = m_elist.getEntityGroup("COFBPEXHIBIT");
-        eiCofBPExhibit = null;
-        if (grpCofBPExhibit != null) {
-          eiCofBPExhibit = grpCofBPExhibit.getEntityItem(0);
-        }
-        else {
-          logMessage("**************COFBPEXHIBIT not found in list**");
-        }
-
-        grpBPExhibit = m_elist.getEntityGroup("BPEXHIBIT");
-        eiBPExhibit = null;
-        if (grpBPExhibit != null) {
-          eiBPExhibit = grpBPExhibit.getEntityItem(0);
-        }
-        else {
-          logMessage("**************BPEXHIBIT not found in list**");
-        }
-
-        grpCofPubs = m_elist.getEntityGroup("COFPUBS");
-        eiCofPubs = null;
-        if (grpCofPubs != null) {
-          eiCofPubs = grpCofPubs.getEntityItem(0);
-        }
-        else {
-          logMessage("**************COFPUBS not found in list**");
-        }
-
-        grpEnvirinfo = m_elist.getEntityGroup("ENVIRINFO");
-        eiEnvirinfo = null;
-        if (grpEnvirinfo != null) {
-          eiEnvirinfo = grpEnvirinfo.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ENVIRINFO not found in list**");
-        }
-
-        grpAltEnvirinfo = m_elist.getEntityGroup("ALTDEPENENVIRINFO");
-        eiAltEnvirinfo = null;
-        if (grpAltEnvirinfo != null) {
-          eiAltEnvirinfo = grpAltEnvirinfo.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ALTDEPENENVIRINFO not found in list**");
-        }
-
-        grpPackaging = m_elist.getEntityGroup("PACKAGING");
-        eiPackaging = null;
-        if (grpPackaging != null) {
-          eiPackaging = grpPackaging.getEntityItem(0);
-        }
-        else {
-          logMessage("**************PACKAGING not found in list**");
-        }
-
-        grpAnnSalesmanchg = m_elist.getEntityGroup("ANNSALESMANCHG");
-        eiAnnSalesmanchg = null;
-        if (grpAnnSalesmanchg != null) {
-          eiAnnSalesmanchg = grpAnnSalesmanchg.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ANNSALESMANCHG not found in list**");
-        }
-        grpSalesmanchg = m_elist.getEntityGroup("SALESMANCHG");
-        eiSalesmanchg = null;
-        if (grpSalesmanchg != null) {
-          eiSalesmanchg = grpSalesmanchg.getEntityItem(0);
-        }
-        else {
-          logMessage("**************SALESMANCHG not found in list**");
-        }
-
-        grpOrderOFAvail = m_elist.getEntityGroup("OOFAVAIL");
-        eiOrderOFAvail = null;
-        if (grpOrderOFAvail != null) {
-          eiOrderOFAvail = grpOrderOFAvail.getEntityItem(0);
-        }
-        else {
-          logMessage("**************OOFAVAIL not found in list**");
-        }
-
-        grpAnnToAnnDeliv = m_elist.getEntityGroup("ANNTOANNDELIVER");
-        eiAnnToAnnDeliv = null;
-        if (grpAnnToAnnDeliv != null) {
-          eiAnnToAnnDeliv = grpAnnToAnnDeliv.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ANNTOANNDELIVER not found in list**");
-        }
-
-        grpAnnDelReqTrans = m_elist.getEntityGroup("ANNDELREQTRANS");
-        eiAnnDelReqTrans = null;
-        if (grpAnnDelReqTrans != null) {
-          eiAnnDelReqTrans = grpAnnDelReqTrans.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ANNDELREQTRANS not found in list**");
-        }
-
-        grpAnnToDescArea = m_elist.getEntityGroup("ANNTODESCAREA");
-        eiAnnToDescArea = null;
-        if (grpAnnToDescArea != null) {
-          eiAnnToDescArea = grpAnnToDescArea.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ANNTODESCAREA not found in list**");
-        }
-
-        grpCofPrice = m_elist.getEntityGroup("COFPRICE");
-        eiCofPrice = null;
-        if (grpCofPrice != null) {
-          eiCofPrice = grpCofPrice.getEntityItem(0);
-        }
-        else {
-          logMessage("**************COFPRICE not found in list**");
-        }
-
-        grpAnnPara = m_elist.getEntityGroup("ANNPARAA");
-        eiAnnPara = null;
-        if (grpAnnPara != null) {
-          eiAnnPara = grpAnnPara.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ANNPARAA not found in list**");
-        }
-
-        grpDependCode = m_elist.getEntityGroup("ANNDEPA");
-        eiDependCode = null;
-        if (grpDependCode != null) {
-          eiDependCode = grpDependCode.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ANNDEPA not found in list**");
-        }
-
-        grpCofChannel = m_elist.getEntityGroup("COFCHANNEL");
-        eiCofChannel = null;
-        if (grpCofChannel != null) {
-          eiCofChannel = grpCofChannel.getEntityItem(0);
-        }
-        else {
-          logMessage("**************COFCHANNEL not found in list**");
-        }
-
-        grpAnnCofa = m_elist.getEntityGroup("ANNCOFA");
-        eiAnnCofa = null;
-        if (grpAnnCofa != null) {
-          eiAnnCofa = grpAnnCofa.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ANNCOFA not found in list**");
-        }
-
-        grpAnnCofOffMgmtGrpa = m_elist.getEntityGroup("ANNCOFOOFMGMTGRPA");
-        eiAnnCofOffMgmtGrpa = null;
-        if (grpAnnCofOffMgmtGrpa != null) {
-          eiAnnCofOffMgmtGrpa = grpAnnCofOffMgmtGrpa.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ANNCOFOOFMGMTGRPA not found in list**");
-        }
-
-        grpAnnAvail = m_elist.getEntityGroup("ANNAVAILA");
-        eiAnnAvail = null;
-        if (grpAnnAvail != null) {
-          eiAnnAvail = grpAnnAvail.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ANNAVAILA not found in list**");
-        }
-
-        grpAnnOp = m_elist.getEntityGroup("ANNOP");
-        eiAnnOp = null;
-        if (grpAnnOp != null) {
-          eiAnnOp = grpAnnOp.getEntityItem(0);
-        }
-        else {
-          logMessage("**************ANNOP not found in list**");
-        }
-
-        egComponent = m_elist.getEntityGroup("CMPNT");
-        eiComponent = null;
-        if (egComponent != null) {
-          eiComponent = egComponent.getEntityItem(0);
-        }
-        else {
-          logMessage("**************CMPNT not found in list**");
-        }
-
-        egSof = m_elist.getEntityGroup("SOF");
-        eiSof = null;
-        if (egSof != null) {
-          eiSof = egSof.getEntityItem(0);
-        }
-        else {
-          logMessage("**************SOF not found in list**");
-        }
-
-        egFeature = m_elist.getEntityGroup("FEATURE");
-        eiFeature = null;
-        if (egFeature != null) {
-          eiFeature = egFeature.getEntityItem(0);
-        }
-        else {
-          logMessage("**************FEATURE not found in list**");
-        }
-
-        egFinof = m_elist.getEntityGroup("FINOF");
-        eiFinof = null;
-        if (egFinof != null) {
-          eiFinof = egFinof.getEntityItem(0);
-        }
-        else {
-          logMessage("**************FINOF not found in list**");
-        }
-
-        rfaReport = new ReportFormatter();
-        rfaReport.setABRItem(getABRItem());
-
-        // Set up all the date information ...
-        DateFormat df = DateFormat.getDateInstance();
-        df.setCalendar(Calendar.getInstance());
-        SimpleDateFormat fmtDate = new SimpleDateFormat("yyyy-MM-dd");
-        fmtDate.setCalendar(Calendar.getInstance());
-        String strDayToday = fmtDate.format(new Date());
-
-        /*
-         *  Here we go! Start with the report header stuff
-         */
-        println(".*$REQUESTTYPE_BEGIN");
-        /*
-                DESCRIPTIONCLASS                 SHORTDESCRIPTION
-                 -------------------------------- ------------------------------------
-                 111                              Draft
-                 112                              Ready for Final Review
-                 113                              Change(Final Review)
-                 114                              Approved
-                 115                              Approved with Risk
-                 116                              Released to Production Management
-                 117                              Announced
-                 118                              Change (Approved)
-                 119                              Change (Approved w/Risk)
-                 120                              Change (Released)
-                 121                              Change (Announced)
-                 122         CmptToSof                     Cancelled
-         */
-        strCondition1 = getAttributeFlagEnabledValue(eiAnnounce, "LOB");
-        logMessage("**************Announcement LOB is " + strCondition1);
-        bIsAnnITS = strCondition1 != null ? strCondition1.equals("101") : false; //Flag to be used for getting the SOF mktname
-
-        //DISTRTYPE=720 THEn final edit
-        strCondition1 = getAttributeFlagEnabledValue(eiAnnounce, "DISTRTYPE");
-        if (!strCondition1.equals("720")) {
-          strCondition1 = getAttributeValue(eiAnnounce, "SENDTOMAINMENU", "NoValuefoundSENDTOMAINMENU");
-          //        println("Value of SENDTOMAINMENU is "+strCondition1);
-          if (strCondition1.equals("Yes")) {
-            //println("strCondition1");
-            strCondition1 = getAttributeFlagEnabledValue(eiAnnounce, "ANCYCLESTATUS");
-            strCondition1 = strCondition1.substring(strCondition1.indexOf("|") == -1 ? 0 :
-                strCondition1.indexOf("|") + 1); //Read after the "|"
-            strCondition2 = getAttributeValue(eiAnnounce, "ANNDATE", "");
-            i = Integer.valueOf(strCondition1).intValue();
-            bConditionOK = true;
-            switch (i) {
-              case 112: //Ready for final review
-              case 114: //Approved
-              case 115: //Approved with Risk
-                strCondition3 = "preEdit";
-                break;
-              case 117: //Change (Approved w/Risk)
-              case 116: //Released to Production Management
-                if (strCondition2.compareTo(strDayToday) > 0) { //set to final only if announcement date > today
-                  strCondition3 = "final";
-                }
-                else {
-                  strCondition3 = "correction";
-                }
-                break;
-              default:
-                println("ANCYCLESTATUS returned unexpected flag value");
-                break;
-            }
-          }
-          else {
-            strCondition3 = "return";
-          }
-        }
-        else {
-          strCondition3 = "finalEdit";
-        }
-        println(strCondition3); //print the request type
-        println(".*$REQUESTTYPE_END");
-        println(".*$USERIDS_BEGIN");
-        println("'" + (eiOP != null ? getAttributeValue(eiOP, "USERTOKEN", "") : "'") + "'");
-        println(".*$USERIDS_END");
-        println(".*$VARIABLES_BEGIN");
-        processShortAnswers();
-        println(".*$ANSWERS_BEGIN");
-
-        /*
-         *  ***************************************
-         *  END OF SHORT ANSWERS
-         *  Now we go get the LONG answers
-         */
-        processLongTo100();
-        processLongTo200();
-        processLongTo300();
-        processLongTo400();
-        processLongTo500();
-        processLongTo600();
-        processLongTo700();
-        processLongTo800();
-        processLongTo900();
-
-        /*
-         *  println(".*$A_9_Begin");
-         *  println(".*$A_9_End");
-         */
-        println(".*$ANSWERS_END");
-
-      }
-
-    }
-    catch (Exception exc) {
-      // Report this error to both the datbase log and the PrintWriter
-      println("Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-      println("" + exc);
-      logError(exc, "");
-      StringWriter writer = new StringWriter();
-
-      exc.printStackTrace(new PrintWriter(writer));
-
-      String x = writer.toString();
-
-      println(x);
-
-      // don't overwrite an update exception
-      if (getABRReturnCode() != UPDATE_ERROR) {
-        setReturnCode(INTERNAL_ERROR);
-      }
-    }
-    finally {
-      String strNavName = eiAnnounce.getNavAttrDescription();
-
-      if (strNavName.length() > 34) {
-        strNavName = strNavName.substring(0, 34);
-      }
-
-      String strDgName = "Extract for " + strNavName + " | " + (getReturnCode() == PASS ? "Passed" : "Failed") +
-          " | Complete";
-      setDGTitle(strDgName);
-
-      setDGRptName("RFA_IGSSVS");
-      setDGRptClass("RFA_IGSSVS");
-      printDGSubmitString(); //Stuff into report for subscription and notification
-
-      // set DG submit string
-      setDGString(getABRReturnCode());
-      // make sure the lock is released
-      if (!isReadOnly()) {
-        clearSoftLock();
-      }
-    }
-  }
-
-  /*
-   * This will navigate from the given EntityItem downward or upward the list of entitytypes
-   * in the array till it arrives at the final one, if a match is found, it will get the attribute
-   * value
-   */
-  /**
-   *  Gets the linkedEntityAttrValue attribute of the RFA_IGSSVS object
-   *
-   *@param  _eiFrom              Description of the Parameter
-   *@param  _strEntityTypes      Description of the Parameter
-   *@param  _strTargetAttribute  Description of the Parameter
-   *@param  _bGoDown             Description of the Parameter
-   *@return                      The linkedEntityAttrValue value
-   */
-  private String getLinkedEntityAttrValue(EntityItem _eiFrom, String _strEntityTypes[], String _strTargetAttribute,
-                                          boolean _bGoDown) {
-    return getLinkedEntityAttrValue(_eiFrom, _strEntityTypes, _strTargetAttribute, _bGoDown, null, null);
-  }
-
-  /**
-   *  Gets the linkedEntityAttrValue attribute of the RFA_IGSSVS object
-   *
-   *@param  _eiFrom              Description of the Parameter
-   *@param  _strEntityTypes      Description of the Parameter
-   *@param  _strTargetAttribute  Description of the Parameter
-   *@param  _bGoDown             Description of the Parameter
-   *@param  _strCheckAttribute   Description of the Parameter
-   *@param  _strCheckValues      Description of the Parameter
-   *@return                      The linkedEntityAttrValue value
-   */
-  private String getLinkedEntityAttrValue(EntityItem _eiFrom, String _strEntityTypes[], String _strTargetAttribute,
-                                          boolean _bGoDown, String[] _strCheckAttribute, String[] _strCheckValues) {
-    String strReturn = null;
-    EntityItem eiLinkItem = null;
-    if (_strCheckAttribute == null) {
-      eiLinkItem = getLinkedEntityItem(_eiFrom, _strEntityTypes, _bGoDown);
-    }
-    else {
-      eiLinkItem = getLinkedEntityItem(_eiFrom, _strEntityTypes, _bGoDown, _strCheckAttribute, _strCheckValues);
-    }
-    strReturn = getAttributeValue(eiLinkItem, _strTargetAttribute, " ");
-
-    return strReturn;
-  }
-
-  /**
-   *  Gets the downlinkedEntityAttrValue attribute of the RFA_IGSSVS object
-   *
-   *@param  _eiFrom              Description of the Parameter
-   *@param  _strEntityTypes      Description of the Parameter
-   *@param  _strTargetAttribute  Description of the Parameter
-   *@return                      The downlinkedEntityAttrValue value
-   */
-  private String getDownlinkedEntityAttrValue(EntityItem _eiFrom, String _strEntityTypes[], String _strTargetAttribute) {
-    return getLinkedEntityAttrValue(_eiFrom, _strEntityTypes, _strTargetAttribute, true);
-  }
-
-  private String getDownlinkedEntityAttrValue(EntityItem _eiFrom, String _strEntityTypes[], String _strTargetAttribute,
-                                              String[] _strCheckAttribute, String[] _strCheckValues) {
-    return getLinkedEntityAttrValue(_eiFrom, _strEntityTypes, _strTargetAttribute, true, _strCheckAttribute,
-                                    _strCheckValues);
-  }
-
-  /**
-   *  Gets the uplinkedEntityAttrValue attribute of the RFA_IGSSVS object
-   *
-   *@param  _eiFrom              Description of the Parameter
-   *@param  _strEntityTypes      Description of the Parameter
-   *@param  _strTargetAttribute  Description of the Parameter
-   *@param  _strCheckAttribute   Description of the Parameter
-   *@param  _strCheckValues      Description of the Parameter
-   *@return                      The uplinkedEntityAttrValue value
-   * /
-  private String getUplinkedEntityAttrValue(EntityItem _eiFrom, String _strEntityTypes[], String _strTargetAttribute,
-                                            String[] _strCheckAttribute, String[] _strCheckValues) {
-    return getLinkedEntityAttrValue(_eiFrom, _strEntityTypes, _strTargetAttribute, false, _strCheckAttribute,
-                                    _strCheckValues);
-  }*/
-
-  /**
-   *  Gets the uplinkedEntityAttrValue attribute of the RFA_IGSSVS object
-   *
-   *@param  _eiFrom              Description of the Parameter
-   *@param  _strEntityTypes      Description of the Parameter
-   *@param  _strTargetAttribute  Description of the Parameter
-   *@return                      The uplinkedEntityAttrValue value
-   */
-  private String getUplinkedEntityAttrValue(EntityItem _eiFrom, String _strEntityTypes[], String _strTargetAttribute) {
-    return getLinkedEntityAttrValue(_eiFrom, _strEntityTypes, _strTargetAttribute, false);
-  }
-
-  /**
-   *  Gets the linkedEntityItem attribute of the RFA_IGSSVS object
-   *
-   *@param  _eiFrom          Description of the Parameter
-   *@param  _strEntityTypes  Description of the Parameter
-   *@param  _bGoDown         Description of the Parameter
-   *@return                  The linkedEntityItem value
-   */
-  private EntityItem getLinkedEntityItem(EntityItem _eiFrom, String _strEntityTypes[], boolean _bGoDown) {
-    return getLinkedEntityItem(_eiFrom, _strEntityTypes, _bGoDown, null, null);
-  }
-
-  /*
-   * This will navigate from the given EntityItem downward or upward the list of entitytypes
-   * in the array till it arrives at the final one, if a match is found, it will return the EntityItem
-   */
-  /**
-   *  Gets the linkedEntityItem attribute of the RFA_IGSSVS object
-   *
-   *@param  _eiFrom             Description of the Parameter
-   *@param  _strEntityTypes     Description of the Parameter
-   *@param  _bGoDown            Description of the Parameter
-   *@param  _strCheckAttribute  Description of the Parameter
-   *@param  _strCheckValues     Description of the Parameter
-   *@return                     The linkedEntityItem value
-   */
-  private EntityItem getLinkedEntityItem(EntityItem _eiFrom, String _strEntityTypes[], boolean _bGoDown,
-                                         String[] _strCheckAttribute, String[] _strCheckValues) {
-    D.ebug(D.EBUG_SPEW, "In getLinkedEntityItem :" + _eiFrom.getKey());
-
-    EntityItem eiLinkItem = _eiFrom;
-    String strTargetEntityType = _strEntityTypes[_strEntityTypes.length - 1];
-    EntityItem eiReturn = null;
-    Vector vTemp = new Vector();
-    D.ebug(D.EBUG_SPEW, "In getLinkedEntityItem 1");
-    for (int k = 0; k < _strEntityTypes.length; k++) {
-      if (_strCheckAttribute == null) {
-        vTemp = searchEntityItemLink(eiLinkItem, null, null, true, _bGoDown, _strEntityTypes[k]);
-      }
-      else {
-        if (k == _strEntityTypes.length - 1) { //Match attribute values only at the target
-          D.ebug(D.EBUG_SPEW,
-                 "getLinkedEntityItem: matching from " + eiLinkItem.getKey() + " to target " + _strEntityTypes[k] +
-                 " for values " + _strCheckAttribute.toString() + " == " + _strCheckValues.toString());
-          vTemp = searchEntityItemLink(eiLinkItem, _strCheckAttribute, _strCheckValues, true, _bGoDown,
-                                       _strEntityTypes[k]);
-        }
-        else {
-          vTemp = searchEntityItemLink(eiLinkItem, null, null, true, _bGoDown, _strEntityTypes[k]);
-        }
-      }
-      D.ebug(D.EBUG_SPEW, "getLinkedEntityItem: Navigating " + eiLinkItem.getKey() + " to " + _strEntityTypes[k]);
-      if (vTemp.size() > 0) {
-        eiLinkItem = (EntityItem) vTemp.elementAt(0);
-      }
-    }
-    eiReturn = eiLinkItem;
-
-    if (!eiReturn.getEntityType().equals(strTargetEntityType)) {
-      D.ebug(D.EBUG_SPEW,
-             "getLinkedEntityItem: could not find target ETYPE:" + strTargetEntityType + " start " + _eiFrom.getKey() +
-             ":" + _strEntityTypes.toString());
-      eiReturn = null;
-    }
-    return eiReturn;
-  }
-
-  /**
-   *  Gets the downlinkedEntityItem attribute of the RFA_IGSSVS object
-   *
-   *@param  _eiFrom             Description of the Parameter
-   *@param  _strEntityTypes     Description of the Parameter
-   *@param  _strCheckAttribute  Description of the Parameter
-   *@param  _strCheckValues     Description of the Parameter
-   *@return                     The downlinkedEntityItem value
-   * /
-  private EntityItem getDownlinkedEntityItem(EntityItem _eiFrom, String _strEntityTypes[], String[] _strCheckAttribute,
-                                             String[] _strCheckValues) {
-    return getLinkedEntityItem(_eiFrom, _strEntityTypes, true, _strCheckAttribute, _strCheckValues);
-  }*/
-
-  /**
-   *  Gets the downlinkedEntityItem attribute of the RFA_IGSSVS object
-   *
-   *@param  _eiFrom          Description of the Parameter
-   *@param  _strEntityTypes  Description of the Parameter
-   *@return                  The downlinkedEntityItem value
-   */
-  private EntityItem getDownlinkedEntityItem(EntityItem _eiFrom, String _strEntityTypes[]) {
-    return getLinkedEntityItem(_eiFrom, _strEntityTypes, true);
-  }
-
-  /**
-   *  Gets the uplinkedEntityItem attribute of the RFA_IGSSVS object
-   *
-   *@param  _eiFrom          Description of the Parameter
-   *@param  _strEntityTypes  Description of the Parameter
-   *@return                  The uplinkedEntityItem value
-   */
-  private EntityItem getUplinkedEntityItem(EntityItem _eiFrom, String _strEntityTypes[]) {
-    D.ebug(D.EBUG_SPEW, "In getUplinkedEntityItem :" + _eiFrom.getKey());
-    return getLinkedEntityItem(_eiFrom, _strEntityTypes, false);
-  }
-
-  /**
-   *  Gets the uplinkedEntityItem attribute of the RFA_IGSSVS object
-   *
-   *@param  _eiFrom             Description of the Parameter
-   *@param  _strEntityTypes     Description of the Parameter
-   *@param  _strCheckAttribute  Description of the Parameter
-   *@param  _strCheckValues     Description of the Parameter
-   *@return                     The uplinkedEntityItem value
-   * /
-  private EntityItem getUplinkedEntityItem(EntityItem _eiFrom, String _strEntityTypes[], String[] _strCheckAttribute,
-                                           String[] _strCheckValues) {
-    D.ebug(D.EBUG_SPEW, "In getUplinkedEntityItem :" + _eiFrom.getKey());
-    return getLinkedEntityItem(_eiFrom, _strEntityTypes, false, _strCheckAttribute, _strCheckValues);
-  }*/
-
-  /**
-   *  searchEntityGroup
-   *
-   *@param  _egFrom             Entity Group to search
-   *@param  _strCheckAttribute  String array of attributes to check
-   *@param  _strCheckValues     String array of corresponding attribute values
-   *      to check in attribute array
-   *@param  _bAllTrue           If true, will return a vector of entities
-   *      fulfilling all the conditions (AND), else will return entityItem
-   *      vector of items fulfilling any condition (OR)
-   *@return                     The vector of EntityItems
-   */
-  private Vector searchEntityGroup(EntityGroup _egFrom, String[] _strCheckAttribute, String[] _strCheckValues,
-                                   boolean _bAllTrue) {
-    Vector vRetval = new Vector();
-   // String strAttrValue = null;
-//logMessage("**********searchEntityGroup:Attributes:"_strCheckAttribute.toString()+":Values:"+_strCheckValues.toString());
-    EntityItem eiCurrentItem = null;
-    for (int i = 0; i < _egFrom.getEntityItemCount(); i++) {
-      eiCurrentItem = _egFrom.getEntityItem(i);
-      if (_strCheckAttribute != null) {
-        if (foundInEntity(eiCurrentItem, _strCheckAttribute, _strCheckValues, _bAllTrue)) {
-          vRetval.add(eiCurrentItem);
-        }
-      }
-      else {
-        vRetval.add(eiCurrentItem);
-      }
-    }
-//logMessage("**********searchEntityGroup done");
-
-    return vRetval;
-  }
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _vEntItems          Vector list of EntityItems
-   *@param  _strCheckAttribute  array of attributes to check in the linked
-   *      entity...a null array will get ALL entities matching _strlinkEtype
-   *@param  _strCheckValues     array Values to match the array of attributes
-   *@param  _bAllTrue           true if all conditions have to match
-   *@param  _bDownLink          "true" if Downlink "false" if uplink
-   *@param  _strLinkEtype       Linked entity type to search
-   *@return                     Description of the Return Value
-   */
-  private Vector searchEntityVectorLink(Vector _vEntItems, String[] _strCheckAttribute, String[] _strCheckValues,
-                                        boolean _bAllTrue, boolean _bDownLink, String _strLinkEtype) {
-    Vector vRetval = new Vector();
-   // boolean bConditionOK = false;
-    //String strAttrValue = null;
-    EntityItem eiCurrentItem = null;
-    EntityItem eiLinkItem = null;
-    int iLinkCount = 0;
-    if (_vEntItems.size() == 0) {
-      logMessage("searchEntityVectorLink:NO ITEMS FOUND");
-    }
-    for (int i = 0; i < _vEntItems.size(); i++) {
-      eiCurrentItem = (EntityItem) _vEntItems.elementAt(i);
-      if (_bDownLink) {
-        iLinkCount = eiCurrentItem.getDownLinkCount();
-      }
-      else {
-        iLinkCount = eiCurrentItem.getUpLinkCount();
-      }
-      for (int j = 0; j < iLinkCount; j++) {
-        if (_bDownLink) {
-          eiLinkItem = (EntityItem) eiCurrentItem.getDownLink(j);
-        }
-        else {
-          eiLinkItem = (EntityItem) eiCurrentItem.getUpLink(j);
-        }
-        if (eiLinkItem != null) {
-          if (eiLinkItem.getEntityType().equals(_strLinkEtype)) {
-            D.ebug(D.EBUG_SPEW,
-                   "searchEntityVectorLink:Linking from :" + eiCurrentItem.getKey() + " to " + eiLinkItem.getKey());
-            if (_strCheckAttribute != null) {
-              if (foundInEntity(eiLinkItem, _strCheckAttribute, _strCheckValues, _bAllTrue)) {
-                if (!vRetval.contains(eiLinkItem)) {
-                  vRetval.add(eiLinkItem);
-                }
-              }
-            }
-            else {
-              if (!vRetval.contains(eiLinkItem)) {
-                vRetval.add(eiLinkItem);
-              }
-            }
-          }
-        }
-      }
-    }
-    return vRetval;
-  }
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _vEntItems          Vector list of EntityItems
-   *@param  _strCheckAttribute  array of attributes to check in the linked
-   *      entity...a null array will get ALL entities matching _strlinkEtype
-   *@param  _strCheckValues     array Values to match the array of attributes
-   *@param  _bAllTrue           true if all conditions have to match
-   *@param  _strLinkEtype       Linked entity type to search
-   *@return                     Description of the Return Value
-   */
-  private Vector searchEntityVectorLink1(Vector _vEntItems, String[] _strCheckAttribute, String[] _strCheckValues,
-                                         boolean _bAllTrue, String _strLinkEtype) {
-    Vector vRetval = new Vector();
-    //boolean bConditionOK = false;
-    //String strAttrValue = null;
-    EntityItem eiCurrentItem = null;
-    //int iLinkCount = 0;
-    D.ebug(D.EBUG_SPEW, "searchEntityVectorLink1-- _vEntItems.size(): " + _vEntItems.size() + "_strCheckAttribute: " +
-           _strCheckAttribute + "_strCheckValues: " + _strCheckValues + "_bAllTrue: " + _bAllTrue +
-           "_strLinkEtype: " + _strLinkEtype);
-    if (_vEntItems.size() == 0) {
-      logMessage("searchEntityVectorLink for searchEntityVectorLink1:NO ITEMS FOUND");
-    }
-    for (int i = 0; i < _vEntItems.size(); i++) {
-      eiCurrentItem = (EntityItem) _vEntItems.elementAt(i);
-      D.ebug(D.EBUG_SPEW, "eiCurrentItem" + eiCurrentItem + ": " + eiCurrentItem.getKey());
-      D.ebug(D.EBUG_SPEW, "searchEntityVectorLink1 mystuff for i" + i + "of: " + _vEntItems.size());
-      if (eiCurrentItem != null) {
-        if (eiCurrentItem.getEntityType().equals(_strLinkEtype)) {
-          D.ebug(D.EBUG_SPEW, "searchEntityVectorLink1:Linking from: " + eiCurrentItem.getKey());
-          if (_strCheckAttribute != null) {
-            D.ebug(D.EBUG_SPEW, "We're getting here: " + eiCurrentItem.getKey() + ": " + _strCheckAttribute + ": " +
-                   _strCheckValues + ": " + _bAllTrue);
-            if (foundInEntity(eiCurrentItem, _strCheckAttribute, _strCheckValues, _bAllTrue)) {
-              D.ebug(D.EBUG_SPEW, "We're getting here2");
-              if (!vRetval.contains(eiCurrentItem)) {
-                D.ebug(D.EBUG_SPEW, "We're getting here3");
-                vRetval.add(eiCurrentItem);
-              }
-            }
-          }
-          else {
-            if (!vRetval.contains(eiCurrentItem)) {
-              D.ebug(D.EBUG_SPEW, "We're getting here4");
-              vRetval.add(eiCurrentItem);
-            }
-          }
-        }
-      }
-    }
-    return vRetval;
-  }
-
-  private Vector searchInGeo(Vector _vEntItems, String _strGeoToCheck) {
-    String[] strGeoToCheck = new String[] {
-        _strGeoToCheck};
-    return searchInGeo(_vEntItems, strGeoToCheck);
-  }
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _vEntItems      Description of the Parameter
-   *@param  _strGeoToCheck  Description of the Parameter
-   *@return                 Description of the Return Value
-   */
-  private Vector searchInGeo(Vector _vEntItems, String[] _strGeoToCheck) {
-    Vector vProcessVector = new Vector();
-    EntityItem eiCheckItem = null;
-    Hashtable hNoDupes = new Hashtable();
-
-    boolean bFound = false;
-    //Mark all the entities that are not part of the given geo
-    for (int ix = 0; ix < _vEntItems.size(); ix++) {
-      eiCheckItem = (EntityItem) _vEntItems.elementAt(ix);
-      String strGeoToCheck = null;
-      bFound = false;
-      for (int iy = 0; iy < _strGeoToCheck.length; iy++) {
-        strGeoToCheck = _strGeoToCheck[iy];
-//logMessage("searchInGeo:checking for GEO:"+strGeoToCheck);
-        if (strGeoToCheck.equals("US")) {
-          bFound = m_geList.isRfaGeoUS(eiCheckItem);
-//logMessage("searchInGeo:checking for GEO:"+strGeoToCheck+":"+eiCheckItem.getKey()+":found:"+bFound);
-          break;
-        }
-        else if (strGeoToCheck.equals("AP")) {
-          bFound = m_geList.isRfaGeoAP(eiCheckItem);
-//logMessage("searchInGeo:checking for GEO:"+strGeoToCheck+":"+eiCheckItem.getKey()+":found:"+bFound);
-          break;
-        }
-        else if (strGeoToCheck.equals("CAN")) {
-          bFound = m_geList.isRfaGeoCAN(eiCheckItem);
-//logMessage("searchInGeo:checking for GEO:"+strGeoToCheck+":"+eiCheckItem.getKey()+":found:"+bFound);
-          break;
-        }
-        else if (strGeoToCheck.equals("EMEA")) {
-          bFound = m_geList.isRfaGeoEMEA(eiCheckItem);
-//logMessage("searchInGeo:checking for GEO:"+strGeoToCheck+":"+eiCheckItem.getKey()+":found:"+bFound);
-          break;
-        }
-        else if (strGeoToCheck.equals("LA")) {
-          bFound = m_geList.isRfaGeoLA(eiCheckItem);
-//logMessage("searchInGeo:checking for GEO:"+strGeoToCheck+":"+eiCheckItem.getKey()+":found:"+bFound);
-          break;
-        }
-      }
-      if (bFound) { // we found it, now check whether we added this before
-        if (!hNoDupes.containsKey(eiCheckItem.getKey())) {
-          hNoDupes.put(eiCheckItem.getKey(), eiCheckItem);
-          vProcessVector.add(eiCheckItem);
-          D.ebug(D.EBUG_SPEW, "searchInGeo:checking for GEO:Adding:" + eiCheckItem.getKey());
-
-        }
-      }
-    }
-    return vProcessVector;
-  }
-
-  /**
-   * Construct a single GEO tag string from a bunch of availability entities. Do not count
-   * GEO's which have already been found in another avail.
-   */
-  private String getAllGeoTags(Vector _v) {
-
-    String strReturn = "";
-    EntityItem eiTempAvail = null;
-    boolean bIsUS = false;
-    boolean bIsAP = false;
-    boolean bIsCAN = false;
-    boolean bIsEMEA = false;
-    boolean bIsLA = false;
-    D.ebug(D.EBUG_SPEW, "getAllGeoTags:Vector is ");
-    displayContents(_v);
-    for (int x = 0; x < _v.size(); x++) {
-      eiTempAvail = (EntityItem) _v.elementAt(x);
-
-      if (m_geList == null) {
-        logMessage("getGeoTags:GE List is null!");
-      }
-      if (!bIsUS) {
-        if (m_geList.isRfaGeoUS(eiTempAvail)) {
-          bIsUS = true;
-        }
-      }
-      if (!bIsAP) {
-        if (m_geList.isRfaGeoAP(eiTempAvail)) {
-          bIsAP = true;
-        }
-      }
-      if (!bIsCAN) {
-        if (m_geList.isRfaGeoCAN(eiTempAvail)) {
-          bIsCAN = true;
-        }
-      }
-      if (!bIsEMEA) {
-        if (m_geList.isRfaGeoEMEA(eiTempAvail)) {
-          bIsEMEA = true;
-        }
-      }
-      if (!bIsLA) {
-        if (m_geList.isRfaGeoLA(eiTempAvail)) {
-          bIsLA = true;
-        }
-      }
-    }
-    if (bIsUS) {
-      strReturn = "US";
-    }
-
-    if (bIsAP) {
-      if (strReturn.length() > 0) {
-        strReturn += ", AP";
-      }
-      else {
-        strReturn = "AP";
-      }
-    }
-
-    if (bIsCAN) {
-      if (strReturn.length() > 0) {
-        strReturn += ", CAN";
-      }
-      else {
-        strReturn = "CAN";
-      }
-    }
-    if (bIsEMEA) {
-      if (strReturn.length() > 0) {
-        strReturn += ", EMEA";
-      }
-      else {
-        strReturn = "EMEA";
-      }
-    }
-    if (bIsLA) {
-      if (strReturn.length() > 0) {
-        strReturn += ", LA";
-      }
-      else {
-        strReturn = "LA";
-      }
-    }
-    logMessage("getAllGeoTags:returning GEO tag :" + strReturn);
-    return strReturn;
-  }
-
-  /**
-   *  Gets the geoTags attribute of the RFA_IGSSVS object
-   *
-   *@param  _entCheck  Description of the Parameter
-   *@return            The geoTags value
-   */
-  private String getGeoTags(EntityItem _entCheck) {
-    String strReturn = "";
-    if (m_geList == null) {
-      logMessage("getGeoTags:GE List is null!");
-    }
-    if (m_geList.isRfaGeoUS(_entCheck)) {
-      strReturn = "US";
-    }
-    if (m_geList.isRfaGeoAP(_entCheck)) {
-      if (strReturn.length() > 0) {
-        strReturn += ", AP";
-      }
-      else {
-        strReturn = "AP";
-      }
-    }
-    if (m_geList.isRfaGeoCAN(_entCheck)) {
-      if (strReturn.length() > 0) {
-        strReturn += ", CAN";
-      }
-      else {
-        strReturn = "CAN";
-      }
-    }
-    if (m_geList.isRfaGeoEMEA(_entCheck)) {
-      if (strReturn.length() > 0) {
-        strReturn += ", EMEA";
-      }
-      else {
-        strReturn = "EMEA";
-      }
-    }
-    if (m_geList.isRfaGeoLA(_entCheck)) {
-      if (strReturn.length() > 0) {
-        strReturn += ", LA";
-      }
-      else {
-        strReturn = "LA";
-      }
-    }
-    logMessage("getGeoTags:returning GEO tag for entity:" + _entCheck.getKey() + ":" + strReturn);
-    return strReturn;
-  }
-
-  //***********************************************************************************************************
-
-
-   /**
-    *  Description of the Method
-    *
-    *@param  _egFrom             Starting entity group
-    *@param  _strCheckAttribute  array of attributes to check in the linked
-    *      entity...a null array will get ALL entities matching _strlinkEtype
-    *@param  _strCheckValues     array Values to match the array of attributes
-    *@param  _bAllTrue           true if all conditions have to match
-    *@param  _bDownLink          "true" if Downlink "false" if uplink
-    *@param  _strLinkEtype       Linked entity type to search
-    *@return                     Description of the Return Value
-    */
-   private Vector searchEntityGroupLink(EntityGroup _egFrom, String[] _strCheckAttribute, String[] _strCheckValues,
-                                        boolean _bAllTrue, boolean _bDownLink, String _strLinkEtype) {
-     Vector vRetval = new Vector();
-     if (_egFrom == null) {
-       logMessage("pASSED NULL ENTITYGROUP");
-       return vRetval;
-     }
-     D.ebug(D.EBUG_SPEW, "searchEntityGroupLink..Group is " + _egFrom.getEntityType());
-     //boolean bConditionOK = false;
-     //String strAttrValue = null;
-     EntityItem eiCurrentItem = null;
-     EntityItem eiLinkItem = null;
-     int iLinkCount = 0;
-     for (int i = 0; i < _egFrom.getEntityItemCount(); i++) {
-       eiCurrentItem = _egFrom.getEntityItem(i);
-       D.ebug(D.EBUG_SPEW, "Searching " + eiCurrentItem + getEntityType() + ":" + eiCurrentItem.getEntityID());
-       if (_bDownLink) {
-         iLinkCount = eiCurrentItem.getDownLinkCount();
-       }
-       else {
-         iLinkCount = eiCurrentItem.getUpLinkCount();
-       }
-       for (int j = 0; j < iLinkCount; j++) {
-         if (_bDownLink) {
-           eiLinkItem = (EntityItem) eiCurrentItem.getDownLink(j);
-           D.ebug(D.EBUG_SPEW, "Getting Downlinked " + eiLinkItem + getEntityType() + ":" + eiLinkItem.getEntityID());
-         }
-         else {
-           eiLinkItem = (EntityItem) eiCurrentItem.getUpLink(j);
-         }
-         if (eiLinkItem != null) {
-           if (eiLinkItem.getEntityType().equals(_strLinkEtype)) {
-             if (_strCheckAttribute != null) {
-               if (foundInEntity(eiLinkItem, _strCheckAttribute, _strCheckValues, _bAllTrue)) {
-                 vRetval.add(eiLinkItem);
-               }
-             }
-             else {
-               vRetval.add(eiLinkItem);
-             }
-           }
-         }
-       }
-     }
-     return vRetval;
-   }
-
-//********************************
-   /**
-    *  Description of the Method
-    *
-    *@param  _eiFrom             EntityItem to search from
-    *@param  _strCheckAttribute  array of attributes to check in the linked
-    *      entity...a null array will get ALL entities matching _strlinkEtype
-    *@param  _strCheckValues     array Values to match the array of attributes
-    *@param  _bAllTrue           true if all conditions have to match
-    *@param  _bDownLink          "true" if Downlink "false" if uplink
-    *@param  _strLinkEtype       Linked entity type to search
-    *@return                     Description of the Return Value
-    */
-   private Vector searchEntityItemLink(EntityItem _eiFrom, String[] _strCheckAttribute, String[] _strCheckValues,
-                                       boolean _bAllTrue, boolean _bDownLink, String _strLinkEtype) {
-     Vector vRetval = new Vector();
-     //boolean bConditionOK = false;
-     //String strAttrValue = null;
-     EntityItem eiLinkItem = null;
-     int iLinkCount = 0;
-     D.ebug(D.EBUG_SPEW,
-            "searchEntityItemLink: searching for " + _strLinkEtype + (_bDownLink ? " downlinks " : " uplinks ") +
-            " from " + _eiFrom.getKey());
-     if (_eiFrom == null) {
-       return vRetval;
-     }
-     if (_bDownLink) {
-       iLinkCount = _eiFrom.getDownLinkCount();
-     }
-     else {
-       iLinkCount = _eiFrom.getUpLinkCount();
-     }
-     D.ebug(D.EBUG_SPEW,
-            "searchEntityItemLink: found " + iLinkCount + (_bDownLink ? " downlinks " : " uplinks ") + " from " +
-            _eiFrom.getKey());
-     for (int j = 0; j < iLinkCount; j++) {
-       if (_bDownLink) {
-         eiLinkItem = (EntityItem) _eiFrom.getDownLink(j);
-       }
-       else {
-         eiLinkItem = (EntityItem) _eiFrom.getUpLink(j);
-       }
-       if (eiLinkItem != null) {
-         if (eiLinkItem.getEntityType().equals(_strLinkEtype)) {
-           if (_strCheckAttribute != null) {
-             if (foundInEntity(eiLinkItem, _strCheckAttribute, _strCheckValues, _bAllTrue)) {
-               D.ebug(D.EBUG_SPEW, "searchEntityItemLink:adding to vector");
-               vRetval.add(eiLinkItem);
-             }
-           }
-           else {
-             vRetval.add(eiLinkItem);
-           }
-         }
-       }
-     }
-
-     return vRetval;
-   }
-
-//*****************************
-
-   /**
-    *  Description of the Method
-    *
-    *@param  _eiItem       Description of the Parameter
-    *@param  _strAttrList  Description of the Parameter
-    *@param  _strNoValue   Description of the Parameter
-    */
-   private void printShortValueListInItem(EntityItem _eiItem, String[] _strAttrList, String _strNoValue) {
-     int intAttLen = _strAttrList.length;
-     String strVal = null;
-     for (int j = 0; j < intAttLen; j++) {
-       if (_strAttrList[j].trim().length() > 0) { //This is a attribute name
-
-         strVal = getAttributeShortFlagDesc(_eiItem.getEntityType(), _eiItem.getEntityID(), _strAttrList[j],
-                                            _strNoValue);
-         //add to vector if there is more than 1 attr passed and does not return default
-         if (intAttLen > 1) {
-           vPrintDetails.add(strVal);
-         }
-         else if (!strVal.equals(_strNoValue)) {
-           vPrintDetails.add(strVal);
-         }
-       }
-     }
-   }
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _eiItem       Description of the Parameter
-   *@param  _strAttrList  Description of the Parameter
-   *@param  _strNoValue   Description of the Parameter
-   *@param  _bXmlConvert  Description of the Parameter
-   */
-  private void printValueListInItem(EntityItem _eiItem, String[] _strAttrList, String _strNoValue, boolean _bXmlConvert) {
-    int intAttLen = _strAttrList.length;
-    String strVal = null;
-    for (int j = 0; j < intAttLen; j++) {
-      if (_strAttrList[j].trim().length() > 0) { //This is a attribute name
-        strVal = getAttributeValue(_eiItem.getEntityType(), _eiItem.getEntityID(), _strAttrList[j], _strNoValue);
-        if (strVal != null) {
-          if (_bXmlConvert && strVal.trim().length() > 0) {
-            strVal = transformXML(strVal);
-          }
-        }
-        //add to vector if there is more than 1 attr passed and does not return default
-        if (intAttLen > 1) {
-          vPrintDetails.add(strVal);
-        }
-        else if (!strVal.equals(_strNoValue)) {
-          vPrintDetails.add(strVal);
-        }
-      }
-    }
-  }
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _egGroup            Description of the Parameter
-   *@param  _strAttrList        Description of the Parameter
-   *@param  _strCheckAttribute  Description of the Parameter
-   *@param  _strCheckValue      Description of the Parameter
-   *@param  _strNoValue         Description of the Parameter
-   *@param  _bXmlConvert        Description of the Parameter
-   */
-  private void printValueListInGroup(EntityGroup _egGroup, String[] _strAttrList, String _strCheckAttribute,
-                                     String _strCheckValue, String _strNoValue, boolean _bXmlConvert) {
-    EntityItem eiItem = null;
-    //String strCheckValue = null;
-    if (_egGroup != null) {
-      for (int i = 0; i < _egGroup.getEntityItemCount(); i++) {
-        eiItem = _egGroup.getEntityItem(i);
-        if (_strCheckAttribute != null) {
-          if (foundInEntity(eiItem, new String[] {_strCheckAttribute}, new String[] {_strCheckValue}, true)) {
-            printValueListInItem(eiItem, _strAttrList, _strNoValue, _bXmlConvert);
-          }
-        }
-        else {
-          printValueListInItem(eiItem, _strAttrList, _strNoValue, _bXmlConvert);
-        }
-      }
-    }
-  }
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _vEntityItems  Description of the Parameter
-   *@param  _strAttrList   Description of the Parameter
-   *@param  _strNoValue    Description of the Parameter
-   *@param  _bLongValue    Description of the Parameter
-   *@param  _bXMLConvert   Description of the Parameter
-   */
-  private void printValueListInVector(Vector _vEntityItems, String[] _strAttrList, String _strNoValue,
-                                      boolean _bLongValue, boolean _bXMLConvert) {
-    EntityItem eiItem = null;
-    //String strCheckValue = null;
-    if (_vEntityItems != null) {
-      for (int i = 0; i < _vEntityItems.size(); i++) {
-        eiItem = (EntityItem) _vEntityItems.elementAt(i);
-        if (_bLongValue) {
-          printValueListInItem(eiItem, _strAttrList, _strNoValue, _bXMLConvert);
-        }
-        else {
-          printShortValueListInItem(eiItem, _strAttrList, _strNoValue);
-        }
-      }
-    }
-  }
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _egGroup      Description of the Parameter
-   *@param  _strAttrList  Description of the Parameter
-   * /
-  private void printValueListInGroup(EntityGroup _egGroup, String[] _strAttrList) {
-    int intAttLen = _strAttrList.length;
-    EntityItem eiPrint = null;
-    if (_egGroup != null) {
-      for (int i = 0; i < _egGroup.getEntityItemCount(); i++) {
-        eiPrint = _egGroup.getEntityItem(i);
-        printValueListInItem(eiPrint, _strAttrList, " ", false);
-      }
-    }
-  }*/
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _egGroup           Description of the Parameter
-   *@param  _strAttributeName  Description of the Parameter
-   *@param  _bAllNewLine       Description of the Parameter
-   * /
-  private void printValueInGroup(EntityGroup _egGroup, String _strAttributeName, boolean _bAllNewLine) {
-    printValueInGroup(_egGroup, _strAttributeName, " ", _bAllNewLine);
-  }*/
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _egGroup           Description of the Parameter
-   *@param  _strAttributeName  Description of the Parameter
-   *@param  _strNoValue        Description of the Parameter
-   *@param  _bLastNewLine      Description of the Parameter
-   * /
-  private void printValueInGroup(EntityGroup _egGroup, String _strAttributeName, String _strNoValue,
-                                 boolean _bLastNewLine) {
-    EntityItem eiPrint = null;
-    String[] strAttr = new String[] {
-        _strAttributeName};
-    if (_egGroup != null) {
-      for (int i = 0; i < _egGroup.getEntityItemCount(); i++) {
-        eiPrint = _egGroup.getEntityItem(i);
-        printValueListInItem(eiPrint, strAttr, _strNoValue, false);
-      }
-    }
-  }*/
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _egSearchGroup     Description of the Parameter
-   *@param  _strAttributeName  Description of the Parameter
-   *@param  _strSearchFor      Value to match in the attribute, null will return
-   *      true if any value found
-   *@return                    Description of the Return Value
-   * /
-  private boolean foundInGroup(EntityGroup _egSearchGroup, String _strAttributeName, String _strSearchFor) {
-    return foundInGroup(_egSearchGroup, new String[] {_strAttributeName}, new String[] {_strSearchFor}, true);
-  }*/
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _egSearchGroup     Description of the Parameter
-   *@param  _strAttributeName  Description of the Parameter
-   *@param  _strSearchFor      Description of the Parameter
-   *@param  _bAllTrue          Description of the Parameter
-   *@return                    Description of the Return Value
-   * /
-  private boolean foundInGroup(EntityGroup _egSearchGroup, String[] _strAttributeName, String[] _strSearchFor,
-                               boolean _bAllTrue) {
-    boolean bRetVal = false;
-    EntityItem eiSearchItem = null;
-    String strAttributeValue = null;
-    if (_egSearchGroup != null) {
-      for (int i = 0; i < _egSearchGroup.getEntityItemCount(); i++) {
-        eiSearchItem = _egSearchGroup.getEntityItem(i);
-        if (foundInEntity(eiSearchItem, _strAttributeName, _strSearchFor, _bAllTrue)) {
-          bRetVal = true;
-        }
-        if (bRetVal) { //Keep on going for an "AND" condition till all the conditions are evaluated
-          if (!_bAllTrue) {
-            break;
-          }
-        }
-        else {
-          if (_bAllTrue) {
-            break;
-          }
-        }
-      }
-    }
-
-    return bRetVal;
-  }*/
-/*
-  private Vector foundInEntityVector(Vector _v, String[] _strAttributeName, String[] _strSearchFor, boolean _bAllTrue) {
-    Vector vReturn = new Vector();
-    EntityItem eItem = null;
-    for (int i = 0; i < _v.size(); i++) {
-      eItem = (EntityItem) _v.elementAt(i);
-      if (foundInEntity(eItem, _strAttributeName, _strSearchFor, _bAllTrue)) {
-        vReturn.add(eItem);
-      }
-    }
-    return vReturn;
-  }*/
-
-  /**
-   *  Description of the Method 363 *@param _eiSearchItem Description of the
-   *  Parameter
-   *
-   *@param  _strAttributeName  Description of the Parameter
-   *@param  _strSearchFor      Description of the Parameter
-   *@param  _bAllTrue          Description of the Parameter
-   *@param  _eiSearchItem      Description of the Parameter
-   *@return                    Description of the Return Value
-   */
-  private boolean foundInEntity(EntityItem _eiSearchItem, String[] _strAttributeName, String[] _strSearchFor,
-                                boolean _bAllTrue) {
-    boolean bRetVal = false;
-    String strAttrValue = null;
-    if (_eiSearchItem == null) {
-      logMessage("Passing null entity item to search");
-      return false;
-    }
-
-    for (int j = 0; j < _strAttributeName.length; j++) {
-      //logMessage("Checking mystuff" + j + ": " + _strAttributeName.length);
-      //logMessage("Checking " + _eiSearchItem.getEntityType() + ":" + _eiSearchItem.getEntityID() + ":" + _strAttributeName[j] + " for value " + _strSearchFor[j]);
-      if (_strSearchFor[j].toLowerCase().equals(_strSearchFor[j].toUpperCase())) { //This is a flag code
-        if (flagvalueEquals(_eiSearchItem.getEntityType(), _eiSearchItem.getEntityID(), _strAttributeName[j],
-                            _strSearchFor[j])) {
-          bRetVal = true;
-        }
-        else {
-          bRetVal = false;
-        }
-      }
-      else {
-        strAttrValue = getAttributeValue(_eiSearchItem, _strAttributeName[j], "");
-        if (strAttrValue.indexOf(_strSearchFor[j]) > -1) {
-          bRetVal = true; //Keep on going for an "AND" condition till all the conditions are evaluated
-          //println(" fOUND!!");
-        }
-        else {
-          bRetVal = false;
-          //println(" not fOUND!!");
-        }
-      }
-      if (bRetVal) { //Keep on going for an "AND" condition till all the conditions are evaluated
-        if (!_bAllTrue) {
-          break;
-        }
-      }
-      else {
-        if (_bAllTrue) {
-          break;
-        }
-      }
-    }
-    //logMessage(" Returning "+bRetVal);
-
-    return bRetVal;
-  }
-
-  /**
-   *  Get the entity description to use in error messages
-   *
-   *@param  entityType  Description of the Parameter
-   *@param  entityId    Description of the Parameter
-   *@return             String
-   */
-  protected String getABREntityDesc(String entityType, int entityId) {
-    return null;
-  }
-
-  /**
-   *  Get ABR description
-   *
-   *@return    java.lang.String
-   */
-  public String getDescription() {
-    //return Constants.IAB3053I + "<br /><br />" + Constants.IAB3050I;
-    return "<br /><br />";
-  }
-
-  /**
-   *  Get the getRevision
-   *
-   *@return    java.lang.String
-   */
-  public String getRevision() {
-    return new String("$Revision: 1.157 $");
-  }
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _bHeader        Description of the Parameter
-   *@param  _strHeader      Description of the Parameter
-   *@param  _iColWidths     Description of the Parameter
-   *@param  _vPrintDetails  Description of the Parameter
-   *@param  _iOffset        Description of the Parameter
-   * /
-  private void printReport(boolean _bHeader, String[] _strHeader, int[] _iColWidths, Vector _vPrintDetails,
-                           int _iOffset) {
-    rfaReport.setOffset(_iOffset);
-    printReport(_bHeader, _strHeader, _iColWidths, _vPrintDetails);
-  }*/
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _bHeader        Description of the Parameter
-   *@param  _strHeader      Description of the Parameter
-   *@param  _iColWidths     Description of the Parameter
-   *@param  _vPrintDetails  Description of the Parameter
-   */
-  private void printReport(boolean _bHeader, String[] _strHeader, int[] _iColWidths, Vector _vPrintDetails) {
-    if ( (_iColWidths.length > 1 || _bHeader)) {
-      rfaReport.printHeaders(_bHeader);
-      rfaReport.setHeader(_strHeader);
-      rfaReport.setColWidth(_iColWidths);
-      rfaReport.setDetail(_vPrintDetails);
-      if (_vPrintDetails.size() > 0) {
-        rfaReport.printReport();
-      }
-      rfaReport.setOffset(0); //Reset previous offsets
-    }
-    else {
-      if (_iColWidths[0] == 69) {
-        for (int x = 0; x < _vPrintDetails.size(); x++) {
-          prettyPrint( (String) _vPrintDetails.elementAt(x), _iColWidths[0]);
-        }
-      }
-      else if (_vPrintDetails.size() > 0) {
-        rfaReport.printHeaders(_bHeader);
-        rfaReport.setColWidth(_iColWidths);
-        rfaReport.setDetail(_vPrintDetails);
-        rfaReport.printReport();
-      }
-      rfaReport.setOffset(0); //Reset previous offsets
-      rfaReport.setColumnSeparator(" ");
-    }
-  }
-
-  /**
-   *  Description of the Method
-   */
-  private void resetPrintvars() {
-    vPrintDetails.removeAllElements();
-    vPrintDetails = null;
-    vPrintDetails = new Vector();
-    rfaReport.setSortable(false);
-
-  }
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _v  Description of the Parameter
-   */
-  private void displayContents(Vector _v) {
-    EntityItem eiItem = null;
-    for (int x = 0; x < _v.size(); x++) {
-      eiItem = (EntityItem) _v.elementAt(x);
-      logMessage("ET:" + eiItem.getEntityType() + ":EI:" + eiItem.getEntityID());
-    }
-  }
-
-  /**
-   *  Description of the Method
-   */
-  private void processShortAnswers() {
-    if (eiAnnounce == null) {
-      println("Announce EntityItem IS NULL!");
-    }
-    println("CNTLNO = '" + getAttributeValue(eiAnnounce, "ANNNUMBER", "Not Populated") + "'");
-    println("TYPE = '" + getAttributeValue(eiAnnounce, "OFANNTYPE", "Not Populated") + "'");
-//TIR 6QKKNN    println("VERSION = '20.05'");
-    println("VERSION = '22.04'");
-    strSplit = "";
-    logMessage("_1A*******************");
-    strFilterAttr = new String[] {
-        "DELIVERABLETYPE"};
-    strFilterValue = new String[] {
-        "860"};
-    vReturnEntities1 = searchEntityGroup(grpAnnDeliv, strFilterAttr, strFilterValue, true);
-    eiAnnDeliv = vReturnEntities1.size() > 0 ? (EntityItem) vReturnEntities1.elementAt(0) : null;
-    bConditionOK = false;
-    if (eiAnnDeliv != null) {
-      bConditionOK = true;
-      strSplit = (eiAnnDeliv != null ? getAttributeValue(eiAnnDeliv, "SUBJECTLINE_1", "") : "ANNDELIVERABLE NOT LINKED");
-    }
-    println(".*$P_1A = '" + strSplit + "'");
-    strSplit = "";
-    if (bConditionOK) {
-//      strSplit = (eiAnnDeliv != null ?A, "DELIVERABLETYPE", "Not Populated") : "ANNDELIVERABLE NOT LINKED") + "'";
-      strSplit = (eiAnnDeliv != null ? getAttributeValue(eiAnnDeliv, "SUBJECTLINE_2", "") : "ANNDELIVERABLE NOT LINKED");
-    }
-    println(".*$P_1B = '" + strSplit + "'");
-    //get the assoc from announcement to this
-    strCondition2 = "";
-    vReturnEntities1 = searchEntityGroupLink(grpAnnPara, null, null, true, true, "PARAMETERCODE");
-    print(".*$P_1C = '");
-    if (vReturnEntities1.size() > 0) {
-      bConditionOK = false;
-      for (i = 0; i < vReturnEntities1.size(); i++) {
-        eiParamCode = (EntityItem) vReturnEntities1.elementAt(i);
-        strCondition1 = getAttributeValue(eiParamCode, "PARAMETERCODENUMBER", "");
-        if (!bConditionOK) {
-          bConditionOK = true;
-          strCondition2 = strCondition1;
-        }
-        else {
-          strCondition2 += "," + strCondition1;
-        }
-        if (i == 1) {
-          break;
-        } //List only the first 2 parmcodes
-      }
-    }
-    println(strCondition2 + "'");
-
-    vReturnEntities1 = searchEntityGroupLink(grpDependCode, null, null, true, true, "DEPENDENCYCODE");
-    print(".*$P_1D = '");
-    if (vReturnEntities1.size() > 0) {
-      bConditionOK = false;
-      for (i = 0; i < vReturnEntities1.size(); i++) {
-        eiDependCode = (EntityItem) vReturnEntities1.elementAt(i);
-        strCondition1 = getAttributeValue(eiDependCode, "DEPENCODENUMBER", "Not Populated");
-        if (!bConditionOK) {
-          bConditionOK = true;
-          strCondition2 = strCondition1;
-        }
-        else {
-          strCondition2 += ", " + strCondition1;
-        }
-        if (i == 8) {
-          break;
-        } //List only the first 9 dependent codes
-      }
-    }
-    println(strCondition2 + "'");
-
-    strCondition2 = "";
-    vReturnEntities1 = searchEntityGroupLink(grpDependCode, null, null, true, true, "DEPENDENCYCODE");
-    print(".*$P_1E = '");
-    if (vReturnEntities1.size() > 8) {
-      bConditionOK = false;
-      for (i = 9; i < vReturnEntities1.size(); i++) {
-        eiDependCode = (EntityItem) vReturnEntities1.elementAt(i);
-        strCondition1 = getAttributeValue(eiDependCode, "DEPENCODENUMBER", "Not Populated");
-        if (!bConditionOK) {
-          bConditionOK = true;
-          strCondition2 = strCondition1;
-        }
-        else {
-          strCondition2 += ", " + strCondition1;
-        }
-        if (i == 17) {
-          break;
-        } //List only the NEXT 9 dependent codes
-      }
-    }
-    println(strCondition2 + "'");
-
-    print(".*$P_1F = '");
-    strCondition2 = "";
-    if (vReturnEntities1.size() > 16) {
-      bConditionOK = false;
-      for (i = 17; i < vReturnEntities1.size(); i++) {
-        eiDependCode = (EntityItem) vReturnEntities1.elementAt(i);
-        strCondition1 = getAttributeValue(eiDependCode, "DEPENCODENUMBER", "Not Populated");
-        if (!bConditionOK) {
-          bConditionOK = true;
-          strCondition2 = strCondition1;
-        }
-        else {
-          strCondition2 += ", " + strCondition1;
-        }
-        if (i == 25) {
-          break;
-        } //List the LAST 9 dependent codes
-      }
-    }
-    println(strCondition2 + "'");
-
-    /*        Delete as per alan 11/5/03
-         strCondition1 = getAttributeValue(eiAnnounce, "MULTIPLEOFFERING", "0");
-         strSplit = (strCondition1.equalsIgnoreCase("Yes") ? "1" : "0");
-         println(".*$P_2A = '" + strSplit + "'");
-
-         strCondition1 = getAttributeValue(eiAnnounce, "STATEOFGENDIRECT", "0");
-         strSplit = (strCondition1.equalsIgnoreCase("Yes") ? "1" : "0");
-         println(".*$P_2B = '" + strSplit + "'");
-     */
-
-    //println(".*$P_3A = '" + (eiAnnProj != null ? getAttributeValue(eiAnnProj.getEntityType(), eiAnnProj.getEntityID(), "AVAILDCP_T", "") : "'") + "'");
-    strCondition1 = (eiAnnReview != null ?
-                     getAttributeValue(eiAnnReview.getEntityType(), eiAnnReview.getEntityID(), "ANREVIEW", "") : "");
-    strSplit = "";
-    strFilterAttr = new String[] {
-        "ANNREVIEWDEF"};
-    strFilterValue = new String[] {
-        "101"};
-    vReturnEntities1 = searchEntityGroup(grpAnnReview, strFilterAttr, strFilterValue, true);
-    eiAnnReview = vReturnEntities1.size() > 0 ? (EntityItem) vReturnEntities1.elementAt(0) : null;
-    strSplit = (eiAnnReview != null ?
-                getAttributeValue(eiAnnReview.getEntityType(), eiAnnReview.getEntityID(), "ANREVDATE", "") : "");
-    println(".*$P_3A = '" + strSplit + "'");
-    strSplit = "";
-    strFilterAttr = new String[] {
-        "ANNREVIEWDEF"};
-    strFilterValue = new String[] {
-        "102"};
-    vReturnEntities1 = searchEntityGroup(grpAnnReview, strFilterAttr, strFilterValue, true);
-    eiAnnReview = vReturnEntities1.size() > 0 ? (EntityItem) vReturnEntities1.elementAt(0) : null;
-    strSplit = (eiAnnReview != null ?
-                getAttributeValue(eiAnnReview.getEntityType(), eiAnnReview.getEntityID(), "ANREVDATE", "") : "");
-    println(".*$P_3B = '" + strSplit + "'");
-    println(".*$P_3C = '" + (grpAnnouncement != null ? getAttributeValue(eiAnnounce, "ANNDATE", "") : "") + "'");
-//Ask ALAN 4a, 4b....6K
-//    println(".*$P_4A = '" + (grpAnnouncement != null ? getAttributeValue(eiAnnounce, "ANNTYPE", "") : "") + "'");
-    println(".*$P_4A = '0'");
-    println(".*$P_4B = '" + (grpAnnouncement != null ? getAttributeValue(eiAnnounce, "REVISIONLEVEL", "") : "'") + "'");
-    //println(".*$P_4B = '0'");
-
-//    println(".*$P_6A = '" + (eiErrataCause != null ? getAttributeValue(eiErrataCause.getEntityType(), eiErrataCause.getEntityID(), "CAUSE", "0") : "0") + "'");
-    println(".*$P_6A = '0'");
-//println(".*$P_6B = '" + (eiErrataCause != null ? getAttributeValue(eiErrataCause.getEntityType(), eiErrataCause.getEntityID(), "CAUSE", "0") : "0") + "'");
-    println(".*$P_6B = '0'");
-    println(".*$P_6C = '0'");
-    println(".*$P_6D = '0'");
-    println(".*$P_6E = '0'");
-    println(".*$P_6F = '0'");
-    println(".*$P_6G = '0'");
-    println(".*$P_6H = '0'");
-    println(".*$P_6I = '0'");
-    println(".*$P_6J = '0'");
-    println(".*$P_6K = '0'");
-//    println(".*$P_6C = '" + (eiErrataCause != null ? getAttributeValue(eiErrataCause.getEntityType(), eiErrataCause.getEntityID(), "CAUSE", "0") : "0") + "'");
-//    println(".*$P_6D = '" + (eiErrataCause != null ? getAttributeValue(eiErrataCause.getEntityType(), eiErrataCause.getEntityID(), "CAUSE", "0") : "0") + "'");
-//    println(".*$P_6E = '" + (eiErrataCause != null ? getAttributeValue(eiErrataCause.getEntityType(), eiErrataCause.getEntityID(), "CAUSE", "0") : "0") + "'");
-//    println(".*$P_6F = '" + (eiErrataCause != null ? getAttributeValue(eiErrataCause.getEntityType(), eiErrataCause.getEntityID(), "CAUSE", "0") : "0") + "'");
-//    println(".*$P_6G = '" + (eiErrataCause != null ? getAttributeValue(eiErrataCause.getEntityType(), eiErrataCause.getEntityID(), "CAUSE", "0") : "0") + "'");
-//    println(".*$P_6H = '" + (eiErrataCause != null ? getAttributeValue(eiErrataCause.getEntityType(), eiErrataCause.getEntityID(), "CAUSE", "0") : "0") + "'");
-//    println(".*$P_6I = '" + (eiErrataCause != null ? getAttributeValue(eiErrataCause.getEntityType(), eiErrataCause.getEntityID(), "CAUSE", "0") : "0") + "'");
-//    println(".*$P_6J = '" + (eiErrataCause != null ? getAttributeValue(eiErrataCause.getEntityType(), eiErrataCause.getEntityID(), "CAUSE", "0") : "0") + "'");
-//    println(".*$P_6K = '" + (eiErrataCause != null ? getAttributeValue(eiErrataCause.getEntityType(), eiErrataCause.getEntityID(), "CAUSE", "0") : "0") + "'");
-
-    strCondition1 = getAttributeValue(eiAnnounce, "EXECAPPREADY", "0");
-    println(".*$P_7A = '" + (strCondition1.equalsIgnoreCase("Yes") ? "1" : "0") + "'");
-    println(".*$P_7B = '" + (grpAnnouncement != null ? getAttributeValue(eiAnnounce, "EXECAPPRDATE_T", "") : "") + "'");
-
-    /*
-     *  Print 7C to 7E if when ORGANUNITTYPE='Division' on ANNORGANUNIT
-     */
-    bConditionOK = false;
-    strFilterAttr = new String[] {
-        "ORGANUNITTYPE"};
-    strFilterValue = new String[] {
-        "4156"};
-    vReturnEntities1 = searchEntityGroup(grpOrganUnit, strFilterAttr, strFilterValue, false);
-    if (vReturnEntities1.size() > 0) {
-      eiOrganUnit = (EntityItem) vReturnEntities1.elementAt(0);
-      bConditionOK = true;
-    }
-    strCondition1 = (bConditionOK ? getAttributeValue(eiOrganUnit, "NAME", "") : "");
-    println(".*$P_7C = '" + strCondition1.trim() + "'");
-    strCondition1 = (bConditionOK ? getAttributeValue(eiOrganUnit, "INITIALS", "") : "");
-    println(".*$P_7D = '" + strCondition1.trim() + "'");
-    strCondition1 = (bConditionOK ? getAttributeValue(eiOrganUnit, "STREETADDRESS", "") : "");
-
-    strCondition2 = (bConditionOK ? getAttributeValue(eiOrganUnit, "CITY", "") : "");
-
-    strCondition1 += strCondition1.length() > 0 && strCondition2.length() > 0 ? "," + strCondition2.trim() : "";
-
-    strCondition2 = (bConditionOK ? getAttributeValue(eiOrganUnit, "STATE", "") : "");
-    strCondition1 += strCondition1.length() > 0 && strCondition2.length() > 0 ? "," + strCondition2.trim() : "";
-
-    strCondition2 = (bConditionOK ? getAttributeValue(eiOrganUnit, "COUNTRY", "") : "");
-    strCondition1 += strCondition1.length() > 0 && strCondition2.length() > 0 ? "," + strCondition2.trim() : "";
-
-    strCondition2 = (bConditionOK ? getAttributeValue(eiOrganUnit, "ZIPCODE", "") : "");
-    strCondition1 += strCondition1.length() > 0 && strCondition2.length() > 0 ? "," + strCondition2.trim() : "";
-    println(".*$P_7E = '" + strCondition1 + "'");
-
-    /*
-     *  Print 8A to 9A  if when ANNROLETYPE='Division President ' on ANNOP
-     */
-    eiAnnToOP = null;
-    eiOP = null;
-    bConditionOK = false;
-    for (i = 0; i < grpAnnToOP.getEntityItemCount(); i++) {
-      eiAnnToOP = grpAnnToOP.getEntityItem(i);
-      if (flagvalueEquals(eiAnnToOP.getEntityType(), eiAnnToOP.getEntityID(), "ANNROLETYPE", "15")) {
-        eiOP = (EntityItem) eiAnnToOP.getDownLink(0);
-        break;
-      }
-    }
-    println(".*$P_8A = '" + (eiOP != null ? getAttributeValue(eiOP, "USERNAME", "") : "") + "'");
-    println(".*$P_8B = '" + (eiOP != null ? getAttributeValue(eiOP, "STREETADDRESS", "") : "") + "'");
-    strSplit = (eiOP != null ? getAttributeValue(eiOP, "CITY", "") : "");
-    strSplit = strSplit + ", " + (eiOP != null ? getAttributeValue(eiOP, "STATE", "") : "");
-    strSplit = strSplit + ", " + (eiOP != null ? getAttributeValue(eiOP, "COUNTRY", "") : "");
-    println(".*$P_8C = '" + strSplit + "'");
-
-    println(".*$P_9A = '" + (eiOP != null ? getAttributeValue(eiOP, "SITE", "") : "") + "'");
-
-    /*
-         Division Focal point
-     */
-    eiAnnToOP = null;
-    eiOP = null;
-    bConditionOK = false;
-    for (i = 0; i < grpAnnToOP.getEntityItemCount(); i++) {
-      eiAnnToOP = grpAnnToOP.getEntityItem(i);
-      if (flagvalueEquals(eiAnnToOP.getEntityType(), eiAnnToOP.getEntityID(), "ANNROLETYPE", "4")) {
-        eiOP = (EntityItem) eiAnnToOP.getDownLink(0);
-        break;
-      }
-    }
-    println(".*$P_9B = '" + (eiOP != null ? getAttributeValue(eiOP, "USERNAME", "") : "") + "'");
-    println(".*$P_9C = '" + (eiOP != null ? getAttributeValue(eiOP, "VNETUID", "") : "") + "'");
-    println(".*$P_9D = '" + (eiOP != null ? getAttributeValue(eiOP, "VNETNODE", "") : "") + "'");
-
-    /*
-         Sponsor
-     */
-    eiAnnToOP = null;
-    eiOP = null;
-    bConditionOK = false;
-    for (i = 0; i < grpAnnToOP.getEntityItemCount(); i++) {
-      eiAnnToOP = grpAnnToOP.getEntityItem(i);
-      if (flagvalueEquals(eiAnnToOP.getEntityType(), eiAnnToOP.getEntityID(), "ANNROLETYPE", "9")) {
-        eiOP = (EntityItem) eiAnnToOP.getDownLink(0);
-        break;
-      }
-    }
-
-    println(".*$P_10A = '" + (eiOP != null ? getAttributeValue(eiOP, "USERNAME", "") : "") + "'");
-    println(".*$P_10B = '" + (eiOP != null ? getAttributeValue(eiOP, "JOBTITLE", "") : "") + "'");
-    println(".*$P_10C = '" + (eiOP != null ? getAttributeValue(eiOP, "TIELINE", "") : "") + "'");
-    strSplit = (eiOP != null ? getAttributeValue(eiOP, "VNETNODE", "") : "");
-    strSplit = strSplit + "/" + (eiOP != null ? getAttributeValue(eiOP, "VNETUID", "") : "");
-    println(".*$P_10D = '" + strSplit + "'");
-
-    /*
-     *  ANNROLETYPE='Sponsor Rep' on ANNOP
-     */
-    eiAnnToOP = null;
-    eiOP = null;
-    bConditionOK = false;
-    for (i = 0; i < grpAnnToOP.getEntityItemCount(); i++) {
-      eiAnnToOP = grpAnnToOP.getEntityItem(i);
-      if (flagvalueEquals(eiAnnToOP.getEntityType(), eiAnnToOP.getEntityID(), "ANNROLETYPE", "7")) {
-        eiOP = (EntityItem) eiAnnToOP.getDownLink(0);
-        break;
-      }
-    }
-    println(".*$P_11A = '" + (eiOP != null ? getAttributeValue(eiOP, "USERNAME", "") : "") + "'");
-    println(".*$P_11B = '" + (eiOP != null ? getAttributeValue(eiOP, "TELEPHONE", "") : "") + "'");
-    println(".*$P_11C = '" + (eiOP != null ? getAttributeValue(eiOP, "VNETUID", "") : "") + "'");
-    println(".*$P_11D = '" + (eiOP != null ? getAttributeValue(eiOP, "VNETNODE", "") : "") + "'");
-    println(".*$P_11E = '" + (eiOP != null ? getAttributeValue(eiOP, "EMAIL", "") : "") + "'");
-
-    /*
-     *  Print 11F to 11I  if when ANNROLETYPE='Product Development Mgr' on ANNOP
-     */
-    eiAnnToOP = null;
-    eiOP = null;
-    bConditionOK = false;
-    for (i = 0; i < grpAnnToOP.getEntityItemCount(); i++) {
-      eiAnnToOP = grpAnnToOP.getEntityItem(i);
-      if (flagvalueEquals(eiAnnToOP.getEntityType(), eiAnnToOP.getEntityID(), "ANNROLETYPE", "3")) {
-        eiOP = (EntityItem) eiAnnToOP.getDownLink(0);
-        break;
-      }
-    }
-    println(".*$P_11F = '" + (eiOP != null ? getAttributeValue(eiOP, "USERNAME", "") : "") + "'");
-    println(".*$P_11G = '" + (eiOP != null ? getAttributeValue(eiOP, "TELEPHONE", "") : "") + "'");
-    println(".*$P_11H = '" + (eiOP != null ? getAttributeValue(eiOP, "EMAIL", "") : "") + "'");
-    println(".*$P_11I = '" + (eiOP != null ? getAttributeValue(eiOP, "VNETNODE", "") : "") + "'");
-
-    /*
-     *  Print 13A to 13E if when ANNROLETYPE='Marketing Comm Mgr' on ANNOP
-     */
-    eiAnnToOP = null;
-    eiOP = null;
-    bConditionOK = false;
-    for (i = 0; i < grpAnnToOP.getEntityItemCount(); i++) {
-      eiAnnToOP = grpAnnToOP.getEntityItem(i);
-      if (flagvalueEquals(eiAnnToOP.getEntityType(), eiAnnToOP.getEntityID(), "ANNROLETYPE", "6")) {
-        eiOP = (EntityItem) eiAnnToOP.getDownLink(0);
-        break;
-      }
-    }
-    println(".*$P_13A = '" + (eiOP != null ? getAttributeValue(eiOP, "USERNAME", "") : "") + "'");
-    println(".*$P_13B = '" + (eiOP != null ? getAttributeValue(eiOP, "TELEPHONE", "") : "") + "'");
-    println(".*$P_13C = '" + (eiOP != null ? getAttributeValue(eiOP, "VNETUID", "") : "") + "'");
-    println(".*$P_13D = '" + (eiOP != null ? getAttributeValue(eiOP, "VNETNODE", "") : "") + "'");
-    println(".*$P_13E = '" + (eiOP != null ? getAttributeValue(eiOP, "SITE", "") : "") + "'");
-    bConditionOK = false;
-    eiChannel = null;
-    strFilterAttr = new String[] {
-        "AVAILTYPE"};
-    strFilterValue = new String[] {
-        "146"}; //Consider AVAILS OF type Planned Availability only 10/21  changed again 12/30
-    //Check fb 52652
-    vReturnEntities1 = searchEntityGroupLink(grpAnnAvail, strFilterAttr, strFilterValue, true, true, "AVAIL");
-    logMessage("****AVAIL*****");
-    displayContents(vReturnEntities1);
-    vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, false, "SOFAVAIL");
-    logMessage("****SOFAVAIL*****");
-    displayContents(vReturnEntities2);
-    vSofFrmSofAvail = searchEntityVectorLink(vReturnEntities2, null, null, true, false, "SOF");
-    logMessage("****SOF*****");
-    displayContents(vSofFrmSofAvail);
-    /* This is a good time to store the components and the features from availability
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> CMPNTAVAIL (R) -> CMPNT (E)
-     */
-    vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, false, "CMPNTAVAIL");
-    logMessage("****CMPNTAVAIL*****");
-    displayContents(vReturnEntities2);
-
-    vCmpntFrmCmpntAvail = searchEntityVectorLink(vReturnEntities2, null, null, true, false, "CMPNT");
-    logMessage("****CMPNT*****");
-    displayContents(vCmpntFrmCmpntAvail);
-
-    //ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> FEATUREAVAIL (R) -> FEATURE (E)
-    vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, false, "FEATUREAVAIL");
-    logMessage("****FEATUREAVAIL*****");
-    displayContents(vReturnEntities2);
-
-    vFeatureFrmFeatureAvail = searchEntityVectorLink(vReturnEntities2, null, null, true, false, "FEATURE");
-    logMessage("****FEATURE*****");
-    displayContents(vFeatureFrmFeatureAvail);
-
-    vSofSortedbyMkt = sortEntities(vSofFrmSofAvail, new String[] {"MKTGNAME"});
-    vReturnEntities5 = new Vector();
-    vReturnEntities5.addAll(vSofFrmSofAvail);
-    vReturnEntities5.addAll(vCmpntFrmCmpntAvail);
-    vReturnEntities5.addAll(vFeatureFrmFeatureAvail);
-
-    //Also sort them by mktmsg ...now they will have to be sorted by SOF mkgname - navigating all the way up
-    strCmptToSof = new String[] {
-        "SOFCMPNT", "SOF"};
-    vCmptSortedbyMkt = sortEntities(vCmpntFrmCmpntAvail, new String[] {"MKTGNAME"});
-
-    //String[] strFeatureToCmpt = new String[] {
-    //    "CMPNTFEATURE", "CMPNT"};
-    //ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> FEATUREAVAIL (R) -> FEATURE (E) -> CMPNTFEATURE (R) -> CMPNT (E) -> SOFCMPNT (R) -> SOF (E)
-    vFeatureSortedbyMkt = sortEntities(vFeatureFrmFeatureAvail, new String[] {"MKTGNAME"});
-
-    vAllSortedOfferings = RFAsort(vReturnEntities5);
-
-    //Start 14A here
-    /*
-         ANNOUNCEMENT (E) -> ANNAVAIL (A) -> AVAIL (E) -> SOFAVAIL (R) -> SOFCHANNEL (R) -> CHANNEL (E) when ROUTESTOMKTG = '110' (No) and CHANNELNAME = '373' (
-         IBM sales Specialist) or
-         ANNOUNCEMENT (E) -> ANNAVAIL (A) -> AVAIL (E) -> CMPNTAVAIL (R) -> CMPNTCHANNEL (R) -> CHANNEL (E) when ROUTESTOMKTG = '110' (No) and
-         CHANNELNAME = '373' (IBM sales Specialist) or
-         ANNOUNCEMENT (E) -> ANNAVAIL (A) -> AVAIL (E) -> FEATUREAVAIL (R) -> FEATURECHANNEL (R) -> CHANNEL (E)   when ROUTESTOMKTG = '110' (No)
-         and CHANNELNAME = '373' (IBM sales Specialist)
-
-         //Change here Bala
-         ANNOUNCEMENT (E) -> ANNAVAIL (A) -> AVAIL (E) -> SOFAVAIL (R) -> SOFCHANNEL (R) -> CHANNEL (E) -> CHGAA (A) -> GENERALAREA (E) when
-     RFAGEO = ''200' (US) or "201" (LA) or "202" (CAN) or "204" (AP) and CHANNEL (E) when ROUTESTOMKTG = '110' (No) and
-      CHANNELNAME = '373' (IBM sales Specialist)  or
-         ANNOUNCEMENT (E) -> ANNAVAIL (A) -> AVAIL (E) -> CMPNTAVAIL (R) -> CMPNTCHANNEL (R) -> CHANNEL (E) -> CHGAA (A) -> GENERALAREA (E) when
-      RFAGEO = ''200' (US) or "201"
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> SOFAVAIL (R) -> SOF (E) -> SOFCHANNEL (R) -> CHANNEL (E) when ROUTESTOMKTG = '100' (Yes) (LA) or "202" (CAN) or "204" (AP) when
-      ROUTESTOMKTG = '110' (No) and CHANNELNAME = '373' (IBM sales Specialist) or
-         ANNOUNCEMENT (E) -> ANNAVAIL (A) -> AVAIL (E) -> FEATUREAVAIL (R) -> FEATURECHANNEL (R) -> CHANNEL (E) -> CHGAA (A) -> GENERALAREA (E) when
-      RFAGEO = ''200' (US) or "201" (LA) or "202" (CAN) or "204" (AP)when ROUTESTOMKTG = '110' (No) and CHANNELNAME = '373' (IBM sales Specialist)
-
-     */
-    /*     strFilterAttr = new String[]{"CHANNELNAME", "ROUTESTOMKTG"};
-        strFilterValue = new String[]{"373", "110"};
-        vReturnEntities2 = searchEntityVectorLink(vSofFrmSofAvail, null, null, true, true, "SOFCHANNEL");
-        logMessage("****SOFCHANNEL*****");
-        displayContents(vReturnEntities2);
-     vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, true, true, "CHANNEL");
-        logMessage("****CHANNEL*****");
-        displayContents(vReturnEntities3);
-        strCondition1 = getAllGeoTags(vReturnEntities3);
-        if (strCondition1.indexOf("US")>-1 ||
-            strCondition1.indexOf("LA")>-1 ||
-            strCondition1.indexOf("CAN")>-1)  {
-        } else {
-          vReturnEntities3 = new Vector();       //disregard channel if it doesnt belong to US, LA, CAN geos
-        }
-        if (vReturnEntities3.size() == 0) {     //Check for channel in components
-          vReturnEntities2 = searchEntityVectorLink(vCmpntFrmCmpntAvail, null, null, true, true, "CMPNTCHANNEL");
-          logMessage("****CMPNTCHANNEL*****");
-          displayContents(vReturnEntities2);
-     vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, true, true, "CHANNEL");
-          logMessage("****CHANNEL*****");
-          displayContents(vReturnEntities3);
-          strCondition1 = getAllGeoTags(vReturnEntities3);
-          if (strCondition1.indexOf("US")>-1 ||
-              strCondition1.indexOf("LA")>-1 ||
-              strCondition1.indexOf("CAN")>-1)  {
-          } else {
-            vReturnEntities3 = new Vector();       //disregard channel if it doesnt belong to US, LA, CAN geos
-          }
-
-
-        }
-        if (vReturnEntities3.size() == 0) {     //Check for channel in Features
-          vReturnEntities2 = searchEntityVectorLink(vFeatureFrmFeatureAvail, null, null, true, true, "FEATURECHANNEL");
-          logMessage("****FEATURECHANNEL*****");
-          displayContents(vReturnEntities1);
-     vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, true, true, "CHANNEL");
-          logMessage("****CHANNEL*****");
-          displayContents(vReturnEntities3);
-          strCondition1 = getAllGeoTags(vReturnEntities3);
-          if (strCondition1.indexOf("US")>-1 ||
-              strCondition1.indexOf("LA")>-1 ||
-              strCondition1.indexOf("CAN")>-1)  {
-          } else {
-            vReturnEntities3 = new Vector();       //disregard channel if it doesnt belong to US, LA, CAN geos
-          }
-        }
-
-        if (vReturnEntities3.size() > 0) {
-          println(".*$P_14A = '1'");
-        } else {
-          println(".*$P_14A = '0'");
-        }
-        14A deleted 04/11/05
-     */
-    /*
-         ANNOUNCEMENT (E) -> ANNAVAIL (A) -> AVAIL (E) -> SOFAVAIL (R) -> SOFCHANNEL (R) -> CHANNEL (E) -> CHGAA (A) -> GENERALAREA (E) when RFAGEO = ''200' (US) or "201" (LA) or "202" (CAN)
-        or "204" (AP) and when ROUTESTOMKTG = '110' (No) and CHANNELNAME = '1000' (Business Partners:  Consultants and Integrators) or
-        '1100' (Business Partners:  Independent Software Vendor (ISV)) or '1200' (Business Partners:  Resellers) or
-        ANNOUNCEMENT (E) -> ANNAVAIL (A) -> AVAIL (E) -> CMPNTAVAIL (R) -> CMPNTCHANNEL (R) -> CHANNEL (E) -> CHGAA (A) -> GENERALAREA (E) when RFAGEO = ''200' (US) or "201" (LA)
-         or "202" (CAN) or "204" (AP) and when ROUTESTOMKTG = '110' (No) and CHANNELNAME =  '1000' (Business Partners:  Consultants and Integrators) or
-         '1100' (Business Partners:  Independent Software Vendor (ISV)) or '1200' (Business Partners:  Resellers) or
-        ANNOUNCEMENT (E) -> ANNAVAIL (A) -> AVAIL (E) -> FEATUREAVAIL (R) -> FEATURECHANNEL (R) -> CHANNEL (E) -> CHGAA (A) -> GENERALAREA (E) when RFAGEO = ''200' (US)
-         or "201" (LA) or "202" (CAN) or "204" (AP) and when ROUTESTOMKTG = '110' (No) and CHANNELNAME =  '1000' (Business Partners:  Consultants and Integrators)
-         or '1100' (Business Partners:  Independent Software Vendor (ISV)) or '1200' (Business Partners:  Resellers)
-        tHIS IS FOR 15A
-     */
-    strFilterAttr = new String[] {
-        "CHANNELNAME", "ROUTESTOMKTG"};
-    strFilterValue = new String[] {
-        "374", "110"};
-    vReturnEntities2 = searchEntityVectorLink(vSofFrmSofAvail, null, null, true, true, "SOFCHANNEL");
-    logMessage("14B****SOFCHANNEL*****");
-    displayContents(vReturnEntities2);
-    vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, false, true, "CHANNEL");
-    logMessage("14B****CHANNEL*****");
-    displayContents(vReturnEntities3);
-    strCondition1 = getAllGeoTags(vReturnEntities3);
-    if (strCondition1.indexOf("US") > -1 || strCondition1.indexOf("LA") > -1 || strCondition1.indexOf("CAN") > -1) {
-    }
-    else {
-      vReturnEntities3 = new Vector(); //disregard channel if it doesnt belong to US, LA, CAN geos
-    }
-    if (vReturnEntities3.size() == 0) { //Check for channel in components
-      vReturnEntities2 = searchEntityVectorLink(vCmpntFrmCmpntAvail, null, null, true, true, "CMPNTCHANNEL");
-      logMessage("14B****CMPNTCHANNEL*****");
-      displayContents(vReturnEntities2);
-      vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, true, true, "CHANNEL");
-      logMessage("14B****CHANNEL*****");
-      displayContents(vReturnEntities3);
-      strCondition1 = getAllGeoTags(vReturnEntities3);
-      if (strCondition1.indexOf("US") > -1 || strCondition1.indexOf("LA") > -1 || strCondition1.indexOf("CAN") > -1) {
-      }
-      else {
-        vReturnEntities3 = new Vector(); //disregard channel if it doesnt belong to US, LA, CAN geos
-      }
-    }
-    if (vReturnEntities3.size() == 0) { //Check for channel in Features
-      vReturnEntities2 = searchEntityVectorLink(vFeatureFrmFeatureAvail, null, null, true, true, "FEATURECHANNEL");
-      logMessage("14B****FEATURECHANNEL*****");
-      displayContents(vReturnEntities2);
-      vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, true, true, "CHANNEL");
-      logMessage("14B****CHANNEL*****");
-      displayContents(vReturnEntities3);
-      strCondition1 = getAllGeoTags(vReturnEntities3);
-      if (strCondition1.indexOf("US") > -1 || strCondition1.indexOf("LA") > -1 || strCondition1.indexOf("CAN") > -1) {
-      }
-      else {
-        vReturnEntities3 = new Vector(); //disregard channel if it doesnt belong to US, LA, CAN geos
-      }
-    }
-    if (vReturnEntities3.size() > 0) {
-      println(".*$P_14B = '1'");
-    }
-    else {
-      println(".*$P_14B = '0'");
-    }
-
-    strFilterAttr = new String[] {
-        "CHANNELNAME", "CHANNELNAME", "CHANNELNAME", "CHANNELNAME", "CHANNELNAME",
-        "CHANNELNAME", "CHANNELNAME", "CHANNELNAME", "CHANNELNAME", "CHANNELNAME", "CHANNELNAME", "CHANNELNAME",
-        "CHANNELNAME"};
-    strFilterValue = new String[] {
-        "375", "379", "380", "382", "383", "384", "385", "386", "387", "388", "1000", "1100",
-        "1200"};
-    vReturnEntities2 = searchEntityVectorLink(vSofFrmSofAvail, null, null, true, true, "SOFCHANNEL");
-    logMessage("15A****SOFCHANNEL*****" + vReturnEntities2);
-    displayContents(vReturnEntities2);
-    vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, false, true, "CHANNEL");
-    displayContents(vReturnEntities3);
-    logMessage("15A****CHANNEL from SOF*****" + vReturnEntities3 + "strFilterAttr: " + strFilterAttr +
-               "strFilterValue: " + strFilterValue + "vReturnEntities3.size" + vReturnEntities3.size());
-
-    if (vReturnEntities3.size() > 0) {
-      strFilterAttr1 = new String[] {
-          "ROUTESTOMKTG"};
-      strFilterValue1 = new String[] {
-          "110"};
-      logMessage("15A****CHANNEL from SOF vReturnEntities3");
-      displayContents(vReturnEntities3);
-      vReturnEntities3 = searchEntityVectorLink1(vReturnEntities3, strFilterAttr1, strFilterValue1, true, "CHANNEL");
-      logMessage("15A****CHANNEL from SOF checking for ROUTESTOMKTG*****" + vReturnEntities2 + "strFilterAttr1: " +
-                 strFilterAttr1 + "strFilterValue1: " + strFilterValue1 + "vReturnEntities3.size: " +
-                 vReturnEntities3.size());
-      displayContents(vReturnEntities3);
-    }
-    else {
-      vReturnEntities3 = new Vector(); //disregard channel if it doesnt belong to US, LA, CAN geos
-    }
-
-    strCondition1 = getAllGeoTags(vReturnEntities3);
-    if (strCondition1.indexOf("US") > -1 || strCondition1.indexOf("LA") > -1 || strCondition1.indexOf("CAN") > -1) {
-    }
-    else {
-      vReturnEntities3 = new Vector(); //disregard channel if it doesnt belong to US, LA, CAN geos
-    }
-    if (vReturnEntities3.size() == 0) { //Check for channel in components
-      vReturnEntities2 = searchEntityVectorLink(vCmpntFrmCmpntAvail, null, null, true, true, "CMPNTCHANNEL");
-      logMessage("15A****CMPNTCHANNEL*****" + vReturnEntities2);
-      displayContents(vReturnEntities2);
-      vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, false, true, "CHANNEL");
-      logMessage("15A****CHANNEL from CMPNT*****" + vReturnEntities3 + "strFilterAttr: " + strFilterAttr +
-                 "strFilterValue: " + strFilterValue + "vReturnEntities3.size" + vReturnEntities3.size());
-      displayContents(vReturnEntities3);
-
-      if (vReturnEntities3.size() > 0) {
-        strFilterAttr1 = new String[] {
-            "ROUTESTOMKTG"};
-        strFilterValue1 = new String[] {
-            "110"};
-        logMessage("15A****CHANNEL from CMPNT vReturnEntities3");
-        displayContents(vReturnEntities3);
-        vReturnEntities3 = searchEntityVectorLink1(vReturnEntities3, strFilterAttr1, strFilterValue1, true, "CHANNEL");
-        logMessage("15A****CHANNEL from CMPNT checking for ROUTESTOMKTG*****" + vReturnEntities2 + "strFilterAttr1: " +
-                   strFilterAttr1 + "strFilterValue1: " + strFilterValue1 + "vReturnEntities3.size: " +
-                   vReturnEntities3.size());
-        displayContents(vReturnEntities3);
-      }
-      else {
-        vReturnEntities3 = new Vector(); //disregard channel if it doesnt belong to US, LA, CAN geos
-      }
-
-      strCondition1 = getAllGeoTags(vReturnEntities3);
-      if (strCondition1.indexOf("US") > -1 || strCondition1.indexOf("LA") > -1 || strCondition1.indexOf("CAN") > -1) {
-      }
-      else {
-        vReturnEntities3 = new Vector(); //disregard channel if it doesnt belong to US, LA, CAN geos
-      }
-    }
-    if (vReturnEntities3.size() == 0) { //Check for channel in Features
-      vReturnEntities2 = searchEntityVectorLink(vFeatureFrmFeatureAvail, null, null, true, true, "FEATURECHANNEL");
-      logMessage("15A****FEATURECHANNEL*****" + vReturnEntities2);
-      displayContents(vReturnEntities2);
-      vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, false, true, "CHANNEL");
-      logMessage("15A****CHANNEL from FEATURE*****" + vReturnEntities3 + "strFilterAttr: " + strFilterAttr +
-                 "strFilterValue: " + strFilterValue + "vReturnEntities3.size" + vReturnEntities3.size());
-      displayContents(vReturnEntities3);
-
-      if (vReturnEntities3.size() > 0) {
-        strFilterAttr1 = new String[] {
-            "ROUTESTOMKTG"};
-        strFilterValue1 = new String[] {
-            "110"};
-        logMessage("15A****CHANNEL from SOF vReturnEntities3");
-        displayContents(vReturnEntities3);
-        vReturnEntities3 = searchEntityVectorLink1(vReturnEntities3, strFilterAttr1, strFilterValue1, true, "CHANNEL");
-        logMessage("15A****CHANNEL from SOF checking for ROUTESTOMKTG*****" + vReturnEntities2 + "strFilterAttr1: " +
-                   strFilterAttr1 + "strFilterValue1: " + strFilterValue1 + "vReturnEntities3.size" +
-                   vReturnEntities3.size());
-        displayContents(vReturnEntities3);
-      }
-      else {
-        vReturnEntities3 = new Vector(); //disregard channel if it doesnt belong to US, LA, CAN geos
-      }
-
-      strCondition1 = getAllGeoTags(vReturnEntities3);
-      if (strCondition1.indexOf("US") > -1 || strCondition1.indexOf("LA") > -1 || strCondition1.indexOf("CAN") > -1) {
-      }
-      else {
-        vReturnEntities3 = new Vector(); //disregard channel if it doesnt belong to US, LA, CAN geos
-      }
-    }
-
-    logMessage("15A****vReturnEntities3.size()*****: " + vReturnEntities3.size());
-    if (vReturnEntities3.size() > 0) {
-      println(".*$P_15A = '1'");
-    }
-    else {
-      println(".*$P_15A = '0'");
-    }
-    /*
-         strFilterAttr = new String[]{"CHANNELNAME"};
-         strFilterValue = new String[]{"375"};
-     */
-
-    /*
-        15B deleted 04/11/05
-     */
-    /*
-        15C Deleted 04/11/05
-     */
-    /*
-       strFilterAttr = new String[]{"CHANNELNAME"};
-       strFilterValue = new String[]{"376"};
-       vReturnEntities2 = searchEntityVectorLink(vSofFrmSofAvail, null, null, true, true, "SOFCHANNEL");
-       logMessage("****SOFCHANNEL*****");
-       displayContents(vReturnEntities2);
-     vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, false, true, "CHANNEL");
-       logMessage("****CHANNEL*****");
-       displayContents(vReturnEntities3);
-       if (vReturnEntities3.size() == 0) {     //Check for channel in components
-         vReturnEntities2 = searchEntityVectorLink(vCmpntFrmCmpntAvail, null, null, true, true, "CMPNTCHANNEL");
-         logMessage("****CMPNTCHANNEL*****");
-         displayContents(vReturnEntities2);
-     vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, false, true, "CHANNEL");
-         logMessage("****CHANNEL*****");
-         displayContents(vReturnEntities3);
-       }
-       if (vReturnEntities3.size() == 0) {     //Check for channel in Features
-         vReturnEntities2 = searchEntityVectorLink(vFeatureFrmFeatureAvail, null, null, true, true, "FEATURECHANNEL");
-         logMessage("****FEATURECHANNEL*****");
-         displayContents(vReturnEntities1);
-     vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, false, true, "CHANNEL");
-         logMessage("****CHANNEL*****");
-         displayContents(vReturnEntities3);
-       }
-       if (vReturnEntities3.size() > 0) {
-         println(".*$P_15D = '1'");
-       } else {
-         println(".*$P_15D = '0'");
-       }
-
-       strFilterAttr = new String[]{"CHANNELNAME"};
-       strFilterValue = new String[]{"377"};
-       vReturnEntities2 = searchEntityVectorLink(vSofFrmSofAvail, null, null, true, true, "SOFCHANNEL");
-       logMessage("****SOFCHANNEL*****");
-       displayContents(vReturnEntities2);
-     vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, false, true, "CHANNEL");
-       logMessage("****CHANNEL*****");
-       displayContents(vReturnEntities3);
-       if (vReturnEntities3.size() == 0) {     //Check for channel in components
-         vReturnEntities2 = searchEntityVectorLink(vCmpntFrmCmpntAvail, null, null, true, true, "CMPNTCHANNEL");
-         logMessage("****CMPNTCHANNEL*****");
-         displayContents(vReturnEntities2);
-     vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, false, true, "CHANNEL");
-         logMessage("****CHANNEL*****");
-         displayContents(vReturnEntities3);
-       }
-       if (vReturnEntities3.size() == 0) {     //Check for channel in Features
-         vReturnEntities2 = searchEntityVectorLink(vFeatureFrmFeatureAvail, null, null, true, true, "FEATURECHANNEL");
-         logMessage("****FEATURECHANNEL*****");
-         displayContents(vReturnEntities1);
-     vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, false, true, "CHANNEL");
-         logMessage("****CHANNEL*****");
-         displayContents(vReturnEntities3);
-       }
-       if (vReturnEntities3.size() > 0) {
-         println(".*$P_15E = '1'");
-       } else {
-         println(".*$P_15E = '0'");
-       }
-     */
-
-    /*
-        15F deleted 04/11/05
-     */
-    strFilterAttr = new String[] {
-        "CHANNELNAME", "ROUTESTOMKTG"};
-    strFilterValue = new String[] {
-        "381", "110"};
-    vReturnEntities2 = searchEntityVectorLink(vSofFrmSofAvail, null, null, true, true, "SOFCHANNEL");
-    logMessage("15G****SOFCHANNEL*****");
-    displayContents(vReturnEntities2);
-    vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, true, true, "CHANNEL");
-    logMessage("15G****CHANNEL*****");
-    displayContents(vReturnEntities3);
-    strCondition1 = getAllGeoTags(vReturnEntities3);
-    if (strCondition1.indexOf("US") > -1 || strCondition1.indexOf("LA") > -1 || strCondition1.indexOf("CAN") > -1) {
-    }
-    else {
-      vReturnEntities3 = new Vector(); //disregard channel if it doesnt belong to US, LA, CAN geos
-    }
-    if (vReturnEntities3.size() == 0) { //Check for channel in components
-      vReturnEntities2 = searchEntityVectorLink(vCmpntFrmCmpntAvail, null, null, true, true, "CMPNTCHANNEL");
-      logMessage("15G****CMPNTCHANNEL*****");
-      displayContents(vReturnEntities2);
-      vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, true, true, "CHANNEL");
-      logMessage("15G****CHANNEL*****");
-      displayContents(vReturnEntities3);
-      strCondition1 = getAllGeoTags(vReturnEntities3);
-      if (strCondition1.indexOf("US") > -1 || strCondition1.indexOf("LA") > -1 || strCondition1.indexOf("CAN") > -1) {
-      }
-      else {
-        vReturnEntities3 = new Vector(); //disregard channel if it doesnt belong to US, LA, CAN geos
-      }
-    }
-    if (vReturnEntities3.size() == 0) { //Check for channel in Features
-      vReturnEntities2 = searchEntityVectorLink(vFeatureFrmFeatureAvail, null, null, true, true, "FEATURECHANNEL");
-      logMessage("15G****FEATURECHANNEL*****");
-      displayContents(vReturnEntities2);
-      vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, true, true, "CHANNEL");
-      logMessage("15G****CHANNEL*****");
-      displayContents(vReturnEntities3);
-      strCondition1 = getAllGeoTags(vReturnEntities3);
-      if (strCondition1.indexOf("US") > -1 || strCondition1.indexOf("LA") > -1 || strCondition1.indexOf("CAN") > -1) {
-      }
-      else {
-        vReturnEntities3 = new Vector(); //disregard channel if it doesnt belong to US, LA, CAN geos
-      }
-    }
-    if (vReturnEntities3.size() > 0) {
-      println(".*$P_15G = '1'");
-    }
-    else {
-      println(".*$P_15G = '0'");
-    }
-
-    strCondition1 = (grpAnnouncement != null ?
-                     getAttributeFlagEnabledValue(eiAnnounce.getEntityType(), eiAnnounce.getEntityID(),
-                                                  "GENAREANAMEINCL", "") : "");
-
-    strCondition2 = "0";
-    /*
-         if 01 - Worldwide then set all to Yes
-         if 02 - US then set 15G to Yes
-         if 03 - Latin America then set 15K to Yes
-         if 04 - Canada then set 15L to Yes
-         if 05 - Europe then set 15H & 15I to Yes
-         if 06 - Asia Pacific then set 15J to Yes
-     */
-    println(".*$P_15H = '" + (m_geList.isRfaGeoUS(eiAnnounce) ? "1" : "0") + "'");
-    println(".*$P_15I = '" + (m_geList.isRfaGeoLA(eiAnnounce) ? "1" : "0") + "'");
-    println(".*$P_15J = '" + (m_geList.isRfaGeoCAN(eiAnnounce) ? "1" : "0") + "'");
-    println(".*$P_15K = '" + (m_geList.isRfaGeoEMEA(eiAnnounce) ? "1" : "0") + "'");
-    println(".*$P_15L = '" + (m_geList.isRfaGeoAP(eiAnnounce) ? "1" : "0") + "'");
-
-    //ANNOUNCEMENT (E) when COUNTRYLIST = '1438' (Aruba) or '1642' (Trinidad and Tobago) or '1629' (Suriname) or '1579' (Netherlands Antilles) or '1534' (Jamaica) or
-    // '1513' (Grenada) or '1450' (Bermuda) or '1442' (Bahamas) or '1445' (Barbados)
-    strCondition1 = getAttributeFlagEnabledValue(eiAnnounce, "COUNTRYLIST");
-    st = new StringTokenizer(strCondition1, "|");
-    bConditionOK = false;
-    while (st.hasMoreTokens()) {
-      strCondition2 = st.nextToken().trim(); //Take the spaces out
-      logMessage("_15M:Got Country:" + i + ":" + strCondition2);
-      if (strCondition2.equals("1438") || strCondition2.equals("1642") ||
-          strCondition2.equals("1629") || strCondition2.equals("1579") ||
-          strCondition2.equals("1534") || strCondition2.equals("1513") ||
-          strCondition2.equals("1450") || strCondition2.equals("1442") ||
-          strCondition2.equals("1445")) {
-        bConditionOK = true;
-        break;
-      }
-    }
-
-    println(".*$P_15M = '" + (bConditionOK ? "1" : "0") + "'");
-
-    println(".*$P_16A = '0'"); //Changed for V20.05
-    println(".*$P_16B = '0'"); //Changed for V20.05
-
-    strCondition1 = getAttributeValue(eiAnnounce, "CROSSPLATFORM", "");
-    println(".*$P_17A = '" + (strCondition1.indexOf("Yes") > -1 ? "1" : "0") + "'");
-
-    println(".*$P_17B = '" + (flagvalueEquals(eiAnnounce, "PLATFORM", "4767") ? "1" : "0") + "'");
-    println(".*$P_17C = '" + (flagvalueEquals(eiAnnounce, "PLATFORM", "4770") ? "1" : "0") + "'");
-    println(".*$P_17D = '" + (flagvalueEquals(eiAnnounce, "PLATFORM", "4769") ? "1" : "0") + "'");
-    println(".*$P_17E = '" + (flagvalueEquals(eiAnnounce, "PLATFORM", "4772") ? "1" : "0") + "'");
-    println(".*$P_17F = '" + (flagvalueEquals(eiAnnounce, "PLATFORM", "4764") ? "1" : "0") + "'");
-    println(".*$P_17G = '" + (flagvalueEquals(eiAnnounce, "PLATFORM", "4768") ? "1" : "0") + "'");
-    println(".*$P_17H = '" + (flagvalueEquals(eiAnnounce, "PLATFORM", "4766") ? "1" : "0") + "'");
-    println(".*$P_17I = '" + (flagvalueEquals(eiAnnounce, "PLATFORM", "4773") ? "1" : "0") + "'");
-
-    println(".*$P_17J = '" + (flagvalueEquals(eiAnnounce, "OFFERINGTYPES", "2907") ? "1" : "0") + "'");
-//    println(".*$P_17K = '" + (flagvalueEquals(eiAnnounce, "OFFERINGTYPES", "2913") ? "1" : "0") + "'");
-
-    println(".*$P_17L = '" + (flagvalueEquals(eiAnnounce, "ELECTRONICSERVICE", "010") ? "1" : "0") + "'");
-    println(".*$P_17M = '" + (flagvalueEquals(eiAnnounce, "ELECTRONICSERVICE", "011") ? "1" : "0") + "'");
-
-    println(".*$P_18A = '" + (flagvalueEquals(eiAnnounce, "CONFIGSUPPORT", "677") ? "1" : "0") + "'");
-    println(".*$P_18B = '" + (flagvalueEquals(eiAnnounce, "CONFIGSUPPORT", "675") ? "1" : "0") + "'");
-
-    /*
-     *  Check for US configurator
-     */
-    bConditionOK = false;
-    vReturnEntities2 = new Vector();
-    for (i = 0; i < grpAnnToConfig.getEntityItemCount(); i++) {
-      eiAnnToConfig = grpAnnToConfig.getEntityItem(i);
-      eiConfigurator = (EntityItem) eiAnnToConfig.getDownLink(0);
-      if (m_geList.isRfaGeoUS(eiConfigurator)) {
-        logMessage("P_19A US Configurator" + eiConfigurator.getEntityType() + ":" + eiConfigurator.getEntityID());
-        bConditionOK = true;
-        vReturnEntities2.addElement(eiConfigurator); //Store all instances of the configurator
-      }
-    }
-
-    //'ANNOUNCEMENT (E) ->ANNTOCONFIG (R) -> CONFIGURATOR (E) -> CONFIGGAA (A) -> GENERALAREA (E) when RFAGEO = '200' (US)
-    eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(0) : null);
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_19A = '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_19B = '" + strCondition2 + "'");
-
-    if (vReturnEntities2.size() > 1) {
-      eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(1) : null);
-    }
-    else {
-      bConditionOK = false;
-    }
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_19C = '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_19D = '" + strCondition2 + "'");
-
-    if (vReturnEntities2.size() > 2) {
-      eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(2) : null);
-    }
-    else {
-      bConditionOK = false;
-    }
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_19E = '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_19F = '" + strCondition2 + "'");
-
-    if (vReturnEntities2.size() > 3) {
-      eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(2) : null);
-    }
-    else {
-      bConditionOK = false;
-    }
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_19G= '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_19H = '" + strCondition2 + "'");
-
-    if (vReturnEntities2.size() > 4) {
-      eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(2) : null);
-    }
-    else {
-      bConditionOK = false;
-    }
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_19I= '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_19J = '" + strCondition2 + "'");
-
-    /*
-     *  Check for AP configurator
-     */
-    bConditionOK = false;
-    vReturnEntities2 = new Vector();
-    for (i = 0; i < grpAnnToConfig.getEntityItemCount(); i++) {
-      eiAnnToConfig = grpAnnToConfig.getEntityItem(i);
-      eiConfigurator = (EntityItem) eiAnnToConfig.getDownLink(0);
-      if (m_geList.isRfaGeoAP(eiConfigurator)) {
-        logMessage("P_20A ap Configurator" + eiConfigurator.getEntityType() + ":" + eiConfigurator.getEntityID());
-        bConditionOK = true;
-        vReturnEntities2.addElement(eiConfigurator); //Store all instances of the configurator
-      }
-    }
-
-    //'ANNOUNCEMENT (E) ->ANNTOCONFIG (R) -> CONFIGURATOR (E) -> CONFIGGAA (A) -> GENERALAREA (E) when RFAGEO = '200' (US)
-    eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(0) : null);
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_20A = '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_20B = '" + strCondition2 + "'");
-
-    if (vReturnEntities2.size() > 1) {
-      eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(1) : null);
-    }
-    else {
-      bConditionOK = false;
-    }
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_20C = '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_20D = '" + strCondition2 + "'");
-
-    if (vReturnEntities2.size() > 2) {
-      eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(2) : null);
-    }
-    else {
-      bConditionOK = false;
-    }
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_20E = '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_20F = '" + strCondition2 + "'");
-
-    if (vReturnEntities2.size() > 3) {
-      eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(2) : null);
-    }
-    else {
-      bConditionOK = false;
-    }
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_20G= '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_20H = '" + strCondition2 + "'");
-
-    if (vReturnEntities2.size() > 4) {
-      eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(2) : null);
-    }
-    else {
-      bConditionOK = false;
-    }
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_20I= '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_20J = '" + strCondition2 + "'");
-
-    /*
-     *  Check for LA configurator
-     */
-    bConditionOK = false;
-    vReturnEntities2 = new Vector();
-    for (i = 0; i < grpAnnToConfig.getEntityItemCount(); i++) {
-      eiAnnToConfig = grpAnnToConfig.getEntityItem(i);
-      eiConfigurator = (EntityItem) eiAnnToConfig.getDownLink(0);
-      if (m_geList.isRfaGeoLA(eiConfigurator)) {
-        logMessage("P_21A LA Configurator" + eiConfigurator.getEntityType() + ":" + eiConfigurator.getEntityID());
-        bConditionOK = true;
-        vReturnEntities2.addElement(eiConfigurator); //Store all instances of the configurator
-      }
-    }
-
-    //'ANNOUNCEMENT (E) ->ANNTOCONFIG (R) -> CONFIGURATOR (E) -> CONFIGGAA (A) -> GENERALAREA (E) when RFAGEO = '200' (US)
-    eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(0) : null);
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_21A = '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_21B = '" + strCondition2 + "'");
-
-    if (vReturnEntities2.size() > 1) {
-      eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(1) : null);
-    }
-    else {
-      bConditionOK = false;
-    }
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_21C = '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_21D = '" + strCondition2 + "'");
-
-    if (vReturnEntities2.size() > 2) {
-      eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(2) : null);
-    }
-    else {
-      bConditionOK = false;
-    }
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_21E = '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_21F = '" + strCondition2 + "'");
-
-    if (vReturnEntities2.size() > 3) {
-      eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(2) : null);
-    }
-    else {
-      bConditionOK = false;
-    }
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_21G= '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_21H = '" + strCondition2 + "'");
-
-    if (vReturnEntities2.size() > 4) {
-      eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(2) : null);
-    }
-    else {
-      bConditionOK = false;
-    }
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_21I= '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_21J = '" + strCondition2 + "'");
-
-    /*
-     *  Check for CAN configurator
-     */
-    bConditionOK = false;
-    vReturnEntities2 = new Vector();
-    for (i = 0; i < grpAnnToConfig.getEntityItemCount(); i++) {
-      eiAnnToConfig = grpAnnToConfig.getEntityItem(i);
-      eiConfigurator = (EntityItem) eiAnnToConfig.getDownLink(0);
-      if (m_geList.isRfaGeoCAN(eiConfigurator)) {
-        logMessage("P_22a CANConfigurator" + eiConfigurator.getEntityType() + ":" + eiConfigurator.getEntityID());
-        bConditionOK = true;
-        vReturnEntities2.addElement(eiConfigurator); //Store all instances of the configurator
-      }
-    }
-
-    //'ANNOUNCEMENT (E) ->ANNTOCONFIG (R) -> CONFIGURATOR (E) -> CONFIGGAA (A) -> GENERALAREA (E) when RFAGEO = '200' (US)
-    eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(0) : null);
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_22A = '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_22B = '" + strCondition2 + "'");
-
-    if (vReturnEntities2.size() > 1) {
-      eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(1) : null);
-    }
-    else {
-      bConditionOK = false;
-    }
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_22C = '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_22D = '" + strCondition2 + "'");
-
-    if (vReturnEntities2.size() > 2) {
-      eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(2) : null);
-    }
-    else {
-      bConditionOK = false;
-    }
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_22E = '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_22F = '" + strCondition2 + "'");
-
-    if (vReturnEntities2.size() > 3) {
-      eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(2) : null);
-    }
-    else {
-      bConditionOK = false;
-    }
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_22G= '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_22H = '" + strCondition2 + "'");
-
-    if (vReturnEntities2.size() > 4) {
-      eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(2) : null);
-    }
-    else {
-      bConditionOK = false;
-    }
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_22I= '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_22J = '" + strCondition2 + "'");
-
-    /*
-     *  Check for EMEA configurator
-     */
-    bConditionOK = false;
-    vReturnEntities2 = new Vector();
-    for (i = 0; i < grpAnnToConfig.getEntityItemCount(); i++) {
-      eiAnnToConfig = grpAnnToConfig.getEntityItem(i);
-      eiConfigurator = (EntityItem) eiAnnToConfig.getDownLink(0);
-      if (m_geList.isRfaGeoEMEA(eiConfigurator)) {
-        logMessage("P_23A EMEA Configurator" + eiConfigurator.getEntityType() + ":" + eiConfigurator.getEntityID());
-        bConditionOK = true;
-        vReturnEntities2.addElement(eiConfigurator); //Store all instances of the configurator
-      }
-    }
-
-    //'ANNOUNCEMENT (E) ->ANNTOCONFIG (R) -> CONFIGURATOR (E) -> CONFIGGAA (A) -> GENERALAREA (E) when RFAGEO = '200' (US)
-    eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(0) : null);
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_23A = '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_23B = '" + strCondition2 + "'");
-
-    if (vReturnEntities2.size() > 1) {
-      eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(1) : null);
-    }
-    else {
-      bConditionOK = false;
-    }
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_23C = '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_23D = '" + strCondition2 + "'");
-
-    if (vReturnEntities2.size() > 2) {
-      eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(2) : null);
-    }
-    else {
-      bConditionOK = false;
-    }
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_23E = '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_23F = '" + strCondition2 + "'");
-
-    if (vReturnEntities2.size() > 3) {
-      eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(2) : null);
-    }
-    else {
-      bConditionOK = false;
-    }
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_23G= '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_23H = '" + strCondition2 + "'");
-
-    if (vReturnEntities2.size() > 4) {
-      eiConfigurator = (bConditionOK ? (EntityItem) vReturnEntities2.elementAt(2) : null);
-    }
-    else {
-      bConditionOK = false;
-    }
-
-    strCondition2 = (bConditionOK ? getAttributeShortFlagDesc(eiConfigurator, "CONFIGNAME", "") : "");
-    println(".*$P_23I= '" + strCondition2 + "'");
-    strCondition2 = (bConditionOK ? getAttributeValue(eiAnnToConfig, "CONFIGAVAILDATE", "") : "");
-    println(".*$P_23J = '" + strCondition2 + "'");
-
-    strCondition1 = getAttributeValue(eiAnnounce, "OFFERINGACCESS", "");
-    println(".*$P_30A = '" + (strCondition1.equals("Yes") ? "1" : "0") + "'");
-    strCondition1 = getAttributeValue(eiAnnounce, "MARKETEDIBMLOGO", "");
-    println(".*$P_30B = '" + (strCondition1.equals("Yes") ? "1" : "0") + "'");
-    println(".*$P_30C = '" + (flagvalueEquals(eiAnnounce, "LOGOACCESSREQTS", "2833") ? "1" : "0") + "'");
-    println(".*$P_30D = '" + (flagvalueEquals(eiAnnounce, "LOGOACCESSREQTS", "2834") ? "1" : "0") + "'");
-    strCondition1 = getAttributeShortFlagDesc(eiAnnounce, "TGTCUSTOMERAUD", "");
-
-    strFilterAttr = new String[] {
-        "CHANNELNAME", "ROUTESTOMKTG"};
-    strFilterValue = new String[] {
-        "381", "110"};
-    vReturnEntities2 = searchEntityVectorLink(vSofFrmSofAvail, null, null, true, true, "SOFCHANNEL");
-    logMessage("****SOFCHANNEL*****");
-    displayContents(vReturnEntities2);
-    vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, true, true, "CHANNEL");
-    logMessage("****CHANNEL*****");
-    displayContents(vReturnEntities3);
-    if (vReturnEntities3.size() == 0) { //Check for channel in components
-      vReturnEntities2 = searchEntityVectorLink(vCmpntFrmCmpntAvail, null, null, true, true, "CMPNTCHANNEL");
-      logMessage("****CMPNTCHANNEL*****");
-      displayContents(vReturnEntities2);
-      vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, true, true, "CHANNEL");
-      logMessage("****CHANNEL*****");
-      displayContents(vReturnEntities3);
-    }
-    if (vReturnEntities3.size() == 0) { //Check for channel in Features
-      vReturnEntities2 = searchEntityVectorLink(vFeatureFrmFeatureAvail, null, null, true, true, "FEATURECHANNEL");
-      logMessage("****FEATURECHANNEL*****");
-      displayContents(vReturnEntities1);
-      vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, true, true, "CHANNEL");
-      logMessage("****CHANNEL*****");
-      displayContents(vReturnEntities3);
-    }
-    println(".*$P_31A = '" + (vReturnEntities3.size() > 0 ? "1" : "0") + "'");
-
-    println(".*$P_43A = '" + (strCondition1.length() > 61 ? strCondition1.substring(0, 61) : strCondition1) + "'");
-    println(".*$VARIABLES_END");
-  }
-
-  /**
-   *  Description of the Method
-   */
-  private void processLongTo100() {
-    println(".*$A_007_Begin");
-    println(getAttributeValue(eiAnnounce, "ANNIMAGES", " "));
-    println(".*$A_007_End");
-    println(".*$A_040_Begin");
-    /*     println(":xmp.");
-        println(".kp off");
-     */
-    strHeader = new String[] {
-        "Role Type", "Name", "Telephone", "Node/ID"};
-    iColWidths = new int[] {
-        15, 18, 12, 17};
-    strFilterAttr = new String[] {
-        "ANNROLETYPE", "ANNROLETYPE", "ANNROLETYPE", "ANNROLETYPE"};
-    strFilterValue = new String[] {
-        "11", "12", "13", "14"};
-    vReturnEntities1 = searchEntityGroup(grpAnnToOP, strFilterAttr, strFilterValue, false);
-    for (i = 0; i < vReturnEntities1.size(); i++) {
-      eiAnnToOP = (EntityItem) vReturnEntities1.elementAt(i);
-      eiOP = (EntityItem) eiAnnToOP.getDownLink(0);
-      strCondition1 = getAttributeValue(eiAnnToOP, "ANNROLETYPE", " ");
-      vPrintDetails.add(strCondition1.length() >= 14 ? strCondition1.substring(0, 14) :
-                        strCondition1.substring(0, strCondition1.length()));
-      strCondition1 = getAttributeValue(eiOP, "FIRSTNAME", " ").substring(0, 1) + ". ";
-      strCondition1 += getAttributeValue(eiOP, "LASTNAME", " ");
-      vPrintDetails.add(strCondition1);
-      vPrintDetails.add(getAttributeValue(eiOP, "TELEPHONE", " "));
-      strCondition1 = getAttributeValue(eiOP, "VNETNODE", " ") + "/";
-      strCondition1 += getAttributeValue(eiOP, "VNETUID", " ");
-      vPrintDetails.add(strCondition1);
-    }
-    if (vPrintDetails.size() > 0) {
-      println("This RFA and its requested schedule hae been reviewed with the");
-      println("following functional representatives");
-      println(":xmp.");
-      printReport(true, strHeader, iColWidths, vPrintDetails);
-      resetPrintvars();
-      println(":exmp.");
-    }
-    println(".*$A_040_End");
-
-    /*
-     *  Get the RElated announcement details...
-     *  navigate via the relator RELATEDANN
-     */
-    println(".*$A_044_Begin");
-    println(":xmp.");
-    println(".in 0");
-    println(".kp off");
-    for (i = 0; i < grpRelatedANN.getEntityItemCount(); i++) {
-      eiRelatedANN = grpRelatedANN.getEntityItem(i);
-      //Now get the downlinked announcement item
-      for (j = 0; j < eiRelatedANN.getDownLinkCount(); j++) {
-        eiNextItem = (EntityItem) eiRelatedANN.getDownLink(j);
-        logMessage("**********_044 next item" + eiNextItem.getEntityType() + eiNextItem.getEntityID());
-        vPrintDetails.add(getAttributeValue(eiNextItem, "ANNTITLE", " "));
-        vPrintDetails.add(getAttributeValue(eiNextItem, "ANNNUMBER", " "));
-      }
-    }
-    strHeader = new String[] {
-        "Announcement Title", "Announcement Number"};
-    iColWidths = new int[] {
-        50, 19};
-    printReport(true, strHeader, iColWidths, vPrintDetails);
-    resetPrintvars();
-    println("");
-
-    println(":exmp.");
-    println(".*$A_044_End");
-
-    /*
-     *  Print OP details when ANNROLETYPE = 'Product Development Mgr' on relator ANNOP
-     */
-    println(".*$A_045_Begin");
-    println(":xmp.");
-    println(".in 0");
-    println(":hp2.Being released to::ehp2.");
-    println(".kp off");
-    /*
-         'ANNOUNCEMENT( E) -> ANNAVAILA (A) -> SOFAVAIL (R) -> SOF (E) -> SOFADMINOP (R) when RFAGEO = '200' (US) ->
-              OP (E)
-     */
-    vReturnEntities4 = searchEntityVectorLink(vSofFrmSofAvail, null, null, true, true, "SOFADMINOP");
-    logMessage("****SOFADMINOP*****");
-    displayContents(vReturnEntities4);
-    //Get the entities which belong to US geo
-    vReturnEntities2.removeAllElements();
-    vReturnEntities2.addAll(vReturnEntities4);
-    vReturnEntities3 = searchInGeo(vReturnEntities2, "US");
-    vReturnEntities1 = searchEntityVectorLink(vReturnEntities3, null, null, true, true, "OP");
-    logMessage("****OP*****");
-    displayContents(vReturnEntities1);
-
-    resetPrintvars();
-    strEntityTypes = new String[] {
-        "SOFADMINOP"};
-    for (i = 0; i < vReturnEntities1.size(); i++) {
-      eiOP = (EntityItem) vReturnEntities1.elementAt(i);
-      logMessage("_045 US" + eiOP.getKey());
-      eiNextItem = getUplinkedEntityItem(eiOP, strEntityTypes);
-      strCondition1 = getGeoTags(eiNextItem);
-      logMessage("_045 US" + eiOP.getKey() + strCondition1);
-      if (strCondition1.equals(strWorldwideTag)) { //Ignore Worldwide tags
-        continue;
-      }
-
-      logMessage("_045 US" + eiNextItem.getKey());
-      vPrintDetails.add(getAttributeValue(eiNextItem, "GENAREASELECTION", " "));
-      strCondition1 = getAttributeValue(eiOP, "FIRSTNAME", " ").substring(0, 1) + ". ";
-      strCondition1 += getAttributeValue(eiOP, "LASTNAME", " ");
-      vPrintDetails.add(strCondition1);
-      vPrintDetails.add(getAttributeValue(eiOP, "TELEPHONE", " "));
-      strCondition1 = getAttributeValue(eiOP, "VNETNODE", " ") + "/";
-      strCondition1 += getAttributeValue(eiOP, "VNETUID", " ");
-      vPrintDetails.add(strCondition1);
-    }
-
-    //Get the entities which belong to EMEA geo
-    vReturnEntities2.removeAllElements();
-    vReturnEntities2.addAll(vReturnEntities4);
-    vReturnEntities3 = searchInGeo(vReturnEntities2, "EMEA");
-    vReturnEntities1 = searchEntityVectorLink(vReturnEntities3, null, null, true, true, "OP");
-    logMessage("****OP*****");
-    displayContents(vReturnEntities1);
-    for (i = 0; i < vReturnEntities1.size(); i++) {
-      eiOP = (EntityItem) vReturnEntities1.elementAt(i);
-      eiNextItem = getUplinkedEntityItem(eiOP, strEntityTypes);
-      strCondition1 = getGeoTags(eiNextItem);
-      logMessage("_045 EMEA" + eiOP.getKey() + strCondition1);
-      if (strCondition1.equals(strWorldwideTag)) { //Ignore Worldwide tags
-        continue;
-      }
-      logMessage("_045 EMEA" + eiNextItem.getKey());
-      vPrintDetails.add(getAttributeValue(eiNextItem, "GENAREASELECTION", " "));
-      strCondition1 = getAttributeValue(eiOP, "FIRSTNAME", " ").substring(0, 1) + ". ";
-      strCondition1 += getAttributeValue(eiOP, "LASTNAME", " ");
-      vPrintDetails.add(strCondition1);
-      vPrintDetails.add(getAttributeValue(eiOP, "TELEPHONE", " "));
-      strCondition1 = getAttributeValue(eiOP, "VNETNODE", " ") + "/";
-      strCondition1 += getAttributeValue(eiOP, "VNETUID", " ");
-      vPrintDetails.add(strCondition1);
-    }
-
-    //Get the entities which belong to AP geo
-    vReturnEntities2.removeAllElements();
-    vReturnEntities2.addAll(vReturnEntities4);
-    vReturnEntities3 = searchInGeo(vReturnEntities2, "AP");
-    vReturnEntities1 = searchEntityVectorLink(vReturnEntities3, null, null, true, true, "OP");
-    logMessage("****OP*****");
-    displayContents(vReturnEntities1);
-    for (i = 0; i < vReturnEntities1.size(); i++) {
-      eiOP = (EntityItem) vReturnEntities1.elementAt(i);
-      eiNextItem = getUplinkedEntityItem(eiOP, strEntityTypes);
-      strCondition1 = getGeoTags(eiNextItem);
-      logMessage("_045 AP" + eiOP.getKey() + strCondition1);
-      if (strCondition1.equals(strWorldwideTag)) { //Ignore Worldwide tags
-        continue;
-      }
-      logMessage("_045 AP" + eiNextItem.getKey());
-      vPrintDetails.add(getAttributeValue(eiNextItem, "GENAREASELECTION", " "));
-      strCondition1 = getAttributeValue(eiOP, "FIRSTNAME", " ").substring(0, 1) + ". ";
-      strCondition1 += getAttributeValue(eiOP, "LASTNAME", " ");
-      vPrintDetails.add(strCondition1);
-      vPrintDetails.add(getAttributeValue(eiOP, "TELEPHONE", " "));
-      strCondition1 = getAttributeValue(eiOP, "VNETNODE", " ") + "/";
-      strCondition1 += getAttributeValue(eiOP, "VNETUID", " ");
-      vPrintDetails.add(strCondition1);
-    }
-
-    //Get the entities which belong to LA geo
-    vReturnEntities2.removeAllElements();
-    vReturnEntities2.addAll(vReturnEntities4);
-    vReturnEntities3 = searchInGeo(vReturnEntities2, "LA");
-    vReturnEntities1 = searchEntityVectorLink(vReturnEntities3, null, null, true, true, "OP");
-    logMessage("****OP*****");
-    displayContents(vReturnEntities1);
-    for (i = 0; i < vReturnEntities1.size(); i++) {
-      eiOP = (EntityItem) vReturnEntities1.elementAt(i);
-      eiNextItem = getUplinkedEntityItem(eiOP, strEntityTypes);
-      strCondition1 = getGeoTags(eiNextItem);
-      logMessage("_045 LA" + eiOP.getKey() + strCondition1);
-      if (strCondition1.equals(strWorldwideTag)) { //Ignore Worldwide tags
-        continue;
-      }
-      logMessage("_045 LA" + eiNextItem.getKey());
-      vPrintDetails.add(getAttributeValue(eiNextItem, "GENAREASELECTION", " "));
-      strCondition1 = getAttributeValue(eiOP, "FIRSTNAME", " ").substring(0, 1) + ". ";
-      strCondition1 += getAttributeValue(eiOP, "LASTNAME", " ");
-      vPrintDetails.add(strCondition1);
-      vPrintDetails.add(getAttributeValue(eiOP, "TELEPHONE", " "));
-      strCondition1 = getAttributeValue(eiOP, "VNETNODE", " ") + "/";
-      strCondition1 += getAttributeValue(eiOP, "VNETUID", " ");
-      vPrintDetails.add(strCondition1);
-    }
-
-    //Get the entities which belong to CA geo
-    vReturnEntities2.removeAllElements();
-    vReturnEntities2.addAll(vReturnEntities4);
-    vReturnEntities3 = searchInGeo(vReturnEntities2, "CA");
-    vReturnEntities1 = searchEntityVectorLink(vReturnEntities3, null, null, true, true, "OP");
-    logMessage("****OP*****");
-    displayContents(vReturnEntities1);
-    for (i = 0; i < vReturnEntities1.size(); i++) {
-      eiOP = (EntityItem) vReturnEntities1.elementAt(i);
-      eiNextItem = getUplinkedEntityItem(eiOP, strEntityTypes);
-      strCondition1 = getGeoTags(eiNextItem);
-      logMessage("_045 CA" + eiOP.getKey());
-      if (strCondition1.equals(strWorldwideTag)) { //Ignore Worldwide tags
-        continue;
-      }
-      logMessage("_045 CA" + eiNextItem.getKey());
-      vPrintDetails.add(getAttributeValue(eiNextItem, "GENAREASELECTION", " "));
-      strCondition1 = getAttributeValue(eiOP, "FIRSTNAME", " ").substring(0, 1) + ". ";
-      strCondition1 += getAttributeValue(eiOP, "LASTNAME", " ");
-      vPrintDetails.add(strCondition1);
-      vPrintDetails.add(getAttributeValue(eiOP, "TELEPHONE", " "));
-      strCondition1 = getAttributeValue(eiOP, "VNETNODE", " ") + "/";
-      strCondition1 += getAttributeValue(eiOP, "VNETUID", " ");
-      vPrintDetails.add(strCondition1);
-    }
-
-    strHeader = new String[] {
-        "Geography", "Product Administrator", " Telephone", "    Node/Userid"};
-    iColWidths = new int[] {
-        10, 21, 12, 17};
-    printReport(true, strHeader, iColWidths, vPrintDetails);
-    resetPrintvars();
-
-    println(":exmp.");
-    println(".*$A_045_End");
-
-    println(".*$A_046_Begin");
-    println(getAttributeShortFlagDesc(eiAnnounce, "TELECOMMEQ", " "));
-    println(".*$A_046_End");
-
-    /*
-     *  Print OP details when ANNROLETYPE = 'Product Development Mgr' on relator ANNOP
-     */
-    println(".*$A_049_Begin");
-    println(":xmp.");
-    println(".kp off");
-    eiAnnToOP = null;
-    eiOP = null;
-    strFilterAttr = new String[] {
-        "ANNROLETYPE"};
-    strFilterValue = new String[] {
-        "5"}; //"Releasing Executive"
-    vReturnEntities1 = searchEntityGroup(grpAnnToOP, strFilterAttr, strFilterValue, true);
-    vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "OP");
-    strFilterAttr = new String[] {
-        "ORGANUNITTYPE", "ORGANUNITTYPE"};
-    strFilterValue = new String[] {
-        "4156", "4157"};
-    vReturnEntities3 = searchEntityGroupLink(grpAnnToOrgUnit, strFilterAttr, strFilterValue, false, true, "ORGANUNIT");
-
-    for (i = 0; i < vReturnEntities2.size(); i++) {
-      eiOP = (EntityItem) vReturnEntities2.elementAt(i);
-      strCondition2 = getAttributeValue(eiOP, "FIRSTNAME", " ");
-      strCondition1 = getAttributeValue(eiOP, "MIDDLENAME", " ");
-      strCondition2 += strCondition1.equals(" ") ? "" : " " + strCondition1 + ".";
-      strCondition1 = getAttributeValue(eiOP, "LASTNAME", " ");
-      strCondition2 += strCondition1.equals(" ") ? "" : " " + strCondition1;
-      println("                     " + strCondition2);
-      println("                     " + getAttributeValue(eiOP, "JOBTITLE", " "));
-      for (j = 0; j < vReturnEntities3.size(); j++) {
-        eiOrganUnit = (EntityItem) vReturnEntities3.elementAt(j);
-        println("                     " + getAttributeValue(eiOrganUnit, "NAME", " "));
-      }
-
-    }
-    /*     strParamList1 = new String[]{"FIRSTNAME","MIDDLENAME","LASTNAME", "JOBTITLE"};
-         printValueListInVector(vReturnEntities2, strParamList1, " ", false, false);
-         iColWidths = new int[]{10,10,10, 15};
-         printReport(false, null, iColWidths, vPrintDetails);
-         resetPrintvars();
-     */
-    println(":exmp.");
-    println(".*$A_049_End");
-
-    println(".*$A_100_Begin");
-    prettyPrint(getAttributeValue(eiAnnounce, "ANNTITLE", " "), 69);
-    println(".*$A_100_End");
-
-  }
-
-  /**
-   *  Description of the Method
-   */
-  private void processLongTo200() {
-    /*     println(".*$A_102_Begin");
-        prettyPrint(getAttributeValue(eiAnnounce, "ONESENTDESC", " "), 69);
-        println(".*$A_102_End");
-     */
-    /*TIR 6QKKNN*/
-    println(".*$A_104_Begin");
-    printVanillaSVSReport("FEATUREBENEFIT", true, false);
-    println(".*$A_104_End");
-    /*TIR 6QKKNN */
-    /*TIR 6QKKNN put this before 108 because VM renames 105 to 108 */
-    println(".*$A_106_Begin");
-    printVanillaSVSReport("DIFFEATURESBENEFITS", true, false);
-    println(".*$A_106_End");
-    /*TIR 6QKKNN */
-    eiChannel = null;
-    strFilterAttr = new String[] {
-        "AVAILTYPE"};
-    strFilterValue = new String[] {
-        "146"}; //Consider AVAILS OF type Planned Availability only 10/21  changed again 12/30
-    vReturnEntities1 = searchEntityGroupLink(grpAnnAvail, strFilterAttr, strFilterValue, true, true, "AVAIL");
-    logMessage("_108****AVAIL*****");
-    displayContents(vReturnEntities1);
-    //Get the entities which belong to US/CAN/LA/AP geo
-    vReturnEntities2.removeAllElements();
-    vReturnEntities2 = searchInGeo(vReturnEntities1, new String[] {"US", "CAN", "LA", "AP"});
-
-    logMessage("_108****AVAIL-US/CAN/LA/AP*****");
-    displayContents(vReturnEntities2);
-    vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, null, null, true, false, "SOFAVAIL");
-    logMessage("****SOFAVAIL*****");
-    displayContents(vReturnEntities3);
-    vReturnEntities5 = searchEntityVectorLink(vReturnEntities3, null, null, true, false, "SOF");
-    logMessage("_108****SOF*****");
-    displayContents(vReturnEntities5);
-
-    vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, null, null, true, false, "CMPNTAVAIL");
-    logMessage("****CMPNTAVAIL*****");
-    displayContents(vReturnEntities3);
-    vReturnEntities4 = searchEntityVectorLink(vReturnEntities3, null, null, true, false, "CMPNT");
-    logMessage("_108****CMPNT*****");
-    displayContents(vReturnEntities4);
-    vReturnEntities5.addAll(vReturnEntities4);
-
-    vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, null, null, true, false, "FEATUREAVAIL");
-    logMessage("****FEATUREAVAIL*****");
-    displayContents(vReturnEntities3);
-    vReturnEntities4 = searchEntityVectorLink(vReturnEntities3, null, null, true, false, "FEATURE");
-    logMessage("_108****FEATURE*****");
-    displayContents(vReturnEntities4);
-
-    vReturnEntities5.addAll(vReturnEntities4);
-    logMessage("_108****SOFCMPNTFEATURE*****");
-    displayContents(vReturnEntities5);
-
-    vReturnEntities4 = sortEntities(vReturnEntities5, new String[] {"MKTGNAME"});
-    bConditionOK = false;
-    bConditionOK1 = false;
-    for (i = 0; i < vReturnEntities4.size(); i++) {
-      eiNextItem = (EntityItem) vReturnEntities4.elementAt(i);
-      logMessage("_108****SOFCMPNTFEATURE*****" + eiNextItem.getKey());
-      strCondition2 = eiNextItem.getEntityType();
-      if (strCondition2.equals("SOF")) {
-        vReturnEntities3 = searchEntityItemLink(eiNextItem, null, null, true, true, "SOFCHANNEL");
-        strCondition3 = getSOFMktName(eiNextItem);
-      }
-      else if (strCondition2.equals("CMPNT")) {
-        vReturnEntities3 = searchEntityItemLink(eiNextItem, null, null, true, true, "CMPNTCHANNEL");
-        strCondition3 = getCmptToSofMktMsg(eiNextItem);
-
-      }
-      else if (strCondition2.equals("FEATURE")) {
-        vReturnEntities3 = searchEntityItemLink(eiNextItem, null, null, true, true, "FEATURECHANNEL");
-        strCondition3 = getfeatureToSofMktMsg(eiNextItem);
-
-      }
-
-      for (int j = 0; j < vReturnEntities3.size(); j++) {
-        eiNextItem1 = (EntityItem) vReturnEntities3.elementAt(j);
-        eiChannel = (EntityItem) eiNextItem1.getDownLink(0);
-        if (!flagvalueEquals(eiChannel, "ROUTESTOMKTG", "110")) { //Process only channels with the ROUTESTOMKTG
-          continue;
-        }
-
-        strCondition1 = getGeoTags(eiChannel);
-
-        logMessage("A_108:" + eiNextItem.getKey() + ":" + eiChannel.getKey() + strCondition1);
-        if (!strCondition1.equals(strWorldwideTag) &&
-            (m_geList.isRfaGeoUS(eiChannel) || m_geList.isRfaGeoAP(eiChannel) || m_geList.isRfaGeoCAN(eiChannel) ||
-             m_geList.isRfaGeoLA(eiChannel))) {
-          if (!bConditionOK) { //Print question tags only if there is data to print
-            println(".*$A_108_Begin");
-            bConditionOK = true; //Reset this so that it doesnt print again
-            bConditionOK1 = true; //Set indicator for End tag
-          }
-          println("");
-          prettyPrint(strCondition3, 69);
-          println("");
-          strCondition1 = getAttributeValue(eiChannel, "CHANNELNAME", " ");
-          if (strCondition1.indexOf("*") > -1) {
-            println(":ul compact.");
-            st = new StringTokenizer(strCondition1, "*");
-            while (st.hasMoreTokens()) {
-              println(":li." + st.nextToken().trim());
-            }
-            println(":eul.");
-          }
-        }
-        else { //remove this after debugging
-          logMessage("_108:Bypassing " + eiChannel.getKey() + ":Tag is :" + strCondition1);
-        }
-      } //vReturnEntities3
-
-    } //vReturnEntities5
-    if (bConditionOK1) {
-      println(".*$A_108_End");
-    }
-
-// _106 DELETED 04/11/05
-
-    /*
-         'ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> SOFAVAIL (R)  -> SOF (E) -> SOFCHANNEL (R) -> CHANNEL (E)
-         -> CHGAA (A) -> GENERALAREA (E) when RFAGEO = ''203' (EMEA)
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> SOFAVAIL (R) -> SOF (E) -> SOFCHANNEL (R) -> CHANNEL (E) when ROUTESTOMKTG = '110' (No)
-
-         Changes as on 6/1/04
-         RFA question 110 - should ALWAYS print the complete list of EMEA channels if an EMEA availability record exist
-
-        To be able to do this the floowing logic is being change:   If an AVAIL (E) EXIST with RFAGEO = EMEA (203) and that CHANNEL
-                                    DOES NOT exist with RFAGEO = EMEA (203)  and ROUTESTOMKGT = NO,
-                                    then RFA question is left BLANK in the generated extract from e-announce
-
-                                    ie:     .*$A_110_Begin
-                                        .*$A_110_End
-
-                                    If an AVAIL (E) EXIST with RFAGEO = EMEA (203) and that CHANNEL
-                                    EXIST with RFAGEO = EMEA (203)  and ROUTESTOMKGT = NO,
-                                    then RFA question 110 is outputed with the CHANNELNAME in the generated
-                                    extract from e-announce
-
-                                    ie:     .*$A_110_Begin
-                                        IBM Technology Assessment and Consulting Services for DB2 Healthcheck
-                                    IBM sales specialists
-                                    IBM Business Partner - Solution Provider
-                                    IBM Business Partner - Reseller
-                                        .*$A_110_End
-      ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> AVAILGAA (A) -> GENERALAREA (E) -> when RFAGEO = "203"S (EMEA) -> OFAVAIL (R) ->
-        SOF (E) -> SOFCHANNEL (R) -> CHANNEL (E) when ROUTESTOMKTG = '110' (No) and When ANNOUNCEMENT (ANNCODENAMEU) = AVAIL (ANNCODENAME)
-
-     */
-    eiChannel = null;
-    strFilterAttr = new String[] {
-        "AVAILTYPE"};
-    strFilterValue = new String[] {
-        "146"}; //Consider AVAILS OF type Planned Availability only 10/21  changed again 12/30
-    vReturnEntities1 = searchEntityGroupLink(grpAnnAvail, strFilterAttr, strFilterValue, true, true, "AVAIL");
-    logMessage("_110****AVAIL*****");
-    displayContents(vReturnEntities1);
-    //Get the entities which belong to EMEA geo
-    vReturnEntities2.removeAllElements();
-    vReturnEntities2 = searchInGeo(vReturnEntities1, "EMEA");
-    logMessage("_110****AVAIL-EMEA*****");
-    displayContents(vReturnEntities2);
-    vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, null, null, true, false, "SOFAVAIL");
-    logMessage("****SOFAVAIL*****");
-    displayContents(vReturnEntities3);
-    vReturnEntities5 = searchEntityVectorLink(vReturnEntities3, null, null, true, false, "SOF");
-    logMessage("_110****SOF*****");
-    displayContents(vReturnEntities5);
-
-    vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, null, null, true, false, "CMPNTAVAIL");
-    logMessage("****CMPNTAVAIL*****");
-    displayContents(vReturnEntities3);
-    vReturnEntities4 = searchEntityVectorLink(vReturnEntities3, null, null, true, false, "CMPNT");
-    logMessage("_110****CMPNT*****");
-    displayContents(vReturnEntities4);
-    vReturnEntities5.addAll(vReturnEntities4);
-
-    vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, null, null, true, false, "FEATUREAVAIL");
-    logMessage("****FEATUREAVAIL*****");
-    displayContents(vReturnEntities3);
-    vReturnEntities4 = searchEntityVectorLink(vReturnEntities3, null, null, true, false, "FEATURE");
-    logMessage("_110****FEATURE*****");
-    displayContents(vReturnEntities4);
-
-    vReturnEntities5.addAll(vReturnEntities4);
-    logMessage("_110****SOFCMPNTFEATURE*****");
-    displayContents(vReturnEntities5);
-
-    vReturnEntities4 = sortEntities(vReturnEntities5, new String[] {"MKTGNAME"});
-    bConditionOK = false;
-    bConditionOK1 = false;
-    for (i = 0; i < vReturnEntities4.size(); i++) {
-      eiNextItem = (EntityItem) vReturnEntities4.elementAt(i);
-      logMessage("_110****SOFCMPNTFEATURE*****" + eiNextItem.getKey());
-      strCondition2 = eiNextItem.getEntityType();
-      if (strCondition2.equals("SOF")) {
-        vReturnEntities3 = searchEntityItemLink(eiNextItem, null, null, true, true, "SOFCHANNEL");
-        strCondition3 = getSOFMktName(eiNextItem);
-      }
-      else if (strCondition2.equals("CMPNT")) {
-        vReturnEntities3 = searchEntityItemLink(eiNextItem, null, null, true, true, "CMPNTCHANNEL");
-        strCondition3 = getCmptToSofMktMsg(eiNextItem);
-
-      }
-      else if (strCondition2.equals("FEATURE")) {
-        vReturnEntities3 = searchEntityItemLink(eiNextItem, null, null, true, true, "FEATURECHANNEL");
-        strCondition3 = getfeatureToSofMktMsg(eiNextItem);
-
-      }
-
-      for (int j = 0; j < vReturnEntities3.size(); j++) {
-        eiNextItem1 = (EntityItem) vReturnEntities3.elementAt(j);
-        eiChannel = (EntityItem) eiNextItem1.getDownLink(0);
-        if (!flagvalueEquals(eiChannel, "ROUTESTOMKTG", "110")) { //Process only channels with the ROUTESTOMKTG
-          continue;
-        }
-
-        strCondition1 = getGeoTags(eiChannel);
-        logMessage("A_110:" + eiNextItem.getKey() + ":" + eiChannel.getKey() + strCondition1);
-        if (!strCondition1.equals(strWorldwideTag) && m_geList.isRfaGeoEMEA(eiChannel)) {
-          if (!bConditionOK) { //Print question tags only if there is data to print
-            println(".*$A_110_Begin");
-            bConditionOK = true; //Reset this so that it doesnt print again
-            bConditionOK1 = true; //Set indicator for End tag
-          }
-          println("");
-          prettyPrint(strCondition3, 69);
-          println("");
-          strCondition1 = getAttributeValue(eiChannel, "CHANNELNAME", " ");
-          if (strCondition1.indexOf("*") > -1) {
-            println(":ul compact.");
-            st = new StringTokenizer(strCondition1, "*");
-            while (st.hasMoreTokens()) {
-              println(":li." + st.nextToken().trim());
-            }
-            println(":eul.");
-          }
-        }
-        else { //remove this after debugging
-          logMessage("_110:Tag is :" + strCondition1);
-          logMessage("_110:EMEA is " + m_geList.isRfaGeoEMEA(eiChannel));
-        }
-      } //vReturnEntities3
-
-    } //vReturnEntities5
-    if (bConditionOK1) {
-      println(".*$A_110_End");
-    }
-
-    /* The old one starts here */
-
-
-    println(".*$A_116_Begin");
-    /*
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> SOFAVAIL (R) -> SOF (E) -> SOFCHANNEL (R) -> CHANNEL (E)
-         Changes as on 6/1/04
-     RFA question 116 - will only be outputed in the extract, if, CHANNEL (E) EXISTS and ROUTESTOMKGT = "Yes"
-
-                                    ie: .*$A_110_Begin
-                                        IBM Technology Assessment and Consulting Services for DB2 Healthcheck
-
-                                        Route Description                                WW AP CAN US EMEA LA
-                                            ---------------------------------------------    -- -- --- -- ---- --
-     * SS/1 sales Specialist                                    X  X
-     * SP/2 Solution Provider                                   X
-                                        .*$A_110_End
-      ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> SOFAVAIL (R) -> SOF (E) -> SOFCHANNEL (R) -> CHANNEL (E) when ROUTESTOMKTG = '100' (Yes)
-
-     */
-    //Store the mktname for the heading based on the number of sofs
-    resetPrintvars();
-    println(":xmp.");
-    println(".kp off");
-    iTemp = vSofFrmSofAvail.size();
-    eiSof = vSofFrmSofAvail.size() > 0 ? (EntityItem) vSofFrmSofAvail.elementAt(0) : null;
-    strCondition1 = (eiSof != null ? getSOFMktName(eiSof) : " ");
-    logMessage("****SOF*****");
-    displayContents(vReturnEntities1);
-
-    vReturnEntities2 = searchEntityVectorLink(vSofFrmSofAvail, null, null, true, true, "SOFCHANNEL");
-    logMessage("****SOFCHANNEL*****");
-    displayContents(vReturnEntities2);
-
-    strFilterAttr = new String[] {
-        "ROUTESTOMKTG"};
-    strFilterValue = new String[] {
-        "100"};
-
-    vReturnEntities1 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, true, true, "CHANNEL");
-    logMessage("****CHANNEL*****");
-    displayContents(vReturnEntities1);
-    bConditionOK = false;
-    for (i = 0; i < vReturnEntities1.size(); i++) {
-      eiChannel = (EntityItem) vReturnEntities1.elementAt(i);
-      logMessage("_116" + eiChannel.getKey() + ":" + getGeoTags(eiChannel));
-      vPrintDetails.add(getAttributeValue(eiChannel, "CHANNELNAME", " ") + " ");
-      bConditionOK = (m_geList.isRfaGeoAP(eiChannel) && m_geList.isRfaGeoCAN(eiChannel) &&
-                      m_geList.isRfaGeoUS(eiChannel) && m_geList.isRfaGeoEMEA(eiChannel) &&
-                      m_geList.isRfaGeoLA(eiChannel));
-      vPrintDetails.add(bConditionOK ? "X" : " ");
-      vPrintDetails.add(m_geList.isRfaGeoAP(eiChannel) && !bConditionOK ? "X" : " ");
-      vPrintDetails.add(m_geList.isRfaGeoCAN(eiChannel) && !bConditionOK ? "X" : " ");
-      vPrintDetails.add(m_geList.isRfaGeoUS(eiChannel) && !bConditionOK ? "X" : " ");
-      vPrintDetails.add(m_geList.isRfaGeoEMEA(eiChannel) && !bConditionOK ? "X" : " ");
-      vPrintDetails.add(m_geList.isRfaGeoLA(eiChannel) && !bConditionOK ? "X" : " ");
-    }
-    if (vPrintDetails.size() > 0) {
-      strHeader = new String[] {
-          "Route Description", "WW", "AP", "CAN", "US", "EMEA", "LA"};
-      iColWidths = new int[] {
-          26, 2, 2, 3, 2, 4, 2};
-      vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, false, "SOFCHANNEL");
-      for (i = 0; i < vReturnEntities2.size(); i++) {
-        eiNextItem = (EntityItem) vReturnEntities2.elementAt(i);
-        logMessage("_116 :Finally:" + eiNextItem.getKey());
-        eiSof = (EntityItem) eiNextItem.getUpLink(0);
-        logMessage("_116 :Finally:" + eiSof.getKey());
-        strCondition1 = getSOFMktName(eiSof);
-        println(strCondition1);
-      }
-      printReport(true, strHeader, iColWidths, vPrintDetails);
-      resetPrintvars();
-      println("");
-    }
-    /*
-     ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> CMPNTAVAIL (R) -> CMPNT (E) -> CMPNTCHANNEL (R) -> CHANNEL (E)
-     */
-    //Store the mktname for the heading based on the number of sofs
-    iTemp = vCmpntFrmCmpntAvail.size();
-    eiComponent = vCmpntFrmCmpntAvail.size() > 0 ? (EntityItem) vCmpntFrmCmpntAvail.elementAt(0) : null;
-    strCondition1 = vCmpntFrmCmpntAvail.size() > 0 ? getCmptToSofMktMsg(eiComponent) : " ";
-
-    vReturnEntities2 = searchEntityVectorLink(vCmpntFrmCmpntAvail, null, null, true, true, "CMPNTCHANNEL");
-    logMessage("****_116 CMPNTCHANNEL*****");
-    displayContents(vReturnEntities2);
-    strFilterAttr = new String[] {
-        "ROUTESTOMKTG"};
-    strFilterValue = new String[] {
-        "100"};
-
-    vReturnEntities1 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, true, true, "CHANNEL");
-    logMessage("****_116 CHANNEL*****");
-    displayContents(vReturnEntities1);
-
-    for (i = 0; i < vReturnEntities1.size(); i++) {
-      eiChannel = (EntityItem) vReturnEntities1.elementAt(i);
-      logMessage("_116 from CMPNT" + eiChannel.getKey());
-      vPrintDetails.add(getAttributeValue(eiChannel, "CHANNELNAME", " ") + " ");
-      strCondition1 = getGeoTags(eiChannel);
-      logMessage("_116" + eiChannel.getKey() + ":" + getGeoTags(eiChannel));
-
-      bConditionOK = strCondition1.equals(strWorldwideTag);
-
-      vPrintDetails.add(bConditionOK ? "X" : " ");
-      vPrintDetails.add(m_geList.isRfaGeoAP(eiChannel) && !bConditionOK ? "X" : " ");
-      vPrintDetails.add(m_geList.isRfaGeoCAN(eiChannel) && !bConditionOK ? "X" : " ");
-      vPrintDetails.add(m_geList.isRfaGeoUS(eiChannel) && !bConditionOK ? "X" : " ");
-      vPrintDetails.add(m_geList.isRfaGeoEMEA(eiChannel) && !bConditionOK ? "X" : " ");
-      vPrintDetails.add(m_geList.isRfaGeoLA(eiChannel) && !bConditionOK ? "X" : " ");
-    }
-    strHeader = new String[] {
-        "Route Description", "WW", "AP", "CAN", "US", "EMEA", "LA"};
-    iColWidths = new int[] {
-        26, 2, 2, 3, 2, 4, 2};
-    if (vReturnEntities1.size() > 0) {
-      vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, false, "CMPNTCHANNEL");
-      for (i = 0; i < vReturnEntities2.size(); i++) {
-        eiNextItem = (EntityItem) vReturnEntities2.elementAt(i);
-        logMessage("_116 :Finally:" + eiNextItem.getKey());
-        eiComponent = (EntityItem) eiNextItem.getUpLink(0);
-        logMessage("_116 :Finally:" + eiComponent.getKey());
-        strCondition1 = getCmptToSofMktMsg(eiComponent);
-        println(strCondition1);
-      }
-    }
-    printReport(true, strHeader, iColWidths, vPrintDetails);
-    resetPrintvars();
-    println("");
-    /*
-     'ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> FEATUREAVAIL (R) -> FEATURE (E) -> FEATURECHANNEL (R) -> CHANNEL (E)
-     */
-    //Store the mktname for the heading based on the number of features
-    iTemp = vFeatureFrmFeatureAvail.size();
-    eiFeature = vFeatureFrmFeatureAvail.size() > 0 ? (EntityItem) vFeatureFrmFeatureAvail.elementAt(0) : null;
-    strCondition1 = (eiFeature != null) ? getfeatureToSofMktMsg(eiFeature) : " ";
-
-    vReturnEntities2 = searchEntityVectorLink(vFeatureFrmFeatureAvail, null, null, true, true, "FEATURECHANNEL");
-    logMessage("****FEATURECHANNEL*****");
-    displayContents(vReturnEntities1);
-    strFilterAttr = new String[] {
-        "ROUTESTOMKTG"};
-    strFilterValue = new String[] {
-        "100"};
-
-    vReturnEntities1 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, true, true, "CHANNEL");
-    logMessage("****_116 from FEATURE CHANNEL*****");
-    displayContents(vReturnEntities1);
-    for (i = 0; i < vReturnEntities1.size(); i++) {
-      eiChannel = (EntityItem) vReturnEntities1.elementAt(i);
-      logMessage("_116 from FEATURE:" + eiChannel.getKey());
-      logMessage("_116" + eiChannel.getKey() + ":" + getGeoTags(eiChannel));
-      vPrintDetails.add(getAttributeValue(eiChannel, "CHANNELNAME", " ") + " ");
-      strCondition1 = getGeoTags(eiChannel);
-      bConditionOK = strCondition1.equals(strWorldwideTag);
-      vPrintDetails.add(bConditionOK ? "X" : " ");
-      vPrintDetails.add(m_geList.isRfaGeoAP(eiChannel) && !bConditionOK ? "X" : " ");
-      vPrintDetails.add(m_geList.isRfaGeoCAN(eiChannel) && !bConditionOK ? "X" : " ");
-      vPrintDetails.add(m_geList.isRfaGeoUS(eiChannel) && !bConditionOK ? "X" : " ");
-      vPrintDetails.add(m_geList.isRfaGeoEMEA(eiChannel) && !bConditionOK ? "X" : " ");
-      vPrintDetails.add(m_geList.isRfaGeoLA(eiChannel) && !bConditionOK ? "X" : " ");
-    }
-    strHeader = new String[] {
-        "Route Description", "WW", "AP", "CAN", "US", "EMEA", "LA"};
-    iColWidths = new int[] {
-        26, 2, 2, 3, 2, 4, 2};
-    if (vReturnEntities1.size() > 0) {
-      vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, false, "FEATURECHANNEL");
-      for (i = 0; i < vReturnEntities2.size(); i++) {
-        eiNextItem = (EntityItem) vReturnEntities2.elementAt(i);
-        logMessage("_116 :Finally:" + eiNextItem.getKey());
-        eiFeature = (EntityItem) eiNextItem.getUpLink(0);
-        logMessage("_116 :Finally:" + eiFeature.getKey());
-        strCondition1 = getfeatureToSofMktMsg(eiFeature);
-        println(strCondition1);
-      }
-    }
-    printReport(true, strHeader, iColWidths, vPrintDetails);
-    resetPrintvars();
-
-    println(":exmp.");
-
-    println(".*$A_116_End");
-
-    println(".*$A_118_Begin");
-    printVanillaSVSReport("MKTGSTRATEGY", true, false);
-    println(".*$A_118_End");
-
-    println(".*$A_119_Begin");
-    /*
-         Concatenate the answer by combining the answer from all three (3) entities -SOF, CMPNT and FREATURE, in that order respectfully
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> SOFAVAIL (R) -> SOF (E) -> SOFRELSOF (R) when TYPE = '110' (Cross-Sell) -> SOF (E)
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> CMPNTAVAIL (R) -> CMPNT (E) -> CMPNTRELCMPNT (R) when TYPE = '110' (Cross-Sell) -> CMPNT (E)
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> FEATUREAVAIL (R) -> FEATURE (E) -> FEATURERELFEATURE (R) when TYPE = '110' (Cross-Sell) -> FEATURE (E)
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> SOFAVAIL (R) -> SOF (E) -> SOFRELCMPNT (R) when TYPE = '110' (Cross-Sell) -> CMPNT (E)
-     */
-    printFeatureBenefit("110", "_119", true, true);
-
-    println(".*$A_119_End");
-
-    println(".*$A_120_Begin");
-    /*
-         Concatenate the answer by combining the answer from all three (3) entities -SOF, CMPNT and FREATURE, in that order respectfully
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> SOFAVAIL (R) -> SOF (E) -> SOFRELSOF (R) when TYPE = '100' (Upsell) -> SOF (E)
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> CMPNTAVAIL (R) -> CMPNT (E) -> CMPNTRELCMPNT (R) when TYPE = '100' (Upsell) -> CMPNT (E)
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> FEATUREAVAIL (R) -> FEATURE (E) -> FEATURERELFEATURE (R) when TYPE = '100' (Upsell) -> FEATURE (E)
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> SOFAVAIL (R) -> SOF (E) -> SOFRELCMPNT (R) when TYPE = '100' (Upsell) -> CMPNT (E)
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> SOFAVAIL (R) -> SOF (E) -> SOFRELFEATURE (R) when TYPE = '100' (Upsell) -> FEATURE (E)
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> CMPNTAVAIL (R) -> CMPNT (E) -> CMPNTRELFEATURE (R) when TYPE = '100' (Upsell) -> FEATURE (E)
-     */
-    printFeatureBenefit("100", "_120", true, true);
-
-    println(".*$A_120_End");
-
-    println(".*$A_122_Begin");
-    printVanillaSVSReport("CUSTWANTSNEEDS", true, false);
-    println(".*$A_122_End");
-
-    println(".*$A_123_Begin");
-    printVanillaSVSReport("CUSTPAINPT", true, false); //02/06/06 Rfa guide
-    println(".*$A_123_End");
-
-    println(".*$A_124_Begin");
-    printVanillaSVSReport("RESOURSKILLSET", true, false);
-    println(".*$A_124_End");
-
-    println(".*$A_126_Begin");
-
-    /*     ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> SOFAVAIL (R) -> SOF (E) -> SOFRELSOF (R) when TYPE = '120' (Related Services) -> SOF (E)
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> CMPNTAVAIL (R) -> CMPNT (E) -> CMPNTRELCMPNT (R) when TYPE = '120' (Related Services) -> CMPNT (E)
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> FEATUREAVAIL (R) -> FEATURE (E) -> FEATURERELFEATURE (R) when TYPE = '120' (Related Services) -> FEATURE (E)
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> SOFAVAIL (R) -> SOF (E) -> SOFRELCMPNT (R) when TYPE = '120' (Related Services) -> CMPNT (E)
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> SOFAVAIL (R) -> SOF (E) -> SOFRELFEATURE (R) when TYPE = '120' (Related Services) -> FEATURE (E)
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> CMPNTAVAIL (R) -> CMPNT (E) -> CMPNTRELFEATURE (R) when TYPE = '120' (Related Services) -> FEATURE (E)
-     */
-    printFeatureBenefit("120", "_126", false, true); //dont print the Benefit
-
-    println(".*$A_126_End");
-
-    println(".*$A_128_Begin");
-    printVanillaSVSReport("OTHERMKTGINFO", true, false);
-
-    println(".*$A_128_End");
-
-    println(".*$A_130_Begin");
-    strCondition2 = "";
-    strCondition4 = "";
-    resetPrintvars();
-    bConditionOK = false;
-    strHeader = new String[] {
-        "Contact Name", "Telephone", "E-mail"};
-    iColWidths = new int[] {
-        25, 12, 29};
-    strEntityTypes = new String[] {
-        "SOFSALESCNTCTOP", "SOF"};
-    strCondition2 = "";
-
-    rfaReport.setPrintDupeLines(false);
-
-    logMessage("_130 Begin********************");
-    for (i = 0; i < vSofSortedbyMkt.size(); i++) {
-      eiSof = (EntityItem) vSofSortedbyMkt.elementAt(i);
-      //Now get the operators
-      vReturnEntities2 = searchEntityItemLink(eiSof, null, null, true, true, "SOFSALESCNTCTOP");
-      logMessage("****SOFSALESCNTCTOP*****");
-      displayContents(vReturnEntities2);
-      vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, null, null, true, true, "OP");
-      logMessage("****OP*****");
-      displayContents(vReturnEntities3);
-      if (vReturnEntities3.size() == 0) {
-        continue; //Go to the next one if no operators found
-      }
-      vReturnEntities4 = sortEntities(vReturnEntities3, new String[] {"LASTNAME", "FIRSTNAME"});
-
-      strCondition4 = getAttributeValue(eiSof, "MKTGNAME") + " ";
-      for (j = 0; j < vReturnEntities4.size(); j++) {
-        eiOP = (EntityItem) vReturnEntities4.elementAt(j);
-        //Navigate Back to SOFSALESCNTCTOP to get the GEO tags
-        vReturnEntities2 = searchEntityItemLink(eiOP, null, null, true, false, "SOFSALESCNTCTOP");
-        for (int k = 0; k < vReturnEntities2.size(); k++) {
-          eiNextItem = (EntityItem) vReturnEntities2.elementAt(k);
-          eiNextItem1 = (EntityItem) eiNextItem.getUpLink(0);
-          if (eiNextItem1.getKey().equals(eiSof.getKey())) {
-            break;
-          } //Multiple SOF's could be linked to an OP each relator having different GEO's
-        }
-        strCondition1 = getGeoTags(eiNextItem);
-        logMessage("Getting GEO :" + strCondition1 + ":for:" + eiNextItem.getKey());
-        if (!strCondition1.equals(strCondition2)) {
-
-          if (!strCondition2.equals(strWorldwideTag)) {
-            if (strCondition2.length() > 0) {
-              vPrintDetails.add(BREAK_INDICATOR + ".br;:hp2.<---" + strCondition2 + ":ehp2.");
-              vPrintDetails.add("");
-              vPrintDetails.add("");
-            }
-          }
-
-          if (strCondition4.trim().length() > 0) {
-            vPrintDetails.add(""); //addl line break needed acc to Alan
-            vPrintDetails.add("");
-            vPrintDetails.add("");
-            vPrintDetails.add(BREAK_INDICATOR + strCondition4 + ":p.");
-            logMessage("_130 " + BREAK_INDICATOR + " " + strCondition4 + ":p.");
-            vPrintDetails.add("");
-            vPrintDetails.add("");
-
-            vPrintDetails.add(""); //addl line break needed acc to Alan
-            vPrintDetails.add("");
-            vPrintDetails.add("");
-            strCondition4 = "";
-          }
-
-          if (!strCondition1.equals(strWorldwideTag)) {
-            if (strCondition1.trim().length() > 0) {
-              vPrintDetails.add(BREAK_INDICATOR + ":p.:hp2." + strCondition1 + "--->:ehp2.");
-              vPrintDetails.add("");
-              vPrintDetails.add("");
-            }
-          }
-          strCondition2 = strCondition1;
-        }
-        else { //Just print the Market Name if there
-          if (strCondition4.trim().length() > 0) {
-            vPrintDetails.add(""); //addl line break needed acc to Alan
-            vPrintDetails.add("");
-            vPrintDetails.add("");
-            vPrintDetails.add(BREAK_INDICATOR + strCondition4 + ":p.");
-            logMessage("_130 " + BREAK_INDICATOR + " " + strCondition4 + ":p.");
-            vPrintDetails.add("");
-            vPrintDetails.add("");
-
-            vPrintDetails.add(""); //addl line break needed acc to Alan
-            vPrintDetails.add("");
-            vPrintDetails.add("");
-            strCondition4 = "";
-          }
-        }
-
-        //Add the details here
-        strCondition3 = getAttributeValue(eiOP, "FIRSTNAME", " ");
-        strCondition3 += " " + getAttributeValue(eiOP, "LASTNAME", " ");
-        vPrintDetails.add(strCondition3);
-        vPrintDetails.add(getAttributeValue(eiOP, "TELEPHONE", " "));
-        vPrintDetails.add(getAttributeValue(eiOP, "EMAIL", " "));
-      }
-
-    }
-    if (!strCondition2.equals(strWorldwideTag)) {
-      if (strCondition2.length() > 0) {
-        vPrintDetails.add(BREAK_INDICATOR + ".br;:hp2.<---" + strCondition2 + ":ehp2.");
-        vPrintDetails.add("");
-        vPrintDetails.add("");
-      }
-      strCondition2 = strCondition1;
-    }
-
-    strEntityTypes = new String[] {
-        "CMPNTSALESCNTCTOP", "CMPNT"};
-    strCondition2 = "";
-
-    logMessage("_130 Begin CMPNT********************");
-    for (i = 0; i < vCmptSortedbyMkt.size(); i++) {
-      eiComponent = (EntityItem) vCmptSortedbyMkt.elementAt(i);
-      //Now get the operators
-      vReturnEntities2 = searchEntityItemLink(eiComponent, null, null, true, true, "CMPNTSALESCNTCTOP");
-      logMessage("****CMPNTSALESCNTCTOP*****");
-      displayContents(vReturnEntities2);
-      vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, null, null, true, true, "OP");
-      logMessage("****OP*****");
-      displayContents(vReturnEntities3);
-      if (vReturnEntities3.size() == 0) {
-        continue; //Go to the next one if no operators found
-      }
-      vReturnEntities4 = sortEntities(vReturnEntities3, new String[] {"LASTNAME", "FIRSTNAME"});
-
-      strCondition4 = getCmptToSofMktMsg(eiComponent);
-      for (j = 0; j < vReturnEntities4.size(); j++) {
-        eiOP = (EntityItem) vReturnEntities4.elementAt(j);
-        //Navigate Back to CMPNTSALESCNTCTOP to get the GEO tags
-        vReturnEntities2 = searchEntityItemLink(eiOP, null, null, true, false, "CMPNTSALESCNTCTOP");
-        for (int k = 0; k < vReturnEntities2.size(); k++) {
-          eiNextItem = (EntityItem) vReturnEntities2.elementAt(k);
-          eiNextItem1 = (EntityItem) eiNextItem.getUpLink(0);
-          if (eiNextItem1.getKey().equals(eiComponent.getKey())) {
-            break;
-          } //Multiple CMPNT's could be linked to an OP each relator having different GEO's
-        }
-        strCondition1 = getGeoTags(eiNextItem);
-        logMessage("Getting GEO :" + strCondition1 + ":for:" + eiNextItem.getKey());
-        if (!strCondition1.equals(strCondition2)) {
-          if (!strCondition2.equals(strWorldwideTag)) {
-            if (strCondition2.length() > 0) {
-              vPrintDetails.add(BREAK_INDICATOR + ".br;:hp2.<---" + strCondition2 + ":ehp2.");
-              vPrintDetails.add("");
-              vPrintDetails.add("");
-            }
-          }
-          if (strCondition4.trim().length() > 0) {
-            vPrintDetails.add(""); //addl line break needed acc to Alan
-            vPrintDetails.add("");
-            vPrintDetails.add("");
-            vPrintDetails.add(BREAK_INDICATOR + strCondition4 + ":p.");
-            logMessage("_130 " + BREAK_INDICATOR + " " + strCondition4 + ":p.");
-            vPrintDetails.add("");
-            vPrintDetails.add("");
-
-            vPrintDetails.add(BREAK_INDICATOR); //addl line break needed acc to Alan
-            vPrintDetails.add("");
-            vPrintDetails.add("");
-            strCondition4 = "";
-          }
-          if (!strCondition1.equals(strWorldwideTag)) {
-            if (strCondition1.trim().length() > 0) {
-              vPrintDetails.add(BREAK_INDICATOR + ":p.:hp2." + strCondition1 + "--->:ehp2.");
-              vPrintDetails.add("");
-              vPrintDetails.add("");
-            }
-          }
-          strCondition2 = strCondition1;
-        }
-        else { //Just print the Market Name if there
-          if (strCondition4.trim().length() > 0) {
-            vPrintDetails.add(""); //addl line break needed acc to Alan
-            vPrintDetails.add("");
-            vPrintDetails.add("");
-            vPrintDetails.add(BREAK_INDICATOR + strCondition4 + ":p.");
-            logMessage("_130 " + BREAK_INDICATOR + " " + strCondition4 + ":p.");
-            vPrintDetails.add("");
-            vPrintDetails.add("");
-
-            vPrintDetails.add(""); //addl line break needed acc to Alan
-            vPrintDetails.add("");
-            vPrintDetails.add("");
-            strCondition4 = "";
-          }
-        }
-
-        //Add the details here
-        strCondition3 = getAttributeValue(eiOP, "FIRSTNAME", " ");
-        strCondition3 += " " + getAttributeValue(eiOP, "LASTNAME", " ");
-        logMessage("_130: OP is " + strCondition1 + "->" + strCondition2 + ":OP" + strCondition3);
-        vPrintDetails.add(strCondition3);
-        vPrintDetails.add(getAttributeValue(eiOP, "TELEPHONE", " "));
-        vPrintDetails.add(getAttributeValue(eiOP, "EMAIL", " "));
-      }
-    }
-    if (!strCondition2.equals(strWorldwideTag)) {
-      if (strCondition2.length() > 0) {
-        vPrintDetails.add(BREAK_INDICATOR + ".br;:hp2.<---" + strCondition2 + ":ehp2.");
-        vPrintDetails.add("");
-        vPrintDetails.add("");
-      }
-      strCondition2 = strCondition1;
-    }
-
-    //ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> FEATUREAVAIL (R) -> FEATURE (E) -> FEATURESALESCNTCTOP (R) -> OP (E)
-
-    vReturnEntities2 = searchEntityVectorLink(vFeatureSortedbyMkt, null, null, true, true, "FEATRSALESCNTCTOP");
-    logMessage("****FEATRSALESCNTCTOP*****");
-    displayContents(vReturnEntities2);
-    vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, null, null, true, true, "OP");
-    logMessage("****OP*****");
-    displayContents(vReturnEntities3);
-    strHeader = new String[] {
-        "Contact Name", "Telephone", "E-mail"};
-    iColWidths = new int[] {
-        25, 12, 29};
-    strEntityTypes = new String[] {
-        "FEATRSALESCNTCTOP", "FEATURE"};
-    logMessage("_130 Begin FEATURE********************");
-    strCondition2 = "";
-    for (i = 0; i < vFeatureSortedbyMkt.size(); i++) {
-      eiFeature = (EntityItem) vFeatureSortedbyMkt.elementAt(i);
-      //Now get the operators
-      vReturnEntities2 = searchEntityItemLink(eiFeature, null, null, true, true, "FEATRSALESCNTCTOP");
-      logMessage("****FEATRSALESCNTCTOP*****");
-      displayContents(vReturnEntities2);
-      vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, null, null, true, true, "OP");
-      logMessage("****OP*****");
-      displayContents(vReturnEntities3);
-      if (vReturnEntities3.size() == 0) {
-        continue; //Go to the next one if no operators found
-      }
-      vReturnEntities4 = sortEntities(vReturnEntities3, new String[] {"LASTNAME", "FIRSTNAME"});
-
-      strCondition4 = getfeatureToSofMktMsg(eiFeature);
-      for (j = 0; j < vReturnEntities4.size(); j++) {
-        eiOP = (EntityItem) vReturnEntities4.elementAt(j);
-        //Navigate Back to FEATRSALESCNTCTOP to get the GEO tags
-        vReturnEntities2 = searchEntityItemLink(eiOP, null, null, true, false, "FEATRSALESCNTCTOP");
-        for (int k = 0; k < vReturnEntities2.size(); k++) {
-          eiNextItem = (EntityItem) vReturnEntities2.elementAt(k);
-          eiNextItem1 = (EntityItem) eiNextItem.getUpLink(0);
-          if (eiNextItem1.getKey().equals(eiFeature.getKey())) {
-            break;
-          } //Multiple features's could be linked to an OP each relator having different GEO's
-        }
-        strCondition1 = getGeoTags(eiNextItem);
-        logMessage("Getting GEO :" + strCondition1 + ":for:" + eiNextItem.getKey());
-        if (!strCondition1.equals(strCondition2)) {
-
-          if (!strCondition2.equals(strWorldwideTag)) {
-            if (strCondition2.length() > 0) {
-              vPrintDetails.add(BREAK_INDICATOR + ".br;:hp2.<---" + strCondition2 + ":ehp2.");
-              vPrintDetails.add("");
-              vPrintDetails.add("");
-            }
-          }
-          if (strCondition4.trim().length() > 0) {
-            vPrintDetails.add(""); //addl line break needed acc to Alan
-            vPrintDetails.add("");
-            vPrintDetails.add("");
-            vPrintDetails.add(BREAK_INDICATOR + strCondition4 + ":p.");
-            logMessage("_130 " + BREAK_INDICATOR + " " + strCondition4 + ":p.");
-            vPrintDetails.add("");
-            vPrintDetails.add("");
-
-            vPrintDetails.add(""); //addl line break needed acc to Alan
-            vPrintDetails.add("");
-            vPrintDetails.add("");
-            strCondition4 = "";
-          }
-          if (!strCondition1.equals(strWorldwideTag)) {
-            if (strCondition1.trim().length() > 0) {
-              vPrintDetails.add(BREAK_INDICATOR + ":p.:hp2." + strCondition1 + "--->:ehp2.");
-              vPrintDetails.add("");
-              vPrintDetails.add("");
-            }
-          }
-          strCondition2 = strCondition1;
-        }
-        else { //Just print the Market Name if there
-          if (strCondition4.trim().length() > 0) {
-            vPrintDetails.add(""); //addl line break needed acc to Alan
-            vPrintDetails.add("");
-            vPrintDetails.add("");
-            vPrintDetails.add(BREAK_INDICATOR + strCondition4 + ":p.");
-            logMessage("_130 " + BREAK_INDICATOR + " " + strCondition4 + ":p.");
-            vPrintDetails.add("");
-            vPrintDetails.add("");
-
-            vPrintDetails.add(""); //addl line break needed acc to Alan
-            vPrintDetails.add("");
-            vPrintDetails.add("");
-            strCondition4 = "";
-          }
-        }
-        //Add the details here
-        strCondition3 = getAttributeValue(eiOP, "FIRSTNAME", " ");
-        strCondition3 += " " + getAttributeValue(eiOP, "LASTNAME", " ");
-        vPrintDetails.add(strCondition3);
-        vPrintDetails.add(getAttributeValue(eiOP, "TELEPHONE", " "));
-        vPrintDetails.add(getAttributeValue(eiOP, "EMAIL", " "));
-      }
-    }
-    if (!strCondition2.equals(strWorldwideTag)) {
-      if (strCondition2.length() > 0) {
-        vPrintDetails.add(BREAK_INDICATOR + ".br;:hp2.<---" + strCondition2 + ":ehp2.");
-        vPrintDetails.add("");
-        vPrintDetails.add("");
-      }
-      strCondition2 = strCondition1;
-    }
-    if (vPrintDetails.size() > 0) {
-      println(":xmp.");
-      println(".kp off");
-      println(".in 0");
-    }
-    printReport(true, strHeader, iColWidths, vPrintDetails);
-    rfaReport.setPrintDupeLines(true);
-    if (vPrintDetails.size() > 0) {
-      println(":exmp.");
-    }
-    resetPrintvars();
-    println(".*$A_130_End");
-
-    println(".*$A_132_Begin");
-    //Sales Action Required
-    printVanillaSVSReport("SALESACTREQ", true, false);
-//    printInternalLetter("SALESACTREQ",true);
-
-    println(".*$A_132_End");
-
-    println(".*$A_134_Begin");
-    //Sales Approach
-    printVanillaSVSReport("SALESAPPROACH", true, false);
-//    printInternalLetter("SALESAPPROACH",true);
-    println(".*$A_134_End");
-
-    println(".*$A_136_Begin");
-    printVanillaSVSReport("CUSTCANDGUIDELINES", true, false);
-    println(".*$A_136_End");
-
-    println(".*$A_138_Begin");
-    printVanillaSVSReport("CUSTRESTRICTIONS", true, false);
-
-    println(".*$A_138_End");
-
-    println(".*$A_140_Begin");
-    printVanillaSVSReport("HANDOBJECTIONS", true, false);
-    println(".*$A_140_End");
-
-    println(".*$A_144_Begin");
-    printVanillaSVSReport("COMPETITIVEOF", true, false);
-    println(".*$A_144_End");
-
-    println(".*$A_146_Begin");
-    printVanillaSVSReport("STRENGTHWEAKNESS", true, false);
-    println(".*$A_146_End");
-
-    println(".*$A_148_Begin");
-    /*
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> SOFAVAIL (R) -> SOF (E) -> SOFPRICE (R) -> PRICEINFO (E)
-     ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> CMPNTAVAIL (R) -> CMPNT (E) -> CMPNTPRICE (R) -> PRICEINFO (E)
-     ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> FEATUREAVAIL (R) -> FEATURE (E) -> FEATUREPRICE (R) -> PRICEINFO (E)
-     */
-    strHeader = new String[] {
-        "Offering Name"};
-    iColWidths = new int[] {
-        69};
-
-    vReturnEntities1 = searchEntityVectorLink(vSofFrmSofAvail, null, null, true, true, "SOFPRICE");
-    //vReturnEntities2 = searchEntityGroupLink(egSof, null, null, true, true, "SOFPRICE");
-    vReturnEntities2 = new Vector();
-    logMessage("A_148:From SOF");
-    displayContents(vReturnEntities1);
-    for (i = 0; i < vReturnEntities1.size(); i++) {
-      eiNextItem = (EntityItem) vReturnEntities1.elementAt(i); //This is SOFPRICE
-      logMessage("A_148:" + eiNextItem.getKey());
-      eiSof = (EntityItem) eiNextItem.getUpLink(0);
-      eiPriceInfo = (EntityItem) eiNextItem.getDownLink(0);
-      logMessage("A_148:" + eiSof.getKey());
-      logMessage("A_148:" + eiPriceInfo.getKey());
-      strCondition1 = getAttributeValue(eiPriceInfo, "BILLINGAPP", " ");
-      strCondition1 += ":" + eiSof.getKey(); //Add the key to the BILLINGAPP name
-
-      vReturnEntities2.add(strCondition1);
-    }
-
-    vReturnEntities1 = searchEntityVectorLink(vCmpntFrmCmpntAvail, null, null, true, true, "CMPNTPRICE");
-    logMessage("A_148:From CMPNTPRICE");
-    displayContents(vReturnEntities1);
-    for (i = 0; i < vReturnEntities1.size(); i++) {
-      eiNextItem = (EntityItem) vReturnEntities1.elementAt(i); //This is CMPNTPRICE
-      logMessage("A_148:" + eiNextItem.getKey());
-      eiComponent = (EntityItem) eiNextItem.getUpLink(0);
-      eiPriceInfo = (EntityItem) eiNextItem.getDownLink(0);
-      logMessage("A_148:" + eiComponent.getKey());
-      logMessage("A_148:" + eiPriceInfo.getKey());
-      strCondition1 = getAttributeValue(eiPriceInfo, "BILLINGAPP", " ");
-      strCondition1 += ":" + eiComponent.getKey(); //Add the key to the BILLINGAPP name
-
-      vReturnEntities2.add(strCondition1);
-    }
-
-    vReturnEntities1 = searchEntityVectorLink(vFeatureFrmFeatureAvail, null, null, true, true, "FEATUREPRICE");
-    logMessage("A_148:From CMPNTPRICE");
-    displayContents(vReturnEntities1);
-    for (i = 0; i < vReturnEntities1.size(); i++) {
-      eiNextItem = (EntityItem) vReturnEntities1.elementAt(i); //This is CMPNTPRICE
-      logMessage("A_148:" + eiNextItem.getKey());
-      eiFeature = (EntityItem) eiNextItem.getUpLink(0);
-      eiPriceInfo = (EntityItem) eiNextItem.getDownLink(0);
-      logMessage("A_148:" + eiFeature.getKey());
-      logMessage("A_148:" + eiPriceInfo.getKey());
-      strCondition1 = getAttributeValue(eiPriceInfo, "BILLINGAPP", " ");
-      strCondition1 += ":" + eiFeature.getKey(); //Add the key to the BILLINGAPP name
-
-      vReturnEntities2.add(strCondition1);
-    }
-
-    resetPrintvars();
-
-    vReturnEntities3 = mySort.alphabetizeVector(vReturnEntities2); //Sort the marketing messages
-    if (vReturnEntities3.size() > 0) {
-      println(":xmp.");
-      println(".kp off");
-      println(".in 0");
-      println("");
-      resetPrintvars();
-      strCondition1 = (String) vReturnEntities3.elementAt(0); //Prepare for the control break sequence
-      if (strCondition1.indexOf(":CMPNT") > 0) {
-        strCondition2 = strCondition1.substring(0, strCondition1.indexOf(":CMPNT"));
-      }
-      else if (strCondition1.indexOf(":FEATURE") > 0) {
-        strCondition2 = strCondition1.substring(0, strCondition1.indexOf(":FEATURE"));
-      }
-      else if (strCondition1.indexOf(":SOF") > 0) {
-        strCondition2 = strCondition1.substring(0, strCondition1.indexOf(":SOF"));
-      }
-      print("Billing Application: ");
-      bConditionOK = false;
-      if (strCondition2.indexOf("*") > -1) {
-        st = new StringTokenizer(strCondition2, "*");
-        while (st.hasMoreTokens()) {
-          if (bConditionOK) {
-            print("                     ");
-          }
-          bConditionOK = true;
-          println(st.nextToken().trim());
-        }
-      }
-    }
-
-    for (i = 0; i < vReturnEntities3.size(); i++) {
-      logMessage("A_148:Sorted Vector returning: " + strCondition1);
-      strCondition1 = (String) vReturnEntities3.elementAt(i);
-      if (strCondition1.indexOf(":CMPNT") > 0) {
-        strCondition4 = strCondition1.substring(0, strCondition1.indexOf(":CMPNT"));
-      }
-      else if (strCondition1.indexOf(":FEATURE") > 0) {
-        strCondition4 = strCondition1.substring(0, strCondition1.indexOf(":FEATURE"));
-      }
-      else if (strCondition1.indexOf(":SOF") > 0) {
-        strCondition4 = strCondition1.substring(0, strCondition1.indexOf(":SOF"));
-      }
-      logMessage("A_148 Current Mkt:" + strCondition4);
-      logMessage("A_148 Prev Mkt :" + strCondition2);
-      if (!strCondition2.equals(strCondition4)) { //check whether previous mktname is the same as current one
-        logMessage("A_148 Current < New");
-        strCondition2 = strCondition4;
-        printReport(true, strHeader, iColWidths, vPrintDetails); //Print when they are not the same
-        println("");
-        print("Billing Application: ");
-        bConditionOK = false; //Skip for the first one
-        if (strCondition2.indexOf("*") > -1) {
-          st = new StringTokenizer(strCondition2, "*");
-          while (st.hasMoreTokens()) {
-            if (bConditionOK) {
-              print("                     ");
-            }
-            println(st.nextToken().trim());
-            bConditionOK = true;
-          }
-        }
-        resetPrintvars();
-      }
-
-      if (strCondition1.indexOf(":CMPNT") > 0) {
-        strCondition5 = strCondition1.substring(strCondition1.indexOf(":CMPNT") + 1);
-        logMessage("A_155:Parsed out" + strCondition5);
-        eiComponent = egComponent.getEntityItem(strCondition5); //get the Component entity from group using parsed key
-        strCondition1 = getCmptToSofMktMsg(eiComponent);
-        vPrintDetails.add(strCondition1);
-        logMessage("A_148:Print:" + strCondition1);
-        //vPrintDetails.add(getAttributeValue(eiComponent, "COMPONENTID","" ));
-        logMessage("A_148:Print:" + getAttributeValue(eiComponent, "COMPONENTID", ""));
-      }
-      else if (strCondition1.indexOf(":FEATURE") > 0) {
-        strCondition5 = strCondition1.substring(strCondition1.indexOf(":FEATURE") + 1);
-        logMessage("A_155:Parsed out" + strCondition5);
-        eiFeature = egFeature.getEntityItem(strCondition5); //get the feature entity from the group using parsed key
-        strCondition1 = getfeatureToSofMktMsg(eiFeature);
-        vPrintDetails.add(strCondition1);
-        //eiComponent = getUplinkedEntityItem(eiFeature, strFeatureToCmpt);
-        //vPrintDetails.add(getAttributeValue(eiComponent, "COMPONENTID",""));
-        logMessage("A_148:Print:" + strCondition1);
-      }
-      else if (strCondition1.indexOf(":SOF") > 0) {
-        strCondition5 = strCondition1.substring(strCondition1.indexOf(":SOF") + 1);
-        logMessage("A_148:Parsed out" + strCondition5);
-        eiSof = egSof.getEntityItem(strCondition5); //get the SOF entity from the group using parsed key
-        strCondition1 = getSOFMktName(eiSof);
-        vPrintDetails.add(strCondition1);
-
-        //vPrintDetails.add(getAttributeValue(eiSof, "OFIDNUMBER", " "));
-        logMessage("A_148:Print:" + strCondition1);
-        logMessage("A_148:Print:" + getAttributeValue(eiSof, "OFIDNUMBER", " "));
-      }
-    }
-
-    if (vPrintDetails.size() > 0) {
-      printReport(true, strHeader, iColWidths, vPrintDetails); //Print when processing is done
-      resetPrintvars();
-    }
-
-    if (vReturnEntities3.size() > 0) {
-      println(":exmp.");
-    }
-
-    println(".*$A_148_End");
-
-    println(".*$A_150_Begin");
-    strParamList1 = new String[] {
-        "STANDARDAMENDTEXT"}; //Internal Letter/Contract Info
-    printValueListInGroup(grpStdAmendText, strParamList1, "STANDARDAMENDTEXT_TYPE", "110", "", true);
-    iColWidths = new int[] {
-        69};
-    printReport(false, null, iColWidths, vPrintDetails);
-    resetPrintvars();
-    println(".*$A_150_End");
-
-    println(".*$A_151_Begin");
-    //ANNOUNCEMENT (E) -> ANNTOANNDELIVER (R) -> ANNDELIVERABLE (E)  -> ANNDELREQTRANS (R) -> EMEATRANSLATION (E) -> TRANSDELREVIEW (R) -> OP (E)
-    strFilterAttr = new String[] {
-        "DELIVERABLETYPE"};
-    strFilterValue = new String[] {
-        "852"};
-    vReturnEntities1 = searchEntityGroup(grpAnnDeliv, strFilterAttr, strFilterValue, true);
-    logMessage("A_151****ANNDELIVERABLE");
-    displayContents(vReturnEntities1);
-    vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "ANNDELREQTRANS");
-    logMessage("A_151****ANNDELREQTRANS");
-    displayContents(vReturnEntities2);
-    strFilterAttr = new String[] {
-        "LANGUAGES", "LANGUAGES", "LANGUAGES", "LANGUAGES"};
-    strFilterValue = new String[] {
-        "2802", "2803", "2797", "2796"};
-    vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, false, true,
-                                              "EMEATRANSLATION");
-    logMessage("A_151****EMEATRANSLATION");
-    displayContents(vReturnEntities3);
-    vReturnEntities4 = searchEntityVectorLink(vReturnEntities3, null, null, true, true, "TRANSDELREVIEW");
-    logMessage("A_151****TRANSDELREVIEW");
-    displayContents(vReturnEntities4);
-    for (i = 0; i < vReturnEntities4.size(); i++) {
-      eiNextItem = (EntityItem) vReturnEntities4.elementAt(i);
-      logMessage("A_287****" + eiNextItem.getEntityType() + ":" + eiNextItem.getEntityID());
-      eiEmeaTranslation = (EntityItem) eiNextItem.getUpLink(0);
-      eiOP = (EntityItem) eiNextItem.getDownLink(0);
-      vPrintDetails.add(getAttributeValue(eiEmeaTranslation, "LANGUAGES", " "));
-      strCondition1 = getAttributeValue(eiOP, "FIRSTNAME", " ").substring(0, 1);
-      strCondition1 += ". " + getAttributeValue(eiOP, "LASTNAME", " ");
-      vPrintDetails.add(strCondition1);
-      strCondition1 = getAttributeValue(eiOP, "VNETNODE", " ");
-      strCondition1 += "/" + getAttributeValue(eiOP, "VNETUID", " ");
-      vPrintDetails.add(strCondition1);
-    }
-
-    strHeader = new String[] {
-        "Language", "Brand Reviewer Name", "  Node/Userid"};
-    iColWidths = new int[] {
-        17, 30, 17};
-    println(":h4.Worldwide Customer Letter Translation");
-    println(":xmp.");
-    println(".kp off");
-    printReport(true, strHeader, iColWidths, vPrintDetails);
-    resetPrintvars();
-    println(":exmp.");
-    println(":p.Note: This section is deleted at PLET generation time.");
-    println(".*$A_151_End");
-
-    println(".*$A_152_Begin");
-    //ANNOUNCEMENT (E) -> ANNTOANNDELIVER (R) -> ANNDELIVERABLE (E)  -> ANNDELREQTRANS (R) -> EMEATRANSLATION (E)
-    //  -> TRANSDELREVIEW (R) -> OP (E)
-    strFilterAttr = new String[] {
-        "DELIVERABLETYPE"};
-    strFilterValue = new String[] {
-        "856"};
-    vReturnEntities1 = searchEntityGroup(grpAnnDeliv, strFilterAttr, strFilterValue, true);
-    logMessage("A_152****ANNDELIVERABLE");
-    displayContents(vReturnEntities1);
-    vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "ANNDELREQTRANS");
-    logMessage("A_152****ANNDELREQTRANS");
-    displayContents(vReturnEntities2);
-    strFilterAttr = new String[] {
-        "LANGUAGES", "LANGUAGES", "LANGUAGES", "LANGUAGES"};
-    strFilterValue = new String[] {
-        "2802", "2803", "2797", "2796"};
-    vReturnEntities3 = searchEntityVectorLink(vReturnEntities2, strFilterAttr, strFilterValue, false, true,
-                                              "EMEATRANSLATION");
-    logMessage("A_152****EMEATRANSLATION");
-    displayContents(vReturnEntities3);
-    vReturnEntities4 = searchEntityVectorLink(vReturnEntities3, null, null, true, true, "TRANSDELREVIEW");
-    logMessage("A_152****TRANSDELREVIEW");
-    displayContents(vReturnEntities4);
-    vPrintDetails1 = new Vector();
-    for (i = 0; i < vReturnEntities4.size(); i++) {
-      eiNextItem = (EntityItem) vReturnEntities4.elementAt(i);
-      eiEmeaTranslation = (EntityItem) eiNextItem.getUpLink(0);
-      eiOP = (EntityItem) eiNextItem.getDownLink(0);
-      logMessage("A_152****" + eiNextItem.getEntityType() + ":" + eiNextItem.getEntityID());
-      vPrintDetails.add(getAttributeValue(eiEmeaTranslation, "LANGUAGES", " "));
-      strCondition1 = getAttributeValue(eiOP, "FIRSTNAME", " ").substring(0, 1);
-      strCondition1 += ". " + getAttributeValue(eiOP, "LASTNAME", " ");
-      vPrintDetails.add(strCondition1);
-      strCondition1 = getAttributeValue(eiOP, "VNETNODE", " ");
-      strCondition1 += "/" + getAttributeValue(eiOP, "VNETUID", " ");
-      vPrintDetails.add(strCondition1);
-      vPrintDetails1.add(getAttributeValue(eiNextItem, "PROPOSALINSERTID", " "));
-    }
-
-    strHeader = new String[] {
-        "Language", "Brand Reviewer Name", "  Node/Userid"};
-    iColWidths = new int[] {
-        17, 30, 17};
-    println(":xmp.");
-    println(".kp off");
-    printReport(true, strHeader, iColWidths, vPrintDetails);
-    resetPrintvars();
-    strCondition1 = "";
-    for (i = 0, j = 0; i < vPrintDetails1.size(); i++) {
-      strCondition1 += "PINo: " + (String) vPrintDetails1.elementAt(i) + "    ";
-      if (j == 3) {
-        println("Proposal Insert Document Ids");
-        println(strCondition1);
-        strCondition1 = "";
-        j = 0;
-      }
-    }
-    if (i < 3) {
-      println("Proposal Insert Document Ids");
-    }
-
-    println(strCondition1);
-    println(":exmp.");
-    println(":p.Note: This section is deleted at PLET generation time.");
-
-    println(".*$A_152_End");
-    /*
-        println(".*$A_153_Begin");
-        logMessage("A_153_Begin");
-        printInternalLetter(null);
-        resetPrintvars();
-        println(".*$A_153_End");
-
-     */
-    println(".*$A_153_Begin");
-    logMessage("A_153_Begin");
-    //    printInternalLetter("OFIDNUMBER", true);
-    // MN29166812  data missing because of SOFAVAIL checks, replaced method with new one to avoid reuse conflicts
-    printA153();
-    resetPrintvars();
-    println(".*$A_153_End");
-
-    println(".*$A_154_Begin");
-    /*
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> CMPNTAVAIL (R) -> CMPNT (E) tbd
-     */
-    //Start from CMPNT and navigate to SOF using SOFCMPNT
-
-    strCondition2 = "";
-    vReturnEntities1 = searchEntityVectorLink(vCmpntFrmCmpntAvail, null, null, true, false, "SOFCMPNT");
-    vReturnEntities2 = new Vector();
-    strSofToCmpt = new String[] {
-        "SOFCMPNT", "CMPNT"}; //Change in navigation from SOF to extract mktmsg
-    logMessage("A_154:From Component");
-    displayContents(vReturnEntities1);
-    for (i = 0; i < vReturnEntities1.size(); i++) {
-      eiNextItem = (EntityItem) vReturnEntities1.elementAt(i); //This is SOFCMPNT
-      logMessage("A_154:" + eiNextItem.getKey());
-      eiSof = (EntityItem) eiNextItem.getUpLink(0);
-      strCondition1 = getSOFMktName(eiSof, false);
-      logMessage("A_154:" + eiSof.getKey());
-      eiComponent = (EntityItem) eiNextItem.getDownLink(0);
-      logMessage("A_154:" + eiComponent.getKey());
-      strCondition1 += ":" + eiComponent.getKey(); //Add the key to the sof mkt name
-
-      vReturnEntities2.add(strCondition1);
-    }
-
-    vReturnEntities1 = searchEntityVectorLink(vFeatureFrmFeatureAvail, null, null, true, false, "CMPNTFEATURE");
-    logMessage("A_154:From Feature");
-    displayContents(vReturnEntities1);
-    for (i = 0; i < vReturnEntities1.size(); i++) {
-      eiNextItem = (EntityItem) vReturnEntities1.elementAt(i); //This is CMPNTFEATURE
-      logMessage("A_154:" + eiNextItem.getKey());
-      eiComponent = (EntityItem) eiNextItem.getUpLink(0);
-      logMessage("A_154:" + eiComponent.getKey());
-      eiFeature = (EntityItem) eiNextItem.getDownLink(0);
-      logMessage("A_154:" + eiFeature.getKey());
-
-      eiSof = getUplinkedEntityItem(eiComponent, new String[] {"SOFCMPNT", "SOF"});
-      strCondition1 = getSOFMktName(eiSof, false);
-      //strCondition1 = getCmptToSofMktMsg(eiComponent);
-      logMessage("A_154:Mktname" + strCondition1);
-      strCondition1 += ":" + eiFeature.getKey(); //Add the key to the sof mkt name
-
-      vReturnEntities2.add(strCondition1);
-    }
-
-    resetPrintvars();
-
-    vReturnEntities3 = mySort.alphabetizeVector(vReturnEntities2); //Sort the marketing messages
-    if (vReturnEntities3.size() > 0) {
-      println(":xmp.");
-      println(".kp off");
-      println("");
-      strHeader = new String[] {
-          "Service Product/Component Name", "Component ID", "Number"};
-      iColWidths = new int[] {
-          45, 13, 10};
-      resetPrintvars();
-      strCondition1 = (String) vReturnEntities3.elementAt(0); //Prepare for the control break sequence
-      if (strCondition1.indexOf(":CMPNT") > 0) {
-        strCondition2 = strCondition1.substring(0, strCondition1.indexOf(":CMPNT"));
-      }
-      else if (strCondition1.indexOf(":FEATURE") > 0) {
-        strCondition2 = strCondition1.substring(0, strCondition1.indexOf(":FEATURE"));
-      }
-      println(strCondition2);
-    }
-
-    for (i = 0; i < vReturnEntities3.size(); i++) {
-      logMessage("A_154:Sorted Vector returning: " + strCondition1);
-      strCondition1 = (String) vReturnEntities3.elementAt(i);
-      if (strCondition1.indexOf(":CMPNT") > 0) {
-        strCondition4 = strCondition1.substring(0, strCondition1.indexOf(":CMPNT"));
-      }
-      else if (strCondition1.indexOf(":FEATURE") > 0) {
-        strCondition4 = strCondition1.substring(0, strCondition1.indexOf(":FEATURE"));
-      }
-      logMessage("A_154 Current Mkt:" + strCondition4);
-      logMessage("A_154 Prev Mkt :" + strCondition2);
-      if (!strCondition2.equals(strCondition4)) { //check whether previous mktname is the same as current one
-        logMessage("A_154 Current < New checking");
-        strCondition2 = strCondition4;
-        println("                                                            Autobahn");
-        println("                                                            Project");
-
-        printReport(true, strHeader, iColWidths, vPrintDetails); //Print when they are not the same
-        println("");
-        println(strCondition2);
-        resetPrintvars();
-      }
-
-      if (strCondition1.indexOf(":CMPNT") > 0) {
-        strCondition5 = strCondition1.substring(strCondition1.indexOf(":CMPNT") + 1);
-        logMessage("A_154:Parsed out" + strCondition5);
-        eiComponent = egComponent.getEntityItem(strCondition5); //get the Component entity from group using parsed key
-        strCondition3 = getAttributeValue(eiComponent, "ITSCMPNTCATNAME", "");
-        strCondition3 = (strCondition3.length() > 0 ? strCondition3 + " " : "") +
-            getAttributeValue(eiComponent, "MKTGNAME", " ");
-        logMessage(":CMPNT :" + strCondition3);
-        //strCondition3 = getCmptToSofMktMsg(eiComponent);
-        vPrintDetails.add(strCondition3);
-
-        strCondition3 = getAttributeValue(eiComponent, "COMPONENTID", "No Value" + eiComponent.getKey());
-        vPrintDetails.add(strCondition3);
-
-        //Navigate to SOF from CMPNT to see whether SOF is linked to AVAIL before printing PROJnumber
-        eiSof = getUplinkedEntityItem(eiComponent, strCmptToSof);
-        //Print Projnumber only if sof linked to avail
-        vReturnEntities1 = searchEntityItemLink(eiSof, null, null, true, true, "SOFAVAIL");
-        strCondition3 = " ";
-        if (vReturnEntities1.size() > 0) {
-          //Navigate to OFDEVLPROJ and get PROJNUMBER
-          //Navigation: ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> CMPNTAVAIL (R) -> CMPNT (E) - OFDEVLPROJCMPNT (R) - OFDEVLPROJ (E)
-
-          vReturnEntities4 = searchEntityItemLink(eiComponent, null, null, true, false, "OFDEVLPROJCMPNT");
-          if (vReturnEntities4.size() > 0) {
-            eiNextItem2 = (EntityItem) vReturnEntities4.elementAt(0);
-            eiNextItem3 = (EntityItem) eiNextItem2.getUpLink(0); //This will be the OFDEVLPROJ entity
-            strCondition3 = getAttributeValue(eiNextItem3, "PROJNUMBER", "No Value" + eiNextItem3.getKey());
-          }
-
-        }
-
-        vPrintDetails.add(strCondition3);
-
-      }
-      else if (strCondition1.indexOf(":FEATURE") > 0) {
-        strCondition5 = strCondition1.substring(strCondition1.indexOf(":FEATURE") + 1);
-        logMessage("A_154:Parsed out" + strCondition5);
-        eiFeature = egFeature.getEntityItem(strCondition5); //get the feature entity from the group using parsed key
-        //Navigate to component and get Mkt message
-        eiNextItem1 = getUplinkedEntityItem(eiFeature, strFeatureToCmpt); //this is CMPNT
-
-        //Then get  mktg msg
-        strCondition3 = getAttributeValue(eiNextItem1, "ITSCMPNTCATNAME", "");
-        strCondition3 = (strCondition3.length() > 0 ? strCondition3 + " " : "") +
-            getAttributeValue(eiNextItem1, "MKTGNAME", " ");
-        logMessage(":Feature :" + strCondition3);
-        vPrintDetails.add(strCondition3);
-        vPrintDetails.add(getAttributeValue(eiNextItem1, "COMPONENTID", "No Value" + eiFeature.getKey()));
-
-        //Navigate to SOF from FEATURE to see whether SOF is linked to AVAIL before printing PROJnumber
-        eiComponent = getUplinkedEntityItem(eiFeature, strFeatureToCmpt);
-        strCondition3 = " ";
-        if (eiComponent == null) {
-          vReturnEntities1.removeAllElements();
-        }
-        else {
-
-          eiSof = getUplinkedEntityItem(eiComponent, strCmptToSof);
-          //Print Projnumber only if sof linked to avail
-          vReturnEntities1 = searchEntityItemLink(eiSof, null, null, true, true, "SOFAVAIL");
-        }
-        if (vReturnEntities1.size() > 0) {
-          //Navigate to OFDEVLPROJ and get PROJNUMBER
-          //Navigation: ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> FEATUREAVAIL (R) -> FEATURE (E) -> CMPNTFEATURE (R ) -> CMPNT (E) - OFDEVLPROJCMPNT (R) - OFDEVLPROJ (E)
-          vReturnEntities4 = searchEntityItemLink(eiNextItem1, null, null, true, false, "OFDEVLPROJCMPNT");
-          if (vReturnEntities4.size() > 0) {
-            eiNextItem2 = (EntityItem) vReturnEntities4.elementAt(0);
-            eiNextItem3 = (EntityItem) eiNextItem2.getUpLink(0); //This will be the OFDEVLPROJ entity
-            strCondition3 = getAttributeValue(eiNextItem3, "PROJNUMBER", "No Value" + eiNextItem3.getKey());
-          }
-
-        }
-
-        vPrintDetails.add(strCondition3);
-
-      }
-    }
-
-    if (vPrintDetails.size() > 0) {
-      println("                                              Service       Autobahn");
-      println("                                              Product/      Project");
-      printReport(true, strHeader, iColWidths, vPrintDetails); //Print when processing is done
-      resetPrintvars();
-    }
-
-    if (vReturnEntities3.size() > 0) {
-      println(":exmp.");
-    }
-    strSofToCmpt = new String[] {
-        "SOFRELCMPNT", "CMPNT"}; //Set it back to what it was
-
-    println(".*$A_154_End");
-
-    println(".*$A_155_Begin");
-    /*
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> FEATUREAVAIL (R) -> FEATURE (E) -> CMPNTFEATURE (R) -> CMPNT (E) -> SOFCMPNT (R) -> SOF (E)
-     ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> FEATUREAVAIL (R) -> FEATURE (E) -> CMPNTFEATURE (R) -> CMPNT (E)
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> FEATUREAVAIL (R) -> FEATURE (E)
-
-
-     */
-    //Start from FEATURE and navigate to SOF using SOFCMPNT
-
-    strCondition2 = "";
-
-    vReturnEntities1 = searchEntityVectorLink(vFeatureFrmFeatureAvail, null, null, true, false, "CMPNTFEATURE");
-    logMessage("A_155:From Feature");
-    displayContents(vReturnEntities1);
-    for (i = 0; i < vReturnEntities1.size(); i++) {
-      eiNextItem = (EntityItem) vReturnEntities1.elementAt(i); //This is CMPNTFEATURE
-      logMessage("A_155:" + eiNextItem.getKey());
-      eiComponent = (EntityItem) eiNextItem.getUpLink(0);
-      logMessage("A_155:" + eiComponent.getKey());
-      eiFeature = (EntityItem) eiNextItem.getDownLink(0);
-      logMessage("A_155:" + eiFeature.getKey());
-
-      eiSof = getUplinkedEntityItem(eiComponent, new String[] {"SOFCMPNT", "SOF"});
-      strCondition1 = getSOFMktName(eiSof, false);
-      //strCondition1 = getCmptToSofMktMsg(eiComponent);
-      logMessage("A_155:Mktname" + strCondition1);
-      strCondition1 += ":" + eiFeature.getKey(); //Add the key to the sof mkt name
-
-      vReturnEntities2.add(strCondition1);
-    }
-
-    resetPrintvars();
-
-    vReturnEntities3 = mySort.alphabetizeVector(vReturnEntities2); //Sort the marketing messages
-    if (vReturnEntities3.size() > 0) {
-      println(":xmp.");
-      println(".kp off");
-      println("");
-      // TIR 6QKKNN
-//      strHeader = new String[]{"Feature Name", "Feature ID"};
-//      iColWidths = new int[]{56, 14};
-      /*
-       Column Header Line 1	Column Position 	 Length
-       Feature Name			1 - 12					12
-       Feature ID				45 - 54					10
-       Autobahn				56 - 63					8
-
-       Column Header			Column Position 	 Length
-       Project Number			56 - 69					14
-       */
-      strHeader = new String[] {
-          "Feature Name", "Feature Id", "Number"}; // TIR 6QKKNN
-      iColWidths = new int[] {
-          45, 11, 10}; // TIR 6QKKNN
-
-      resetPrintvars();
-      strCondition1 = (String) vReturnEntities3.elementAt(0); //Prepare for the control break sequence
-      if (strCondition1.indexOf(":CMPNT") > 0) {
-        strCondition2 = strCondition1.substring(0, strCondition1.indexOf(":CMPNT"));
-      }
-      else if (strCondition1.indexOf(":FEATURE") > 0) {
-        strCondition2 = strCondition1.substring(0, strCondition1.indexOf(":FEATURE"));
-      }
-      println(strCondition2);
-    }
-
-    for (i = 0; i < vReturnEntities3.size(); i++) {
-      logMessage("A_155:Sorted Vector returning: " + strCondition1);
-      strCondition1 = (String) vReturnEntities3.elementAt(i);
-      if (strCondition1.indexOf(":CMPNT") > 0) {
-        strCondition4 = strCondition1.substring(0, strCondition1.indexOf(":CMPNT"));
-      }
-      else if (strCondition1.indexOf(":FEATURE") > 0) {
-        strCondition4 = strCondition1.substring(0, strCondition1.indexOf(":FEATURE"));
-      }
-      logMessage("A_155 Current Mkt:" + strCondition4);
-      logMessage("A_155 Prev Mkt :" + strCondition2);
-      if (!strCondition2.equals(strCondition4)) { //check whether previous mktname is the same as current one
-        logMessage("A_155 Current < New");
-        strCondition2 = strCondition4;
-        println("                                              Service/    Autobahn");
-        println("Service Component/                            Component   Project");
-        printReport(true, strHeader, iColWidths, vPrintDetails); //Print when they are not the same
-        println("");
-        println(strCondition2);
-        resetPrintvars();
-      }
-
-      if (strCondition1.indexOf(":CMPNT") > 0) { //This shouldnt apply since we are getting only features
-        strCondition5 = strCondition1.substring(strCondition1.indexOf(":CMPNT") + 1);
-        logMessage("A_155:Parsed out" + strCondition5);
-        eiComponent = egComponent.getEntityItem(strCondition5); //get the Component entity from group using parsed key
-        logMessage(":CMPNT :" + strCondition3);
-        strCondition3 = getCmptToSofMktMsg(eiComponent);
-        vPrintDetails.add(strCondition3);
-        strCondition3 = getAttributeValue(eiComponent, "COMPONENTID", "No Value" + eiComponent.getKey());
-        vPrintDetails.add(strCondition3);
-
-        //Navigate to SOF from CMPNT to see whether SOF is linked to AVAIL before printing PROJnumber
-        eiSof = getUplinkedEntityItem(eiComponent, strCmptToSof);
-        //Print Projnumber only if sof linked to avail
-        vReturnEntities1 = searchEntityItemLink(eiSof, null, null, true, true, "SOFAVAIL");
-        // TIR 6QKKNN add autobahn project number
-        strCondition3 = " ";
-        if (vReturnEntities1.size() > 0) {
-          //Navigate to OFDEVLPROJ and get PROJNUMBER
-          //Navigation: ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> CMPNTAVAIL (R) -> CMPNT (E) - OFDEVLPROJCMPNT (R) - OFDEVLPROJ (E)
-          vReturnEntities4 = searchEntityItemLink(eiComponent, null, null, true, false, "OFDEVLPROJCMPNT");
-          if (vReturnEntities4.size() > 0) {
-            eiNextItem2 = (EntityItem) vReturnEntities4.elementAt(0);
-            eiNextItem3 = (EntityItem) eiNextItem2.getUpLink(0); //This will be the OFDEVLPROJ entity
-            strCondition3 = getAttributeValue(eiNextItem3, "PROJNUMBER", "No Value" + eiNextItem3.getKey());
-          }
-
-        }
-
-        vPrintDetails.add(strCondition3);
-        // end TIR 6QKKNN
-      }
-      else if (strCondition1.indexOf(":FEATURE") > 0) {
-        strCondition5 = strCondition1.substring(strCondition1.indexOf(":FEATURE") + 1);
-        logMessage("A_155 in FEATURE:Parsed out" + strCondition5);
-        eiFeature = egFeature.getEntityItem(strCondition5); //get the feature entity from the group using parsed key
-        //Navigate to component and get Mkt message
-        //  eiNextItem1 = getUplinkedEntityItem(eiFeature, strFeatureToCmpt);
-
-        //strCondition3 =  getAttributeValue(eiNextItem1, "MKTGNAME", " ");
-
-        //strCondition3 = (strCondition3.length()>0 ? strCondition3+" " : "")+getAttributeValue(eiNextItem1, "MKTGNAME", " ");
-        strCondition3 = getAttributeValue(eiFeature, "MKTGNAME", " ");
-        logMessage(":Feature :" + strCondition3);
-        vPrintDetails.add(strCondition3);
-        vPrintDetails.add(getAttributeValue(eiFeature, "FEATURENUMBER", "No Value" + eiFeature.getKey()));
-
-        //Navigate to SOF from FEATURE to see whether SOF is linked to AVAIL before printing PROJnumber
-        eiComponent = getUplinkedEntityItem(eiFeature, strFeatureToCmpt);
-        // TIR 6QKKNN add autobahn project number
-        strCondition3 = " ";
-        if (eiComponent == null) {
-          vReturnEntities1.removeAllElements();
-        }
-        else {
-
-          eiSof = getUplinkedEntityItem(eiComponent, strCmptToSof);
-          //Print Projnumber only if sof linked to avail
-          vReturnEntities1 = searchEntityItemLink(eiSof, null, null, true, true, "SOFAVAIL");
-        }
-        if (vReturnEntities1.size() > 0) {
-          //Navigate to OFDEVLPROJ and get PROJNUMBER
-          //Navigation: ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> FEATUREAVAIL (R) -> FEATURE (E) -> CMPNTFEATURE (R ) -> CMPNT (E) - OFDEVLPROJCMPNT (R) - OFDEVLPROJ (E)
-
-          vReturnEntities4 = searchEntityItemLink(eiComponent, null, null, true, false, "OFDEVLPROJCMPNT");
-          if (vReturnEntities4.size() > 0) {
-            eiNextItem2 = (EntityItem) vReturnEntities4.elementAt(0);
-            eiNextItem3 = (EntityItem) eiNextItem2.getUpLink(0); //This will be the OFDEVLPROJ entity
-            strCondition3 = getAttributeValue(eiNextItem3, "PROJNUMBER", "No Value" + eiNextItem3.getKey());
-          }
-
-        }
-
-        vPrintDetails.add(strCondition3);
-        // end TIR 6QKKNN
-      }
-    }
-
-    if (vPrintDetails.size() > 0) {
-      println("                                              Service/    Autobahn");
-      println("Service Component/                            Component   Project");
-      printReport(true, strHeader, iColWidths, vPrintDetails); //Print when processing is done
-      resetPrintvars();
-    }
-
-    if (vReturnEntities3.size() > 0) {
-      println(":exmp.");
-    }
-
-    println(".*$A_155_End");
-
-    println(".*$A_156_Begin");
-    strParamList1 = new String[] {
-        "STANDARDAMENDTEXT"}; //Internal Letter, EMEA - Business Partner Terms and Conditions
-
-    printValueListInGroup(grpStdAmendText, strParamList1, "STANDARDAMENDTEXT_TYPE", "120", "", true);
-    iColWidths = new int[] {
-        69};
-    printReport(false, null, iColWidths, vPrintDetails);
-    resetPrintvars();
-    println(".*$A_156_End");
-
-    println(".*$A_157_Begin");
-    /*
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> SOFAVAIL (R) -> SOF (E) -> SOFCATINCL (R) -> CATINCL (E)
-         If SOFCATINCL (R) exist and CATALOGNAME = '321' (ibm.com) then answer 'Yes' otherwise or
-     */
-    bConditionOK = false;
-    vReturnEntities1 = searchEntityVectorLink(vSofFrmSofAvail, null, null, true, true, "SOFCATINCL");
-    strFilterAttr = new String[] {
-        "CATALOGNAME"};
-    strFilterValue = new String[] {
-        "321"};
-    vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, strFilterAttr, strFilterValue, true, true, "CATINCL");
-    if (vReturnEntities2.size() > 0) {
-      bConditionOK = true;
-    }
-    /*
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> CMPNTAVAIL (R) -> CMPNT (E) -> CMPNTCATINCL (R) -> CATINCL (E)
-         If CMPNTCATINCL (R) exist and CATALOGNAME = '321' (ibm.com) then answer 'Yes' or
-     */
-    if (!bConditionOK) {
-      vReturnEntities1 = searchEntityVectorLink(vCmpntFrmCmpntAvail, null, null, true, true, "CMPNTCATINCL");
-      strFilterAttr = new String[] {
-          "CATALOGNAME"};
-      strFilterValue = new String[] {
-          "321"};
-      vReturnEntities3 = searchEntityVectorLink(vReturnEntities1, strFilterAttr, strFilterValue, true, true, "CATINCL");
-      if (vReturnEntities3.size() > 0) {
-        bConditionOK = true;
-      }
-    }
-    /*
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> FEATUREAVAIL (R) -> FEATURE (E) -> FEATURECATINCL (R) -> CATINCL (E)
-         If FEATURECATINCL (R) exist and CATALOGNAME = '321' (ibm.com) then answer 'Yes' otherwise answer 'No' if none of the relators exist
-     */
-    if (!bConditionOK) {
-      vReturnEntities1 = searchEntityVectorLink(vFeatureFrmFeatureAvail, null, null, true, true, "FEATURECATINCL");
-      strFilterAttr = new String[] {
-          "CATALOGNAME"};
-      strFilterValue = new String[] {
-          "321"};
-      vReturnEntities4 = searchEntityVectorLink(vReturnEntities1, strFilterAttr, strFilterValue, true, true, "CATINCL");
-      if (vReturnEntities4.size() > 0) {
-        bConditionOK = true;
-      }
-    }
-    if (bConditionOK) {
-      println("Yes");
-    }
-    else {
-      println("No");
-    }
-
-    println(".*$A_157_End");
-
-    println(".*$A_158_Begin");
-    /*
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> SOFAVAIL (R) -> SOF (E) -> SOFCATINCL (R) -> CATINCL (E)
-         When ANNOUNCEMENT (ANNCODENAME) = AVAIL (ANNCODENAME) and CATINCL = (CATALOGNAME = '321' (ibm.com))
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> CMPNTAVAIL (R) -> CMPNT (E) -> CMPNTCATINCL (R) -> CATINCL (E)
-         When ANNOUNCEMENT (ANNCODENAME) = AVAIL (ANNCODENAME) and CATINCL = (CATALOGNAME = '321' (ibm.com))
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> FEATUREAVAIL (R) -> FEATURE (E) -> FEATURECATINCL (R) -> CATINCL (E)
-         When ANNOUNCEMENT (ANNCODENAME) = AVAIL (ANNCODENAME) and CATINCL = (CATALOGNAME = '321' (ibm.com))
-     */
-    printQ158(bConditionOK);
-
-    println(".*$A_158_End");
-
-    println(".*$A_160_Begin");
-    println(transformXML(getAttributeValue(eiAnnounce, "ACCESPEOWDISABLE", " ")));
-    println(".*$A_160_End");
-
-    println(".*$A_161_Begin");
-    println(transformXML(getAttributeValue(eiAnnounce, "ACCESPEOWDISABLECONSID", " ")));
-    println(".*$A_161_End");
-
-    println(".*$A_162_Begin");
-    println(transformXML(getAttributeValue(eiAnnounce, "USSEC508", " ")));
-    println(".*$A_162_End");
-
-    println(".*$A_163_Begin");
-    println(transformXML(getAttributeValue(eiAnnounce, "USSEC508LOGO", " ")));
-    println(".*$A_163_End");
-
-    println(".*$A_170_Begin"); //Internal Letter -  SPoC
-
-    /*
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> SOFAVAIL (R) -> SOF (E) -> SOFGBTA (A) -> GBT (E)
-     */
-    vPrintDetails1 = new Vector();
-    vPrintDetails2 = new Vector();
-    vPrintDetails3 = new Vector();
-    logMessage("170 vSofFrmSofAvail");
-    displayContents(vSofFrmSofAvail);
-    for (i = 0; i < vSofFrmSofAvail.size(); i++) {
-      eiSof = (EntityItem) vSofFrmSofAvail.elementAt(i);
-
-      vReturnEntities2 = searchEntityItemLink(eiSof, null, null, true, true, "SOFGBTA");
-      logMessage("A_170_1");
-      displayContents(vReturnEntities2);
-      eiNextItem = null;
-      eiNextItem1 = null;
-      if (vReturnEntities2.size() > 0) {
-        eiNextItem = (EntityItem) vReturnEntities2.elementAt(0);
-        eiNextItem1 = (eiNextItem.getDownLinkCount() > 0 ? (EntityItem) eiNextItem.getDownLink(0) : null); //this will be the GBT entity (Wayne)
-      }
-      if (eiNextItem1 != null) {
-        vPrintDetails.add(getAttributeValue(eiSof, "OFIDNUMBER", " "));
-        vPrintDetails.add(getAttributeValue(eiNextItem1, "GBNAME", " "));
-        vPrintDetails.add(eiNextItem1 != null ? getAttributeValue(eiNextItem1, "SAPPRIMBRANDCODE", " ") : " ");
-
-        vPrintDetails1.add(eiNextItem1 != null ? getAttributeValue(eiNextItem1, "SAPPRODFAMCODE", " ") : " ");
-        vPrintDetails1.add(eiNextItem1 != null ? getAttributeValue(eiNextItem1, "OMBRANDCODE", " ") : " ");
-        vPrintDetails1.add(eiNextItem1 != null ? getAttributeValue(eiNextItem1, "OMPRODFAMCODE", " ") : " ");
-        vPrintDetails1.add(eiNextItem1 != null ? getAttributeValue(eiNextItem1, "BPDBBRANDCODE", " ") : " ");
-
-        vPrintDetails2.add(getAttributeValue(eiSof, "OFIDNUMBER", " "));
-        vPrintDetails2.add(getAttributeValue(eiSof, "MATACCGRP", " "));
-        vPrintDetails2.add(getAttributeValue(eiSof, "ASSORTMODULE", " "));
-        //ANNOUNCEMENT (E) -> ANNAVAILA (A) -> SOFAVAIL (R) -> SOF (E) -> SOFOFDEVLPROJA (R) -> OFDEVLPROJ (E)
-        vReturnEntities3 = searchEntityItemLink(eiSof, null, null, true, true, "SOFOFDEVLPROJA");
-        if (vReturnEntities3.size() > 0) {
-          eiNextItem = (EntityItem) vReturnEntities3.elementAt(0);
-          eiNextItem1 = (eiNextItem.getDownLinkCount() > 0 ? (EntityItem) eiNextItem.getDownLink(0) : null); //this will be the OFDEVLPROJ entity
-          vPrintDetails2.add(eiNextItem1 != null ? getAttributeValue(eiNextItem1, "DEVDIV", " ") : " ");
-        }
-        else {
-          vPrintDetails2.add(" ");
-        }
-
-      }
-      //Lets get to PriceINfo
-      //ANNOUNCEMENT (E) -> ANNAVAILA (A) -> SOFAVAIL (R) -> SOF (E) -> SOFPRICEININFO (R) -> PRICEININFO (E)
-      vReturnEntities3 = searchEntityItemLink(eiSof, null, null, true, true, "SOFPRICE");
-      if (vReturnEntities3.size() > 0) {
-        eiNextItem = (EntityItem) vReturnEntities3.elementAt(0);
-        eiPriceInfo = (eiNextItem.getDownLinkCount() > 0 ? (EntityItem) eiNextItem.getDownLink(0) : null); //this will be the PRICEININFO entity
-        vPrintDetails3.add(eiPriceInfo != null ? getAttributeValue(eiPriceInfo, "AMORTIZATIONSTART", " ") : " ");
-        vPrintDetails3.add(eiPriceInfo != null ? getAttributeValue(eiPriceInfo, "AMORTIZATIONLENGTH", " ") : " ");
-      }
-    }
-
-    //Now do the same from CMPNT
-    logMessage("170 vCmpntFrmCmpntAvail");
-    displayContents(vCmpntFrmCmpntAvail);
-    for (i = 0; i < vCmpntFrmCmpntAvail.size(); i++) {
-      eiComponent = (EntityItem) vCmpntFrmCmpntAvail.elementAt(i);
-
-      //Now get to the SOF.
-      eiNextItem = null;
-      eiNextItem1 = null;
-      eiSof = getUplinkedEntityItem(eiComponent, strCmptToSof);
-      if (eiSof != null) {
-        vReturnEntities2 = searchEntityItemLink(eiSof, null, null, true, true, "SOFGBTA");
-        logMessage("A_170_2");
-        displayContents(vReturnEntities2);
-        if (vReturnEntities2.size() > 0) {
-          eiNextItem = (EntityItem) vReturnEntities2.elementAt(0);
-          eiNextItem1 = (eiNextItem.getDownLinkCount() > 0 ? (EntityItem) eiNextItem.getDownLink(0) : null); //this will be the GBT entity (Wayne)
-        }
-      }
-      if (eiNextItem1 != null) {
-        vPrintDetails.add(getAttributeValue(eiSof, "OFIDNUMBER", " "));
-        vPrintDetails.add(getAttributeValue(eiNextItem1, "GBNAME", " "));
-        vPrintDetails.add(eiNextItem1 != null ? getAttributeValue(eiNextItem1, "SAPPRIMBRANDCODE", " ") : " ");
-
-        vPrintDetails1.add(eiNextItem1 != null ? getAttributeValue(eiNextItem1, "SAPPRODFAMCODE", " ") : " ");
-        vPrintDetails1.add(eiNextItem1 != null ? getAttributeValue(eiNextItem1, "OMBRANDCODE", " ") : " ");
-        vPrintDetails1.add(eiNextItem1 != null ? getAttributeValue(eiNextItem1, "OMPRODFAMCODE", " ") : " ");
-        vPrintDetails1.add(eiNextItem1 != null ? getAttributeValue(eiNextItem1, "BPDBBRANDCODE", " ") : " ");
-
-        vPrintDetails2.add(getAttributeValue(eiSof, "OFIDNUMBER", " "));
-        vPrintDetails2.add(getAttributeValue(eiSof, "MATACCGRP", " "));
-        vPrintDetails2.add(getAttributeValue(eiSof, "ASSORTMODULE", " "));
-        //ANNOUNCEMENT (E) -> ANNAVAILA (A) -> SOFAVAIL (R) -> SOF (E) -> SOFOFDEVLPROJA (R) -> OFDEVLPROJ (E)
-        vReturnEntities3 = searchEntityItemLink(eiSof, null, null, true, true, "SOFOFDEVLPROJA");
-        if (vReturnEntities3.size() > 0) {
-          eiNextItem = (EntityItem) vReturnEntities3.elementAt(0);
-          eiNextItem1 = (eiNextItem.getDownLinkCount() > 0 ? (EntityItem) eiNextItem.getDownLink(0) : null); //this will be the OFDEVLPROJ entity
-          vPrintDetails2.add(eiNextItem1 != null ? getAttributeValue(eiNextItem1, "DEVDIV", " ") : " ");
-        }
-        else {
-          vPrintDetails2.add(" ");
-        }
-
-      }
-      //Lets get to PriceINfo
-      //ANNOUNCEMENT (E) -> ANNAVAILA (A) -> CMPNTAVAIL (R) -> CMPNT (E) -> CMPNTPRICEININFO (R) -> PRICEININFO (E)
-      vReturnEntities3 = searchEntityItemLink(eiComponent, null, null, true, true, "CMPNTPRICE");
-      if (vReturnEntities3.size() > 0) {
-        eiNextItem = (EntityItem) vReturnEntities3.elementAt(0);
-        eiPriceInfo = (eiNextItem.getDownLinkCount() > 0 ? (EntityItem) eiNextItem.getDownLink(0) : null); //this will be the PRICEININFO entity
-        vPrintDetails3.add(eiPriceInfo != null ? getAttributeValue(eiPriceInfo, "AMORTIZATIONSTART", " ") : " ");
-        vPrintDetails3.add(eiPriceInfo != null ? getAttributeValue(eiPriceInfo, "AMORTIZATIONLENGTH", " ") : " ");
-      }
-    }
-
-    //And FEATURE  Feature has been deleted for this release
-
-
-    if (vPrintDetails.size() > 0) {
-      println(":xmp.");
-      println(".kp off");
-      println("Offering Id          Description                        Primary Brand");
-      strHeader = new String[] {
-          "", "", "   Code"};
-      iColWidths = new int[] {
-          19, 34, 14};
-      printReport(true, strHeader, iColWidths, vPrintDetails);
-      resetPrintvars();
-      println("");
-      println("");
-      println("Product Family OM Brand OM Product Family BPDP Brand");
-      strHeader = new String[] {
-          "   Code", "Code", "     Code", "   Code"};
-      iColWidths = new int[] {
-          14, 8, 17, 10};
-      printReport(true, strHeader, iColWidths, vPrintDetails1);
-      vPrintDetails1 = new Vector();
-      println("");
-      println("");
-      println("                    Material Account   Assortment Development");
-      strHeader = new String[] {
-          "Offering ID", "Assignment Group", "  Module", " Division"};
-      iColWidths = new int[] {
-          19, 17, 11, 11};
-      printReport(true, strHeader, iColWidths, vPrintDetails2);
-      vPrintDetails2 = new Vector();
-
-      if (vPrintDetails3.size() > 0) {
-        println("");
-        println("");
-        strHeader = new String[] {
-            "Amortization Start", "Amortization Length"};
-        iColWidths = new int[] {
-            18, 20};
-        printReport(true, strHeader, iColWidths, vPrintDetails3);
-        vPrintDetails3 = new Vector();
-      }
-      println(":exmp.");
-    }
-
-    println(".*$A_170_End");
-
-    println(".*$A_181_Begin"); //Internal Letter, Supplemental Information - Marketing Information - Global Financing available?
-    /*
-         CMPNT (E) -> CMPNTFINOF (R) -> FINOF
-         If CMPNTFINOF exists or FEATUREFINOF exists, then answer = 'Yes'., otherwise answer = No'
-         FEATURE (E) -> FEATUREFINOF (R) -> FINOF
-         If CMPNTFINOF exists or FEATUREFINOF exists, then answer = 'Yes'., otherwise answer = No'
-     */
-    bConditionOK = false;
-    vReturnEntities1 = searchEntityGroupLink(egComponent, null, null, true, true, "CMPNTFINOF");
-    if (vReturnEntities1.size() > 0) {
-      bConditionOK = true;
-    }
-    else {
-      vReturnEntities1 = searchEntityGroupLink(egFeature, null, null, true, true, "FEATUREFINOF");
-      if (vReturnEntities1.size() > 0) {
-        bConditionOK = true;
-      }
-    }
-    if (bConditionOK) {
-      println("Yes");
-    }
-    else {
-      println("No");
-    }
-
-    println(".*$A_181_End");
-
-    println(".*$A_182_Begin"); //Internal Letter - Marketing Information - Global Financing - Marketing Messages for Internal Letter
-    printIntSuppMktFinInfo("MKTGMSGINTERNAL");
-    println(".*$A_182_End");
-
-    println(".*$A_183_Begin"); //Supplemental Information - Marketing Information - Global Financing - Marketing Messages for External Letter
-    printIntSuppMktFinInfo("MKTGMESEXTERNAL");
-    println(".*$A_183_End");
-
-    println(".*$A_184_Begin");
-
-    /*
-         CMPNT (E) -> CMPNTFINOF (R) -> FINOF
-         If PROMOELIGIBILITYTCS exits, then aswer ='YES' otherwise answer = 'No"
-         FEATURE (E) -> FEATUREFINOF (R) -> FINOF
-     */
-    resetPrintvars();
-    bConditionOK = false;
-    strParamList1 = new String[] {
-        "PROMOELIGIBILITYTCS"};
-    vReturnEntities1 = searchEntityGroupLink(egComponent, null, null, true, true, "CMPNTFINOF");
-    if (vReturnEntities1.size() > 0) {
-      vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "FINOF");
-      printValueListInVector(vReturnEntities3, strParamList1, " ", true, false);
-      if (vPrintDetails.size() > 0) {
-        bConditionOK = true;
-      }
-    }
-    else {
-      vReturnEntities1 = searchEntityGroupLink(egFeature, null, null, true, true, "FEATUREFINOF");
-      vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "FINOF");
-      printValueListInVector(vReturnEntities3, strParamList1, " ", true, false);
-      if (vPrintDetails.size() > 0) {
-        bConditionOK = true;
-      }
-    }
-    if (bConditionOK) {
-      println("Yes");
-    }
-    else {
-      println("No");
-    }
-    resetPrintvars();
-    println(".*$A_184_End");
-
-    println(".*$A_185_Begin"); //Internal Letter, Supplemental Information - Marketing Information - Global Financing - Qualifying Ts & Cs of Promotion
-    //CMPNT (E) -> CMPNTFINOF (R) -> FINOF
-    //FEATURE (E) -> FEATUREFINOF (R) -> FINOF
-    printIntSuppMktFinInfo("PROMOELIGIBILITYTCS");
-
-    println(".*$A_185_End");
-
-    println(".*$A_186_Begin");
-    /*
-         CMPNT (E) -> CMPNTFINOF (R) -> FINOF
-         If MONTHLYPAYMENT exits, then aswer ='YES' otherwise answer = 'No"
-         FEATURE (E) -> FEATUREFINOF (R) -> FINOF
-     */
-    resetPrintvars();
-    bConditionOK = false;
-    strParamList1 = new String[] {
-        "MONTHLYPAYMENT"};
-    vReturnEntities1 = searchEntityGroupLink(egComponent, null, null, true, true, "CMPNTFINOF");
-    if (vReturnEntities1.size() > 0) {
-      vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "FINOF");
-      printValueListInVector(vReturnEntities3, strParamList1, " ", true, false);
-      if (vPrintDetails.size() > 0) {
-        bConditionOK = true;
-      }
-    }
-    else {
-      vReturnEntities1 = searchEntityGroupLink(egFeature, null, null, true, true, "FEATUREFINOF");
-      vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "FINOF");
-      printValueListInVector(vReturnEntities3, strParamList1, " ", true, false);
-      if (vPrintDetails.size() > 0) {
-        bConditionOK = true;
-      }
-    }
-    if (bConditionOK) {
-      println("Yes");
-    }
-    else {
-      println("No");
-    }
-    resetPrintvars();
-
-    println(".*$A_186_End");
-
-    println(".*$A_187_Begin"); //Internal Letter, Supplemental Information - Marketing Information - Global Financing - Monthly Payment
-    printIntSuppMktFinInfo("MONTHLYPAYMENT", false);
-
-    println(".*$A_187_End");
-
-    println(".*$A_188_Begin"); //Internal Letter, Supplemental Information - Marketing Information - Global Financing - Term
-    //CMPNT (E) -> CMPNTFINOF (R) -> FINOF
-    //FEATURE (E) -> FEATUREFINOF (R) -> FINOF
-    printIntSuppMktFinInfo("PAYMENTTERM", false);
-
-    println(".*$A_188_End");
-
-    println(".*$A_189_Begin"); //Internal Letter, Supplemental Information - Marketing Information - Global Financing - Qualifying Ts & Cs
-    printIntSuppMktFinInfo("ELIGIBILITYTCS");
-    println(".*$A_189_End");
-
-    println(".*$A_195_Begin");
-    strParamList1 = new String[] {
-        "STANDARDAMENDTEXT"};
-    printValueListInGroup(grpStdAmendText, strParamList1, "STANDARDAMENDTEXT_TYPE", "200", "", true);
-    iColWidths = new int[] {
-        69};
-    printReport(false, null, iColWidths, vPrintDetails);
-    resetPrintvars();
-    println(".*$A_195_End");
-
-    // TIR 6QKKNN
-    println(".*$A_200_Begin"); //WWCL - At a Glance
-    prettyPrint(transformXML(getAttributeValue(eiAnnounce, "ATAGLANCE", " ")), 69);
-    println(".*$A_200_End");
-
-    // TIR 6QKKNN
-    println(".*$A_202_Begin"); //Fact Sheet, Release Memo, Internal Letter, WW Customer Announcement Letter, IBM PCD Letter, Business Partner Attachment - Overview
-    prettyPrint(transformXML(getAttributeValue(eiAnnounce, "OVERVIEWABSTRACT", " ")), 69);
-    printVanillaSVSReport("OVERVIEWABSTRACT", true, false);
-    println(".*$A_202_End");
-
-    println(".*$A_204_Begin"); //WWCAL, Pre-requisties and Co-requisties
-    printVanillaSVSReport("PREREQCOREQ", true, false);
-    println(".*$A_204_End");
-
-    println(".*$A_208_Begin"); //Fact Letter, Internal Letter, WW Customer Announcement Letter - Planned Availability Date
-    /*
-     ANNOUNCEMENT (E) -> ANNAVAILA (A) ->AVAIL (E) when AVAILTYPE = '146' (Planned Availibility) -> SOFAVAIL (R) -> SOF (E)
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) ->AVAIL (E) when AVAILTYPE = '146' (Planned Availibility) -> CMPNTAVAIL (R) -> CMPNT (E)
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) ->AVAIL (E) when AVAILTYPE = '146' (Planned Availibility) -> FEATUREAVAIL (R) -> FEATURE (E)
-     */
-    //ANNOUNCEMENT (E) -> ANNAVAILA (A) ->AVAIL (E) when AVAILTYPE = '146' (Planned Availibility) -> SOFAVAIL (R) -> SOF (E)
-    strFilterAttr = new String[] {
-        "AVAILTYPE"};
-    strFilterValue = new String[] {
-        "146"};
-    vReturnEntities1 = searchEntityGroupLink(grpAnnAvail, strFilterAttr, strFilterValue, true, true, "AVAIL");
-    logMessage("****AVAIL*****");
-    displayContents(vReturnEntities1);
-    vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, false, "SOFAVAIL");
-    displayContents(vReturnEntities1);
-    strCondition1 = "";
-    strCondition2 = "";
-    strCondition4 = "";
-    vReturnEntities4 = new Vector();
-    iTemp = vSofFrmSofAvail.size() + vCmpntFrmCmpntAvail.size() + vFeatureFrmFeatureAvail.size();
-    logMessage("_208:Array Size=" + iTemp);
-
-    //strAnswers = new String [iTemp];    //Set the size of the array here
-    i = 0;
-    logMessage("_208:SOFAVAIL");
-    displayContents(vReturnEntities2);
-    for (i = 0; i < vReturnEntities2.size(); i++) {
-      eiNextItem = (EntityItem) vReturnEntities2.elementAt(i); //this is SOFAVAIL
-      eiSof = (EntityItem) eiNextItem.getUpLink(0);
-      eiAvail = (EntityItem) eiNextItem.getDownLink(0);
-      strCondition1 = getGeoTags(eiAvail);
-      strCondition4 = getAttributeValue(eiAvail, "EFFECTIVEDATE", " ");
-      strCondition3 = getSOFMktName(eiSof);
-//      strAnswers[i] = strCondition4+"|"+strCondition3+"|"+strCondition1;
-      vReturnEntities4.add(strCondition4 + "|" + strCondition3 + "|" + strCondition1);
-    }
-    j = (i > 0) ? i - 1 : i;
-    logMessage("_208:After SOFAVAIL Ctr=" + j);
-
-    vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, false, "CMPNTAVAIL");
-    strCondition1 = "";
-    strCondition2 = "";
-    strCondition4 = "";
-    logMessage("_208:CMPNTAVAIL");
-    displayContents(vReturnEntities2);
-    for (i = 0; i < vReturnEntities2.size(); i++) {
-      eiNextItem = (EntityItem) vReturnEntities2.elementAt(i); //this is CMPNTAVAIL
-      eiComponent = (EntityItem) eiNextItem.getUpLink(0);
-      eiAvail = (EntityItem) eiNextItem.getDownLink(0);
-      strCondition1 = getGeoTags(eiAvail);
-      strCondition4 = getAttributeValue(eiAvail, "EFFECTIVEDATE", " ");
-      strCondition3 = getCmptToSofMktMsg(eiComponent);
-//      strAnswers[i+j] = strCondition4+"|"+strCondition3+"|"+strCondition1;
-      vReturnEntities4.add(strCondition4 + "|" + strCondition3 + "|" + strCondition1);
-    }
-    j = ( (i + j) > 0) ? (i + j) - 1 : 0;
-    logMessage("_208:After CMPNTAVAIL Ctr=" + j);
-    vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, false, "FEATUREAVAIL");
-    strCondition1 = "";
-    strCondition2 = "";
-    strCondition4 = "";
-    logMessage("_208:FEATUREAVAIL");
-    displayContents(vReturnEntities2);
-    for (i = 0; i < vReturnEntities2.size(); i++) {
-      eiNextItem = (EntityItem) vReturnEntities2.elementAt(i); //this is FEATUREAVAIL
-      logMessage("_208:FEATUREAVAIL" + eiNextItem.getKey());
-      eiFeature = (EntityItem) eiNextItem.getUpLink(0);
-      logMessage("_208:FEATURE" + eiAvail.getKey());
-      eiAvail = (EntityItem) eiNextItem.getDownLink(0);
-      strCondition1 = getGeoTags(eiAvail);
-      strCondition4 = getAttributeValue(eiAvail, "EFFECTIVEDATE", " ");
-      strCondition3 = getfeatureToSofMktMsg(eiFeature);
-      logMessage("_208: FEATUREAVAIL Setting =" + (i + j));
-      //strAnswers[i+j] = strCondition4+"|"+strCondition3+"|"+strCondition1;
-      vReturnEntities4.add(strCondition4 + "|" + strCondition3 + "|" + strCondition1);
-    }
-    strAnswers = vReturnEntities4.toArray(); //Convert back into array
-    //Sort the Array now
-    Arrays.sort(strAnswers);
-    strCondition5 = "";
-    resetPrintvars();
-
-    for (i = 0; i < strAnswers.length; i++) {
-      strCondition1 = (String) strAnswers[i];
-      logMessage("String stored at " + i + ":" + strCondition1);
-      iTemp = strCondition1.indexOf("|");
-      strCondition2 = strCondition1.substring(0, iTemp);
-      strCondition1 = strCondition1.substring(iTemp + 1);
-      logMessage("Found | at   " + iTemp);
-      logMessage("Parsed Date  " + strCondition2);
-      iTemp = strCondition1.indexOf("|");
-      strCondition3 = strCondition1.substring(0, iTemp);
-      strCondition1 = strCondition1.substring(iTemp + 1);
-      logMessage("Found | at   " + iTemp);
-      logMessage("Parsed  MktName " + strCondition3);
-
-      strCondition4 = strCondition1;
-      logMessage("Parsed GEO  " + strCondition4);
-
-    }
-
-    strCondition6 = "";
-    if (strAnswers.length > 0) {
-      println(":xmp.");
-      println(".kp off");
-      //println(".sp");
-    }
-    int iTemp = 0; //to check for number of marketingname within a geotag/date
-    for (i = 0; i < strAnswers.length; i++) {
-      strCondition1 = (String) strAnswers[i];
-      logMessage("String stored at " + i + ":" + strCondition1);
-      iTemp = strCondition1.indexOf("|");
-      strCondition2 = strCondition1.substring(0, iTemp);
-      strCondition1 = strCondition1.substring(iTemp + 1);
-      logMessage("Found | at   " + iTemp);
-      logMessage("Parsed Date  " + strCondition2);
-      iTemp = strCondition1.indexOf("|");
-      strCondition3 = strCondition1.substring(0, iTemp);
-      strCondition1 = strCondition1.substring(iTemp + 1);
-      logMessage("Found | at   " + iTemp);
-      logMessage("Parsed  MktName " + strCondition3);
-
-      strCondition4 = strCondition1;
-      logMessage("Parsed GEO  " + strCondition4);
-
-      if (!strCondition4.equals(strCondition5)) {
-        if (!strCondition5.equals(strWorldwideTag)) {
-          if (strCondition5.trim().length() > 0) {
-            logMessage("Ending GEO Break  " + strCondition5);
-            println(".br;:hp2.<---" + strCondition5 + ":ehp2.");
-            println("");
-          }
-        }
-
-        if (!strCondition4.equals(strWorldwideTag)) {
-          if (strCondition4.trim().length() > 0) {
-            logMessage("Starting GEO Break  " + strCondition4);
-            println(":p.:hp2." + strCondition4 + "--->:ehp2.");
-            iTemp = 0; //Reset the counter to 0 for each geo break
-            strCondition6 = strCondition2;
-            println(getRFADateFormat(strCondition2) + ""); //Date
-          }
-        }
-        strCondition5 = strCondition4;
-      }
-
-      if (!strCondition6.equals(strCondition2)) { //Check for Date break
-        strCondition6 = strCondition2;
-        if (iTemp == 1) {
-          println(".p"); //print if only 1 instance has printed for previous date
-        }
-        iTemp = 0;
-        println(getRFADateFormat(strCondition2) + "");
-      }
-
-      prettyPrint(strCondition3, 69);
-      iTemp++;
-
-    }
-    if (!strCondition5.equals(strWorldwideTag)) {
-      if (strCondition5.trim().length() > 0) {
-        logMessage("Final Ending GEO Break  " + strCondition5);
-        println(".br;:hp2.<---" + strCondition5 + ":ehp2.");
-        println("");
-      }
-    }
-    if (strAnswers.length > 0) {
-      println(":exmp.");
-      resetPrintvars();
-    }
-
-    println(".*$A_208_End");
-
-    println(".*$A_210_Begin"); //WW Customer Announcement Letter - Description
-
-    prettyPrint(transformXML(getAttributeValue(eiAnnounce, "DESCRIPTION", " ")), 69);
-    printVanillaSVSReport("DESCRIPTION", true, false);
-    println(".*$A_210_End");
-
-    println(".*$A_212_Begin"); //Supplemental Information - Discretionary Information
-
-    strParamList1 = new String[] {
-        "STANDARDAMENDTEXT"};
-    printValueListInGroup(grpStdAmendText, strParamList1, "STANDARDAMENDTEXT_TYPE", "130", "", true);
-    iColWidths = new int[] {
-        69};
-    printReport(false, null, iColWidths, vPrintDetails);
-    resetPrintvars();
-    println(".*$A_212_End");
-
-    println(".*$A_214_Begin"); //Supplemental Information - Charges
-    printVanillaSVSReport("CHARGES", true, true);
-
-    println(".*$A_214_End");
-
-    println(".*$A_218_Begin");
-    printVanillaSVSReport("BILLINGPERIOD", false, true);
-    //printIntSuppMktFinInfo("BILLINGPERIOD");
-    println(".*$A_218_End");
-
-    println(".*$A_219_Begin");
-    GeneralAreaGroup geGrEmea = m_geList.getRfaGeoEMEAInclusion(eiAnnounce);
-    logMessage("A_219_Begin returned GEItemcount" + geGrEmea.getGeneralAreaItemCount());
-    vReturnEntities1 = searchEntityGroupLink(grpAnnAvail, null, null, true, true, "AVAIL");
-    displayContents(vReturnEntities1);
-
-    //Process all the avails to get their respective effective dates and the countries selected in them
-    vReturnEntities2 = new Vector();
-    bConditionOK=false;
-    //if (m_geList.isRfaGeoEMEA(eiAnnounce) && vReturnEntities1.size() > 0) {   //dont need this as we are looking for specific countries
-      if ( vReturnEntities1.size() > 0) {
-      Hashtable htCountries = new Hashtable();
-      for (int y = 0; y < vReturnEntities1.size(); y++) {
-        eiAvail = (EntityItem) vReturnEntities1.elementAt(y);
-
-        strCondition2 = getRFADateFormat(getAttributeValue(eiAvail, "EFFECTIVEDATE", ""));
-        if (y==0) {
-          strCondition6=strCondition2;
-        } else if (!strCondition2.equals(strCondition6)) {
-          bConditionOK = true;            //Flag to print all the dates
-        }
-        strCondition3 = getAttributeLongFlagDesc(eiAvail, "COUNTRYLIST");
-        if (strCondition3 == null) {
-          break;
-        }
-        StringTokenizer st = new StringTokenizer(strCondition3, "|");
-
-        for (int i = 0;  st.hasMoreTokens(); i++) {
-
-          strCondition1 = st.nextToken().trim();          //Take the spaces out
-          logMessage("_219:Got Country:" + i + ":" + strCondition1);
-          if (strCondition1.compareToIgnoreCase("Austria") == 0 || strCondition1.compareToIgnoreCase("Belgium") == 0 ||
-              strCondition1.compareToIgnoreCase("Bulgaria") == 0 || strCondition1.compareToIgnoreCase("Croatia") == 0 ||
-              strCondition1.compareToIgnoreCase("Czech Republic") == 0 ||
-              strCondition1.compareToIgnoreCase("Denmark") == 0 || strCondition1.compareToIgnoreCase("Finland") == 0 ||
-              strCondition1.compareToIgnoreCase("France") == 0 || strCondition1.compareToIgnoreCase("Germany") == 0 ||
-              strCondition1.compareToIgnoreCase("Greece") == 0 || strCondition1.compareToIgnoreCase("Hungary") == 0 ||
-              strCondition1.compareToIgnoreCase("Ireland") == 0 || strCondition1.compareToIgnoreCase("Israel") == 0 ||
-              strCondition1.compareToIgnoreCase("Italy") == 0 || strCondition1.compareToIgnoreCase("Luxembourg") == 0 ||
-              strCondition1.compareToIgnoreCase("Netherlands") == 0 || strCondition1.compareToIgnoreCase("Norway") == 0 ||
-              strCondition1.compareToIgnoreCase("Poland") == 0 || strCondition1.compareToIgnoreCase("Portugal") == 0 ||
-              strCondition1.compareToIgnoreCase("Romania") == 0 || strCondition1.compareToIgnoreCase("Russian Federation") == 0 ||
-              strCondition1.compareToIgnoreCase("Slovakia") == 0 || strCondition1.compareToIgnoreCase("Slovenia") == 0 ||
-              strCondition1.compareToIgnoreCase("South Africa") == 0 || strCondition1.compareToIgnoreCase("Spain") == 0 ||
-              strCondition1.compareToIgnoreCase("Switzerland") == 0 || strCondition1.compareToIgnoreCase("Sweden") == 0 ||
-              strCondition1.compareToIgnoreCase("Turkey") == 0 ||
-              strCondition1.compareToIgnoreCase("United Kingdom") == 0) {
-            if (strCondition1.compareToIgnoreCase("United Kingdom") == 0) {
-              vReturnEntities2.add("United Kingdom**");
-              htCountries.put("United Kingdom**", strCondition2);
-            }
-            else if (strCondition1.compareToIgnoreCase("France") == 0) {
-              vReturnEntities2.add("France*");
-              htCountries.put("France*", strCondition2);
-            }
-            else {
-              vReturnEntities2.add(strCondition1);
-              htCountries.put(strCondition1, strCondition2);
-
-            }
-
-            logMessage("_219:MATCHED Country" + strCondition1);
-          }
-
-        }
-      }
-      vReturnEntities3 = mySort.alphabetizeVector(vReturnEntities2); //Sort the countries selected
-      strCondition1="";
-      for (i = 0; i < vReturnEntities3.size(); i++) {
-        vPrintDetails.add( (String) vReturnEntities3.elementAt(i));
-        strCondition2 = (String) htCountries.get( (String) vReturnEntities3.elementAt(i));
-        if (!bConditionOK) { //Break when flag shows dates are different
-          vPrintDetails.add("");
-        }
-        else {
-          vPrintDetails.add(strCondition2);
-        }
-
-      }
-
-      strHeader = new String[] {
-          "Country", "Availability Date"};
-      iColWidths = new int[] {
-          35, 17};
-      if (vPrintDetails.size() > 0) {
-        println(":xmp.");
-        println(".kp off");
-        printReport(true, strHeader, iColWidths, vPrintDetails);
-        resetPrintvars();
-        println("* Except overseas territories");
-        println("** UK Mainland Only");
-        println(":exmp.");
-      }
-
-    }
-    println(".*$A_219_End");
-
-    println(".*$A_220_Begin");
-    println("AP DISTRIBUTION:  TO ALL ASIA PACIFIC COUNTRIES FOR RELEASE.");
-    TreeMap tmDistribution = new TreeMap();
-    tmDistribution.put("ASEAN *", "No");
-    tmDistribution.put("India/South Asia**", "No");
-    tmDistribution.put("AUSTRALIA", "No");
-    tmDistribution.put("People's Republic of China", "No");
-    tmDistribution.put("HONG KONG S.A.R of the PRC", "No");
-    tmDistribution.put("Macao S.A.R of the PRC", "No");
-    tmDistribution.put("TAIWAN", "No");
-    tmDistribution.put("KOREA", "No");
-    tmDistribution.put("JAPAN", "No");
-    tmDistribution.put("NEW ZEALAND", "No");
-
-    if (m_geList.isRfaGeoAP(eiAnnounce)) {
-      GeneralAreaGroup geGrAP = m_geList.getRfaGeoAPInclusion(eiAnnounce);
-      for (int i = 0; i < geGrAP.getGeneralAreaItemCount(); i++) {
-        GeneralAreaItem gai = geGrAP.getGeneralAreaItem(i);
-        strCondition1 = gai.getName().toUpperCase();
-        logMessage("_220:Found country" + strCondition1);
-        if (strCondition1.equals("DARUSSALAM") || strCondition1.equals("BRUNEI") || strCondition1.equals("MYANMAR") ||
-            strCondition1.equals("MALAYSIA") || strCondition1.equals("PHILIPPINES") || strCondition1.equals("SINGAPORE") ||
-            strCondition1.equals("CAMBODIA") || strCondition1.equals("LAO PEOPLES DEMOCRATIC REPUBLIC") ||
-            strCondition1.equals("THAILAND") || strCondition1.equals("VIETNAM")) {
-          tmDistribution.put("ASEAN *", "Yes");
-          //strCondition1.equals("SRI LANKA") || strCondition1.equals("INDIA") || strCondition1.equals("INDONESIA") ||
-        }
-        else if ( (strCondition1.equals("KOREA, REPUBLIC OF")) ||
-                 (strCondition1.equals("KOREA, DEMOCRATIC PEOPLES REPUBLIC OF"))) {
-          tmDistribution.put("KOREA", "Yes");
-        }
-        else if (  strCondition1.equals("MALDIVES") || strCondition1.equals("AFGHANISTAN") ||
-                  strCondition1.equals("SRI LANKA") || strCondition1.equals("INDIA") || strCondition1.equals("BANGLADESH") ||
-                 strCondition1.equals("NEPAL") ||(strCondition1.equals("BHUTAN"))) {
-          tmDistribution.put("India/South Asia**", "Yes");
-        }
-
-        else if ( (strCondition1.equals("HONG KONG"))) {
-          tmDistribution.put("HONG KONG S.A.R of the PRC", "Yes");
-        }
-        else if ( (strCondition1.equals("MACAO"))) {
-          tmDistribution.put("Macao S.A.R of the PRC", "Yes");
-        }
-
-        else if ( (strCondition1.equals("CHINA"))) {
-          tmDistribution.put("People's Republic of China", "Yes");
-        }
-        else if ( (strCondition1.equals("TAIWAN, PROVINCE OF CHINA"))) {
-          tmDistribution.put("TAIWAN", "Yes");
-        }
-        else if (tmDistribution.containsKey(strCondition1)) {
-          tmDistribution.put(strCondition1, "Yes");
-        }
-      }
-    }
-    Set hKeys = tmDistribution.keySet();
-    Iterator ikeys = hKeys.iterator();
-    resetPrintvars();
-    while (ikeys.hasNext()) {
-      strCondition1 = (String) ikeys.next();
-      vPrintDetails.add(strCondition1);
-      vPrintDetails.add( (String) tmDistribution.get(strCondition1));
-    }
-    tmDistribution.clear();
-    tmDistribution = null;
-    strHeader = new String[] {
-        "CTRY/Region", "ANNOUNCED"};
-    iColWidths = new int[] {
-        32, 20};
-    println(":xmp.");
-
-    printReport(true, strHeader, iColWidths, vPrintDetails);
-    resetPrintvars();
-    println("* Brunei Darussalam, Indonesia, Cambodia, Lao People's Democratic ");
-    println("Republic, Myanmar, Malaysia, Philippines, Singapore, Thailand, Vietnam ");
-    println("**Bangladesh, Bhutan, India, Sri Lanka, Maldives, Nepal, Afghanistan ");
-    println(":exmp.");
-
-    println(".*$A_220_End");
-
-  }
-
-  /**
-   *  Description of the Method
-   */
-  private void processLongTo300() {
-    println(".*$A_300_Begin");
-    prettyPrint(getAttributeValue(eiAnnounce, "AMCALLCENTER", " "), 69);
-    println(".*$A_300_End");
-  }
-
-  /**
-   *  Description of the Method
-   */
-  private void processLongTo400() {
-
-  }
-
-  /**
-   *  Description of the Method
-   */
-  private void processLongTo500() {
-
-  }
-
-  /**
-   *  Description of the Method
-   */
-  private void processLongTo600() {
-
-  }
-
-  /**
-   *  Description of the Method
-   */
-  private void processLongTo700() { //IBM Personal Computing Division Letter
-
-    println(".*$A_725_Begin");
-
-    prettyPrint(transformXML(getAttributeValue(eiAnnounce, "IBMGRENLTR", " ")), 69);
-
-    println(".*$A_725_End");
-
-    println(".*$A_726_Begin");
-    prettyPrint(transformXML(getAttributeValue(eiAnnounce, "LENOVOGRENLTR", " ")), 69);
-    println(".*$A_726_End");
-
-  }
-
-  /**
-   *  Description of the Method
-   */
-  private void processLongTo800() {
-
-    println(".*$A_800_Begin"); //Business Partner Attachment
-    strParamList1 = new String[] {
-        "STANDARDAMENDTEXT"};
-    printValueListInGroup(grpStdAmendText, strParamList1, "STANDARDAMENDTEXT_TYPE", "150", "", true);
-    iColWidths = new int[] {
-        69};
-    printReport(false, null, iColWidths, vPrintDetails);
-    resetPrintvars();
-
-    /**
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> SOFAVAIL (R) -> SOF (E) -> SOFPRICE (R) -> PRICEINFO (E)
-     */
-
-    vReturnEntities5 = new Vector();
-    vReturnEntities1 = searchEntityVectorLink(vSofFrmSofAvail, null, null, true, true, "SOFPRICE");
-    vReturnEntities5.addAll(vReturnEntities1);
-    vReturnEntities1 = searchEntityVectorLink(vCmpntFrmCmpntAvail, null, null, true, true, "CMPNTPRICE");
-    vReturnEntities5.addAll(vReturnEntities1);
-    vReturnEntities1 = searchEntityVectorLink(vFeatureFrmFeatureAvail, null, null, true, true, "FEATUREPRICE");
-    vReturnEntities5.addAll(vReturnEntities1);
-    if (vReturnEntities5.size() > 0) {
-      logMessage("A_800:SOFPRICE");
-      strCondition1 = "";
-      for (i = 0; i < vSofFrmSofAvail.size(); i++) {
-        eiSof = (EntityItem) vSofFrmSofAvail.elementAt(i);
-        logMessage("_800" + eiSof.getKey());
-        eiPriceInfo = getDownlinkedEntityItem(eiSof, new String[] {"SOFPRICE", "PRICEFININFO"});
-        if (eiPriceInfo == null) {
-          continue;
-        }
-        logMessage("_800" + eiPriceInfo.getKey());
-
-        //Check whether the attrs are populated before we print
-        strCondition1 = getAttributeValue(eiPriceInfo, "LPFEE", " ");
-        strCondition1 += getAttributeValue(eiPriceInfo, "CONTRACTCLOSEFEE", " ");
-        strCondition1 += getAttributeValue(eiPriceInfo, "REMKTGDISCOUNT", " ");
-        strCondition1 += getAttributeValue(eiSof, "DISTRCODE", " ");
-        //strCondition1 += getAttributeValue(eiComponent, "SVCCAT", " ");
-        strCondition1 += getAttributeValue(eiSof, "VAE", " ");
-        logMessage("_800 Value of strCondition1:" + strCondition1 + ":");
-        if (strCondition1.trim().length() > 0) {
-          vPrintDetails.add(getAttributeValue(eiSof, "MKTGNAME", " "));
-          vPrintDetails.add(getAttributeValue(eiSof, "OFIDNUMBER", " "));
-          vPrintDetails.add(getAttributeValue(eiSof, "MKTGNAME", " "));
-          vPrintDetails.add(getAttributeValue(eiPriceInfo, "LPFEE", " "));
-          vPrintDetails.add(getAttributeValue(eiPriceInfo, "CONTRACTCLOSEFEE", " "));
-          vPrintDetails.add(getAttributeValue(eiPriceInfo, "REMKTGDISCOUNT", " "));
-          vPrintDetails.add(getAttributeValue(eiSof, "DISTRCODE", " "));
-          //vPrintDetails.add(getAttributeValue(eiComponent, "SVCCAT", " "));
-          vPrintDetails.add(getAttributeValue(eiSof, "VAE", " "));
-        }
-        else {
-          logMessage("_800:Skipping " + strCondition1 + " for " + eiSof.getKey() + ":Downlinked:" + eiPriceInfo.getKey());
-        }
-      }
-
-      /*
-           ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> CMPNTAVAIL (R) -> CMPNT (E) -> SOFCMPT (R) -> SOF (E)
-       ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> CMPNTAVAIL (R) -> CMPNT (E) -> CMPNTPRICE (R) -> PRICEINFO (E)
-       */
-      //Check whether we have downlinked pricefininfo rows, if not dont print
-      vReturnEntities1 = searchEntityVectorLink(vCmpntFrmCmpntAvail, null, null, true, true, "CMPNTPRICE");
-      logMessage("A_800:CMPNTPRICE");
-      if (vReturnEntities1.size() > 0) {
-        strCondition1 = "";
-        for (i = 0; i < vCmpntFrmCmpntAvail.size(); i++) {
-          eiComponent = (EntityItem) vCmpntFrmCmpntAvail.elementAt(i);
-          logMessage("_800" + eiComponent.getKey());
-          eiSof = getUplinkedEntityItem(eiComponent, new String[] {"SOFCMPNT", "SOF"});
-          if (eiSof == null) {
-            logMessage("_800 No linked SOF found from " + eiComponent.getKey());
-          }
-          else {
-            logMessage("_800" + eiSof.getKey());
-          }
-          eiPriceInfo = getDownlinkedEntityItem(eiComponent, new String[] {"CMPNTPRICE", "PRICEFININFO"});
-          if (eiPriceInfo == null) {
-            continue;
-          }
-          logMessage("_800" + eiPriceInfo.getKey());
-
-          //Check whether the attrs are populated before we print
-          strCondition1 = getAttributeValue(eiPriceInfo, "LPFEE", " ");
-          strCondition1 += getAttributeValue(eiPriceInfo, "CONTRACTCLOSEFEE", " ");
-          strCondition1 += getAttributeValue(eiPriceInfo, "REMKTGDISCOUNT", " ");
-          strCondition1 += getAttributeValue(eiComponent, "DISTRCODE", " ");
-          //strCondition1 += getAttributeValue(eiComponent, "SVCCAT", " ");
-          strCondition1 += getAttributeValue(eiComponent, "VAE", " ");
-          if (strCondition1.trim().length() > 0) {
-            vPrintDetails.add(getQ800SOFMktName(eiComponent, eiSof));
-            if (bIsAnnITS) {
-              strCondition2 = getAttributeShortFlagDesc(eiComponent, "ITSCMPNTCATNAME");
-              if (strCondition2 == null) {
-                strCondition2 = "";
-              }
-              if (strCondition2.trim().length() > 0) {
-                vPrintDetails.add(getDownlinkedEntityAttrValue(eiComponent, new String[] {"CMPNTITSCMPNTCATA",
-                    "ITSCMPNTCAT"}, "ITSCMPNTCATID"));
-              }
-              else {
-                vPrintDetails.add(getAttributeValue(eiSof, "OFIDNUMBER", " "));
-              }
-            }
-            else {
-              vPrintDetails.add(getAttributeValue(eiSof, "OFIDNUMBER", " "));
-            }
-            strCondition1 = getCmptToSofMktMsg(eiComponent);
-            vPrintDetails.add(strCondition1);
-            vPrintDetails.add(getAttributeValue(eiPriceInfo, "LPFEE", " "));
-            vPrintDetails.add(getAttributeValue(eiPriceInfo, "CONTRACTCLOSEFEE", " "));
-            vPrintDetails.add(getAttributeValue(eiPriceInfo, "REMKTGDISCOUNT", " "));
-            vPrintDetails.add(getAttributeValue(eiComponent, "DISTRCODE", " "));
-            //vPrintDetails.add(getAttributeValue(eiComponent, "SVCCAT", " "));
-            vPrintDetails.add(getAttributeValue(eiComponent, "VAE", " "));
-          }
-          else {
-            logMessage("_800:Skipping " + strCondition1 + " for " + eiComponent.getKey() + ":Downlinked:" +
-                       eiPriceInfo.getKey());
-          }
-        }
-      }
-
-      vReturnEntities1 = searchEntityVectorLink(vFeatureFrmFeatureAvail, null, null, true, true, "FEATUREPRICE");
-      if (vReturnEntities1.size() > 0) {
-        strCondition1 = "";
-        for (i = 0; i < vFeatureFrmFeatureAvail.size(); i++) {
-          eiFeature = (EntityItem) vFeatureFrmFeatureAvail.elementAt(i);
-          logMessage("_800" + eiFeature.getKey());
-          eiSof = getUplinkedEntityItem(eiFeature, strFeatureToSof);
-          if (eiSof == null) {
-            logMessage("_800 No linked SOF found from " + eiFeature.getKey());
-          }
-          else {
-            logMessage("_800" + eiSof.getKey());
-          }
-          eiComponent = getUplinkedEntityItem(eiFeature, strFeatureToCmpt);
-          logMessage("_800" + eiComponent.getKey());
-
-          eiPriceInfo = getDownlinkedEntityItem(eiFeature, new String[] {"FEATUREPRICE", "PRICEFININFO"});
-          if (eiPriceInfo == null) {
-            continue;
-          }
-          logMessage("_800" + eiPriceInfo.getKey());
-
-          //Check whether the attrs are populated before we print
-          strCondition1 = getAttributeValue(eiPriceInfo, "LPFEE", " ");
-          strCondition1 += getAttributeValue(eiPriceInfo, "CONTRACTCLOSEFEE", " ");
-          strCondition1 += getAttributeValue(eiPriceInfo, "REMKTGDISCOUNT", " ");
-          strCondition1 += getAttributeValue(eiComponent, "DISTRCODE", " ");
-          //strCondition1 += getAttributeValue(eiComponent, "SVCCAT", " ");
-          strCondition1 += getAttributeValue(eiComponent, "VAE", " ");
-          if (strCondition1.trim().length() > 0) {
-            vPrintDetails.add(getQ800SOFMktName(eiComponent, eiSof));
-            if (bIsAnnITS) {
-              strCondition2 = getAttributeShortFlagDesc(eiComponent, "ITSCMPNTCATNAME");
-              if (strCondition2 == null) {
-                strCondition2 = "";
-              }
-              if (strCondition2.trim().length() > 0) {
-                vPrintDetails.add(getDownlinkedEntityAttrValue(eiComponent, new String[] {"CMPNTITSCMPNTCATA",
-                    "ITSCMPNTCAT"}, "ITSCMPNTCATID"));
-              }
-              else {
-                vPrintDetails.add(getAttributeValue(eiSof, "OFIDNUMBER", " "));
-              }
-            }
-            else {
-              vPrintDetails.add(getAttributeValue(eiSof, "OFIDNUMBER", " "));
-            }
-            strCondition1 = getCmptToSofMktMsg(eiComponent);
-            vPrintDetails.add(strCondition1);
-            vPrintDetails.add(getAttributeValue(eiPriceInfo, "LPFEE", " "));
-            vPrintDetails.add(getAttributeValue(eiPriceInfo, "CONTRACTCLOSEFEE", " "));
-            vPrintDetails.add(getAttributeValue(eiPriceInfo, "REMKTGDISCOUNT", " "));
-            vPrintDetails.add(getAttributeValue(eiComponent, "DISTRCODE", " "));
-            //vPrintDetails.add(getAttributeValue(eiComponent, "SVCCAT", " "));
-            vPrintDetails.add(getAttributeValue(eiComponent, "VAE", " "));
-          }
-          else {
-            logMessage("_800:Skipping " + strCondition1 + " for " + eiFeature.getKey() + ":Downlinked:" +
-                       eiPriceInfo.getKey());
-          }
-        }
-      }
-
-      if (vPrintDetails.size() > 0) {
-        //strHeader = new String[]{"Offering", "ID", "Description", "fee", "fee", "disc", "Dist", "cat", " E"};
-        strHeader = new String[] {
-            "Offering", "ID", "Description", "fee", "fee", "disc", "Dist", " E"};
-        iColWidths = new int[] {
-            15, 8, 20, 3, 5, 5, 4, 3};
-        println(":xmp.");
-        println("                                                  Close             V");
-        println("                                              L/P cont  Remkt       A");
-
-        printReport(true, strHeader, iColWidths, vPrintDetails);
-        resetPrintvars();
-        println(":exmp.");
-      }
-    }
-    else {
-      logMessage("Q800..no links to priceinfo found..");
-    }
-
-    println(".*$A_800_End");
-
-    println(".*$A_801_Begin");
-    prettyPrint(transformXML(getAttributeValue(eiAnnounce, "LENOVOBUSPRTNRATTCH", " ")), 69);
-    println(".*$A_801_End");
-
-    println(".*$A_805_Begin");
-    strParamList1 = new String[] {
-        "STANDARDAMENDTEXT"};
-    printValueListInGroup(grpStdAmendText, strParamList1, "STANDARDAMENDTEXT_TYPE", "210", "", true);
-    iColWidths = new int[] {
-        69};
-    printReport(false, null, iColWidths, vPrintDetails);
-    resetPrintvars();
-    println(".*$A_805_End");
-
-  }
-
-  /**
-   *  Description of the Method
-   */
-  private void processLongTo900() {
-  }
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _strXml  Description of the Parameter
-   *@return          Description of the Return Value
-   */
-  private String transformXML(String _strXml) {
-    ByteArrayOutputStream gmlOS = null; // create output stream & transform
-    _strXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> <!DOCTYPE eAnnounceData SYSTEM \"file:/" + DTDFILEPATH +
-        "\" ><eAnnounceData>" + _strXml + "</eAnnounceData>";
-//    _strXml="<?xml version=\"1.0\" encoding=\"UTF-8\"?> <!DOCTYPE eAnnounceData SYSTEM \"file:///eAnnounceText.dtd\" ><eAnnounceData>"+_strXml+"</eAnnounceData>";
-    try {
-      // load xml file into stream
-      StringReader srInput = new StringReader(_strXml);
-      StreamSource xmlSource = new StreamSource(srInput); //create xml stream source
-      xmlSource.setSystemId(_strXml); // resolve relative urls
-      //XMLtoGML x2g = new XMLtoGML();// create gml transformer
-      gmlOS = (ByteArrayOutputStream) x2g.transform(xmlSource); // xml to gml
-    }
-    catch (Exception e) {
-      println("Error: " + e + "\n");
-      println("The following is the Offending xml");
-      println(_strXml);
-      logError("Exception!" + e.getMessage() + "\n" + ":***:" + _strXml + ":***:");
-
-    }
-    return (gmlOS != null ? gmlOS.toString() : "");
-  }
-
-  /**
-   *  Gets the version attribute of the RFA_IGSSVS class
-   *
-   *@return    The version value
-   */
-  public static String getVersion() {
-    return ("$Id: RFA_IGSSVS.java,v 1.157 2008/03/19 19:30:44 wendy Exp $");
-  }
-
-  /**
-   *  Gets the aBRVersion attribute of the RFA_IGSSVS object
-   *
-   *@return    The aBRVersion value
-   */
-  public String getABRVersion() {
-    return getVersion();
-  }
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _strOfferingAttr  Description of the Parameter
-   * /
-  private void printVanillaSVSReport(String _strOfferingAttr) {
-    printVanillaSVSReport(_strOfferingAttr, false, false);
-  }*/
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _strOfferingAttr  Description of the Parameter
-   *@param  bXmlattr          Description of the Parameter
-   *@param  bWithPriceAttr    Description of the Parameter
-   */
-  private void printVanillaSVSReport(String _strOfferingAttr, boolean bXmlattr, boolean bWithPriceAttr) {
-    logMessage("printVanillaSVSReport: for " + _strOfferingAttr);
-    /*
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> SOFAVAIL (R) -> SOF (E)
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> CMPNTAVAIL (R) -> CMPNT (E)
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> AVAIL (E) -> FEATUREAVAIL (R) -> FEATURE (E)
-     */
-    bConditionOK = false;
-    if (bWithPriceAttr) { //If to get attribute from priceinfo, then check whether link to price info exist
-      vReturnEntities1 = searchEntityVectorLink(vSofSortedbyMkt, null, null, true, true, "SOFPRICE");
-      bConditionOK = vReturnEntities1.size() > 0;
-      vReturnEntities1 = searchEntityVectorLink(vCmptSortedbyMkt, null, null, true, true, "CMPNTPRICE");
-      bConditionOK = !bConditionOK ? vReturnEntities1.size() > 0 : bConditionOK;
-      vReturnEntities1 = searchEntityVectorLink(vFeatureSortedbyMkt, null, null, true, true, "FEATUREPRICE");
-      bConditionOK = !bConditionOK ? vReturnEntities1.size() > 0 : bConditionOK;
-      if (!bConditionOK) {
-        logMessage("No Priceinfo links found for " + _strOfferingAttr);
-        return;
-      }
-    }
-
-    strCondition4 = "";
-    strCondition2 = "";
-    //boolean bSofDone = vSofSortedbyMkt.size() == 0;
-   // boolean bCmptDone = vCmptSortedbyMkt.size() == 0;
-    //boolean bFeatDone = vFeatureSortedbyMkt.size() == 0;
-
-    String strMarketingMsg = null;
-    String strOFType = null;
-
-    int iCountInstances = vSofSortedbyMkt.size();
-    iCountInstances += vCmptSortedbyMkt.size();
-    iCountInstances += vFeatureSortedbyMkt.size();
-
-    logMessage("vSofSortedbyMkt" + vSofSortedbyMkt.size());
-    logMessage("vCmptSortedbyMkt" + vCmptSortedbyMkt.size());
-    logMessage("vFeatureSortedbyMkt" + vFeatureSortedbyMkt.size());
-
-    if (!bWithPriceAttr) { //Check whether we have attr values to print
-      strParamList1 = new String[] {
-          _strOfferingAttr};
-      printValueListInVector(vSofSortedbyMkt, strParamList1, " ", true, false);
-      //bSofDone = vPrintDetails.size() == 0;
-      resetPrintvars();
-
-      printValueListInVector(vCmptSortedbyMkt, strParamList1, " ", true, false);
-      //bCmptDone = vPrintDetails.size() == 0;
-      resetPrintvars();
-
-      printValueListInVector(vFeatureSortedbyMkt, strParamList1, " ", true, false);
-      //bFeatDone = vPrintDetails.size() == 0;
-      resetPrintvars();
-    }
-
-    //boolean bAlldone = bSofDone && bCmptDone && bFeatDone;
-
-    i = 0;
-    strFilterAttr = new String[] {
-        "AVAILTYPE"};
-    strFilterValue = new String[] {
-        "146"}; //Consider AVAILS OF type Planned Availability only 10/21
-    strCondition4 = "";
-    for (i = 0; i < vAllSortedOfferings.size(); i++) { //get SOF, CMPT and FEATURE one after the other
-      logMessage("  printVanillaSVSReport:I is" + i);
-      eiNextItem = (EntityItem) vAllSortedOfferings.elementAt(i);
-      strOFType = eiNextItem.getEntityType();
-      if (strOFType.equals("SOF")) {
-        eiSof = (EntityItem) vAllSortedOfferings.elementAt(i);
-        logMessage("printVanillaSVSReport After sof" + eiSof.getKey());
-        if (!bWithPriceAttr) {
-          strCondition1 = getAttributeValue(eiSof, _strOfferingAttr, " ");
-          bConditionOK = strCondition1.trim().length() > 0;
-        }
-        else {
-          strEntityTypes = new String[] {
-              "SOFPRICE", "PRICEFININFO"};
-          strCondition1 = getDownlinkedEntityAttrValue(eiSof, strEntityTypes, _strOfferingAttr);
-          bConditionOK = strCondition1.trim().length() > 0;
-        }
-        if (bConditionOK) { //Print only if attributes found
-          //Check for multiple AVAILS linked to SOF
-          vReturnEntities1 = searchEntityItemLink(eiSof, null, null, true, true, "SOFAVAIL");
-          //So get the AVAILS
-          vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "AVAIL");
-          if (vReturnEntities2.size() > 0) {
-            strCondition1 = getAllGeoTags(vReturnEntities2);
-            if (!strCondition1.equals(strCondition2)) {
-              if (!strCondition2.equals(strWorldwideTag)) {
-                if (strCondition2.length() > 0) {
-                  println(".br;:hp2.<---" + strCondition2 + ":ehp2.");
-                }
-              }
-              if (!strCondition1.equals(strWorldwideTag)) {
-                println("");
-                println(":p.:hp2." + strCondition1 + "--->:ehp2.");
-              }
-              strCondition2 = strCondition1;
-            }
-            strMarketingMsg = getSOFMktName(eiSof);
-
-            logMessage("Marketing Msg :" + strMarketingMsg);
-            prettyPrint(strMarketingMsg, 69);
-            /*
-                        if (iCountInstances > 1) {//Print mkt msg if there is more than one instance
-                          prettyPrint(strMarketingMsg, 69);
-                        }
-
-             */
-            if (bXmlattr) {
-              if (!bWithPriceAttr) {
-                prettyPrint(transformXML(getAttributeValue(eiSof, _strOfferingAttr, " ")), 69);
-                //println(":p.");
-              }
-              else {
-                strEntityTypes = new String[] {
-                    "SOFPRICE", "PRICEFININFO"};
-                prettyPrint(transformXML(getDownlinkedEntityAttrValue(eiSof, strEntityTypes, _strOfferingAttr)), 69);
-                //println(":p.");
-              }
-            }
-            else {
-              if (!bWithPriceAttr) {
-                prettyPrint(getAttributeValue(eiSof, _strOfferingAttr, " "), 69);
-              }
-              else {
-                prettyPrint(getDownlinkedEntityAttrValue(eiSof, strEntityTypes, _strOfferingAttr), 69);
-              }
-            }
-          }
-          else {
-            logMessage("printVanillaSVSReport: NO AVAIL found for " + eiSof.getKey());
-          }
-        }
-        else {
-          logMessage("printVanillaSVSReport:Attribute not returned for " + eiSof.getKey());
-        }
-        println("");
-      }
-
-      if (strOFType.equals("CMPNT")) {
-        eiComponent = (EntityItem) vAllSortedOfferings.elementAt(i);
-        logMessage("after component" + eiComponent.getKey());
-        if (!bWithPriceAttr) {
-          strCondition1 = getAttributeValue(eiComponent, _strOfferingAttr, " ");
-          bConditionOK = strCondition1.trim().length() > 0;
-        }
-        else {
-          strEntityTypes = new String[] {
-              "CMPNTPRICE", "PRICEFININFO"};
-          strCondition1 = getDownlinkedEntityAttrValue(eiComponent, strEntityTypes, _strOfferingAttr);
-          bConditionOK = strCondition1.trim().length() > 0;
-        }
-        if (bConditionOK) {
-          //Check for multiple AVAILS linked to Component
-          vReturnEntities1 = searchEntityItemLink(eiComponent, null, null, true, true, "CMPNTAVAIL");
-          //So get the AVAILS
-          vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "AVAIL");
-          if (vReturnEntities2.size() > 0) {
-            strCondition1 = getAllGeoTags(vReturnEntities2);
-            if (!strCondition1.equals(strCondition2)) {
-              if (!strCondition2.equals(strWorldwideTag)) {
-                if (strCondition2.length() > 0) {
-                  println(".br;:hp2.<---" + strCondition2 + ":ehp2.");
-                }
-              }
-              if (!strCondition1.equals(strWorldwideTag)) {
-                println("");
-                println(":p.:hp2." + strCondition1 + "--->:ehp2.");
-              }
-              strCondition2 = strCondition1;
-            }
-
-            strMarketingMsg = getCmptToSofMktMsg(eiComponent);
-
-            logMessage("1) Marketing Msg :" + strMarketingMsg);
-            prettyPrint(strMarketingMsg, 69);
-            /*             if (iCountInstances > 1) {
-                          prettyPrint(strMarketingMsg, 69);
-                        }
-             */
-            if (bXmlattr) {
-              if (!bWithPriceAttr) {
-                prettyPrint(transformXML(getAttributeValue(eiComponent, _strOfferingAttr, " ")), 69);
-                //println(":p.");
-              }
-              else {
-                strEntityTypes = new String[] {
-                    "CMPNTPRICE", "PRICEFININFO"};
-                prettyPrint(transformXML(getDownlinkedEntityAttrValue(eiComponent, strEntityTypes, _strOfferingAttr)),
-                            69);
-                //println(":p.");
-              }
-            }
-            else {
-              if (!bWithPriceAttr) {
-                prettyPrint(getAttributeValue(eiComponent, _strOfferingAttr, " "), 69);
-              }
-              else {
-                strEntityTypes = new String[] {
-                    "CMPNTPRICE", "PRICEFININFO"};
-                prettyPrint(getDownlinkedEntityAttrValue(eiComponent, strEntityTypes, _strOfferingAttr), 69);
-              }
-            }
-          }
-          else {
-            logMessage("printVanillaSVSReport: No AVAIL found for " + eiComponent.getKey());
-          }
-        }
-        else {
-          logMessage("printVanillaSVSReport:Attribute not returned for " + eiComponent.getKey());
-        }
-        println("");
-      }
-
-      if (strOFType.equals("FEATURE")) {
-        eiFeature = (EntityItem) vAllSortedOfferings.elementAt(i);
-        logMessage("After feature " + eiFeature.getKey());
-        if (!bWithPriceAttr) {
-          strCondition1 = getAttributeValue(eiFeature, _strOfferingAttr, " ");
-          bConditionOK = strCondition1.trim().length() > 0;
-        }
-        else {
-          strEntityTypes = new String[] {
-              "FEATUREPRICE", "PRICEFININFO"};
-          strCondition1 = getDownlinkedEntityAttrValue(eiFeature, strEntityTypes, _strOfferingAttr);
-          bConditionOK = strCondition1.trim().length() > 0;
-        }
-        if (bConditionOK) {
-          //Check for multiple AVAILS linked to Feature
-          vReturnEntities1 = searchEntityItemLink(eiFeature, null, null, true, true, "FEATUREAVAIL");
-          //So get the AVAILS
-          vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "AVAIL");
-          if (vReturnEntities2.size() > 0) {
-            strCondition1 = getAllGeoTags(vReturnEntities2);
-            if (!strCondition1.equals(strCondition2)) {
-              if (!strCondition2.equals(strWorldwideTag)) {
-                if (strCondition2.length() > 0) {
-                  println(".br;:hp2.<---" + strCondition2 + ":ehp2.");
-                }
-              }
-              if (!strCondition1.equals(strWorldwideTag)) {
-                println("");
-                println(":p.:hp2." + strCondition1 + "--->:ehp2.");
-              }
-              strCondition2 = strCondition1;
-            }
-            /*             if (!strCondition1.equals(strWorldwideTag)) {
-                          if (!strCondition1.equals(strCondition2)) {
-                            if (strCondition2.length() > 0) {
-                              println(".br;:hp2.<---" + strCondition2 + ":ehp2.");
-                            }
-                            println("");
-                            println(":p.:hp2." + strCondition1 + "--->:ehp2.");
-                            strCondition2 = strCondition1;
-                          }
-                        }
-             */
-            strMarketingMsg = getfeatureToSofMktMsg(eiFeature);
-            logMessage("2) Marketing Msg :" + strMarketingMsg);
-            prettyPrint(strMarketingMsg, 69);
-            /*             if (iCountInstances > 1) {
-                          prettyPrint(strMarketingMsg, 69);
-                        }
-             */
-            if (bXmlattr) {
-              if (!bWithPriceAttr) {
-                prettyPrint(transformXML(getAttributeValue(eiFeature, _strOfferingAttr, " ")), 69);
-                //println(":p.");
-              }
-              else {
-                strEntityTypes = new String[] {
-                    "FEATUREPRICE", "PRICEFININFO"};
-                prettyPrint(transformXML(getDownlinkedEntityAttrValue(eiFeature, strEntityTypes, _strOfferingAttr)), 69);
-                //println(":p.");
-              }
-            }
-            else {
-              if (!bWithPriceAttr) {
-                prettyPrint(getAttributeValue(eiFeature, _strOfferingAttr, " "), 69);
-              }
-              else {
-                strEntityTypes = new String[] {
-                    "CMPNTPRICE", "PRICEFININFO"};
-                prettyPrint(getDownlinkedEntityAttrValue(eiFeature, strEntityTypes, _strOfferingAttr), 69);
-              }
-            }
-          }
-          else {
-            logMessage("printVanillaSVSReport:No AVAIL found for " + eiFeature.getKey());
-          }
-        }
-        else {
-          logMessage("printVanillaSVSReport:Attribute not returned for " + eiFeature.getKey());
-        }
-        println("");
-      }
-
-    }
-
-    if (!strCondition2.equals(strWorldwideTag)) {
-      if (strCondition2.length() > 0) {
-        println(".br;:hp2.<---" + strCondition2 + ":ehp2.");
-      }
-    }
-
-    println("");
-
-  }
-
-  private void printIntSuppMktFinInfo(String _strFinAttrCode) {
-    printIntSuppMktFinInfo(_strFinAttrCode, true);
-  }
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _strFinAttrCode  Description of the Parameter
-   */
-  private void printIntSuppMktFinInfo(String _strFinAttrCode, boolean _bullets) {
-    //CMPNT (E) -> CMPNTFINOF (R) -> FINOF
-    //FEATURE (E) -> FEATUREFINOF (R) -> FINOF
-    logMessage("printIntSuppMktFinInfo for " + _strFinAttrCode);
-
-    bConditionOK = false;
-    vReturnEntities1 = searchEntityVectorLink(vCmpntFrmCmpntAvail, null, null, true, true, "CMPNTFINOF");
-    bConditionOK = vReturnEntities1.size() > 0;
-    vReturnEntities1 = searchEntityVectorLink(vFeatureFrmFeatureAvail, null, null, true, true, "FEATUREFINOF");
-    bConditionOK = !bConditionOK ? vReturnEntities1.size() > 0 : bConditionOK;
-    if (!bConditionOK) {
-      logMessage("No Fininfo links found for " + _strFinAttrCode);
-      return;
-    }
-
-    boolean bCmptDone = vCmpntFrmCmpntAvail.size() == 0;
-    boolean bFeatDone = vFeatureFrmFeatureAvail.size() == 0;
-    boolean bAlldone = (bCmptDone && bFeatDone) ? true : false;
-
-    int iCountInstances = vCmpntFrmCmpntAvail.size(); //Count instances of entities
-    iCountInstances += vFeatureFrmFeatureAvail.size();
-
-    //String[] strCmptToFin = new String[] {
-    //    "CMPNTFINOF", "FINOF"};
-    //String[] strFeatToFin = new String[] {
-     //   "FEATUREFINOF", "FINOF"};
-
-   // Hashtable hNoDupes = new Hashtable();
-    String strMarketingMsg = null;
-
-    strCondition4 = "";
-
-    logMessage("vComponents" + vCmpntFrmCmpntAvail.size());
-    logMessage("vFeatures" + vFeatureFrmFeatureAvail.size());
-
-    i = 0;
-    while (!bAlldone) {
-
-      if (!bCmptDone) {
-        eiComponent = (EntityItem) vCmpntFrmCmpntAvail.elementAt(i);
-        logMessage("printIntSuppMktFinInfo after component" + eiComponent.getKey());
-        /*
-               Get component details
-         */
-        strMarketingMsg = getCmptToSofMktMsg(eiComponent);
-        /*         if (!hNoDupes.containsKey(strMarketingMsg)) {
-          strCondition4 += strMarketingMsg+" ";
-          hNoDupes.put(strMarketingMsg,"MM");
-                 }
-         */
-        //Get the financial part now
-        vReturnEntities1 = searchEntityItemLink(eiComponent, null, null, true, true, "CMPNTFINOF");
-        vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "FINOF");
-
-        if (vReturnEntities2.size() > 0) {
-          logMessage("1) printIntSuppMktFinInfo Marketing Msg :" + strMarketingMsg);
-          if (iCountInstances > 1) {
-            println("Component Offerings");
-            prettyPrint(strMarketingMsg, 69);
-            if (vReturnEntities2.size() > 0 && _bullets) {
-              println("The financing will enable:");
-            }
-          }
-          //Now print the fininfo attribute
-          for (j = 0; j < vReturnEntities2.size(); j++) {
-            eiFinof = (EntityItem) vReturnEntities2.elementAt(j);
-            strCondition1 = transformXML(getAttributeValue(eiFinof, _strFinAttrCode, " ")); //This will be an xml field
-
-            if (strCondition1.trim().length() > 0) {
-//              prettyPrint( ( (_bullets) ? ":li." : "") + strCondition1, 69);
-              prettyPrint(strCondition1, 69);
-            }
-          }
-
-          println("");
-        }
-        else {
-          logMessage("No info returned for attr:" + eiComponent.getKey() + ":" + _strFinAttrCode);
-        }
-        println("");
-      }
-
-      /*
-             Get Feature details
-       */
-      if (!bFeatDone) {
-        eiFeature = (EntityItem) vFeatureFrmFeatureAvail.elementAt(i);
-        logMessage("printIntSuppMktFinInfo after feature" + eiFeature.getKey());
-
-        strMarketingMsg = getfeatureToSofMktMsg(eiFeature);
-        /*         if (!hNoDupes.containsKey(strMarketingMsg)) {
-          strCondition4 += strMarketingMsg+" ";
-          hNoDupes.put(strMarketingMsg,"MM");
-                 }
-         */
-        //Get the financial part now
-        vReturnEntities1 = searchEntityItemLink(eiFeature, null, null, true, true, "FEATUREFINOF");
-        vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "FINOF");
-        if (vReturnEntities2.size() > 0) {
-          logMessage("2) printIntSuppMktFinInfo Marketing Msg :" + strMarketingMsg);
-          if (iCountInstances > 1) {
-            println("Feature ");
-            prettyPrint(strMarketingMsg, 69);
-            if (vReturnEntities2.size() > 0 && _bullets) {
-              println("The financing will enable:");
-            }
-          }
-
-          //Now print the fininfo attribute
-          for (j = 0; j < vReturnEntities2.size(); j++) {
-            eiFinof = (EntityItem) vReturnEntities2.elementAt(j);
-            strCondition1 = transformXML(getAttributeValue(eiFinof, _strFinAttrCode, " "));
-            if (strCondition1.trim().length() > 0) {
-//              prettyPrint( ( (_bullets) ? ":li." : "") + strCondition1, 69);
-              prettyPrint(strCondition1, 69);
-
-            }
-          }
-          println("");
-        }
-        else {
-          logMessage("No info returned for attr:" + eiFeature.getKey() + ":" + _strFinAttrCode);
-        }
-        println("");
-      }
-
-      i++;
-      bCmptDone = vCmpntFrmCmpntAvail.size() <= i;
-      bFeatDone = vFeatureFrmFeatureAvail.size() <= i;
-
-      bAlldone = (bCmptDone && bFeatDone) ? true : false;
-    }
-
-  }
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _strType      Description of the Parameter
-   *@param  _strQuestion  Description of the Parameter
-   * /
-  private void printFeatureBenefit(String _strType, String _strQuestion) {
-    printFeatureBenefit(_strType, _strQuestion, true, false);
-  }*/
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _strType        Description of the Parameter
-   *@param  _strQuestion    Description of the Parameter
-   *@param  _bPrintBenefit  Description of the Parameter
-   */
-  private void printFeatureBenefit(String _strType, String _strQuestion, boolean _bPrintBenefit,
-                                   boolean _bPrintCrossSell_UpSell) {
-    /* ////If one and only one of the offering types exists and one and only one data element exists,
-         then DO NOT print Header, ff more than one offering type exists and/or more than one data element exists,
-         then DO print Header*/
-    //Check for no. of data elements/offering types
-    logMessage("printFeatureBenefit:" + _strType + ":Q:" + _strQuestion);
-    bConditionOK = false;
-    boolean bComptChildren = false;
-    boolean bSofChildren = false;
-    boolean bFeatureChildren = false;
-    String[] strQAttr = new String[] {
-        "TYPE"};
-    String[] strQVal = new String[] {
-        _strType};
-    String strOFType = null;
-
-    int iCountInstances = vSofSortedbyMkt.size();
-    iCountInstances += vCmptSortedbyMkt.size();
-    iCountInstances += vFeatureSortedbyMkt.size();
-
-    String strCrossSell_UpSell = _strType.equals("110") ? "CROSSELL" : "UPSELL"; //Set the attr code depending on type
-    strCrossSell_UpSell = _strType.equals("120") ? "" : strCrossSell_UpSell; //Set the attr code depending on type
-
-    if (_bPrintBenefit && !_bPrintCrossSell_UpSell) { //Check for parents here
-      vReturnEntities1 = searchEntityVectorLink(vSofSortedbyMkt, strQAttr, strQVal, true, false, "SOFRELSOF");
-      bConditionOK = vReturnEntities1.size() > 0;
-      vReturnEntities1 = searchEntityVectorLink(vCmptSortedbyMkt, strQAttr, strQVal, true, false, "CMPNTRELCMPNT");
-      bConditionOK = !bConditionOK ? vReturnEntities1.size() > 0 : bConditionOK;
-      vReturnEntities1 = searchEntityVectorLink(vFeatureSortedbyMkt, strQAttr, strQVal, true, false,
-                                                "FEATURERELFEATURE");
-      bConditionOK = !bConditionOK ? vReturnEntities1.size() > 0 : bConditionOK;
-      if (!bConditionOK) {
-        logMessage("No Parent links found for Q" + _strQuestion);
-        return;
-      }
-    }
-
-    if (_bPrintCrossSell_UpSell) { //Check for children
-      vReturnEntities1 = searchEntityVectorLink(vSofSortedbyMkt, strQAttr, strQVal, true, true, "SOFRELSOF");
-      bConditionOK = vReturnEntities1.size() > 0;
-      bSofChildren = vReturnEntities1.size() > 1;
-      vReturnEntities1 = searchEntityVectorLink(vSofSortedbyMkt, strQAttr, strQVal, true, true, "SOFRELCMPNT");
-      bConditionOK = !bConditionOK ? vReturnEntities1.size() > 0 : bConditionOK;
-      bSofChildren = (!bSofChildren) ? vReturnEntities1.size() > 1 : bSofChildren;
-      vReturnEntities1 = searchEntityVectorLink(vSofSortedbyMkt, strQAttr, strQVal, true, true, "SOFRELFEATURE");
-      bConditionOK = !bConditionOK ? vReturnEntities1.size() > 0 : bConditionOK;
-      bSofChildren = (!bSofChildren) ? vReturnEntities1.size() > 1 : bSofChildren;
-      if (!bConditionOK) {
-        logMessage("No Children links found for SOF Q" + _strQuestion);
-      }
-      bConditionOK1 = false;
-      vReturnEntities1 = searchEntityVectorLink(vCmptSortedbyMkt, strQAttr, strQVal, true, true, "CMPNTRELCMPNT");
-
-      bConditionOK1 = !bConditionOK1 ? vReturnEntities1.size() > 0 : bConditionOK1;
-      bComptChildren = vReturnEntities1.size() > 1;
-      vReturnEntities1 = searchEntityVectorLink(vCmptSortedbyMkt, strQAttr, strQVal, true, true, "CMPNTRELFEATURE");
-      bConditionOK1 = !bConditionOK1 ? vReturnEntities1.size() > 0 : bConditionOK1;
-      bComptChildren = (!bComptChildren) ? vReturnEntities1.size() > 1 : bComptChildren;
-      vReturnEntities1 = searchEntityVectorLink(vCmptSortedbyMkt, strQAttr, strQVal, true, true, "CMPNTRELSOF");
-      bConditionOK1 = !bConditionOK1 ? vReturnEntities1.size() > 0 : bConditionOK1;
-      bComptChildren = (!bComptChildren) ? vReturnEntities1.size() > 1 : bComptChildren;
-      if (!bConditionOK1) {
-        logMessage("No Children links found for CMPNT Q" + _strQuestion);
-      }
-      bConditionOK = !bConditionOK ? bConditionOK1 : bConditionOK;
-
-      vReturnEntities1 = searchEntityVectorLink(vFeatureSortedbyMkt, strQAttr, strQVal, true, true, "FEATURERELFEATURE");
-      bConditionOK1 = !bConditionOK1 ? vReturnEntities1.size() > 0 : bConditionOK1;
-      bFeatureChildren = vReturnEntities1.size() > 1;
-      vReturnEntities1 = searchEntityVectorLink(vFeatureSortedbyMkt, strQAttr, strQVal, true, true, "FEATURERELCMPNT");
-      bConditionOK1 = !bConditionOK1 ? vReturnEntities1.size() > 0 : bConditionOK1;
-      bFeatureChildren = (!bFeatureChildren) ? vReturnEntities1.size() > 1 : bFeatureChildren;
-      vReturnEntities1 = searchEntityVectorLink(vFeatureSortedbyMkt, strQAttr, strQVal, true, true, "FEATURERELSOF");
-      bConditionOK1 = !bConditionOK1 ? vReturnEntities1.size() > 0 : bConditionOK1;
-      bFeatureChildren = (!bFeatureChildren) ? vReturnEntities1.size() > 1 : bFeatureChildren;
-      if (!bConditionOK) {
-        logMessage("No Children links found for Q" + _strQuestion);
-      }
-    }
-
-    bConditionOK = false;
-    bConditionOK1 = false;
-    resetPrintvars();
-    strFilterAttr = new String[] {
-        "AVAILTYPE"};
-    strFilterValue = new String[] {
-        "146"}; //Consider AVAILS OF type Planned Availability only 10/21
-
-    strCondition4 = "";
-    strCondition2 = "";
-    strCondition1 = "";
-
-    //boolean bSofDone = vSofSortedbyMkt.size() == 0;
-   // boolean bCmptDone = vCmptSortedbyMkt.size() == 0;
-    //boolean bFeatDone = vFeatureSortedbyMkt.size() == 0;
-    //boolean bAlldone = bSofDone && bCmptDone && bFeatDone;
-
-    String strMarketingMsg = null;
-    i = 0;
-    for (i = 0; i < vAllSortedOfferings.size(); i++) { //get SOF, CMPT and FEATURE one after the other
-      logMessage("  printFeatureBenefit:I is" + i);
-      eiNextItem = (EntityItem) vAllSortedOfferings.elementAt(i);
-      strOFType = eiNextItem.getEntityType();
-      if (strOFType.equals("SOF")) {
-        eiSof = (EntityItem) vAllSortedOfferings.elementAt(i);
-        logMessage("printFeatureBenefit After sof" + eiSof.getKey());
-        strEntityTypes = new String[] {
-            "SOFRELSOF"};
-        strCondition4 = getDownlinkedEntityAttrValue(eiSof, strEntityTypes, "BENEFIT", strQAttr, strQVal);
-
-        if (_bPrintCrossSell_UpSell) {
-          strCondition4 = getAttributeValue(eiSof, strCrossSell_UpSell, " ");
-          if (strCondition4.trim().length() == 0) { //Check for related rows if the attribute is empty
-            vReturnEntities1 = searchEntityItemLink(eiSof, strQAttr, strQVal, true, true, "SOFRELSOF");
-            bConditionOK = vReturnEntities1.size() > 0;
-            vReturnEntities1 = searchEntityItemLink(eiSof, strQAttr, strQVal, true, true, "SOFRELCMPNT");
-            bConditionOK = !bConditionOK ? vReturnEntities1.size() > 0 : bConditionOK;
-            vReturnEntities1 = searchEntityItemLink(eiSof, strQAttr, strQVal, true, true, "SOFRELFEATURE");
-            bConditionOK = !bConditionOK ? vReturnEntities1.size() > 0 : bConditionOK;
-            if (bConditionOK) {
-              strCondition4 = ".";
-            } //Let it go thru if there are relators
-          }
-        }
-        if (strCondition4.trim().length() > 0) {
-          //Check for multiple AVAILS linked to SOF
-          vReturnEntities1 = searchEntityItemLink(eiSof, null, null, true, true, "SOFAVAIL");
-          //So get the AVAILS
-          vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "AVAIL");
-          if (vReturnEntities2.size() > 0) {
-            strCondition1 = getAllGeoTags(vReturnEntities2);
-            if (!strCondition1.equals(strCondition2)) {
-              if (!strCondition2.equals(strWorldwideTag)) {
-                if (strCondition2.length() > 0) {
-                  println(".br;:hp2.<---" + strCondition2 + ":ehp2.");
-                }
-              }
-              if (!strCondition1.equals(strWorldwideTag)) {
-                println("");
-                println(":p.:hp2." + strCondition1 + "--->:ehp2.");
-              }
-              strCondition2 = strCondition1;
-            }
-            strMarketingMsg = getSOFMktName(eiSof);
-            logMessage("Marketing Msg :" + strMarketingMsg);
-            if (iCountInstances > 1 || bSofChildren) { //Print mkt msg if there is more than one instance
-              prettyPrint(strMarketingMsg, 69);
-              println(":p.");
-              println(":ul c.");
-            }
-            else {
-              println(":p.");
-              prettyPrint(strMarketingMsg, 69);
-            }
-            if (_bPrintCrossSell_UpSell && ! (strCrossSell_UpSell.equals(""))) {
-              strCondition4 = transformXML(getAttributeValue(eiSof, strCrossSell_UpSell, " "));
-              //strCondition4 = transformXML(getDownlinkedEntityAttrValue(eiSof, strEntityTypes, strCrossSell_UpSell, strQAttr, strQVal));
-              if (strCondition4.trim().length() > 0) {
-//                prettyPrint(":li." + strCondition4, 69);
-                prettyPrint(strCondition4, 69);
-              }
-            }
-
-            if (_bPrintCrossSell_UpSell) {
-
-              strEntityTypes = new String[] {
-                  "SOFRELSOF"};
-              vReturnEntities1 = searchEntityItemLink(eiSof, strQAttr, strQVal, true, true, "SOFRELSOF");
-              if (vReturnEntities1.size() > 0) {
-                for (j = 0; j < vReturnEntities1.size(); j++) {
-                  eiNextItem = (EntityItem) vReturnEntities1.elementAt(j);
-                  eiNextItem1 = (EntityItem) eiNextItem.getDownLink(0); //GET THE SOF
-                  strCondition4 = getSOFMktName(eiNextItem1);
-                  logMessage("0) Child Marketing Msg for SOFRELSOF" + eiNextItem.getKey() + " Downlinked from " +
-                             eiSof.getKey() + " is " + strCondition4);
-                  //Print mkt msg if there is more than one offering instance and more than one Data Element
-                  if ( (iCountInstances > 1 || vReturnEntities1.size() > 1) && strCondition4.trim().length() > 0) {
-                    prettyPrint(":li." + strCondition4, 69);
-//                  println(":p.");
-                  }
-                  else {
-                    if (strCondition4.trim().length() > 0) {
-                      println(":p.");
-                      prettyPrint(strCondition4, 69);
-                    }
-                  }
-                }
-              }
-              else {
-                logMessage("0)  No Child Marketing Msg for SOFRELSOF" + eiSof.getKey());
-              }
-
-              strEntityTypes = new String[] {
-                  "SOFRELCMPNT"};
-              vReturnEntities1 = searchEntityItemLink(eiSof, strQAttr, strQVal, true, true, "SOFRELCMPNT");
-              if (vReturnEntities1.size() > 0) {
-                for (j = 0; j < vReturnEntities1.size(); j++) {
-                  eiNextItem = (EntityItem) vReturnEntities1.elementAt(j);
-                  eiNextItem1 = (EntityItem) eiNextItem.getDownLink(0); //Get the CMPNT
-                  strCondition4 = getCmptToSofMktMsg(eiNextItem1);
-                  logMessage("0)  Child Marketing Msg for SOFRELCMPNT" + eiNextItem.getKey() + " Downlinked from " +
-                             eiSof.getKey() + " is " + strCondition4);
-                  if ( (iCountInstances > 1 || vReturnEntities1.size() > 1) && strCondition4.trim().length() > 0) {
-                    prettyPrint(":li." + strCondition4, 69);
-//                  println(":p.");
-                  }
-                  else {
-                    if (strCondition4.trim().length() > 0) {
-                      println(":p.");
-                      prettyPrint(strCondition4, 69);
-                    }
-                  }
-                }
-              }
-              else {
-                logMessage("0)  No Child Marketing Msg for SOFRELCMPNT" + eiSof.getKey());
-              }
-
-              strEntityTypes = new String[] {
-                  "SOFRELFEATURE"};
-              vReturnEntities1 = searchEntityItemLink(eiSof, strQAttr, strQVal, true, true, "SOFRELFEATURE");
-              if (vReturnEntities1.size() > 0) {
-                for (j = 0; j < vReturnEntities1.size(); j++) {
-                  eiNextItem = (EntityItem) vReturnEntities1.elementAt(j);
-                  eiNextItem1 = (EntityItem) eiNextItem.getDownLink(0); //GET THE FEATURE
-                  strCondition4 = getfeatureToSofMktMsg(eiNextItem1);
-                  logMessage("0)  Child Marketing Msg for SOFRELFEATURE" + eiNextItem.getKey() + " Downlinked from " +
-                             eiSof.getKey() + " is " + strCondition4);
-                  //Print mkt msg if there is more than one offering instance and more than one Data Element
-                  if ( (iCountInstances > 1 || vReturnEntities1.size() > 1) && strCondition4.trim().length() > 0) {
-                    prettyPrint(":li." + strCondition4, 69);
-//                  println(":p.");
-                  }
-                  else {
-                    if (strCondition4.trim().length() > 0) {
-                      println(":p.");
-                      prettyPrint(strCondition4, 69);
-                    }
-                  }
-                }
-              }
-              else {
-                logMessage("0)  No Child Marketing Msg for SOFRELFEATURE" + eiSof.getKey());
-              }
-
-              if (iCountInstances > 1 || bSofChildren) {
-                println(":eul.");
-              }
-
-            }
-
-            if (_bPrintBenefit) {
-              strEntityTypes = new String[] {
-                  "SOFRELSOF"};
-              if (_bPrintCrossSell_UpSell) {
-                strCondition4 = transformXML(getDownlinkedEntityAttrValue(eiSof, strEntityTypes, "BENEFIT", strQAttr,
-                    strQVal));
-                if (strCondition4.trim().length() > 0) {
-                  prettyPrint("Benefit:" + strCondition4, 69);
-                }
-                strEntityTypes = new String[] {
-                    "SOFRELCMPNT"};
-                strCondition4 = transformXML(getDownlinkedEntityAttrValue(eiSof, strEntityTypes, "BENEFIT", strQAttr,
-                    strQVal));
-                if (strCondition4.trim().length() > 0) {
-                  prettyPrint("Benefit:" + strCondition4, 69);
-                }
-                strEntityTypes = new String[] {
-                    "SOFRELFEATURE"};
-                strCondition4 = transformXML(getDownlinkedEntityAttrValue(eiSof, strEntityTypes, "BENEFIT", strQAttr,
-                    strQVal));
-                if (strCondition4.trim().length() > 0) {
-                  prettyPrint("Benefit:" + strCondition4, 69);
-                }
-              }
-              else {
-                strCondition4 = transformXML(getDownlinkedEntityAttrValue(eiSof, strEntityTypes, "BENEFIT", strQAttr,
-                    strQVal));
-                if (strCondition4.trim().length() > 0) {
-                  prettyPrint("Benefit:" + strCondition4, 69);
-                }
-              }
-            }
-          }
-        }
-        else {
-          logMessage("No related rows found for " + eiSof.getKey());
-        }
-        println("");
-
-      }
-
-      if (strOFType.equals("CMPNT")) {
-        eiComponent = (EntityItem) vAllSortedOfferings.elementAt(i);
-        logMessage("after component" + eiComponent.getKey());
-
-        strEntityTypes = new String[] {
-            "CMPNTRELCMPNT"};
-        strCondition4 = ".";
-        if (_bPrintCrossSell_UpSell) {
-          strCondition4 = getAttributeValue(eiComponent, strCrossSell_UpSell, "");
-          logMessage("Value of " + strCrossSell_UpSell + " is |" + strCondition4 + "|");
-          if (strCondition4.trim().length() == 0) { //Check for related rows if the attribute is empty
-            logMessage("Checking for relators from " + eiComponent.getKey());
-            vReturnEntities1 = searchEntityItemLink(eiComponent, strQAttr, strQVal, true, true, "CMPNTRELSOF");
-            bConditionOK = vReturnEntities1.size() > 0;
-            vReturnEntities1 = searchEntityItemLink(eiComponent, strQAttr, strQVal, true, true, "CMPNTRELCMPNT");
-            bConditionOK = !bConditionOK ? vReturnEntities1.size() > 0 : bConditionOK;
-            vReturnEntities1 = searchEntityItemLink(eiComponent, strQAttr, strQVal, true, true, "CMPNTRELFEATURE");
-            bConditionOK = !bConditionOK ? vReturnEntities1.size() > 0 : bConditionOK;
-            if (bConditionOK) {
-              strCondition4 = ".";
-            } //Let it go thru if there are relators
-          }
-        }
-        else {
-          strCondition4 = getDownlinkedEntityAttrValue(eiComponent, strEntityTypes, "BENEFIT", strQAttr, strQVal);
-        }
-        if (strCondition4.trim().length() > 0) {
-          //Check for multiple AVAILS linked to Component
-          vReturnEntities1 = searchEntityItemLink(eiComponent, null, null, true, true, "CMPNTAVAIL");
-          //So get the AVAILS
-          vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "AVAIL");
-          if (vReturnEntities2.size() > 0) {
-            strCondition1 = getAllGeoTags(vReturnEntities2);
-            if (!strCondition1.equals(strCondition2)) {
-              if (!strCondition2.equals(strWorldwideTag)) {
-                if (strCondition2.length() > 0) {
-                  println(".br;:hp2.<---" + strCondition2 + ":ehp2.");
-                }
-              }
-              if (!strCondition1.equals(strWorldwideTag)) {
-                println("");
-                println(":p.:hp2." + strCondition1 + "--->:ehp2.");
-              }
-              strCondition2 = strCondition1;
-            }
-            strMarketingMsg = getCmptToSofMktMsg(eiComponent);
-            logMessage("1) Marketing Msg :" + strMarketingMsg);
-            if (iCountInstances > 1 || bComptChildren) {
-              prettyPrint(strMarketingMsg, 69);
-              println(":p.");
-              println(":ul c.");
-            }
-            else {
-              println(":p.");
-              prettyPrint(strMarketingMsg, 69);
-            }
-
-            if (_bPrintCrossSell_UpSell && ! (strCrossSell_UpSell.equals(""))) {
-              strCondition4 = transformXML(getAttributeValue(eiComponent, strCrossSell_UpSell, " "));
-              if (strCondition4.trim().length() > 0) {
-                //  println(":p.");
-                prettyPrint("       " + strCondition4, 69);
-              }
-            }
-            if (_bPrintCrossSell_UpSell) {
-              strEntityTypes = new String[] {
-                  "CMPNTRELCMPNT"};
-              vReturnEntities1 = searchEntityItemLink(eiComponent, strQAttr, strQVal, true, true, "CMPNTRELCMPNT");
-              if (vReturnEntities1.size() > 0) {
-                for (j = 0; j < vReturnEntities1.size(); j++) {
-                  eiNextItem = (EntityItem) vReturnEntities1.elementAt(j);
-                  eiNextItem1 = (EntityItem) eiNextItem.getDownLink(0); //Get the CMPNT
-                  strCondition4 = getCmptToSofMktMsg(eiNextItem1);
-                  logMessage("1)  Child Marketing Msg for CMPNTRELCMPNT" + eiNextItem.getKey() + " Downlinked from " +
-                             eiComponent.getKey() + " is " + strCondition4);
-                  //Print mkt msg if there is more than one offering instance and more than one Data Element
-                  if ( (iCountInstances > 1 || vReturnEntities1.size() > 1) && strCondition4.trim().length() > 0) {
-                    prettyPrint(":li." + strCondition4, 69);
-//                  println(":p.");
-                  }
-                  else {
-                    if (strCondition4.trim().length() > 0) {
-                      println(":p.");
-                      prettyPrint(strCondition4, 69);
-                    }
-                  }
-                }
-              }
-              else {
-                logMessage("1)  No Child Marketing Msg for CMPNTRELCMPNT" + eiComponent.getKey());
-              }
-
-              strEntityTypes = new String[] {
-                  "CMPNTRELFEATURE"};
-              vReturnEntities1 = searchEntityItemLink(eiComponent, strQAttr, strQVal, true, true, "CMPNTRELFEATURE");
-              if (vReturnEntities1.size() > 0) {
-                for (j = 0; j < vReturnEntities1.size(); j++) {
-                  eiNextItem = (EntityItem) vReturnEntities1.elementAt(j);
-                  eiNextItem1 = (EntityItem) eiNextItem.getDownLink(0); //GET THE FEATURE
-                  strCondition4 = getfeatureToSofMktMsg(eiNextItem1);
-                  logMessage("1)  Child Marketing Msg for CMPNTRELFEATURE" + eiNextItem.getKey() + " Downlinked from " +
-                             eiComponent.getKey() + " is " + strCondition4);
-                  //Print mkt msg if there is more than one offering instance and more than one Data Element
-                  if ( (iCountInstances > 1 || vReturnEntities1.size() > 1) && strCondition4.trim().length() > 0) {
-                    prettyPrint(":li." + strCondition4, 69);
-//                  println(":p.");
-                  }
-                  else {
-                    if (strCondition4.trim().length() > 0) {
-                      println(":p.");
-                      prettyPrint(strCondition4, 69);
-                    }
-                  }
-                }
-              }
-              else {
-                logMessage("1)  No Child Marketing Msg for CMPNTRELFEATURE" + eiComponent.getKey());
-              }
-
-              strEntityTypes = new String[] {
-                  "CMPNTRELSOF"};
-              vReturnEntities1 = searchEntityItemLink(eiComponent, strQAttr, strQVal, true, true, "CMPNTRELSOF");
-              if (vReturnEntities1.size() > 0) {
-                for (j = 0; j < vReturnEntities1.size(); j++) {
-                  eiNextItem = (EntityItem) vReturnEntities1.elementAt(j);
-                  logMessage("****1) " + eiNextItem.getKey());
-                  eiNextItem1 = (EntityItem) eiNextItem.getDownLink(0); //GET THE SOF
-                  logMessage("****1) Downlinked from CMPTRELSOF" + eiNextItem1.getKey());
-                  strCondition4 = getSOFMktName(eiNextItem1);
-                  logMessage("1)  Child Marketing Msg for CMPNTRELSOF" + eiNextItem.getKey() + " Downlinked from " +
-                             eiComponent.getKey() + " is " + strCondition4);
-                  //Print mkt msg if there is more than one offering instance and more than one Data Element
-                  if ( (iCountInstances > 1 || vReturnEntities1.size() > 1) && strCondition4.trim().length() > 0) {
-                    prettyPrint(":li." + strCondition4, 69);
-//                  println(":p.");
-                  }
-                  else {
-                    if (strCondition4.trim().length() > 0) {
-                      println(":p.");
-                      prettyPrint(strCondition4, 69);
-                    }
-                  }
-                }
-
-              }
-              else {
-                logMessage("1)  No Child Marketing Msg for CMPNTRELSOF" + eiComponent.getKey());
-              }
-              if (iCountInstances > 1 || bComptChildren) {
-                println(":eul.");
-              }
-
-            }
-
-            if (_bPrintBenefit) {
-              if (_bPrintCrossSell_UpSell) {
-                strEntityTypes = new String[] {
-                    "CMPNTRELCMPNT"};
-                strCondition4 = transformXML(getDownlinkedEntityAttrValue(eiComponent, strEntityTypes, "BENEFIT",
-                    strQAttr, strQVal));
-                logMessage("CMPNTRELCMPNT BENEFIT" + strCondition4);
-                if (strCondition4.trim().length() > 0) {
-                  prettyPrint("Benefit:" + strCondition4, 69);
-                }
-
-                strEntityTypes = new String[] {
-                    "CMPNTRELFEATURE"};
-                strCondition4 = transformXML(getDownlinkedEntityAttrValue(eiComponent, strEntityTypes, "BENEFIT",
-                    strQAttr, strQVal));
-                logMessage("CMPNTRELFEATURE BENEFIT" + strCondition4);
-                if (strCondition4.trim().length() > 0) {
-                  prettyPrint("Benefit:" + strCondition4, 69);
-                }
-
-                strEntityTypes = new String[] {
-                    "CMPNTRELSOF"};
-                strCondition4 = transformXML(getDownlinkedEntityAttrValue(eiComponent, strEntityTypes, "BENEFIT",
-                    strQAttr, strQVal));
-                logMessage("CMPNTRELSOF BENEFIT" + strCondition4);
-                if (strCondition4.trim().length() > 0) {
-                  prettyPrint("Benefit:" + strCondition4, 69);
-                }
-              }
-              else {
-                strEntityTypes = new String[] {
-                    "CMPNTRELCMPNT"};
-                strCondition4 = transformXML(getDownlinkedEntityAttrValue(eiComponent, strEntityTypes, "BENEFIT",
-                    strQAttr, strQVal));
-                if (strCondition4.trim().length() > 0) {
-                  prettyPrint("Benefit:" + strCondition4, 69);
-                }
-              }
-            }
-
-          }
-        }
-        else {
-          logMessage("No related rows found for " + eiComponent.getKey());
-        }
-        println("");
-
-      }
-
-      if (strOFType.equals("FEATURE")) {
-        eiFeature = (EntityItem) vAllSortedOfferings.elementAt(i);
-        logMessage("After feature " + eiFeature.getKey());
-        strEntityTypes = new String[] {
-            "FEATURERELFEATURE"};
-        if (_bPrintCrossSell_UpSell) {
-          strCondition4 = getAttributeValue(eiFeature, strCrossSell_UpSell, "");
-          if (strCondition4.trim().length() == 0) { //Check for related rows if the attribute is empty
-            vReturnEntities1 = searchEntityItemLink(eiFeature, strQAttr, strQVal, true, true, "FEATURERELSOF");
-            bConditionOK = vReturnEntities1.size() > 0;
-            vReturnEntities1 = searchEntityItemLink(eiFeature, strQAttr, strQVal, true, true, "FEATURERELCMPNT");
-            bConditionOK = !bConditionOK ? vReturnEntities1.size() > 0 : bConditionOK;
-            vReturnEntities1 = searchEntityItemLink(eiFeature, strQAttr, strQVal, true, true, "FEATURERELFEATURE");
-            bConditionOK = !bConditionOK ? vReturnEntities1.size() > 0 : bConditionOK;
-            if (bConditionOK) {
-              strCondition4 = ".";
-            } //Let it go thru if there are relators
-          }
-        }
-        else {
-          strCondition4 = getDownlinkedEntityAttrValue(eiFeature, strEntityTypes, "BENEFIT", strQAttr, strQVal);
-        }
-        if (strCondition4.trim().length() > 0) {
-
-          //Check for multiple AVAILS linked to Feature
-          vReturnEntities1 = searchEntityItemLink(eiFeature, null, null, true, true, "FEATUREAVAIL");
-          //So get the AVAILS
-          vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "AVAIL");
-          if (vReturnEntities2.size() > 0) {
-            strCondition1 = getAllGeoTags(vReturnEntities2);
-            if (!strCondition1.equals(strCondition2)) {
-              if (!strCondition2.equals(strWorldwideTag)) {
-                if (strCondition2.length() > 0) {
-                  println(".br;:hp2.<---" + strCondition2 + ":ehp2.");
-                }
-              }
-              if (!strCondition1.equals(strWorldwideTag)) {
-                println("");
-                println(":p.:hp2." + strCondition1 + "--->:ehp2.");
-              }
-              strCondition2 = strCondition1;
-            }
-            strMarketingMsg = getfeatureToSofMktMsg(eiFeature);
-            logMessage("2) Marketing Msg :" + strMarketingMsg);
-            if (iCountInstances > 1 || bFeatureChildren) {
-              prettyPrint(strMarketingMsg, 69);
-              println(":p.");
-              println(":ul c.");
-            }
-            else {
-              println(":p.");
-              prettyPrint(strMarketingMsg, 69);
-            }
-            if (_bPrintCrossSell_UpSell && ! (strCrossSell_UpSell.equals(""))) {
-              strCondition4 = transformXML(getAttributeValue(eiFeature, strCrossSell_UpSell, " "));
-              if (strCondition4.trim().length() > 0) {
-                //println(":p.");
-                prettyPrint("       " + strCondition4, 69);
-              }
-            }
-
-            if (_bPrintCrossSell_UpSell) {
-              strEntityTypes = new String[] {
-                  "FEATURERELFEATURE"};
-              vReturnEntities1 = searchEntityItemLink(eiFeature, strQAttr, strQVal, true, true, "FEATURERELFEATURE");
-              if (vReturnEntities1.size() > 0) {
-                for (j = 0; j < vReturnEntities1.size(); j++) {
-                  eiNextItem = (EntityItem) vReturnEntities1.elementAt(j);
-                  eiNextItem1 = (EntityItem) eiNextItem.getDownLink(0); //GET THE FEATURE
-                  strCondition4 = getfeatureToSofMktMsg(eiNextItem1);
-                  logMessage("2)  Child Marketing Msg for FEATURERELFEATURE" + eiNextItem.getKey() +
-                             " Downlinked from " + eiFeature.getKey() + " is " + strCondition4);
-                  if ( (iCountInstances > 1 || vReturnEntities1.size() > 1) && strCondition4.trim().length() > 0) {
-                    prettyPrint(":li." + strCondition4, 69);
-                    //println(":p.");
-                  }
-                  else {
-                    if (strCondition4.trim().length() > 0) {
-                      println(":p.");
-                      prettyPrint(strCondition4, 69);
-                    }
-                  }
-                }
-              }
-              else {
-                logMessage("2)  No Child Marketing Msg for FEATURERELFEATURE" + eiFeature.getKey());
-              }
-
-              strEntityTypes = new String[] {
-                  "FEATURERELCMPNT"};
-              vReturnEntities1 = searchEntityItemLink(eiFeature, strQAttr, strQVal, true, true, "FEATURERELCMPNT");
-              if (vReturnEntities1.size() > 0) {
-                for (j = 0; j < vReturnEntities1.size(); j++) {
-                  eiNextItem = (EntityItem) vReturnEntities1.elementAt(j);
-                  eiNextItem1 = (EntityItem) eiNextItem.getDownLink(0); //Get the CMPNT
-                  strCondition4 = getCmptToSofMktMsg(eiNextItem1);
-                  logMessage("2)  Child Marketing Msg for FEATURERELCMPNT" + eiNextItem.getKey() + " Downlinked from " +
-                             eiFeature.getKey() + " is " + strCondition4);
-                  if ( (iCountInstances > 1 || vReturnEntities1.size() > 1) && strCondition4.trim().length() > 0) {
-                    prettyPrint(":li." + strCondition4, 69);
-//                  println(":p.");
-                  }
-                  else {
-                    if (strCondition4.trim().length() > 0) {
-                      println("");
-                      prettyPrint(strCondition4, 69);
-                    }
-                  }
-                }
-              }
-              else {
-                logMessage("2)  No Child Marketing Msg for FEATURERELCMPNT" + eiFeature.getKey());
-              }
-
-              strEntityTypes = new String[] {
-                  "FEATURERELSOF"};
-              vReturnEntities1 = searchEntityItemLink(eiFeature, strQAttr, strQVal, true, true, "FEATURERELSOF");
-              if (vReturnEntities1.size() > 0) {
-                for (j = 0; j < vReturnEntities1.size(); j++) {
-                  eiNextItem = (EntityItem) vReturnEntities1.elementAt(j);
-                  eiNextItem1 = (EntityItem) eiNextItem.getDownLink(0); //GET THE SOF
-                  strCondition4 = getSOFMktName(eiNextItem1);
-                  logMessage("2)  Child Marketing Msg for FEATURERELSOF" + eiNextItem.getKey() + " Downlinked from " +
-                             eiFeature.getKey() + " is " + strCondition4);
-                  if ( (iCountInstances > 1 || vReturnEntities1.size() > 1) && strCondition4.trim().length() > 0) {
-                    prettyPrint(":li." + strCondition4, 69);
-//                  println(":p.");
-                  }
-                  else {
-                    if (strCondition4.trim().length() > 0) {
-                      println(":p.");
-                      prettyPrint(strCondition4, 69);
-                    }
-                  }
-                }
-              }
-              else {
-                logMessage("2)  No Child Marketing Msg for FEATURERELSOF" + eiFeature.getKey());
-              }
-              if (iCountInstances > 1 || bFeatureChildren) {
-                println(":eul.");
-              }
-
-            }
-
-            if (_bPrintBenefit) {
-              strEntityTypes = new String[] {
-                  "FEATURERELFEATURE"};
-              if (_bPrintCrossSell_UpSell) {
-                strCondition4 = transformXML(getDownlinkedEntityAttrValue(eiFeature, strEntityTypes, "BENEFIT",
-                    strQAttr, strQVal));
-                if (strCondition4.trim().length() > 0) {
-                  prettyPrint("Benefit:" + strCondition4, 69);
-                }
-
-                strEntityTypes = new String[] {
-                    "FEATURERELCMPNT"};
-                strCondition4 = transformXML(getDownlinkedEntityAttrValue(eiFeature, strEntityTypes, "BENEFIT",
-                    strQAttr, strQVal));
-                if (strCondition4.trim().length() > 0) {
-                  prettyPrint("Benefit:" + strCondition4, 69);
-                }
-
-                strEntityTypes = new String[] {
-                    "FEATURERELSOF"};
-                strCondition4 = transformXML(getDownlinkedEntityAttrValue(eiFeature, strEntityTypes, "BENEFIT",
-                    strQAttr, strQVal));
-                if (strCondition4.trim().length() > 0) {
-                  prettyPrint("Benefit:" + strCondition4, 69);
-                }
-              }
-              else {
-                strCondition4 = transformXML(getDownlinkedEntityAttrValue(eiFeature, strEntityTypes, "BENEFIT",
-                    strQAttr, strQVal));
-                if (strCondition4.trim().length() > 0) {
-                  prettyPrint("Benefit:" + strCondition4, 69);
-                }
-              }
-
-            }
-
-          }
-        }
-        else {
-          logMessage("No related rows found for " + eiFeature.getKey());
-        }
-        println("");
-      }
-
-    }
-    if (!strCondition2.equals(strWorldwideTag)) {
-      if (strCondition2.length() > 0) {
-        println(".br;:hp2.<---" + strCondition2 + ":ehp2.");
-      }
-    }
-  }
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _b  Description of the Parameter
-   */
-  private void printQ158(boolean _b) {
-    /*
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> SOFAVAIL (R) -> SOF (E) -> SOFCATINCL (R) -> CATINCL (E)
-         If SOFCATINCL (R) exist and CATALOGNAME = '321' (ibm.com) then answer 'Yes' otherwise or
-         ANNOUNCEMENT (E) -> ANNAVAILA (A) -> CMPNTAVAIL (R) -> CMPNT (E) -> (SOFCMPNT (R) -> SOF (E))
-         CMPNTCATINCL (R) -> CATINCL (E)
-     */
-    Vector vSofCats = new Vector();
-    Vector vCmptCats = new Vector();
-    Vector vFeatCats = new Vector();
-    bConditionOK = false;
-    vReturnEntities1 = searchEntityVectorLink(vSofFrmSofAvail, null, null, true, true, "SOFCATINCL");
-    strFilterAttr = new String[] {
-        "CATALOGNAME"};
-    strFilterValue = new String[] {
-        "321"};
-    vSofCats = searchEntityVectorLink(vReturnEntities1, strFilterAttr, strFilterValue, true, true, "CATINCL");
-
-    vReturnEntities1 = searchEntityVectorLink(vCmpntFrmCmpntAvail, null, null, true, true, "CMPNTCATINCL");
-    vCmptCats = searchEntityVectorLink(vReturnEntities1, strFilterAttr, strFilterValue, true, true, "CATINCL");
-
-    vReturnEntities1 = searchEntityVectorLink(vFeatureFrmFeatureAvail, null, null, true, true, "FEATURECATINCL");
-    vFeatCats = searchEntityVectorLink(vReturnEntities1, strFilterAttr, strFilterValue, true, true, "CATINCL");
-
-    strCondition4 = "";
-    strCondition2 = "";
-    boolean bSofDone = vSofCats.size() == 0;
-    boolean bCmptDone = vCmptCats.size() == 0;
-    boolean bFeatDone = vFeatCats.size() == 0;
-    boolean bAlldone = bSofDone && bCmptDone && bFeatDone;
-
-    //String strMarketingMsg = null;
-
-    //Hashtable hNoDupes = new Hashtable();
-
-    int iCountInstances = vSofCats.size();
-    iCountInstances += vCmptCats.size();
-    iCountInstances += vFeatCats.size();
-
-    logMessage("vSofCats" + vSofCats.size());
-    logMessage("vCmptCats" + vCmptCats.size());
-    logMessage("vFeatCats" + vFeatCats.size());
-
-    i = 0;
-    strFilterAttr = new String[] {
-        "AVAILTYPE"};
-    strFilterValue = new String[] {
-        "146"}; //Consider AVAILS OF type Planned Availability only 10/21
-    strCondition4 = "";
-    while (!bAlldone) { //get SOF, CMPT and FEATURE one after the other
-      logMessage("  printQ158:I is" + i);
-      if (!bSofDone) {
-        eiCatIncl = (EntityItem) vSofCats.elementAt(i);
-        strEntityTypes = new String[] {
-            "SOFCATINCL", "SOF"};
-        eiSof = getUplinkedEntityItem(eiCatIncl, strEntityTypes);
-        logMessage("after SOF" + eiSof.getKey());
-        //Check for multiple AVAILS linked to SOF
-        vReturnEntities1 = searchEntityItemLink(eiSof, null, null, true, true, "SOFAVAIL");
-        //So get the AVAILS
-        vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "AVAIL");
-        strCondition1 = getAllGeoTags(vReturnEntities2);
-
-        if (!strCondition1.equals(strCondition2)) {
-          if (!strCondition2.equals(strWorldwideTag)) {
-            if (strCondition2.length() > 0) {
-              println(".br;:hp2.<---" + strCondition2 + ":ehp2.");
-            }
-          }
-          if (!strCondition1.equals(strWorldwideTag)) {
-            println("");
-            println(":p.:hp2." + strCondition1 + "--->:ehp2.");
-          }
-          strCondition2 = strCondition1;
-        }
-        if (_b) {
-          strCondition4 = getSOFMktName(eiSof);
-          logMessage("printQ158:" + strCondition4);
-          prettyPrint(strCondition4, 69);
-        }
-        strCondition4 = transformXML(getAttributeValue(eiCatIncl, "CATALOGTAXONOMY", " "));
-        prettyPrint(":p.:hp2." + strCondition4 + ":ehp2.", 69);
-        println("");
-      }
-
-      if (!bCmptDone) {
-
-        eiCatIncl = (EntityItem) vCmptCats.elementAt(i);
-        strEntityTypes = new String[] {
-            "CMPNTCATINCL", "CMPNT"};
-        eiComponent = getUplinkedEntityItem(eiCatIncl, strEntityTypes);
-        logMessage("after component" + eiComponent.getKey());
-
-        //Check for multiple AVAILS linked to Component
-        vReturnEntities1 = searchEntityItemLink(eiComponent, null, null, true, true, "CMPNTAVAIL");
-        //So get the AVAILS
-        vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "AVAIL");
-        strCondition1 = getAllGeoTags(vReturnEntities2);
-        if (!strCondition1.equals(strCondition2)) {
-          if (!strCondition2.equals(strWorldwideTag)) {
-            if (strCondition2.length() > 0) {
-              println(".br;:hp2.<---" + strCondition2 + ":ehp2.");
-            }
-          }
-          if (!strCondition1.equals(strWorldwideTag)) {
-            println("");
-            println(":p.:hp2." + strCondition1 + "--->:ehp2.");
-          }
-          strCondition2 = strCondition1;
-        }
-        if (_b) {
-          strCondition4 = getCmptToSofMktMsg(eiComponent);
-          logMessage("printQ158:1:" + strCondition4);
-          prettyPrint(strCondition4, 69);
-        }
-        strCondition4 = transformXML(getAttributeValue(eiCatIncl, "CATALOGTAXONOMY", " "));
-        prettyPrint(":p.:hp2." + strCondition4 + ":ehp2.", 69);
-        println("");
-
-      }
-      if (!bFeatDone) {
-        eiCatIncl = (EntityItem) vFeatCats.elementAt(i);
-        strEntityTypes = new String[] {
-            "FEATURECATINCL", "FEATURE"};
-        eiFeature = getUplinkedEntityItem(eiCatIncl, strEntityTypes);
-        logMessage("After feature " + eiFeature.getKey());
-
-        //Check for multiple AVAILS linked to Feature
-        vReturnEntities1 = searchEntityItemLink(eiFeature, null, null, true, true, "FEATUREAVAIL");
-        //So get the AVAILS
-        vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "AVAIL");
-        strCondition1 = getAllGeoTags(vReturnEntities2);
-        if (!strCondition1.equals(strCondition2)) {
-          if (!strCondition2.equals(strWorldwideTag)) {
-            if (strCondition2.length() > 0) {
-              println(".br;:hp2.<---" + strCondition2 + ":ehp2.");
-            }
-          }
-          if (!strCondition1.equals(strWorldwideTag)) {
-            println("");
-            println(":p.:hp2." + strCondition1 + "--->:ehp2.");
-          }
-          strCondition2 = strCondition1;
-        }
-        if (_b) {
-          strCondition4 = getfeatureToSofMktMsg(eiFeature);
-          logMessage("printQ158:2:" + strCondition4);
-          prettyPrint(strCondition4, 69);
-        }
-        strCondition4 = transformXML(getAttributeValue(eiCatIncl, "CATALOGTAXONOMY", " "));
-        prettyPrint(":p.:hp2." + strCondition4 + ":ehp2.", 69);
-        println("");
-      }
-
-      if (bSofDone && bCmptDone && bFeatDone) {
-        bAlldone = true;
-      }
-
-      i++;
-      bSofDone = vSofCats.size() <= i;
-      bCmptDone = vCmptCats.size() <= i;
-      bFeatDone = vFeatCats.size() <= i;
-    }
-
-    if (!strCondition2.equals(strWorldwideTag)) {
-      if (strCondition2.length() > 0) {
-        println(".br;:hp2.<---" + strCondition2 + ":ehp2.");
-      }
-    }
-
-    println("");
-
-  }
-
-  /****
-   * Q153 The SOF Marketing Name (MKTGNAME) and OFIDNUMBER needs to be printed on ALL announcements
-   * whether or not the SOF has an AVAIL. The SOF Marketing Name (MKTGNAME) and OFIDNUMEBR needs only
-   * to be printed ONCE, eventhough it may have multiple CMPNT or FEATURES referencing it in any given announcement.
-   * MN29166812  data missing because of SOFAVAIL checks
-   */
-  private void printA153() {
-    String strSOFAttrCode = "OFIDNUMBER";
-
-    logMessage("printA153: entered vAllSortedOfferings " + vAllSortedOfferings.size());
-    displayContents(vAllSortedOfferings);
-
-    // vAllSortedOfferings is SOF that had SOFAVAIL, CMPNT that had CMPNTAVAIL and FEATURE that had FEATUREAVAIL
-    for (int i = 0; i < vAllSortedOfferings.size(); i++) { //get SOF, CMPT and FEATURE one after the other
-      String strMarketingMsg;
-      String strSOFidNum;
-      String strProjNum;
-      eiNextItem = (EntityItem) vAllSortedOfferings.elementAt(i);
-      logMessage("printA153: loop [" + i + "] " + eiNextItem.getKey());
-
-      if (eiNextItem.getEntityType().equals("SOF")) { // SOF had the AVAIL
-        eiSof = eiNextItem;
-        logMessage("printA153: in SOF " + eiSof.getKey());
-
-        //get the SOF mktmsg
-        strMarketingMsg = getSOFMktName(eiSof);
-        if (strMarketingMsg.trim().length() > 0) { //Marketing Msg found
-          logMessage("printA153: " + eiSof.getKey() + " Adding Marketing Msg :" + strMarketingMsg);
-          vPrintDetails.add(strMarketingMsg);
-
-          strSOFidNum = getAttributeValue(eiSof, strSOFAttrCode, " ");
-          logMessage("printA153: Adding " + strSOFAttrCode + " :" + strSOFidNum);
-          vPrintDetails.add(strSOFidNum);
-          // TIR 6QKKNN add autobahn project number
-          //Navigate to OFDEVLPROJ and get PROJNUMBER
-          strProjNum = " ";
-          vReturnEntities4 = searchEntityItemLink(eiSof, null, null, true, true, "SOFPRA");
-          logMessage("printA153: Number of SOFPRA links found =" + vReturnEntities4.size());
-          // Not Checking for link to AVAIL here since this is coming from entities derived from AVAIL
-          if (vReturnEntities4.size() > 0) {
-            // SOFPRA may be more than one.. future fix match ANNOUNCEMENT.ANNDATE to OFDEVLPROJ.ANNDATE
-            eiNextItem2 = (EntityItem) vReturnEntities4.elementAt(0); // SOFPRA association
-            eiNextItem3 = (EntityItem) eiNextItem2.getDownLink(0); //This will be the OFDEVLPROJ entity
-            strProjNum = getAttributeValue(eiNextItem3, "PROJNUMBER", "No Value" + eiNextItem3.getKey());
-          }
-
-          logMessage("printA153: Adding PROJNUMBER:" + strProjNum);
-          vPrintDetails.add(strProjNum);
-          // end TIR 6QKKNN
-        } // end marketing msg found
-        else {
-          logMessage("printA153: No Marketing Msg found. Skipping " + eiSof.getKey());
-        }
-      } // end SOF
-
-      if (eiNextItem.getEntityType().equals("CMPNT")) { // CMPNT had the AVAIL
-        eiComponent = (EntityItem) vAllSortedOfferings.elementAt(i);
-        logMessage("printA153 After component" + eiComponent.getKey());
-        eiSof = getUplinkedEntityItem(eiComponent, strCmptToSof);
-        if (eiSof != null) {
-          //get the SOF mktmsg
-          strMarketingMsg = getSOFMktName(eiSof);
-          if (strMarketingMsg.trim().length() > 0) {
-            // SOF does not need to have an AVAIL, the CMPNT has the AVAIL
-            logMessage("printA153 " + eiSof.getKey() + " for " + eiComponent.getKey() + " Adding Marketing Msg :" +
-                       strMarketingMsg);
-            vPrintDetails.add(strMarketingMsg);
-
-            strSOFidNum = getAttributeValue(eiSof, strSOFAttrCode, " ");
-            logMessage("printA153: Adding " + strSOFAttrCode + " :" + strSOFidNum);
-            vPrintDetails.add(strSOFidNum);
-
-            // TIR 6QKKNN add autobahn project number
-            vReturnEntities4 = searchEntityItemLink(eiSof, null, null, true, true, "SOFPRA");
-            logMessage("printA153 Number of SOFPRA links found =" + vReturnEntities4.size());
-
-            strProjNum = " ";
-            //Navigate to OFDEVLPROJ and get PROJNUMBER
-            if (vReturnEntities4.size() > 0) {
-              // SOFPRA may be more than one.. future fix match ANNOUNCEMENT.ANNDATE to OFDEVLPROJ.ANNDATE
-              eiNextItem2 = (EntityItem) vReturnEntities4.elementAt(0); // This will be the assoc
-              eiNextItem3 = (EntityItem) eiNextItem2.getDownLink(0); //This will be the OFDEVLPROJ entity
-              strProjNum = getAttributeValue(eiNextItem3, "PROJNUMBER", "No Value" + eiNextItem3.getKey());
-            }
-
-            logMessage("printA153 adding PROJNUMBER :" + strProjNum);
-            vPrintDetails.add(strProjNum);
-            // end TIR 6QKKNN
-          } // end marketing msg found
-          else {
-            logMessage("printA153 No Marketing msg found on " + eiSof.getKey() + " for " + eiComponent.getKey());
-          }
-        } // end SOF found for CMPNT
-        else {
-          logMessage("printA153 No SOF for " + eiComponent.getKey());
-        }
-      } // end CMPNT
-
-      if (eiNextItem.getEntityType().equals("FEATURE")) {
-        strFeatureToSof = new String[] {
-            "CMPNTFEATURE", "CMPNT", "SOFCMPNT", "SOF"};
-        eiFeature = (EntityItem) vAllSortedOfferings.elementAt(i);
-        logMessage("printA153 After feature" + eiFeature.getKey());
-        eiSof = getUplinkedEntityItem(eiFeature, strFeatureToSof);
-        if (eiSof != null) {
-          //get the SOF mktmsg
-          strMarketingMsg = getSOFMktName(eiSof);
-          if (strMarketingMsg.trim().length() > 0) {
-            // SOF does not need an AVAIL, FEATURE has it
-            logMessage("printA153 " + eiSof.getKey() + " for " + eiFeature.getKey() + " Adding Marketing Msg :" +
-                       strMarketingMsg);
-            vPrintDetails.add(strMarketingMsg);
-
-            strSOFidNum = getAttributeValue(eiSof, strSOFAttrCode, " ");
-            logMessage("printA153: Adding " + strSOFAttrCode + " :" + strSOFidNum);
-            vPrintDetails.add(strSOFidNum);
-
-            // TIR 6QKKNN add autobahn project number
-            vReturnEntities4 = searchEntityItemLink(eiSof, null, null, true, true, "SOFPRA");
-            logMessage("printA153 Number of SOFPRA links found =" + vReturnEntities4.size());
-
-            strProjNum = " ";
-            //Navigate to OFDEVLPROJ and get PROJNUMBER
-            if (vReturnEntities4.size() > 0) {
-              // SOFPRA may be more than one.. future fix match ANNOUNCEMENT.ANNDATE to OFDEVLPROJ.ANNDATE
-              eiNextItem2 = (EntityItem) vReturnEntities4.elementAt(0); // this is the assoc
-              eiNextItem3 = (EntityItem) eiNextItem2.getDownLink(0); //This will be the OFDEVLPROJ entity
-              strProjNum = getAttributeValue(eiNextItem3, "PROJNUMBER", "No Value" + eiNextItem3.getKey());
-            }
-
-            logMessage("printA153 adding PROJNUMBER :" + strProjNum);
-            vPrintDetails.add(strProjNum);
-            // end TIR 6QKKNN
-          } // end marketing msg found
-          else {
-            logMessage("printA153 No Marketing msg found on " + eiSof.getKey() + " for " + eiFeature.getKey());
-          }
-        } // end SOF found for FEATURE
-        else {
-          logMessage("printA153 No SOF found for " + eiFeature.getKey());
-        }
-      } // end FEATURE
-    } // end loop of SOF, CMPNT, FEATURE linked to AVAILs
-
-    if (vPrintDetails.size() > 0) {
-      for (int ky = 0; ky < vPrintDetails.size(); ky++) {
-        logMessage("printA153 Printvector :" + ky + ":" + (String) vPrintDetails.elementAt(ky));
-      }
-
-      println(":xmp.");
-      println(".kp off");
-      /*TIR 6QKKNN
-       Column Header - Line 1	Column Position 	 Length
-       Offering				1 - 8					8
-       Offering				47 - 54					8
-       Autobahn				56 - 63					8
-
-       Column Header  Line 2	Column Position 	 Length
-       Name					1 - 4					4
-       ID						47 - 48					2
-       Project Number			56 - 69					14
-       */
-      strHeader = new String[] {
-          "Name", "ID", "Number"};
-      iColWidths = new int[] {
-          47, 16, 10};
-      rfaReport.setSortColumns(new int[] {1});
-      rfaReport.setSortable(true);
-      println("                                                                 Autobahn");
-      println("Service/Offering                                Service/Offering Project");
-      printReport(true, strHeader, iColWidths, vPrintDetails);
-      println(":exmp.");
-      resetPrintvars();
-    }
-  }
-
- /* private void printInternalLetter(String _strSOFAttrCode) {
-    printInternalLetter(_strSOFAttrCode, false);
-  }*/
-
- /* private void printInternalLetter(String _strSOFAttrCode, boolean _bFromOffering) {
-    String strOFType = null;
-    logMessage("printInternalLetter:" + _strSOFAttrCode);
-    bConditionOK = vSofSortedbyMkt.size() > 0;
-    vReturnEntities1 = searchEntityVectorLink(vCmptSortedbyMkt, null, null, true, false, "SOFCMPNT");
-    displayContents(vReturnEntities1);
-    bConditionOK = !bConditionOK ? vReturnEntities1.size() > 0 : bConditionOK;
-
-    vReturnEntities1 = searchEntityVectorLink(vFeatureSortedbyMkt, null, null, true, false, "CMPNTFEATURE");
-    displayContents(vReturnEntities1);
-    vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, false, "CMPNT");
-    vReturnEntities1 = searchEntityVectorLink(vReturnEntities2, null, null, true, false, "SOFCMPNT");
-    displayContents(vReturnEntities1);
-    bConditionOK = !bConditionOK ? vReturnEntities1.size() > 0 : bConditionOK;
-    if (!bConditionOK) {
-      logMessage("No SOF links found for " + _strSOFAttrCode);
-      return;
-    }
-
-    strCondition4 = "";
-    strCondition2 = "";
-    strFeatureToSof = new String[] {
-        "CMPNTFEATURE", "CMPNT", "SOFCMPNT", "SOF"};
-    boolean bSofDone = vSofSortedbyMkt.size() == 0;
-    boolean bCmptDone = vCmptSortedbyMkt.size() == 0;
-    boolean bFeatDone = vFeatureSortedbyMkt.size() == 0;
-
-    //String strMarketingMsg = null;
-
-    int iCountInstances = vSofSortedbyMkt.size();
-    iCountInstances += vCmptSortedbyMkt.size();
-    iCountInstances += vFeatureSortedbyMkt.size();
-
-    logMessage("vSofSortedbyMkt" + vSofSortedbyMkt.size());
-    displayContents(vSofSortedbyMkt);
-    logMessage("vCmptSortedbyMkt" + vCmptSortedbyMkt.size());
-    displayContents(vCmptSortedbyMkt);
-    logMessage("vFeatureSortedbyMkt" + vFeatureSortedbyMkt.size());
-    displayContents(vFeatureSortedbyMkt);
-
-    if (_strSOFAttrCode != null) { //Check whether we have attr values to print
-      strParamList1 = new String[] {
-          _strSOFAttrCode};
-      printValueListInVector(vSofSortedbyMkt, strParamList1, " ", true, false);
-      bSofDone = vPrintDetails.size() == 0;
-      if (bSofDone) {
-        logMessage("No " + _strSOFAttrCode + " populated from the SOF...So no details printed from SOF");
-      }
-      resetPrintvars();
-
-      if (_bFromOffering) {
-        printValueListInVector(vCmptSortedbyMkt, strParamList1, " ", true, false);
-      }
-      else {
-        vReturnEntities1 = searchEntityVectorLink(vCmptSortedbyMkt, null, null, true, false, "SOFCMPNT");
-        vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, false, "SOF");
-        printValueListInVector(vReturnEntities2, strParamList1, " ", true, false);
-      }
-
-      bCmptDone = vPrintDetails.size() == 0;
-      if (bCmptDone) {
-        logMessage("No " + _strSOFAttrCode + " populated from the COMPONENTS...So no details printed from COMPONENTS");
-      }
-      resetPrintvars();
-      if (_bFromOffering) {
-        printValueListInVector(vFeatureSortedbyMkt, strParamList1, " ", true, false);
-      }
-      else {
-        vReturnEntities1 = searchEntityVectorLink(vFeatureSortedbyMkt, null, null, true, false, "CMPNTFEATURE");
-        vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, false, "CMPNT");
-        vReturnEntities1 = searchEntityVectorLink(vReturnEntities2, null, null, true, false, "SOFCMPNT");
-        vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, false, "SOF");
-        printValueListInVector(vReturnEntities2, strParamList1, " ", true, false);
-      }
-
-      bFeatDone = vPrintDetails.size() == 0;
-      if (bFeatDone) {
-        logMessage("No " + _strSOFAttrCode + " populated from the features...So no details printed from FEATURES");
-      }
-      resetPrintvars();
-    }
-    //boolean bAlldone = bSofDone && bCmptDone && bFeatDone;
-
-    i = 0;
-    for (i = 0; i < vAllSortedOfferings.size(); i++) { //get SOF, CMPT and FEATURE one after the other
-      logMessage("  printInternalLetter:I is " + i);
-      eiNextItem = (EntityItem) vAllSortedOfferings.elementAt(i);
-      strOFType = eiNextItem.getEntityType();
-      if (strOFType.equals("SOF")) {
-        eiSof = (EntityItem) vAllSortedOfferings.elementAt(i);
-        logMessage("printInternalLetter After sof " + eiSof.getKey());
-
-        //get the SOF mktmsg
-        strCondition4 = getSOFMktName(eiSof);
-
-        logMessage("Marketing Msg :" + strCondition4);
-
-        if (strCondition4.trim().length() > 0) { //Marketing Msg found
-          //Check for multiple AVAILS linked to SOF
-          vReturnEntities1 = searchEntityItemLink(eiSof, null, null, true, true, "SOFAVAIL");
-          //So get the AVAILS
-          vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "AVAIL");
-          logMessage("vReturnEntities2 " + vReturnEntities2.size());
-          displayContents(vReturnEntities2);
-          if (vReturnEntities2.size() > 0) {
-            strCondition1 = getAllGeoTags(vReturnEntities2);
-            if (!strCondition1.equals(strCondition2)) { // GEO tags changed
-              if (_strSOFAttrCode == null) {
-                if (!strCondition2.equals(strWorldwideTag)) {
-                  if (strCondition2.length() > 0) {
-                    vPrintDetails.add("9999" + strCondition4 + BREAK_INDICATOR + ".br;:hp2.<---" + strCondition2 +
-                                      ":ehp2.");
-                  }
-                }
-                if (!strCondition1.equals(strWorldwideTag)) {
-                  if (strCondition1.length() > 0) {
-                    vPrintDetails.add("    " + strCondition4 + BREAK_INDICATOR + ":p.:hp2." + strCondition1 +
-                                      "--->:ehp2.");
-                  }
-                }
-                else {
-                  logMessage("Adding Marketing Msg :" + strCondition4);
-                  vPrintDetails.add(strCondition4);
-                }
-              }
-              else {
-                logMessage("Adding Marketing Msg :" + strCondition4);
-                vPrintDetails.add(strCondition4);
-              }
-
-              strCondition2 = strCondition1;
-            }
-            else { // GEOs match, always need this mktmsg  MN29121594
-              logMessage("GEOs didn't change, Adding Marketing Msg :" + strCondition4);
-              vPrintDetails.add(strCondition4);
-            }
-
-            if (_strSOFAttrCode != null) {
-              strCondition4 = getAttributeValue(eiSof, _strSOFAttrCode, " ");
-              logMessage(_strSOFAttrCode + " :" + strCondition4);
-              vPrintDetails.add(strCondition4);
-              // TIR 6QKKNN add autobahn project number
-              //Navigate to OFDEVLPROJ and get PROJNUMBER
-              strCondition3 = " ";
-              vReturnEntities4 = searchEntityItemLink(eiSof, null, null, true, true, "SOFPRA");
-              logMessage("Number of SOFPRA links found =" + vReturnEntities4.size());
-              // Not Checking for link to AVAIL here since this is coming from entities derived from AVAIL
-              if (vReturnEntities4.size() > 0) {
-                eiNextItem2 = (EntityItem) vReturnEntities4.elementAt(0); // SOFPRA association
-                eiNextItem3 = (EntityItem) eiNextItem2.getDownLink(0); //This will be the OFDEVLPROJ entity
-                strCondition3 = getAttributeValue(eiNextItem3, "PROJNUMBER", "No Value" + eiNextItem3.getKey());
-              }
-
-              vPrintDetails.add(strCondition3);
-              // end TIR 6QKKNN
-            }
-          } // end SOFAVAILs found
-        }
-        else {
-          logMessage("No related rows found for " + eiSof.getKey());
-        }
-
-      }
-
-      if (strOFType.equals("CMPNT")) {
-        eiComponent = (EntityItem) vAllSortedOfferings.elementAt(i);
-        logMessage("printInternalLetter After component" + eiComponent.getKey());
-        eiSof = getUplinkedEntityItem(eiComponent, strCmptToSof);
-        if (eiSof != null) {
-          //get the SOF mktmsg
-          strCondition4 = getSOFMktName(eiSof);
-          logMessage("Marketing Msg :" + strCondition4);
-          if (strCondition4.trim().length() > 0) {
-            //Check for multiple AVAILS linked to SOF
-            vReturnEntities1 = searchEntityItemLink(eiSof, null, null, true, true, "SOFAVAIL");
-            //So get the AVAILS
-            vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "AVAIL");
-            if (vReturnEntities2.size() > 0) {
-              strCondition1 = getAllGeoTags(vReturnEntities2);
-              if (!strCondition1.equals(strCondition2)) {
-                if (_strSOFAttrCode == null) {
-                  if (!strCondition2.equals(strWorldwideTag)) {
-                    if (strCondition2.length() > 0) {
-                      vPrintDetails.add("9999" + strCondition4 + BREAK_INDICATOR + ".br;:hp2.<---" + strCondition2 +
-                                        ":ehp2.");
-                    }
-                  }
-                  if (!strCondition1.equals(strWorldwideTag)) {
-                    vPrintDetails.add("    " + strCondition4 + BREAK_INDICATOR + ":p.:hp2." + strCondition1 +
-                                      "--->:ehp2.");
-                  }
-                  else {
-                    logMessage("Adding Marketing Msg :" + strCondition4);
-                    vPrintDetails.add(strCondition4);
-                  }
-                }
-                else {
-                  logMessage("Adding Marketing Msg :" + strCondition4);
-                  vPrintDetails.add(strCondition4);
-                }
-
-                strCondition2 = strCondition1;
-              }
-              else { // GEOs match, always need this mktmsg  MN29121594
-                logMessage("GEOs didn't change, Adding Marketing Msg :" + strCondition4);
-                vPrintDetails.add(strCondition4);
-              }
-            }
-            / * continuation of MN# 28837752 Q153 had no output because the vector didn't have 3 columns of data
-                Wendy	does the SOF need to have an AVAIL?
-                Tim Ragosta	the way I read in the spec it does not
-                Tim Ragosta	this the comment in the beginning of q153
-                Tim Ragosta	The SOF Marketing Name (MKTGNAME) and OFIDNUMBER needs to be printed on ALL
-             announcements whether or not the SOF has an AVAIL. The SOF Marketing Name (MKTGNAME) and
-             OFIDNUMBER needs only to be printed ONCE, even though it may have multiple CMPNT or
-             FEATURES referencing it in any given announcement.
-             * /
-            else { // need mktmsg in vector of details
-              logMessage("No SOFAVAIL, Adding Marketing Msg :" + strCondition4);
-              vPrintDetails.add(strCondition4);
-            }
-
-            if (_strSOFAttrCode != null) {
-              strCondition4 = getAttributeValue(eiSof, _strSOFAttrCode, " ");
-              logMessage(_strSOFAttrCode + " :" + strCondition4);
-              vPrintDetails.add(strCondition4);
-
-              // TIR 6QKKNN add autobahn project number
-              vReturnEntities4 = searchEntityItemLink(eiSof, null, null, true, true, "SOFPRA");
-              logMessage("Number of SOFPRA links found =" + vReturnEntities4.size());
-
-              strCondition3 = " ";
-              //Navigate to OFDEVLPROJ and get PROJNUMBER
-              if (vReturnEntities4.size() > 0) {
-                eiNextItem2 = (EntityItem) vReturnEntities4.elementAt(0); // This will be the assoc
-                eiNextItem3 = (EntityItem) eiNextItem2.getDownLink(0); //This will be the OFDEVLPROJ entity
-                strCondition3 = getAttributeValue(eiNextItem3, "PROJNUMBER", "No Value" + eiNextItem3.getKey());
-              }
-
-              logMessage("PROJNUMBER :" + strCondition3);
-              vPrintDetails.add(strCondition3);
-              // end TIR 6QKKNN
-            }
-          }
-          else {
-            logMessage("No related rows found for " + eiComponent.getKey());
-          }
-        }
-      }
-
-      if (strOFType.equals("FEATURE")) {
-        eiFeature = (EntityItem) vAllSortedOfferings.elementAt(i);
-        logMessage("printInternalLetter After feature" + eiFeature.getKey());
-        eiSof = getUplinkedEntityItem(eiFeature, strFeatureToSof);
-        logMessage("Uplinked sof from feature is :" + eiSof.getKey());
-        if (eiSof != null) {
-          //get the SOF mktmsg
-          strCondition4 = getSOFMktName(eiSof);
-          logMessage("Marketing Msg :" + strCondition4);
-
-          if (strCondition4.trim().length() > 0) {
-
-            //Check for multiple AVAILS linked to SOF
-            vReturnEntities1 = searchEntityItemLink(eiSof, null, null, true, true, "SOFAVAIL");
-            //So get the AVAILS
-            vReturnEntities2 = searchEntityVectorLink(vReturnEntities1, null, null, true, true, "AVAIL");
-            if (vReturnEntities2.size() > 0) {
-              strCondition1 = getAllGeoTags(vReturnEntities2);
-              if (!strCondition1.equals(strCondition2)) {
-                if (_strSOFAttrCode == null) {
-                  if (!strCondition2.equals(strWorldwideTag)) {
-                    if (strCondition2.length() > 0) {
-                      vPrintDetails.add("9999" + strCondition4 + BREAK_INDICATOR + ".br;:hp2.<---" + strCondition2 +
-                                        ":ehp2.");
-                    }
-                  }
-                  if (!strCondition1.equals(strWorldwideTag)) {
-                    vPrintDetails.add("    " + strCondition4 + BREAK_INDICATOR + ":p.:hp2." + strCondition1 +
-                                      "--->:ehp2.");
-                  }
-                  else {
-                    logMessage("Adding Marketing Msg :" + strCondition4);
-                    vPrintDetails.add(strCondition4);
-                  }
-                }
-                else {
-                  logMessage("Adding Marketing Msg :" + strCondition4);
-                  vPrintDetails.add(strCondition4);
-                }
-
-                strCondition2 = strCondition1;
-              }
-              else { // GEOs match, always need this mktmsg  MN29121594
-                logMessage("GEOs didn't change, Adding Marketing Msg :" + strCondition4);
-                vPrintDetails.add(strCondition4);
-              }
-
-              if (_strSOFAttrCode != null) {
-                strCondition4 = getAttributeValue(eiSof, _strSOFAttrCode, " ");
-                logMessage(_strSOFAttrCode + " :" + strCondition4);
-                vPrintDetails.add(strCondition4);
-
-                // TIR 6QKKNN add autobahn project number
-                vReturnEntities4 = searchEntityItemLink(eiSof, null, null, true, true, "SOFPRA");
-                logMessage("Number of SOFPRA links found =" + vReturnEntities4.size());
-
-                strCondition3 = " ";
-                //Navigate to OFDEVLPROJ and get PROJNUMBER
-                if (vReturnEntities4.size() > 0) {
-                  eiNextItem2 = (EntityItem) vReturnEntities4.elementAt(0); // this is the assoc
-                  eiNextItem3 = (EntityItem) eiNextItem2.getDownLink(0); //This will be the OFDEVLPROJ entity
-                  strCondition3 = getAttributeValue(eiNextItem3, "PROJNUMBER", "No Value" + eiNextItem3.getKey());
-                }
-
-                logMessage("PROJNUMBER :" + strCondition3);
-                vPrintDetails.add(strCondition3);
-                // end TIR 6QKKNN
-              }
-            }
-          }
-          else {
-            logMessage("No related rows found for " + eiFeature.getKey());
-          }
-        }
-      }
-
-    }
-    if (_strSOFAttrCode == null) {
-      if (!strCondition2.equals(strWorldwideTag)) {
-        if (strCondition2.trim().length() > 0) {
-          vPrintDetails.add("9999" + strCondition4 + BREAK_INDICATOR + ".br;:hp2.<---" + strCondition2 + ":ehp2.");
-        }
-      }
-    }
-    for (int ky = 0; ky < vPrintDetails.size(); ky++) {
-      logMessage("Printvector :" + ky + ":" + (String) vPrintDetails.elementAt(ky));
-    }
-    if (vPrintDetails.size() > 0) {
-      println(":xmp.");
-      println(".kp off");
-      if (_strSOFAttrCode != null) {
-//TIR 6QKKNN        strHeader = new String[] {"Offering Name", "Offering ID"};
-//TIR 6QKKNN        iColWidths = new int[] {56,11};
-        / *TIR 6QKKNN
-         Column Header - Line 1	Column Position 	 Length
-         Offering				1 - 8					8
-         Offering				47 - 54					8
-         Autobahn				56 - 63					8
-
-         Column Header  Line 2	Column Position 	 Length
-         Name					1 - 4					4
-         ID						47 - 48					2
-         Project Number			56 - 69					14
-         * /
-        strHeader = new String[] {
-            "Name", "ID", "Project Number"};
-        iColWidths = new int[] {
-            47, 9, 14};
-        rfaReport.setSortColumns(new int[] {1});
-        rfaReport.setSortable(true);
-        println("Offering	                                       Offering  Autobahn");
-        printReport(true, strHeader, iColWidths, vPrintDetails);
-      }
-      else {
-        iColWidths = new int[] {
-            56};
-        rfaReport.setSortColumns(new int[] {0});
-        rfaReport.setSortable(true);
-        printReport(false, null, iColWidths, vPrintDetails);
-      }
-      resetPrintvars();
-      println(":exmp.");
-    }
-  }*/
-
-  /**
-   *  Description of the Method
-   *
-   *@param  _eiFeature  Description of the Parameter
-   *@return             Description of the Return Value
-   */
-  private String getfeatureToSofMktMsg(EntityItem _eiFeature) {
-    String strReturn = "";
-    String strMktMsg = "";
-    if (_eiFeature == null) {
-      return "";
-    }
-    //first get Feature mktg msg
-    strReturn = getAttributeValue(_eiFeature, "MKTGNAME", " ");
-    logMessage("getfeatureToSofMktMsg:Feature :" + strReturn);
-    //Then Navigate to component and get Mkt message
-    eiNextItem1 = getUplinkedEntityItem(_eiFeature, strFeatureToCmpt);
-    strMktMsg = getAttributeValue(eiNextItem1, "MKTGNAME", " ");
-    logMessage("getfeatureToSofMktMsg:Component :" + strMktMsg);
-    strReturn = strMktMsg + " " + strReturn;
-    //Next Navigate to sof and get mkt msg
-    strMktMsg = "";
-    if (bIsAnnITS && eiNextItem1 != null) {
-      strMktMsg = getAttributeValue(eiNextItem1, "ITSCMPNTCATNAME", "");
-      logMessage("getfeatureToSofMktMsg:ITSCMPNTCATNAME is: " + strMktMsg);
-    }
-    if (strMktMsg.trim().length() == 0 && eiNextItem1 != null) {
-      strMktMsg = getUplinkedEntityAttrValue(eiNextItem1, strCmptToSof, "MKTGNAME");
-      logMessage("getfeatureToSofMktMsg:ITSCMPNTCATNAME is empty...getting SOF MTGNAME: " + strMktMsg);
-    }
-    logMessage("getfeatureToSofMktMsg:Sof :" + strMktMsg);
-    strReturn = strMktMsg + " " + strReturn;
-    return strReturn;
-  }
-
-  /**
-   *  Gets the cmptToSofMktMsg attribute of the RFA_IGSSVS object
-   *
-   *@param  _eiCmpt  Description of the Parameter
-   *@return          The cmptToSofMktMsg value
-   */
-  private String getCmptToSofMktMsg(EntityItem _eiCmpt) {
-    String strReturn = "";
-    String strMktMsg = "";
-    if (_eiCmpt == null) {
-      return "";
-    }
-    strReturn = getAttributeValue(_eiCmpt, "MKTGNAME", " ");
-    logMessage("getCmptToSofMktMsg:Component :" + strReturn);
-    //Next Navigate to sof and get mkt msg
-    if (bIsAnnITS) {
-      strMktMsg = getAttributeValue(_eiCmpt, "ITSCMPNTCATNAME", "");
-      logMessage("getCmptToSofMktMsg:ITSCMPNTCATNAME is: " + strMktMsg);
-    }
-    if (strMktMsg.trim().length() == 0) {
-      strMktMsg = getUplinkedEntityAttrValue(_eiCmpt, strCmptToSof, "MKTGNAME");
-      logMessage("getCmptToSofMktMsg:ITSCMPNTCATNAME is empty...getting SOF MTGNAME: " + strMktMsg);
-    }
-    logMessage("getCmptToSofMktMsg:Sof :" + strMktMsg);
-    strReturn = strMktMsg + " " + strReturn;
-    return strReturn;
-  }
-
-  private String getSOFMktName(EntityItem _eiSof) {
-    return getSOFMktName(_eiSof, true);
-  }
-
-  private String getSOFMktName(EntityItem _eiSof, boolean _bDownLinkToCMPNT) {
-    if (_eiSof == null) {
-      return "";
-    }
-    String strMktMsg = "";
-    if (bIsAnnITS && _bDownLinkToCMPNT) {
-      logMessage("getSOFMktName:Getting downlinked cmpt from " + _eiSof.getKey());
-      strMktMsg = getDownlinkedEntityAttrValue(_eiSof, strSofToCmpt, "ITSCMPNTCATNAME");
-      logMessage("getSOFMktName:ITSCMPNTCATNAME is: " + strMktMsg);
-    }
-    if (strMktMsg.trim().length() == 0 || !_bDownLinkToCMPNT) {
-      strMktMsg = getAttributeValue(_eiSof, "MKTGNAME", " ");
-      logMessage("getSOFMktName:ITSCMPNTCATNAME is empty...getting SOF MTGNAME: " + strMktMsg);
-    }
-    return strMktMsg;
-  }
-
-  private String getQ800SOFMktName(EntityItem _eiCmpnt, EntityItem _eiSof) {
-    /*
-        Alan Crudo - question 800 does not use any of the --REL-- relators
-        zzzzzzzzzzzzzz - what does it use?
-        Alan Crudo - it is based on the SOF -> CMPNT -> FEATURE ->
-        zzzzzzzzzzzzzz - right..but what is the relator type between them?
-        Alan Crudo - SOFCMPNT, CMPNTFEATURE
-        zzzzzzzzzzzzzz - ok
-        Alan Crudo - question 800 is working finem except for column 1 labeled OFFERING
-        zzzzzzzzzzzzzz - and offering code
-        zzzzzzzzzzzzzz - ok..I will change it just for those columns
-        Alan Crudo - yes, and that needs to come from the association
-        zzzzzzzzzzzzzz - ok
-        Alan Crudo - thanks
-
-       Multiple avail problem
-       Offerings currently sorted by name...and will print geos from multiple availablities
-       Since request to group by geos, will have to sort by geos...
-
-     */
-
-
-    if (_eiCmpnt == null) {
-      return "";
-    }
-    String strMktMsg = "";
-    if (bIsAnnITS) {
-      strMktMsg = getAttributeShortFlagDesc(_eiCmpnt, "ITSCMPNTCATNAME");
-      logMessage("getQ800SOFMktName ShortaName:ITSCMPNTCATNAME is: " + strMktMsg);
-      if (strMktMsg == null) {
-        strMktMsg = "";
-      }
-    }
-    if (strMktMsg.trim().length() == 0) {
-      strMktMsg = getAttributeValue(_eiSof, "MKTGNAME", " ");
-      logMessage("getQ800SOFMktName:ITSCMPNTCATNAME is empty...getting SOF MTGNAME: " + strMktMsg);
-    }
-    return strMktMsg;
-  }
-
-  private String getRFADateFormat(String _strDate) {
-    String strReturn = "";
-    if (_strDate.trim().length() == 0) {
-      return " ";
-    }
-    SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    SimpleDateFormat outputDateFormat = new SimpleDateFormat("MMMMMMMMM dd, yyyy"); //Spell out month in its entirety
-    try {
-      Date date = inputDateFormat.parse(_strDate);
-      strReturn = outputDateFormat.format(date);
-
-    }
-    catch (Exception ex) {
-      System.out.println(ex.getMessage());
-    }
-
-    return strReturn;
-
-  }
-
-  private Vector RFAsort(Vector _v) {
-    EntityItem[] eArray = getEntityArray(_v);
-    RFAsort(eArray);
-    return getEntityVector(eArray);
-  }
-
-  private void RFAsort(EntityItem[] _e) {
-    EntityItem eiTemp = null;
-    EntityItem eiTemp1 = null;
-    EntityItem eiTemp3 = null;
-    String str1 = null;
-    String str2 = null;
-    String str3 = null;
-    String str4 = null;
-    if (_e == null) {
-      return;
-    }
-
-    for (int i = _e.length; --i >= 0; ) {
-      boolean swapped = false;
-
-      for (int j = 0; j < i; j++) {
-        eiTemp = (EntityItem) _e[j];
-        eiTemp1 = (EntityItem) _e[j + 1];
-        str3 = eiTemp.getEntityType();
-        str4 = eiTemp.getEntityType();
-        // go get the strings to be compared
-        if (str3.equals("SOF")) {
-          str1 = getSOFMktName(eiTemp);
-        }
-        else if (str3.equals("CMPNT")) {
-          str1 = getCmptToSofMktMsg(eiTemp);
-        }
-        else if (str3.equals("FEATURE")) {
-          str1 = getfeatureToSofMktMsg(eiTemp);
-        }
-
-        if (str4.equals("SOF")) {
-          str2 = getSOFMktName(eiTemp1);
-        }
-        else if (str4.equals("CMPNT")) {
-          str2 = getCmptToSofMktMsg(eiTemp1);
-        }
-        else if (str4.equals("FEATURE")) {
-          str2 = getfeatureToSofMktMsg(eiTemp1);
-        }
-
-        logMessage("RFASort:Comparing:" + eiTemp.getKey() + ":" + str1 + ":with:" + eiTemp1.getKey() + ":" + str2);
-
-        if (str1.compareTo(str2) > 0) {
-          eiTemp3 = _e[j];
-          _e[j] = _e[j + 1];
-          _e[j + 1] = eiTemp3;
-          swapped = true;
-        }
-      }
-
-      if (!swapped) {
-        return;
-      }
-    }
-  }
-
-}

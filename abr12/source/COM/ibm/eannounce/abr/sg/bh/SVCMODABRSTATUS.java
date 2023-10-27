@@ -1,1734 +1,1740 @@
-//Licensed Materials -- Property of IBM
+/*      */ package COM.ibm.eannounce.abr.sg.bh;
+/*      */ 
+/*      */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*      */ import COM.ibm.eannounce.objects.EntityGroup;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.MetaFlag;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.sql.SQLException;
+/*      */ import java.util.ArrayList;
+/*      */ import java.util.HashSet;
+/*      */ import java.util.Hashtable;
+/*      */ import java.util.Set;
+/*      */ import java.util.Vector;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public class SVCMODABRSTATUS
+/*      */   extends DQABRSTATUS
+/*      */ {
+/*      */   private Vector svcmodAvailVct;
+/*      */   private Vector svcmodLOAvailVctE;
+/*      */   private Vector svcmodPlaAvailVctA;
+/*      */   private Vector svcmodFOAvailVctC;
+/*      */   private Vector svcmodEOSAvailVctG;
+/*      */   private Vector svcmodEOMAvailVctM;
+/*   87 */   private Hashtable svcmdlPlaAvailCtryTblA = null;
+/*   88 */   private Hashtable svcmdlFOAvailCtryTblC = null;
+/*   89 */   private Hashtable svcmdlLOAvailCtryTblE = null;
+/*   90 */   private Hashtable svcmdlEOSAvailCtryTblG = null;
+/*   91 */   private Vector mdlPlaAnnVct = new Vector();
+/*      */   
+/*   93 */   private String SVCSEOFO = null;
+/*   94 */   private String SVCSEOPA = null;
+/*   95 */   private String SVCSEOAD = null;
+/*   96 */   private String SVCMODFO = null;
+/*   97 */   private String SVCMODPA = null;
+/*   98 */   private String SVCMODAD = null;
+/*      */   
+/*  100 */   private static Set set = new HashSet();
+/*      */   
+/*      */   static {
+/*  103 */     set.add("MSWH");
+/*  104 */     set.add("MAIN");
+/*  105 */     set.add("CABL");
+/*  106 */     set.add("PMG");
+/*  107 */     set.add("MANL");
+/*  108 */     set.add("MATM");
+/*  109 */     set.add("PLA");
+/*  110 */     set.add("ALP");
+/*  111 */     set.add("CSW");
+/*  112 */     set.add("EDUC");
+/*  113 */     set.add("MNPM");
+/*  114 */     set.add("***");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private static final String OFERCONFIGTYPE_Configurable = "CNFIG";
+/*      */ 
+/*      */   
+/*      */   protected boolean isVEneeded(String paramString) {
+/*  123 */     return domainInList();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void completeNowR4RProcessing() throws SQLException, MiddlewareException, MiddlewareRequestException {
+/*  165 */     if (doR10processing()) {
+/*  166 */       doR4R_RFAProcessing("SVCMODAVAIL");
+/*      */     } else {
+/*  168 */       setFlagValue(this.m_elist.getProfile(), "ADSABRSTATUS", getRFRQueuedValue("ADSABRSTATUS"));
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void completeNowFinalProcessing() throws SQLException, MiddlewareException, MiddlewareRequestException {
+/*  188 */     if (doR10processing()) {
+/*  189 */       doFinal_RFAProcessing("SVCMODAVAIL");
+/*      */     } else {
+/*  191 */       setFlagValue(this.m_elist.getProfile(), "ADSABRSTATUS", getQueuedValue("ADSABRSTATUS"));
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void doFinal_RFAProcessing(String paramString) throws MiddlewareRequestException, MiddlewareException, SQLException {
+/*  214 */     EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*      */     
+/*  216 */     Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(entityItem, paramString, "AVAIL");
+/*      */     
+/*  218 */     for (byte b = 0; b < vector.size(); b++) {
+/*  219 */       EntityItem entityItem1 = vector.elementAt(b);
+/*  220 */       String str = PokUtils.getAttributeFlagValue(entityItem1, "AVAILANNTYPE");
+/*  221 */       if (str == null) {
+/*  222 */         str = "RFA";
+/*      */       }
+/*      */ 
+/*      */       
+/*  226 */       addDebug("doFinal_RFAProcessing: " + entityItem1.getKey() + " availAnntypeFlag " + str);
+/*      */ 
+/*      */       
+/*  229 */       if (statusIsFinal(entityItem1)) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/*  274 */         setSinceFirstFinal(entityItem, "ADSABRSTATUS");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  286 */     vector.clear();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void doDQChecking(EntityItem paramEntityItem, String paramString) throws Exception {
+/*  469 */     addHeading(2, paramEntityItem.getEntityGroup().getLongDescription() + " Checks:");
+/*      */     
+/*  471 */     int i = getCheck_W_E_E(paramString);
+/*      */     
+/*  473 */     checkPrftctr(paramEntityItem);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  478 */     checkCanNotBeEarlier(paramEntityItem, "WITHDRAWDATE", "ANNDATE", 4);
+/*      */ 
+/*      */ 
+/*      */     
+/*  482 */     int j = getCount("SVCMODTAXRELEVANCE");
+/*  483 */     if (j == 0) {
+/*      */ 
+/*      */       
+/*  486 */       this.args[0] = this.m_elist.getEntityGroup("TAXCATG").getLongDescription();
+/*  487 */       createMessage(getCheck_W_W_E(paramString), "MINIMUM_ERR", this.args);
+/*      */     } 
+/*      */ 
+/*      */     
+/*  491 */     j = getCount("SVCMODTAXGRP");
+/*  492 */     if (j == 0) {
+/*      */ 
+/*      */       
+/*  495 */       this.args[0] = this.m_elist.getEntityGroup("TAXGRP").getLongDescription();
+/*  496 */       createMessage(getCheck_W_W_E(paramString), "MINIMUM_ERR", this.args);
+/*      */     } 
+/*      */     
+/*  499 */     getAvails(paramEntityItem, paramString);
+/*      */     
+/*  501 */     checkAvails(paramEntityItem, paramString, i);
+/*      */     
+/*  503 */     checkConfig(paramEntityItem);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkConfig(EntityItem paramEntityItem) throws MiddlewareException, SQLException {
+/*  567 */     String str = PokUtils.getAttributeFlagValue(paramEntityItem, "OFERCONFIGTYPE");
+/*  568 */     addHeading(3, paramEntityItem.getEntityGroup().getLongDescription() + " " + 
+/*  569 */         PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "OFERCONFIGTYPE", "OFERCONFIGTYPE") + " checks:");
+/*      */ 
+/*      */     
+/*  572 */     int i = getCount("SVCMODCHRGCOMP");
+/*  573 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("CHRGCOMP");
+/*  574 */     addDebug("checkConfig " + paramEntityItem.getKey() + " oferconfigtype " + str);
+/*      */     
+/*  576 */     if ("CNFIG".equals(str)) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  589 */       for (byte b1 = 0; b1 < entityGroup.getEntityItemCount(); b1++) {
+/*  590 */         EntityItem entityItem = entityGroup.getEntityItem(b1);
+/*      */ 
+/*      */ 
+/*      */         
+/*  594 */         checkStatusVsDQ(entityItem, "STATUS", paramEntityItem, 4);
+/*      */       } 
+/*      */       
+/*  597 */       addHeading(3, this.m_elist.getEntityGroup("PRCPT").getLongDescription() + " checks:");
+/*      */ 
+/*      */       
+/*  600 */       Vector<EntityItem> vector1 = PokUtils.getAllLinkedEntities(entityGroup, "CHRGCOMPPRCPT", "PRCPT");
+/*  601 */       addDebug("checkConfig prcptVctQ " + vector1.size());
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  623 */       checkSVCMODAvails(paramEntityItem);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  636 */       checkSVCSEOAvails(paramEntityItem);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  652 */       checkFODates(paramEntityItem);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  664 */       for (byte b2 = 0; b2 < vector1.size(); b2++) {
+/*  665 */         EntityItem entityItem = vector1.elementAt(b2);
+/*  666 */         String str1 = checkCtryMismatch(entityItem, this.svcmdlPlaAvailCtryTblA, 4);
+/*  667 */         if (str1.length() > 0) {
+/*  668 */           addDebug(entityItem.getKey() + " COUNTRYLIST had extra [" + str1 + "]");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */           
+/*  677 */           this.args[0] = getLD_NDN(entityItem);
+/*  678 */           this.args[1] = PokUtils.getAttributeDescription(this.m_elist.getEntityGroup("AVAIL"), "COUNTRYLIST", "COUNTRYLIST");
+/*      */           
+/*  680 */           this.args[2] = this.m_elist.getEntityGroup("SVCMOD").getLongDescription() + " " + this.m_elist
+/*  681 */             .getEntityGroup("AVAIL").getLongDescription();
+/*  682 */           this.args[3] = PokUtils.getAttributeDescription(this.m_elist.getEntityGroup("AVAIL"), "COUNTRYLIST", "COUNTRYLIST");
+/*      */           
+/*  684 */           this.args[4] = str1;
+/*  685 */           createMessage(4, "INCLUDE_ERR2", this.args);
+/*      */         } 
+/*      */       } 
+/*      */ 
+/*      */       
+/*  690 */       addHeading(3, "Referenced " + paramEntityItem.getEntityGroup().getLongDescription() + " checks:");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  698 */       Vector<EntityItem> vector2 = PokUtils.getAllLinkedEntities(paramEntityItem, "SVCMODSVCMOD", "SVCMOD");
+/*  699 */       Vector vector = PokUtils.getAllLinkedEntities(vector2, "SVCMODAVAIL", "AVAIL");
+/*  700 */       Vector<EntityItem> vector3 = PokUtils.getEntitiesWithMatchedAttr(vector, "AVAILTYPE", "146");
+/*  701 */       addDebug("svcmodVctT " + vector2.size() + " availVctU " + vector.size() + " plaAvailVctU " + vector3
+/*  702 */           .size());
+/*  703 */       if (this.svcmdlPlaAvailCtryTblA.size() > 0 && vector3
+/*      */ 
+/*      */         
+/*  706 */         .size() > 0)
+/*      */       {
+/*  708 */         boolean bool = false;
+/*      */         
+/*      */         byte b;
+/*  711 */         label62: for (b = 0; b < vector3.size(); b++) {
+/*  712 */           EntityItem entityItem = vector3.elementAt(b);
+/*  713 */           addDebug("referenced svcmod plannedavail " + entityItem.getKey() + " COUNTRYLIST [" + 
+/*  714 */               PokUtils.getAttributeFlagValue(entityItem, "COUNTRYLIST") + "]");
+/*  715 */           EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)getAttrAndCheckLvl(entityItem, "COUNTRYLIST", 4);
+/*      */           
+/*  717 */           if (eANFlagAttribute != null && eANFlagAttribute.toString().length() > 0) {
+/*      */             
+/*  719 */             MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/*  720 */             for (byte b3 = 0; b3 < arrayOfMetaFlag.length; b3++) {
+/*  721 */               if (arrayOfMetaFlag[b3].isSelected() && 
+/*  722 */                 this.svcmdlPlaAvailCtryTblA.keySet().contains(arrayOfMetaFlag[b3].getFlagCode())) {
+/*  723 */                 bool = true;
+/*      */                 
+/*      */                 break label62;
+/*      */               } 
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*  730 */         if (!bool) {
+/*  731 */           for (b = 0; b < this.svcmodPlaAvailVctA.size(); b++) {
+/*  732 */             EntityItem entityItem = this.svcmodPlaAvailVctA.elementAt(b);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */             
+/*  741 */             addDebug(" nointersection root plannedavail " + entityItem.getKey());
+/*  742 */             for (byte b3 = 0; b3 < vector2.size(); b3++) {
+/*  743 */               EntityItem entityItem1 = vector2.elementAt(b3);
+/*  744 */               addDebug("nointersection referenced " + entityItem1.getKey());
+/*      */ 
+/*      */               
+/*  747 */               this.args[0] = getLD_NDN(entityItem);
+/*  748 */               this.args[1] = PokUtils.getAttributeDescription(entityItem.getEntityGroup(), "COUNTRYLIST", "COUNTRYLIST");
+/*      */               
+/*  750 */               this.args[2] = getLD_NDN(entityItem1);
+/*  751 */               this.args[3] = entityItem.getEntityGroup().getLongDescription();
+/*  752 */               this.args[4] = PokUtils.getAttributeDescription(entityItem.getEntityGroup(), "COUNTRYLIST", "COUNTRYLIST");
+/*      */               
+/*  754 */               createMessage(4, "INTERSECT_ERR", this.args);
+/*      */             
+/*      */             }
+/*      */ 
+/*      */           
+/*      */           }
+/*      */ 
+/*      */         
+/*      */         }
+/*      */       
+/*      */       }
+/*      */     
+/*      */     }
+/*      */     else {
+/*      */       
+/*  769 */       if (i != 0) {
+/*      */         
+/*  771 */         this.args[0] = getLD_Value(paramEntityItem, "OFERCONFIGTYPE");
+/*  772 */         this.args[1] = entityGroup.getLongDescription();
+/*  773 */         createMessage(4, "MUST_NOT_HAVE2_ERR", this.args);
+/*      */       } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  779 */       i = getCount("SVCMODSVCSEO");
+/*  780 */       if (i != 0) {
+/*      */         
+/*  782 */         this.args[0] = getLD_Value(paramEntityItem, "OFERCONFIGTYPE");
+/*  783 */         this.args[1] = this.m_elist.getEntityGroup("SVCSEO").getLongDescription();
+/*  784 */         createMessage(4, "MUST_NOT_HAVE2_ERR", this.args);
+/*      */       } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  790 */       i = getCount("SVCMODSVCSEOREF");
+/*  791 */       if (i != 0) {
+/*      */         
+/*  793 */         this.args[0] = getLD_Value(paramEntityItem, "OFERCONFIGTYPE");
+/*  794 */         this.args[1] = this.m_elist.getEntityGroup("SVCMODSVCSEOREF").getLongDescription() + " " + this.m_elist
+/*  795 */           .getEntityGroup("SVCSEO").getLongDescription();
+/*  796 */         createMessage(4, "MUST_NOT_HAVE2_ERR", this.args);
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkFODates(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/*  820 */     String str1 = null;
+/*  821 */     String str2 = null;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  826 */     if (this.SVCSEOFO != null) {
+/*  827 */       str1 = this.SVCSEOFO;
+/*  828 */     } else if (this.SVCSEOAD != null) {
+/*  829 */       str1 = this.SVCSEOAD;
+/*  830 */     } else if (this.SVCSEOPA != null) {
+/*  831 */       str1 = this.SVCSEOPA;
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  838 */     if (this.SVCMODFO != null) {
+/*  839 */       str2 = this.SVCMODFO;
+/*  840 */     } else if (this.SVCMODAD != null) {
+/*  841 */       str2 = this.SVCMODAD;
+/*  842 */     } else if (this.SVCMODPA != null) {
+/*  843 */       str2 = this.SVCMODPA;
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  852 */     if (str2 != null && str1 != null && 
+/*  853 */       str2.compareTo(str1) > 0) {
+/*  854 */       this.args[0] = paramEntityItem.getEntityGroup().getLongDescription();
+/*  855 */       this.args[1] = str2;
+/*  856 */       this.args[3] = str1;
+/*      */       
+/*  858 */       Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(paramEntityItem, "SVCMODSVCSEO", "SVCSEO");
+/*  859 */       for (byte b = 0; b < vector.size(); b++) {
+/*  860 */         EntityItem entityItem = vector.elementAt(b);
+/*  861 */         this.args[2] = getLD_NDN(entityItem);
+/*  862 */         createMessage(3, "FODATE_ERR", this.args);
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkSVCSEOAvails(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/*  883 */     Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(paramEntityItem, "SVCMODSVCSEO", "SVCSEO");
+/*  884 */     addDebug("svcseoVct " + vector.size());
+/*  885 */     for (byte b = 0; b < vector.size(); b++) {
+/*  886 */       EntityItem entityItem = vector.elementAt(b);
+/*  887 */       addHeading(3, getLD_NDN(entityItem) + " Planned Availability checks:");
+/*      */       
+/*  889 */       Vector vector1 = PokUtils.getAllLinkedEntities(entityItem, "SVCSEOAVAIL", "AVAIL");
+/*      */       
+/*  891 */       Vector<EntityItem> vector2 = PokUtils.getEntitiesWithMatchedAttr(vector1, "AVAILTYPE", "146");
+/*      */       
+/*  893 */       Vector<EntityItem> vector3 = PokUtils.getEntitiesWithMatchedAttr(vector1, "AVAILTYPE", "143");
+/*      */ 
+/*      */       
+/*  896 */       addDebug("svcseo " + entityItem.getKey() + " svcseoAvailVctW " + vector1.size() + " svcseoplaAvailVctX " + vector2
+/*  897 */           .size() + " svcseofoAvailVct " + vector3.size());
+/*      */       byte b1;
+/*  899 */       for (b1 = 0; b1 < vector2.size(); b1++) {
+/*  900 */         EntityItem entityItem1 = vector2.elementAt(b1);
+/*  901 */         String str = PokUtils.getAttributeValue(entityItem1, "EFFECTIVEDATE", "", null, false);
+/*      */         
+/*  903 */         if (this.SVCSEOPA == null) {
+/*  904 */           this.SVCSEOPA = str;
+/*      */         }
+/*  906 */         else if (this.SVCSEOPA.compareTo(str) > 0) {
+/*  907 */           this.SVCSEOPA = str;
+/*      */         } 
+/*      */ 
+/*      */         
+/*  911 */         Vector<EntityItem> vector4 = PokUtils.getAllLinkedEntities(entityItem1, "AVAILANNA", "ANNOUNCEMENT");
+/*  912 */         addDebug(entityItem1.getKey() + " annVct " + vector4.size());
+/*  913 */         for (byte b2 = 0; b2 < vector4.size(); b2++) {
+/*  914 */           EntityItem entityItem2 = vector4.elementAt(b2);
+/*  915 */           String str1 = getAttributeFlagEnabledValue(entityItem2, "ANNTYPE");
+/*  916 */           addDebug(entityItem2.getKey() + " type " + str1);
+/*      */           
+/*  918 */           if ("19".equals(str1)) {
+/*      */             
+/*  920 */             String str2 = PokUtils.getAttributeValue(entityItem2, "ANNDATE", "", null, false);
+/*  921 */             if (this.SVCSEOAD == null) {
+/*  922 */               this.SVCSEOAD = str2;
+/*      */             }
+/*  924 */             else if (this.SVCSEOAD.compareTo(str2) > 0) {
+/*      */ 
+/*      */               
+/*  927 */               this.SVCSEOAD = str2;
+/*      */             } 
+/*      */             
+/*  930 */             addDebug("svcseo pla avail ann " + entityItem2.getKey() + " annDate " + str2 + " SVCSEOAD " + this.SVCSEOAD);
+/*      */           } 
+/*      */         } 
+/*      */ 
+/*      */         
+/*  935 */         vector4.clear();
+/*      */       } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  941 */       for (b1 = 0; b1 < vector3.size(); b1++) {
+/*  942 */         EntityItem entityItem1 = vector3.elementAt(b1);
+/*  943 */         String str = PokUtils.getAttributeValue(entityItem1, "EFFECTIVEDATE", "", null, false);
+/*      */         
+/*  945 */         if (this.SVCSEOFO == null) {
+/*  946 */           this.SVCSEOFO = str;
+/*      */         }
+/*  948 */         else if (this.SVCSEOFO.compareTo(str) > 0) {
+/*  949 */           this.SVCSEOFO = str;
+/*      */         } 
+/*      */         
+/*  952 */         addDebug("svcseo fo avail " + entityItem1.getKey() + " effDate " + str + " SVCSEOFO " + this.SVCSEOFO);
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */     
+/*  957 */     if (this.SVCSEOFO == null) {
+/*  958 */       this.args[0] = "No Date";
+/*      */     } else {
+/*  960 */       this.args[0] = this.SVCSEOFO;
+/*      */     } 
+/*  962 */     this.args[1] = this.m_elist.getEntityGroup("SVCSEO").getLongDescription();
+/*  963 */     this.args[2] = "First Order date";
+/*      */     
+/*  965 */     addResourceMsg("VALUE_FND", this.args);
+/*      */     
+/*  967 */     if (this.SVCSEOPA == null) {
+/*  968 */       this.args[0] = "No Date";
+/*      */     } else {
+/*  970 */       this.args[0] = this.SVCSEOPA;
+/*      */     } 
+/*  972 */     this.args[1] = this.m_elist.getEntityGroup("SVCSEO").getLongDescription();
+/*  973 */     this.args[2] = "Planned Availability date";
+/*  974 */     addResourceMsg("VALUE_FND", this.args);
+/*      */ 
+/*      */     
+/*  977 */     if (this.SVCSEOAD == null) {
+/*  978 */       this.args[0] = "No Date";
+/*      */     } else {
+/*  980 */       this.args[0] = this.SVCSEOAD;
+/*      */     } 
+/*  982 */     this.args[1] = this.m_elist.getEntityGroup("SVCSEO").getLongDescription();
+/*  983 */     this.args[2] = "New Announcement date";
+/*  984 */     addResourceMsg("VALUE_FND", this.args);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkSVCMODAvails(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 1008 */     EntityGroup entityGroup1 = this.m_elist.getEntityGroup("PRCPT");
+/*      */ 
+/*      */     
+/* 1011 */     Vector vector = PokUtils.getAllLinkedEntities(paramEntityItem, "SVCMODAVAIL", "AVAIL");
+/*      */ 
+/*      */     
+/* 1014 */     Vector<EntityItem> vector1 = PokUtils.getEntitiesWithMatchedAttr(vector, "AVAILTYPE", "146");
+/*      */     
+/* 1016 */     Vector<EntityItem> vector2 = PokUtils.getEntitiesWithMatchedAttr(vector, "AVAILTYPE", "143");
+/*      */     
+/* 1018 */     ArrayList arrayList = getCountriesAsList(vector1, 4);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1024 */     addDebug("root availVctS " + vector.size() + " plaAvailVctR " + vector1.size() + " foAvailVct " + vector2
+/* 1025 */         .size() + " plaavailCtrys " + arrayList);
+/*      */ 
+/*      */ 
+/*      */     
+/* 1029 */     for (byte b1 = 0; b1 < vector1.size(); b1++) {
+/* 1030 */       EntityItem entityItem = vector1.elementAt(b1);
+/* 1031 */       String str = PokUtils.getAttributeValue(entityItem, "EFFECTIVEDATE", "", null, false);
+/*      */       
+/* 1033 */       if (this.SVCMODPA == null) {
+/* 1034 */         this.SVCMODPA = str;
+/*      */       }
+/* 1036 */       else if (this.SVCMODPA.compareTo(str) > 0) {
+/* 1037 */         this.SVCMODPA = str;
+/*      */       } 
+/*      */ 
+/*      */       
+/* 1041 */       addDebug("svcmod pla avail " + entityItem.getKey() + " effDate " + str + " SVCMODPA " + this.SVCMODPA);
+/*      */ 
+/*      */       
+/* 1044 */       Vector<EntityItem> vector3 = PokUtils.getAllLinkedEntities(entityItem, "AVAILANNA", "ANNOUNCEMENT");
+/* 1045 */       addDebug(entityItem.getKey() + " annVct " + vector3.size());
+/* 1046 */       for (byte b = 0; b < vector3.size(); b++) {
+/* 1047 */         EntityItem entityItem1 = vector3.elementAt(b);
+/* 1048 */         String str1 = getAttributeFlagEnabledValue(entityItem1, "ANNTYPE");
+/* 1049 */         addDebug(entityItem1.getKey() + " type " + str1);
+/*      */         
+/* 1051 */         if ("19".equals(str1)) {
+/*      */           
+/* 1053 */           String str2 = PokUtils.getAttributeValue(entityItem1, "ANNDATE", "", null, false);
+/* 1054 */           if (this.SVCMODAD == null) {
+/* 1055 */             this.SVCMODAD = str2;
+/*      */           }
+/* 1057 */           else if (this.SVCMODAD.compareTo(str2) > 0) {
+/*      */             
+/* 1059 */             this.SVCMODAD = str2;
+/*      */           } 
+/*      */           
+/* 1062 */           addDebug("svcmod pla avail ann " + entityItem1.getKey() + " annDate " + str2 + " SVCMODAD " + this.SVCMODAD);
+/*      */         } 
+/*      */       } 
+/*      */ 
+/*      */       
+/* 1067 */       vector3.clear();
+/*      */     } 
+/*      */ 
+/*      */     
+/* 1071 */     if (this.SVCMODPA == null) {
+/* 1072 */       this.args[0] = "No Date";
+/*      */     } else {
+/* 1074 */       this.args[0] = this.SVCMODPA;
+/*      */     } 
+/* 1076 */     this.args[1] = paramEntityItem.getEntityGroup().getLongDescription();
+/* 1077 */     this.args[2] = "Planned Availability date";
+/* 1078 */     addResourceMsg("VALUE_FND", this.args);
+/*      */     
+/* 1080 */     EntityGroup entityGroup2 = this.m_elist.getEntityGroup("CNTRYEFF");
+/* 1081 */     addHeading(3, entityGroup2.getLongDescription() + " and Planned Availability checks:");
+/*      */     byte b2;
+/* 1083 */     for (b2 = 0; b2 < entityGroup1.getEntityItemCount(); b2++) {
+/* 1084 */       EntityItem entityItem = entityGroup1.getEntityItem(b2);
+/* 1085 */       Vector<EntityItem> vector3 = PokUtils.getAllLinkedEntities(entityItem, "PRCPTCNTRYEFF", "CNTRYEFF");
+/* 1086 */       addDebug(" " + entityItem.getKey() + " cntryeffVct " + vector3.size());
+/* 1087 */       for (byte b = 0; b < vector3.size(); b++) {
+/* 1088 */         EntityItem entityItem1 = vector3.elementAt(b);
+/* 1089 */         String str = checkCtryMismatch(entityItem1, arrayList, 4);
+/* 1090 */         if (str.length() > 0) {
+/* 1091 */           addDebug(entityItem1.getKey() + " COUNTRYLIST had extra [" + str + "]");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */           
+/* 1101 */           this.args[0] = getLD_NDN(entityItem);
+/* 1102 */           this.args[1] = getLD_NDN(entityItem1);
+/*      */           
+/* 1104 */           this.args[2] = paramEntityItem.getEntityGroup().getLongDescription() + " " + this.m_elist
+/* 1105 */             .getEntityGroup("AVAIL").getLongDescription();
+/* 1106 */           this.args[3] = PokUtils.getAttributeDescription(entityGroup2, "COUNTRYLIST", "COUNTRYLIST");
+/* 1107 */           this.args[4] = str;
+/* 1108 */           createMessage(4, "INCLUDE_ERR2", this.args);
+/*      */         } 
+/*      */       } 
+/* 1111 */       vector3.clear();
+/*      */     } 
+/*      */ 
+/*      */     
+/* 1115 */     if (this.SVCMODAD == null) {
+/* 1116 */       this.args[0] = "No Date";
+/*      */     } else {
+/* 1118 */       this.args[0] = this.SVCMODAD;
+/*      */     } 
+/* 1120 */     this.args[1] = paramEntityItem.getEntityGroup().getLongDescription();
+/* 1121 */     this.args[2] = "New Announcement date";
+/* 1122 */     addResourceMsg("VALUE_FND", this.args);
+/*      */ 
+/*      */     
+/* 1125 */     for (b2 = 0; b2 < vector2.size(); b2++) {
+/* 1126 */       EntityItem entityItem = vector2.elementAt(b2);
+/* 1127 */       String str = PokUtils.getAttributeValue(entityItem, "EFFECTIVEDATE", "", null, false);
+/*      */       
+/* 1129 */       if (this.SVCMODFO == null) {
+/* 1130 */         this.SVCMODFO = str;
+/*      */       }
+/* 1132 */       else if (this.SVCMODFO.compareTo(str) > 0) {
+/* 1133 */         this.SVCMODFO = str;
+/*      */       } 
+/*      */       
+/* 1136 */       addDebug("svcmod fo avail " + entityItem.getKey() + " effDate " + str + " SVCMODFO " + this.SVCMODFO);
+/*      */     } 
+/*      */ 
+/*      */     
+/* 1140 */     if (this.SVCMODFO == null) {
+/* 1141 */       this.args[0] = "No Date";
+/*      */     } else {
+/* 1143 */       this.args[0] = this.SVCMODFO;
+/*      */     } 
+/* 1145 */     this.args[1] = paramEntityItem.getEntityGroup().getLongDescription();
+/* 1146 */     this.args[2] = "First Order date";
+/* 1147 */     addResourceMsg("VALUE_FND", this.args);
+/*      */ 
+/*      */     
+/* 1150 */     arrayList.clear();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void getAvails(EntityItem paramEntityItem, String paramString) throws MiddlewareException, SQLException {
+/* 1162 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("AVAIL");
+/* 1163 */     if (entityGroup == null) {
+/* 1164 */       throw new MiddlewareException("AVAIL is missing from extract for " + this.m_abri.getVEName());
+/*      */     }
+/*      */     
+/* 1167 */     addHeading(3, paramEntityItem.getEntityGroup().getLongDescription() + " Availability RFA checks:");
+/* 1168 */     checkAvailAnnType();
+/*      */ 
+/*      */     
+/* 1171 */     this.svcmodAvailVct = PokUtils.getAllLinkedEntities(paramEntityItem, "SVCMODAVAIL", "AVAIL");
+/*      */ 
+/*      */ 
+/*      */     
+/* 1175 */     this.svcmodPlaAvailVctA = PokUtils.getEntitiesWithMatchedAttr(this.svcmodAvailVct, "AVAILTYPE", "146");
+/*      */ 
+/*      */     
+/* 1178 */     this.svcmodFOAvailVctC = PokUtils.getEntitiesWithMatchedAttr(this.svcmodAvailVct, "AVAILTYPE", "143");
+/*      */ 
+/*      */     
+/* 1181 */     this.svcmodLOAvailVctE = PokUtils.getEntitiesWithMatchedAttr(this.svcmodAvailVct, "AVAILTYPE", "149");
+/*      */ 
+/*      */     
+/* 1184 */     this.svcmodEOSAvailVctG = PokUtils.getEntitiesWithMatchedAttr(this.svcmodAvailVct, "AVAILTYPE", "151");
+/*      */     
+/* 1186 */     this.svcmodEOMAvailVctM = PokUtils.getEntitiesWithMatchedAttr(this.svcmodAvailVct, "AVAILTYPE", "200");
+/* 1187 */     addDebug("getAvails SVCMODAVAIL svcmodPlaAvailVctA: " + this.svcmodPlaAvailVctA.size() + " svcmodFOAvailVctC: " + this.svcmodFOAvailVctC
+/* 1188 */         .size() + " svcmodLOAvailVctE: " + this.svcmodLOAvailVctE.size() + " svcmodEOSAvailVctG: " + this.svcmodEOSAvailVctG
+/* 1189 */         .size() + " svcmodEOMAvailVctM: " + this.svcmodEOMAvailVctM.size());
+/*      */     
+/* 1191 */     this.svcmdlPlaAvailCtryTblA = getAvailByCountry(this.svcmodPlaAvailVctA, getCheck_W_W_E(paramString));
+/* 1192 */     addDebug("getAvails SVCMODAVAIL svcmdlPlaAvailCtryTblA " + this.svcmdlPlaAvailCtryTblA.keySet());
+/*      */     
+/* 1194 */     this.svcmdlFOAvailCtryTblC = getAvailByCountry(this.svcmodFOAvailVctC, getCheck_W_W_E(paramString));
+/* 1195 */     addDebug("getAvails SVCMODAVAIL svcmdlFOAvailCtryTblC: " + this.svcmdlFOAvailCtryTblC.keySet());
+/*      */     
+/* 1197 */     this.svcmdlLOAvailCtryTblE = getAvailByCountry(this.svcmodLOAvailVctE, getCheck_W_W_E(paramString));
+/* 1198 */     addDebug("getAvails SVCMODAVAIL svcmdlLOAvailCtryTblE: " + this.svcmdlLOAvailCtryTblE.keySet());
+/*      */     
+/* 1200 */     this.svcmdlEOSAvailCtryTblG = getAvailByCountry(this.svcmodEOSAvailVctG, getCheck_W_W_E(paramString));
+/* 1201 */     addDebug("getAvails SVCMODAVAIL svcmdlEOSAvailCtryTblG: " + this.svcmdlEOSAvailCtryTblG.keySet());
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   public void dereference() {
+/* 1206 */     super.dereference();
+/*      */     
+/* 1208 */     this.SVCSEOFO = null;
+/* 1209 */     this.SVCSEOPA = null;
+/* 1210 */     this.SVCSEOAD = null;
+/* 1211 */     this.SVCMODFO = null;
+/* 1212 */     this.SVCMODPA = null;
+/* 1213 */     this.SVCMODAD = null;
+/*      */     
+/* 1215 */     this.mdlPlaAnnVct.clear();
+/* 1216 */     this.mdlPlaAnnVct = null;
+/* 1217 */     if (this.svcmodAvailVct != null) {
+/* 1218 */       this.svcmodAvailVct.clear();
+/* 1219 */       this.svcmodAvailVct = null;
+/*      */     } 
+/* 1221 */     if (this.svcmodLOAvailVctE != null) {
+/* 1222 */       this.svcmodLOAvailVctE.clear();
+/* 1223 */       this.svcmodLOAvailVctE = null;
+/*      */     } 
+/* 1225 */     if (this.svcmodPlaAvailVctA != null) {
+/* 1226 */       this.svcmodPlaAvailVctA.clear();
+/* 1227 */       this.svcmodPlaAvailVctA = null;
+/*      */     } 
+/* 1229 */     if (this.svcmodFOAvailVctC != null) {
+/* 1230 */       this.svcmodFOAvailVctC.clear();
+/* 1231 */       this.svcmodFOAvailVctC = null;
+/*      */     } 
+/* 1233 */     if (this.svcmodEOSAvailVctG != null) {
+/* 1234 */       this.svcmodEOSAvailVctG.clear();
+/* 1235 */       this.svcmodEOSAvailVctG = null;
+/*      */     } 
+/* 1237 */     if (this.svcmdlPlaAvailCtryTblA != null) {
+/* 1238 */       this.svcmdlPlaAvailCtryTblA.clear();
+/* 1239 */       this.svcmdlPlaAvailCtryTblA = null;
+/*      */     } 
+/* 1241 */     if (this.svcmdlFOAvailCtryTblC != null) {
+/* 1242 */       this.svcmdlFOAvailCtryTblC.clear();
+/* 1243 */       this.svcmdlFOAvailCtryTblC = null;
+/*      */     } 
+/* 1245 */     if (this.svcmdlLOAvailCtryTblE != null) {
+/* 1246 */       this.svcmdlLOAvailCtryTblE.clear();
+/* 1247 */       this.svcmdlLOAvailCtryTblE = null;
+/*      */     } 
+/* 1249 */     if (this.svcmdlEOSAvailCtryTblG != null) {
+/* 1250 */       this.svcmdlEOSAvailCtryTblG.clear();
+/* 1251 */       this.svcmdlEOSAvailCtryTblG = null;
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkPrftctr(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 1265 */     addHeading(3, paramEntityItem.getEntityGroup().getLongDescription() + " SVCMODTAXRELEVANCE Checks:");
+/* 1266 */     String str = PokUtils.getAttributeFlagValue(paramEntityItem, "PRFTCTR");
+/* 1267 */     if ("P4022".equals(str) || "P4016".equals(str)) {
+/* 1268 */       Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(paramEntityItem, "SVCMODTAXRELEVANCE", "TAXCATG");
+/* 1269 */       if (vector != null && !vector.isEmpty()) {
+/* 1270 */         for (byte b = 0; b < vector.size(); b++) {
+/* 1271 */           EntityItem entityItem = vector.get(b);
+/* 1272 */           String str1 = PokUtils.getAttributeFlagValue(entityItem, "TAXCNTRY");
+/* 1273 */           if ("1464".equals(str1)) {
+/* 1274 */             EntityItem entityItem1 = entityItem.getUpLink().get(0);
+/*      */             
+/* 1276 */             String str2 = PokUtils.getAttributeValue(entityItem1, "TAXCLS", "", "");
+/* 1277 */             if (!set.contains(str2)) {
+/* 1278 */               this.args[0] = getLD_NDN(entityItem1);
+/*      */ 
+/*      */               
+/* 1281 */               this.args[1] = "Tax Country Canada";
+/* 1282 */               addError("INVALID_VALUES_ERR", this.args);
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       }
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkAvails(EntityItem paramEntityItem, String paramString, int paramInt) throws SQLException, MiddlewareException {
+/* 1305 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("AVAIL");
+/*      */ 
+/*      */     
+/* 1308 */     addHeading(3, paramEntityItem.getEntityGroup().getLongDescription() + " " + entityGroup.getLongDescription() + " Planned Availability Checks:");
+/*      */     
+/* 1310 */     checkSvcmodPlaAvails(paramEntityItem, paramString);
+/*      */     
+/* 1312 */     addHeading(3, paramEntityItem.getEntityGroup().getLongDescription() + " " + entityGroup.getLongDescription() + " First Order Checks:");
+/*      */     
+/* 1314 */     checkSvcmodFOAvails(paramEntityItem, paramString);
+/*      */     
+/* 1316 */     addHeading(3, paramEntityItem.getEntityGroup().getLongDescription() + " " + entityGroup.getLongDescription() + " Last Order Checks:");
+/*      */     
+/* 1318 */     checkSvcmodLOAvails(paramEntityItem, paramString);
+/*      */     
+/* 1320 */     addHeading(3, paramEntityItem.getEntityGroup().getLongDescription() + " " + entityGroup.getLongDescription() + " End of Marketing Checks:");
+/*      */     
+/* 1322 */     checkSvcmodEOMAvails(paramEntityItem, paramString);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkSvcmodPlaAvails(EntityItem paramEntityItem, String paramString) throws SQLException, MiddlewareException {
+/* 1349 */     addDebug("checkSvcmodPlaAvails svcmodPlaAvailVctA " + this.svcmodPlaAvailVctA.size());
+/*      */ 
+/*      */ 
+/*      */     
+/* 1353 */     checkPlannedAvailsExist(this.svcmodPlaAvailVctA, getCheck_RW_RW_RE(paramString));
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1361 */     checkPlannedAvailsStatus(this.svcmodPlaAvailVctA, paramEntityItem, 3);
+/*      */     
+/* 1363 */     for (byte b = 0; b < this.svcmodPlaAvailVctA.size(); b++) {
+/* 1364 */       EntityItem entityItem = this.svcmodPlaAvailVctA.elementAt(b);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1370 */       checkCanNotBeEarlier(entityItem, "EFFECTIVEDATE", paramEntityItem, "ANNDATE", getCheck_W_E_E(paramString));
+/*      */ 
+/*      */ 
+/*      */       
+/* 1374 */       String str = PokUtils.getAttributeFlagValue(entityItem, "AVAILANNTYPE");
+/* 1375 */       addDebug("checkSvcmodPlaAvails " + entityItem.getKey() + " availAnntypeFlag " + str);
+/* 1376 */       if (str == null) {
+/* 1377 */         str = "RFA";
+/*      */       }
+/*      */       
+/* 1380 */       if ("RFA".equals(str)) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1392 */         Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(entityItem, "AVAILANNA", "ANNOUNCEMENT");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1398 */         for (byte b1 = 0; b1 < vector.size(); b1++) {
+/* 1399 */           EntityItem entityItem1 = vector.elementAt(b1);
+/* 1400 */           String str1 = PokUtils.getAttributeFlagValue(entityItem1, "ANNTYPE");
+/* 1401 */           addDebug("checkSvcmodPlaAvails " + entityItem1.getKey() + " anntypeFlag " + str1);
+/* 1402 */           if (!"19".equals(str1)) {
+/*      */             
+/* 1404 */             this.args[0] = getLD_NDN(entityItem);
+/* 1405 */             this.args[1] = getLD_NDN(entityItem1);
+/* 1406 */             createMessage(4, "MUST_NOT_BE_IN_ERR2", this.args);
+/*      */ 
+/*      */           
+/*      */           }
+/*      */           else {
+/*      */ 
+/*      */             
+/* 1413 */             checkCanNotBeEarlier(entityItem1, "ANNDATE", paramEntityItem, "ANNDATE", getCheck_W_W_E(paramString));
+/* 1414 */             this.mdlPlaAnnVct.add(entityItem1);
+/*      */           } 
+/*      */         } 
+/*      */         
+/* 1418 */         vector.clear();
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkSvcmodFOAvails(EntityItem paramEntityItem, String paramString) throws SQLException, MiddlewareException {
+/* 1446 */     addDebug("checkSvcmodFOAvails svcmodFOAvailVctC " + this.svcmodFOAvailVctC.size());
+/*      */     
+/* 1448 */     for (byte b = 0; b < this.svcmodFOAvailVctC.size(); b++) {
+/* 1449 */       EntityItem entityItem = this.svcmodFOAvailVctC.elementAt(b);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1455 */       checkCanNotBeEarlier(entityItem, "EFFECTIVEDATE", paramEntityItem, "ANNDATE", getCheck_W_W_E(paramString));
+/*      */       
+/* 1457 */       String str = PokUtils.getAttributeFlagValue(entityItem, "AVAILANNTYPE");
+/* 1458 */       addDebug("checkSvcmodFOAvails " + entityItem.getKey() + " availAnntypeFlag " + str);
+/* 1459 */       if (str == null) {
+/* 1460 */         str = "RFA";
+/*      */       }
+/*      */       
+/* 1463 */       if ("RFA".equals(str)) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1473 */         Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(entityItem, "AVAILANNA", "ANNOUNCEMENT");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1479 */         for (byte b1 = 0; b1 < vector.size(); b1++) {
+/* 1480 */           EntityItem entityItem1 = vector.elementAt(b1);
+/* 1481 */           String str1 = PokUtils.getAttributeFlagValue(entityItem1, "ANNTYPE");
+/* 1482 */           addDebug("checkSvcmodFOAvails " + entityItem1.getKey() + " anntypeFlag " + str1);
+/* 1483 */           if (!"19".equals(str1)) {
+/*      */             
+/* 1485 */             this.args[0] = getLD_NDN(entityItem);
+/* 1486 */             this.args[1] = getLD_NDN(entityItem1);
+/* 1487 */             createMessage(4, "MUST_NOT_BE_IN_ERR2", this.args);
+/*      */ 
+/*      */           
+/*      */           }
+/*      */           else {
+/*      */ 
+/*      */ 
+/*      */             
+/* 1495 */             checkCanNotBeEarlier(entityItem1, "ANNDATE", paramEntityItem, "ANNDATE", getCheck_W_W_E(paramString));
+/*      */           } 
+/*      */         } 
+/* 1498 */         vector.clear();
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkSvcmodLOAvails(EntityItem paramEntityItem, String paramString) throws SQLException, MiddlewareException {
+/* 1534 */     addDebug("checkSvcmodLOAvails svcmodLOAvailVctE " + this.svcmodLOAvailVctE.size());
+/*      */     
+/* 1536 */     for (byte b = 0; b < this.svcmodLOAvailVctE.size(); b++) {
+/* 1537 */       EntityItem entityItem = this.svcmodLOAvailVctE.elementAt(b);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1542 */       checkCanNotBeLater(entityItem, "EFFECTIVEDATE", paramEntityItem, "WTHDRWEFFCTVDATE", getCheck_W_W_E(paramString));
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1547 */       checkPlannedAvailForCtryExists(entityItem, this.svcmdlPlaAvailCtryTblA.keySet(), getCheck_W_W_E(paramString));
+/*      */       
+/* 1549 */       String str = PokUtils.getAttributeFlagValue(entityItem, "AVAILANNTYPE");
+/* 1550 */       addDebug("checkSvcmodLOAvails " + entityItem.getKey() + " availAnntypeFlag " + str);
+/* 1551 */       if (str == null) {
+/* 1552 */         str = "RFA";
+/*      */       }
+/*      */       
+/* 1555 */       if ("RFA".equals(str)) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1565 */         Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(entityItem, "AVAILANNA", "ANNOUNCEMENT");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1570 */         for (byte b1 = 0; b1 < vector.size(); b1++) {
+/* 1571 */           EntityItem entityItem1 = vector.elementAt(b1);
+/* 1572 */           String str1 = PokUtils.getAttributeFlagValue(entityItem1, "ANNTYPE");
+/* 1573 */           addDebug("checkSvcmodLOAvails " + entityItem1.getKey() + " anntypeFlag " + str1);
+/* 1574 */           if (!"14".equals(str1)) {
+/*      */             
+/* 1576 */             this.args[0] = getLD_NDN(entityItem);
+/* 1577 */             this.args[1] = getLD_NDN(entityItem1);
+/* 1578 */             createMessage(4, "MUST_NOT_BE_IN_ERR2", this.args);
+/*      */ 
+/*      */           
+/*      */           }
+/*      */           else {
+/*      */ 
+/*      */             
+/* 1585 */             checkCanNotBeLater(entityItem1, "ANNDATE", paramEntityItem, "WITHDRAWDATE", getCheck_W_W_E(paramString));
+/*      */           } 
+/*      */         } 
+/* 1588 */         vector.clear();
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkSvcmodEOMAvails(EntityItem paramEntityItem, String paramString) throws SQLException, MiddlewareException {
+/* 1619 */     addDebug("checkSvcmodEOMAvails svcmodEOMAvailVctM " + this.svcmodEOMAvailVctM.size());
+/* 1620 */     for (byte b = 0; b < this.svcmodEOMAvailVctM.size(); b++) {
+/* 1621 */       EntityItem entityItem = this.svcmodEOMAvailVctM.elementAt(b);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1626 */       checkCanNotBeLater(entityItem, "EFFECTIVEDATE", paramEntityItem, "WITHDRAWDATE", getCheck_W_W_E(paramString));
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1631 */       checkPlannedAvailForCtryExists(entityItem, this.svcmdlPlaAvailCtryTblA.keySet(), getCheck_W_W_E(paramString));
+/*      */       
+/* 1633 */       String str = PokUtils.getAttributeFlagValue(entityItem, "AVAILANNTYPE");
+/* 1634 */       addDebug("checkSvcmodEOMAvails " + entityItem.getKey() + " availAnntypeFlag " + str);
+/* 1635 */       if (str == null) {
+/* 1636 */         str = "RFA";
+/*      */       }
+/*      */       
+/* 1639 */       if ("RFA".equals(str)) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1647 */         Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(entityItem, "AVAILANNA", "ANNOUNCEMENT");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1652 */         for (byte b1 = 0; b1 < vector.size(); b1++) {
+/* 1653 */           EntityItem entityItem1 = vector.elementAt(b1);
+/* 1654 */           String str1 = PokUtils.getAttributeFlagValue(entityItem1, "ANNTYPE");
+/* 1655 */           addDebug("checkSvcmodEOMAvails " + entityItem1.getKey() + " anntypeFlag " + str1);
+/* 1656 */           if (!"14".equals(str1)) {
+/*      */             
+/* 1658 */             this.args[0] = getLD_NDN(entityItem);
+/* 1659 */             this.args[1] = getLD_NDN(entityItem1);
+/* 1660 */             createMessage(4, "MUST_NOT_BE_IN_ERR2", this.args);
+/*      */ 
+/*      */           
+/*      */           }
+/*      */           else {
+/*      */ 
+/*      */ 
+/*      */             
+/* 1668 */             checkCanNotBeLater(entityItem1, "ANNDATE", paramEntityItem, "WITHDRAWDATE", getCheck_W_W_E(paramString));
+/*      */           } 
+/*      */         } 
+/* 1671 */         vector.clear();
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected boolean updateDerivedData(EntityItem paramEntityItem) throws Exception {
+/* 1691 */     boolean bool = false;
+/*      */     
+/* 1693 */     String str = PokUtils.getAttributeValue(paramEntityItem, "WTHDRWEFFCTVDATE", "", "9999-12-31", false);
+/* 1694 */     addDebug("updateDerivedData wdDate: " + str + " now: " + getCurrentDate());
+/* 1695 */     if (getCurrentDate().compareTo(str) <= 0) {
+/* 1696 */       bool = execDerivedData(paramEntityItem);
+/*      */     }
+/* 1698 */     return bool;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected String getLCRFRWFName() {
+/* 1708 */     return "WFLCSVCMODRFR";
+/*      */   }
+/*      */   
+/*      */   protected String getLCFinalWFName() {
+/* 1712 */     return "WFLCSVCMODFINAL";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getDescription() {
+/* 1721 */     return "SVCMOD ABR.";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getABRVersion() {
+/* 1732 */     return "1.12";
+/*      */   }
+/*      */ }
 
-//(C) Copyright IBM Corp. 2009,2011  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
 
-package COM.ibm.eannounce.abr.sg.bh;
-
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
-
-import com.ibm.transform.oim.eacm.util.*;
-
-import java.sql.SQLException;
-import java.util.*;
-
-/*****************
- * BH FS ABR Data Quality 20111020e.xls BH Defect 67890 (support for old data)
- * sets changes from BH FS ABR Catalog Attr Derivation 20110221b.doc need
- * updated DQVESVCMOD
- * 
- * From "BH FS ABR Data Quality 20101220.doc" DQVESVCMOD VE updates need meta
- * and actions for SVCMODMM and SVCMODFB how to nav to SVCSEO from SVCMOD (not
- * the ref one), cant find it now - trying to test SVCSEOAD.. this must have
- * been there before?
- * 
- * 
- * From "BH FS ABR Data Quality 20100823.doc"
- * 
- * DQVESVCMOD VE updates for SVCMODCHRGCOMP-d SVCMODSVCSEO-d
- * 
- * XXX. SVCMOD
- * 
- * A. Checking
- * 
- * A SVCMOD always has Availability Dates (AVAIL EFFECTIVEDATE) and may have an
- * Announcement Date (ANNOUNCEMENT ANNDATE) which are checked against the
- * planning dates.
- * 
- * The dates on the IPSC Structure (IPSCSTRUCT) and its referenced Availability
- * (AVAIL) are checked to ensure that they are consistent with the Service Model
- * dates (either SVCMOD or AVAIL).
- * 
- * B. STATUS changed to Ready for Review
- * 
- * 1. Set ADSABRSTATUS = 0020 (Queued) C. STATUS changed to Final
- * 
- * 1. Set ADSABRSTATUS = 0020 (Queued) D. Status = Final
- * 
- * 1. Set ADSABRSTATUS = 0020 (Queued)
- * 
- * 
- * SVCMODABRSTATUS_class=COM.ibm.eannounce.abr.sg.bh.SVCMODABRSTATUS
- * SVCMODABRSTATUS_enabled=true SVCMODABRSTATUS_idler_class=A
- * SVCMODABRSTATUS_keepfile=true SVCMODABRSTATUS_report_type=DGTYPE01
- * SVCMODABRSTATUS_vename=DQVESVCMOD
- * SVCMODABRSTATUS_CAT1=RPTCLASS.SVCMODABRSTATUS SVCMODABRSTATUS_CAT2=
- * SVCMODABRSTATUS_CAT3=RPTSTATUS
- * SVCMODABRSTATUS_domains=0010,0020,0030,0040,0050,0150,0160,0170,0190,0200,0210,0220,0230,0240,0250,0260,0270,0280,0290,0300,0310,0320,0330,0340,0350,0360,0370,0520,530,540,SG,550,PDIV49,PDIV71,PPWRS,PRSSS,PSANMOHE,PSANMOLE,PSTGV,PSWIDLU,PSSDS,PSQS,550
- * 
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\bh\SVCMODABRSTATUS.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-// SVCMODABRSTATUS.java,v
-// Revision 1.12 2011/03/23 18:08:43 wendy
-// Add CATDATA support
-//
-// Revision 1.11 2011/01/06 13:51:44 wendy
-// BH FS ABR Data Quality 20110105 updates
-//
-// Revision 1.6 2010/01/21 22:13:40 wendy
-// update cmts
-
-// Revision 1.2 2010/01/11 19:31:56 wendy
-// Add postprocess method to support trigger of workflow action when STATUS is
-// updated
-
-// Revision 1.1 2009/11/11 13:40:06 wendy
-// SR 76 - OTC - Support pre-configured/configured/sw/services offerings
-
-public class SVCMODABRSTATUS extends DQABRSTATUS {
-	private Vector svcmodAvailVct;
-	private Vector svcmodLOAvailVctE;
-	private Vector svcmodPlaAvailVctA;
-	private Vector svcmodFOAvailVctC;
-	private Vector svcmodEOSAvailVctG;
-	private Vector svcmodEOMAvailVctM;
-	private Hashtable svcmdlPlaAvailCtryTblA = null;
-	private Hashtable svcmdlFOAvailCtryTblC = null;
-	private Hashtable svcmdlLOAvailCtryTblE = null;
-	private Hashtable svcmdlEOSAvailCtryTblG = null;
-	private Vector mdlPlaAnnVct = new Vector();
-
-	private String SVCSEOFO = null;
-	private String SVCSEOPA = null;
-	private String SVCSEOAD = null;
-	private String SVCMODFO = null;
-	private String SVCMODPA = null;
-	private String SVCMODAD = null;
-	
-	private static Set set = new HashSet();
-
-	static{
-		set.add("MSWH");
-		set.add("MAIN");
-		set.add("CABL");
-		set.add("PMG");
-		set.add("MANL");
-		set.add("MATM");
-		set.add("PLA");
-		set.add("ALP");
-		set.add("CSW");
-		set.add("EDUC");
-		set.add("MNPM");
-		set.add("***");
-	}
-	// OFERCONFIGTYPE CNFIG Configurable
-	private static final String OFERCONFIGTYPE_Configurable = "CNFIG";
-
-	/**********************************
-	 * must be in list of domains
-	 */
-	protected boolean isVEneeded(String statusFlag) {
-		return domainInList();
-	}
-
-	/*
-	 * 
-	 * 174.00 SVCMOD Root Entity 175.00 R0.5 SET SVCMOD ADSABRSTATUS &ADSFEEDRFR
-	 * &ADSFEED 176.00 R0.5 END 174 SVCMOD
-	 * 
-	 * 175.02 R1.0 IF SVCMOD STATUS = "Ready for Review" (0040) 175.04 R1.0 AND
-	 * SVCMOD LIFECYCLE = "Develop" (LF02) | "Plan" (LF01) 175.06 R1.0 AND
-	 * SVCMODAVAIL-d: AVAILANNA AVAIL STATUS = "Final" (0020) |
-	 * "Ready for Review" (0040) 175.08 R1.0 IF AVAIL AVAILANNTYPE = "RFA" (RFA)
-	 * 175.10 R1.0 IF ANNOUNCEMENT STATUS = "Final" (0020) | "Ready for Review"
-	 * (0040) 175.12 R1.0 SET SVCMOD ADSABRSTATUS &ADSFEEDRFR 175.14 R1.0 ELSE
-	 * 175.08 175.16 R1.0 SET SVCMOD ADSABRSTATUS &ADSFEEDRFR 175.17 R1.0 END
-	 * 175.10 175.18 R1.0 END 175.08 175.20 R1.0 END 175.02 175.22 R1.0 IF
-	 * SVCMOD STATUS = "Final" (0020) 175.24 R1.0 AND SVCMODAVAIL-d: AVAILANNA
-	 * AVAIL STATUS = "Final" (0020) 175.26 R1.0 IF AVAIL AVAILANNTYPE = "RFA"
-	 * (RFA) 175.28 R1.0 IF ANNOUNCEMENT STATUS = "Final" (0020) Delete
-	 * 2011-10-20 175.300 R1.0 IF ANNOUNCEMENT ANNTYPE = "New" (19) Delete
-	 * 2011-10-20 175.320 R1.0 SET ANNOUNCEMENT WWPRTABRSTATUS &ABRWAITODS2
-	 * Delete 2011-10-20 175.340 R1.0 END 175.300
-	 * 
-	 * 175.36 R1.0 SET SVCMOD ADSABRSTATUS &ADSFEED 136.13 R1.0 END 175.28
-	 * 175.38 R1.0 ELSE 175.26 175.40 R1.0 SET SVCMOD ADSABRSTATUS &ADSFEED
-	 * 175.41 R1.0 END 175.26 175.42 R1.0 END 175.22 176.00 END 174.00 SVCMOD
-	 * 
-	 */
-	/**********************************
-	 * complete abr processing after status moved to readyForReview; (status was
-	 * chgreq) B. Status changed to Ready for Review 175.02 R1.0 IF SVCMOD
-	 * STATUS = "Ready for Review" (0040) 175.04 R1.0 AND SVCMOD LIFECYCLE =
-	 * "Develop" (LF02) | "Plan" (LF01) 175.06 R1.0 AND SVCMODAVAIL-d: AVAILANNA
-	 * AVAIL STATUS = "Final" (0020) | "Ready for Review" (0040) 175.08 R1.0 IF
-	 * AVAIL AVAILANNTYPE = "RFA" (RFA) 175.10 R1.0 IF ANNOUNCEMENT STATUS =
-	 * "Final" (0020) | "Ready for Review" (0040) 175.12 R1.0 SET SVCMOD
-	 * ADSABRSTATUS &ADSFEEDRFR 175.14 R1.0 ELSE 175.08 175.16 R1.0 SET SVCMOD
-	 * ADSABRSTATUS &ADSFEEDRFR 175.17 R1.0 END 175.10 175.18 R1.0 END 175.08
-	 * 175.20 R1.0 END 175.02 Final processing.. 176.00 END 174.00 SVCMOD
-	 */
-	protected void completeNowR4RProcessing() throws java.sql.SQLException,
-			COM.ibm.opicmpdh.middleware.MiddlewareException, COM.ibm.opicmpdh.middleware.MiddlewareRequestException {
-		if (doR10processing()) {
-			doR4R_RFAProcessing("SVCMODAVAIL");
-		} else { // R0.5
-			setFlagValue(m_elist.getProfile(), "ADSABRSTATUS", getRFRQueuedValue("ADSABRSTATUS"));
-		}
-	}
-
-	/**********************************
-	 * complete abr processing after status moved to final; (status was r4r) C.
-	 * STATUS changed to Final RFR processing.. 175.22 R1.0 IF SVCMOD STATUS =
-	 * "Final" (0020) 175.24 R1.0 AND SVCMODAVAIL-d: AVAILANNA AVAIL STATUS =
-	 * "Final" (0020) 175.26 R1.0 IF AVAIL AVAILANNTYPE = "RFA" (RFA) 175.28
-	 * R1.0 IF ANNOUNCEMENT STATUS = "Final" (0020) Delete 2011-10-20 175.300
-	 * R1.0 IF ANNOUNCEMENT ANNTYPE = "New" (19) Delete 2011-10-20 175.320 R1.0
-	 * SET ANNOUNCEMENT WWPRTABRSTATUS &ABRWAITODS2 Delete 2011-10-20 175.340
-	 * R1.0 END 175.300
-	 * 
-	 * 175.36 R1.0 SET SVCMOD ADSABRSTATUS &ADSFEED 136.13 R1.0 END 175.28
-	 * 175.38 R1.0 ELSE 175.26 175.40 R1.0 SET SVCMOD ADSABRSTATUS &ADSFEED
-	 * 175.41 R1.0 END 175.26 175.42 R1.0 END 175.22 176.00 END 174.00 SVCMOD
-	 */
-	protected void completeNowFinalProcessing() throws java.sql.SQLException,
-			COM.ibm.opicmpdh.middleware.MiddlewareException, COM.ibm.opicmpdh.middleware.MiddlewareRequestException {
-		if (doR10processing()) {
-			doFinal_RFAProcessing("SVCMODAVAIL");
-		} else { // R0.5
-			setFlagValue(m_elist.getProfile(), "ADSABRSTATUS", getQueuedValue("ADSABRSTATUS"));
-		}
-	}
-
-	/**
-	 * used when entities are going to final and must check RFA 175.22 R1.0 IF
-	 * SVCMOD STATUS = "Final" (0020) 175.24 R1.0 AND SVCMODAVAIL-d: AVAILANNA
-	 * AVAIL STATUS = "Final" (0020) 175.26 R1.0 IF AVAIL AVAILANNTYPE = "RFA"
-	 * (RFA) 175.28 R1.0 IF ANNOUNCEMENT STATUS = "Final" (0020) Delete
-	 * 2011-10-20 175.300 R1.0 IF ANNOUNCEMENT ANNTYPE = "New" (19) Delete
-	 * 2011-10-20 175.320 R1.0 SET ANNOUNCEMENT WWPRTABRSTATUS &ABRWAITODS2
-	 * Delete 2011-10-20 175.340 R1.0 END 175.300 175.36 R1.0 SET SVCMOD
-	 * ADSABRSTATUS &ADSFEED 136.13 R1.0 END 175.28 175.38 R1.0 ELSE 175.26
-	 * 175.40 R1.0 SET SVCMOD ADSABRSTATUS &ADSFEED 175.41 R1.0 END 175.26
-	 * 175.42 R1.0 END 175.22
-	 * 
-	 * @param availRel
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws MiddlewareRequestException
-	 */
-	private void doFinal_RFAProcessing(String availRel)
-			throws MiddlewareRequestException, MiddlewareException, SQLException {
-		EntityItem mdlItem = m_elist.getParentEntityGroup().getEntityItem(0);
-		// Add 175.22 IF SVCMOD STATUS = "Final" (0020)
-		Vector availVct = PokUtils.getAllLinkedEntities(mdlItem, availRel, "AVAIL");
-
-		availloop: for (int ai = 0; ai < availVct.size(); ai++) {
-			EntityItem avail = (EntityItem) availVct.elementAt(ai);
-			String availAnntypeFlag = PokUtils.getAttributeFlagValue(avail, "AVAILANNTYPE");
-			if (availAnntypeFlag == null) {
-				availAnntypeFlag = AVAILANNTYPE_RFA; // if not set, default to
-														// RFA
-			}
-
-			addDebug("doFinal_RFAProcessing: " + avail.getKey() + " availAnntypeFlag " + availAnntypeFlag);
-			// Add 175.24 AND SVCMODAVAIL-d: AVAILANNA AVAIL STATUS = "Final"
-			// (0020)
-			if (statusIsFinal(avail)) {
-				// Add 175.26 IF AVAIL AVAILANNTYPE = "RFA" (RFA)
-				// if (AVAILANNTYPE_RFA.equals(availAnntypeFlag)){
-				// Vector annVct= PokUtils.getAllLinkedEntities(avail,
-				// "AVAILANNA", "ANNOUNCEMENT");
-				// for (int i=0; i<annVct.size(); i++){
-				// EntityItem annItem = (EntityItem)annVct.elementAt(i);
-				// //String anntype = getAttributeFlagEnabledValue(annItem,
-				// "ANNTYPE");
-				// addDebug("doFinal_RFAProcessing: "+annItem.getKey());//+"
-				// type "+anntype);
-				// // 175.28 IF ANNOUNCEMENT STATUS = "Final" (0020)
-				// if (statusIsFinal(annItem,"ANNSTATUS")){
-				// /*if(ANNTYPE_NEW.equals(anntype)){
-				// addDebug(annItem.getKey()+" is Final and New");
-				// //Delete 2011-10-20 175.30 IF ANNOUNCEMENT ANNTYPE = "New"
-				// (19)
-				// //Delete 2011-10-20 175.32 SET ANNOUNCEMENT WWPRTABRSTATUS
-				// &ABRWAITODS2
-				// setFlagValue(m_elist.getProfile(),"WWPRTABRSTATUS",
-				// getQueuedValueForItem(annItem,"WWPRTABRSTATUS"),annItem);
-				// }//Delete 2011-10-20 175.34 END 175.30
-				// */
-				//
-				// //175.36 SET SVCMOD ADSABRSTATUS &ADSFEED
-				// setFlagValue(m_elist.getProfile(),"ADSABRSTATUS",
-				// getQueuedValueForItem(mdlItem,"ADSABRSTATUS"),mdlItem);
-				// annVct.clear();
-				// break availloop;
-				// }
-				// }// end ann loop
-				// annVct.clear();
-				// //136.13 R1.0 END 175.28
-				// }else{ // not RFA
-				// 175.38 ELSE 175.26
-				// 175.40 SET SVCMOD ADSABRSTATUS &ADSFEED
-				// 20121210 Delete 175.260 IF AVAIL AVAILANNTYPE = "RFA" (RFA)
-				// 20121210 Delete 175.280 IF ANNOUNCEMENT ANNSTATUS = "Final"
-				// (0020)
-				// 20130904b Change Columns E, I, J, K 175.360 SetSinceFinal
-				// SVCMOD ADSABRSTATUS = "Passed" (0030) | "Passed Resend RFR"
-				// (XMLRFR) ADSABRSTATUS &ADSFEED
-				// 20130904b Add 175.370 SetSinceFinal SVCMOD ADSABRSTATUS <>
-				// "Passed" (0030) | "Passed Resend RFR" (XMLRFR) ADSABRSTATUS
-				// &ADSFEEDFINALFIRST
-				setSinceFirstFinal(mdlItem, "ADSABRSTATUS");
-				// 20121210 Delete 136.130 END 175.280
-				// 20121210 Delete 175.380 ELSE 175.260
-				// 20121210 Delete 175.400 SET SVCMOD ADSABRSTATUS &ADSFEED
-				// 20121210 Delete 175.410 END 175.260
-				// setFlagValue(m_elist.getProfile(),"ADSABRSTATUS",
-				// getQueuedValueForItem(mdlItem,"ADSABRSTATUS"),mdlItem);
-				break availloop;
-				// 175.41 END 175.26
-				// } // end not RFA
-			} // end avail.status=final
-		} // end avail loop
-		availVct.clear();
-		// Add 175.42 END 175.22
-	}
-
-	/**********************************
-	 * Note the ABR is only called when DATAQUALITY transitions from 'Draft to
-	 * Ready for Review', 'Change Request to Ready for Review' and from 'Ready
-	 * for Review to Final'
-	 * 
-	 * 
-	 * A. Checking
-	 * 
-	 * checks from ss: 1.00 SVCMOD Root 2.00 ANNDATE 3.00 WITHDRAWDATE => SVCMOD
-	 * ANNDATE E E E {LD: WITHDRAWDATE} {WITHDRAWDATE} can not be earlier than
-	 * {LD: ANNDATE} {ANNDATE} 4.00 AVAIL SVCMODAVAIL-d 5.00 WHEN A AVAILTYPE =
-	 * "Planned Availability" 6.00 Count of => 1 RW RW RE must have at least one
-	 * "Planned Availability" 7.00 EFFECTIVEDATE => SVCMOD ANNDATE W E E {LD:
-	 * AVAIL} {NDN: AVAIL} can not be earlier than the {LD: SVCMODEL} {LD:
-	 * ANNDATE} {ANNDATE} 8.00 COUNTRYLIST 9.00 ANNOUNCEMENT B A: + AVAILANNA-d
-	 * 10.00 WHEN "RFA" (RFA) <> A: AVAIL AVAILANNTYPE 11.00 Count of = 0 E E E
-	 * {LD: AVAIL} {NDN: A:AVAIL} must not be in {LD: ANNOUNCEMENT} {NDN:
-	 * ANNOUNCEMENT} 12.00 END 10.00 13.00 IF ANNTYPE <> New (19) 14.00 Count of
-	 * = 0 E E E {LD: AVAIL} {NDN: A:AVAIL} must not be in {LD: ANNOUNCEMENT}
-	 * {NDN: ANNOUNCEMENT} 15.00 ELSE ANNDATE => SVCMOD ANNDATE W W E {LD:
-	 * ANNOUNCEMENT} {NDN: ANNOUNCEMENT} can not be earlier than the {LD:
-	 * SVCMOD} {LD: ANNDATE} {ANNDATE} 16.00 END 13.00 17.00 END 5.00
-	 * 
-	 * 18.00 AVAIL C SVCMODAVAIL-d 19.00 WHEN C AVAILTYPE = "First Order" 20.00
-	 * EFFECTIVEDATE => SVCMOD ANNDATE W W E {LD: AVAIL} {NDN: AVAIL} has a date
-	 * earlier than the {LD: SVCMOD} {LD: ANNDATE} 21.00 ANNOUNCEMENT D C: +
-	 * AVAILANNA-d 22.00 WHEN "RFA" (RFA) <> C: AVAIL AVAILANNTYPE 23.00 Count
-	 * of = 0 E E E {LD: AVAIL} {NDN: C:AVAIL} must not be in {LD: ANNOUNCEMENT}
-	 * {NDN: ANNOUNCEMENT} 24.00 END 22.00 25.00 IF ANNTYPE <> New (19) 26.00
-	 * Count of = 0 E E E {LD: AVAIL} {NDN: C:AVAIL} must not be in {LD:
-	 * ANNOUNCEMENT} {NDN: ANNOUNCEMENT} 27.00 ELSE ANNDATE => SVCMOD ANNDATE W
-	 * W E {LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} can not be earlier than the
-	 * {LD: SVCMOD} {LD: ANNDATE} {ANNDATE} 28.00 END 25.00 29.00 END 19.00
-	 * 
-	 * 30.00 AVAIL E SVCMODAVAIL-d 31.00 WHEN AVAILTYPE = "Last Order" 32.00
-	 * EFFECTIVEDATE <= SVCMOD WTHDRWEFFCTVDATE W W E {LD: AVAIL} {NDN: AVAIL}
-	 * must not be later than the {LD: SVCMOD} {LD: WTHDRWEFFCTVDATE}
-	 * {WTHDRWEFFCTVDATE} 33.00 COUNTRYLIST "IN aggregate G" A:AVAIL COUNTRYLIST
-	 * W W E {LD: AVAIL} {NDN: AVAIL} {LD: COUNTRYLIST} includes a country that
-	 * does not have a "Planned Availability" delete34.00 IF COUNTRYLIST Match
-	 * J: AVAIL COUNTRYLIST delete35.00 THEN TheMatch IN K: AVAIL COUNTRYLIST W
-	 * RW RE {LD: IPSCFEAT} (NDN: K: IPSCFEAT} must have a "Last Order" for all
-	 * countries in the {LD: SVCMOD} {LD: AVAIL} {E: AVAIL} 36.00 ANNOUNCEMENT F
-	 * E: + AVAILANNA-d 37.00 WHEN "RFA" (RFA) <> E: AVAIL AVAILANNTYPE 38.00
-	 * Count of = 0 E E E {LD: AVAIL} {NDN: E:AVAIL} must not be in {LD:
-	 * ANNOUNCEMENT} {NDN: ANNOUNCEMENT} 39.00 END 37.00 40.00 IF ANNTYPE <>
-	 * "End Of Life - Withdrawal from mktg" (14) 41.00 Count of = 0 E E E {LD:
-	 * AVAIL} {NDN: E:AVAIL} must not be in {LD: ANNOUNCEMENT} {NDN:
-	 * ANNOUNCEMENT} 42.00 ELSE ANNDATE <= SVCMOD WITHDRAWDATE W W E {LD:
-	 * ANNOUNCEMENT} {NDN: ANNOUNCEMENT} must be earlier than the {LD: SVCMOD}
-	 * {LD: WITHDRAWDATE} {WITHDRAWDATE} 43.00 END 40.00 44.00 END 31.00
-	 * 
-	 * 45.00 AVAIL M SVCMODAVAIL-d 46.00 WHEN AVAILTYPE = "End of Marketing"
-	 * (200) 47.00 EFFECTIVEDATE <= SVCMOD WTHDRWEFFCTVDATE W W E {LD: AVAIL}
-	 * {NDN: AVAIL} must not be later than the {LD: SVCMOD} {LD:
-	 * WTHDRWEFFCTVDATE} {WTHDRWEFFCTVDATE} 48.00 COUNTRYLIST "IN aggregate G"
-	 * A:AVAIL COUNTRYLIST W W E {LD: AVAIL} {NDN: AVAIL} {LD: COUNTRYLIST}
-	 * includes a country that does not have a "Planned Availability" 49.00
-	 * ANNOUNCEMENT N M: + AVAILANNA-d 50.00 WHEN "RFA" (RFA) <> M: AVAIL
-	 * AVAILANNTYPE 51.00 Count of = 0 E E E {LD: AVAIL} {NDN: M:AVAIL} must not
-	 * be in {LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} 52.00 END 50.00 53.00 IF
-	 * ANNTYPE <> "End Of Life - Withdrawal from mktg" (14) 54.00 Count of = 0 E
-	 * E E {LD: AVAIL} {NDN: M:AVAIL} must not be in {LD: ANNOUNCEMENT} {NDN:
-	 * ANNOUNCEMENT} 55.00 ELSE ANNDATE <= SVCMOD WITHDRAWDATE W W E {LD:
-	 * ANNOUNCEMENT} {NDN: ANNOUNCEMENT} must be earlier than the {LD: SVCMOD}
-	 * {LD: WITHDRAWDATE} {WITHDRAWDATE} 56.00 END 53.00 57.00 END 46.00
-	 * 
-	 * For R1.0 Remove 58 AVAIL G SVCMODAVAIL-d Remove 59 WHEN AVAILTYPE = "End
-	 * of Service" (151) Remove 60 EFFECTIVEDATE <= SVCMOD WTHDRWEFFCTVDATE W W
-	 * E {LD: AVAIL} {NDN: AVAIL} must not be later than the {LD: SVCMOD} {LD:
-	 * WTHDRWEFFCTVDATE} {WTHDRWEFFCTVDATE} Remove 61 COUNTRYLIST IN E:AVAIL
-	 * COUNTRYLIST W W E {LD: AVAIL} {NDN: AVAIL} {LD: COUNTRYLIST} includes a
-	 * country that does not have a "Last Order" Remove 62 IF COUNTRYLIST Match
-	 * J: AVAIL COUNTRYLIST Remove 63 THEN TheMatch IN L: AVAIL COUNTRYLIST W RW
-	 * RE {LD: IPSCFEAT} (NDN: L: IPSCFEAT} must have a "End of Service" for all
-	 * countries in the {LD: SVCMOD} {LD: AVAIL} {E: AVAIL} Remove 64 WHEN
-	 * AVAILANNTYPE <> "RFA" (RFA) Remove 65 ANNOUNCEMENT H G: + AVAILANNA-d
-	 * Remove 66 WHEN "RFA" (RFA) <> G: AVAIL AVAILANNTYPE Remove 67 Count of =
-	 * 0 E E E {LD: AVAIL} {NDN: G:AVAIL} must not be in {LD: ANNOUNCEMENT}
-	 * {NDN: ANNOUNCEMENT} Remove 68 END 66 Remove 69 IF ANNTYPE <> "End Of Life
-	 * - Discontinuance of service" (13) Remove 70 Count of = 0 E E E {LD:
-	 * AVAIL} {NDN: G:AVAIL} must not be in {LD: ANNOUNCEMENT} {NDN:
-	 * ANNOUNCEMENT} Remove 71 ELSE ANNDATE <= SVCMOD WITHDRAWDATE W W E {LD:
-	 * ANNOUNCEMENT} {NDN: ANNOUNCEMENT} must be earlier than the {LD: SVCMOD}
-	 * {LD: WITHDRAWDATE} {WITHDRAWDATE} Remove 72 END 69 Remove 73 END 59
-	 * 
-	 * delete74.00 AVAIL J IPSCSTRUCT-d: IPSCSTRUCAVAIL-d delete75.00 WHEN
-	 * AVAILTYPE = "Planned Availability" delete76.00 ANNCODENAME delete77.00
-	 * COUNTRYLIST "IN aggregate G" A: AVAIL COUNTRYLIST W W E {LD: AVAIL} {NDN:
-	 * AVAIL} {LD: COUNTRYLIST} includes a country that does not have a "Planned
-	 * Availability" delete78.00 EFFECTIVEDATE => A: AVAIL EFFECTIVEDATE Yes W W
-	 * E {LD: IPSCSTRUCT} {NDN: IPSCSTRUCT} {LD: AVAIL} {NDN: AVAIL} can not be
-	 * earlier than the {LD:AVAIL} {NDN: A: AVAIL} delete79.00 END 75.00
-	 * delete80.00 AVAIL IPSCSTRUCT-d: IPSCSTRUCAVAIL-d delete81.00 WHEN
-	 * AVAILTYPE = "First Order" delete82.00 ANNCODENAME delete83.00 COUNTRYLIST
-	 * "IN aggregate G" J: AVAIL COUNTRYLIST W W E {LD: AVAIL} {NDN: AVAIL} {LD:
-	 * COUNTRYLIST} includes a country that does not have a "Planned
-	 * Availability" delete84.00 END 81.00 delete85.00 AVAIL K IPSCSTRUCT-d:
-	 * IPSCSTRUCAVAIL-d delete86.00 WHEN AVAILTYPE = "Last Order" delete87.00
-	 * ANNCODENAME delete88.00 COUNTRYLIST IN J: AVAIL COUNTRYLIST W W E {LD:
-	 * AVAIL} {NDN: AVAIL} {LD: COUNTRYLIST} includes a country that does not
-	 * have a "Planned Availability" delete89.00 EFFECTIVEDATE <= E: AVAIL
-	 * EFFECTIVEDATE Yes W W E {LD: IPSCSTRUCT} {NDN: IPSCSTRUCT} {LD: AVAIL}
-	 * {NDN: AVAIL} can not be later than the {LD:AVAIL} {NDN: E: AVAIL}
-	 * delete90.00 END 86.00 delete91.00 AVAIL P IPSCSTRUCT-d: IPSCSTRUCAVAIL-d
-	 * delete92.00 WHEN AVAILTYPE = "End of Marketing" (200) delete93.00
-	 * ANNCODENAME delete94.00 COUNTRYLIST "IN aggregate G" J: AVAIL COUNTRYLIST
-	 * W W E {LD: AVAIL} {NDN: AVAIL} {LD: COUNTRYLIST} includes a country that
-	 * does not have a "Planned Availability" delete95.00 EFFECTIVEDATE <= E:
-	 * AVAIL EFFECTIVEDATE Yes W W E {LD: IPSCSTRUCT} {NDN: IPSCSTRUCT} {LD:
-	 * AVAIL} {NDN: AVAIL} can not be later than the {LD:AVAIL} {NDN: E: AVAIL}
-	 * delete96.00 END 92.00 delete97.00 AVAIL L IPSCSTRUCT-d: IPSCSTRUCAVAIL-d
-	 * delete98.00 WHEN AVAILTYPE = "End of Service" (151) delete99.00
-	 * ANNCODENAME delete100.00 COUNTRYLIST "IN aggregate G" J: AVAIL
-	 * COUNTRYLIST W W E {LD: AVAIL} {NDN: AVAIL} {LD: COUNTRYLIST} includes a
-	 * country that does not have a "Planned Availability" delete101.00
-	 * EFFECTIVEDATE <= E: AVAIL EFFECTIVEDATE Yes W W E {LD: IPSCSTRUCT} {NDN:
-	 * IPSCSTRUCT} {LD: AVAIL} {NDN: AVAIL} can not be later than the {LD:AVAIL}
-	 * {NDN: E: AVAIL} delete102.00 END 98.00
-	 * 
-	 * Replaced 103.20 IF OFERCONFIGTYPE = "Configurable" (CNFIG) Replaced
-	 * 103.40 SVCMODCHRGCOMP-d CHRGCOMP Replaced 103.60 Q CHRGCOMPPRCPT-d PRCPT
-	 * Replaced 103.80 DATAQUALITY <= CHRGCOMP STATUS E E E If SVCMOD has a
-	 * CHRGCOMP, check its STATUS {LD: STATUS} can not be higher than the {LD:
-	 * CHRGCOMP} {NDN: CHRGCOMP} {LD: STATUS} {STATUS} Replaced 104.00 COUNT =>
-	 * 0 E E E "Configurable must have 0 - N CHRGCOMP this used to be 1 - N but
-	 * they changed it, hence I want to leave it in case they change their mind"
-	 * {LD: OFERCONFIGTYPE} {OFERCONFIGTYPE} must have 0 - N LD(CHRGCOMP}
-	 * Replaced 104.20 S SVCMODAVAIL-d AVAIL Replaced 104.40 WHEN R AVAILTYPE =
-	 * "Planned Availability" (146) SVCMOD AVAIL "Planned Availability" Replaced
-	 * 104.60 "Q: +PRCPTCNTRYEFF-dCOUNTRYLIST" "IN aggregate G" R: AVAIL
-	 * COUNTRYLIST E E E PRCPT CNTRYEFF COUNTRYLIST must be a subset of SVCMOD
-	 * AVAIL COUNTRYLIST {LD: PRCPT} {NDN: Q:PRCPT} {LD: CNTRYEFF} {NDN:
-	 * CNTRYEFF} {LD: COUNTRYLIST} must not include a country that is not in the
-	 * {LD: SVCMOD} {LD: AVAIL} Replaced 104.80 SVCMODPA SetTo R: AVAIL
-	 * MIN(EFFECTIVEDATE) Replaced 105.00 T "S: +AVAILANNA-d" ANNOUNCEMENT
-	 * Replaced 105.20 IF T: ANNTYPE = New (19) Replaced 105.40 SVCMODAD SetTo
-	 * T: ANNOUNCEMENT MIN(ANNDATE) Replaced 105.60 END 105.20 Replaced 105.80
-	 * END 104.40 Replaced 106.00 WHEN "First Order" = S: AVAIL AVAILTYPE
-	 * Replaced 106.20 SVCMODFO SetTo S:AVAIL MIN(EFFECTIVEDATE) Replaced 106.40
-	 * END 106.00 Replaced 106.60 W "SVCMODSVCSEO-dSVCSEOAVAIL-d" AVAIL Replaced
-	 * 106.80 WHEN X AVAILTYPE = "Planned Availability" (146) Replaced 107.00
-	 * SVCSEOPA SetTo X: AVAIL MIN(EFFECTIVEDATE) Replaced 107.20 Y "W:
-	 * +AVAILANNA-d" ANNOUNCEMENT Replaced 107.40 IF Y: ANNTYPE = New (19)
-	 * Replaced 107.60 SVCSEOAD SetTo T: ANNOUNCEMENT MIN(ANNDATE) Replaced
-	 * 107.80 END 107.40 Replaced 108.00 END 106.80 Replaced 108.20 WHEN "First
-	 * Order" = W: AVAIL AVAILTYPE Replaced 108.40 SVCSEOFO SetTo W:AVAIL
-	 * MIN(EFFECTIVEDATE) Replaced 108.60 END 108.20 Replaced 108.80
-	 * SVCSEOFIRSTORDER FirstValue SVCSEOFO Derives SVCSEO First Order Replaced
-	 * 109.00 SVCSEOAD Replaced 109.20 SVCSEOPA Replaced 109.40 SVCMODFIRSTORDER
-	 * FirstValue SVCMODFO Derves SVCMOD First Order Replaced 109.60 SVCMODAD
-	 * Replaced 109.80 SVCMODPA 109.90 IF NotNull(SVCSEOFIRSTORDER) 109.92 AND
-	 * NotNull(SVCMODFIRSTORDER) 110.00 SVCMODFIRSTORDER <= SVCSEOFIRSTORDER RE
-	 * RE RE First Order SVCMOD can not be later than SVCSEO First Order {LD:
-	 * SVCMOD} First Order date must not be later than the {LD: SVCSEO} {NDN:
-	 * SVCSEO) 110.20 END 109.92
-	 * 
-	 * 113.00 ELSE 104.00 SVCMODSVCSEO-d SVCSEO Owned child SVCSEO 114.00 COUNT
-	 * = 0 E E E If not Configurable, must not have a SVCSEO {LD:
-	 * OFERCONFIGTYPE} {OFERCONFIGTYPE} must not have a LD(SVCSEO) 115.00
-	 * SVCMODSVCSEOREF-d SVCSEO Shared SVCSEO 116.00 COUNT = 0 E E E If not
-	 * Configurable, must not have a SVCSEO {LD: OFERCONFIGTYPE}
-	 * {OFERCONFIGTYPE} must not have a LD(SVCSEO) 117.00 SVCMODCHRGCOMP-d
-	 * CHRGCOMP 118.00 COUNT = 0 E E E If not Configurable, must not have a
-	 * CHRGCOMP {LD: OFERCONFIGTYPE} {OFERCONFIGTYPE} must not have a
-	 * LD(CHRGCOMP) 119.00 END 104.00 120.00 SVCMOD Root 121.00 IF
-	 * OFERCONFIGTYPE = "Configurable" (CNFIG) 122.00 S SVCMODAVAIL-d AVAIL
-	 * AVAIL for Root 123.00 WHEN AVAILTYPE = "Planned Availability" (146)
-	 * Planned AVAIL for Root 124.00 T SVCMODSVCMOD-d SVCMOD Referenced SVCMOD
-	 * 125.00 U SVCMODAVAIL-d AVAIL AVAIL for Referenced SVCMOD 126.00 WHEN
-	 * AVAILTYPE = "Planned Availability" (146) Planned AVAIL for Referenced
-	 * SVCMOD 127.00 S: COUNTRYLIST Intersection is not null T: AVAIL
-	 * COUNTRYLIST E E E One or more countries of SVCMOD AVAIL must be in the
-	 * referenced SVCMODAVAIL. i.e. the intersection of the two country lists
-	 * may not be null {LD: AVAIL} {NDN: S:AVAIL} {LD: COUNTRYLIST} must have a
-	 * least one country in common with {LD: SVCMOD} {NDN: T:SVCMOD} {LD: AVAIL}
-	 * {LD: COUNTRYLIST} 128.00 END 126.00 129.00 END 123.00 130.00 END 121.00
-	 */
-	protected void doDQChecking(EntityItem rootEntity, String statusFlag) throws Exception {
-		addHeading(2, rootEntity.getEntityGroup().getLongDescription() + " Checks:");
-
-		int checklvl = getCheck_W_E_E(statusFlag);
-
-		checkPrftctr(rootEntity);
-		// 1.00 SVCMOD Root
-		// 2.00 ANNDATE
-		// 3.00 WITHDRAWDATE => SVCMOD ANNDATE E E E {LD: WITHDRAWDATE}
-		// {WITHDRAWDATE} can not be earlier than {LD: ANNDATE} {ANNDATE}
-		checkCanNotBeEarlier(rootEntity, "WITHDRAWDATE", "ANNDATE", CHECKLEVEL_E);
-
-		int cnt;
-		// 3.10 TAXCATG SVCMODTAXRELEVANCE-d
-		cnt = getCount("SVCMODTAXRELEVANCE");
-		if (cnt == 0) {
-			// 3.12 CountOf => 1 W W E must have at least one "Tax Category"
-			// MINIMUM_ERR = must have at least one {0}
-			args[0] = m_elist.getEntityGroup("TAXCATG").getLongDescription();
-			createMessage(getCheck_W_W_E(statusFlag), "MINIMUM_ERR", args);
-		}
-
-		// 3.40 TAXGRP SVCMODTAXGRP-d
-		cnt = getCount("SVCMODTAXGRP");
-		if (cnt == 0) {
-			// 3.42 CountOf => 1 W W E must have at least one "Tax Group"
-			// MINIMUM_ERR = must have at least one {0}
-			args[0] = m_elist.getEntityGroup("TAXGRP").getLongDescription();
-			createMessage(getCheck_W_W_E(statusFlag), "MINIMUM_ERR", args);
-		}
-
-		getAvails(rootEntity, statusFlag);
-
-		checkAvails(rootEntity, statusFlag, checklvl);
-
-		checkConfig(rootEntity);
-	}
-
-	/**
-	 * 103.00 SVCMOD Root 103.20 IF OFERCONFIGTYPE = "Configurable" (CNFIG)
-	 * 103.40 SVCMODCHRGCOMP-d CHRGCOMP 103.60 Q CHRGCOMPPRCPT-d PRCPT 103.80
-	 * DATAQUALITY <= CHRGCOMP STATUS E E E If SVCMOD has a CHRGCOMP, check its
-	 * STATUS {LD: STATUS} can not be higher than the {LD: CHRGCOMP} {NDN:
-	 * CHRGCOMP} {LD: STATUS} {STATUS} 104.00 COUNT => 0 E E E "Configurable
-	 * must have 0 - N CHRGCOMP this used to be 1 - N but they changed it, hence
-	 * I want to leave it in case they change their mind" {LD: OFERCONFIGTYPE}
-	 * {OFERCONFIGTYPE} must have 0 - N LD(CHRGCOMP} 104.20 S SVCMODAVAIL-d
-	 * AVAIL 104.40 WHEN R AVAILTYPE = "Planned Availability" (146) SVCMOD AVAIL
-	 * "Planned Availability" 104.60 "Q: +PRCPTCNTRYEFF-d COUNTRYLIST"
-	 * "INaggregate G" R: AVAIL COUNTRYLIST E E E PRCPT CNTRYEFF COUNTRYLIST
-	 * must be a subset of SVCMOD AVAIL COUNTRYLIST {LD: PRCPT} {NDN: Q:PRCPT}
-	 * {LD: CNTRYEFF} {NDN: CNTRYEFF} {LD: COUNTRYLIST} must not include a
-	 * country that is not in the {LD: SVCMOD} {LD: AVAIL} 104.80 SVCMODPA SetTo
-	 * R: AVAIL MIN(EFFECTIVEDATE) 105.00 T "S: +AVAILANNA-d" ANNOUNCEMENT
-	 * 105.20 IF T: ANNTYPE = New (19) 105.40 SVCMODAD SetTo T: ANNOUNCEMENT
-	 * MIN(ANNDATE) 105.60 END 105.20 105.80 END 104.40 106.00 WHEN "First
-	 * Order" = S: AVAIL AVAILTYPE 106.20 SVCMODFO SetTo S:AVAIL
-	 * MIN(EFFECTIVEDATE) 106.40 END 106.00 106.60 W "SVCMODSVCSEO-d
-	 * SVCSEOAVAIL-d" AVAIL 106.80 WHEN X AVAILTYPE = "Planned Availability"
-	 * (146) 107.00 SVCSEOPA SetTo X: AVAIL MIN(EFFECTIVEDATE) 107.20 Y "W:
-	 * +AVAILANNA-d" ANNOUNCEMENT 107.40 IF Y: ANNTYPE = New (19) 107.60
-	 * SVCSEOAD SetTo T: ANNOUNCEMENT MIN(ANNDATE) 107.80 END 107.40 108.00 END
-	 * 106.80 108.20 WHEN "First Order" = W: AVAIL AVAILTYPE 108.40 SVCSEOFO
-	 * SetTo W:AVAIL MIN(EFFECTIVEDATE) 108.60 END 108.20 108.80
-	 * SVCSEOFIRSTORDER FirstValue SVCSEOFO Derives SVCSEO First Order 109.00
-	 * SVCSEOAD 109.20 SVCSEOPA 109.40 SVCMODFIRSTORDER FirstValue SVCMODFO
-	 * Derves SVCMOD First Order 109.60 SVCMODAD 109.80 SVCMODPA 109.90 IF
-	 * NotNull(SVCSEOFIRSTORDER) 109.92 AND NotNull(SVCMODFIRSTORDER) 110.00
-	 * SVCMODFIRSTORDER <= SVCSEOFIRSTORDER RE RE RE First Order SVCMOD can not
-	 * be later than SVCSEO First Order {LD: SVCMOD} First Order date must not
-	 * be later than the {LD: SVCSEO} {NDN: SVCSEO) 110.20 END 109.92
-	 * 
-	 * 113.00 ELSE 103.20 SVCMODSVCSEO-d SVCSEO Owned child SVCSEO
-	 * 
-	 * 114.00 COUNT = 0 E E E If not Configurable, must not have a SVCSEO {LD:
-	 * OFERCONFIGTYPE} {OFERCONFIGTYPE} must not have a LD(SVCSEO) 115.00
-	 * SVCMODSVCSEOREF-d SVCSEO Shared SVCSEO 116.00 COUNT = 0 E E E If not
-	 * Configurable, must not have a SVCSEO {LD: OFERCONFIGTYPE}
-	 * {OFERCONFIGTYPE} must not have a LD(SVCSEO) 117.00 SVCMODCHRGCOMP-d
-	 * CHRGCOMP 118.00 COUNT = 0 E E E If not Configurable, must not have a
-	 * CHRGCOMP {LD: OFERCONFIGTYPE} {OFERCONFIGTYPE} must not have a
-	 * LD(CHRGCOMP) 119.00 END 103.20 120.00 SVCMOD Root 121.00 IF
-	 * OFERCONFIGTYPE = "Configurable" (CNFIG) 122.00 S SVCMODAVAIL-d AVAIL
-	 * AVAIL for Root 123.00 WHEN AVAILTYPE = "Planned Availability" (146)
-	 * Planned AVAIL for Root 124.00 T SVCMODSVCMOD-d SVCMOD Referenced SVCMOD
-	 * 125.00 U SVCMODAVAIL-d AVAIL AVAIL for Referenced SVCMOD 126.00 WHEN
-	 * AVAILTYPE = "Planned Availability" (146) Planned AVAIL for Referenced
-	 * SVCMOD 127.00 S: COUNTRYLIST Intersection is not null T: AVAIL
-	 * COUNTRYLIST E E E One or more countries of SVCMOD AVAIL must be in the
-	 * referenced SVCMODAVAIL. i.e. the intersection of the two country lists
-	 * may not be null {LD: AVAIL} {NDN: S:AVAIL} {LD: COUNTRYLIST} must have a
-	 * least one country in common with {LD: SVCMOD} {NDN: T:SVCMOD} {LD: AVAIL}
-	 * {LD: COUNTRYLIST} 128.00 END 126.00 129.00 END 123.00 130.00 END 121.00
-	 * 
-	 * @param rootEntity
-	 * @throws MiddlewareException
-	 * @throws SQLException
-	 */
-	private void checkConfig(EntityItem rootEntity) throws MiddlewareException, SQLException {
-		String oferconfigtype = PokUtils.getAttributeFlagValue(rootEntity, "OFERCONFIGTYPE");
-		addHeading(3, rootEntity.getEntityGroup().getLongDescription() + " "
-				+ PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), "OFERCONFIGTYPE", "OFERCONFIGTYPE")
-				+ " checks:");
-
-		int cnt = getCount("SVCMODCHRGCOMP");
-		EntityGroup confGrp = m_elist.getEntityGroup("CHRGCOMP");
-		addDebug("checkConfig " + rootEntity.getKey() + " oferconfigtype " + oferconfigtype);
-		// 103.20 IF OFERCONFIGTYPE = "Configurable" (CNFIG)
-		if (OFERCONFIGTYPE_Configurable.equals(oferconfigtype)) {
-			// 103.40 SVCMODCHRGCOMP-d CHRGCOMP
-			// 103.60 Q CHRGCOMPPRCPT-d PRCPT
-			// 104.00 COUNT => 0 E E E "Configurable must have 0 - N CHRGCOMP
-			// this used to be 1 - N but they changed it, hence I want to leave
-			// it in case they change their mind" {LD: OFERCONFIGTYPE}
-			// {OFERCONFIGTYPE} must have 0 - N LD(CHRGCOMP}
-			/*
-			 * if(cnt==0){ //MINIMUM2_ERR = {0} must have at least one {1}
-			 * args[0] = getLD_Value(rootEntity, "OFERCONFIGTYPE"); args[1] =
-			 * confGrp.getLongDescription();
-			 * createMessage(CHECKLEVEL_E,"MINIMUM2_ERR",args); }
-			 */
-			for (int i = 0; i < confGrp.getEntityItemCount(); i++) {
-				EntityItem confitem = confGrp.getEntityItem(i);
-				// 103.80 DATAQUALITY <= CHRGCOMP STATUS E E E If SVCMOD has a
-				// CHRGCOMP, check its STATUS {LD: STATUS} can not be higher
-				// than the {LD: CHRGCOMP} {NDN: CHRGCOMP} {LD: STATUS} {STATUS}
-				checkStatusVsDQ(confitem, "STATUS", rootEntity, CHECKLEVEL_E);
-			}
-
-			addHeading(3, m_elist.getEntityGroup("PRCPT").getLongDescription() + " checks:");
-
-			// 103.60 Q CHRGCOMPPRCPT-d PRCPT
-			Vector prcptVctQ = PokUtils.getAllLinkedEntities(confGrp, "CHRGCOMPPRCPT", "PRCPT");
-			addDebug("checkConfig prcptVctQ " + prcptVctQ.size());
-
-			// 104.20 S SVCMODAVAIL-d AVAIL
-			// 104.40 WHEN R AVAILTYPE = "Planned Availability" (146) SVCMOD
-			// AVAIL "Planned Availability"
-			// 104.60 "Q: + PRCPTCNTRYEFF-d COUNTRYLIST" "IN aggregate G" R:
-			// AVAIL COUNTRYLIST E E E
-			// PRCPT CNTRYEFF COUNTRYLIST must be a subset of SVCMOD AVAIL
-			// COUNTRYLIST
-			// {LD: PRCPT} {NDN: Q:PRCPT} {LD: CNTRYEFF} {NDN: CNTRYEFF} {LD:
-			// COUNTRYLIST} must not include a country that is not in the {LD:
-			// SVCMOD} {LD: AVAIL}
-			// 104.80 SVCMODPA SetTo R: AVAIL MIN(EFFECTIVEDATE)
-			// 105.00 T "S: + AVAILANNA-d" ANNOUNCEMENT
-			// 105.20 IF T: ANNTYPE = New (19)
-			// 105.40 SVCMODAD SetTo T: ANNOUNCEMENT MIN(ANNDATE)
-			// 105.60 END 105.20
-			// 105.80 END 104.40
-
-			// 106.00 WHEN "First Order" = S: AVAIL AVAILTYPE
-			// 106.20 SVCMODFO SetTo S:AVAIL MIN(EFFECTIVEDATE)
-			// 106.40 END 106.00
-			checkSVCMODAvails(rootEntity);
-
-			// 106.60 W "SVCMODSVCSEO-d SVCSEOAVAIL-d" AVAIL
-			// 106.80 WHEN X AVAILTYPE = "Planned Availability" (146)
-			// 107.00 SVCSEOPA SetTo X: AVAIL MIN(EFFECTIVEDATE)
-			// 107.20 Y "W: +AVAILANNA-d" ANNOUNCEMENT
-			// 107.40 IF Y: ANNTYPE = New (19)
-			// 107.60 SVCSEOAD SetTo T: ANNOUNCEMENT MIN(ANNDATE)
-			// 107.80 END 107.40
-			// 108.00 END 106.80
-			// 108.20 WHEN "First Order" = W: AVAIL AVAILTYPE
-			// 108.40 SVCSEOFO SetTo W:AVAIL MIN(EFFECTIVEDATE)
-			// 108.60 END 108.20
-			checkSVCSEOAvails(rootEntity);
-
-			// 108.80 SVCSEOFIRSTORDER FirstValue SVCSEOFO Derives SVCSEO First
-			// Order
-			// 109.00 SVCSEOAD
-			// 109.20 SVCSEOPA
-			// 109.40 SVCMODFIRSTORDER FirstValue SVCMODFO Derves SVCMOD First
-			// Order
-			// 109.60 SVCMODAD
-			// 109.80 SVCMODPA
-			// 109.90 IF NotNull(SVCSEOFIRSTORDER)
-			// 109.92 AND NotNull(SVCMODFIRSTORDER)
-			// 110.00 SVCMODFIRSTORDER <= SVCSEOFIRSTORDER RE RE RE First Order
-			// SVCMOD can not be later than SVCSEO First Order {LD: SVCMOD}
-			// First Order date must not be later than the {LD: SVCSEO} {NDN:
-			// SVCSEO)
-			checkFODates(rootEntity);
-			// 110.20 END 109.92
-
-			// 104.40 WHEN R AVAILTYPE = "Planned Availability" (146) same as
-			// A:AVAIL SVCMOD AVAIL "Planned Availability"
-			// 104.60 "Q: + PRCPTCNTRYEFF-d COUNTRYLIST" "IN aggregate G" R:
-			// AVAIL COUNTRYLIST E E E
-			// PRCPT CNTRYEFF COUNTRYLIST must be a subset of SVCMOD AVAIL
-			// COUNTRYLIST
-			// {LD: PRCPT} {NDN: Q:PRCPT} {LD: CNTRYEFF} {NDN: CNTRYEFF} {LD:
-			// COUNTRYLIST} must not include a country that is not in the {LD:
-			// SVCMOD} {LD: AVAIL}
-			for (int i = 0; i < prcptVctQ.size(); i++) {
-				EntityItem prcptitem = (EntityItem) prcptVctQ.elementAt(i);
-				String missingCtry = checkCtryMismatch(prcptitem, svcmdlPlaAvailCtryTblA, CHECKLEVEL_E);
-				if (missingCtry.length() > 0) {
-					addDebug(prcptitem.getKey() + " COUNTRYLIST had extra [" + missingCtry + "]");
-					// 111.00 Q: COUNTRYLIST "IN aggregate G" R: AVAIL
-					// COUNTRYLIST E E E PRCPT COUNTRYLIST must be a subset of
-					// SVCMOD AVAIL COUNTRYLIST
-					// {LD: PRCPT} {NDN: Q:PRCPT} {LD: COUNTRYLIST} must not
-					// include a country that is not in the {LD: SVCMOD} {LD:
-					// AVAIL}
-					// INCLUDE_ERR2 = {0} {1} must not include a Country that is
-					// not in the {2} {3}. Extra countries are: {4}
-					args[0] = getLD_NDN(prcptitem);
-					args[1] = PokUtils.getAttributeDescription(m_elist.getEntityGroup("AVAIL"), "COUNTRYLIST",
-							"COUNTRYLIST");
-					args[2] = m_elist.getEntityGroup("SVCMOD").getLongDescription() + " "
-							+ m_elist.getEntityGroup("AVAIL").getLongDescription();
-					args[3] = PokUtils.getAttributeDescription(m_elist.getEntityGroup("AVAIL"), "COUNTRYLIST",
-							"COUNTRYLIST");
-					args[4] = missingCtry;
-					createMessage(CHECKLEVEL_E, "INCLUDE_ERR2", args);
-				}
-			}
-			// 112.00 END 110.00
-
-			addHeading(3, "Referenced " + rootEntity.getEntityGroup().getLongDescription() + " checks:");
-			// 120.00 SVCMOD Root
-			// 121.00 IF OFERCONFIGTYPE = "Configurable" (CNFIG)
-			// 122.00 S SVCMODAVAIL-d AVAIL AVAIL for Root
-			// 123.00 WHEN AVAILTYPE = "Planned Availability" (146) Planned
-			// AVAIL for Root
-			// 124.00 T SVCMODSVCMOD-d SVCMOD Referenced SVCMOD
-			// 125.00 U SVCMODAVAIL-d AVAIL AVAIL for Referenced SVCMOD
-			Vector svcmodVctT = PokUtils.getAllLinkedEntities(rootEntity, "SVCMODSVCMOD", "SVCMOD");
-			Vector availVctU = PokUtils.getAllLinkedEntities(svcmodVctT, "SVCMODAVAIL", "AVAIL");
-			Vector plaAvailVctU = PokUtils.getEntitiesWithMatchedAttr(availVctU, "AVAILTYPE", PLANNEDAVAIL);
-			addDebug("svcmodVctT " + svcmodVctT.size() + " availVctU " + availVctU.size() + " plaAvailVctU "
-					+ plaAvailVctU.size());
-			if (svcmdlPlaAvailCtryTblA.size() > 0 && // there are root svcmod
-														// planned avails with
-														// countries
-					plaAvailVctU.size() > 0) { // there are referenced svcmod
-												// planned avails
-				boolean intersects = false;
-				// 126.00 WHEN AVAILTYPE = "Planned Availability" (146) Planned
-				// AVAIL for Referenced SVCMOD
-				availloop: for (int i = 0; i < plaAvailVctU.size(); i++) {
-					EntityItem plaitem = (EntityItem) plaAvailVctU.elementAt(i);
-					addDebug("referenced svcmod plannedavail " + plaitem.getKey() + " COUNTRYLIST ["
-							+ PokUtils.getAttributeFlagValue(plaitem, "COUNTRYLIST") + "]");
-					EANFlagAttribute ctrylist = (EANFlagAttribute) getAttrAndCheckLvl(plaitem, "COUNTRYLIST",
-							CHECKLEVEL_E);
-					if (ctrylist != null && ctrylist.toString().length() > 0) {
-						// Get the selected Flag codes.
-						MetaFlag[] mfArray = (MetaFlag[]) ctrylist.get();
-						for (int im = 0; im < mfArray.length; im++) {
-							if (mfArray[im].isSelected()) {
-								if (svcmdlPlaAvailCtryTblA.keySet().contains(mfArray[im].getFlagCode())) {
-									intersects = true;
-									break availloop;
-								}
-							}
-						} // end for
-					}
-				}
-				if (!intersects) {
-					for (int i = 0; i < svcmodPlaAvailVctA.size(); i++) {
-						EntityItem plaitem = (EntityItem) svcmodPlaAvailVctA.elementAt(i);
-						// 127.00 S: COUNTRYLIST Intersection is not null T:
-						// AVAIL COUNTRYLIST E E E One or more countries of
-						// SVCMOD AVAIL must be in the referenced SVCMODAVAIL.
-						// i.e. the intersection of the two country lists may
-						// not be null
-						// {LD: AVAIL} {NDN: S:AVAIL} {LD: COUNTRYLIST} must
-						// have a least one country in common with {LD: SVCMOD}
-						// {NDN: T:SVCMOD} {LD: AVAIL} {LD: COUNTRYLIST}
-						addDebug(" nointersection root plannedavail " + plaitem.getKey());
-						for (int x = 0; x < svcmodVctT.size(); x++) {
-							EntityItem svcmoditem = (EntityItem) svcmodVctT.elementAt(x);
-							addDebug("nointersection referenced " + svcmoditem.getKey());
-							// INTERSECT_ERR = {0} {1} must have a least one
-							// country in common with {2} {3} {4}
-							args[0] = getLD_NDN(plaitem);
-							args[1] = PokUtils.getAttributeDescription(plaitem.getEntityGroup(), "COUNTRYLIST",
-									"COUNTRYLIST");
-							args[2] = getLD_NDN(svcmoditem);
-							args[3] = plaitem.getEntityGroup().getLongDescription();
-							args[4] = PokUtils.getAttributeDescription(plaitem.getEntityGroup(), "COUNTRYLIST",
-									"COUNTRYLIST");
-							createMessage(CHECKLEVEL_E, "INTERSECT_ERR", args);
-						}
-					}
-				} // end no intersection
-					// 128.00 END 126.00
-			} // end there are root svcmod planned avails and refd svcmod
-				// plaavail
-
-			// 129.00 END 123.00
-			// 130.00 END 121.00
-		} else {
-			// 117.00 SVCMODCHRGCOMP-d CHRGCOMP
-			// 118.00 COUNT = 0 E E E If not Configurable, must not have a
-			// CHRGCOMP {LD: OFERCONFIGTYPE} {OFERCONFIGTYPE} must not have a
-			// LD(CHRGCOMP)
-			if (cnt != 0) {
-				// MUST_NOT_HAVE2_ERR= {0} must not have any {1}
-				args[0] = getLD_Value(rootEntity, "OFERCONFIGTYPE");
-				args[1] = confGrp.getLongDescription();
-				createMessage(CHECKLEVEL_E, "MUST_NOT_HAVE2_ERR", args);
-			}
-			// 113.00 ELSE 103.20 SVCMODSVCSEO-d SVCSEO Owned child SVCSEO
-			// 114.00 COUNT = 0 E E E If not Configurable, must not have a
-			// SVCSEO {LD: OFERCONFIGTYPE} {OFERCONFIGTYPE} must not have a
-			// LD(SVCSEO)
-			cnt = getCount("SVCMODSVCSEO");
-			if (cnt != 0) {
-				// MUST_NOT_HAVE2_ERR= {0} must not have any {1}
-				args[0] = getLD_Value(rootEntity, "OFERCONFIGTYPE");
-				args[1] = m_elist.getEntityGroup("SVCSEO").getLongDescription();
-				createMessage(CHECKLEVEL_E, "MUST_NOT_HAVE2_ERR", args);
-			}
-			// 115.00 SVCMODSVCSEOREF-d SVCSEO Shared SVCSEO
-			// 116.00 COUNT = 0 E E E If not Configurable, must not have a
-			// SVCSEO {LD: OFERCONFIGTYPE} {OFERCONFIGTYPE} must not have a
-			// LD(SVCSEO)
-			cnt = getCount("SVCMODSVCSEOREF");
-			if (cnt != 0) {
-				// MUST_NOT_HAVE2_ERR= {0} must not have any {1}
-				args[0] = getLD_Value(rootEntity, "OFERCONFIGTYPE");
-				args[1] = m_elist.getEntityGroup("SVCMODSVCSEOREF").getLongDescription() + " "
-						+ m_elist.getEntityGroup("SVCSEO").getLongDescription();
-				createMessage(CHECKLEVEL_E, "MUST_NOT_HAVE2_ERR", args);
-			}
-		}
-		// 119.00 END 103.20
-	}
-
-	/**
-	 * 
-	 * 108.80 SVCSEOFIRSTORDER FirstValue SVCSEOFO Derives SVCSEO First Order
-	 * 109.00 SVCSEOAD 109.20 SVCSEOPA 109.40 SVCMODFIRSTORDER FirstValue
-	 * SVCMODFO Derves SVCMOD First Order 109.60 SVCMODAD 109.80 SVCMODPA 109.90
-	 * IF NotNull(SVCSEOFIRSTORDER) 109.92 AND NotNull(SVCMODFIRSTORDER) 110.00
-	 * SVCMODFIRSTORDER <= SVCSEOFIRSTORDER RE RE RE First Order SVCMOD can not
-	 * be later than SVCSEO First Order {LD: SVCMOD} First Order date must not
-	 * be later than the {LD: SVCSEO} {NDN: SVCSEO) 110.20 END 109.92
-	 * SVCMODFIRSTORDER <= SVCSEOFIRSTORDER RE RE RE First Order SVCMOD can not
-	 * be later than SVCSEO First Order {LD: SVCMOD} First Order date must not
-	 * be later than the {LD: SVCSEO} {NDN: SVCSEO)
-	 * 
-	 * @param rootEntity
-	 * @throws MiddlewareException
-	 * @throws SQLException
-	 */
-	private void checkFODates(EntityItem rootEntity) throws SQLException, MiddlewareException {
-		String seofodate = null;
-		String modfodate = null;
-		// 108.80 SVCSEOFIRSTORDER FirstValue SVCSEOFO Derives SVCSEO First
-		// Order
-		// 109.00 SVCSEOAD
-		// 109.20 SVCSEOPA
-		if (SVCSEOFO != null) {
-			seofodate = SVCSEOFO;
-		} else if (SVCSEOAD != null) {
-			seofodate = SVCSEOAD;
-		} else if (SVCSEOPA != null) {
-			seofodate = SVCSEOPA;
-		}
-
-		// 109.40 SVCMODFIRSTORDER FirstValue SVCMODFO Derives SVCMOD First
-		// Order
-		// 109.60 SVCMODAD
-		// 109.80 SVCMODPA
-		if (SVCMODFO != null) {
-			modfodate = SVCMODFO;
-		} else if (SVCMODAD != null) {
-			modfodate = SVCMODAD;
-		} else if (SVCMODPA != null) {
-			modfodate = SVCMODPA;
-		}
-		// 109.90 IF NotNull(SVCSEOFIRSTORDER)
-		// 109.92 AND NotNull(SVCMODFIRSTORDER)
-		// 110.00 SVCMODFIRSTORDER <= SVCSEOFIRSTORDER RE RE RE First Order
-		// SVCMOD can not be later than SVCSEO First Order {LD: SVCMOD} First
-		// Order date must not be later than the {LD: SVCSEO} {NDN: SVCSEO)
-		// FODATE_ERR= {0} First Order date {1} must not be later than the {2}
-		// date {3}
-		if (modfodate != null && seofodate != null) {
-			if (modfodate.compareTo(seofodate) > 0) {
-				args[0] = rootEntity.getEntityGroup().getLongDescription();
-				args[1] = modfodate;
-				args[3] = seofodate;
-
-				Vector svcseoVct = PokUtils.getAllLinkedEntities(rootEntity, "SVCMODSVCSEO", "SVCSEO");
-				for (int iv = 0; iv < svcseoVct.size(); iv++) {
-					EntityItem svcseo = (EntityItem) svcseoVct.elementAt(iv);
-					args[2] = this.getLD_NDN(svcseo);
-					createMessage(CHECKLEVEL_RE, "FODATE_ERR", args);
-				}
-			}
-		}
-		// 110.20 END 109.92
-	}
-
-	/**
-	 * 106.60 W "SVCMODSVCSEO-d SVCSEOAVAIL-d" AVAIL 106.80 WHEN X AVAILTYPE =
-	 * "Planned Availability" (146) 107.00 SVCSEOPA SetTo X: AVAIL
-	 * MIN(EFFECTIVEDATE) 107.20 Y "W: +AVAILANNA-d" ANNOUNCEMENT 107.40 IF Y:
-	 * ANNTYPE = New (19) 107.60 SVCSEOAD SetTo T: ANNOUNCEMENT MIN(ANNDATE)
-	 * 107.80 END 107.40 108.00 END 106.80 108.20 WHEN "First Order" = W: AVAIL
-	 * AVAILTYPE 108.40 SVCSEOFO SetTo W:AVAIL MIN(EFFECTIVEDATE) 108.60 END
-	 * 108.20
-	 * 
-	 * @param rootEntity
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	private void checkSVCSEOAvails(EntityItem rootEntity) throws SQLException, MiddlewareException {
-		Vector svcseoVct = PokUtils.getAllLinkedEntities(rootEntity, "SVCMODSVCSEO", "SVCSEO");
-		addDebug("svcseoVct " + svcseoVct.size());
-		for (int iv = 0; iv < svcseoVct.size(); iv++) {
-			EntityItem svcseo = (EntityItem) svcseoVct.elementAt(iv);
-			addHeading(3, getLD_NDN(svcseo) + " Planned Availability checks:");
-			// 106.60 W "SVCMODSVCSEO-d SVCSEOAVAIL-d" AVAIL
-			Vector svcseoAvailVctW = PokUtils.getAllLinkedEntities(svcseo, "SVCSEOAVAIL", "AVAIL");
-			// 106.80 WHEN X AVAILTYPE = "Planned Availability" (146)
-			Vector svcseoplaAvailVctX = PokUtils.getEntitiesWithMatchedAttr(svcseoAvailVctW, "AVAILTYPE", PLANNEDAVAIL);
-			// 108.20 WHEN "First Order" = W: AVAIL AVAILTYPE
-			Vector svcseofoAvailVct = PokUtils.getEntitiesWithMatchedAttr(svcseoAvailVctW, "AVAILTYPE",
-					FIRSTORDERAVAIL);
-
-			addDebug("svcseo " + svcseo.getKey() + " svcseoAvailVctW " + svcseoAvailVctW.size() + " svcseoplaAvailVctX "
-					+ svcseoplaAvailVctX.size() + " svcseofoAvailVct " + svcseofoAvailVct.size());
-			// 106.80 WHEN X AVAILTYPE = "Planned Availability" (146)
-			for (int i = 0; i < svcseoplaAvailVctX.size(); i++) {
-				EntityItem availitem = (EntityItem) svcseoplaAvailVctX.elementAt(i);
-				String effDate = PokUtils.getAttributeValue(availitem, "EFFECTIVEDATE", "", null, false);
-				// 107.00 SVCSEOPA SetTo X: AVAIL MIN(EFFECTIVEDATE)
-				if (SVCSEOPA == null) {
-					SVCSEOPA = effDate;
-				} else {
-					if (SVCSEOPA.compareTo(effDate) > 0) { // find earliest date
-						SVCSEOPA = effDate;
-					}
-				}
-				// 107.20 Y "W: + AVAILANNA-d" ANNOUNCEMENT
-				Vector annVct = PokUtils.getAllLinkedEntities(availitem, "AVAILANNA", "ANNOUNCEMENT");
-				addDebug(availitem.getKey() + " annVct " + annVct.size());
-				for (int i2 = 0; i2 < annVct.size(); i2++) {
-					EntityItem annItem = (EntityItem) annVct.elementAt(i2);
-					String anntype = getAttributeFlagEnabledValue(annItem, "ANNTYPE");
-					addDebug(annItem.getKey() + " type " + anntype);
-					// 107.40 IF Y: ANNTYPE = New (19)
-					if (ANNTYPE_NEW.equals(anntype)) {
-						// 107.60 SVCSEOAD SetTo T: ANNOUNCEMENT MIN(ANNDATE)
-						String annDate = PokUtils.getAttributeValue(annItem, "ANNDATE", "", null, false);
-						if (SVCSEOAD == null) {
-							SVCSEOAD = annDate;
-						} else {
-							if (SVCSEOAD.compareTo(annDate) > 0) { // find
-																	// earliest
-																	// date
-								SVCSEOAD = annDate;
-							}
-						}
-						addDebug("svcseo pla avail ann " + annItem.getKey() + " annDate " + annDate + " SVCSEOAD "
-								+ SVCSEOAD);
-					}
-					// 107.80 END 107.40
-				} // end ann loop
-				annVct.clear();
-			}
-			// 108.00 END 106.80
-
-			// 108.20 WHEN "First Order" = W: AVAIL AVAILTYPE
-			// 108.40 SVCSEOFO SetTo W:AVAIL MIN(EFFECTIVEDATE)
-			for (int i = 0; i < svcseofoAvailVct.size(); i++) {
-				EntityItem availitem = (EntityItem) svcseofoAvailVct.elementAt(i);
-				String effDate = PokUtils.getAttributeValue(availitem, "EFFECTIVEDATE", "", null, false);
-				// 108.40 SVCSEOFO SetTo W:AVAIL MIN(EFFECTIVEDATE)
-				if (SVCSEOFO == null) {
-					SVCSEOFO = effDate;
-				} else {
-					if (SVCSEOFO.compareTo(effDate) > 0) { // find earliest date
-						SVCSEOFO = effDate;
-					}
-				}
-				addDebug("svcseo fo avail " + availitem.getKey() + " effDate " + effDate + " SVCSEOFO " + SVCSEOFO);
-			}
-			// 108.60 END 108.20
-		}
-		// VALUE_FND = {0} found for {1} {2}
-		if (SVCSEOFO == null) {
-			args[0] = "No Date";
-		} else {
-			args[0] = SVCSEOFO;
-		}
-		args[1] = m_elist.getEntityGroup("SVCSEO").getLongDescription();
-		args[2] = "First Order date";
-
-		addResourceMsg("VALUE_FND", args);
-		// VALUE_FND = {0} found for {1} {2}
-		if (SVCSEOPA == null) {
-			args[0] = "No Date";
-		} else {
-			args[0] = SVCSEOPA;
-		}
-		args[1] = m_elist.getEntityGroup("SVCSEO").getLongDescription();
-		args[2] = "Planned Availability date";
-		addResourceMsg("VALUE_FND", args);
-
-		// VALUE_FND = {0} found for {1} {2}
-		if (SVCSEOAD == null) {
-			args[0] = "No Date";
-		} else {
-			args[0] = SVCSEOAD;
-		}
-		args[1] = m_elist.getEntityGroup("SVCSEO").getLongDescription();
-		args[2] = "New Announcement date";
-		addResourceMsg("VALUE_FND", args);
-	}
-
-	/**
-	 * 
-	 * 104.20 S SVCMODAVAIL-d AVAIL 104.40 WHEN R AVAILTYPE = "Planned
-	 * Availability" (146) SVCMOD AVAIL "Planned Availability" 104.60 "Q: +
-	 * PRCPTCNTRYEFF-d COUNTRYLIST" "IN aggregate G" R: AVAIL COUNTRYLIST E E E
-	 * PRCPT CNTRYEFF COUNTRYLIST must be a subset of SVCMOD AVAIL COUNTRYLIST
-	 * {LD: PRCPT} {NDN: Q:PRCPT} {LD: CNTRYEFF} {NDN: CNTRYEFF} {LD:
-	 * COUNTRYLIST} must not include a country that is not in the {LD: SVCMOD}
-	 * {LD: AVAIL} 104.80 SVCMODPA SetTo R: AVAIL MIN(EFFECTIVEDATE) 105.00 T
-	 * "S: + AVAILANNA-d" ANNOUNCEMENT 105.20 IF T: ANNTYPE = New (19) 105.40
-	 * SVCMODAD SetTo T: ANNOUNCEMENT MIN(ANNDATE) 105.60 END 105.20 105.80 END
-	 * 104.40
-	 * 
-	 * 106.00 WHEN "First Order" = S: AVAIL AVAILTYPE 106.20 SVCMODFO SetTo
-	 * S:AVAIL MIN(EFFECTIVEDATE) 106.40 END 106.00
-	 * 
-	 * @param rootEntity
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	private void checkSVCMODAvails(EntityItem rootEntity) throws SQLException, MiddlewareException {
-		EntityGroup prcptGrp = m_elist.getEntityGroup("PRCPT");
-
-		// 104.20 S SVCMODAVAIL-d AVAIL
-		Vector availVctS = PokUtils.getAllLinkedEntities(rootEntity, "SVCMODAVAIL", "AVAIL");
-		// 104.40 WHEN R AVAILTYPE = "Planned Availability" (146) SVCMOD AVAIL
-		// "Planned Availability"
-		Vector plaAvailVctR = PokUtils.getEntitiesWithMatchedAttr(availVctS, "AVAILTYPE", PLANNEDAVAIL);
-		// 106.00 WHEN "First Order" = S: AVAIL AVAILTYPE
-		Vector foAvailVct = PokUtils.getEntitiesWithMatchedAttr(availVctS, "AVAILTYPE", FIRSTORDERAVAIL);
-
-		ArrayList plaavailCtrys = getCountriesAsList(plaAvailVctR, CHECKLEVEL_E); // get
-																					// all
-																					// planned
-																					// avail
-																					// ctrys
-
-		addDebug("root availVctS " + availVctS.size() + " plaAvailVctR " + plaAvailVctR.size() + " foAvailVct "
-				+ foAvailVct.size() + " plaavailCtrys " + plaavailCtrys);
-
-		// 104.40 WHEN R AVAILTYPE = "Planned Availability" (146) SVCMOD AVAIL
-		// "Planned Availability"
-		for (int i = 0; i < plaAvailVctR.size(); i++) {
-			EntityItem availitem = (EntityItem) plaAvailVctR.elementAt(i);
-			String effDate = PokUtils.getAttributeValue(availitem, "EFFECTIVEDATE", "", null, false);
-			// 104.80 SVCMODPA SetTo R: AVAIL MIN(EFFECTIVEDATE)
-			if (SVCMODPA == null) {
-				SVCMODPA = effDate;
-			} else {
-				if (SVCMODPA.compareTo(effDate) > 0) { // find earliest date
-					SVCMODPA = effDate;
-				}
-			}
-
-			addDebug("svcmod pla avail " + availitem.getKey() + " effDate " + effDate + " SVCMODPA " + SVCMODPA);
-
-			// 105.00 T "S: + AVAILANNA-d" ANNOUNCEMENT
-			Vector annVct = PokUtils.getAllLinkedEntities(availitem, "AVAILANNA", "ANNOUNCEMENT");
-			addDebug(availitem.getKey() + " annVct " + annVct.size());
-			for (int i2 = 0; i2 < annVct.size(); i2++) {
-				EntityItem annItem = (EntityItem) annVct.elementAt(i2);
-				String anntype = getAttributeFlagEnabledValue(annItem, "ANNTYPE");
-				addDebug(annItem.getKey() + " type " + anntype);
-				// 105.20 IF T: ANNTYPE = New (19)
-				if (ANNTYPE_NEW.equals(anntype)) {
-					// 105.40 SVCMODAD SetTo T: ANNOUNCEMENT MIN(ANNDATE)
-					String annDate = PokUtils.getAttributeValue(annItem, "ANNDATE", "", null, false);
-					if (SVCMODAD == null) {
-						SVCMODAD = annDate;
-					} else {
-						if (SVCMODAD.compareTo(annDate) > 0) { // find earliest
-																// date
-							SVCMODAD = annDate;
-						}
-					}
-					addDebug("svcmod pla avail ann " + annItem.getKey() + " annDate " + annDate + " SVCMODAD "
-							+ SVCMODAD);
-				}
-				// 105.60 END 105.20
-			} // end ann loop
-			annVct.clear();
-		}
-		// 38.00 END 32.00
-		// VALUE_FND = {0} found for {1} {2}
-		if (SVCMODPA == null) {
-			args[0] = "No Date";
-		} else {
-			args[0] = SVCMODPA;
-		}
-		args[1] = rootEntity.getEntityGroup().getLongDescription();
-		args[2] = "Planned Availability date";
-		addResourceMsg("VALUE_FND", args);
-
-		EntityGroup egCNTRYEFF = m_elist.getEntityGroup("CNTRYEFF");
-		addHeading(3, egCNTRYEFF.getLongDescription() + " and Planned Availability checks:");
-
-		for (int i = 0; i < prcptGrp.getEntityItemCount(); i++) {
-			EntityItem prcptitem = prcptGrp.getEntityItem(i);
-			Vector cntryeffVct = PokUtils.getAllLinkedEntities(prcptitem, "PRCPTCNTRYEFF", "CNTRYEFF");
-			addDebug(" " + prcptitem.getKey() + " cntryeffVct " + cntryeffVct.size());
-			for (int c = 0; c < cntryeffVct.size(); c++) {
-				EntityItem cntryeffitem = (EntityItem) cntryeffVct.elementAt(c);
-				String missingCtry = checkCtryMismatch(cntryeffitem, plaavailCtrys, CHECKLEVEL_E);
-				if (missingCtry.length() > 0) {
-					addDebug(cntryeffitem.getKey() + " COUNTRYLIST had extra [" + missingCtry + "]");
-					// 104.60 "Q: + PRCPTCNTRYEFF-d COUNTRYLIST" "IN aggregate
-					// G" R: AVAIL COUNTRYLIST E E E
-					// PRCPT CNTRYEFF COUNTRYLIST must be a subset of SVCMOD
-					// AVAIL COUNTRYLIST
-					// {LD: PRCPT} {NDN: Q:PRCPT} {LD: CNTRYEFF} {NDN: CNTRYEFF}
-					// {LD: COUNTRYLIST} must not include a country that is not
-					// in the {LD: SVCMOD} {LD: AVAIL}
-					// INCLUDE_ERR2 = {0} {1} must not include a Country that is
-					// not in the {2} {3}. Extra countries are: {4}
-					args[0] = this.getLD_NDN(prcptitem);
-					args[1] = this.getLD_NDN(cntryeffitem);
-
-					args[2] = rootEntity.getEntityGroup().getLongDescription() + " "
-							+ m_elist.getEntityGroup("AVAIL").getLongDescription();
-					args[3] = PokUtils.getAttributeDescription(egCNTRYEFF, "COUNTRYLIST", "COUNTRYLIST");
-					args[4] = missingCtry;
-					createMessage(CHECKLEVEL_E, "INCLUDE_ERR2", args);
-				}
-			}
-			cntryeffVct.clear();
-		}
-
-		// VALUE_FND = {0} found for {1} {2}
-		if (SVCMODAD == null) {
-			args[0] = "No Date";
-		} else {
-			args[0] = SVCMODAD;
-		}
-		args[1] = rootEntity.getEntityGroup().getLongDescription();
-		args[2] = "New Announcement date";
-		addResourceMsg("VALUE_FND", args);
-
-		// 106.00 WHEN "First Order" = S: AVAIL AVAILTYPE
-		for (int i = 0; i < foAvailVct.size(); i++) {
-			EntityItem availitem = (EntityItem) foAvailVct.elementAt(i);
-			String effDate = PokUtils.getAttributeValue(availitem, "EFFECTIVEDATE", "", null, false);
-			// 106.20 SVCMODFO SetTo S:AVAIL MIN(EFFECTIVEDATE)
-			if (SVCMODFO == null) {
-				SVCMODFO = effDate;
-			} else {
-				if (SVCMODFO.compareTo(effDate) > 0) { // find earliest date
-					SVCMODFO = effDate;
-				}
-			}
-			addDebug("svcmod fo avail " + availitem.getKey() + " effDate " + effDate + " SVCMODFO " + SVCMODFO);
-		}
-		// 106.40 END 106.00
-		// VALUE_FND = {0} found for {1} {2}
-		if (SVCMODFO == null) {
-			args[0] = "No Date";
-		} else {
-			args[0] = SVCMODFO;
-		}
-		args[1] = rootEntity.getEntityGroup().getLongDescription();
-		args[2] = "First Order date";
-		addResourceMsg("VALUE_FND", args);
-
-		// release memory
-		plaavailCtrys.clear();
-	}
-
-	/**
-	 * get all avails needed for avail checks
-	 * 
-	 * @param rootEntity
-	 * @throws MiddlewareException
-	 * @throws SQLException
-	 */
-	private void getAvails(EntityItem rootEntity, String statusFlag) throws MiddlewareException, SQLException {
-		// get all AVAILS
-		EntityGroup availGrp = m_elist.getEntityGroup("AVAIL");
-		if (availGrp == null) {
-			throw new MiddlewareException("AVAIL is missing from extract for " + m_abri.getVEName());
-		}
-
-		addHeading(3, rootEntity.getEntityGroup().getLongDescription() + " Availability RFA checks:");
-		checkAvailAnnType();
-
-		// look at SVCMOD avails
-		svcmodAvailVct = PokUtils.getAllLinkedEntities(rootEntity, "SVCMODAVAIL", "AVAIL");
-
-		// 4.00 AVAIL A SVCMODAVAIL-d SVCMOD AVAIL 5.00 WHEN A AVAILTYPE =
-		// "Planned Availability"
-		svcmodPlaAvailVctA = PokUtils.getEntitiesWithMatchedAttr(svcmodAvailVct, "AVAILTYPE", PLANNEDAVAIL);
-		// 18.00 AVAIL C SVCMODAVAIL-d SVCMOD AVAIL 19.00 WHEN C AVAILTYPE =
-		// "First Order"
-		svcmodFOAvailVctC = PokUtils.getEntitiesWithMatchedAttr(svcmodAvailVct, "AVAILTYPE", FIRSTORDERAVAIL);
-		// 30.00 AVAIL E SVCMODAVAIL-d SVCMOD AVAIL 31.00 WHEN AVAILTYPE = "Last
-		// Order"
-		svcmodLOAvailVctE = PokUtils.getEntitiesWithMatchedAttr(svcmodAvailVct, "AVAILTYPE", LASTORDERAVAIL);
-		// 45.00 AVAIL G SVCMODAVAIL-d SVCMOD AVAIL 46.00 WHEN AVAILTYPE = "End
-		// of Service" (151)
-		svcmodEOSAvailVctG = PokUtils.getEntitiesWithMatchedAttr(svcmodAvailVct, "AVAILTYPE", EOSAVAIL);
-
-		svcmodEOMAvailVctM = PokUtils.getEntitiesWithMatchedAttr(svcmodAvailVct, "AVAILTYPE", EOMAVAIL);
-		addDebug("getAvails SVCMODAVAIL svcmodPlaAvailVctA: " + svcmodPlaAvailVctA.size() + " svcmodFOAvailVctC: "
-				+ svcmodFOAvailVctC.size() + " svcmodLOAvailVctE: " + svcmodLOAvailVctE.size() + " svcmodEOSAvailVctG: "
-				+ svcmodEOSAvailVctG.size() + " svcmodEOMAvailVctM: " + svcmodEOMAvailVctM.size());
-
-		svcmdlPlaAvailCtryTblA = getAvailByCountry(svcmodPlaAvailVctA, getCheck_W_W_E(statusFlag));
-		addDebug("getAvails SVCMODAVAIL svcmdlPlaAvailCtryTblA " + svcmdlPlaAvailCtryTblA.keySet());
-
-		svcmdlFOAvailCtryTblC = getAvailByCountry(svcmodFOAvailVctC, getCheck_W_W_E(statusFlag));
-		addDebug("getAvails SVCMODAVAIL svcmdlFOAvailCtryTblC: " + svcmdlFOAvailCtryTblC.keySet());
-
-		svcmdlLOAvailCtryTblE = getAvailByCountry(svcmodLOAvailVctE, getCheck_W_W_E(statusFlag));
-		addDebug("getAvails SVCMODAVAIL svcmdlLOAvailCtryTblE: " + svcmdlLOAvailCtryTblE.keySet());
-
-		svcmdlEOSAvailCtryTblG = getAvailByCountry(svcmodEOSAvailVctG, getCheck_W_W_E(statusFlag));
-		addDebug("getAvails SVCMODAVAIL svcmdlEOSAvailCtryTblG: " + svcmdlEOSAvailCtryTblG.keySet());
-
-	}
-
-	public void dereference() {
-		super.dereference();
-
-		SVCSEOFO = null;
-		SVCSEOPA = null;
-		SVCSEOAD = null;
-		SVCMODFO = null;
-		SVCMODPA = null;
-		SVCMODAD = null;
-
-		mdlPlaAnnVct.clear();
-		mdlPlaAnnVct = null;
-		if (svcmodAvailVct != null) {
-			svcmodAvailVct.clear();
-			svcmodAvailVct = null;
-		}
-		if (svcmodLOAvailVctE != null) {
-			svcmodLOAvailVctE.clear();
-			svcmodLOAvailVctE = null;
-		}
-		if (svcmodPlaAvailVctA != null) {
-			svcmodPlaAvailVctA.clear();
-			svcmodPlaAvailVctA = null;
-		}
-		if (svcmodFOAvailVctC != null) {
-			svcmodFOAvailVctC.clear();
-			svcmodFOAvailVctC = null;
-		}
-		if (svcmodEOSAvailVctG != null) {
-			svcmodEOSAvailVctG.clear();
-			svcmodEOSAvailVctG = null;
-		}
-		if (svcmdlPlaAvailCtryTblA != null) {
-			svcmdlPlaAvailCtryTblA.clear();
-			svcmdlPlaAvailCtryTblA = null;
-		}
-		if (svcmdlFOAvailCtryTblC != null) {
-			svcmdlFOAvailCtryTblC.clear();
-			svcmdlFOAvailCtryTblC = null;
-		}
-		if (svcmdlLOAvailCtryTblE != null) {
-			svcmdlLOAvailCtryTblE.clear();
-			svcmdlLOAvailCtryTblE = null;
-		}
-		if (svcmdlEOSAvailCtryTblG != null) {
-			svcmdlEOSAvailCtryTblG.clear();
-			svcmdlEOSAvailCtryTblG = null;
-		}
-	}
-
-	/**
-	 * @param rootEntity
-	 * @param statusFlag
-	 * @param checklvl
-	 * @throws java.sql.SQLException
-	 * @throws MiddlewareException
-	 * 
-	 */
-	private void checkPrftctr(EntityItem rootEntity) throws SQLException, MiddlewareException {
-
-		addHeading(3, rootEntity.getEntityGroup().getLongDescription() + " SVCMODTAXRELEVANCE Checks:");
-		String prftctr = PokUtils.getAttributeFlagValue(rootEntity, "PRFTCTR");
-		if ("P4022".equals(prftctr) || "P4016".equals(prftctr)) {
-			Vector taxcat = PokUtils.getAllLinkedEntities(rootEntity, "SVCMODTAXRELEVANCE", "TAXCATG");
-			if (taxcat != null && !taxcat.isEmpty()) {
-				for (int i = 0; i < taxcat.size(); i++) {
-					EntityItem tItem = (EntityItem) taxcat.get(i);
-					String tax = PokUtils.getAttributeFlagValue(tItem, "TAXCNTRY");	
-					if ("1464".equals(tax)) {
-						EntityItem entityItem = (EntityItem) tItem.getUpLink().get(0);
-						
-						String v2 = PokUtils.getAttributeValue(entityItem, "TAXCLS", "", "");
-							if(!set.contains(v2)){
-								args[0]=getLD_NDN(entityItem);
-								//args[1]=PokUtils.getAttributeDescription(entityItem.getEntityGroup(), "TAXCLS","");
-								//
-								args[1] = "Tax Country Canada";
-								addError("INVALID_VALUES_ERR", args);
-							}
-					}
-
-				}
-			}
-		}
-
-		// check model avails
-
-	}
-
-	/**
-	 * @param rootEntity
-	 * @param statusFlag
-	 * @param checklvl
-	 * @throws java.sql.SQLException
-	 * @throws MiddlewareException
-	 * 
-	 */
-	private void checkAvails(EntityItem rootEntity, String statusFlag, int checklvl)
-			throws java.sql.SQLException, MiddlewareException {
-		// get all AVAILS
-		EntityGroup availGrp = m_elist.getEntityGroup("AVAIL");
-
-		// check model avails
-		addHeading(3, rootEntity.getEntityGroup().getLongDescription() + " " + availGrp.getLongDescription()
-				+ " Planned Availability Checks:");
-		checkSvcmodPlaAvails(rootEntity, statusFlag);
-
-		addHeading(3, rootEntity.getEntityGroup().getLongDescription() + " " + availGrp.getLongDescription()
-				+ " First Order Checks:");
-		checkSvcmodFOAvails(rootEntity, statusFlag);
-
-		addHeading(3, rootEntity.getEntityGroup().getLongDescription() + " " + availGrp.getLongDescription()
-				+ " Last Order Checks:");
-		checkSvcmodLOAvails(rootEntity, statusFlag);
-
-		addHeading(3, rootEntity.getEntityGroup().getLongDescription() + " " + availGrp.getLongDescription()
-				+ " End of Marketing Checks:");
-		checkSvcmodEOMAvails(rootEntity, statusFlag);
-	}
-
-	/**
-	 * @param rootEntity
-	 * @param statusFlag
-	 * @param checklvl
-	 * @throws java.sql.SQLException
-	 * @throws MiddlewareException
-	 * 
-	 *             checks from ss: 5.00 WHEN AVAILTYPE = "Planned Availability"
-	 *             6.00 Count of => 1 RW RW RE must have at least one "Planned
-	 *             Availability" 7.00 EFFECTIVEDATE => SVCMOD ANNDATE W E E {LD:
-	 *             AVAIL} {NDN: AVAIL} can not be earlier than the {LD:
-	 *             SVCMODEL} {LD: ANNDATE} {ANNDATE} 8.00 COUNTRYLIST 9.00
-	 *             ANNOUNCEMENT B A: + AVAILANNA-d 10.00 WHEN "RFA" (RFA) <> A:
-	 *             AVAIL AVAILANNTYPE 11.00 Count of = 0 E E E {LD: AVAIL} {NDN:
-	 *             A:AVAIL} must not be in {LD: ANNOUNCEMENT} {NDN:
-	 *             ANNOUNCEMENT} 12.00 END 10.00 13.00 IF ANNTYPE <> New (19)
-	 *             14.00 Count of = 0 E E E {LD: AVAIL} {NDN: A:AVAIL} must not
-	 *             be in {LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} 15.00 ELSE
-	 *             ANNDATE => SVCMOD ANNDATE W W E {LD: ANNOUNCEMENT} {NDN:
-	 *             ANNOUNCEMENT} can not be earlier than the {LD: SVCMOD} {LD:
-	 *             ANNDATE} {ANNDATE} 16.00 END 13.00 17.00 END 5.00
-	 */
-	private void checkSvcmodPlaAvails(EntityItem rootEntity, String statusFlag)
-			throws java.sql.SQLException, MiddlewareException {
-		addDebug("checkSvcmodPlaAvails svcmodPlaAvailVctA " + svcmodPlaAvailVctA.size());
-		// 5.00 WHEN AVAILTYPE = "Planned Availability"
-		// 6.00 Count Of => 1 RW RW RE must have at least one "Planned
-		// Availability"
-		checkPlannedAvailsExist(svcmodPlaAvailVctA, getCheck_RW_RW_RE(statusFlag));
-		// 20121030 Add 6.20 WHEN "Final" (FINAL) = SVCMOD DATAQUALITY
-		// 20121030 Add 6.22 IF STATUS = "Ready for Review" (0040)
-		// 20121030 Add 6.24 OR STATUS = "Final" (0020)
-		// 20121030 Add 6.26 CountOf => 1 RE must have at least one "Planned
-		// Availability" that is either "Ready for Review" or "Final" in order
-		// to be "Final"
-		// 20121030 Add 6.28 END 6.20
-		checkPlannedAvailsStatus(svcmodPlaAvailVctA, rootEntity, CHECKLEVEL_RE);
-
-		for (int i = 0; i < svcmodPlaAvailVctA.size(); i++) {
-			EntityItem avail = (EntityItem) svcmodPlaAvailVctA.elementAt(i);
-			// addDebug("checkAvails svcmodPlaAvail "+avail.getKey());
-			// 5.00 WHEN AVAILTYPE = "Planned Availability"
-			// 7.00 EFFECTIVEDATE => SVCMOD ANNDATE W E E
-			// {LD: AVAIL} {NDN: AVAIL} can not be earlier than the {LD:
-			// SVCMODEL} {LD: ANNDATE} {ANNDATE}
-			checkCanNotBeEarlier(avail, "EFFECTIVEDATE", rootEntity, "ANNDATE", getCheck_W_E_E(statusFlag));
-			// 8.00 COUNTRYLIST Not Checked since SVCMOD does not have
-			// COUNTRYLIST
-
-			String availAnntypeFlag = PokUtils.getAttributeFlagValue(avail, "AVAILANNTYPE");
-			addDebug("checkSvcmodPlaAvails " + avail.getKey() + " availAnntypeFlag " + availAnntypeFlag);
-			if (availAnntypeFlag == null) {
-				availAnntypeFlag = AVAILANNTYPE_RFA; // if not set, default to
-														// RFA
-			}
-			if (AVAILANNTYPE_RFA.equals(availAnntypeFlag)) { // error was
-																// already
-																// logged
-				// check its announcements
-				// 9.00 ANNOUNCEMENT B A: + AVAILANNA-d SVCMOD ANNOUNCEMENT
-				// 10.00 WHEN "RFA" (RFA) <> A: AVAIL AVAILANNTYPE - done in
-				// getAvails()
-				// 11.00 Count of = 0 E E E Only AVAIL.AVAILANNTYPE = "RFA" can
-				// be in an ANNOUNCEMENT
-				// {LD: AVAIL} {NDN: A:AVAIL} must not be in {LD: ANNOUNCEMENT}
-				// {NDN: ANNOUNCEMENT}
-				// 12.00 END 10.00
-				Vector annVct = PokUtils.getAllLinkedEntities(avail, "AVAILANNA", "ANNOUNCEMENT");
-
-				// 13.00 IF ANNTYPE <> New (19)
-				// 14.00 Count of = 0 E E E
-				// {LD: AVAIL} {NDN: A:AVAIL} must not be in {LD: ANNOUNCEMENT}
-				// {NDN: ANNOUNCEMENT}
-				for (int ai = 0; ai < annVct.size(); ai++) {
-					EntityItem annItem = (EntityItem) annVct.elementAt(ai);
-					String anntypeFlag = PokUtils.getAttributeFlagValue(annItem, "ANNTYPE");
-					addDebug("checkSvcmodPlaAvails " + annItem.getKey() + " anntypeFlag " + anntypeFlag);
-					if (!ANNTYPE_NEW.equals(anntypeFlag)) {
-						// MUST_NOT_BE_IN_ERR2= {0} must not be in {1}
-						args[0] = getLD_NDN(avail);
-						args[1] = getLD_NDN(annItem);
-						createMessage(CHECKLEVEL_E, "MUST_NOT_BE_IN_ERR2", args);
-						continue;
-					}
-					// 15.00 ELSE ANNDATE => SVCMOD ANNDATE W W E
-					// {LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} can not be earlier
-					// than the {LD: SVCMOD} {LD: ANNDATE} {ANNDATE}
-					// 16.00 END 13.00
-					checkCanNotBeEarlier(annItem, "ANNDATE", rootEntity, "ANNDATE", getCheck_W_W_E(statusFlag));
-					mdlPlaAnnVct.add(annItem); // hang onto this for later
-												// checks
-				}
-
-				annVct.clear();
-			}
-		} // end svcmod plannedavail loop
-	}
-
-	/**
-	 * @param rootEntity
-	 * @param statusFlag
-	 * @param checklvl
-	 * @throws java.sql.SQLException
-	 * @throws MiddlewareException
-	 * 
-	 *             checks from ss: 18.00 AVAIL C SVCMODAVAIL-d 19.00 WHEN
-	 *             AVAILTYPE = "First Order" 20.00 EFFECTIVEDATE => SVCMOD
-	 *             ANNDATE W W E {LD: AVAIL} {NDN: AVAIL} has a date earlier
-	 *             than the {LD: SVCMOD} {LD: ANNDATE} 21.00 ANNOUNCEMENT D C: +
-	 *             AVAILANNA-d 22.00 WHEN "RFA" (RFA) <> C: AVAIL AVAILANNTYPE
-	 *             23.00 Count of = 0 E E E {LD: AVAIL} {NDN: C:AVAIL} must not
-	 *             be in {LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} 24.00 END 22.00
-	 *             25.00 IF ANNTYPE <> New (19) 26.00 Count of = 0 E E E {LD:
-	 *             AVAIL} {NDN: C:AVAIL} must not be in {LD: ANNOUNCEMENT} {NDN:
-	 *             ANNOUNCEMENT} 27.00 ELSE ANNDATE => SVCMOD ANNDATE W W E {LD:
-	 *             ANNOUNCEMENT} {NDN: ANNOUNCEMENT} can not be earlier than the
-	 *             {LD: SVCMOD} {LD: ANNDATE} {ANNDATE} 28.00 END 25.00 29.00
-	 *             END 19.00
-	 */
-	private void checkSvcmodFOAvails(EntityItem rootEntity, String statusFlag)
-			throws java.sql.SQLException, MiddlewareException {
-		addDebug("checkSvcmodFOAvails svcmodFOAvailVctC " + svcmodFOAvailVctC.size());
-
-		for (int i = 0; i < svcmodFOAvailVctC.size(); i++) {
-			EntityItem avail = (EntityItem) svcmodFOAvailVctC.elementAt(i);
-			// addDebug("checkAvails svcmodFOAvail "+avail.getKey());
-			// 19.00 WHEN AVAILTYPE = "First Order"
-			// 20.00 EFFECTIVEDATE => SVCMOD ANNDATE W W E
-			// {LD: AVAIL} {NDN: AVAIL} can not be earlier than the {LD:
-			// SVCMODEL} {LD: ANNDATE} {ANNDATE}
-			checkCanNotBeEarlier(avail, "EFFECTIVEDATE", rootEntity, "ANNDATE", getCheck_W_W_E(statusFlag));
-
-			String availAnntypeFlag = PokUtils.getAttributeFlagValue(avail, "AVAILANNTYPE");
-			addDebug("checkSvcmodFOAvails " + avail.getKey() + " availAnntypeFlag " + availAnntypeFlag);
-			if (availAnntypeFlag == null) {
-				availAnntypeFlag = AVAILANNTYPE_RFA; // if not set, default to
-														// RFA
-			}
-			if (AVAILANNTYPE_RFA.equals(availAnntypeFlag)) { // error was
-																// already
-																// logged
-				// check its announcements
-				// 21.00 ANNOUNCEMENT D C: + AVAILANNA-d SVCMOD ANNOUNCEMENT
-				// 22.00 WHEN "RFA" (RFA) <> C: AVAIL AVAILANNTYPE - done in
-				// getAvails()
-				// 23.00 Count of = 0 E E E {LD: AVAIL} {NDN: C:AVAIL} must not
-				// be in {LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT}
-				// 24.00 END 22.00
-				Vector annVct = PokUtils.getAllLinkedEntities(avail, "AVAILANNA", "ANNOUNCEMENT");
-
-				// 25.00 IF ANNTYPE <> New (19)
-				// 26.00 Count of = 0 E E E
-				// {LD: AVAIL} {NDN: C:AVAIL} must not be in {LD: ANNOUNCEMENT}
-				// {NDN: ANNOUNCEMENT}
-				for (int ai = 0; ai < annVct.size(); ai++) {
-					EntityItem annItem = (EntityItem) annVct.elementAt(ai);
-					String anntypeFlag = PokUtils.getAttributeFlagValue(annItem, "ANNTYPE");
-					addDebug("checkSvcmodFOAvails " + annItem.getKey() + " anntypeFlag " + anntypeFlag);
-					if (!ANNTYPE_NEW.equals(anntypeFlag)) {
-						// MUST_NOT_BE_IN_ERR2= {0} must not be in {1}
-						args[0] = getLD_NDN(avail);
-						args[1] = getLD_NDN(annItem);
-						createMessage(CHECKLEVEL_E, "MUST_NOT_BE_IN_ERR2", args);
-						continue;
-					}
-					// 27.00 ELSE ANNDATE => SVCMOD ANNDATE W W E
-					// {LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} can not be earlier
-					// than the {LD: SVCMOD} {LD: ANNDATE} {ANNDATE}
-					// 28.00 END 25.00
-					// 29.00 END 19.00
-					checkCanNotBeEarlier(annItem, "ANNDATE", rootEntity, "ANNDATE", getCheck_W_W_E(statusFlag));
-				}
-
-				annVct.clear();
-			}
-		} // end svcmod foavail loop
-	}
-
-	/**
-	 * @param rootEntity
-	 * @param statusFlag
-	 * @param checklvl
-	 * @throws java.sql.SQLException
-	 * @throws MiddlewareException
-	 * 
-	 *             checks from ss: 30.00 AVAIL E SVCMODAVAIL-d 31.00 WHEN
-	 *             AVAILTYPE = "Last Order" 32.00 EFFECTIVEDATE <= SVCMOD
-	 *             WTHDRWEFFCTVDATE W W E {LD: AVAIL} {NDN: AVAIL} must not be
-	 *             later than the {LD: SVCMOD} {LD: WTHDRWEFFCTVDATE}
-	 *             {WTHDRWEFFCTVDATE} 33.00 COUNTRYLIST "IN aggregate G" A:AVAIL
-	 *             COUNTRYLIST W W E {LD: AVAIL} {NDN: AVAIL} {LD: COUNTRYLIST}
-	 *             includes a country that does not have a "Planned
-	 *             Availability" delete34.00 IF COUNTRYLIST Match J: AVAIL
-	 *             COUNTRYLIST delete35.00 THEN TheMatch IN K: AVAIL COUNTRYLIST
-	 *             W RW RE {LD: IPSCFEAT} (NDN: K: IPSCFEAT} must have a "Last
-	 *             Order" for all countries in the {LD: SVCMOD} {LD: AVAIL} {E:
-	 *             AVAIL} 36.00 ANNOUNCEMENT F E: + AVAILANNA-d 37.00 WHEN "RFA"
-	 *             (RFA) <> E: AVAIL AVAILANNTYPE 38.00 Count of = 0 E E E {LD:
-	 *             AVAIL} {NDN: E:AVAIL} must not be in {LD: ANNOUNCEMENT} {NDN:
-	 *             ANNOUNCEMENT} 39.00 END 37.00 40.00 IF ANNTYPE <> "End Of
-	 *             Life - Withdrawal from mktg" (14) 41.00 Count of = 0 E E E
-	 *             {LD: AVAIL} {NDN: E:AVAIL} must not be in {LD: ANNOUNCEMENT}
-	 *             {NDN: ANNOUNCEMENT} 42.00 ELSE ANNDATE <= SVCMOD WITHDRAWDATE
-	 *             W W E {LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} must be earlier
-	 *             than the {LD: SVCMOD} {LD: WITHDRAWDATE} {WITHDRAWDATE} 43.00
-	 *             END 40.00 44.00 END 31.00
-	 */
-	private void checkSvcmodLOAvails(EntityItem rootEntity, String statusFlag)
-			throws java.sql.SQLException, MiddlewareException {
-		addDebug("checkSvcmodLOAvails svcmodLOAvailVctE " + svcmodLOAvailVctE.size());
-
-		for (int i = 0; i < svcmodLOAvailVctE.size(); i++) {
-			EntityItem avail = (EntityItem) svcmodLOAvailVctE.elementAt(i);
-			// addDebug("checkSvcmodLOAvails svcmodLOAvail "+avail.getKey());
-			// 32.00 EFFECTIVEDATE <= SVCMOD WTHDRWEFFCTVDATE W W E
-			// {LD: AVAIL} {NDN: AVAIL} must not be later than the {LD: SVCMOD}
-			// {LD: WTHDRWEFFCTVDATE} {WTHDRWEFFCTVDATE}
-			checkCanNotBeLater(avail, "EFFECTIVEDATE", rootEntity, "WTHDRWEFFCTVDATE", getCheck_W_W_E(statusFlag));
-
-			// 33.00 COUNTRYLIST "IN aggregate G" A:AVAIL COUNTRYLIST W W E
-			// {LD: AVAIL} {NDN: AVAIL} {LD: COUNTRYLIST} includes a country
-			// that does not have a "Planned Availability"
-			checkPlannedAvailForCtryExists(avail, svcmdlPlaAvailCtryTblA.keySet(), getCheck_W_W_E(statusFlag));
-
-			String availAnntypeFlag = PokUtils.getAttributeFlagValue(avail, "AVAILANNTYPE");
-			addDebug("checkSvcmodLOAvails " + avail.getKey() + " availAnntypeFlag " + availAnntypeFlag);
-			if (availAnntypeFlag == null) {
-				availAnntypeFlag = AVAILANNTYPE_RFA; // if not set, default to
-														// RFA
-			}
-			if (AVAILANNTYPE_RFA.equals(availAnntypeFlag)) { // error was
-																// already
-																// logged
-				// 36.00 ANNOUNCEMENT F E: + AVAILANNA-d SVCMOD ANNOUNCEMENT
-				// 37.00 WHEN "RFA" (RFA) <> E: AVAIL AVAILANNTYPE - done in
-				// getAvails()
-				// 38.00 Count of = 0 E E E
-				// {LD: AVAIL} {NDN: E:AVAIL} must not be in {LD: ANNOUNCEMENT}
-				// {NDN: ANNOUNCEMENT}
-				// 39.00 END 37.00
-				Vector annVct = PokUtils.getAllLinkedEntities(avail, "AVAILANNA", "ANNOUNCEMENT");
-
-				// 40.00 IF ANNTYPE <> "End Of Life - Withdrawal from mktg" (14)
-				// 41.00 Count of = 0 E E E {LD: AVAIL} {NDN: E:AVAIL} must not
-				// be in {LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT}
-				for (int ai = 0; ai < annVct.size(); ai++) {
-					EntityItem annItem = (EntityItem) annVct.elementAt(ai);
-					String anntypeFlag = PokUtils.getAttributeFlagValue(annItem, "ANNTYPE");
-					addDebug("checkSvcmodLOAvails " + annItem.getKey() + " anntypeFlag " + anntypeFlag);
-					if (!ANNTYPE_EOL.equals(anntypeFlag)) {
-						// MUST_NOT_BE_IN_ERR2= {0} must not be in {1}
-						args[0] = getLD_NDN(avail);
-						args[1] = getLD_NDN(annItem);
-						createMessage(CHECKLEVEL_E, "MUST_NOT_BE_IN_ERR2", args);
-						continue;
-					}
-					// 42.00 ELSE ANNDATE <= SVCMOD WITHDRAWDATE W W E
-					// {LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} can not be later
-					// than the {LD: SVCMOD} {LD: WITHDRAWDATE} {WITHDRAWDATE}
-					// 43.00 END 40.00
-					checkCanNotBeLater(annItem, "ANNDATE", rootEntity, "WITHDRAWDATE", getCheck_W_W_E(statusFlag));
-				}
-
-				annVct.clear();
-			}
-		} // end svcmod lo avail loop
-
-		// 34.00 IF COUNTRYLIST Match J: AVAIL COUNTRYLIST SVCMOD has Last Order
-		// ==> TMF available in that Country has to have a Last Order
-		// 35.00 THEN TheMatch IN K: AVAIL COUNTRYLIST W RW RE {LD: IPSCFEAT}
-		// (NDN: K: IPSCFEAT} must have a "Last Order" for all countries in the
-		// {LD: SVCMOD} {LD: AVAIL} {E: AVAIL}
-		// delete matchPsModelLastOrderAvail(statusFlag);
-	}
-
-	/*************
-	 * 
-	 * 45.00 AVAIL M SVCMODAVAIL-d 46.00 WHEN AVAILTYPE = "End of Marketing"
-	 * (200) 47.00 EFFECTIVEDATE <= SVCMOD WITHDRAWDATE W W E {LD: AVAIL} {NDN:
-	 * AVAIL} must not be later than the {LD: SVCMOD} {LD: WTHDRWEFFCTVDATE}
-	 * {WTHDRWEFFCTVDATE} 48.00 COUNTRYLIST "IN aggregate G" A:AVAIL COUNTRYLIST
-	 * W W E {LD: AVAIL} {NDN: AVAIL} {LD: COUNTRYLIST} includes a country that
-	 * does not have a "Planned Availability" 49.00 ANNOUNCEMENT N M: +
-	 * AVAILANNA-d 50.00 WHEN "RFA" (RFA) <> M: AVAIL AVAILANNTYPE 51.00 Count
-	 * of = 0 E E E {LD: AVAIL} {NDN: M:AVAIL} must not be in {LD: ANNOUNCEMENT}
-	 * {NDN: ANNOUNCEMENT} 52.00 END 50.00 53.00 IF ANNTYPE <> "End Of Life -
-	 * Withdrawal from mktg" (14) 54.00 Count of = 0 E E E {LD: AVAIL} {NDN:
-	 * M:AVAIL} must not be in {LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} 55.00 ELSE
-	 * ANNDATE <= SVCMOD WITHDRAWDATE W W E {LD: ANNOUNCEMENT} {NDN:
-	 * ANNOUNCEMENT} must be earlier than the {LD: SVCMOD} {LD: WITHDRAWDATE}
-	 * {WITHDRAWDATE} 56.00 END 53.00 57.00 END 46.00
-	 */
-	private void checkSvcmodEOMAvails(EntityItem rootEntity, String statusFlag)
-			throws java.sql.SQLException, MiddlewareException {
-		addDebug("checkSvcmodEOMAvails svcmodEOMAvailVctM " + svcmodEOMAvailVctM.size());
-		for (int i = 0; i < svcmodEOMAvailVctM.size(); i++) {
-			EntityItem avail = (EntityItem) svcmodEOMAvailVctM.elementAt(i);
-			// addDebug("checkSvcmodEOMAvails svcmodLOAvail "+avail.getKey());
-			// 47.00 EFFECTIVEDATE <= SVCMOD WITHDRAWDATE W W E {LD: AVAIL}
-			// {NDN: AVAIL} must not be later than the {LD: SVCMOD} {LD:
-			// WTHDRWEFFCTVDATE} {WTHDRWEFFCTVDATE}
-			checkCanNotBeLater(avail, "EFFECTIVEDATE", rootEntity, "WITHDRAWDATE", getCheck_W_W_E(statusFlag));
-
-			// 48.00 COUNTRYLIST "IN aggregate G" A:AVAIL COUNTRYLIST W W E {LD:
-			// AVAIL} {NDN: AVAIL} {LD: COUNTRYLIST} includes a country that
-			// does not have a "Planned Availability"
-			checkPlannedAvailForCtryExists(avail, svcmdlPlaAvailCtryTblA.keySet(), getCheck_W_W_E(statusFlag));
-
-			String availAnntypeFlag = PokUtils.getAttributeFlagValue(avail, "AVAILANNTYPE");
-			addDebug("checkSvcmodEOMAvails " + avail.getKey() + " availAnntypeFlag " + availAnntypeFlag);
-			if (availAnntypeFlag == null) {
-				availAnntypeFlag = AVAILANNTYPE_RFA; // if not set, default to
-														// RFA
-			}
-			if (AVAILANNTYPE_RFA.equals(availAnntypeFlag)) { // error was
-																// already
-																// logged
-				// 49.00 ANNOUNCEMENT N M: + AVAILANNA-d
-				// 50.00 WHEN "RFA" (RFA) <> M: AVAIL AVAILANNTYPE
-				// 51.00 Count of = 0 E E E {LD: AVAIL} {NDN: M:AVAIL} must not
-				// be in {LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT}
-				// 52.00 END 50.00
-				Vector annVct = PokUtils.getAllLinkedEntities(avail, "AVAILANNA", "ANNOUNCEMENT");
-
-				// 53.00 IF ANNTYPE <> "End Of Life - Withdrawal from mktg" (14)
-				// 54.00 Count of = 0 E E E {LD: AVAIL} {NDN: M:AVAIL} must not
-				// be in {LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT}
-				for (int ai = 0; ai < annVct.size(); ai++) {
-					EntityItem annItem = (EntityItem) annVct.elementAt(ai);
-					String anntypeFlag = PokUtils.getAttributeFlagValue(annItem, "ANNTYPE");
-					addDebug("checkSvcmodEOMAvails " + annItem.getKey() + " anntypeFlag " + anntypeFlag);
-					if (!ANNTYPE_EOL.equals(anntypeFlag)) {
-						// MUST_NOT_BE_IN_ERR2= {0} must not be in {1}
-						args[0] = getLD_NDN(avail);
-						args[1] = getLD_NDN(annItem);
-						createMessage(CHECKLEVEL_E, "MUST_NOT_BE_IN_ERR2", args);
-						continue;
-					}
-					// 55.00 ELSE ANNDATE <= SVCMOD WITHDRAWDATE W W E {LD:
-					// ANNOUNCEMENT} {NDN: ANNOUNCEMENT} must be earlier than
-					// the {LD: SVCMOD} {LD: WITHDRAWDATE} {WITHDRAWDATE}
-					// 56.00 END 53.00
-					// 57.00 END 46.00
-					checkCanNotBeLater(annItem, "ANNDATE", rootEntity, "WITHDRAWDATE", getCheck_W_W_E(statusFlag));
-				}
-
-				annVct.clear();
-			}
-		} // end svcmod eom avail loop
-	}
-
-	/**
-	 * from BH FS ABR Catalog Attr Derivation 20110221.doc C. Data Quality As
-	 * part of the normal process for offering information, a user first creates
-	 * data in ï¿½Draftï¿½. The user then asserts the Data Quality (DATAQUALITY)
-	 * as being ï¿½Ready for Reviewï¿½ which queues the Data Quality ABR. The DQ
-	 * ABR checks to ensure that the data is ï¿½Ready for Reviewï¿½ and then
-	 * advances Status (STATUS) to ï¿½Ready for Reviewï¿½.
-	 * 
-	 * The Data Quality ABR will be enhanced such that if the checks pass, then
-	 * the DQ ABR will process the corresponding DARULE. If DARULE is processed
-	 * successfully, then the DQ ABR will set STATUS = ï¿½Ready for Reviewï¿½.
-	 * If DARULE is not processed successfully, then the DQ ABR will ï¿½Failï¿½
-	 * and return Data Quality to the prior state (Draft or Change Request).
-	 */
-	protected boolean updateDerivedData(EntityItem rootEntity) throws Exception {
-		boolean chgsMade = false;
-		// NOW() <= Withdrawal Effective Date (WTHDRWEFFCTVDATE)
-		String wdDate = PokUtils.getAttributeValue(rootEntity, "WTHDRWEFFCTVDATE", "", FOREVER_DATE, false);
-		addDebug("updateDerivedData wdDate: " + wdDate + " now: " + getCurrentDate());
-		if (getCurrentDate().compareTo(wdDate) <= 0) {
-			chgsMade = execDerivedData(rootEntity);
-		}
-		return chgsMade;
-	}
-
-	/*
-	 * (non-Javadoc) update LIFECYCLE value when STATUS is updated
-	 * 
-	 * @see COM.ibm.eannounce.abr.sg.bh.DQABRSTATUS#doPostProcessing(COM.ibm.
-	 * eannounce.objects.EntityItem, java.lang.String)
-	 */
-	protected String getLCRFRWFName() {
-		return "WFLCSVCMODRFR";
-	}
-
-	protected String getLCFinalWFName() {
-		return "WFLCSVCMODFINAL";
-	}
-
-	/***********************************************
-	 * Get ABR description
-	 *
-	 * @return java.lang.String
-	 */
-	public String getDescription() {
-		String desc = "SVCMOD ABR.";
-
-		return desc;
-	}
-
-	/***********************************************
-	 * Get the version
-	 *
-	 * @return java.lang.String
-	 */
-	public String getABRVersion() {
-		return "1.12";
-	}
-}

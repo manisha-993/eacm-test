@@ -1,338 +1,344 @@
-//Licensed Materials -- Property of IBM
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.MetaFlag;
+/*     */ import com.ibm.transform.oim.eacm.diff.DiffEntity;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.util.Hashtable;
+/*     */ import org.apache.poi.hssf.usermodel.HSSFCell;
+/*     */ import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+/*     */ import org.apache.poi.ss.usermodel.RichTextString;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class XLColumn
+/*     */ {
+/*     */   private static final String BLANKS = "                                                                                ";
+/*     */   public static final int ATTRVAL = 0;
+/*     */   public static final int FLAGVAL = 1;
+/*     */   public static final boolean LEFT = true;
+/*     */   public static final boolean RIGHT = false;
+/*  42 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/*  43 */   static final String NEWLINE = new String(FOOL_JTEST);
+/*     */   
+/*     */   private String colName;
+/*     */   private String ffColName;
+/*  47 */   protected String etype = null;
+/*  48 */   protected String attrCode = null;
+/*  49 */   private int colWidth = 0;
+/*     */   private boolean isLeftJustified = true;
+/*  51 */   private int attrSrc = 0;
+/*     */   public void setAlwaysShow() {
+/*  53 */     this.alwaysShow = true;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean alwaysShow = false;
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public XLColumn(String paramString1, String paramString2, String paramString3) {
+/*  64 */     this(paramString1, paramString2, paramString3, 0);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public XLColumn(String paramString1, String paramString2, String paramString3, int paramInt) {
+/*  77 */     this.colName = paramString1;
+/*  78 */     this.etype = paramString2;
+/*  79 */     this.attrCode = paramString3;
+/*  80 */     this.attrSrc = paramInt;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getColumnLabel() {
+/*  88 */     return this.colName;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getFFColumnLabel() {
+/*  96 */     return this.ffColName;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setFFColumnLabel(String paramString) {
+/* 102 */     this.ffColName = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setColumnValue(HSSFCell paramHSSFCell, Hashtable paramHashtable) {
+/* 109 */     Object object = paramHashtable.get(this.etype);
+/* 110 */     if (object instanceof DiffEntity) {
+/* 111 */       DiffEntity diffEntity = (DiffEntity)object;
+/* 112 */       if (this.alwaysShow || isChanged(diffEntity)) {
+/* 113 */         getValue(paramHSSFCell, diffEntity.getCurrentEntityItem());
+/*     */       }
+/*     */     } else {
+/* 116 */       getValue(paramHSSFCell, (EntityItem)object);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getColumnValue(Hashtable paramHashtable) {
+/* 125 */     Object object = paramHashtable.get(this.etype);
+/* 126 */     String str = "";
+/* 127 */     if (object instanceof DiffEntity) {
+/* 128 */       DiffEntity diffEntity = (DiffEntity)object;
+/* 129 */       if (this.alwaysShow || isChanged(diffEntity)) {
+/* 130 */         str = getValue(diffEntity.getCurrentEntityItem());
+/*     */       }
+/*     */     } else {
+/* 133 */       str = getValue((EntityItem)object);
+/*     */     } 
+/* 135 */     return formatToWidth(str, this.colWidth, this.isLeftJustified);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setColumnWidth(int paramInt) {
+/* 143 */     this.colWidth = paramInt;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setJustified(boolean paramBoolean) {
+/* 150 */     this.isLeftJustified = (paramBoolean == true);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public int getColumnWidth() {
+/* 157 */     return this.colWidth;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void getValue(HSSFCell paramHSSFCell, EntityItem paramEntityItem) {
+/* 166 */     if (paramEntityItem == null) {
+/*     */       return;
+/*     */     }
+/*     */     
+/* 170 */     paramHSSFCell.setCellType(1);
+/* 171 */     paramHSSFCell.setCellValue((RichTextString)new HSSFRichTextString(getValue(paramEntityItem)));
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getValue(EntityItem paramEntityItem) {
+/* 179 */     String str = "";
+/* 180 */     if (paramEntityItem != null) {
+/* 181 */       EntityGroup entityGroup = paramEntityItem.getEntityGroup();
+/*     */       
+/* 183 */       EANMetaAttribute eANMetaAttribute = entityGroup.getMetaAttribute(this.attrCode);
+/* 184 */       if (eANMetaAttribute == null) {
+/*     */         
+/* 186 */         str = "Error: Attribute " + this.attrCode + " not found in " + paramEntityItem.getEntityType() + " META data.";
+/*     */       } else {
+/* 188 */         EANAttribute eANAttribute = paramEntityItem.getAttribute(this.attrCode);
+/* 189 */         if (eANAttribute instanceof COM.ibm.eannounce.objects.EANTextAttribute) {
+/* 190 */           str = eANAttribute.toString();
+/*     */         }
+/* 192 */         else if (this.attrSrc == 1) {
+/* 193 */           if (eANMetaAttribute.getAttributeType().equals("U")) {
+/* 194 */             EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)paramEntityItem.getAttribute(this.attrCode);
+/* 195 */             if (eANFlagAttribute != null && eANFlagAttribute.toString().length() > 0) {
+/*     */               
+/* 197 */               MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 198 */               for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/*     */                 
+/* 200 */                 if (arrayOfMetaFlag[b].isSelected()) {
+/* 201 */                   str = arrayOfMetaFlag[b].getFlagCode();
+/*     */                   break;
+/*     */                 } 
+/*     */               } 
+/*     */             } 
+/* 206 */           } else if (eANMetaAttribute.getAttributeType().equals("F")) {
+/* 207 */             StringBuffer stringBuffer = new StringBuffer();
+/*     */             
+/* 209 */             EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)paramEntityItem.getAttribute(this.attrCode);
+/* 210 */             if (eANFlagAttribute != null && eANFlagAttribute.toString().length() > 0) {
+/*     */               
+/* 212 */               MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 213 */               for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/*     */                 
+/* 215 */                 if (arrayOfMetaFlag[b].isSelected()) {
+/* 216 */                   if (stringBuffer.length() > 0) {
+/* 217 */                     stringBuffer.append(", ");
+/*     */                   }
+/*     */                   
+/* 220 */                   stringBuffer.append(arrayOfMetaFlag[b].getFlagCode());
+/*     */                 } 
+/*     */               } 
+/*     */             } 
+/* 224 */             str = stringBuffer.toString();
+/*     */           } 
+/*     */         } else {
+/* 227 */           str = PokUtils.getAttributeValue(paramEntityItem, this.attrCode, ", ", "", false);
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/*     */ 
+/*     */     
+/* 233 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public boolean isChanged(Hashtable paramHashtable) {
+/* 245 */     boolean bool = false;
+/*     */     
+/* 247 */     DiffEntity diffEntity = (DiffEntity)paramHashtable.get(this.etype);
+/* 248 */     if (diffEntity != null) {
+/* 249 */       if (diffEntity.isDeleted() || diffEntity.isNew()) {
+/* 250 */         bool = true;
+/*     */       } else {
+/* 252 */         bool = isChanged(diffEntity);
+/*     */       } 
+/*     */     }
+/* 255 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean isChanged(DiffEntity paramDiffEntity) {
+/* 263 */     boolean bool = false;
+/*     */     
+/* 265 */     EntityItem entityItem1 = paramDiffEntity.getCurrentEntityItem();
+/* 266 */     EntityItem entityItem2 = paramDiffEntity.getPriorEntityItem();
+/* 267 */     String str1 = "";
+/* 268 */     if (entityItem1 != null) {
+/* 269 */       str1 = PokUtils.getAttributeValue(entityItem1, this.attrCode, ", ", "", false);
+/*     */     }
+/* 271 */     String str2 = "";
+/* 272 */     if (entityItem2 != null) {
+/* 273 */       str2 = PokUtils.getAttributeValue(entityItem2, this.attrCode, ", ", "", false);
+/*     */     }
+/* 275 */     bool = !str1.equals(str2) ? true : false;
+/*     */     
+/* 277 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String formatToWidth(String paramString, int paramInt) {
+/* 290 */     return formatToWidth(paramString, paramInt, true);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String formatToWidth(String paramString, int paramInt, boolean paramBoolean) {
+/* 304 */     if (paramInt == 0) {
+/* 305 */       return paramString;
+/*     */     }
+/* 307 */     if (paramString == null) {
+/* 308 */       paramString = "";
+/*     */     }
+/* 310 */     String str = paramString;
+/* 311 */     int i = paramString.length();
+/* 312 */     if (i != paramInt) {
+/* 313 */       StringBuffer stringBuffer = new StringBuffer(paramString);
+/*     */       
+/* 315 */       paramString = paramString.replace('\n', ' ');
+/* 316 */       paramString = paramString.replace('\r', ' ');
+/* 317 */       if (paramBoolean == true) {
+/* 318 */         stringBuffer.append("                                                                                ");
+/*     */       } else {
+/* 320 */         int j = paramInt - i;
+/* 321 */         if (j > 0) {
+/* 322 */           stringBuffer.insert(0, "                                                                                ".substring(0, j));
+/*     */         }
+/*     */       } 
+/* 325 */       stringBuffer.setLength(paramInt);
+/* 326 */       str = stringBuffer.toString();
+/*     */     } 
+/* 328 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String toString() {
+/* 336 */     return "Column:" + this.colName + " type:" + this.etype + " attr:" + this.attrCode;
+/*     */   }
+/*     */ }
 
-//(C) Copyright IBM Corp. 2008  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
 
-
-package COM.ibm.eannounce.abr.util;
-
-import COM.ibm.eannounce.objects.*;
-
-import com.ibm.transform.oim.eacm.diff.DiffEntity;
-import com.ibm.transform.oim.eacm.util.*;
-import java.util.*;
-
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRichTextString;
-
-/**********************************************************************************
- * Base Class used to hold info and structure to generate a ss cell/column
- *
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\XLColumn.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-//$Log: XLColumn.java,v $
-//Revision 1.3  2009/07/30 18:01:54  wendy
-//Prevent NPE if DiffEntity has a null current or prev item
-//
-//Revision 1.2  2009/02/04 21:22:46  wendy
-//CQ00016165 - Automated QSM feed from ePIMS HW to support the late change request from BIDS
-//
-//Revision 1.1  2008/09/30 12:36:19  wendy
-//CQ00006066-WI LA CTO - EACM - Support GFS data Load of QSM (report)
-//
-public class XLColumn
-{
-	private static final String BLANKS="                                                                                ";
-    
-	public static final int ATTRVAL = 0; // get value from attribute
-	public static final int FLAGVAL = 1; // get value from flag code
-	public static final boolean LEFT = true;
-	public static final boolean RIGHT = false;
-	
-	private static final char[] FOOL_JTEST = {'\n'};
-	static final String NEWLINE = new String(FOOL_JTEST);
-
-	private String colName;
-	private String ffColName;
-	protected String etype =null;
-	protected String attrCode =null; 
-	private int colWidth=0; //CQ00016165
-	private boolean isLeftJustified = LEFT; //CQ00016165
-	private int attrSrc = ATTRVAL;
-	protected boolean alwaysShow = false;
-	public void setAlwaysShow(){  alwaysShow = true;}
-
-	/**********************************************************************************
-	 * Constructor 
-	 *
-	 *@param nname String with name of column to be created
-	 *@param type String with entity type
-	 *@param code String with attribute code
-	 */
-	public XLColumn(String nname, String type, String code)
-	{
-		this(nname,type,code,ATTRVAL);
-	}
-
-	/**********************************************************************************
-	 * Constructor 
-	 *
-	 *@param cname String with name of column to be created
-	 *@param type String with entity type
-	 *@param code String with attribute code
-	 *@param src int for flag attributes
-	 */
-	public XLColumn(String cname, String type, String code, int src)
-	{
-		colName = cname;
-		etype = type;
-		attrCode = code;
-		attrSrc = src;
-	}
-
-	/**********************************************************************************
-	 * get the column name
-	 *@return String
-	 */
-	public String getColumnLabel() {
-		return colName;
-	}
-
-	/**********************************************************************************
-	 * get the column name for the flatfile
-	 *@return String
-	 */
-	public String getFFColumnLabel() {
-		return ffColName;
-	}
-	/**********************************************************************************
-	 * set the column name for the flatfile
-	 */
-	public void setFFColumnLabel(String s) {
-		ffColName = s;
-	}	
-	/**********************************************************************************
-	 * set value for this column - used when creating ss
-	 *
-	 */
-	public void setColumnValue(HSSFCell cell,Hashtable itemTbl) {
-		Object obj = itemTbl.get(etype);
-		if (obj instanceof DiffEntity){
-			DiffEntity diff = (DiffEntity)obj;
-			if (alwaysShow || isChanged(diff)){
-				getValue(cell,diff.getCurrentEntityItem());
-			}
-		}else{
-			getValue(cell,(EntityItem)obj);
-		}
-	}
-	
-	/**********************************************************************************
-	 * get value for this column, it will be padded or truncated to meet column width
-	 * CQ00016165
-	 */
-	public String getColumnValue(Hashtable itemTbl) {
-		Object obj = itemTbl.get(etype);
-		String value = "";
-		if (obj instanceof DiffEntity){
-			DiffEntity diff = (DiffEntity)obj;
-			if (alwaysShow || isChanged(diff)){
-				value = getValue(diff.getCurrentEntityItem());
-			}
-		}else{
-			value = getValue((EntityItem)obj);
-		}
-		return formatToWidth(value, colWidth,isLeftJustified);
-	}
-
-	/*****************************************
-	 * Set the width used for fixed columns (used for flat file generation)
-	 * CQ00016165
-	 * @param len
-	 */
-	public void setColumnWidth(int len){ colWidth = len; }
-	
-	/*****************************************
-	 * Set the justification for this column (used for flat file generation)
-	 * CQ00016165
-	 * @param b
-	 */
-	public void setJustified(boolean b){ isLeftJustified = (b==LEFT); }
-	
-	/****************************************
-	 * Get the width used for fixed columns (used for flat file generation)
-	 *  CQ00016165
-	 * @return int
-	 */
-	public int getColumnWidth(){ return colWidth; }
-
-	/**********************************************************************************
-	 * fill in value for this attribute code from this entity
-	 *
-	 * @param cell
-	 * @param item
-	 */
-	protected void getValue(HSSFCell cell,EntityItem item) {
-		if (item==null){
-			return;
-		}
-
-		cell.setCellType(HSSFCell.CELL_TYPE_STRING);
-		cell.setCellValue(new HSSFRichTextString(getValue(item)));
-	}
-	/**********************************************************************************
-	 * get the value for this attribute code from this entity
-	 *
-	 * @param item
-	 */
-	protected String getValue(EntityItem item) {
-		String value = "";
-		if (item!=null){
-			EntityGroup egrp = item.getEntityGroup();		
-
-			EANMetaAttribute metaAttr = egrp.getMetaAttribute(attrCode);
-			if (metaAttr==null) {			
-				value = "Error: Attribute "+attrCode+" not found in "+
-				item.getEntityType()+" META data.";
-			}else{ // meta exists for this attribute
-				EANAttribute att = item.getAttribute(attrCode);
-				if (att instanceof EANTextAttribute){
-					value = att.toString();
-				}else{					
-					if (attrSrc == FLAGVAL){
-						if(metaAttr.getAttributeType().equals("U")){ //Unique Flag and flagcode needed
-							EANFlagAttribute fAtt = (EANFlagAttribute)item.getAttribute(attrCode);
-							if (fAtt!=null && fAtt.toString().length()>0){
-								// Get the selected Flag code
-								MetaFlag[] mfArray = (MetaFlag[]) fAtt.get();
-								for (int i = 0; i < mfArray.length; i++){
-									// get selection
-									if (mfArray[i].isSelected()){
-										value =mfArray[i].getFlagCode();
-										break;
-									}  // metaflag is selected
-								}// end of flagcodes
-							}
-						}else if(metaAttr.getAttributeType().equals("F")){ //MultiFlagAttribute
-							StringBuffer sbb = new StringBuffer();
-							// get countrylist attr, it is F
-							EANFlagAttribute fAtt = (EANFlagAttribute)item.getAttribute(attrCode);
-							if (fAtt!=null && fAtt.toString().length()>0){
-								// Get the selected Flag codes.
-								MetaFlag[] mfArray = (MetaFlag[]) fAtt.get();
-								for (int i = 0; i < mfArray.length; i++){
-									// get selection
-									if (mfArray[i].isSelected()){
-										if (sbb.length()>0){
-											sbb.append(", ");
-										}
-										// get flagcode instead of flag value here
-										sbb.append(mfArray[i].getFlagCode());										
-									}  // metaflag is selected
-								}// end of flagcodes		
-							}
-							value = sbb.toString();
-						}	
-					}else{
-						value =	PokUtils.getAttributeValue(item, attrCode,", ", "", false);
-					}		
-				}
-			} // end meta ok
-		}
-		
-		return value;
-	}	
-
-	//================================================================================
-	// methods for DiffEntity
-	//================================================================================
-	/***********************************************
-	 *  is this column changed?
-	 *
-	 *@return boolean
-	 */
-	public boolean isChanged(Hashtable itemTbl){
-		boolean chgsFound=false;
-		
-		DiffEntity diffitem = (DiffEntity)itemTbl.get(etype);
-		if (diffitem != null){
-			if (diffitem.isDeleted() || diffitem.isNew()){
-				chgsFound = true;
-			}else{
-				chgsFound = isChanged(diffitem);
-			}
-		}
-		return chgsFound;
-	}
-	/*********************************************
-	 * check for changes
-	 * @param diffitem
-	 * @return
-	 */
-	protected boolean isChanged(DiffEntity diffitem){
-		boolean chgsFound=false;
-		// must check the attribute value
-		EntityItem curritem = diffitem.getCurrentEntityItem();
-		EntityItem previtem = diffitem.getPriorEntityItem();
-		String currVal = "";
-		if (curritem!=null){
-			currVal = PokUtils.getAttributeValue(curritem, attrCode,", ", "", false);
-		}
-		String prevVal = "";
-		if (previtem!=null){
-			prevVal = PokUtils.getAttributeValue(previtem, attrCode,", ", "", false);
-		}
-		chgsFound = !currVal.equals(prevVal);
-		
-		return chgsFound;
-	}
-	/********************************************************************************
-	 * Format string to specifed length, padded with blank if necessary
-	    if i edit COMMENTS in the BUI, new lines are saved as '\r\n'..
-	    if i edit COMMENTS in the JUI, new lines are '\n'.. causes problems with character counts
-	    CQ00016165
-	 * @param data String to format
-	 * @param len int with length to set
-	 * @return String formatted to x chars long
-	 */
-	public static String formatToWidth(String data, int len)
-	{
-		return formatToWidth(data, len, LEFT);
-	}	
-	
-	/********************************************************************************
-	 * Format string to specifed length, padded with blank if necessary
-	    if i edit COMMENTS in the BUI, new lines are saved as '\r\n'..
-	    if i edit COMMENTS in the JUI, new lines are '\n'.. causes problems with character counts
-	    CQ00016165
-	 * @param data String to format
-	 * @param len int with length to set
-	 * @return String formatted to x chars long
-	 */
-	public static String formatToWidth(String data, int len, boolean justified)
-	{
-		if (len==0){ // no adjustments done
-			return data;
-		}
-		if (data ==null) {
-			data =""; 
-		}
-		String adjData = data;
-		int dataLen = data.length();
-		if (dataLen != len){
-			StringBuffer tmp = new StringBuffer(data);
-			// remove new line characters
-			data = data.replace('\n', ' ');
-			data = data.replace('\r', ' ');
-			if (justified==LEFT){
-				tmp.append(BLANKS);
-			}else{
-				int diff = len-dataLen;
-				if (diff>0){
-					tmp.insert(0, BLANKS.substring(0,diff));
-				}
-			}
-			tmp.setLength(len);
-			adjData = tmp.toString();
-		}
-		return adjData;
-	}		
-	/**********************************************************************************
-	 * string rep
-	 *
-	 *@return String
-	 */
-	public String toString() {
-		return "Column:"+colName+" type:"+etype+" attr:"+attrCode;
-	}
-}

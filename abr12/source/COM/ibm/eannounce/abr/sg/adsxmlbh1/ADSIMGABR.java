@@ -1,77 +1,83 @@
-//Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2010  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//<?xml version="1.0" encoding="UTF-8" ?>	
-/**********************************************************************************
-*/
-package COM.ibm.eannounce.abr.sg.adsxmlbh1;
+/*    */ package COM.ibm.eannounce.abr.sg.adsxmlbh1;
+/*    */ 
+/*    */ import COM.ibm.eannounce.abr.util.XMLActivityElem;
+/*    */ import COM.ibm.eannounce.abr.util.XMLElem;
+/*    */ import COM.ibm.eannounce.abr.util.XMLGroupElem;
+/*    */ import COM.ibm.eannounce.abr.util.XMLImageElem;
+/*    */ import COM.ibm.eannounce.abr.util.XMLNotificationElem;
+/*    */ import COM.ibm.eannounce.abr.util.XMLVMElem;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class ADSIMGABR
+/*    */   extends XMLMQRoot
+/*    */ {
+/* 28 */   private static final XMLElem XMLMAP = (XMLElem)new XMLGroupElem("IMAGE_UPDATE"); static {
+/* 29 */     XMLMAP.addChild((XMLElem)new XMLVMElem("IMAGE_UPDATE", "1"));
+/*    */     
+/* 31 */     XMLMAP.addChild(new XMLElem("PDHDOMAIN", "PDHDOMAIN"));
+/* 32 */     XMLMAP.addChild((XMLElem)new XMLNotificationElem("DTSOFMSG"));
+/* 33 */     XMLMAP.addChild((XMLElem)new XMLActivityElem("ACTIVITY"));
+/*    */     
+/* 35 */     XMLMAP.addChild(new XMLElem("ENTITYTYPE", "ENTITYTYPE"));
+/* 36 */     XMLMAP.addChild(new XMLElem("ENTITYID", "ENTITYID"));
+/* 37 */     XMLMAP.addChild(new XMLElem("STATUS", "STATUS", 1));
+/*    */     
+/* 39 */     XMLMAP.addChild(new XMLElem("MARKETINGIMAGEFILENAME", "MKTGIMGFILENAM"));
+/*    */     
+/* 41 */     XMLMAP.addChild((XMLElem)new XMLImageElem());
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public XMLElem getXMLMap() {
+/* 49 */     return XMLMAP;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getVeName() {
+/* 55 */     return "dummy";
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public String getStatusAttr() {
+/* 60 */     return "STATUS";
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getMQCID() {
+/* 66 */     return "IMAGE_UPDATE";
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getVersion() {
+/* 75 */     return "$Revision: 1.5 $";
+/*    */   }
+/*    */ }
 
-import COM.ibm.eannounce.abr.util.*;
-/**********************************************************************************
- * ADSIMGABR.java
- * 
+
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\adsxmlbh1\ADSIMGABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-//$Log: ADSIMGABR.java,v $
-//Revision 1.5  2011/12/14 02:21:58  guobin
-//Update the Version V Mod M for the ADSABR
-//
-//Revision 1.4  2011/01/21 12:15:26  guobin
-//add comments log
-//
-public class ADSIMGABR extends XMLMQRoot
-{
-    private static final XMLElem XMLMAP;
-
-    static {
-        XMLMAP = new XMLGroupElem("IMAGE_UPDATE");
-        XMLMAP.addChild(new XMLVMElem("IMAGE_UPDATE","1"));
-         // level2
-        XMLMAP.addChild(new XMLElem("PDHDOMAIN","PDHDOMAIN"));
-        XMLMAP.addChild(new XMLNotificationElem("DTSOFMSG")); // pull from profile.endofday
-        XMLMAP.addChild(new XMLActivityElem("ACTIVITY"));
-        
-        XMLMAP.addChild(new XMLElem("ENTITYTYPE","ENTITYTYPE"));
-        XMLMAP.addChild(new XMLElem("ENTITYID","ENTITYID"));
-        XMLMAP.addChild(new XMLElem("STATUS","STATUS",XMLElem.FLAGVAL));
-        
-        XMLMAP.addChild(new XMLElem("MARKETINGIMAGEFILENAME","MKTGIMGFILENAM"));
-        //get the attribute of the IMAGECONTENTS from opicm.blob.ATTRIBUTEVALUE
-        XMLMAP.addChild(new XMLImageElem());
-        
-    }
-
-    /**********************************
-    * get xml object mapping
-    */
-    public XMLElem getXMLMap() {
-        return XMLMAP;
-    }
-
-    /**********************************
-    * get the name of the VE to use
-    */
-    public String getVeName() { return "dummy";}
-
-    /**********************************
-    * get the status attribute to use for this ABR
-    */
-    public String getStatusAttr() { return "STATUS";}
-
-    /**********************************
-    *
-	A.	MQ-Series CID
-    */
-    public String getMQCID() { return "IMAGE_UPDATE"; }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getVersion()
-    {
-        return "$Revision: 1.5 $";
-    }
-}

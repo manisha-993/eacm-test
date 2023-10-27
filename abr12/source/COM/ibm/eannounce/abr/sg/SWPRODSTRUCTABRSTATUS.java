@@ -1,677 +1,683 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2007  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.abr.sg;
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*     */ import COM.ibm.eannounce.objects.MetaFlag;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.ArrayList;
+/*     */ import java.util.Collections;
+/*     */ import java.util.HashSet;
+/*     */ import java.util.Vector;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class SWPRODSTRUCTABRSTATUS
+/*     */   extends DQABRSTATUS
+/*     */ {
+/*  92 */   private Object[] args = new Object[3];
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean isVEneeded(String paramString) {
+/*  98 */     return true;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void doAlreadyFinalProcessing() {
+/* 107 */     setFlagValue(this.m_elist.getProfile(), "SAPLABRSTATUS", "0020");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void completeNowR4RProcessing() throws SQLException, MiddlewareException, MiddlewareRequestException {}
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void completeNowFinalProcessing() throws SQLException, MiddlewareException, MiddlewareRequestException {
+/* 139 */     queueSapl();
+/* 140 */     setFlagValue(this.m_elist.getProfile(), "EPIMSABRSTATUS", "0020");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void completeNowFinalProcessingForOtherDomains() throws SQLException, MiddlewareException, MiddlewareRequestException {
+/* 153 */     queueSapl();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void doDQChecking(EntityItem paramEntityItem, String paramString) throws Exception {
+/* 200 */     checkAllFeatures();
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 219 */     checkRPQAvails(paramEntityItem, paramString);
+/*     */     
+/* 221 */     if ("0010".equals(paramString) || "0050".equals(paramString)) {
+/*     */       
+/* 223 */       EntityItem entityItem1 = this.m_elist.getEntityGroup("MODEL").getEntityItem(0);
+/* 224 */       EntityItem entityItem2 = this.m_elist.getEntityGroup("SWFEATURE").getEntityItem(0);
+/*     */ 
+/*     */ 
+/*     */       
+/* 228 */       String str = getAttributeFlagEnabledValue(entityItem1, "STATUS");
+/* 229 */       addDebug(entityItem1.getKey() + " check status " + str);
+/* 230 */       if (str == null) {
+/* 231 */         str = "0020";
+/*     */       }
+/*     */       
+/* 234 */       if (!"0020".equals(str) && !"0040".equals(str)) {
+/* 235 */         addDebug(entityItem1.getKey() + " is not Final or R4R");
+/*     */         
+/* 237 */         this.args[0] = entityItem1.getEntityGroup().getLongDescription();
+/* 238 */         this.args[1] = getNavigationName(entityItem1);
+/* 239 */         addError("NOT_R4R_FINAL_ERR", this.args);
+/*     */       } 
+/*     */ 
+/*     */       
+/* 243 */       str = getAttributeFlagEnabledValue(entityItem2, "STATUS");
+/* 244 */       addDebug(entityItem2.getKey() + " check status " + str);
+/* 245 */       if (str == null) {
+/* 246 */         str = "0020";
+/*     */       }
+/*     */       
+/* 249 */       if (!"0020".equals(str) && !"0040".equals(str)) {
+/* 250 */         addDebug(entityItem2.getKey() + " is not Final or R4R");
+/*     */         
+/* 252 */         this.args[0] = entityItem2.getEntityGroup().getLongDescription();
+/* 253 */         this.args[1] = getNavigationName(entityItem2);
+/* 254 */         addError("NOT_R4R_FINAL_ERR", this.args);
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 258 */     if ("0040".equals(paramString)) {
+/*     */ 
+/*     */ 
+/*     */       
+/* 262 */       checkStatus("MODEL");
+/*     */ 
+/*     */ 
+/*     */       
+/* 266 */       checkStatus("SWFEATURE");
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void checkAllFeatures() throws Exception {
+/* 280 */     Profile profile = this.m_elist.getProfile();
+/* 281 */     String str = "DQVESWPRODSTRUCT2";
+/*     */     
+/* 283 */     EntityItem entityItem1 = this.m_elist.getEntityGroup("MODEL").getEntityItem(0);
+/*     */ 
+/*     */     
+/* 286 */     EntityList entityList = this.m_db.getEntityList(profile, new ExtractActionItem(null, this.m_db, profile, str), new EntityItem[] { new EntityItem(null, profile, "MODEL", entityItem1
+/*     */             
+/* 288 */             .getEntityID()) });
+/* 289 */     addDebug("checkAllFeatures:: Extract " + str + NEWLINE + PokUtils.outputList(entityList));
+/*     */     
+/* 291 */     EntityItem entityItem2 = entityList.getParentEntityGroup().getEntityItem(0);
+/*     */     
+/* 293 */     Vector<String> vector = new Vector();
+/* 294 */     for (byte b = 0; b < entityItem2.getUpLinkCount(); b++) {
+/* 295 */       EntityItem entityItem = (EntityItem)entityItem2.getUpLink(b);
+/* 296 */       if (!entityItem.getEntityType().equals("SWPRODSTRUCT")) {
+/* 297 */         addDebug("checkAllFeatures skipping uplink " + entityItem.getKey());
+/*     */       } else {
+/*     */         
+/* 300 */         for (byte b1 = 0; b1 < entityItem.getUpLinkCount(); b1++) {
+/* 301 */           EntityItem entityItem3 = (EntityItem)entityItem.getUpLink(b1);
+/*     */           
+/* 303 */           String str1 = PokUtils.getAttributeValue(entityItem3, "FEATURECODE", ", ", "", false);
+/* 304 */           addDebug("checkAllFeatures checking " + entityItem.getKey() + " -- " + entityItem3.getKey() + " fcode: " + str1);
+/* 305 */           if (vector.contains(str1)) {
+/*     */ 
+/*     */ 
+/*     */             
+/* 309 */             this.args[0] = entityItem3.getEntityGroup().getLongDescription();
+/* 310 */             this.args[1] = getNavigationName(entityItem3);
+/* 311 */             this.args[2] = entityItem2.getEntityGroup().getLongDescription();
+/* 312 */             addError("NOT_UNIQUE_ERR", this.args);
+/*     */           } else {
+/* 314 */             vector.add(str1);
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/* 319 */     vector.clear();
+/*     */     
+/* 321 */     entityList.dereference();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void checkRPQAvails(EntityItem paramEntityItem, String paramString) throws SQLException, MiddlewareException {
+/* 332 */     HashSet<String> hashSet = new HashSet();
+/*     */     
+/* 334 */     hashSet.add("140");
+/*     */     
+/* 336 */     EntityItem entityItem = this.m_elist.getEntityGroup("SWFEATURE").getEntityItem(0);
+/* 337 */     addDebug("checkRPQAvails checking " + entityItem.getKey());
+/*     */ 
+/*     */     
+/* 340 */     if (!PokUtils.contains(entityItem, "FCTYPE", hashSet)) {
+/* 341 */       addDebug("checkRPQAvails " + entityItem.getKey() + " is NOT an RPQ");
+/*     */ 
+/*     */       
+/* 344 */       EntityGroup entityGroup = this.m_elist.getEntityGroup("AVAIL");
+/*     */ 
+/*     */       
+/* 347 */       String str = getAttributeFlagEnabledValue(paramEntityItem, "SAPL");
+/* 348 */       addDebug("checkRPQAvails checking entity: " + paramEntityItem.getKey() + " sapl " + str);
+/* 349 */       HashSet<String> hashSet1 = new HashSet();
+/* 350 */       hashSet1.add("10");
+/* 351 */       hashSet1.add("90");
+/*     */       
+/* 353 */       if (PokUtils.contains(paramEntityItem, "SAPL", hashSet1)) {
+/* 354 */         addDebug("checkRPQAvails " + paramEntityItem.getKey() + " has SAPL of 90 or 10");
+/*     */ 
+/*     */ 
+/*     */         
+/* 358 */         byte b1 = 0;
+/* 359 */         for (byte b2 = 0; b2 < entityGroup.getEntityItemCount(); b2++) {
+/* 360 */           EntityItem entityItem1 = entityGroup.getEntityItem(b2);
+/* 361 */           addDebug("checkRPQAvails looking for planned avail; checking: " + entityItem1.getKey());
+/* 362 */           if (PokUtils.isSelected(entityItem1, "AVAILTYPE", "146")) {
+/* 363 */             b1++;
+/*     */           }
+/*     */         } 
+/* 366 */         if (b1 == 0)
+/*     */         {
+/*     */           
+/* 369 */           addError("NO_PLANNEDAVAIL_ERR", (Object[])null);
+/*     */         }
+/*     */ 
+/*     */         
+/* 373 */         if ("0040".equals(paramString))
+/*     */         {
+/*     */ 
+/*     */           
+/* 377 */           checkAnnDate(paramEntityItem, entityGroup);
+/*     */ 
+/*     */ 
+/*     */           
+/* 381 */           checkMinWDate(paramEntityItem, entityGroup);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */           
+/* 387 */           checkLastOrderWDCountries(paramEntityItem, entityGroup);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */           
+/* 392 */           checkPlannedAvailWDCountries(entityGroup);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */           
+/* 397 */           checkAvailDates(entityGroup);
+/*     */         }
+/*     */       
+/*     */       } else {
+/*     */         
+/* 402 */         addDebug("checkRPQAvails " + paramEntityItem.getKey() + " is not SAPL of 90 or 10");
+/*     */       } 
+/*     */     } else {
+/* 405 */       addDebug("checkRPQAvails " + entityItem.getKey() + " is an RPQ");
+/*     */     } 
+/*     */     
+/* 408 */     hashSet.clear();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void checkAvailDates(EntityGroup paramEntityGroup) throws SQLException, MiddlewareException {
+/* 420 */     for (byte b = 0; b < paramEntityGroup.getEntityItemCount(); b++) {
+/* 421 */       EntityItem entityItem = paramEntityGroup.getEntityItem(b);
+/* 422 */       String str1 = PokUtils.getAttributeValue(entityItem, "EFFECTIVEDATE", ", ", "", false);
+/* 423 */       String str2 = getAttributeFlagEnabledValue(entityItem, "AVAILTYPE");
+/* 424 */       addDebug("checkAvailDates " + entityItem.getKey() + " EFFECTIVEDATE: " + str1 + " AVAILTYPE: " + str2);
+/* 425 */       if (("146".equals(str2) || "143".equals(str2)) && str1
+/* 426 */         .length() > 0) {
+/* 427 */         Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(entityItem, "AVAILANNA", "ANNOUNCEMENT");
+/* 428 */         addDebug("checkAvailDates " + entityItem.getKey() + " annVct: " + vector.size());
+/* 429 */         for (byte b1 = 0; b1 < vector.size(); b1++) {
+/* 430 */           EntityItem entityItem1 = vector.elementAt(b1);
+/* 431 */           String str = PokUtils.getAttributeValue(entityItem1, "ANNDATE", ", ", "", false);
+/* 432 */           addDebug("checkAvailDates " + entityItem1.getKey() + " annDate: " + str);
+/* 433 */           if (str.length() > 0 && str1.compareTo(str) < 0) {
+/*     */ 
+/*     */             
+/* 436 */             this.args[0] = entityItem.getEntityGroup().getLongDescription() + " " + getNavigationName(entityItem);
+/* 437 */             this.args[1] = entityItem1.getEntityGroup().getLongDescription();
+/* 438 */             this.args[2] = getNavigationName(entityItem1);
+/* 439 */             this.args[3] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "ANNDATE", "ANNDATE");
+/* 440 */             addError("EARLY_DATE_ERR", this.args);
+/*     */           } 
+/*     */         } 
+/* 443 */         vector.clear();
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void checkAnnDate(EntityItem paramEntityItem, EntityGroup paramEntityGroup) throws SQLException, MiddlewareException {
+/* 455 */     EntityItem entityItem = this.m_elist.getEntityGroup("MODEL").getEntityItem(0);
+/* 456 */     String str = PokUtils.getAttributeValue(entityItem, "ANNDATE", ", ", "", false);
+/* 457 */     addDebug("checkAnnDate " + entityItem.getKey() + " (" + str + ")");
+/*     */     
+/* 459 */     if (str.length() > 0) {
+/* 460 */       for (byte b = 0; b < paramEntityGroup.getEntityItemCount(); b++) {
+/* 461 */         EntityItem entityItem1 = paramEntityGroup.getEntityItem(b);
+/* 462 */         addDebug("checkAnnDate looking for planned avail; checking: " + entityItem1.getKey());
+/* 463 */         if (PokUtils.isSelected(entityItem1, "AVAILTYPE", "146")) {
+/* 464 */           String str1 = PokUtils.getAttributeValue(entityItem1, "EFFECTIVEDATE", ", ", "", false);
+/* 465 */           addDebug("checkAnnDate plannedavail " + entityItem1.getKey() + " EFFECTIVEDATE: " + str1);
+/* 466 */           if (str1.length() > 0 && str.compareTo(str1) > 0) {
+/*     */             
+/* 468 */             this.args[0] = entityItem.getEntityGroup().getLongDescription();
+/* 469 */             this.args[1] = PokUtils.getAttributeDescription(entityItem.getEntityGroup(), "ANNDATE", "ANNDATE");
+/* 470 */             addError("EARLY_PLANNEDAVAIL_ERR", this.args);
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void checkMinWDate(EntityItem paramEntityItem, EntityGroup paramEntityGroup) throws SQLException, MiddlewareException {
+/* 485 */     Vector<String> vector = new Vector(2);
+/* 486 */     EntityItem entityItem1 = this.m_elist.getEntityGroup("MODEL").getEntityItem(0);
+/* 487 */     String str1 = PokUtils.getAttributeValue(entityItem1, "WITHDRAWDATE", ", ", null, false);
+/* 488 */     EntityItem entityItem2 = this.m_elist.getEntityGroup("SWFEATURE").getEntityItem(0);
+/* 489 */     String str2 = PokUtils.getAttributeValue(entityItem2, "WITHDRAWDATEEFF_T", ", ", null, false);
+/* 490 */     addDebug("checkMinWDate " + entityItem2.getKey() + " (" + str2 + ") " + entityItem1
+/* 491 */         .getKey() + " (" + str1 + ")");
+/*     */     
+/* 493 */     if (str1 != null) {
+/* 494 */       vector.add(str1);
+/*     */     }
+/* 496 */     if (str2 != null) {
+/* 497 */       vector.add(str2);
+/*     */     }
+/*     */     
+/* 500 */     if (vector.size() > 0) {
+/* 501 */       Collections.sort(vector);
+/* 502 */       String str = vector.firstElement().toString();
+/* 503 */       vector.clear();
+/* 504 */       addDebug("checkMinWDate looking for lastorder avail; after " + str);
+/*     */       
+/* 506 */       for (byte b = 0; b < paramEntityGroup.getEntityItemCount(); b++) {
+/* 507 */         EntityItem entityItem = paramEntityGroup.getEntityItem(b);
+/* 508 */         addDebug("checkMinWDate looking for lastorder avail; checking: " + entityItem.getKey());
+/* 509 */         if (PokUtils.isSelected(entityItem, "AVAILTYPE", "149")) {
+/* 510 */           String str3 = PokUtils.getAttributeValue(entityItem, "EFFECTIVEDATE", ", ", "", false);
+/* 511 */           addDebug("checkMinWDate lastorder " + entityItem.getKey() + " EFFECTIVEDATE: " + str3);
+/* 512 */           if (str3.length() > 0 && str3.compareTo(str) > 0) {
+/*     */             
+/* 514 */             this.args[0] = entityItem1.getEntityGroup().getLongDescription();
+/* 515 */             this.args[1] = entityItem2.getEntityGroup().getLongDescription();
+/* 516 */             addError("LATE_LASTORDERAVAIL_ERR", this.args);
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void checkLastOrderWDCountries(EntityItem paramEntityItem, EntityGroup paramEntityGroup) throws SQLException, MiddlewareException {
+/* 532 */     EntityItem entityItem1 = this.m_elist.getEntityGroup("MODEL").getEntityItem(0);
+/* 533 */     String str1 = PokUtils.getAttributeValue(entityItem1, "WITHDRAWDATE", ", ", null, false);
+/* 534 */     EntityItem entityItem2 = this.m_elist.getEntityGroup("SWFEATURE").getEntityItem(0);
+/* 535 */     String str2 = PokUtils.getAttributeValue(entityItem2, "WITHDRAWDATEEFF_T", ", ", null, false);
+/* 536 */     addDebug("checkLastOrderWDCountries " + entityItem2.getKey() + " (" + str2 + ") " + entityItem1
+/* 537 */         .getKey() + " (" + str1 + ")");
+/*     */     
+/* 539 */     if (str1 != null || str2 != null) {
+/* 540 */       ArrayList<String> arrayList1 = new ArrayList();
+/* 541 */       ArrayList<String> arrayList2 = new ArrayList();
+/*     */       
+/* 543 */       for (byte b = 0; b < paramEntityGroup.getEntityItemCount(); b++) {
+/* 544 */         EntityItem entityItem = paramEntityGroup.getEntityItem(b);
+/* 545 */         addDebug("checkLastOrderWDCountries checking avail: " + entityItem.getKey());
+/* 546 */         if (PokUtils.isSelected(entityItem, "AVAILTYPE", "149")) {
+/* 547 */           addDebug("checkLastOrderWDCountries lastorder " + entityItem.getKey());
+/* 548 */           EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("COUNTRYLIST");
+/* 549 */           if (eANFlagAttribute != null) {
+/*     */             
+/* 551 */             MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 552 */             for (byte b1 = 0; b1 < arrayOfMetaFlag.length; b1++)
+/*     */             {
+/* 554 */               if (arrayOfMetaFlag[b1].isSelected() && !arrayList1.contains(arrayOfMetaFlag[b1].getFlagCode())) {
+/* 555 */                 arrayList1.add(arrayOfMetaFlag[b1].getFlagCode());
+/*     */               }
+/*     */             }
+/*     */           
+/*     */           } 
+/* 560 */         } else if (PokUtils.isSelected(entityItem, "AVAILTYPE", "146")) {
+/* 561 */           addDebug("checkLastOrderWDCountries plannedavail " + entityItem.getKey());
+/* 562 */           EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("COUNTRYLIST");
+/* 563 */           if (eANFlagAttribute != null) {
+/*     */             
+/* 565 */             MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 566 */             for (byte b1 = 0; b1 < arrayOfMetaFlag.length; b1++) {
+/*     */               
+/* 568 */               if (arrayOfMetaFlag[b1].isSelected() && !arrayList2.contains(arrayOfMetaFlag[b1].getFlagCode())) {
+/* 569 */                 arrayList2.add(arrayOfMetaFlag[b1].getFlagCode());
+/*     */               }
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */       
+/* 576 */       addDebug("checkLastOrderWDCountries all plannedavail countries " + arrayList2);
+/* 577 */       addDebug("checkLastOrderWDCountries all lastorderavail countries " + arrayList1);
+/*     */       
+/* 579 */       if (!arrayList1.containsAll(arrayList2)) {
+/*     */ 
+/*     */         
+/* 582 */         this.args[0] = paramEntityGroup.getLongDescription();
+/* 583 */         addError("NO_LASTORDER_ERR", this.args);
+/*     */       } 
+/* 585 */       arrayList1.clear();
+/* 586 */       arrayList2.clear();
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void checkPlannedAvailWDCountries(EntityGroup paramEntityGroup) throws SQLException, MiddlewareException {
+/* 600 */     ArrayList<String> arrayList = new ArrayList();
+/*     */     
+/*     */     byte b;
+/* 603 */     for (b = 0; b < paramEntityGroup.getEntityItemCount(); b++) {
+/* 604 */       EntityItem entityItem = paramEntityGroup.getEntityItem(b);
+/* 605 */       addDebug("checkPlannedAvailWDCountries checking avail: " + entityItem.getKey());
+/* 606 */       if (PokUtils.isSelected(entityItem, "AVAILTYPE", "146")) {
+/* 607 */         addDebug("checkPlannedAvailWDCountries plannedavail " + entityItem.getKey());
+/* 608 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("COUNTRYLIST");
+/* 609 */         if (eANFlagAttribute != null) {
+/*     */           
+/* 611 */           MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 612 */           for (byte b1 = 0; b1 < arrayOfMetaFlag.length; b1++) {
+/*     */             
+/* 614 */             if (arrayOfMetaFlag[b1].isSelected() && !arrayList.contains(arrayOfMetaFlag[b1].getFlagCode())) {
+/* 615 */               arrayList.add(arrayOfMetaFlag[b1].getFlagCode());
+/*     */             }
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 622 */     addDebug("checkPlannedAvailWDCountries all plannedavail countries " + arrayList);
+/*     */     
+/* 624 */     for (b = 0; b < paramEntityGroup.getEntityItemCount(); b++) {
+/* 625 */       EntityItem entityItem = paramEntityGroup.getEntityItem(b);
+/* 626 */       addDebug("checkPlannedAvailWDCountries checking avail: " + entityItem.getKey());
+/* 627 */       if (PokUtils.isSelected(entityItem, "AVAILTYPE", "149")) {
+/* 628 */         ArrayList<String> arrayList1 = new ArrayList();
+/* 629 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("COUNTRYLIST");
+/* 630 */         if (eANFlagAttribute != null) {
+/*     */           
+/* 632 */           MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 633 */           for (byte b1 = 0; b1 < arrayOfMetaFlag.length; b1++) {
+/*     */             
+/* 635 */             if (arrayOfMetaFlag[b1].isSelected() && !arrayList1.contains(arrayOfMetaFlag[b1].getFlagCode())) {
+/* 636 */               arrayList1.add(arrayOfMetaFlag[b1].getFlagCode());
+/*     */             }
+/*     */           } 
+/*     */         } 
+/* 640 */         addDebug("checkPlannedAvailWDCountries all lastorder " + entityItem.getKey() + " countries " + arrayList1);
+/*     */         
+/* 642 */         if (!arrayList.containsAll(arrayList1)) {
+/*     */ 
+/*     */           
+/* 645 */           this.args[0] = paramEntityGroup.getLongDescription();
+/* 646 */           this.args[1] = getNavigationName(entityItem);
+/* 647 */           addError("NO_PLANNEDAVAIL_ERR2", this.args);
+/*     */         } 
+/* 649 */         arrayList1.clear();
+/*     */       } 
+/*     */     } 
+/*     */ 
+/*     */     
+/* 654 */     arrayList.clear();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 664 */     return "SWPRODSTRUCT ABR";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 675 */     return "1.20";
+/*     */   }
+/*     */ }
 
-import COM.ibm.eannounce.objects.*;
-import com.ibm.transform.oim.eacm.util.*;
-import COM.ibm.opicmpdh.middleware.*;
-import java.util.*;
 
-/**********************************************************************************
-* SWPRODSTRUCTABRSTATUS class
-*
-* From "SG FS ABR Data Quality 20080502.doc"
-*
-*
-SWPRODSTRUCTABRSTATUS_class=COM.ibm.eannounce.abr.sg.SWPRODSTRUCTABRSTATUS
-SWPRODSTRUCTABRSTATUS_enabled=true
-SWPRODSTRUCTABRSTATUS_idler_class=A
-SWPRODSTRUCTABRSTATUS_keepfile=true
-SWPRODSTRUCTABRSTATUS_report_type=DGTYPE01
-SWPRODSTRUCTABRSTATUS_vename=DQVESWPRODSTRUCT
-SWPRODSTRUCTABRSTATUS_CAT1=RPTCLASS.SWPRODSTRUCTABRSTATUS
-SWPRODSTRUCTABRSTATUS_CAT2=
-SWPRODSTRUCTABRSTATUS_CAT3=RPTSTATUS
-SWPRODSTRUCTABRSTATUS_domains=0050,0090,0150,0190,0210,0230,0240,0310,0330,0340,0360,0390
-*/
-// SWPRODSTRUCTABRSTATUS.java,v
-// Revision 1.20  2009/07/30 18:41:27  wendy
-// Moved BH DQ ABRs to diff pkg
-//
-// Revision 1.18  2008/05/29 15:53:50  wendy
-// Backout queueing ADSABRSTATUS
-//
-// Revision 1.17  2008/05/06 21:23:24  wendy
-// Changes for SG FS ABR Data Quality 20080506.doc
-//
-// Revision 1.16  2008/05/01 12:02:46  wendy
-// updates for SG FS ABR Data Quality 20080430.doc
-//
-// Revision 1.15  2008/04/24 21:33:27  wendy
-// "SG FS ABR Data Quality 20080422.doc" spec updates
-//
-// Revision 1.14  2008/04/11 17:57:02  wendy
-// changes for spec SG FS ABR Data Quality 200803xx.doc
-//
-// Revision 1.13  2008/02/13 19:58:50  wendy
-// Make ABRWAITODSx into constants, allow easier change in future
-//
-// Revision 1.12  2007/12/19 17:02:57  wendy
-// Always need VE for navigation name
-//
-// Revision 1.11  2007/10/25 21:17:39  wendy
-// Spec chgs
-//
-// Revision 1.10  2007/10/23 17:47:12  wendy
-// Spec changes
-//
-// Revision 1.9  2007/10/15 20:22:35  wendy
-// QueueSAPL when PDHDOMAIN is not in list of domains
-//
-// Revision 1.8  2007/09/14 17:43:55  wendy
-// Updated for GX
-//
-// Revision 1.7  2007/08/17 16:02:10  wendy
-// RQ0713072645 - support for converged products. Another PDHDOMAIN was added.
-// from 'SG FS xSeries ABRs 20070803.doc'
-//
-// Revision 1.6  2007/06/20 12:06:31  wendy
-// Added mising 'GeographyList' level TIR74BL5E
-//
-// Revision 1.5  2007/06/13 21:18:22  wendy
-// TIR73RS77 -XML Mapping updated
-//
-// Revision 1.4  2007/05/16 17:19:15  wendy
-// TIR 7STP5L - Routing of XML correction required, spec chg
-//
-// Revision 1.3  2007/05/01 21:00:55  wendy
-// TIR72PGQ9 VE won't pull MODELPROJA from (SW)PRODSTRUCT root, use 2 VEs
-//
-// Revision 1.2  2007/04/20 21:48:59  wendy
-// RQ0417075638 updates
-//
-// Revision 1.1  2007/04/02 17:41:10  wendy
-// Init for SAPL abr
-//
-public class SWPRODSTRUCTABRSTATUS extends DQABRSTATUS
-{
-	private Object args[] = new Object[3];
-
-	/**********************************
-	* always check if not final, but need navigation name from model and fc
-	*/
-	protected boolean isVEneeded(String statusFlag) {
-		return true;
-	}
-
-	/**********************************
-	* complete abr processing when status is already final; (dq was final too)
-	*D.	STATUS = Final
-	*1.	Set SAPLABRSTATUS = 0020 (Queued)
-	*/
-	protected void doAlreadyFinalProcessing() {
-        setFlagValue(m_elist.getProfile(),"SAPLABRSTATUS", SAPLABR_QUEUED);
-	}
-
-    /**********************************
-    * complete abr processing after status moved to readyForReview; (status was chgreq)
-	* C.	Status changed to Ready for Review
-1.	Set ADSABRSTATUS = 0020 (Queued)
-    */
-    protected void completeNowR4RProcessing() throws
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-    {
-//         setFlagValue(m_elist.getProfile(),"ADSABRSTATUS", ABR_QUEUED);
-    }
-
-	/**********************************
-	* complete abr processing after status moved to final; (status was r4r)
-D.	STATUS changed to Final
-
-1.	QueueSAPL
-2.	Set EPIMSABRSTATUS =  &ABRWAITODS
-3.	Set ADSABRSTATUS = 0020 (Queued)
-
-	*
-	*Note:  SWFEATURE does not flow to WWPRT
-	*/
-	protected void completeNowFinalProcessing() throws
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-	{
-		queueSapl();
-        setFlagValue(m_elist.getProfile(),"EPIMSABRSTATUS", ABRWAITODS);
-//        setFlagValue(m_elist.getProfile(),"ADSABRSTATUS", ABR_QUEUED);
-	}
-
-	/**********************************
-	* complete abr processing after status moved to final; (status was r4r) for
-	* those ABRs that have domains that are not in the list of domains
-	*/
-	protected void completeNowFinalProcessingForOtherDomains() throws
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-    {
-		queueSapl();
-	}
-
-    /**********************************
-	*A.	STATUS = Draft | Change Request
-	*
-	*1.	SWPRODSTRUCT-d: MODEL then MODEL: SWPRODSTRUCT-u: SWFEATURE UNIQUE (FEATURECODE)
-	*ErrorMessage LD(SWFEATURE) NDN(SWFEATURE) 'is not unique in this' LD(MODEL)
-	*2.	IF ValueOf(SWPRODSTRUCT-u: SWFEATURE.FCTYPE) = 140 (PRPQ)  THEN ELSE  IF CompareAll(SWPRODSTRUCT.SAPL) = (90 (N/A) | 10 (Not Ready)) THEN
-	*a.	CountOf( SWPRODSTRUCTAVAIL-d: AVAIL  => 1 WHERE ValueOf(AVAILTYPE) = 146 (Planned Availability) )
-	*ErrorMessage 'does not have a Planned Availability'
-3.	CompareAll(SWPRODSTRUCT-d: MODEL.STATUS) = 0020 (Final) or 0040 (Ready for Review)
-ErrorMessage LD(MODEL) 'Status is not Ready for Review or Final'
-4.	CompareAll(SWPRODSTRUCT-u: SWFEATURE.STATUS) = 0020 (Final) or 0040 (Ready for Review)
-ErrorMessage LD(FEATURE 'Status is not Ready for Review or Final'
-
-	*B.	STATUS = Ready for Review
-	*
-	*1.	All checks from 'STATUS = Draft | Change Request'
-	*2.	CompareAll(SWPRODSTRUCT-d: MODEL.STATUS) = 0020 (Final)
-	*ErrorMessage LD(MODEL) 'Status is not Final'
-	*3.	CompareAll(SWPRODSTRUCT-u: SWFEATURE.STATUS) = 0020 (Final)
-	*ErrorMessage LD(FEATURE 'Status is not Final'
-	*4.	IF ValueOf(SWPRODSTRUCT-u: SWFEATURE.FCTYPE) = 140 (PRPQ)  THEN ELSE  IF CompareAll(SWPRODSTRUCT.SAPL) = (90 (N/A) | 10 (Not Ready)) THEN
-	*a.	SWPRODSTRUCT-u:MODEL.ANNDATE <= CompareAll(AVAIL.EFFECTIVEDATE) WHERE AVAIL.AVAILTYPE = 146 (Planned Availability)
-	*ErrorMessage LD(SWPRODSTRUCT) NDN(SWPRODSTRUCT) 'has a Planned Availability earlier than the' LD(MODEL) LD(ANNDATE).
-	*b.	MIN(SWPRODSTRUCT-u: MODEL.WITHDRAWDATE; SWFEATURE.WITHDRAWDATEEFF_T) => CompareAll(AVAIL.EFFECTIVEDATE) WHERE AVAIL.AVAILTYPE = 149 (Last Order)
-	*ErrorMessage LD(SWPRODSTRUCT) NDN(SWPRODSTRUCT) has a Last Order Availability later than the Model or SW Feature'.
-	*c.	IF NotNull(SWPRODSTRUCT-u: MODEL.WITHDRAWDATE) OR NotNull(SWPRODSTRUCT-d: SWFEATURE.WITHDRAWDATE) THEN AllValuesOf(SWPRODSTRUCT: SWPRODSTRUCTAVAIL-d: AVAIL.COUNTRYLIST WHERE ValueOf(AVAILTYPE) = 146 (Planned Availability) IN (PRODSTRUCT: OOFAVAIL-d: AVAIL.COUNTRYLIST WHERE ValueOf(AVAILTYPE) = 149 (Last Order)
-	*ErrorMessage LD(SWPRODSTRUCT) NDN(SWPRODSTRUCT) 'is being withdrawn and is available in a Country that does not have a Last Order' LD(AVAIL).
-	*d.	AllValuesOf(SWPRODSTRUCT: SWPRODSTRUCTAVAIL-d: AVAIL.COUNTRYLIST WHERE ValueOf(AVAILTYPE) = 149 (Last Order) IN (SWPRODSTRUCT: SWPRODSTRUCTAVAIL-d: AVAIL.COUNTRYLIST WHERE ValueOf(AVAILTYPE) = 146 (Planned Availability)
-	*ErrorMessage LD(SWPRODSTRUCT) NDN(SWPRODSTRUCT) LD(AVAIL) NDN(AVAIL) 'is being withdrawn from a country that does not have a planned availability'. Note: the AVAIL is the one with the AVAILTYPE = 149.
-e.	AllValuesOf(SWPRODSTRUCT: SWPRODSTRUCTAVAIL -d: AVAIL.EFFECTIVEDATE WHERE ValueOf(AVAILTYPE) = 146 (Planned Availability) or 143 (First Order)) => (AVAILANNA: ANNOUNCEMENT.ANNDATE)
-ErrorMessage  LD(SWPRODSTRUCT) NDN(SWPRODSTRUCT) LD(AVAIL) NDN(AVAIL) "is earlier than" LD(ANNOUNCEMENT) NDN(ANNOUNCEMENT) LD(ANNDATE).
-C.	STATUS changed to Ready for Review
-
-1.	Set ADSABRSTATUS = 0020 (Queued)
-D.	STATUS changed to Final
-
-1.	QueueSAPL
-2.	Set EPIMSABRSTATUS =  &ABRWAITODS
-3.	Set ADSABRSTATUS = 0020 (Queued)
-
-	*/
-    protected void doDQChecking(EntityItem rootEntity, String statusFlag) throws Exception
-    {
-		//1.	All checks from 'STATUS = Draft | Change Request'
-		checkAllFeatures(); // always do this check
-		// from SG FS ABR Data Quality 200803xx.doc do first check if draft or chgreq
-		//2.	IF ValueOf(SWPRODSTRUCT-u: SWFEATURE.FCTYPE) = 140 (PRPQ)  THEN ELSE
-		//	IF CompareAll(SWPRODSTRUCT.SAPL) = (90 (N/A) | 10 (Not Ready)) THEN
-		//		a.	CountOf( SWPRODSTRUCTAVAIL-d: AVAIL  => 1 WHERE ValueOf(AVAILTYPE) = 146 (Planned Availability) )
-		//		ErrorMessage 'does not have a Planned Availability'
-		//if status is R4R do the rest of these checks
-		//4.	IF ValueOf(SWPRODSTRUCT-u: SWFEATURE.FCTYPE) = 140 (PRPQ)  THEN ELSE
-		//	IF CompareAll(SWPRODSTRUCT.SAPL) = (90 (N/A) | 10 (Not Ready)) THEN
-		//		a.	SWPRODSTRUCT-u:MODEL.ANNDATE <= CompareAll(AVAIL.EFFECTIVEDATE) WHERE AVAIL.AVAILTYPE = 146 (Planned Availability)
-		//		ErrorMessage LD(SWPRODSTRUCT) NDN(SWPRODSTRUCT) 'has a Planned Availability earlier than the' LD(MODEL) LD(ANNDATE).
-		//		b.	MIN(SWPRODSTRUCT-u: MODEL.WITHDRAWDATE; SWFEATURE.WITHDRAWDATEEFF_T) => CompareAll(AVAIL.EFFECTIVEDATE) WHERE AVAIL.AVAILTYPE = 149 (Last Order)
-		//		ErrorMessage LD(SWPRODSTRUCT) NDN(SWPRODSTRUCT) has a Last Order Availability later than the Model or SW Feature'.
-		//		c.	IF NotNull(SWPRODSTRUCT-u: MODEL.WITHDRAWDATE) OR NotNull(SWPRODSTRUCT-d: SWFEATURE.WITHDRAWDATE) THEN AllValuesOf(SWPRODSTRUCT: SWPRODSTRUCTAVAIL-d: AVAIL.COUNTRYLIST WHERE ValueOf(AVAILTYPE) = 146 (Planned Availability) IN (PRODSTRUCT: OOFAVAIL-d: AVAIL.COUNTRYLIST WHERE ValueOf(AVAILTYPE) = 149 (Last Order)
-		//		ErrorMessage LD(SWPRODSTRUCT) NDN(SWPRODSTRUCT) 'is being withdrawn and is available in a Country that does not have a Last Order' LD(AVAIL).
-		//		d.	AllValuesOf(SWPRODSTRUCT: SWPRODSTRUCTAVAIL-d: AVAIL.COUNTRYLIST WHERE ValueOf(AVAILTYPE) = 149 (Last Order) IN (SWPRODSTRUCT: SWPRODSTRUCTAVAIL-d: AVAIL.COUNTRYLIST WHERE ValueOf(AVAILTYPE) = 146 (Planned Availability)
-		//		ErrorMessage LD(SWPRODSTRUCT) NDN(SWPRODSTRUCT) LD(AVAIL) NDN(AVAIL) 'is being withdrawn from a country that does not have a planned availability'. Note: the AVAIL is the one with the AVAILTYPE = 149.
-		//		e.	AllValuesOf(SWPRODSTRUCT: SWPRODSTRUCTAVAIL -d: AVAIL.EFFECTIVEDATE WHERE ValueOf(AVAILTYPE) = 146 (Planned Availability) or 143 (First Order)) => (AVAILANNA: ANNOUNCEMENT.ANNDATE)
-		//		ErrorMessage  LD(SWPRODSTRUCT) NDN(SWPRODSTRUCT) LD(AVAIL) NDN(AVAIL) "is earlier than" LD(ANNOUNCEMENT) NDN(ANNOUNCEMENT) LD(ANNDATE).
-		checkRPQAvails(rootEntity,statusFlag);
-
-		if(STATUS_DRAFT.equals(statusFlag) || STATUS_CHGREQ.equals(statusFlag)) // 'Draft or Ready for Review'
-		{
-	        EntityItem mdlItem = m_elist.getEntityGroup("MODEL").getEntityItem(0); // has to exist
-	        EntityItem swfcItem = m_elist.getEntityGroup("SWFEATURE").getEntityItem(0); // has to exist
-
-			//3.	CompareAll(SWPRODSTRUCT-d: MODEL.STATUS) = 0020 (Final) or 0040 (Ready for Review)
-			//ErrorMessage LD(MODEL) 'Status is not Ready for Review or Final'
-			String status = getAttributeFlagEnabledValue(mdlItem , "STATUS");
-			addDebug(mdlItem.getKey()+" check status "+status);
-			if (status==null){
-				status = STATUS_FINAL;
-			}
-
-			if (!STATUS_FINAL.equals(status) && !STATUS_R4REVIEW.equals(status)){
-				addDebug(mdlItem.getKey()+" is not Final or R4R");
-				//NOT_R4R_FINAL_ERR = {0} {1} is not Ready for Review or Final.
-				args[0] = mdlItem.getEntityGroup().getLongDescription();
-				args[1] = getNavigationName(mdlItem);
-				addError("NOT_R4R_FINAL_ERR",args);
-			}
-			//4.	CompareAll(SWPRODSTRUCT-u: SWFEATURE.STATUS) = 0020 (Final) or 0040 (Ready for Review)
-			//ErrorMessage LD(SWFEATURE 'Status is not Ready for Review or Final'
-			status = getAttributeFlagEnabledValue(swfcItem , "STATUS");
-			addDebug(swfcItem.getKey()+" check status "+status);
-			if (status==null){
-				status = STATUS_FINAL;
-			}
-
-			if (!STATUS_FINAL.equals(status) && !STATUS_R4REVIEW.equals(status)){
-				addDebug(swfcItem.getKey()+" is not Final or R4R");
-				//NOT_R4R_FINAL_ERR = {0} {1} is not Ready for Review or Final.
-				args[0] = swfcItem.getEntityGroup().getLongDescription();
-				args[1] = getNavigationName(swfcItem);
-				addError("NOT_R4R_FINAL_ERR",args);
-			}
-		}
-
-		if(STATUS_R4REVIEW.equals(statusFlag)) // 'Ready for Review to Final'
-		{
-			//2.CompareAll(SWPRODSTRUCT-d: MODEL.STATUS) = 0020 (Final)
-			//ErrorMessage LD(MODEL) ' is not Final'
-			checkStatus("MODEL");
-
-			//3.CompareAll(SWPRODSTRUCT-d: SWFEATURE.STATUS) = 0020 (Final)
-			//ErrorMessage LD(SWFEATURE) ' is not Final'
-			checkStatus("SWFEATURE");
-		}
-	}
-
-    /**********************************
-    *
-Wendy   i think u can pull things tied to a feature when prodstruct is root..
-bnair@us.ibm.c...   right, u can
-Wendy   but seems like u cant pull things tied to a model when prodstruct is root
-bnair@us.ibm.c...   right, because the entry which seeds the trsnavigate always says root is 'UP' when the root entity is a relator
-bnair@us.ibm.c...   so thats a limitation with gbl8000
-    */
-	private void checkAllFeatures() throws Exception
-	{
-        Profile profile = m_elist.getProfile();
-        String VeName = "DQVESWPRODSTRUCT2";
-
-        EntityItem origmdlItem = m_elist.getEntityGroup("MODEL").getEntityItem(0); // has to exist
-
-        // entityitem passed in is adjusted in extract, we don't want that so create new one
-        EntityList mdlList = m_db.getEntityList(profile,
-                new ExtractActionItem(null, m_db, profile, VeName),
-                new EntityItem[] { new EntityItem(null, profile, "MODEL", origmdlItem.getEntityID()) });
-        addDebug("checkAllFeatures:: Extract "+VeName+NEWLINE+PokUtils.outputList(mdlList));
-
-        EntityItem mdlItem = mdlList.getParentEntityGroup().getEntityItem(0);
-
-		Vector fcVct = new Vector();
-		for (int i=0; i<mdlItem.getUpLinkCount(); i++){ // look at prodstructs for this model
-			EntityItem psItem = (EntityItem)mdlItem.getUpLink(i);
-			if (!psItem.getEntityType().equals("SWPRODSTRUCT")){
-				addDebug("checkAllFeatures skipping uplink "+psItem.getKey());
-				continue;
-			}
-			for (int f=0; f<psItem.getUpLinkCount(); f++){ // look at features for this ps
-				EntityItem featItem = (EntityItem)psItem.getUpLink(f);
-				// look at all features for this model thru each prodstruct
-				String fcode = PokUtils.getAttributeValue(featItem, "FEATURECODE",", ", "", false);
-				addDebug("checkAllFeatures checking "+psItem.getKey()+" -- "+featItem.getKey()+" fcode: "+fcode);
-				if (fcVct.contains(fcode)){
-					//1.	PRODSTRUCT-d: MODEL then PRODSTRUCT-u: FEATURE UNIQUE (FEATURECODE)
-					//ErrorMessage LD(FEATURE) NDN(FEATURE) 'is not unique in this' LD(MODEL)
-					//NOT_UNIQUE_ERR = {0} {1} is not unique in this {2}
-					args[0] = featItem.getEntityGroup().getLongDescription();
-					args[1] = getNavigationName(featItem);
-					args[2] = mdlItem.getEntityGroup().getLongDescription();
-					addError("NOT_UNIQUE_ERR",args);
-				}else{
-					fcVct.add(fcode);
-				}
-			} // end prodstruct uplinks
-		} // end model uplinks
-
-		fcVct.clear();
-
-		mdlList.dereference();
-	}
-
-	/********************************
-	* this checks the FCTYPE of the SWFEATURE, if it is not an RPQ
-	* it checks the SAPL value of the root SWPRODSTRUCT
-	* if it is NA or not ready, AVAIL checks are needed
-	*/
-    private void checkRPQAvails(EntityItem rootEntity, String statusFlag) throws java.sql.SQLException, MiddlewareException
-	{
-		// check FCTYPE
-		Set fctypeSet = new HashSet();
-		//SWFEATURE.FCTYPE) = 140 (RPQ)
-		fctypeSet.add("140");
-
-		EntityItem featItem = m_elist.getEntityGroup("SWFEATURE").getEntityItem(0);
-		addDebug("checkRPQAvails checking "+featItem.getKey());
-		//4.	IF ValueOf(SWPRODSTRUCT-u: SWFEATURE.FCTYPE) = 140 (PRPQ)  THEN ELSE
-		// check FCTYPE
-		if (!PokUtils.contains(featItem, "FCTYPE", fctypeSet)){
-			addDebug("checkRPQAvails "+featItem.getKey()+" is NOT an RPQ");
-			// is not an RPQ
-			// look at avails
-			EntityGroup availGrp = m_elist.getEntityGroup("AVAIL");
-
-			// get SAPL value
-			String sapl = getAttributeFlagEnabledValue(rootEntity, "SAPL"); // (sw)prodstruct
-			addDebug("checkRPQAvails checking entity: "+rootEntity.getKey()+" sapl "+sapl);
-			Set saplSet = new HashSet();
-			saplSet.add(SAPL_NOTREADY);
-			saplSet.add(SAPL_NA);
-			//IF CompareAll(PRODSTRUCT.SAPL) = ('N/A' (90) | 'Not Ready' (10)) THEN
-			if (PokUtils.contains(rootEntity, "SAPL", saplSet)){
-				addDebug("checkRPQAvails "+rootEntity.getKey()+" has SAPL of 90 or 10");
-
-				//a.	CountOf( SWPRODSTRUCTAVAIL-d: AVAIL  => 1 WHERE ValueOf(AVAILTYPE) = 146 (Planned Availability) )
-				//ErrorMessage 'does not have a Planned Availability'
-				int plannedAvailCnt=0;
-				for (int ai=0; ai<availGrp.getEntityItemCount(); ai++){ // look at avails
-					EntityItem avail = (EntityItem)availGrp.getEntityItem(ai);
-					addDebug("checkRPQAvails looking for planned avail; checking: "+avail.getKey());
-					if(PokUtils.isSelected(avail, "AVAILTYPE", PLANNEDAVAIL)){
-						plannedAvailCnt++;
-					}
-				}
-				if (plannedAvailCnt==0){
-					//ErrorMessage 'does not have a Planned Availability'
-					//NO_PLANNEDAVAIL_ERR = does not have a Planned Availability
-					addError("NO_PLANNEDAVAIL_ERR",null);
-				}
-
-				// the rest of these are only done if R4R
-				if(STATUS_R4REVIEW.equals(statusFlag)){ // 'Ready for Review to Final'
-
-					//a.	SWPRODSTRUCT-u:MODEL.ANNDATE <= CompareAll(AVAIL.EFFECTIVEDATE) WHERE AVAIL.AVAILTYPE = 146 (Planned Availability)
-					//ErrorMessage LD(SWPRODSTRUCT) NDN(SWPRODSTRUCT) 'has a Planned Availability earlier than the' LD(MODEL) LD(ANNDATE).
-					checkAnnDate(rootEntity, availGrp);
-
-					//b.MIN(SWPRODSTRUCT-u: MODEL.WITHDRAWDATE; SWFEATURE.WITHDRAWDATEEFF_T) => CompareAll(AVAIL.EFFECTIVEDATE) WHERE AVAIL.AVAILTYPE = 149 (Last Order)
-					//ErrorMessage has a Last Order Availability later than the Model or SW Feature'.
-					checkMinWDate(rootEntity, availGrp);
-
-					//c.	IF NotNull(SWPRODSTRUCT-u: MODEL.WITHDRAWDATE) OR NotNull(SWPRODSTRUCT-d: SWFEATURE.WITHDRAWDATE) THEN
-					// AllValuesOf(SWPRODSTRUCT: SWPRODSTRUCTAVAIL-d: AVAIL.COUNTRYLIST WHERE ValueOf(AVAILTYPE) = 146 (Planned Availability) IN
-					//  (SWPRODSTRUCT: SWPRODSTRUCTAVAIL-d: AVAIL.COUNTRYLIST WHERE ValueOf(AVAILTYPE) = 149 (Last Order)
-					//ErrorMessage 'is being withdrawn and is available in a Country that does not have a Last Order' LD(AVAIL).
-					checkLastOrderWDCountries(rootEntity,availGrp);
-
-					//d.	AllValuesOf(SWPRODSTRUCT: SWPRODSTRUCTAVAIL-d: AVAIL.COUNTRYLIST WHERE ValueOf(AVAILTYPE) = 149 (Last Order) IN
-					//(SWPRODSTRUCT: SWPRODSTRUCTAVAIL-d: AVAIL.COUNTRYLIST WHERE ValueOf(AVAILTYPE) = 146 (Planned Availability)
-					//ErrorMessage LD(AVAIL) NDN(AVAIL) 'is being withdrawn from a country that does not have a planned availability'. Note: the AVAIL is the one with the AVAILTYPE = 149.
-					checkPlannedAvailWDCountries(availGrp);
-
-					//e.	AllValuesOf(SWPRODSTRUCT: SWPRODSTRUCTAVAIL -d: AVAIL.EFFECTIVEDATE WHERE ValueOf(AVAILTYPE) = 146
-					//(Planned Availability) or 143 (First Order)) => (AVAILANNA: ANNOUNCEMENT.ANNDATE)
-					//ErrorMessage  LD(SWPRODSTRUCT) NDN(SWPRODSTRUCT) LD(AVAIL) NDN(AVAIL) "is earlier than" LD(ANNOUNCEMENT) NDN(ANNOUNCEMENT) LD(ANNDATE).
-					checkAvailDates(availGrp);
-				}
-
-			}// end SAPL is NA or NOTREADY
-			else{
-				addDebug("checkRPQAvails "+rootEntity.getKey()+" is not SAPL of 90 or 10");
-			}
-		}else{
-			addDebug("checkRPQAvails "+featItem.getKey()+" is an RPQ");
-		}
-
-		fctypeSet.clear();
-	}
-
-    /***********************************************
-e.	AllValuesOf(SWPRODSTRUCT: SWPRODSTRUCTAVAIL -d: AVAIL.EFFECTIVEDATE WHERE ValueOf(AVAILTYPE) = 146
-(Planned Availability) or 143 (First Order)) => (AVAILANNA: ANNOUNCEMENT.ANNDATE)
-ErrorMessage  LD(SWPRODSTRUCT) NDN(SWPRODSTRUCT) LD(AVAIL) NDN(AVAIL) "is earlier than" LD(ANNOUNCEMENT) NDN(ANNOUNCEMENT) LD(ANNDATE).
-	*/
-	private void checkAvailDates(EntityGroup availGrp) throws java.sql.SQLException,
-		COM.ibm.opicmpdh.middleware.MiddlewareException
-	{
-
-		for (int ai=0; ai<availGrp.getEntityItemCount(); ai++){ // look at avails
-			EntityItem avail = availGrp.getEntityItem(ai);
-			String effDate = PokUtils.getAttributeValue(avail, "EFFECTIVEDATE",", ", "", false);
-			String availtype = getAttributeFlagEnabledValue(avail, "AVAILTYPE");
-			addDebug("checkAvailDates "+avail.getKey()+" EFFECTIVEDATE: "+effDate+" AVAILTYPE: "+availtype);
-			if((PLANNEDAVAIL.equals(availtype) || FIRSTORDERAVAIL.equals(availtype))
-				&& effDate.length()>0){
-				Vector annVct = PokUtils.getAllLinkedEntities(avail, "AVAILANNA", "ANNOUNCEMENT");
-				addDebug("checkAvailDates "+avail.getKey()+" annVct: "+annVct.size());
-				for (int a=0; a<annVct.size(); a++){
-					EntityItem annitem = (EntityItem)annVct.elementAt(a);
-					String annDate = PokUtils.getAttributeValue(annitem, "ANNDATE",", ", "", false);
-					addDebug("checkAvailDates "+annitem.getKey()+" annDate: "+annDate);
-					if(annDate.length()>0 && effDate.compareTo(annDate)<0){
-						//ErrorMessage LD(AVAIL) NDN(AVAIL) 'is earlier than' LD(ANNOUNCEMENT) NDN(ANNOUNCEMENT) LD(ANNDATE)
-						//EARLY_DATE_ERR = {0} is earlier than the {1} {2} {3}
-						args[0] = avail.getEntityGroup().getLongDescription()+" "+ getNavigationName(avail);
-						args[1] = annitem.getEntityGroup().getLongDescription();
-						args[2] = getNavigationName(annitem);
-						args[3] = PokUtils.getAttributeDescription(annitem.getEntityGroup(), "ANNDATE", "ANNDATE");
-						addError("EARLY_DATE_ERR",args);
-					}
-				}
-				annVct.clear();
-			}
-		}
-	}
-
-    /**********************************
-    *b.	SWPRODSTRUCT-u:MODEL.ANNDATE <= CompareAll(AVAIL.EFFECTIVEDATE) WHERE AVAIL.AVAILTYPE = 146 (Planned Availability)
-    *ErrorMessage 'has a Planned Availability earlier than the' LD(MODEL) LD(ANNDATE).
-    */
-	private void checkAnnDate(EntityItem rootEntity,EntityGroup availGrp)
-		throws java.sql.SQLException, MiddlewareException
-	{
-		EntityItem mdlItem = m_elist.getEntityGroup("MODEL").getEntityItem(0);
-    	String annDate = PokUtils.getAttributeValue(mdlItem, "ANNDATE",", ", "", false);
-		addDebug("checkAnnDate "+mdlItem.getKey()+" ("+annDate+")");
-
-		if (annDate.length()>0){
-			for (int ai=0; ai<availGrp.getEntityItemCount(); ai++){ // look at avails
-				EntityItem avail = (EntityItem)availGrp.getEntityItem(ai);
-				addDebug("checkAnnDate looking for planned avail; checking: "+avail.getKey());
-				if(PokUtils.isSelected(avail, "AVAILTYPE", PLANNEDAVAIL)){
-					String effDate = PokUtils.getAttributeValue(avail, "EFFECTIVEDATE",", ", "", false);
-					addDebug("checkAnnDate plannedavail "+avail.getKey()+" EFFECTIVEDATE: "+effDate);
-					if (effDate.length()>0 && annDate.compareTo(effDate)>0){
-						//EARLY_PLANNEDAVAIL_ERR = has a Planned Availability earlier than the {0} {1}
-						args[0] = mdlItem.getEntityGroup().getLongDescription();
-						args[1] = PokUtils.getAttributeDescription(mdlItem.getEntityGroup(), "ANNDATE", "ANNDATE");
-						addError("EARLY_PLANNEDAVAIL_ERR",args);
-					}
-				}
-			}
-		}
-	}
-
-    /**********************************
-    *c.	MIN(SWPRODSTRUCT-u: MODEL.WITHDRAWDATE; SWFEATURE.WITHDRAWDATEEFF_T) => CompareAll(AVAIL.EFFECTIVEDATE)
-    * WHERE AVAIL.AVAILTYPE = 149 (Last Order)
-    * ErrorMessage has a Last Order Availability later than the Model or SW Feature'.
-    */
-	private void checkMinWDate(EntityItem rootEntity,EntityGroup availGrp)
-		throws java.sql.SQLException, MiddlewareException
-	{
-		Vector tmp = new Vector(2);
-		EntityItem mdlItem = m_elist.getEntityGroup("MODEL").getEntityItem(0);
-    	String mdlDate = PokUtils.getAttributeValue(mdlItem, "WITHDRAWDATE",", ", null, false);
-		EntityItem featItem = m_elist.getEntityGroup("SWFEATURE").getEntityItem(0);
-    	String fcDate = PokUtils.getAttributeValue(featItem, "WITHDRAWDATEEFF_T",", ", null, false);
-		addDebug("checkMinWDate "+featItem.getKey()+" ("+fcDate+") "+
-			mdlItem.getKey()+" ("+mdlDate+")");
-
-		if (mdlDate != null){
-    		tmp.add(mdlDate);
-		}
-		if (fcDate != null){
-	    	tmp.add(fcDate);
-		}
-
-		if (tmp.size()>0){
-			Collections.sort(tmp);
-			String wdDate = tmp.firstElement().toString();
-			tmp.clear();
-			addDebug("checkMinWDate looking for lastorder avail; after "+wdDate);
-
-			for (int ai=0; ai<availGrp.getEntityItemCount(); ai++){ // look at avails
-				EntityItem avail = (EntityItem)availGrp.getEntityItem(ai);
-				addDebug("checkMinWDate looking for lastorder avail; checking: "+avail.getKey());
-				if(PokUtils.isSelected(avail, "AVAILTYPE", LASTORDERAVAIL)){
-					String effDate = PokUtils.getAttributeValue(avail, "EFFECTIVEDATE",", ", "", false);
-					addDebug("checkMinWDate lastorder "+avail.getKey()+" EFFECTIVEDATE: "+effDate);
-					if (effDate.length()>0 && effDate.compareTo(wdDate)>0){
-						//LATE_LASTORDERAVAIL_ERR =has a Last Order Availability later than the {0} or {1}.
-						args[0] = mdlItem.getEntityGroup().getLongDescription();
-						args[1] = featItem.getEntityGroup().getLongDescription();
-						addError("LATE_LASTORDERAVAIL_ERR",args);
-					}
-				}
-			}
-		}
-	}
-
-    /**********************************
-	*d.	IF NotNull(SWPRODSTRUCT-u: MODEL.WITHDRAWDATE) OR NotNull(SWPRODSTRUCT-d: SWFEATURE.WITHDRAWDATE) THEN
-	*AllValuesOf(SWPRODSTRUCT: SWPRODSTRUCTAVAIL-d: AVAIL.COUNTRYLIST WHERE ValueOf(AVAILTYPE) = 146 (Planned Availability) IN
-	*(SWPRODSTRUCT: SWPRODSTRUCTAVAIL-d: AVAIL.COUNTRYLIST WHERE ValueOf(AVAILTYPE) = 149 (Last Order)
-	*ErrorMessage 'is being withdrawn and is available in a Country that does not have a Last Order' LD(AVAIL).
-    */
-	private void checkLastOrderWDCountries(EntityItem rootEntity,EntityGroup availGrp)
-		throws java.sql.SQLException, MiddlewareException
-	{
-		EntityItem mdlItem = m_elist.getEntityGroup("MODEL").getEntityItem(0);
-    	String mdlDate = PokUtils.getAttributeValue(mdlItem, "WITHDRAWDATE",", ", null, false);
-		EntityItem featItem = m_elist.getEntityGroup("SWFEATURE").getEntityItem(0);
-    	String fcDate = PokUtils.getAttributeValue(featItem, "WITHDRAWDATEEFF_T",", ", null, false);
-		addDebug("checkLastOrderWDCountries "+featItem.getKey()+" ("+fcDate+") "+
-			mdlItem.getKey()+" ("+mdlDate+")");
-
-		if (mdlDate != null || fcDate != null){
-			ArrayList lastOrderAvailCtry = new ArrayList();
-			ArrayList plannedAvailCtry = new ArrayList();
-
-			for (int ai=0; ai<availGrp.getEntityItemCount(); ai++){ // look at avails
-				EntityItem avail = availGrp.getEntityItem(ai);
-				addDebug("checkLastOrderWDCountries checking avail: "+avail.getKey());
-				if(PokUtils.isSelected(avail, "AVAILTYPE", LASTORDERAVAIL)){ // last order
-					addDebug("checkLastOrderWDCountries lastorder "+avail.getKey());
-					EANFlagAttribute ctrylist = (EANFlagAttribute)avail.getAttribute("COUNTRYLIST");
-					if (ctrylist != null) {
-						// Get the selected Flag codes.
-						MetaFlag[] mfArray = (MetaFlag[]) ctrylist.get();
-						for (int im = 0; im < mfArray.length; im++) {
-							// get selection
-							if (mfArray[im].isSelected() && !lastOrderAvailCtry.contains(mfArray[im].getFlagCode())) {
-								lastOrderAvailCtry.add(mfArray[im].getFlagCode());
-							}
-						} //end for
-					} //end of null chk
-
-				}else if(PokUtils.isSelected(avail, "AVAILTYPE", PLANNEDAVAIL)){
-					addDebug("checkLastOrderWDCountries plannedavail "+avail.getKey());
-					EANFlagAttribute ctrylist = (EANFlagAttribute)avail.getAttribute("COUNTRYLIST");
-					if (ctrylist != null) {
-						// Get the selected Flag codes.
-						MetaFlag[] mfArray = (MetaFlag[]) ctrylist.get();
-						for (int im = 0; im < mfArray.length; im++) {
-							// get selection
-							if (mfArray[im].isSelected()&& !plannedAvailCtry.contains(mfArray[im].getFlagCode())) {
-								plannedAvailCtry.add(mfArray[im].getFlagCode());
-							}
-						} //end for
-					} //end of null chk
-				}
-			} // end avails
-
-			addDebug("checkLastOrderWDCountries all plannedavail countries "+plannedAvailCtry);
-			addDebug("checkLastOrderWDCountries all lastorderavail countries "+lastOrderAvailCtry);
-			// each lastorder avail country must have a plannedavail too
-			if (!lastOrderAvailCtry.containsAll(plannedAvailCtry)) {
-				// ErrorMessage 'is being withdrawn and is available in a Country that does not have a Last Order' LD(AVAIL).
-				//NO_LASTORDER_ERR= is being withdrawn and is available in a Country that does not have a Last Order {0}
-				args[0] = availGrp.getLongDescription();
-				addError("NO_LASTORDER_ERR",args);
-			}
-			lastOrderAvailCtry.clear();
-			plannedAvailCtry.clear();
-		}
-	}
-
-    /**********************************
-	*e.	AllValuesOf(SWPRODSTRUCT: SWPRODSTRUCTAVAIL-d: AVAIL.COUNTRYLIST WHERE ValueOf(AVAILTYPE) = 149 (Last Order) IN
-	*(SWPRODSTRUCT: SWPRODSTRUCTAVAIL-d: AVAIL.COUNTRYLIST WHERE ValueOf(AVAILTYPE) = 146 (Planned Availability)
-	*ErrorMessage LD(AVAIL) NDN(AVAIL) 'is being withdrawn from a country that does not have a planned availability'.
-	*Note: the AVAIL is the one with the AVAILTYPE = 149.
-	*
-    */
-	private void checkPlannedAvailWDCountries(EntityGroup availGrp)
-		throws java.sql.SQLException, MiddlewareException
-	{
-		ArrayList plannedAvailCtry = new ArrayList();
-
-		// get all planned avail countries
-		for (int ai=0; ai<availGrp.getEntityItemCount(); ai++){ // look at avails
-			EntityItem avail = availGrp.getEntityItem(ai);
-			addDebug("checkPlannedAvailWDCountries checking avail: "+avail.getKey());
-			if(PokUtils.isSelected(avail, "AVAILTYPE", PLANNEDAVAIL)){
-				addDebug("checkPlannedAvailWDCountries plannedavail "+avail.getKey());
-				EANFlagAttribute ctrylist = (EANFlagAttribute)avail.getAttribute("COUNTRYLIST");
-				if (ctrylist != null) {
-					// Get the selected Flag codes.
-					MetaFlag[] mfArray = (MetaFlag[]) ctrylist.get();
-					for (int im = 0; im < mfArray.length; im++) {
-						// get selection
-						if (mfArray[im].isSelected()&& !plannedAvailCtry.contains(mfArray[im].getFlagCode())) {
-							plannedAvailCtry.add(mfArray[im].getFlagCode());
-						}
-					} //end for
-				} //end of null chk
-			}
-		} // end avails
-
-		addDebug("checkPlannedAvailWDCountries all plannedavail countries "+plannedAvailCtry);
-
-		for (int ai=0; ai<availGrp.getEntityItemCount(); ai++){ // look at avails
-			EntityItem avail = availGrp.getEntityItem(ai);
-			addDebug("checkPlannedAvailWDCountries checking avail: "+avail.getKey());
-			if(PokUtils.isSelected(avail, "AVAILTYPE", LASTORDERAVAIL)){ // last order
-				ArrayList lastOrderAvailCtry = new ArrayList();
-				EANFlagAttribute ctrylist = (EANFlagAttribute)avail.getAttribute("COUNTRYLIST");
-				if (ctrylist != null) {
-					// Get the selected Flag codes.
-					MetaFlag[] mfArray = (MetaFlag[]) ctrylist.get();
-					for (int im = 0; im < mfArray.length; im++) {
-						// get selection
-						if (mfArray[im].isSelected() && !lastOrderAvailCtry.contains(mfArray[im].getFlagCode())) {
-							lastOrderAvailCtry.add(mfArray[im].getFlagCode());
-						}
-					} //end for
-				} //end of null chk
-				addDebug("checkPlannedAvailWDCountries all lastorder "+avail.getKey()+" countries "+lastOrderAvailCtry);
-				// each plannedavail avail country must have a lastorder too
-				if (!plannedAvailCtry.containsAll(lastOrderAvailCtry)) {
-					// ErrorMessage LD(AVAIL) NDN(AVAIL) 'is being withdrawn from a country that does not have a planned availability'.
-					//NO_PLANNEDAVAIL_ERR2= {0} {1} is being withdrawn from a country that does not have a planned availability.
-					args[0] = availGrp.getLongDescription();
-					args[1] = getNavigationName(avail);
-					addError("NO_PLANNEDAVAIL_ERR2",args);
-				}
-				lastOrderAvailCtry.clear();
-
-			}
-		} // end avails
-
-		plannedAvailCtry.clear();
-	}
-
-    /***********************************************
-    *  Get ABR description
-    *
-    *@return java.lang.String
-    */
-    public String getDescription()
-    {
-        String desc =  "SWPRODSTRUCT ABR";
-        return desc;
-    }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getABRVersion()
-    {
-        return "1.20";
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\SWPRODSTRUCTABRSTATUS.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

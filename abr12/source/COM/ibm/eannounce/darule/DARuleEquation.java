@@ -1,83 +1,89 @@
-//Licensed Materials -- Property of IBM
-//(C) Copyright IBM Corp. 2011  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.darule;
+/*    */ package COM.ibm.eannounce.darule;
+/*    */ 
+/*    */ import COM.ibm.eannounce.objects.EntityItem;
+/*    */ import COM.ibm.opicmpdh.middleware.Database;
+/*    */ import COM.ibm.opicmpdh.middleware.Profile;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class DARuleEquation
+/*    */   extends DARuleItem
+/*    */ {
+/*    */   private static final long serialVersionUID = 1L;
+/*    */   
+/*    */   protected DARuleEquation(EntityItem paramEntityItem) {
+/* 32 */     super(paramEntityItem);
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   protected String getDerivedValue(Database paramDatabase, Profile paramProfile, EntityItem paramEntityItem, String paramString, StringBuffer paramStringBuffer) throws Exception {
+/* 41 */     String str = paramString;
+/*    */     
+/* 43 */     if (isApplicable(paramEntityItem, paramStringBuffer));
+/*    */ 
+/*    */ 
+/*    */     
+/* 47 */     return str;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   protected String[] getDerivedValues(Database paramDatabase, Profile paramProfile, EntityItem[] paramArrayOfEntityItem, String[] paramArrayOfString, StringBuffer paramStringBuffer) throws Exception {
+/* 56 */     String[] arrayOfString = new String[paramArrayOfEntityItem.length];
+/* 57 */     for (byte b = 0; b < paramArrayOfEntityItem.length; b++) {
+/* 58 */       EntityItem entityItem = paramArrayOfEntityItem[b];
+/*    */       
+/* 60 */       if (!isApplicable(entityItem, paramStringBuffer))
+/*    */       {
+/*    */ 
+/*    */         
+/* 64 */         if (paramArrayOfString != null) {
+/* 65 */           arrayOfString[b] = paramArrayOfString[b];
+/*    */         } else {
+/* 67 */           arrayOfString[b] = null;
+/*    */         } 
+/*    */       }
+/*    */     } 
+/* 71 */     return arrayOfString;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public static String getVersion() {
+/* 81 */     return "$Revision: 1.1 $";
+/*    */   }
+/*    */ }
 
 
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.opicmpdh.middleware.Database;
-
-import COM.ibm.opicmpdh.middleware.Profile;
-
-/*********************************
- *DARULETYPE  40  Equation
- *4.	Equation
- *This is not defined nor implemented yet.
- *
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\darule\DARuleEquation.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-// $Log: DARuleEquation.java,v $
-// Revision 1.1  2011/03/15 21:12:10  wendy
-// Init for BH FS ABR Catalog Attr Derivation 20110221b.doc
-//
-public class DARuleEquation extends DARuleItem {
-	private static final long serialVersionUID = 1L;
-	
-	/**
-	 * constructor
-	 * @param ei
-	 */
-	protected DARuleEquation(EntityItem ei){
-		super(ei);
-	}
-	
-	/* (non-Javadoc)
-	 *  used for offering DQ and Workflow 
-	 * @see COM.ibm.eannounce.darule.DARuleItem#getDerivedValue(COM.ibm.opicmpdh.middleware.Database, COM.ibm.opicmpdh.middleware.Profile, java.lang.String, java.lang.StringBuffer)
-	 */
-	protected String getDerivedValue(Database db, Profile prof, EntityItem rootItem,String interimValue, StringBuffer debugSb) 
-	throws Exception{
-		String results=interimValue;
-		//The root entity type PDHDOMAIN is in DARULE.PDHDOMAIN
-		if(isApplicable(rootItem, debugSb)){
-			// process this rule
-			//results=
-		}
-		return results;
-	}
-	/* (non-Javadoc)
-	 * used for IDL to improve performance
-	 * @see COM.ibm.eannounce.darule.DARuleItem#getDerivedValues(COM.ibm.opicmpdh.middleware.Database, COM.ibm.opicmpdh.middleware.Profile, COM.ibm.eannounce.objects.EntityItem[], java.lang.String[], java.lang.StringBuffer)
-	 */
-	protected String[] getDerivedValues(Database db, Profile prof, EntityItem[] rootItemArray, String[] interimValues, 
-			StringBuffer debugSb) 
-	throws Exception{
-		String results[] = new String[rootItemArray.length];
-		for(int i=0; i<rootItemArray.length; i++){
-			EntityItem rootItem = rootItemArray[i];
-			//The root entity type PDHDOMAIN is in DARULE.PDHDOMAIN
-			if(isApplicable(rootItem, debugSb)){
-				// process this rule
-				//results[i]=
-			}else{
-				if(interimValues!=null){
-					results[i]=interimValues[i];
-				}else{
-					results[i]=null;
-				}
-			}
-		}
-		return results;
-	}
-	
-    /***********************************************
-     *  Get the version
-     *
-     *@return java.lang.String
-     */
-     public static String getVersion()
-     {
-     	return "$Revision: 1.1 $";
-     }
-}

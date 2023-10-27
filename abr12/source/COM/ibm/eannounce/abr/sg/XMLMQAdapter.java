@@ -1,146 +1,151 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.abr.sg;
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.XMLElem;
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareServerProperties;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import com.ibm.eacm.AES256Utils;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.Connection;
+/*     */ import java.sql.DriverManager;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.MissingResourceException;
+/*     */ import java.util.Vector;
+/*     */ import javax.xml.parsers.ParserConfigurationException;
+/*     */ import javax.xml.transform.TransformerException;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public abstract class XMLMQAdapter
+/*     */   implements XMLMQ
+/*     */ {
+/*     */   public Vector getMQPropertiesFN() {
+/*  45 */     Vector<String> vector = new Vector(1);
+/*  46 */     vector.add("ADSMQSERIES");
+/*  47 */     return vector;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public boolean createXML(EntityItem paramEntityItem) {
+/*  53 */     return true;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public XMLElem getXMLMap() {
+/*  58 */     return null;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public String getVeName() {
+/*  63 */     return "dummy";
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public String getRoleCode() {
+/*  68 */     return "BHFEED";
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public String getStatusAttr() {
+/*  73 */     return "";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public abstract String getMQCID();
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVersion() {
+/*  86 */     return "";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void processThis(ADSABRSTATUS paramADSABRSTATUS, Profile paramProfile1, Profile paramProfile2, EntityItem paramEntityItem) throws SQLException, MiddlewareException, ParserConfigurationException, RemoteException, EANBusinessRuleException, MiddlewareShutdownInProgressException, IOException, TransformerException, MissingResourceException {}
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected Connection setupConnection() throws SQLException {
+/* 110 */     Connection connection = null;
+/*     */     try {
+/* 112 */       connection = DriverManager.getConnection(
+/* 113 */           MiddlewareServerProperties.getPDHDatabaseURL(), 
+/* 114 */           MiddlewareServerProperties.getPDHDatabaseUser(), 
+/* 115 */           AES256Utils.decrypt(MiddlewareServerProperties.getPDHDatabasePassword()));
+/* 116 */     } catch (SQLException sQLException) {
+/*     */       
+/* 118 */       throw sQLException;
+/* 119 */     } catch (Exception exception) {
+/*     */       
+/* 121 */       exception.printStackTrace();
+/*     */     } 
+/*     */     
+/* 124 */     connection.setAutoCommit(false);
+/*     */     
+/* 126 */     return connection;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void closeConnection(Connection paramConnection) throws SQLException {
+/* 133 */     if (paramConnection != null)
+/*     */       try {
+/* 135 */         paramConnection.rollback();
+/*     */       }
+/* 137 */       catch (Throwable throwable) {
+/* 138 */         System.err.println("XMLMQAdapter.closeConnection(), unable to rollback. " + throwable);
+/*     */       } finally {
+/*     */         
+/* 141 */         paramConnection.close();
+/* 142 */         paramConnection = null;
+/*     */       }  
+/*     */   }
+/*     */ }
 
 
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-
-import java.util.*;
-import java.sql.*;
-import java.io.*;
-
-import javax.xml.parsers.*;
-
-import com.ibm.eacm.AES256Utils;
-
-/**********************************************************************************
-* base class for ADS feeds in ADSABRSTATUS abr
-*
-*/
-// XMLMQAdapter.java,v
-// Revision 1.2  2008/04/29 14:29:11  wendy
-// Add CID support
-//
-// Revision 1.1  2008/04/25 12:11:37  wendy
-// Init for
-//  -   CQ00003539-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC
-//  -   CQ00005096-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Add Category MM and Images
-//  -   CQ00005046-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Support CRAD in BHC
-//  -   CQ00005045-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Upgrade/Conversion Support
-//  -   CQ00006862-WI  - BHC 3.0 Support - Support for Services Data UI
-//
-//
-public abstract class XMLMQAdapter implements XMLMQ
-{
-    /**********************************
-    * get the name(s) of the MQ properties file to use
-    */
-    public Vector getMQPropertiesFN() {
-        Vector vct = new Vector(1);
-        vct.add(ADSABRSTATUS.ADSMQSERIES);
-        return vct;
-    }
-
-    /**********************************
-    * check if xml should be created for this
-    */
-    public boolean createXML(EntityItem rootItem) { return true;}
-
-    /**********************************
-    * get xml object mapping
-    */
-    public XMLElem getXMLMap() {return null;}
-
-    /**********************************
-    * get the name of the VE to use
-    */
-    public String getVeName() {return "dummy";}
-
-    /**********************************
-    * get the role code to use for this ABR
-    */
-    public String getRoleCode() { return "BHFEED"; }
-
-    /**********************************
-    * get the status attribute to use for this ABR
-    */
-    public String getStatusAttr(){ return "";}
-
-    /**********************************
-    *
-	A.	MQ-Series CID
-    */
-    public abstract String getMQCID();
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getVersion(){ return "";}
-
-    /**********************************
-    * create xml and write to queue
-    */
-    public void processThis(ADSABRSTATUS abr, Profile profileT1, Profile profileT2, EntityItem rootEntity)
-    throws
-    java.sql.SQLException,
-    COM.ibm.opicmpdh.middleware.MiddlewareException,
-    ParserConfigurationException,
-    java.rmi.RemoteException,
-    COM.ibm.eannounce.objects.EANBusinessRuleException,
-    COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-    IOException,
-    javax.xml.transform.TransformerException,
-	MissingResourceException
-    {}
-
-    /********************************************************************************
-    * setup the connection and preparedstatements
-    */
-    protected Connection setupConnection()
-        throws java.sql.SQLException
-    {
-        Connection connection = null;
-		try {
-			connection = DriverManager.getConnection(
-                MiddlewareServerProperties.getPDHDatabaseURL(),
-                MiddlewareServerProperties.getPDHDatabaseUser(),
-                AES256Utils.decrypt(MiddlewareServerProperties.getPDHDatabasePassword()));
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			throw e;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-        connection.setAutoCommit(false);
-
-        return connection;
-    }
-    /********************************************************************************
-    * close the connection and preparedstatements
-    */
-    protected void closeConnection(Connection connection) throws java.sql.SQLException
-    {
-        if(connection != null) {
-            try {
-                connection.rollback();
-            }
-            catch (Throwable ex) {
-                System.err.println("XMLMQAdapter.closeConnection(), unable to rollback. "+ ex);
-            }
-            finally {
-                connection.close();
-                connection = null;
-            }
-        }
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\XMLMQAdapter.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

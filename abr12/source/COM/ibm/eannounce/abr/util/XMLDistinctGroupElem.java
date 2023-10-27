@@ -1,650 +1,656 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import com.ibm.transform.oim.eacm.diff.DiffEntity;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Collection;
+/*     */ import java.util.HashMap;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.StringTokenizer;
+/*     */ import java.util.Vector;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class XMLDistinctGroupElem
+/*     */   extends XMLElem
+/*     */ {
+/*  34 */   private String path = null;
+/*  35 */   private String etype = null;
+/*     */   private boolean isMultUse = false;
+/*     */   private boolean isOnce = false;
+/*  38 */   private int ilevel = 0;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public XMLDistinctGroupElem(String paramString1, String paramString2, String paramString3, boolean paramBoolean1, boolean paramBoolean2) {
+/*  55 */     super(paramString1);
+/*  56 */     this.etype = paramString2;
+/*  57 */     this.path = paramString3;
+/*  58 */     this.isMultUse = paramBoolean1;
+/*  59 */     this.isOnce = paramBoolean2;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public XMLDistinctGroupElem(String paramString1, String paramString2, String paramString3, boolean paramBoolean) {
+/*  76 */     super(paramString1);
+/*  77 */     this.etype = paramString2;
+/*  78 */     this.path = paramString3;
+/*  79 */     this.isMultUse = paramBoolean;
+/*     */   }
+/*     */   
+/*     */   public XMLDistinctGroupElem(String paramString1, String paramString2, String paramString3, boolean paramBoolean, int paramInt) {
+/*  83 */     super(paramString1);
+/*  84 */     this.etype = paramString2;
+/*  85 */     this.path = paramString3;
+/*  86 */     this.isMultUse = paramBoolean;
+/*  87 */     this.ilevel = paramInt;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public XMLDistinctGroupElem(String paramString1, String paramString2, String paramString3) {
+/* 103 */     super(paramString1);
+/* 104 */     this.etype = paramString2;
+/* 105 */     this.path = paramString3;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public XMLDistinctGroupElem(String paramString1, String paramString2) {
+/* 116 */     super(paramString1);
+/* 117 */     this.etype = paramString2;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public XMLDistinctGroupElem(String paramString) {
+/* 129 */     super(paramString);
+/* 130 */     this.etype = "ROOT";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addElements(Database paramDatabase, Hashtable paramHashtable, Document paramDocument, Element paramElement, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 158 */     Vector vector = getItems(paramHashtable, paramDiffEntity, paramStringBuffer);
+/*     */     
+/* 160 */     if (vector == null) {
+/* 161 */       if (this.nodeName == null) this.nodeName = "ERROR"; 
+/* 162 */       Element element = paramDocument.createElement(this.nodeName);
+/* 163 */       addXMLAttrs(element);
+/*     */       
+/* 165 */       if (paramElement == null) {
+/* 166 */         paramDocument.appendChild(element);
+/*     */       } else {
+/* 168 */         paramElement.appendChild(element);
+/*     */       } 
+/*     */       
+/* 171 */       element.appendChild(paramDocument.createTextNode("Error: " + this.etype + " not found in extract!"));
+/*     */       
+/* 173 */       if (this.isReq) {
+/* 174 */         throw new IOException(this.nodeName + " is required but " + this.etype + " is not in extract");
+/*     */       }
+/*     */       
+/* 177 */       for (byte b = 0; b < this.childVct.size(); b++) {
+/* 178 */         XMLElem xMLElem = this.childVct.elementAt(b);
+/* 179 */         xMLElem.addElements(paramDatabase, paramHashtable, paramDocument, element, paramDiffEntity, paramStringBuffer);
+/*     */       } 
+/*     */     } else {
+/*     */       
+/* 183 */       Vector<DiffEntity> vector1 = getEntities(vector);
+/*     */       
+/* 185 */       if (this.nodeName != null) {
+/* 186 */         String str = null;
+/* 187 */         if (paramElement == null) {
+/* 188 */           str = "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/" + this.nodeName;
+/*     */         }
+/*     */         
+/* 191 */         Element element = paramDocument.createElementNS(str, this.nodeName);
+/* 192 */         addXMLAttrs(element);
+/*     */         
+/* 194 */         if (paramElement == null) {
+/* 195 */           ABRUtil.append(paramStringBuffer, "create root1: " + str + " " + this.nodeName);
+/* 196 */           paramDocument.appendChild(element);
+/* 197 */           element.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", str);
+/*     */         } else {
+/* 199 */           paramElement.appendChild(element);
+/*     */         } 
+/*     */ 
+/*     */         
+/* 203 */         if (vector1.size() == 0) {
+/*     */ 
+/*     */           
+/* 206 */           element.appendChild(paramDocument.createTextNode("@@"));
+/* 207 */           ABRUtil.append(paramStringBuffer, "XMLGroupElem: node:" + this.nodeName + " path:" + this.path + " No entities found for " + this.etype + NEWLINE);
+/*     */ 
+/*     */           
+/*     */           return;
+/*     */         } 
+/*     */         
+/* 213 */         for (byte b = 0; b < vector1.size(); b++) {
+/*     */           
+/* 215 */           DiffEntity diffEntity = vector1.elementAt(b);
+/*     */ 
+/*     */           
+/* 218 */           if (!diffEntity.isRoot() && !hasChanges(paramHashtable, diffEntity, paramStringBuffer)) {
+/* 219 */             ABRUtil.append(paramStringBuffer, "XMLGroupElem: node:" + this.nodeName + " path:" + this.path + " No Changes found in " + diffEntity
+/* 220 */                 .getKey() + NEWLINE);
+/*     */           
+/*     */           }
+/*     */           else {
+/*     */             
+/* 225 */             for (byte b1 = 0; b1 < this.childVct.size(); b1++) {
+/* 226 */               XMLElem xMLElem = this.childVct.elementAt(b1);
+/* 227 */               xMLElem.addElements(paramDatabase, paramHashtable, paramDocument, element, diffEntity, paramStringBuffer);
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/* 231 */         vector1.clear();
+/*     */         
+/* 233 */         if (!element.hasChildNodes())
+/*     */         {
+/* 235 */           element.appendChild(paramDocument.createTextNode("@@"));
+/*     */         
+/*     */         }
+/*     */       
+/*     */       }
+/*     */       else {
+/*     */ 
+/*     */         
+/* 243 */         if (vector1.size() == 0) {
+/* 244 */           ABRUtil.append(paramStringBuffer, "XMLGroupElem: node:" + this.nodeName + " path:" + this.path + " No entities found for " + this.etype + NEWLINE);
+/*     */ 
+/*     */           
+/* 247 */           for (byte b1 = 0; b1 < this.childVct.size(); b1++) {
+/* 248 */             XMLElem xMLElem = this.childVct.elementAt(b1);
+/* 249 */             xMLElem.addElements(paramDatabase, paramHashtable, paramDocument, paramElement, (DiffEntity)null, paramStringBuffer);
+/*     */           } 
+/*     */           
+/*     */           return;
+/*     */         } 
+/*     */         
+/* 255 */         for (byte b = 0; b < vector1.size(); b++) {
+/*     */           
+/* 257 */           DiffEntity diffEntity = vector1.elementAt(b);
+/*     */ 
+/*     */           
+/* 260 */           for (byte b1 = 0; b1 < this.childVct.size(); b1++) {
+/* 261 */             XMLElem xMLElem = this.childVct.elementAt(b1);
+/* 262 */             xMLElem.addElements(paramDatabase, paramHashtable, paramDocument, paramElement, diffEntity, paramStringBuffer);
+/*     */           } 
+/*     */         } 
+/* 265 */         vector1.clear();
+/*     */       } 
+/* 267 */       vector.clear();
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addElements(Database paramDatabase, EntityList paramEntityList, Document paramDocument, Element paramElement, EntityItem paramEntityItem, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 296 */     EntityGroup entityGroup = null;
+/* 297 */     if ("ROOT".equals(this.etype)) {
+/* 298 */       entityGroup = paramEntityList.getParentEntityGroup();
+/*     */     } else {
+/* 300 */       entityGroup = paramEntityList.getEntityGroup(this.etype);
+/*     */     } 
+/*     */     
+/* 303 */     if (entityGroup == null) {
+/* 304 */       Element element = paramDocument.createElement(this.nodeName);
+/* 305 */       addXMLAttrs(element);
+/* 306 */       if (paramElement == null) {
+/* 307 */         paramDocument.appendChild(element);
+/*     */       } else {
+/* 309 */         paramElement.appendChild(element);
+/*     */       } 
+/*     */       
+/* 312 */       element.appendChild(paramDocument.createTextNode("Error: " + this.etype + " not found in extract!"));
+/*     */       
+/* 314 */       if (this.isReq) {
+/* 315 */         throw new IOException(this.nodeName + " is required but " + this.etype + " is not in extract");
+/*     */       }
+/*     */       
+/* 318 */       for (byte b = 0; b < this.childVct.size(); b++) {
+/* 319 */         XMLElem xMLElem = this.childVct.elementAt(b);
+/* 320 */         xMLElem.addElements(paramDatabase, paramEntityList, paramDocument, element, paramEntityItem, paramStringBuffer);
+/*     */       } 
+/*     */     } else {
+/*     */       
+/* 324 */       Vector<EntityItem> vector = getEntities(entityGroup);
+/*     */ 
+/*     */ 
+/*     */       
+/* 328 */       if (this.path != null && paramEntityItem != null) {
+/* 329 */         EntityItem entityItem = paramEntityItem;
+/* 330 */         Vector<EntityItem> vector1 = new Vector(1);
+/* 331 */         Vector<EntityItem> vector2 = new Vector(1);
+/* 332 */         vector2.add(entityItem);
+/* 333 */         StringTokenizer stringTokenizer = new StringTokenizer(this.path, ":");
+/* 334 */         while (stringTokenizer.hasMoreTokens()) {
+/* 335 */           String str1 = stringTokenizer.nextToken();
+/* 336 */           String str2 = this.etype;
+/* 337 */           if (stringTokenizer.hasMoreTokens()) {
+/* 338 */             str2 = stringTokenizer.nextToken();
+/*     */           }
+/* 340 */           ABRUtil.append(paramStringBuffer, "XMLGroupElem: node:" + this.nodeName + " path:" + this.path + " dir:" + str1 + " destination " + str2 + NEWLINE);
+/*     */ 
+/*     */           
+/* 343 */           Vector<EntityItem> vector3 = new Vector();
+/* 344 */           for (byte b = 0; b < vector2.size(); b++) {
+/* 345 */             EntityItem entityItem1 = vector2.elementAt(b);
+/* 346 */             ABRUtil.append(paramStringBuffer, "XMLGroupElem: loop pitem " + entityItem1.getKey() + NEWLINE);
+/* 347 */             Vector<EntityItem> vector4 = null;
+/* 348 */             if (str1.equals("D")) {
+/* 349 */               vector4 = entityItem1.getDownLink();
+/*     */             } else {
+/* 351 */               vector4 = entityItem1.getUpLink();
+/*     */             } 
+/* 353 */             for (byte b1 = 0; b1 < vector4.size(); b1++) {
+/* 354 */               EntityItem entityItem2 = vector4.elementAt(b1);
+/* 355 */               ABRUtil.append(paramStringBuffer, "XMLGroupElem: linkloop entity " + entityItem2.getKey() + NEWLINE);
+/* 356 */               if (entityItem2.getEntityType().equals(str2)) {
+/* 357 */                 if (stringTokenizer.hasMoreTokens()) {
+/*     */                   
+/* 359 */                   vector3.add(entityItem2);
+/*     */                 } else {
+/* 361 */                   vector1.add(entityItem2);
+/*     */                 } 
+/*     */               }
+/*     */             } 
+/*     */           } 
+/* 366 */           vector2 = vector3;
+/*     */         } 
+/* 368 */         vector = vector1;
+/*     */       } 
+/*     */       
+/* 371 */       if (this.nodeName != null) {
+/*     */         
+/* 373 */         String str = null;
+/* 374 */         if (paramElement == null) {
+/* 375 */           str = "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/" + this.nodeName;
+/*     */         }
+/*     */         
+/* 378 */         Element element = paramDocument.createElementNS(str, this.nodeName);
+/* 379 */         addXMLAttrs(element);
+/*     */         
+/* 381 */         if (paramElement == null) {
+/* 382 */           ABRUtil.append(paramStringBuffer, "create root2: " + str + " " + this.nodeName);
+/* 383 */           paramDocument.appendChild(element);
+/* 384 */           element.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", str);
+/*     */         } else {
+/* 386 */           paramElement.appendChild(element);
+/*     */         } 
+/*     */ 
+/*     */         
+/* 390 */         if (vector.size() == 0) {
+/*     */ 
+/*     */           
+/* 393 */           element.appendChild(paramDocument.createTextNode("@@"));
+/* 394 */           ABRUtil.append(paramStringBuffer, "XMLGroupElem: node:" + this.nodeName + " No entities found for " + this.etype + NEWLINE);
+/*     */           
+/* 396 */           for (byte b1 = 0; b1 < this.childVct.size(); b1++) {
+/* 397 */             XMLElem xMLElem = this.childVct.elementAt(b1);
+/* 398 */             xMLElem.addElements(paramDatabase, paramEntityList, paramDocument, element, (EntityItem)null, paramStringBuffer);
+/*     */           } 
+/*     */           
+/*     */           return;
+/*     */         } 
+/*     */         
+/* 404 */         for (byte b = 0; b < vector.size(); b++) {
+/* 405 */           EntityItem entityItem = vector.elementAt(b);
+/*     */ 
+/*     */           
+/* 408 */           for (byte b1 = 0; b1 < this.childVct.size(); b1++) {
+/* 409 */             XMLElem xMLElem = this.childVct.elementAt(b1);
+/* 410 */             xMLElem.addElements(paramDatabase, paramEntityList, paramDocument, element, entityItem, paramStringBuffer);
+/*     */           } 
+/*     */         } 
+/* 413 */         vector.clear();
+/*     */         
+/* 415 */         if (!element.hasChildNodes())
+/*     */         {
+/* 417 */           element.appendChild(paramDocument.createTextNode("@@"));
+/*     */ 
+/*     */         
+/*     */         }
+/*     */       
+/*     */       }
+/*     */       else {
+/*     */ 
+/*     */         
+/* 426 */         if (vector.size() == 0) {
+/* 427 */           ABRUtil.append(paramStringBuffer, "XMLGroupElem: node:" + this.nodeName + " No entities found for " + this.etype + NEWLINE);
+/*     */           
+/* 429 */           for (byte b1 = 0; b1 < this.childVct.size(); b1++) {
+/* 430 */             XMLElem xMLElem = this.childVct.elementAt(b1);
+/* 431 */             xMLElem.addElements(paramDatabase, paramEntityList, paramDocument, paramElement, (EntityItem)null, paramStringBuffer);
+/*     */           } 
+/*     */           
+/*     */           return;
+/*     */         } 
+/* 436 */         for (byte b = 0; b < vector.size(); b++) {
+/* 437 */           EntityItem entityItem = vector.elementAt(b);
+/*     */ 
+/*     */           
+/* 440 */           for (byte b1 = 0; b1 < this.childVct.size(); b1++) {
+/* 441 */             XMLElem xMLElem = this.childVct.elementAt(b1);
+/* 442 */             xMLElem.addElements(paramDatabase, paramEntityList, paramDocument, paramElement, entityItem, paramStringBuffer);
+/*     */           } 
+/*     */         } 
+/* 445 */         vector.clear();
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean hasChanges(Hashtable paramHashtable, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) {
+/* 458 */     boolean bool1 = false;
+/* 459 */     ABRUtil.append(paramStringBuffer, "XMLGroupElem.hasChanges entered for node:" + this.nodeName + " " + paramDiffEntity.getKey() + NEWLINE);
+/*     */ 
+/*     */ 
+/*     */     
+/* 463 */     String[] arrayOfString = PokUtils.convertToArray(this.etype);
+/* 464 */     boolean bool2 = false; byte b;
+/* 465 */     for (b = 0; b < arrayOfString.length; b++) {
+/* 466 */       if (arrayOfString[b].equals(paramDiffEntity.getEntityType())) bool2 = true;
+/*     */     
+/*     */     } 
+/* 469 */     if (paramDiffEntity != null && bool2) {
+/* 470 */       for (b = 0; b < this.childVct.size() && !bool1; b++) {
+/* 471 */         XMLElem xMLElem = this.childVct.elementAt(b);
+/* 472 */         if (xMLElem.hasChanges(paramHashtable, paramDiffEntity, paramStringBuffer)) {
+/* 473 */           bool1 = true;
+/*     */           break;
+/*     */         } 
+/*     */       } 
+/*     */     } else {
+/* 478 */       Vector<DiffEntity> vector = getItems(paramHashtable, paramDiffEntity, paramStringBuffer);
+/* 479 */       if (vector != null) {
+/*     */         byte b1;
+/* 481 */         label40: for (b1 = 0; b1 < vector.size(); b1++) {
+/* 482 */           DiffEntity diffEntity = vector.elementAt(b1);
+/* 483 */           for (byte b2 = 0; b2 < this.childVct.size() && !bool1; b2++) {
+/* 484 */             XMLElem xMLElem = this.childVct.elementAt(b2);
+/* 485 */             if (xMLElem.hasChanges(paramHashtable, diffEntity, paramStringBuffer)) {
+/* 486 */               bool1 = true;
+/*     */               break label40;
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/* 491 */         vector.clear();
+/*     */       } 
+/*     */     } 
+/* 494 */     return bool1;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private Vector getItems(Hashtable paramHashtable, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) {
+/* 515 */     Vector<DiffEntity> vector = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 520 */     if (this.path != null && paramDiffEntity != null) {
+/*     */       
+/* 522 */       ABRUtil.append(paramStringBuffer, "XMLGroupElem.getItems: path2=" + this.path + NEWLINE);
+/* 523 */       EntityItem entityItem = paramDiffEntity.getCurrentEntityItem();
+/* 524 */       if (paramDiffEntity.isDeleted()) {
+/* 525 */         entityItem = paramDiffEntity.getPriorEntityItem();
+/*     */       }
+/* 527 */       Vector<DiffEntity> vector1 = new Vector(1);
+/* 528 */       Vector<EntityItem> vector2 = new Vector(1);
+/* 529 */       vector2.add(entityItem);
+/* 530 */       StringTokenizer stringTokenizer = new StringTokenizer(this.path, ":");
+/* 531 */       while (stringTokenizer.hasMoreTokens()) {
+/* 532 */         String str1 = stringTokenizer.nextToken();
+/* 533 */         String str2 = this.etype;
+/* 534 */         if (stringTokenizer.hasMoreTokens()) {
+/* 535 */           str2 = stringTokenizer.nextToken();
+/*     */         }
+/* 537 */         ABRUtil.append(paramStringBuffer, "XMLGroupElem.getItems: node:" + this.nodeName + " path:" + this.path + " dir:" + str1 + " destination " + str2 + NEWLINE);
+/*     */ 
+/*     */         
+/* 540 */         Vector<EntityItem> vector3 = new Vector();
+/* 541 */         for (byte b = 0; b < vector2.size(); b++) {
+/* 542 */           EntityItem entityItem1 = vector2.elementAt(b);
+/* 543 */           ABRUtil.append(paramStringBuffer, "XMLGroupElem.getItems: loop pitem " + entityItem1.getKey() + NEWLINE);
+/* 544 */           Vector<EntityItem> vector4 = null;
+/* 545 */           if (str1.equals("D")) {
+/* 546 */             vector4 = entityItem1.getDownLink();
+/*     */           } else {
+/* 548 */             vector4 = entityItem1.getUpLink();
+/*     */           } 
+/* 550 */           for (byte b1 = 0; b1 < vector4.size(); b1++) {
+/* 551 */             EntityItem entityItem2 = vector4.elementAt(b1);
+/* 552 */             ABRUtil.append(paramStringBuffer, "XMLGroupElem.getItems: linkloop entity " + entityItem2.getKey() + NEWLINE);
+/* 553 */             if (entityItem2.getEntityType().equals(str2)) {
+/* 554 */               if (stringTokenizer.hasMoreTokens()) {
+/*     */                 
+/* 556 */                 vector3.add(entityItem2);
+/*     */               } else {
+/*     */                 
+/* 559 */                 DiffEntity diffEntity = (DiffEntity)paramHashtable.get(entityItem2.getKey());
+/* 560 */                 if (diffEntity != null) {
+/* 561 */                   if (this.ilevel > 0) {
+/* 562 */                     if (diffEntity.getLevel() == this.ilevel) {
+/* 563 */                       vector1.add(diffEntity);
+/* 564 */                       ABRUtil.append(paramStringBuffer, "XMLGroupElem.getItems: find entity key=" + entityItem2.getKey() + "de.level=" + diffEntity.getLevel() + "ilevel=" + this.ilevel + NEWLINE);
+/*     */                     } 
+/*     */                   } else {
+/* 567 */                     vector1.add(diffEntity);
+/*     */                   } 
+/*     */                 }
+/*     */               } 
+/*     */             }
+/* 572 */             if (this.isOnce && 
+/* 573 */               vector1.size() == 1) {
+/* 574 */               vector2.clear();
+/* 575 */               return vector1;
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */ 
+/*     */         
+/* 581 */         vector2.clear();
+/* 582 */         vector2 = vector3;
+/*     */       } 
+/* 584 */       vector = vector1;
+/* 585 */       vector2.clear();
+/*     */ 
+/*     */     
+/*     */     }
+/*     */     else {
+/*     */ 
+/*     */       
+/* 592 */       String[] arrayOfString = PokUtils.convertToArray(this.etype);
+/* 593 */       for (byte b = 0; b < arrayOfString.length; b++) {
+/* 594 */         String str = arrayOfString[b];
+/* 595 */         Vector<? extends DiffEntity> vector1 = (Vector)paramHashtable.get(str);
+/* 596 */         if (vector1 != null) {
+/* 597 */           if (vector == null) {
+/* 598 */             vector = new Vector<>(vector1);
+/*     */           } else {
+/* 600 */             vector.addAll(vector1);
+/*     */           } 
+/*     */         }
+/*     */       } 
+/*     */       
+/* 605 */       if (this.isOnce) {
+/* 606 */         Vector<DiffEntity> vector1 = new Vector();
+/* 607 */         if (vector.size() > 0) {
+/* 608 */           DiffEntity diffEntity = vector.elementAt(0);
+/* 609 */           vector1.add(diffEntity);
+/*     */         } 
+/* 611 */         return vector1;
+/*     */       } 
+/*     */       
+/* 614 */       if (this.isMultUse) {
+/*     */         
+/* 616 */         HashMap<Object, Object> hashMap = new HashMap<>();
+/* 617 */         Vector vector1 = new Vector();
+/* 618 */         for (byte b1 = 0; b1 < vector.size(); b1++) {
+/* 619 */           DiffEntity diffEntity = vector.elementAt(b1);
+/* 620 */           ABRUtil.append(paramStringBuffer, "XMLDistinctGroupElem.getItems: dffFeature=" + diffEntity.getKey() + " isDelete" + diffEntity.isDeleted() + " isNew" + diffEntity.isNew() + " isUpdate" + diffEntity.isChanged() + NEWLINE);
+/*     */ 
+/*     */           
+/* 623 */           if ("FEATURE|SWFEATURE".equals(this.etype)) {
+/* 624 */             if (diffEntity.toString().indexOf("LSEOPRODSTRUCT") > 0 || diffEntity.toString().indexOf("LSEOSWPRODSTRUCT") > 0 || diffEntity.toString().indexOf("WWSEOPRODSTRUCT") > 0 || diffEntity.toString().indexOf("WWSEOSWPRODSTRUCT") > 0) {
+/* 625 */               String str = diffEntity.getKey();
+/* 626 */               if (!hashMap.containsKey(str)) {
+/* 627 */                 hashMap.put(str, diffEntity);
+/*     */               }
+/*     */             } 
+/*     */           } else {
+/* 631 */             String str = diffEntity.getKey();
+/* 632 */             if (!hashMap.containsKey(str)) {
+/* 633 */               hashMap.put(str, diffEntity);
+/*     */             }
+/*     */           } 
+/*     */         } 
+/* 637 */         Collection collection = hashMap.values();
+/* 638 */         vector1.addAll(collection);
+/* 639 */         return vector1;
+/*     */       } 
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 648 */     return vector;
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.util;
 
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.objects.*;
-
-import com.ibm.transform.oim.eacm.diff.*;
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-import java.io.*;
-import java.util.*;
-
-import org.w3c.dom.*;
-
-/**********************************************************************************
-this Class can mutilple used , you can add additional function if you like.
-Current Function:
-1
-isMultUse is True, then get DiffEntity one entity ID only get once.
-for example :  WWSEO->Prodtruct->Feature and LSEO-Prodstruct-Feature and MODEL->Prodstruct->Feature.
-These Features are the same ones. so we need to distinct them.
-2...
-
-*/
-
-public class XMLDistinctGroupElem extends XMLElem
-{
-	private String path = null;
-    private String etype =null;
-    private boolean isMultUse= false;
-    private boolean isOnce = false;
-    private int ilevel=0;
-    
-    /**********************************************************************************
-     * Constructor - used when element is part of a group with child elements that are
-     * attributes for the entity or structure based on the entity
-     * <MMLIST>						2	MM
-     * <MMELEMENT>					3
-     * <MMACTION>	</MMACTION>		4	MM	MMAction
-     * ...
-     * MMLIST is the group, one MMELEMENT for each MM
-     *@param nname String with name of node to be created
-     *@param type String with entity type
-     *@param _path String with path to use to get to this group D:MODELAVAIL:D where type = AVAIL
-     *@param _isMultUse boolean with isNesting to check whether XMLGroupElem has a nesting list after leve 2
-     */
-    public XMLDistinctGroupElem(String nname, String type, String _path,boolean _isMultUse, boolean _isOnce)
-    {
-    	super(nname);
-        etype = type;
-        path = _path;
-        isMultUse = _isMultUse;
-        isOnce = _isOnce;
-    }
-    /**********************************************************************************
-     * Constructor - used when element is part of a group with child elements that are
-     * attributes for the entity or structure based on the entity
-     * <MMLIST>						2	MM
-     * <MMELEMENT>					3
-     * <MMACTION>	</MMACTION>		4	MM	MMAction
-     * ...
-     * MMLIST is the group, one MMELEMENT for each MM
-     *@param nname String with name of node to be created
-     *@param type String with entity type
-     *@param _path String with path to use to get to this group D:MODELAVAIL:D where type = AVAIL
-     *@param _isMultUse boolean with isNesting to check whether XMLGroupElem has a nesting list after leve 2
-     */
-    public XMLDistinctGroupElem(String nname, String type, String _path,boolean _isMultUse)
-    {
-    	super(nname);
-        etype = type;
-        path = _path;
-        isMultUse = _isMultUse;
-    }
-    public XMLDistinctGroupElem(String nname, String type, String _path,boolean _isMultUse,int _ilevel)
-    {
-    	super(nname);
-        etype = type;
-        path = _path;
-        isMultUse = _isMultUse;
-        ilevel = _ilevel;
-    }
-    /**********************************************************************************
-    * Constructor - used when element is part of a group with child elements that are
-    * attributes for the entity or structure based on the entity
-    * <MMLIST>						2	MM
-    * <MMELEMENT>					3
-    * <MMACTION>	</MMACTION>		4	MM	MMAction
-    * ...
-    * MMLIST is the group, one MMELEMENT for each MM
-    *@param nname String with name of node to be created
-    *@param type String with entity type
-    *@param _path String with path to use to get to this group D:MODELAVAIL:D where type = AVAIL
-    */
-    public XMLDistinctGroupElem(String nname, String type, String _path)
-    {
-        super(nname);
-        etype = type;
-        path = _path;
-	}
-    /**********************************************************************************
-    * Constructor - used when element is part of a group with child elements that are
-    * attributes for the entity - no path will be used, just get all entities of this type
-    *
-    *@param nname String with name of node to be created
-    *@param type String with entity type
-    */
-    public XMLDistinctGroupElem(String nname, String type)
-    {
-        super(nname);
-        etype = type;
-	}
-    /**********************************************************************************
-    * Constructor - used when element is part of a group with child elements that are
-    * attributes for the root entity
-    *
-    *@param nname String with name of node to be created
-    *@param type String with entity type
-    *@param isroot boolean if true, entity is root
-    */
-    public XMLDistinctGroupElem(String nname)
-    {
-        super(nname);
-        etype = "ROOT";
-	}
-
-	/**********************************************************************************
-	* Create a node for this element and add to the parent and any children this node has
-	*
-	*@param dbCurrent Database
-	*@param table Hashtable of Vectors of DiffEntity
-	*@param document Document needed to create nodes
-	*@param parent Element node to add this node too
-	*@param parentItem EntityItem - parent to use if path is specified
-	*@param debugSb StringBuffer for debug output
-	*/
-	public void addElements(Database dbCurrent,Hashtable table, Document document, Element parent,
-		DiffEntity parentItem, StringBuffer debugSb)
-	throws
-		COM.ibm.eannounce.objects.EANBusinessRuleException,
-		java.sql.SQLException,
-		COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-		COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-		java.rmi.RemoteException,
-		IOException,
-		COM.ibm.opicmpdh.middleware.MiddlewareException,
-		COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-	{
-		//ABRUtil.append(debugSb,"XMLGroupElem.addElements: entered node:"+nodeName+" etype:"+etype+" "+
-			//	(parentItem==null?" null parent":parentItem.getKey())+" path:"+path+NEWLINE);
-		
-		Vector vct = getItems(table, parentItem, debugSb);
-
-		if (vct==null){
-			if (nodeName==null) {nodeName="ERROR";}
-			Element elem = (Element) document.createElement(nodeName);
-			addXMLAttrs(elem);
-
-			if (parent ==null){ // create the root element of the document
-				document.appendChild(elem);
-			}else{
-				parent.appendChild(elem);
-			}
-
-			elem.appendChild(document.createTextNode("Error: "+etype+" not found in extract!"));
-
-			if(isReq){
-				throw new IOException(nodeName+" is required but "+etype+" is not in extract");
-			}
-			// add any children
-			for (int c=0; c<childVct.size(); c++){
-				XMLElem childElem = (XMLElem)childVct.elementAt(c);
-				childElem.addElements(dbCurrent,table, document,elem,parentItem,debugSb);
-			}
-		}else{
-			// get list of entities to look at, filtering may have been done
-			Vector entityVct = getEntities(vct);
-			
-			if (nodeName != null){
-				String xmlns = null;
-				if (parent == null) 
-					xmlns = "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/" + nodeName;
-								
-				// create node for this element
-				Element elem = (Element) document.createElementNS(xmlns,nodeName);
-				addXMLAttrs(elem);
-
-				if (parent ==null){ // create the root
-					ABRUtil.append(debugSb,"create root1: " + xmlns + " " + nodeName);
-					document.appendChild(elem);
-					elem.setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns",xmlns);
-				}else{
-					parent.appendChild(elem);
-				}
-
-				// if no entities exist for this type, return
-				if (entityVct.size()==0){
-					// create the node but dont output children
-					// a value is expected, prevent a normal empty tag, OIDH cant handle it
-					elem.appendChild(document.createTextNode(CHEAT));
-					ABRUtil.append(debugSb,"XMLGroupElem: node:"+nodeName+" path:"+path+
-						" No entities found for "+etype+NEWLINE);
-					return;
-				}
-
-				// use this entity for children elements
-				for(int i=0; i<entityVct.size(); i++){
-					// it may exist at current or prior time or both
-					DiffEntity de = (DiffEntity)entityVct.elementAt(i);
-//						 only output if changed or is root
-						if (//!de.isChanged() cant do it this way because child structure may use other entities
-							!de.isRoot() && !hasChanges(table, de, debugSb)){
-							ABRUtil.append(debugSb,"XMLGroupElem: node:"+nodeName+" path:"+path+
-								" No Changes found in "+de.getKey()+NEWLINE);
-							continue;
-						}
-
-						// add any children
-						for (int c=0; c<childVct.size(); c++){
-							XMLElem childElem = (XMLElem)childVct.elementAt(c);
-							childElem.addElements(dbCurrent,table, document,elem,de,debugSb);
-						}
-						
-					}
-				entityVct.clear();
-
-				if (!elem.hasChildNodes()){
-					// a value is expected, prevent a normal empty tag, OIDH cant handle it
-					elem.appendChild(document.createTextNode(CHEAT));
-				}
-			} // nodename !=null
-			else{
-				// used where a different entity is needed on the same level as current entity
-				// like MODEL output needs
-				//<DIVISION>	</DIVISION>			2	PROJ	DIV
-				// node is null, so dont create one for this, just do children..
-				if (entityVct.size()==0){
-					ABRUtil.append(debugSb,"XMLGroupElem: node:"+nodeName+" path:"+path+
-						" No entities found for "+etype+NEWLINE);
-					// add any children to the parent, not this node
-					for (int c=0; c<childVct.size(); c++){
-						XMLElem childElem = (XMLElem)childVct.elementAt(c);
-						childElem.addElements(dbCurrent,table, document,parent,null,debugSb);
-					}
-
-					return;
-				}
-
-				for(int i=0; i<entityVct.size(); i++){
-					// it may exist at current or prior time or both
-					DiffEntity de = (DiffEntity)entityVct.elementAt(i);
-
-					// add any children to the parent, not this node
-					for (int c=0; c<childVct.size(); c++){
-						XMLElem childElem = (XMLElem)childVct.elementAt(c);
-						childElem.addElements(dbCurrent,table, document,parent,de,debugSb);
-					}
-				}
-				entityVct.clear();
-			} // nodename is null
-			vct.clear();
-		}//end vct !=null
-		//ABRUtil.append(debugSb,"XMLGroupElem.addElements: exiting node:"+nodeName+" etype:"+etype+"  "+
-			//	(parentItem==null?" null parent":parentItem.getKey())+" path:"+path+NEWLINE);
-	}
-
-    /**********************************************************************************
-    * Create a node for this element and add to the parent and any children this node has
-    *
-    *@param dbCurrent Database
-    *@param list EntityList
-    *@param document Document needed to create nodes
-    *@param parent Element node to add this node too
-	*@param parentItem EntityItem - parent to use if path is specified
-    *@param debugSb StringBuffer for debug output
-    */
-    public void addElements(Database dbCurrent,EntityList list, Document document, Element parent,
-        EntityItem parentItem,StringBuffer debugSb)
-    throws
-        COM.ibm.eannounce.objects.EANBusinessRuleException,
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-        java.rmi.RemoteException,
-        IOException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {
-		// get all entitys of etype
-		EntityGroup egrp = null;
-		if ("ROOT".equals(etype)) {
-			egrp = list.getParentEntityGroup();
-		} else {
-			egrp = list.getEntityGroup(etype);
-		}
-
-		if (egrp==null){
-			Element elem = (Element) document.createElement(nodeName);
-			addXMLAttrs(elem);
-			if (parent ==null){ // create the root
-				document.appendChild(elem);
-			}else{
-				parent.appendChild(elem);
-			}
-
-			elem.appendChild(document.createTextNode("Error: "+etype+" not found in extract!"));
-
-			if(isReq){
-				throw new IOException(nodeName+" is required but "+etype+" is not in extract");
-			}
-			// add any children
-			for (int c=0; c<childVct.size(); c++){
-				XMLElem childElem = (XMLElem)childVct.elementAt(c);
-				childElem.addElements(dbCurrent,list, document,elem,parentItem,debugSb);
-			}
-		}else{
-			// get list of entities to look at, filtering may have been done
-			Vector entityVct = getEntities(egrp);
-
-			// if path is not null then use it to go from parentItem to children via that path
-			// else just get all of that particular type
-			if (path != null && parentItem!= null){
-				EntityItem theitem = parentItem;
-				Vector overrideVct = new Vector(1);
-				Vector parentitemsVct = new Vector(1);
-				parentitemsVct.add(theitem);
-				StringTokenizer st1 = new StringTokenizer(path,":");
-				while (st1.hasMoreTokens()) {
-					String dir = st1.nextToken();
-					String destination = etype;
-					if (st1.hasMoreTokens()){
-						destination = st1.nextToken();
-					}
-					ABRUtil.append(debugSb,"XMLGroupElem: node:"+nodeName+" path:"+path+
-						" dir:"+dir+" destination "+destination+NEWLINE);
-					// know we know dir and type needed
-					Vector tmp = new Vector();
-					for (int p=0; p<parentitemsVct.size(); p++){
-						EntityItem pitem = (EntityItem)parentitemsVct.elementAt(p);
-						ABRUtil.append(debugSb,"XMLGroupElem: loop pitem "+pitem.getKey()+NEWLINE);
-						Vector linkVct = null;
-						if (dir.equals("D")){
-							linkVct = pitem.getDownLink();
-						}else{
-							linkVct = pitem.getUpLink();
-						}
-						for (int i=0; i<linkVct.size(); i++){
-							EntityItem entity = (EntityItem)linkVct.elementAt(i);
-							ABRUtil.append(debugSb,"XMLGroupElem: linkloop entity "+entity.getKey()+NEWLINE);
-							if (entity.getEntityType().equals(destination)){
-								if (st1.hasMoreTokens()){
-									//keep looking
-									tmp.add(entity);
-								}else{
-									overrideVct.add(entity);
-								}
-							}
-						}// end linkloop
-					}// end parentloop
-					parentitemsVct = tmp;
-				}
-				entityVct = overrideVct;
-			}
-
-			if (nodeName != null){
-				// create node for this element
-				String xmlns = null;
-				if (parent == null) 
-					xmlns = "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/" + nodeName;
-							    
-				// create node for this element
-				Element elem = (Element) document.createElementNS(xmlns,nodeName);
-				addXMLAttrs(elem);
-
-				if (parent ==null){ // create the root
-					ABRUtil.append(debugSb,"create root2: " + xmlns + " " + nodeName);
-					document.appendChild(elem);
-					elem.setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns",xmlns);
-				}else{
-					parent.appendChild(elem);
-				}
-
-				// if no entities exist for this type, return
-				if (entityVct.size()==0){
-					// create the node but dont output children
-					// a value is expected, prevent a normal empty tag, OIDH cant handle it
-					elem.appendChild(document.createTextNode(CHEAT));
-					ABRUtil.append(debugSb,"XMLGroupElem: node:"+nodeName+" No entities found for "+etype+NEWLINE);
-					// add any children
-					for (int c=0; c<childVct.size(); c++){
-						XMLElem childElem = (XMLElem)childVct.elementAt(c);
-						childElem.addElements(dbCurrent,list, document,elem,null,debugSb);
-					}
-					return;
-				}
-
-				// use this entity for children elements
-				for(int i=0; i<entityVct.size(); i++){
-					EntityItem item = (EntityItem)entityVct.elementAt(i);
-
-					// add any children
-					for (int c=0; c<childVct.size(); c++){
-						XMLElem childElem = (XMLElem)childVct.elementAt(c);
-						childElem.addElements(dbCurrent,list, document,elem,item,debugSb);
-					}
-				}
-				entityVct.clear();
-
-				if (!elem.hasChildNodes()){
-					// a value is expected, prevent a normal empty tag, OIDH cant handle it
-					elem.appendChild(document.createTextNode(CHEAT));
-				}
-			} // nodename !=null
-			else{
-				// used where a different entity is needed on the same level as current entity
-				// like MODEL output needs
-				//<DIVISION>	</DIVISION>			2	PROJ	DIV
-				// node is null, so dont create one for this, just do children..
-				// if no entities exist for this type, return
-				if (entityVct.size()==0){
-					ABRUtil.append(debugSb,"XMLGroupElem: node:"+nodeName+" No entities found for "+etype+NEWLINE);
-					// add any children to the parent, not this node
-					for (int c=0; c<childVct.size(); c++){
-						XMLElem childElem = (XMLElem)childVct.elementAt(c);
-						childElem.addElements(dbCurrent,list, document,parent,null,debugSb);
-					}
-					return;
-				}
-
-				for(int i=0; i<entityVct.size(); i++){
-					EntityItem item = (EntityItem)entityVct.elementAt(i);
-
-					// add any children to the parent, not this node
-					for (int c=0; c<childVct.size(); c++){
-						XMLElem childElem = (XMLElem)childVct.elementAt(c);
-						childElem.addElements(dbCurrent,list, document,parent,item,debugSb);
-					}
-				}
-				entityVct.clear();
-			} // nodename is null
-		}
-    }
-    /**********************************************************************************
-     * Check to see if there are any changes in this node or in the children
-     *
-     *@param table Hashtable
-     *@param diffitem DiffEntity
-     *@param debugSb StringBuffer
-     */
-     protected boolean hasChanges(Hashtable table, DiffEntity diffitem, StringBuffer debugSb)
-     {
-    	 boolean changed=false;
-    	 ABRUtil.append(debugSb,"XMLGroupElem.hasChanges entered for node:"+nodeName+" "+diffitem.getKey()+NEWLINE);
-    	 // if item matches the etype then this is looking at an item within the group, no path needed
-         // etype may be mutliple entitytype as is the case for FEATURELIST in ADSLSEOABR where
-    	 // FEATURE|SWFEATURE is used to include both types in the list.
-    	 String types[] = PokUtils.convertToArray(etype);
-         boolean found_etype=false;
-         for(int a=0; a<types.length; a++){
-    		 if (types[a].equals(diffitem.getEntityType())) found_etype = true;
-         }
-         
-    	 if (diffitem!=null && found_etype){    		
-			 for (int c=0; c<childVct.size() && !changed; c++){
-    			 XMLElem childElem = (XMLElem)childVct.elementAt(c);    			
-				 if (childElem.hasChanges(table, diffitem, debugSb)){
-    				 changed = true; // one change one is enough
-    				 break;
-    			 }    			     			 
-    		 }     		 	 
-    	 }else{
-    		 Vector vct = getItems(table, diffitem, debugSb);
-    		 if (vct !=null){
-    			 // check its children
-    			 outerloop: for (int i=0; i<vct.size(); i++){
-    				 DiffEntity de = (DiffEntity)vct.elementAt(i);
-    				 for (int c=0; c<childVct.size() && !changed; c++){
-    					 XMLElem childElem = (XMLElem)childVct.elementAt(c);
-    						 if (childElem.hasChanges(table, de,debugSb)){
-	    						 changed = true; // one change one is enough
-	    						 break outerloop;
-    					 }
-    				 }
-    			 }
-    		 	vct.clear();
-    		 }
-    	 }
-    	 return changed;
-     }
-     
-//     private void printTable(Hashtable table, StringBuffer debugSb) {
-// 		ABRUtil.append(debugSb,"XMLCtryAudElem.printTable for new lseo:" + NEWLINE);
-// 		Iterator it = table.keySet().iterator();
-// 		while (it.hasNext()){
-// 			String key =(String)it.next();
-// 			ABRUtil.append(debugSb,"table:key=" + key + ";value=" + table.get(key)+NEWLINE);
-// 		}
-// 		
-// 	}
-     
-     /********************
-     * use path if necessary to find items for this group
-     * @param table
-     * @param diffitem
-     * @param debugSb
-     * @return
-     */
-     private Vector getItems(Hashtable table, DiffEntity diffitem, StringBuffer debugSb) {
-		Vector vct = null;
-
-		// if path is not null then use it to go from parentItem to children via that path
-		// else just get all of that particular type
-		// change 20110214 avoid add the same entity
-		if (path != null && diffitem != null) {
-				//only check the isMultUse= false and level>0
-				ABRUtil.append(debugSb,"XMLGroupElem.getItems: path2="+ path + NEWLINE);
-				EntityItem theitem = diffitem.getCurrentEntityItem();				
-				if (diffitem.isDeleted()) {
-					theitem = diffitem.getPriorEntityItem();
-				}
-				Vector overrideVct = new Vector(1);
-				Vector parentitemsVct = new Vector(1);
-				parentitemsVct.add(theitem);
-				StringTokenizer st1 = new StringTokenizer(path, ":");
-				while (st1.hasMoreTokens()) {
-					String dir = st1.nextToken();
-					String destination = etype;
-					if (st1.hasMoreTokens()) {
-						destination = st1.nextToken();
-					}
-					ABRUtil.append(debugSb,"XMLGroupElem.getItems: node:" + nodeName + " path:" + path + " dir:" + dir + " destination "
-						+ destination + NEWLINE);
-					// know we know dir and type needed
-					Vector tmp = new Vector();
-					for (int p = 0; p < parentitemsVct.size(); p++) {
-						EntityItem pitem = (EntityItem) parentitemsVct.elementAt(p);
-						ABRUtil.append(debugSb,"XMLGroupElem.getItems: loop pitem " + pitem.getKey() + NEWLINE);
-						Vector linkVct = null;
-						if (dir.equals("D")) {
-							linkVct = pitem.getDownLink();
-						} else {
-							linkVct = pitem.getUpLink();
-						}
-						for (int i = 0; i < linkVct.size(); i++) {
-							EntityItem entity = (EntityItem) linkVct.elementAt(i);
-							ABRUtil.append(debugSb,"XMLGroupElem.getItems: linkloop entity " + entity.getKey() + NEWLINE);
-							if (entity.getEntityType().equals(destination)) {
-								if (st1.hasMoreTokens()) {
-									//keep looking
-									tmp.add(entity);
-								} else {
-									//find diffitem in table
-									DiffEntity de = (DiffEntity) table.get(entity.getKey());
-									if (de != null) {										
-										if(ilevel>0){
-											if(de.getLevel()==ilevel){
-												overrideVct.add(de);
-												ABRUtil.append(debugSb,"XMLGroupElem.getItems: find entity key=" + entity.getKey()+"de.level="+de.getLevel()+"ilevel="+ ilevel + NEWLINE);
-											}
-										}else{
-											overrideVct.add(de);
-										}										
-									}
-								}
-							}
-							if(isOnce){
-								if(overrideVct.size()==1){
-									parentitemsVct.clear();
-									return overrideVct;
-								}
-								
-							}
-						}// end linkloop
-					}// end parentloop
-					parentitemsVct.clear();// remove all
-					parentitemsVct = tmp;
-				}
-				vct = overrideVct;
-				parentitemsVct.clear();
-			}else {
-				
-				// get all entitys of etype, root is "ROOT"
-				// This code supports coding mutliple entity types for the group
-				// like (FEATURE|SWFEATURE) for example.
-				//ABRUtil.append(debugSb,"test XMLGroupElem.getItems: path3="+ path + NEWLINE);
-					String types[] = PokUtils.convertToArray(etype);
-					for (int a = 0; a < types.length; a++) {
-						String type = types[a];
-						Vector tmp = (Vector) table.get(type);
-						if (tmp != null) {
-							if (vct == null) {
-								vct = new Vector(tmp);
-							} else {
-								vct.addAll(tmp);
-							}
-						}
-					}
-					//if isOnce is true, then get the first DiffEntity and get only one Diff.
-					if(isOnce){
-						Vector tmpvct = new Vector();
-						if(vct.size()>0){
-							DiffEntity diffEntity = (DiffEntity)vct.elementAt(0);
-							tmpvct.add(diffEntity);
-						}
-						return tmpvct;						
-					}
-					//if isMultUse is true, then distinct DiffEntity one EntityID only get one Diff. 					
-					if (isMultUse){	
-						//ABRUtil.append(debugSb,"table: " + table.toString() + NEWLINE);
-						HashMap keyHash = new HashMap();
-						Vector tmpvct = new Vector();
-						for (int jj=0; jj<vct.size(); jj++){
-							DiffEntity dffFeature = (DiffEntity)vct.elementAt(jj);
-							ABRUtil.append(debugSb,"XMLDistinctGroupElem.getItems: dffFeature="+ dffFeature.getKey()+ " isDelete"+dffFeature.isDeleted() + " isNew"+dffFeature.isNew() + " isUpdate"+dffFeature.isChanged() + NEWLINE);
-							//[Work Item 1016651] FEATUREELEMENT in SEO_UPDATE is not derived correctly. dffEeature show delete, although it was not deleted.
-							//ABRUtil.append(debugSb,"XMLDistinctGroupElem.getItems: dffFeature=" + dffFeature.toString()+ NEWLINE);
-							if ("FEATURE|SWFEATURE".equals(etype)){
-								if (dffFeature.toString().indexOf("LSEOPRODSTRUCT") > 0 || dffFeature.toString().indexOf("LSEOSWPRODSTRUCT") > 0 || dffFeature.toString().indexOf("WWSEOPRODSTRUCT") > 0  || dffFeature.toString().indexOf("WWSEOSWPRODSTRUCT") > 0) {
-									String key = dffFeature.getKey();
-									if (!keyHash.containsKey(key)){
-										keyHash.put(key, dffFeature);
-									}
-								}		
-							} else{ 
-								String key = dffFeature.getKey();
-								if (!keyHash.containsKey(key)){
-									keyHash.put(key, dffFeature);
-								}
-							}
-						}
-						Collection ctryrecs = keyHash.values();
-						tmpvct.addAll(ctryrecs);
-						return tmpvct;
-					}
-			}			
-			/* vct = (Vector)table.get(etype);
-			 if (vct!=null){
-			 vct = (Vector)vct.clone();
-
-			 }*/
-
-		return vct;
-	}
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\XMLDistinctGroupElem.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

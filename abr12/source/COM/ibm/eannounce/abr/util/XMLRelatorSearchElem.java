@@ -1,420 +1,423 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import com.ibm.transform.oim.eacm.diff.DiffEntity;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.Connection;
+/*     */ import java.sql.PreparedStatement;
+/*     */ import java.sql.ResultSet;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.Vector;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class XMLRelatorSearchElem
+/*     */   extends XMLSearchElem
+/*     */ {
+/*  53 */   String fsql = "select tf.entityid as FEATUREID from opicm.text tf inner join opicm.flag df on df.entityid = tf.entityid and df.entitytype = tf.entitytype and df.attributecode = 'PDHDOMAIN' and  df.effto>current timestamp and df.valto>current timestamp where tf.attributecode = 'FEATURECODE' and  tf.ATTRIBUTEVALUE = ? and  df.ATTRIBUTEVALUE = ? and tf.effto>current timestamp and tf.valto>current timestamp with ur";
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*  62 */   String psql = "select r.entity1id as FEATUREID,r.entity2id as MODELID from opicm.flag mf inner join opicm.text mt on mt.entityid = mf.entityid and mf.entitytype = mt.entitytype and mf.ATTRIBUTECODE='MACHTYPEATR' and mt.ATTRIBUTECODE='MODELATR' inner join opicm.flag dm on dm.entityid = mt.entityid and dm.entitytype = mt.entitytype and dm.attributecode = 'PDHDOMAIN' and  dm.effto>current timestamp and dm.valto>current timestamp inner join opicm.relator r on r.entitytype='PRODSTRUCT'  AND r.entity2id = mf.entityid inner join opicm.text ff on ff.ATTRIBUTECODE='FEATURECODE'  and ff.entityid=r.entity1id inner join opicm.flag df on df.entityid = ff.entityid and df.entitytype = ff.entitytype and df.attributecode = 'PDHDOMAIN' and  df.effto>current timestamp and df.valto>current timestamp where   mf.ATTRIBUTEVALUE=?  AND mt.ATTRIBUTEVALUE= ? and ff.ATTRIBUTEVALUE =?  and df.attributevalue = ? and dm.attributevalue=? and mf.effto>current timestamp and mf.valto>current timestamp and mt.effto>current timestamp and mt.valto>current timestamp and r.effto>current timestamp and r.valto>current timestamp and ff.effto>current timestamp and ff.valto>current timestamp with ur";
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String upNodeName;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public XMLRelatorSearchElem(String paramString1, String paramString2, String paramString3, String paramString4) {
+/*  86 */     super(paramString1, paramString3, paramString4, true);
+/*  87 */     this.upNodeName = paramString2;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addElements(Database paramDatabase, EntityList paramEntityList, Document paramDocument, Element paramElement, EntityItem paramEntityItem, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 111 */     Element element = paramDocument.createElement(this.nodeName);
+/* 112 */     addXMLAttrs(element);
+/*     */     
+/* 114 */     String str1 = "@@";
+/* 115 */     String str2 = "@@";
+/*     */     
+/* 117 */     boolean bool = false;
+/* 118 */     String str3 = null;
+/* 119 */     String str4 = null;
+/* 120 */     String str5 = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 140 */     Connection connection = paramDatabase.getPDHConnection();
+/* 141 */     PreparedStatement preparedStatement = null;
+/* 142 */     String str6 = PokUtils.getAttributeFlagValue(paramEntityItem, "PDHDOMAIN");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 147 */     if ("FCTRANSACTION".equals(paramEntityItem.getEntityType()) && "FROMMODELENTITYID".equals(this.nodeName)) {
+/* 148 */       String str = PokUtils.getAttributeValue(paramEntityItem, "FROMMODEL", ", ", "@@", false);
+/*     */       
+/* 150 */       if ("@@".equals(str)) {
+/* 151 */         bool = true;
+/*     */ 
+/*     */ 
+/*     */         
+/* 155 */         preparedStatement = connection.prepareStatement(this.fsql);
+/* 156 */         str5 = PokUtils.getAttributeValue(paramEntityItem, "FROMFEATURECODE", ", ", "@@", false);
+/* 157 */         preparedStatement.setString(1, str5);
+/* 158 */         preparedStatement.setString(2, str6);
+/* 159 */         ABRUtil.append(paramStringBuffer, "sql=" + this.fsql + ":" + str5 + "\n");
+/*     */       } else {
+/* 161 */         str3 = PokUtils.getAttributeValue(paramEntityItem, "FROMMACHTYPE", ", ", "@@", false);
+/* 162 */         str4 = PokUtils.getAttributeValue(paramEntityItem, "FROMMODEL", ", ", "@@", false);
+/* 163 */         str5 = PokUtils.getAttributeValue(paramEntityItem, "FROMFEATURECODE", ", ", "@@", false);
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 167 */     if ("FCTRANSACTION".equals(paramEntityItem.getEntityType()) && "TOMODELENTITYID".equals(this.nodeName)) {
+/* 168 */       String str = PokUtils.getAttributeValue(paramEntityItem, "TOMODEL", ", ", "@@", false);
+/* 169 */       if ("@@".equals(str)) {
+/*     */ 
+/*     */         
+/* 172 */         bool = true;
+/* 173 */         preparedStatement = connection.prepareStatement(this.fsql);
+/* 174 */         str5 = PokUtils.getAttributeValue(paramEntityItem, "TOFEATURECODE", ", ", "@@", false);
+/* 175 */         preparedStatement.setString(1, str5);
+/* 176 */         preparedStatement.setString(2, str6);
+/* 177 */         ABRUtil.append(paramStringBuffer, "sql=" + this.fsql + ":" + str5 + "\n");
+/*     */       } else {
+/* 179 */         str3 = PokUtils.getAttributeValue(paramEntityItem, "TOMACHTYPE", ", ", "@@", false);
+/* 180 */         str4 = PokUtils.getAttributeValue(paramEntityItem, "TOMODEL", ", ", "@@", false);
+/* 181 */         str5 = PokUtils.getAttributeValue(paramEntityItem, "TOFEATURECODE", ", ", "@@", false);
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 185 */     if (!bool) {
+/* 186 */       preparedStatement = connection.prepareStatement(this.psql);
+/*     */       
+/* 188 */       preparedStatement.setString(1, str3);
+/* 189 */       preparedStatement.setString(2, str4);
+/* 190 */       preparedStatement.setString(3, str5);
+/* 191 */       preparedStatement.setString(4, str6);
+/* 192 */       preparedStatement.setString(5, str6);
+/* 193 */       ABRUtil.append(paramStringBuffer, "sql=" + this.psql + ":" + str3 + ":" + str4 + ":" + str5 + "\n");
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */     
+/* 198 */     ResultSet resultSet = preparedStatement.executeQuery();
+/* 199 */     if (resultSet.next()) {
+/*     */       try {
+/* 201 */         str2 = resultSet.getString("FEATUREID");
+/* 202 */         ABRUtil.append(paramStringBuffer, "FEATUREID=" + str2 + "\n");
+/* 203 */       } catch (Exception exception) {}
+/*     */ 
+/*     */       
+/*     */       try {
+/* 207 */         str1 = resultSet.getString("MODELID");
+/* 208 */         ABRUtil.append(paramStringBuffer, "MODELID=" + str1 + "\n");
+/*     */       }
+/* 210 */       catch (Exception exception) {}
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 216 */     element.appendChild(paramDocument.createTextNode(str1));
+/* 217 */     paramElement.appendChild(element);
+/*     */     
+/* 219 */     element = paramDocument.createElement(this.upNodeName);
+/* 220 */     element.appendChild(paramDocument.createTextNode(str2));
+/* 221 */     paramElement.appendChild(element);
+/*     */ 
+/*     */     
+/* 224 */     for (byte b = 0; b < this.childVct.size(); b++) {
+/* 225 */       XMLElem xMLElem = this.childVct.elementAt(b);
+/* 226 */       xMLElem.addElements(paramDatabase, paramEntityList, paramDocument, element, paramEntityItem, paramStringBuffer);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addElements(Database paramDatabase, Hashtable paramHashtable, Document paramDocument, Element paramElement, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 254 */     Element element = paramDocument.createElement(this.nodeName);
+/*     */     
+/* 256 */     addXMLAttrs(element);
+/*     */     
+/* 258 */     String str1 = "@@";
+/* 259 */     String str2 = "@@";
+/* 260 */     boolean bool = false;
+/* 261 */     EntityItem entityItem = paramDiffEntity.getCurrentEntityItem();
+/* 262 */     if (paramDiffEntity.isDeleted()) {
+/* 263 */       entityItem = paramDiffEntity.getPriorEntityItem();
+/*     */     }
+/* 265 */     String str3 = PokUtils.getAttributeFlagValue(entityItem, "PDHDOMAIN");
+/*     */     
+/* 267 */     String str4 = null;
+/* 268 */     String str5 = null;
+/* 269 */     String str6 = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 279 */     Connection connection = paramDatabase.getPDHConnection();
+/* 280 */     PreparedStatement preparedStatement = null;
+/*     */ 
+/*     */ 
+/*     */     
+/* 284 */     if ("FCTRANSACTION".equals(paramDiffEntity.getEntityType()) && "FROMMODELENTITYID".equals(this.nodeName)) {
+/* 285 */       String str = PokUtils.getAttributeValue(entityItem, "FROMMODEL", ", ", "@@", false);
+/*     */       
+/* 287 */       if ("@@".equals(str)) {
+/* 288 */         bool = true;
+/*     */ 
+/*     */ 
+/*     */         
+/* 292 */         preparedStatement = connection.prepareStatement(this.fsql);
+/* 293 */         str6 = PokUtils.getAttributeValue(entityItem, "FROMFEATURECODE", ", ", "@@", false);
+/* 294 */         preparedStatement.setString(1, str6);
+/* 295 */         preparedStatement.setString(2, str3);
+/*     */         
+/* 297 */         System.out.println("sql=1" + this.fsql + ":" + str4 + ":" + str5 + ":" + str6 + "\n");
+/*     */       } else {
+/* 299 */         str4 = PokUtils.getAttributeValue(entityItem, "FROMMACHTYPE", ", ", "@@", false);
+/* 300 */         str5 = PokUtils.getAttributeValue(entityItem, "FROMMODEL", ", ", "@@", false);
+/* 301 */         str6 = PokUtils.getAttributeValue(entityItem, "FROMFEATURECODE", ", ", "@@", false);
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 305 */     if ("FCTRANSACTION".equals(paramDiffEntity.getEntityType()) && "TOMODELENTITYID".equals(this.nodeName)) {
+/* 306 */       String str = PokUtils.getAttributeValue(entityItem, "TOMODEL", ", ", "@@", false);
+/* 307 */       if ("@@".equals(str)) {
+/*     */ 
+/*     */         
+/* 310 */         bool = true;
+/* 311 */         preparedStatement = connection.prepareStatement(this.fsql);
+/* 312 */         str6 = PokUtils.getAttributeValue(entityItem, "TOFEATURECODE", ", ", "@@", false);
+/* 313 */         preparedStatement.setString(1, str6);
+/* 314 */         preparedStatement.setString(2, str3);
+/*     */       } else {
+/*     */         
+/* 317 */         str4 = PokUtils.getAttributeValue(entityItem, "TOMACHTYPE", ", ", "@@", false);
+/* 318 */         str5 = PokUtils.getAttributeValue(entityItem, "TOMODEL", ", ", "@@", false);
+/* 319 */         str6 = PokUtils.getAttributeValue(entityItem, "TOFEATURECODE", ", ", "@@", false);
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 323 */     if (!bool) {
+/* 324 */       preparedStatement = connection.prepareStatement(this.psql);
+/*     */       
+/* 326 */       preparedStatement.setString(1, str4);
+/* 327 */       preparedStatement.setString(2, str5);
+/* 328 */       preparedStatement.setString(3, str6);
+/* 329 */       preparedStatement.setString(4, str3);
+/* 330 */       preparedStatement.setString(5, str3);
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */     
+/* 335 */     ResultSet resultSet = preparedStatement.executeQuery();
+/* 336 */     if (resultSet.next()) {
+/*     */       try {
+/* 338 */         str2 = resultSet.getString("FEATUREID");
+/* 339 */         ABRUtil.append(paramStringBuffer, "FEATUREID=" + str2 + "\n");
+/* 340 */       } catch (Exception exception) {}
+/*     */ 
+/*     */       
+/*     */       try {
+/* 344 */         str1 = resultSet.getString("MODELID");
+/* 345 */         ABRUtil.append(paramStringBuffer, "MODELID=" + str1 + "\n");
+/*     */       }
+/* 347 */       catch (Exception exception) {}
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 354 */     element.appendChild(paramDocument.createTextNode(str1));
+/* 355 */     paramElement.appendChild(element);
+/*     */     
+/* 357 */     element = paramDocument.createElement(this.upNodeName);
+/* 358 */     element.appendChild(paramDocument.createTextNode(str2));
+/* 359 */     paramElement.appendChild(element);
+/*     */ 
+/*     */     
+/* 362 */     for (byte b = 0; b < this.childVct.size(); b++) {
+/* 363 */       XMLElem xMLElem = this.childVct.elementAt(b);
+/* 364 */       xMLElem.addElements(paramDatabase, paramHashtable, paramDocument, element, paramDiffEntity, paramStringBuffer);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private EntityItem[] SearchFeature(EntityItem paramEntityItem, Database paramDatabase, String paramString, StringBuffer paramStringBuffer) throws MiddlewareBusinessRuleException, MiddlewareRequestException, SQLException, MiddlewareException, MiddlewareShutdownInProgressException, RemoteException, EANBusinessRuleException, IOException {
+/* 396 */     EntityItem[] arrayOfEntityItem = null;
+/* 397 */     Profile profile = paramEntityItem.getProfile();
+/*     */     
+/* 399 */     String str1 = "SRDFEATURE";
+/* 400 */     String str2 = "FEATURE";
+/* 401 */     Vector<String> vector1 = new Vector();
+/* 402 */     Vector<String> vector2 = new Vector();
+/*     */     
+/* 404 */     vector1.add("FEATURECODE");
+/* 405 */     String str3 = PokUtils.getAttributeValue(paramEntityItem, paramString, ", ", "@@", false);
+/* 406 */     ABRUtil.append(paramStringBuffer, "searchFeature from/to featurecode=" + str3 + "\n");
+/* 407 */     vector2.add(str3);
+/*     */     try {
+/* 409 */       arrayOfEntityItem = ABRUtil.doSearch(paramDatabase, profile, str1, str2, false, vector1, vector2, paramStringBuffer);
+/*     */     }
+/* 411 */     catch (Exception exception) {
+/* 412 */       ABRUtil.append(paramStringBuffer, "doSearch error=" + exception.getMessage() + "\n");
+/* 413 */       exception.printStackTrace();
+/*     */     } 
+/* 415 */     return arrayOfEntityItem;
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.util;
 
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.objects.*;
-
-import org.w3c.dom.*;
-
-import java.io.IOException;
-import java.rmi.RemoteException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
-
-import com.ibm.transform.oim.eacm.diff.*;
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-/**********************************************************************************
- * Class used to hold info and structure to be generated for the xml feed for
- * abrs. search must be used to find values for these nodes
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\XMLRelatorSearchElem.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-// $Log: XMLRelatorSearchElem.java,v $
-// Revision 1.3 2015/01/26 15:53:39 wangyul
-// fix the issue PR24222 -- SPF ADS abr string buffer
-//
-// Revision 1.2 2013/06/27 12:52:16 guobin
-// Fixed CQ-227442 BH - reduce number of FC transaction records required, was
-// approved by BH W1 CCB via BH W1 CQ-152329
-//
-// Revision 1.1 2008/04/17 19:37:53 wendy
-// Init for
-// - CQ00003539-WI - BHC 3.0 Support - Feed of ZIPSRSS product info to BHC
-// - CQ00005096-WI - BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Add
-// Category MM and Images
-// - CQ00005046-WI - BHC 3.0 Support - Feed of ZIPSRSS product info to BHC -
-// Support CRAD in BHC
-// - CQ00005045-WI - BHC 3.0 Support - Feed of ZIPSRSS product info to BHC -
-// Upgrade/Conversion Support
-// - CQ00006862-WI - BHC 3.0 Support - Support for Services Data UI
-//
-//
-
-public class XMLRelatorSearchElem extends XMLSearchElem {
-	//fString fsql2 = "select entityid as FEATUREID from opicm.text where attributecode = 'FEATURECODE' and  ATTRIBUTEVALUE = ? and effto>current timestamp and valto>current timestamp with ur";
-	String fsql = "select tf.entityid as FEATUREID from opicm.text tf "
-			+ "inner join opicm.flag df on df.entityid = tf.entityid and df.entitytype = tf.entitytype and df.attributecode = 'PDHDOMAIN' and  df.effto>current timestamp and df.valto>current timestamp "
-			+ "where tf.attributecode = 'FEATURECODE' and  tf.ATTRIBUTEVALUE = ? and  df.ATTRIBUTEVALUE = ? and tf.effto>current timestamp and tf.valto>current timestamp with ur";
-	/*String psql2 = "select r.entity1id as FEATUREID,r.entity2id as MODELID from opicm.flag mf inner join opicm.text mt "
-			+ "on mt.entityid = mf.entityid and mf.entitytype = mt.entitytype and mf.ATTRIBUTECODE='MACHTYPEATR' and mt.ATTRIBUTECODE='MODELATR' "
-			+ "inner join opicm.relator r on r.entitytype='PRODSTRUCT'  AND r.entity2id = mf.entityid "
-			+ "inner join opicm.text ff on ff.ATTRIBUTECODE='FEATURECODE'  and ff.entityid=r.entity1id "
-			+ "where   mf.ATTRIBUTEVALUE= ?  AND mt.ATTRIBUTEVALUE= ? and ff.ATTRIBUTEVALUE = ?  and mf.effto>current timestamp and mf.valto>current timestamp and mt.effto>current timestamp and mt.valto>current timestamp and r.effto>current timestamp and r.valto>current timestamp and ff.effto>current timestamp and ff.valto>current timestamp with ur";
-*/
-	String psql = "select r.entity1id as FEATUREID,r.entity2id as MODELID from opicm.flag mf "
-			+ "inner join opicm.text mt on mt.entityid = mf.entityid and mf.entitytype = mt.entitytype and mf.ATTRIBUTECODE='MACHTYPEATR' and mt.ATTRIBUTECODE='MODELATR' "
-			+ "inner join opicm.flag dm on dm.entityid = mt.entityid and dm.entitytype = mt.entitytype and dm.attributecode = 'PDHDOMAIN' and  dm.effto>current timestamp and dm.valto>current timestamp "
-			+ "inner join opicm.relator r on r.entitytype='PRODSTRUCT'  AND r.entity2id = mf.entityid "
-			+ "inner join opicm.text ff on ff.ATTRIBUTECODE='FEATURECODE'  and ff.entityid=r.entity1id "
-			+ "inner join opicm.flag df on df.entityid = ff.entityid and df.entitytype = ff.entitytype and df.attributecode = 'PDHDOMAIN' and  df.effto>current timestamp and df.valto>current timestamp "
-			+ "where   mf.ATTRIBUTEVALUE=?  AND mt.ATTRIBUTEVALUE= ? and ff.ATTRIBUTEVALUE =?  and df.attributevalue = ? and dm.attributevalue=? "
-			+ "and mf.effto>current timestamp and mf.valto>current timestamp and mt.effto>current timestamp and mt.valto>current timestamp and r.effto>current timestamp and r.valto>current timestamp and ff.effto>current timestamp and ff.valto>current timestamp with ur";
-
-	private String upNodeName;
-
-	/**********************************************************************************
-	 * Constructor for search value elements
-	 *
-	 * @param downnname
-	 *            String with name of first node to be created- for model
-	 * @param upnname
-	 *            String with name of second node to be created- for fc
-	 * @param srchAct
-	 *            String with search action name
-	 * @param stype
-	 *            String with entitytype to find
-	 */
-	public XMLRelatorSearchElem(String downnname, String upnname, String srchAct, String stype) {
-		super(downnname, srchAct, stype, true);
-		upNodeName = upnname;
-	}
-
-	/**********************************************************************************
-	 * Create a node for this element and add to the parent and any children
-	 * this node has
-	 *
-	 * @param dbCurrent
-	 *            Database
-	 * @param list
-	 *            EntityList
-	 * @param document
-	 *            Document needed to create nodes
-	 * @param parent
-	 *            Element node to add this node too
-	 * @param debugSb
-	 *            StringBuffer for debug output
-	 */
-	public void addElements(Database dbCurrent, EntityList list, Document document, Element parent,
-			EntityItem parentItem, StringBuffer debugSb) throws COM.ibm.eannounce.objects.EANBusinessRuleException,
-			java.sql.SQLException, COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-			COM.ibm.opicmpdh.middleware.MiddlewareRequestException, java.rmi.RemoteException, java.io.IOException,
-			COM.ibm.opicmpdh.middleware.MiddlewareException,
-			COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException {
-		Element elem = (Element) document.createElement(nodeName);
-		addXMLAttrs(elem);
-		// search to find entity needed for entityid
-		String value = CHEAT;
-		String upvalue = CHEAT;
-		//System.out.println("EntityItem parentItem");
-		boolean emptymod = false;
-		String machtype = null;
-		String mod = null;
-		String code = null;
-		/*String fsql2 = "select entityid as FEATUREID from opicm.text where attributecode = 'FEATURECODE' and  ATTRIBUTEVALUE = ? and effto>current timestamp and valto>current timestamp with ur";
-		String fsql = "select entityid as FEATUREID from opicm.text tf "
-				+ "inner join opicm.flag df on df.eneityid = tf.eneityid and df.entitytype = tf.entitytype and df.attributecode = 'PDHDOMAIN' and  df.effto>current timestamp and df.valto>current timestamp "
-				+ "where tf.attributecode = 'FEATURECODE' and  tf.ATTRIBUTEVALUE = ? and  df.ATTRIBUTEVALUE = ? and tf.effto>current timestamp and tf.valto>current timestamp with ur";
-		String psql2 = "select r.entity1id as FEATUREID,r.entity2id as MODELID from opicm.flag mf inner join opicm.text mt "
-				+ "on mt.entityid = mf.entityid and mf.entitytype = mt.entitytype and mf.ATTRIBUTECODE='MACHTYPEATR' and mt.ATTRIBUTECODE='MODELATR'"
-				+ "inner join opicm.relator r on r.entitytype='PRODSTRUCT'  AND r.entity2id = mf.entityid "
-				+ "inner join opicm.text ff on ff.ATTRIBUTECODE='FEATURECODE'  and ff.entityid=r.entity1id "
-				+ "where   mf.ATTRIBUTEVALUE= ?  AND mt.ATTRIBUTEVALUE= ? and ff.ATTRIBUTEVALUE = ?  and mf.effto>current timestamp and mf.valto>current timestamp and mt.effto>current timestamp and mt.valto>current timestamp and r.effto>current timestamp and r.valto>current timestamp and ff.effto>current timestamp and ff.valto>current timestamp with ur";
-
-		String psql = "select r.entity1id as FEATUREID,r.entity2id as MODELID from opicm.flag mf "
-				+ "inner join opicm.text mt on mt.entityid = mf.entityid and mf.entitytype = mt.entitytype and mf.ATTRIBUTECODE='MACHTYPEATR' and mt.ATTRIBUTECODE='MODELATR' "
-				+ "inner join opicm.flag dm on dm.eneityid = mt.eneityid and dm.entitytype = mt.entitytype and dm.attributecode = 'PDHDOMAIN' and  dm.effto>current timestamp and dm.valto>current timestamp"
-				+ "inner join opicm.relator r on r.entitytype='PRODSTRUCT'  AND r.entity2id = mf.entityid "
-				+ "inner join opicm.text ff on ff.ATTRIBUTECODE='FEATURECODE'  and ff.entityid=r.entity1id "
-				+ "inner join opicm.flag df on df.eneityid = ff.eneityid and df.entitytype = ff.entitytype and df.attributecode = 'PDHDOMAIN' and  df.effto>current timestamp and df.valto>current timestamp "
-				+ "where   mf.ATTRIBUTEVALUE=?  AND mt.ATTRIBUTEVALUE= ? and ff.ATTRIBUTEVALUE =?  and df.attributevalue = ? and dm.attributecode=? "
-				+ "and mf.effto>current timestamp and mf.valto>current timestamp and mt.effto>current timestamp and mt.valto>current timestamp and r.effto>current timestamp and r.valto>current timestamp and ff.effto>current timestamp and ff.valto>current timestamp with ur";
-*/
-		Connection connection = dbCurrent.getPDHConnection();
-		PreparedStatement statement = null;
-		String domain = PokUtils.getAttributeFlagValue(parentItem, "PDHDOMAIN");
-		//System.out.println("Domin:" + domain);
-		// do speical check, if rootentity is FEATURE Transaction and
-		// FromModel/ToModel is empty ,then Modelentityid = empty and
-		// Featureentityid using Featurecode search.
-		if ("FCTRANSACTION".equals(parentItem.getEntityType()) && "FROMMODELENTITYID".equals(nodeName)) {
-			String frommodel = PokUtils.getAttributeValue(parentItem, "FROMMODEL", ", ", CHEAT, false);
-
-			if (CHEAT.equals(frommodel)) {
-				emptymod = true;
-				// MODELENITYID is empty, FEATUREENTITYID has same value ,
-				// according to FEATURECODE to search.
-
-				statement = connection.prepareStatement(fsql);
-				code = PokUtils.getAttributeValue(parentItem, "FROMFEATURECODE", ", ", CHEAT, false);
-				statement.setString(1, code);
-				statement.setString(2, domain);
-				ABRUtil.append(debugSb, "sql=" + fsql + ":" + code + "\n");
-			} else {
-				machtype = PokUtils.getAttributeValue(parentItem, "FROMMACHTYPE", ", ", CHEAT, false);
-				mod = PokUtils.getAttributeValue(parentItem, "FROMMODEL", ", ", CHEAT, false);
-				code = PokUtils.getAttributeValue(parentItem, "FROMFEATURECODE", ", ", CHEAT, false);
-				//ABRUtil.append(debugSb, "sql=" + fsql + ":" + code + "\n");
-			}
-		}
-		if ("FCTRANSACTION".equals(parentItem.getEntityType()) && "TOMODELENTITYID".equals(nodeName)) {
-			String tomodel = PokUtils.getAttributeValue(parentItem, "TOMODEL", ", ", CHEAT, false);
-			if (CHEAT.equals(tomodel)) {
-				// MODELENITYID is empty, FEATUREENTITYID has same value ,
-				// according to FEATURECODE to search.
-				emptymod = true;
-				statement = connection.prepareStatement(fsql);
-				code = PokUtils.getAttributeValue(parentItem, "TOFEATURECODE", ", ", CHEAT, false);
-				statement.setString(1, code);
-				statement.setString(2, domain);
-				ABRUtil.append(debugSb, "sql=" + fsql + ":" + code + "\n");
-			} else {
-				machtype = PokUtils.getAttributeValue(parentItem, "TOMACHTYPE", ", ", CHEAT, false);
-				mod = PokUtils.getAttributeValue(parentItem, "TOMODEL", ", ", CHEAT, false);
-				code = PokUtils.getAttributeValue(parentItem, "TOFEATURECODE", ", ", CHEAT, false);
-
-			}
-		}
-		if (!emptymod) {
-			statement = connection.prepareStatement(psql);
-
-			statement.setString(1, machtype);
-			statement.setString(2, mod);
-			statement.setString(3, code);
-			statement.setString(4, domain);
-			statement.setString(5, domain);
-			ABRUtil.append(debugSb, "sql=" + psql + ":" + machtype + ":" + mod + ":" + code + "\n");
-
-			//System.out.println("sql=" + psql + ":" + machtype + ":" + mod + ":" + code + "\n");
-		}
-
-		ResultSet resultSet = statement.executeQuery();
-		while (resultSet.next()) {
-			try {
-				upvalue = resultSet.getString("FEATUREID");
-				ABRUtil.append(debugSb, "FEATUREID=" + upvalue + "\n");
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
-			try {
-				value = resultSet.getString("MODELID");
-				ABRUtil.append(debugSb, "MODELID=" + value + "\n");
-
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
-
-			break;
-		}
-		elem.appendChild(document.createTextNode(value));
-		parent.appendChild(elem);
-
-		elem = (Element) document.createElement(upNodeName);
-		elem.appendChild(document.createTextNode(upvalue));
-		parent.appendChild(elem);
-
-		// add any children
-		for (int c = 0; c < childVct.size(); c++) {
-			XMLElem childElem = (XMLElem) childVct.elementAt(c);
-			childElem.addElements(dbCurrent, list, document, elem, parentItem, debugSb);
-		}
-	}
-
-	/**********************************************************************************
-	 * Create a node for this element and add to the parent and any children
-	 * this node has
-	 *
-	 * @param dbCurrent
-	 *            Database
-	 * @param table
-	 *            Hashtable of Vectors of DiffEntity
-	 * @param document
-	 *            Document needed to create nodes
-	 * @param parent
-	 *            Element node to add this node too
-	 * @param parentItem
-	 *            DiffEntity - parent to use if path is specified in
-	 *            XMLGroupElem, item to use otherwise
-	 * @param debugSb
-	 *            StringBuffer for debug output
-	 */
-	public void addElements(Database dbCurrent, Hashtable table, Document document, Element parent,
-			DiffEntity parentItem, StringBuffer debugSb) throws COM.ibm.eannounce.objects.EANBusinessRuleException,
-			java.sql.SQLException, COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-			COM.ibm.opicmpdh.middleware.MiddlewareRequestException, java.rmi.RemoteException, java.io.IOException,
-			COM.ibm.opicmpdh.middleware.MiddlewareException,
-			COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException {
-		Element elem = (Element) document.createElement(nodeName);
-		//System.out.println("DiffEntity parentItem");
-		addXMLAttrs(elem);
-		// search to find entity needed for entityid
-		String value = CHEAT;
-		String upvalue = CHEAT;
-		boolean emptymod = false;
-		EntityItem item = parentItem.getCurrentEntityItem();
-		if (parentItem.isDeleted()) {
-			item = parentItem.getPriorEntityItem();
-		}
-		String domain = PokUtils.getAttributeFlagValue(item, "PDHDOMAIN");
-		//System.out.println("Domin:" + domain);
-		String machtype = null;
-		String mod = null;
-		String code = null;
-		/*String fsql = "select entityid as FEATUREID from opicm.text tf "
-				+ "inner join opicm.flag df on df.eneityid = tf.eneityid and df.entitytype = tf.entitytype and  df.effto>current timestamp and df.valto>current timestamp "
-				+ "where tf.attributecode = 'FEATURECODE' and df.attributecode = 'PDHDOMAIN'  and tf.entitytype = 'FEATURE' and  tf.ATTRIBUTEVALUE = ? AND df.ATTRIBUTEVALUE= ?  and tf.effto>current timestamp and tf.valto>current timestamp   and df.effto>current timestamp and df.valto>current timestamp with ur";
-		String psql = "select r.entity1id as FEATUREID,r.entity2id as MODELID from opicm.flag mf inner join opicm.text mt "
-				+ "on mt.entityid = mf.entityid and mf.entitytype = mt.entitytype and mf.ATTRIBUTECODE='MACHTYPEATR' and mt.ATTRIBUTECODE='MODELATR'"
-				+ "inner join opicm.relator r on r.entitytype='PRODSTRUCT'  AND r.entity2id = mf.entityid "
-				+ "inner join opicm.text ff on ff.ATTRIBUTECODE='FEATURECODE'  and ff.entityid=r.entity1id "
-				+ "where   mf.ATTRIBUTEVALUE=?  AND mt.ATTRIBUTEVALUE= ? and ff.ATTRIBUTEVALUE = ?  and mf.effto>current timestamp and mf.valto>current timestamp and mt.effto>current timestamp and mt.valto>current timestamp and r.effto>current timestamp and r.valto>current timestamp and ff.effto>current timestamp and ff.valto>current timestamp with ur";
-*/
-		Connection connection = dbCurrent.getPDHConnection();
-		PreparedStatement statement = null;
-		// do speical check, if rootentity is FEATURE Transaction and
-		// FromModel/ToModel is empty ,then Modelentityid = empty and
-		// Featureentityid using Featurecode search.
-		if ("FCTRANSACTION".equals(parentItem.getEntityType()) && "FROMMODELENTITYID".equals(nodeName)) {
-			String frommodel = PokUtils.getAttributeValue(item, "FROMMODEL", ", ", CHEAT, false);
-
-			if (CHEAT.equals(frommodel)) {
-				emptymod = true;
-				// MODELENITYID is empty, FEATUREENTITYID has same value ,
-				// according to FEATURECODE to search.
-
-				statement = connection.prepareStatement(fsql);
-				code = PokUtils.getAttributeValue(item, "FROMFEATURECODE", ", ", CHEAT, false);
-				statement.setString(1, code);
-				statement.setString(2, domain);
-				//ABRUtil.append(debugSb, "sql=" + fsql + ":" + code + "\n");
-				System.out.println("sql=1" + fsql + ":" + machtype + ":" + mod + ":" + code + "\n");
-			} else {
-				machtype = PokUtils.getAttributeValue(item, "FROMMACHTYPE", ", ", CHEAT, false);
-				mod = PokUtils.getAttributeValue(item, "FROMMODEL", ", ", CHEAT, false);
-				code = PokUtils.getAttributeValue(item, "FROMFEATURECODE", ", ", CHEAT, false);
-				//ABRUtil.append(debugSb, "sql=" + fsql + ":" + code + "\n");
-			}
-		}
-		if ("FCTRANSACTION".equals(parentItem.getEntityType()) && "TOMODELENTITYID".equals(nodeName)) {
-			String tomodel = PokUtils.getAttributeValue(item, "TOMODEL", ", ", CHEAT, false);
-			if (CHEAT.equals(tomodel)) {
-				// MODELENITYID is empty, FEATUREENTITYID has same value ,
-				// according to FEATURECODE to search.
-				emptymod = true;
-				statement = connection.prepareStatement(fsql);
-				code = PokUtils.getAttributeValue(item, "TOFEATURECODE", ", ", CHEAT, false);
-				statement.setString(1, code);
-				statement.setString(2, domain);
-				//ABRUtil.append(debugSb, "sql=" + fsql + ":" + code + "\n");
-			} else {
-				machtype = PokUtils.getAttributeValue(item, "TOMACHTYPE", ", ", CHEAT, false);
-				mod = PokUtils.getAttributeValue(item, "TOMODEL", ", ", CHEAT, false);
-				code = PokUtils.getAttributeValue(item, "TOFEATURECODE", ", ", CHEAT, false);
-
-			}
-		}
-		if (!emptymod) {
-			statement = connection.prepareStatement(psql);
-
-			statement.setString(1, machtype);
-			statement.setString(2, mod);
-			statement.setString(3, code);
-			statement.setString(4, domain);
-			statement.setString(5, domain);
-			/*ABRUtil.append(debugSb, "sql=" + psql + ":" + machtype + ":" + mod + ":" + code + "\n");
-			System.out.println("sql=" + psql + ":" + machtype + ":" + mod + ":" + code + "\n");*/
-		}
-
-		ResultSet resultSet = statement.executeQuery();
-		while (resultSet.next()) {
-			try {
-				upvalue = resultSet.getString("FEATUREID");
-				ABRUtil.append(debugSb, "FEATUREID=" + upvalue + "\n");
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
-			try {
-				value = resultSet.getString("MODELID");
-				ABRUtil.append(debugSb, "MODELID=" + value + "\n");
-
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
-
-			break;
-		}
-
-		elem.appendChild(document.createTextNode(value));
-		parent.appendChild(elem);
-
-		elem = (Element) document.createElement(upNodeName);
-		elem.appendChild(document.createTextNode(upvalue));
-		parent.appendChild(elem);
-
-		// add any children
-		for (int c = 0; c < childVct.size(); c++) {
-			XMLElem childElem = (XMLElem) childVct.elementAt(c);
-			childElem.addElements(dbCurrent, table, document, elem, parentItem, debugSb);
-		}
-	}
-
-	/**
-	 * do search setup entity
-	 * 
-	 * @param item,
-	 *            db, debugsb
-	 * @return EntityItem[]
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 * @throws ClassNotFoundException
-	 * @throws MiddlewareBusinessRuleException
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws MiddlewareShutdownInProgressException
-	 * @throws RemoteException
-	 * @throws EANBusinessRuleException
-	 * @throws IOException
-	 */
-	private EntityItem[] SearchFeature(EntityItem item, Database dbCurrent, String attrcode, StringBuffer debugSb)
-			throws MiddlewareBusinessRuleException, MiddlewareRequestException, SQLException, MiddlewareException,
-			MiddlewareShutdownInProgressException, RemoteException, EANBusinessRuleException, IOException {
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-		// get attribute of EXTXMLFEED Entitys
-		// search for the EXTXMLFEED by XMLSETUPTYPE='Production' and
-		///////////////////////////////////////////////////////////////////////////////////////////////////// XMLENTITYTYPE='Root
-		///////////////////////////////////////////////////////////////////////////////////////////////////// Entity
-		///////////////////////////////////////////////////////////////////////////////////////////////////// Type'
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-		EntityItem[] FeatureArray = null;
-		Profile m_prof = item.getProfile();
-
-		String searchAction = "SRDFEATURE";
-		String srchType = "FEATURE";
-		Vector attrVct = new Vector();
-		Vector valVct = new Vector();
-
-		attrVct.add("FEATURECODE");
-		String feacode = PokUtils.getAttributeValue(item, attrcode, ", ", CHEAT, false);
-		ABRUtil.append(debugSb, "searchFeature from/to featurecode=" + feacode + "\n");
-		valVct.add(feacode);
-		try {
-			FeatureArray = ABRUtil.doSearch(dbCurrent, m_prof, searchAction, srchType, false, attrVct, valVct, debugSb);
-
-		} catch (Exception e) {
-			ABRUtil.append(debugSb, "doSearch error=" + e.getMessage() + "\n");
-			e.printStackTrace();
-		}
-		return FeatureArray;
-		////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// search end
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	}
-}

@@ -1,79 +1,83 @@
-/* Copyright IBM Corp. 2016 */
-package COM.ibm.eannounce.abr.sg.rfc;
+/*    */ package COM.ibm.eannounce.abr.sg.rfc;
+/*    */ 
+/*    */ import COM.ibm.eannounce.abr.sg.rfc.entity.Rdhzdmprktbl;
+/*    */ import COM.ibm.eannounce.abr.util.RfcConfigProperties;
+/*    */ import com.google.gson.annotations.SerializedName;
+/*    */ import java.util.ArrayList;
+/*    */ import java.util.List;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class UpdateParkStatus
+/*    */   extends RdhBase
+/*    */ {
+/*    */   @SerializedName("ZDMPRKTBL")
+/* 27 */   List<Rdhzdmprktbl> rdhzdmprktbls = null;
+/*    */   @SerializedName("Z_GEO")
+/* 29 */   String zgeo = null;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public UpdateParkStatus(String paramString1, String paramString2) {
+/* 42 */     super(paramString2, "Z_DM_SAP_PARK_STATUS ".toLowerCase(), null);
+/* 43 */     this.rdhzdmprktbls = new ArrayList<>();
+/* 44 */     Rdhzdmprktbl rdhzdmprktbl = new Rdhzdmprktbl();
+/* 45 */     rdhzdmprktbl = new Rdhzdmprktbl();
+/* 46 */     rdhzdmprktbl.setZdmclass(paramString1);
+/* 47 */     rdhzdmprktbl.setZdmrelnum(paramString2);
+/* 48 */     if ("MD_TSS_IERP".equals(paramString1)) {
+/* 49 */       rdhzdmprktbl.setZdmstatus(RfcConfigProperties.getTssZdmstatus());
+/*    */     } else {
+/* 51 */       rdhzdmprktbl.setZdmstatus(RfcConfigProperties.getZdmstatus());
+/*    */     } 
+/* 53 */     this.rdhzdmprktbls.add(rdhzdmprktbl);
+/* 54 */     this.zgeo = "WW";
+/*    */     
+/* 56 */     if ("MD_CHW_IERP".equals(paramString1)) {
+/* 57 */       this.pims_identity = "H";
+/*    */     }
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   protected void setDefaultValues() {
+/* 67 */     super.setDefaultValues();
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   protected boolean isReadyToExecute() {
+/* 75 */     return true;
+/*    */   }
+/*    */ }
 
-import java.util.ArrayList;
-import java.util.List;
 
-import COM.ibm.eannounce.abr.sg.adsxmlbh1.ADSABRSTATUS;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhBase_zdm_geo_to_class;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_api_ausp;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_klah;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_kssk;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_mara;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_object_key;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_rcuco;
-import COM.ibm.eannounce.abr.sg.rfc.entity.Rdhzdmprktbl;
-import COM.ibm.eannounce.abr.util.DateUtility;
-import COM.ibm.eannounce.abr.util.RfcConfigProperties;
-
-import com.google.gson.annotations.SerializedName;
-
-
-/**
- *
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\UpdateParkStatus.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class UpdateParkStatus extends RdhBase
-{
-    @SerializedName("ZDMPRKTBL")
-    List<Rdhzdmprktbl>  rdhzdmprktbls = null;
-    @SerializedName("Z_GEO")
-    String zgeo = null;
-
-    /**
-     * Constructor
-     * @param productSchedule
-     * @param obj_id
-     * @param class_name
-     * @param class_type
-     * @param enablementprocess
-     */
-    public UpdateParkStatus (String zdmclass,String zdmrelnum)
-    {
-    	super(zdmrelnum,"Z_DM_SAP_PARK_STATUS ".toLowerCase(),null);
-    	rdhzdmprktbls = new ArrayList<Rdhzdmprktbl>();
-    	Rdhzdmprktbl rdhzdmprktbl = new Rdhzdmprktbl();
-    	rdhzdmprktbl = new Rdhzdmprktbl();
-    	rdhzdmprktbl.setZdmclass(zdmclass);
-    	rdhzdmprktbl.setZdmrelnum(zdmrelnum);
-        if("MD_TSS_IERP".equals(zdmclass)) {
-            rdhzdmprktbl.setZdmstatus(RfcConfigProperties.getTssZdmstatus());
-        }else {
-            rdhzdmprktbl.setZdmstatus(RfcConfigProperties.getZdmstatus());
-        }
-    	rdhzdmprktbls.add(rdhzdmprktbl);
-    	zgeo = "WW";
-    	
-    	if("MD_CHW_IERP".equals(zdmclass)) {
-    		this.pims_identity="H";
-    	}
-    }
- 
-    /* (non-Javadoc)
-     * @see com.ibm.sdpi.cmd.interfaces.rdh.esw.caller.RdhBase#setDefaultValues()
-     */
-    @Override
-    protected void setDefaultValues()
-    {
-        super.setDefaultValues();
-       
-    }
-
-    @Override
-    protected boolean isReadyToExecute()
-    {
-        
-        return true;
-
-    }
-
-}

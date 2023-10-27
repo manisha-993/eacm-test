@@ -1,230 +1,236 @@
-//  (c) Copyright International Business Machines Corporation, 2001
-//  All Rights Reserved.</pre>
-//
-//AFHWFUPPOFABR01.java,v
-//Revision 1.5  2006/03/03 19:23:24  bala
-//remove reference to Constants.CSS
-//
-//Revision 1.4  2006/01/24 16:36:40  yang
-//J-test
-//
-//Revision 1.3  2005/02/08 18:29:12  joan
-//changes for Jtest
-//
-//Revision 1.2  2003/12/12 21:28:52  joan
-//adjust code
-//
-//Revision 1.1  2003/12/09 17:31:48  joan
-//initial load
-//
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.LockPDHEntityException;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.abr.util.UpdatePDHEntityException;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.HWFUPPOFPDG;
+/*     */ import COM.ibm.eannounce.objects.SBRException;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class AFHWFUPPOFABR01
+/*     */   extends PokBaseABR
+/*     */ {
+/*  39 */   public static final String DEF_NOT_POPULATED_HTML = new String("");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*  44 */   public static final String ABR = new String("AFHWFUPPOFABR01");
+/*     */   
+/*  46 */   private EntityGroup m_egParent = null;
+/*  47 */   private EntityItem m_ei = null;
+/*  48 */   private HWFUPPOFPDG m_pdg = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/*  55 */     String str1 = null;
+/*  56 */     String str2 = System.getProperty("line.separator");
+/*     */     try {
+/*  58 */       start_ABRBuild();
+/*     */       
+/*  60 */       buildReportHeaderII();
+/*     */       
+/*  62 */       this.m_egParent = this.m_elist.getParentEntityGroup();
+/*  63 */       this.m_ei = this.m_egParent.getEntityItem(0);
+/*  64 */       println("<br><b>Hardware FUP/POF PDG Request: " + this.m_ei
+/*     */           
+/*  66 */           .getKey() + "</b>");
+/*     */ 
+/*     */       
+/*  69 */       printNavigateAttributes(this.m_ei, this.m_egParent, true);
+/*     */       
+/*  71 */       setReturnCode(0);
+/*     */ 
+/*     */       
+/*  74 */       if (getReturnCode() == 0) {
+/*  75 */         log("AFHWFUPPOFABR01 generating data");
+/*  76 */         this.m_pdg = new HWFUPPOFPDG(null, this.m_db, this.m_prof, "HWFUPPOFPDG");
+/*  77 */         this.m_pdg.setEntityItem(this.m_ei);
+/*  78 */         this.m_pdg.executeAction(this.m_db, this.m_prof);
+/*     */       }
+/*     */     
+/*  81 */     } catch (LockPDHEntityException lockPDHEntityException) {
+/*  82 */       setReturnCode(-2);
+/*  83 */       println("<h3><font color=red>IAB1007E: Could not get soft lock.  Rule execution is terminated.<br />" + lockPDHEntityException
+/*     */ 
+/*     */ 
+/*     */           
+/*  87 */           .getMessage() + "</font></h3>");
+/*     */       
+/*  89 */       logError(lockPDHEntityException.getMessage());
+/*  90 */     } catch (UpdatePDHEntityException updatePDHEntityException) {
+/*  91 */       setReturnCode(-2);
+/*  92 */       println("<h3><font color=red>UpdatePDH error: " + updatePDHEntityException
+/*     */           
+/*  94 */           .getMessage() + "</font></h3>");
+/*     */       
+/*  96 */       logError(updatePDHEntityException.getMessage());
+/*  97 */     } catch (SBRException sBRException) {
+/*  98 */       String str = sBRException.toString();
+/*  99 */       int i = str.indexOf("(ok)");
+/* 100 */       if (i < 0) {
+/* 101 */         setReturnCode(-2);
+/* 102 */         println("<h3><font color=red>Generate Data error: " + 
+/*     */             
+/* 104 */             replace(str, str2, "<br>") + "</font></h3>");
+/*     */         
+/* 106 */         logError(sBRException.toString());
+/*     */       } else {
+/* 108 */         str = str.substring(0, i);
+/* 109 */         println("<h3> " + replace(str, str2, "<br>") + "</h3>");
+/*     */       } 
+/* 111 */     } catch (Exception exception) {
+/*     */       
+/* 113 */       println("Error in " + this.m_abri.getABRCode() + ":" + exception.getMessage());
+/* 114 */       println("" + exception);
+/* 115 */       exception.printStackTrace();
+/*     */       
+/* 117 */       if (getABRReturnCode() != -2) {
+/* 118 */         setReturnCode(-3);
+/*     */       }
+/*     */     } finally {
+/* 121 */       println("<br /><b>" + 
+/*     */           
+/* 123 */           buildMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 126 */               getABRDescription(), 
+/* 127 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }) + "</b>");
+/*     */       
+/* 130 */       log(
+/* 131 */           buildLogMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 134 */               getABRDescription(), 
+/* 135 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }));
+/*     */       
+/* 138 */       str1 = this.m_ei.toString();
+/* 139 */       if (str1.length() > 64) {
+/* 140 */         str1 = str1.substring(0, 64);
+/*     */       }
+/* 142 */       setDGTitle(str1);
+/* 143 */       setDGRptName(ABR);
+/*     */ 
+/*     */       
+/* 146 */       setDGString(getABRReturnCode());
+/* 147 */       printDGSubmitString();
+/*     */ 
+/*     */ 
+/*     */       
+/* 151 */       buildReportFooter();
+/*     */       
+/* 153 */       if (!isReadOnly()) {
+/* 154 */         clearSoftLock();
+/*     */       }
+/*     */     } 
+/*     */   }
+/*     */   
+/*     */   private String replace(String paramString1, String paramString2, String paramString3) {
+/* 160 */     String str = "";
+/* 161 */     int i = paramString1.indexOf(paramString2);
+/*     */     
+/* 163 */     while (paramString1.length() > 0 && i >= 0) {
+/* 164 */       str = str + paramString1.substring(0, i) + paramString3;
+/* 165 */       paramString1 = paramString1.substring(i + paramString2.length());
+/* 166 */       i = paramString1.indexOf(paramString2);
+/*     */     } 
+/* 168 */     str = str + paramString1;
+/* 169 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getABREntityDesc(String paramString, int paramInt) {
+/* 180 */     return null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 189 */     return "Hardware FUP/POF ABR 01.";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getStyle() {
+/* 200 */     return "";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getRevision() {
+/* 210 */     return new String("1.5");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String getVersion() {
+/* 220 */     return "AFHWFUPPOFABR01.java,v 1.5 2006/03/03 19:23:24 bala Exp";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 228 */     return "AFHWFUPPOFABR01.java";
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.sg;
 
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.eannounce.abr.util.*;
-
-/**
- * AFHWFUPPOFABR01
- *
- *@author     Administrator
- *@created    August 30, 2002
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\AFHWFUPPOFABR01.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class AFHWFUPPOFABR01 extends PokBaseABR {
-  /**
-  *  Execute ABR.
-  *
-  */
-
-  // Class constants
-  public final static String DEF_NOT_POPULATED_HTML = new String("");
-  /**
-     * ABR
-     *
-     */
-  public final static String ABR = new String("AFHWFUPPOFABR01");
-
-  private EntityGroup m_egParent = null;
-  private EntityItem m_ei = null;
-  private HWFUPPOFPDG m_pdg = null;
-
-  /**
-   * @see COM.ibm.opicmpdh.middleware.taskmaster.AbstractTask#execute_run()
-   * @author Administrator
-   */
-  public void execute_run() {
-    String strDgName = null;
-    String RETURN = System.getProperty("line.separator");
-    try {
-      start_ABRBuild();
-      // Build the report header
-      buildReportHeaderII();
-
-      m_egParent = m_elist.getParentEntityGroup();
-      m_ei = m_egParent.getEntityItem(0);
-      println(
-        "<br><b>Hardware FUP/POF PDG Request: "
-          + m_ei.getKey()
-          + "</b>");
-
-      printNavigateAttributes(m_ei, m_egParent, true);
-
-      setReturnCode(PASS);
-
-      //============= run the PDG to generate data ==========================================
-      if (getReturnCode() == PASS) {
-        log("AFHWFUPPOFABR01 generating data");
-        m_pdg = new HWFUPPOFPDG(null, m_db, m_prof, "HWFUPPOFPDG");
-        m_pdg.setEntityItem(m_ei);
-        m_pdg.executeAction(m_db, m_prof);
-      }
-
-    } catch (LockPDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>"
-          + ERR_IAB1007E
-          + "<br />"
-          + le.getMessage()
-          + "</font></h3>");
-      logError(le.getMessage());
-    } catch (UpdatePDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>UpdatePDH error: "
-          + le.getMessage()
-          + "</font></h3>");
-      logError(le.getMessage());
-    } catch (SBRException _sbrex) {
-      String strError = _sbrex.toString();
-      int i = strError.indexOf("(ok)");
-      if (i < 0) {
-        setReturnCode(UPDATE_ERROR);
-        println(
-          "<h3><font color=red>Generate Data error: "
-            + replace(strError, RETURN, "<br>")
-            + "</font></h3>");
-        logError(_sbrex.toString());
-      } else {
-        strError = strError.substring(0, i);
-        println("<h3> " + replace(strError, RETURN, "<br>") + "</h3>");
-      }
-    } catch (Exception exc) {
-      // Report this error to both the datbase log and the PrintWriter
-      println("Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-      println("" + exc);
-      exc.printStackTrace();
-      // don't overwrite an update exception
-      if (getABRReturnCode() != UPDATE_ERROR) {
-        setReturnCode(INTERNAL_ERROR);
-      }
-    } finally {
-      println(
-        "<br /><b>"
-          + buildMessage(
-            MSG_IAB2016I,
-            new String[] {
-              getABRDescription(),
-              (getReturnCode() == PASS ? "Passed" : "Failed")})
-          + "</b>");
-
-      log(
-        buildLogMessage(
-          MSG_IAB2016I,
-          new String[] {
-            getABRDescription(),
-            (getReturnCode() == PASS ? "Passed" : "Failed")}));
-
-      // set DG title
-      strDgName = m_ei.toString();
-      if (strDgName.length() > 64) {
-        strDgName = strDgName.substring(0, 64);
-      }
-      setDGTitle(strDgName);
-      setDGRptName(ABR);
-
-      // set DG submit string
-      setDGString(getABRReturnCode());
-      printDGSubmitString();
-      //Stuff into report for subscription and notification
-
-      // Tack on the DGString
-      buildReportFooter();
-      // make sure the lock is released
-      if (!isReadOnly()) {
-        clearSoftLock();
-      }
-    }
-  }
-
-  private String replace(String _s, String _s1, String _s2) {
-    String sResult = "";
-    int iTab = _s.indexOf(_s1);
-
-    while (_s.length() > 0 && iTab >= 0) {
-      sResult = sResult + _s.substring(0, iTab) + _s2;
-      _s = _s.substring(iTab + _s1.length());
-      iTab = _s.indexOf(_s1);
-    }
-    sResult = sResult + _s;
-    return sResult;
-  }
-
-  /**
-  *  Get the entity description to use in error messages
-  *
-  *@param  entityType  Description of the Parameter
-  *@param  entityId    Description of the Parameter
-  *@return             String
-  */
-  protected String getABREntityDesc(String entityType, int entityId) {
-    return null;
-  }
-
-  /**
-   *  Get ABR description
-   *
-   *@return    java.lang.String
-   */
-  public String getDescription() {
-    return "Hardware FUP/POF ABR 01.";
-  }
-
-  /**
-   *  Get any style that should be used for this page. Derived classes can
-   *  override this to set styles They must include the <style>...</style> tags
-   *
-   *@return    String
-   */
-  protected String getStyle() {
-    // Print out the PSG stylesheet
-    return "";
-  }
-
-  /**
-     * getRevision
-     *
-     * @return
-     * @author Administrator
-     */
-  public String getRevision() {
-    return new String("1.5");
-  }
-
-  /**
-     * getVersion
-     *
-     * @return
-     * @author Administrator
-     */
-  public static String getVersion() {
-    return ("AFHWFUPPOFABR01.java,v 1.5 2006/03/03 19:23:24 bala Exp");
-  }
-
-  /**
-   * @see COM.ibm.eannounce.abr.util.PokBaseABR#getABRVersion()
-   * @author Administrator
-   */
-  public String getABRVersion() {
-    return "AFHWFUPPOFABR01.java";
-  }
-}

@@ -1,42 +1,46 @@
-/* Copyright IBM Corp. 2016 */
-package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ 
+/*    */ import com.google.gson.annotations.SerializedName;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class RdhDepd_depdescr
+/*    */ {
+/*    */   @SerializedName("LANGUAGE")
+/*    */   private String language;
+/*    */   @SerializedName("DESCRIPT")
+/*    */   private String descript;
+/*    */   
+/*    */   public String getLanguage() {
+/* 17 */     return this.language;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setLanguage(String paramString) {
+/* 24 */     this.language = paramString;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getDescript() {
+/* 31 */     return this.descript;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setDescript(String paramString) {
+/* 38 */     this.descript = paramString;
+/*    */   }
+/*    */ }
 
-import com.google.gson.annotations.SerializedName;
 
-public class RdhDepd_depdescr
-{
-    @SerializedName("LANGUAGE")
-    private String language;
-    @SerializedName("DESCRIPT")
-    private String descript;
-    /**
-     * @return the language
-     */
-    public String getLanguage()
-    {
-        return language;
-    }
-    /**
-     * @param language the language to set
-     */
-    public void setLanguage(String language)
-    {
-        this.language = language;
-    }
-    /**
-     * @return the descript
-     */
-    public String getDescript()
-    {
-        return descript;
-    }
-    /**
-     * @param descript the descript to set
-     */
-    public void setDescript(String descript)
-    {
-        this.descript = descript;
-    }
-    
-    
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\entity\RdhDepd_depdescr.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

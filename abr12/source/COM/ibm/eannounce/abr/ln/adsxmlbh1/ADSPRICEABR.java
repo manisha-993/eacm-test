@@ -1,2372 +1,2373 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.abr.ln.adsxmlbh1;
-
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-
-import java.util.*;
-import java.sql.*;
-import java.io.*;
-
-import javax.xml.parsers.*;
-import javax.xml.transform.TransformerException;
-
-import org.w3c.dom.*;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-/**********************************************************************************
-* This is an extract and feed of Meta Data with the source being MetaDescription table.
-*/
-//$Log: ADSPRICEABR.java,v $
-//Revision 1.1  2015/02/04 14:55:49  wangyul
-//RCQ00337765-RQ change the XML mapping to pull DIV from PROJ for Lenovo
-//
-//Revision 1.25  2013/12/11 08:15:00  guobin
-//xsd validation for generalarea, reconcile, wwcompat and price XML
-//
-//Revision 1.24  2013/08/26 12:34:26  wangyulo
-// RTC WI 986855 with title RCQ00255719: Provide GTS prices in the EACM feed to e-Pricer - DIVISION FILTER FOR PRODUCT FEED
-//
-//Revision 1.23  2013/06/04 20:11:14  praveen
-//Fix TMF (Feature) query to pull SVCMOD prices
-//
-//Revision 1.22  2013/04/22 14:00:19  wangyulo
-//fix the out of memory problem by the limit the size of prices with the parameter ADSABRSTATUS_PRICE_ENTITY_LIMIT
-//
-//Revision 1.21  2013/04/15 17:07:18  praveen
-//Fix SWTMF query
-//
-//Revision 1.20  2013/02/26 16:04:44  wangyulo
-//fix the defect 899006 that Can not filter by offering type for WWPRT outbound
-//
-//Revision 1.19  2013/01/17 03:15:35  praveen
-//Tune EACM price queries
-//
-//Revision 1.18  2013/01/16 16:10:20  wangyulo
-//fix the defect  874393 for the performance issue for the EACM format price
-//
-//Revision 1.17  2013/01/15 14:04:21  wangyulo
-//update the code for the ADSPUTO problem
-//
-//Revision 1.16  2013/01/14 16:24:35  wangyulo
-//Build request for the defect 871116 and remove the valto check for the price entity table
-//
-//Revision 1.15  2012/08/31 16:02:32  wangyulo
-//update for the RCQ00212274-WI BH W1 R1 - H5 support - DCUT
-//
-//Revision 1.14  2012/07/30 12:54:45  wangyulo
-//uncomment  the references to ADSABRSTATUS.USERXML_OFF_LOG in ADSPRICEABR
-//
-//Revision 1.13  2012/07/24 20:57:06  wendy
-//Removed references to ADSABRSTATUS.USERXML_OFF_LOG for now, ADSABRSTATUS could not go to production yet
-//
-//Revision 1.12  2012/07/17 16:57:16  wangyulo
-//fix the outbound price for the end tag of the wwprt type
-//
-//Revision 1.11  2012/07/13 13:20:32  wangyulo
-//Build request for the performance of the outbound price
-//
-//Revision 1.10  2012/07/03 07:53:00  wangyulo
-//Fixed defect 751817--SIT testing with RDX - Performance issue,   fix the column and order by in the select sql for wwprt type
-//
-//Revision 1.9  2012/06/08 07:32:05  wangyulo
-//Build Request for the wwprt pricexml of the outbound price - defect 737778
-//
-//Revision 1.8  2012/05/21 12:22:56  wangyulo
-//add the limit of the size of price record in one MQ message
-//
-//Revision 1.7  2012/04/26 13:30:14  wangyulo
-//Defect 710663  a error found for WWPRT outbound, should use the short description of ADSPRICETYPE
-//
-//Revision 1.6  2012/04/24 13:04:51  wangyulo
-//fixed the defect 697075 - chg code to limit the number of price records in each MQ msg
-//
-//Revision 1.5  2012/03/27 07:53:51  wangyulo
-//add NONEPDHDOMAIN for Setting for "No PDHDOMAIN filter" for Product Price Outbound
-//
-//Revision 1.4  2012/03/15 06:38:56  wangyulo
-//Change for the Outbound price base on the BH FS Product Price Outbound XML  20120301.doc
-//1. Add PUB_TO and PDHDOMAIN filter for the WWPRT outbound price
-//2. update the filter for the attribute ACTION of the price(the ACTION value should be 'I')
-//
-//Revision 1.2  2011/12/14 02:24:23  guobin
-//Update the Version V Mod M for the ADSABR
-//
-//Revision 1.1  2011/11/03 16:09:56  guobin
-//Add for the Outbound Price
-//
-// Init for
-//updates for spec "SG FS Product Price Outbound XML  20110608.doc"
-//
-public class ADSPRICEABR extends XMLMQAdapter
-{
-	private static final String NONEPDHDOMAIN;
-	private static final String ALLPRICETYPE;
-	private static final String NONEPRICETYPE;
-	private static final String OFFERINGTYPE;
-	private String MQCID = "";
-	/**
-	 * the PRICE_ENTITY_LIMIT is used to limit the size of the price group list table to avoid the out of memory.
-	 * the PRICE_MQ_LIMIT is used to limit the size of price records in one price message(Level 2) that send the MQ.
-	 * the PRICE_MESSAGE_COUNT is used to record the count of the price message.
-	 */
-	private static final int PRICE_ENTITY_LIMIT;
-	private static final int PRICE_MQ_LIMIT;
-	protected static int PRICE_MESSAGE_COUNT;
-	protected static int PRICE_RECORD_COUNT ;
-
-	private long ALL_WWPRT_SEND_TIME =0;
-	private static String offeringtypes ="";
-	static {
-		String entitylimit = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("ADSABRSTATUS", "_PRICE_ENTITY_LIMIT",	"50000");
-		String pricemqlimit = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("ADSABRSTATUS", "_PRICE_MQ_LIMIT","1000");
-		PRICE_ENTITY_LIMIT = Integer.parseInt(entitylimit);
-		PRICE_MQ_LIMIT     = Integer.parseInt(pricemqlimit);
-	    NONEPDHDOMAIN = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("ADSABRSTATUS", "_NONEPDHDOMAIN","$None$");
-	    ALLPRICETYPE = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("ADSABRSTATUS", "_ALLPRICETYPE","$ALL$");
-	    NONEPRICETYPE = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("ADSABRSTATUS", "_NONEPRICETYPE","$NONE$");
-	    OFFERINGTYPE = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("ADSABRSTATUS", "_OFFERINGTYPE","SEO,EEE,OSP");
-
-	    String offeringtype[] = OFFERINGTYPE.split(",");
-    	for (int i =0;i< offeringtype.length;i++) {
-    		if(i==0) offeringtypes = "'" +offeringtype[i] + "'";
-    		else offeringtypes = offeringtypes +",'" +offeringtype[i] + "'";
-		}
-
-	}
-
-	private boolean isSended = false;
-	/**
-	 * A price record that is to be feed to a downstream system is one where:
-	 *	INSERT_TS is later than the value for ADSDTS (aka T1)
-	 *	VALID_TO is greater than or equal DTS that the ABR started (aka T2)
-	 *	STATUS is ?Active? (ADSPPABRSTATUS)
-	 *	ENTITYTYPE = ADSOFFTYPE
-	 *	COUNTRY = ADSCOUNTRY
-	 *	PRICE_XML/pricetype = ADSPRICETYPE
-	 *	ADSOFFCAT see the following table
-
-		ENTITYTYPE		ADSOFFCAT
-		MODEL			ValueOf(COFCAT)
-		FEATURE			Hardware
-		SWFEATURE		Software
-		FCTRANSACTION	Hardware
-		MODELCONVERT	Hardware
-	 */
-
-    /**********************************
-    * create xml and write to queue
-    */
-    public void processThis(ADSABRSTATUS abr, Profile profileT1, Profile profileT2, EntityItem rootEntity)
-    throws
-    java.sql.SQLException,
-    COM.ibm.opicmpdh.middleware.MiddlewareException,
-    ParserConfigurationException,
-    java.rmi.RemoteException,
-    COM.ibm.eannounce.objects.EANBusinessRuleException,
-    COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-    IOException,
-    javax.xml.transform.TransformerException,
-	MissingResourceException
-    {
-    	//step1 get the attribute of rootEntity(?XML Product Price Setup? (XMLPRODPRICESETUP) entity)
-    	//the same value with the value of ADSDTS from rootEntity
-    	//because in the ADSABRSTAUTS, t1DTS = PokUtils.getAttributeValue(rootEntity, "ADSDTS",",", "", false);
-    	String t1DTS = profileT1.getValOn();
-
-		String t2DTS = profileT2.getValOn();
-		abr.addDebug("ADSPRICEABR process t1DTS="+t1DTS);
-		abr.addDebug("ADSPRICEABR process t2DTS="+t2DTS);
-		/**
-		 * INIT the price message count for the reconcile
-		 */
-		PRICE_MESSAGE_COUNT = 0;
-		PRICE_RECORD_COUNT = 0;
-
-		/**
-		 * ADSPPFORMAT : WWPRT and EACM
-		 */
-		String ADSPPFORMAT   = getDescription(rootEntity, "ADSPPFORMAT","long");// flag--> long get long description
-
-		if(ADSPPFORMAT!=null && "WWPRT".equals(ADSPPFORMAT)){
-			MQCID = "PRICE";
-		} else if("EACM".equals(ADSPPFORMAT)){
-			MQCID = "PRODUCT_PRICE_UPDATE";
-		}
-
-		/**
-		*   1. ADSOFTYPE is the EACM entity type used to filter the prices that are to be fed to the downstream system.
-		*   If null (i.e. empty ? note that ?NULL? is not empty), then all are considered
-		*	MODEL
-		*	FEATURE
-		*	SWFEATURE
-		*	FCTRANSACTION
-		*	MODELCONVERT
-		*	NULL
-		*/
-		String ADSOFFTYPE   = getDescription(rootEntity, "ADSOFFTYPE","long");
-		/**
-		* 2. ADSOFFCAT is the EACM offering category used to filter the prices that are to be fed to the downstream system.
-		* If null, then all are considered. The values are:
-		*	Hardware
-		*	Software
-		*	Service
-    	*/
-		String ADSOFFCAT   = getDescription(rootEntity, "ADSOFFCAT","long");
-		/**
-		 * 3. ADSCOUNTRY is the ISO 2 character country code used to filter the prices that are to be fed to the downstream system.
-		 * If null, then all are considered.
-		 *
-		 */
-		String ADSCOUNTRY   = getMultiDescription(rootEntity, "ADSCOUNTRY","long");
-
-		/**
-		 * 4. ADSPRICETYPE is the WWPRT 3 character price type used to filter the prices that are to be fed to the downstream system.
-		 * If null, then all are considered.
-		 *
-		 */
-		String ADSPRICETYPE = getMultiDescription(rootEntity, "ADSPRICETYPE","flag");
-		/**
-		 * 5. ADSPPABRSTATUS is the attribute used to manage (queue) the Product Price ABR that generates the XML
-		 */
-		String ADSPPABRSTATUS = getDescription(rootEntity, "ADSPPABRSTATUS","long");
-
-		/**
-		 * 6. PDHDOMAIN
-		 */
-		//String ADSPDHDOMAIN = getDescription(rootEntity, "PDHDOMAIN","long");
-		Hashtable ADSPDHDOMAIN = getDescriptionTable(rootEntity, "PDHDOMAIN","long");
-
-		/**
-		 * 7. ADSPUBTO need add the meta on the GUI
-		 */
-		String ADSPUBTO = PokUtils.getAttributeValue(rootEntity,"PUBTO",",","", false);//getDescription(rootEntity, "PUBTO","long");
-
-		/**
-		 * 8. ADSXPRICETYPE should only be valid when ADSPRICETYPE = $ALL$
-		 * We need the H5 price types that need to be excluded.
-		 * They would be allowed values for ADSXPRICETYPE when  ADSPRICETYPE = $ALL$
-		 */
-		String ADSXPRICETYPE = getMultiDescription(rootEntity, "ADSXPRICETYPE","flag");
-		
-		/**
-		 * TODO
-		 * 9. DIVTEXT 
-		 */
-		String ADSDIVTEXT = PokUtils.getAttributeValue(rootEntity,"DIVTEXT",",","", false);
-
-		//step 2 find price according to the attriutevalue
-		abr.addDebug("ADSPRICEABR0 ADSPPFORMAT="+ADSPPFORMAT);
-		abr.addDebug("ADSPRICEABR2 ADSOFFTYPE="+ADSOFFTYPE);
-		abr.addDebug("ADSPRICEABR2 ADSOFFCAT="+ADSOFFCAT);
-		abr.addDebug("ADSPRICEABR3 ADSCOUNTRY="+ADSCOUNTRY);
-		abr.addDebug("ADSPRICEABR4 ADSPRICETYPE="+ADSPRICETYPE);
-		abr.addDebug("ADSPRICEABR5 ADSPPABRSTATUS="+ADSPPABRSTATUS);
-		abr.addDebug("ADSPRICEABR6 ADSPDHDOMAIN="+ADSPDHDOMAIN);
-		abr.addDebug("ADSPRICEABR7 ADSPUBTO="+ADSPUBTO);
-		abr.addDebug("ADSPRICEABR8 ADSXPRICETYPE="+ADSXPRICETYPE);
-		abr.addDebug("ADSPRICEABR9 ADSDIVTEXT="+ADSDIVTEXT);
-		Hashtable priceTable =  new Hashtable();
-
-		priceTable = getPriceTable(abr,ADSPPFORMAT,t1DTS,ADSOFFTYPE,ADSOFFCAT,
-				                   ADSCOUNTRY,ADSPRICETYPE,rootEntity,profileT2,ADSPDHDOMAIN,
-				                   ADSPUBTO,ADSXPRICETYPE,ADSDIVTEXT);
-
-
-		if (priceTable.size()==0 && isSended == false){
-			//NO_CHANGES_FND=No Changes found for {0}
-			abr.addXMLGenMsg("NO_CHANGES_FND","PRICE");
-		} else if(priceTable.size()==0 && isSended == true){
-			//Do nothing
-		}else{
-			//10 WWPRT 20 EACM
-			if(ADSPPFORMAT!=null && "WWPRT".equals(ADSPPFORMAT)){
-				sendWWPRTXML(abr, profileT2, rootEntity, priceTable);
-			}else{
-				sendEACMXML(abr, profileT2, rootEntity, priceTable);
-			}
-
-			abr.addXMLGenMsg("SUCCESS","total "+PRICE_MESSAGE_COUNT+" Messsages for the price.");
-			abr.addXMLGenMsg("SUCCESS","total "+PRICE_RECORD_COUNT+" records for the price.");
-		}
-
-		if(ADSPPFORMAT!=null && "WWPRT".equals(ADSPPFORMAT)){
-			abr.addDebug("Sending WWPRT MQ message total takes time: "+ALL_WWPRT_SEND_TIME+" ms");
-		}
-    }
-
-
-    /**
-	 * get Price vector
-	 * @param abr
-	 * @param t1DTS
-	 * @param t2DTS
-	 * @param ADSOFFTYPE
-	 * @param ADSOFFCAT
-	 * @param ADSCOUNTRY
-	 * @param ADSPRICETYPE
-	 * @param ADSPPABRSTATUS
-	 * @return
-	 * @throws java.sql.SQLException
-	 * @throws NumberFormatException
-	 * @throws MiddlewareRequestException
-	 * @throws MiddlewareException
-     * @throws TransformerException
-     * @throws ParserConfigurationException
-     * @throws MissingResourceException
-     * @throws DOMException
-	 */
-    private Hashtable getPriceTable(ADSABRSTATUS abr, String ADSPPFORMAT, String t1DTS, String ADSOFFTYPE, String ADSOFFCAT,
-    						String ADSCOUNTRY, String ADSPRICETYPE,EntityItem rootEntity,Profile profileT2,Hashtable ADSPDHDOMAIN,
-    						String ADSPUBTO, String ADSXPRICETYPE, String ADSDIVTEXT)
-    throws java.sql.SQLException, NumberFormatException, MiddlewareRequestException, MiddlewareException, DOMException,
-    	MissingResourceException, ParserConfigurationException, TransformerException {
-    	Hashtable priceTable = new Hashtable();// contain all the price data
-    	StringBuffer sqlSb = null;
-		try {
-            //connection = setupConnection();
-
-            if(ADSPPFORMAT!=null && !"".equals(ADSPPFORMAT)){
-                if("WWPRT".equals(ADSPPFORMAT)){
-                	sqlSb = new StringBuffer();
-                	sqlSb.append(PRICE_WWPRT_SQL);
-                	getQuerySql(abr, ADSPPFORMAT, t1DTS, ADSOFFTYPE, ADSCOUNTRY, ADSPRICETYPE,
-        					profileT2, ADSPUBTO, ADSXPRICETYPE, sqlSb);
-
-                	priceTable = processWWPRTPrice(priceTable,abr,sqlSb.toString(),rootEntity,profileT2);
-                }else if("EACM".equals(ADSPPFORMAT)){
-                	/**
-                	 *
-                	 * MODEL
-					 * FEATURE
-					 * SWFEATURE
-					 * FCTRANSACTION
-					 * MODELCONVERT
-					 * NULL
-					 * ''
-                	 */
-                	//~ sqlSb.append(PRICE_EACM_SQL);
-                	if("MODEL".equals(ADSOFFTYPE)){
-                		sqlSb = new StringBuffer();
-						sqlSb.append(SQL_MODEL);
-						getQuerySql(abr, ADSPPFORMAT, t1DTS, ADSOFFTYPE, ADSCOUNTRY, ADSPRICETYPE, profileT2, ADSPUBTO, ADSXPRICETYPE, sqlSb);
-						priceTable = processEACMPrice(priceTable, abr, sqlSb.toString(),ADSPPFORMAT,ADSOFFCAT, rootEntity,profileT2,ADSPDHDOMAIN,ADSDIVTEXT);
-
-					}else if("FEATURE".equals(ADSOFFTYPE)){
-						sqlSb = new StringBuffer();
-						sqlSb.append(SQL_FEATURE);
-						getQuerySql(abr, ADSPPFORMAT, t1DTS, ADSOFFTYPE, ADSCOUNTRY, ADSPRICETYPE, profileT2, ADSPUBTO, ADSXPRICETYPE, sqlSb);
-						priceTable = processEACMPrice(priceTable, abr, sqlSb.toString(),ADSPPFORMAT,ADSOFFCAT, rootEntity,profileT2,ADSPDHDOMAIN,ADSDIVTEXT);
-
-					}else if("SWFEATURE".equals(ADSOFFTYPE)){
-						sqlSb = new StringBuffer();
-						sqlSb.append(SQL_SWFEATURE);
-						getQuerySql(abr, ADSPPFORMAT, t1DTS, ADSOFFTYPE, ADSCOUNTRY, ADSPRICETYPE, profileT2, ADSPUBTO, ADSXPRICETYPE, sqlSb);
-						priceTable = processEACMPrice(priceTable, abr, sqlSb.toString(),ADSPPFORMAT,ADSOFFCAT, rootEntity,profileT2,ADSPDHDOMAIN,"");
-					}else if("FCTRANSACTION".equals(ADSOFFTYPE)){
-						sqlSb = new StringBuffer();
-						sqlSb.append(SQL_FCTRANSACTION);
-						getQuerySql(abr, ADSPPFORMAT, t1DTS, ADSOFFTYPE, ADSCOUNTRY, ADSPRICETYPE, profileT2, ADSPUBTO, ADSXPRICETYPE, sqlSb);
-						priceTable = processEACMPrice(priceTable, abr, sqlSb.toString(),ADSPPFORMAT,ADSOFFCAT, rootEntity,profileT2,ADSPDHDOMAIN,"");
-					}else if("MODELCONVERT".equals(ADSOFFTYPE)){
-						sqlSb = new StringBuffer();
-						sqlSb.append(SQL_MODELCONVERT);
-						getQuerySql(abr, ADSPPFORMAT, t1DTS, ADSOFFTYPE, ADSCOUNTRY, ADSPRICETYPE, profileT2, ADSPUBTO, ADSXPRICETYPE, sqlSb);
-						priceTable = processEACMPrice(priceTable, abr, sqlSb.toString(),ADSPPFORMAT,ADSOFFCAT, rootEntity,profileT2,ADSPDHDOMAIN,"");
-					}else if("NULL".equals(ADSOFFTYPE)){
-						sqlSb = new StringBuffer();
-						sqlSb.append(SQL_LSEO);
-						getQuerySql(abr, ADSPPFORMAT, t1DTS, ADSOFFTYPE, ADSCOUNTRY, ADSPRICETYPE, profileT2, ADSPUBTO, ADSXPRICETYPE, sqlSb);
-						priceTable = processEACMPrice(priceTable, abr, sqlSb.toString(),ADSPPFORMAT,ADSOFFCAT, rootEntity,profileT2,ADSPDHDOMAIN,"");
-					}else if("".equals(ADSOFFTYPE)){
-						sqlSb = new StringBuffer();
-						sqlSb.append(SQL_MODEL);
-						getQuerySql(abr, ADSPPFORMAT, t1DTS, ADSOFFTYPE, ADSCOUNTRY, ADSPRICETYPE, profileT2, ADSPUBTO, ADSXPRICETYPE, sqlSb);
-						priceTable = processEACMPrice(priceTable, abr, sqlSb.toString(),ADSPPFORMAT,ADSOFFCAT, rootEntity,profileT2,ADSPDHDOMAIN,ADSDIVTEXT);
-
-						sqlSb = new StringBuffer();
-						sqlSb.append(SQL_FEATURE);
-						getQuerySql(abr, ADSPPFORMAT, t1DTS, ADSOFFTYPE, ADSCOUNTRY, ADSPRICETYPE, profileT2, ADSPUBTO, ADSXPRICETYPE, sqlSb);
-						priceTable = processEACMPrice(priceTable, abr, sqlSb.toString(),ADSPPFORMAT,ADSOFFCAT, rootEntity,profileT2,ADSPDHDOMAIN,ADSDIVTEXT);
-
-						sqlSb = new StringBuffer();
-						sqlSb.append(SQL_SWFEATURE);
-						getQuerySql(abr, ADSPPFORMAT, t1DTS, ADSOFFTYPE, ADSCOUNTRY, ADSPRICETYPE, profileT2, ADSPUBTO, ADSXPRICETYPE, sqlSb);
-						priceTable = processEACMPrice(priceTable, abr, sqlSb.toString(),ADSPPFORMAT,ADSOFFCAT, rootEntity,profileT2,ADSPDHDOMAIN,"");
-
-						sqlSb = new StringBuffer();
-						sqlSb.append(SQL_MODELCONVERT);
-						getQuerySql(abr, ADSPPFORMAT, t1DTS, ADSOFFTYPE, ADSCOUNTRY, ADSPRICETYPE, profileT2, ADSPUBTO, ADSXPRICETYPE, sqlSb);
-						priceTable = processEACMPrice(priceTable, abr, sqlSb.toString(),ADSPPFORMAT,ADSOFFCAT, rootEntity,profileT2,ADSPDHDOMAIN,"");
-
-						sqlSb = new StringBuffer();
-						sqlSb.append(SQL_LSEO);
-						getQuerySql(abr, ADSPPFORMAT, t1DTS, ADSOFFTYPE, ADSCOUNTRY, ADSPRICETYPE, profileT2, ADSPUBTO, ADSXPRICETYPE, sqlSb);
-						priceTable = processEACMPrice(priceTable, abr, sqlSb.toString(),ADSPPFORMAT,ADSOFFCAT, rootEntity,profileT2,ADSPDHDOMAIN,"");
-
-
-						sqlSb = new StringBuffer();
-						sqlSb.append(SQL_ESW);
-						getQuerySql(abr, ADSPPFORMAT, t1DTS, ADSOFFTYPE, ADSCOUNTRY, ADSPRICETYPE, profileT2, ADSPUBTO, ADSXPRICETYPE, sqlSb);
-						priceTable = processEACMPrice(priceTable, abr, sqlSb.toString(),ADSPPFORMAT,ADSOFFCAT, rootEntity,profileT2,ADSPDHDOMAIN,"");
-
-					}
-                }else{
-                	return new Hashtable();//other value of ADSPPFORMAT
-                }
-            }else{
-            	return new Hashtable();// no value of ADSPPFORMAT
-            }
-
-		}
-        finally{
-
-			//when use the connection = abr.getDB().getODSConnection(),
-			//please do not close the connection
-			//closeConnection(connection);
-        }
-		return priceTable;
-	}
-    /**
-     * @param abr
-     * @param sql
-     * @param rootEntity
-     * @param profileT2
-     * @throws MiddlewareException
-     * @throws SQLException
-     * @throws DOMException
-     * @throws MissingResourceException
-     * @throws ParserConfigurationException
-     * @throws TransformerException
-     */
-    private Hashtable processWWPRTPrice(Hashtable priceTable, ADSABRSTATUS abr, String sql, EntityItem rootEntity,Profile profileT2)
-    throws MiddlewareException, SQLException, DOMException, MissingResourceException, ParserConfigurationException, TransformerException{
-
- 		Connection connection=null;
- 		PreparedStatement statement = null;
- 		ResultSet result=null;
- 		connection = abr.getDB().getODSConnection();
- 		statement = connection.prepareStatement(sql);
-        result = statement.executeQuery();
-
-        //work for the count limit
-        String skey = "";
-        boolean needClear = false;
-        /**
-         * performance issue
-         * move the definition of the Variables out of the cycle
-         */
-        String wwprtPRODUCTENTITYID = "";
-		String pricexml 	= "";
-		Vector temp 		= null;
-		int result_size = 0;
-
-        while(result.next()) {
-         	/**
-         	 * start count limit
-             * when priceTable is more than PRICE_ENTITY_LIMIT records
-             * and when the next key is not equal the current key,
-             * send the price data and clear the pricetable, the left price data
-             * will send later in the processThis
-             */
-            if(result_size>=PRICE_ENTITY_LIMIT){
-            	abr.addDebug("ADSPRICEABR WWPRT format clear priceTable result_size="+result_size+" \r\n");
-            	needClear = true;
-            	result_size = 0;
-            }
-            wwprtPRODUCTENTITYID = convertValue(result.getString("ID"));
-            //change for the column PRICEXML
-			pricexml = result.getString("PRICEXML");
-			skey = wwprtPRODUCTENTITYID.trim();
-			temp = (Vector)priceTable.get(skey);
-			if(temp!=null && temp.size()>0 && !needClear){
-				temp.add(pricexml);
-				priceTable.put(skey,temp);
-			}else{
-				needClear = clearPriceTable(abr, "WWPRT", rootEntity, profileT2, priceTable, needClear);
-				temp = new Vector();
-				temp.add(pricexml);
-				priceTable.put(skey,temp);
-			}
-			result_size ++;
-
-        }
-        if (result!=null){
-			result.close();
-			result = null;
-        }
-		if (statement!=null) {
-			statement.close();
-			statement=null;
-		}
-		return priceTable;
-
-    }
-    /**
-     *
-     * * ADSABRSTATUS abr, String ADSPPFORMAT, String t1DTS, String ADSOFFTYPE, String ADSOFFCAT,
-    						String ADSCOUNTRY, String ADSPRICETYPE,EntityItem rootEntity,Profile profileT2,Hashtable ADSPDHDOMAIN,
-    						String ADSPUBTO, String ADSXPRICETYPE
-     * @param abr
-     * @param sql
-     * @param ADSOFFCAT
-     * @param rootEntity
-     * @param profileT2
-     * @throws MiddlewareException
-     * @throws SQLException
-     * @throws DOMException
-     * @throws MissingResourceException
-     * @throws ParserConfigurationException
-     * @throws TransformerException
-     */
-
-    private Hashtable processEACMPrice(Hashtable priceTable, ADSABRSTATUS abr, String sql, String ADSPPFORMAT, String ADSOFFCAT, EntityItem rootEntity,Profile profileT2,
-    		Hashtable ADSPDHDOMAIN,String ADSDIVTEXT)
-    throws MiddlewareException, SQLException, DOMException, MissingResourceException, ParserConfigurationException, TransformerException{
-
-
- 		Connection connection=null;
- 		PreparedStatement statement = null;
- 		ResultSet result=null;
- 		connection = abr.getDB().getODSConnection();
- 		statement = connection.prepareStatement(sql);
-        result = statement.executeQuery();
-        int count =0;
-
-        //work for the count limit
-        String skey = "";
-        boolean needClear = false;
-        /**
-         * performance issue
-         * move the definition of the Variables out of the cycle
-         */
-        //String wwprtPRODUCTENTITYID = "";
-        String PRODUCTOFFERINGTYPE  = "";
-     	String OFFERING_TYPE        = "";
-     	String MACHTYPE    	        = "";
-     	String MODEL          	    = "";
-     	String FEATURECODE          = "";
-     	String FROMMACHTYPE         = "";
-     	String FROMMODEL            = "";
-     	String FROMFEATURECODE      = "";
-     	String SEOID                = "";
-     	String OFFERING             = "";
-     	String STARTDATE            = "";
-
-     	String CURRENCY             = "";
-     	String CABLETYPE            = "";
-     	String CABLEID              = "";
-     	String RELEASETS            = "";
-     	String PRICEVALUE           = "";
-
-
-     	String PRICEPOINTTYPE       = "";
-     	String PRICEPOINTVALUE      = "";
-     	String COUNTRY              = "";
-     	String PRICETYPE            = "";
-     	String ONSHORE              = "";
-
-     	String ENDDATE              = "";
-     	String PRICEVALUEUSD        = "";
-     	String FACTOR               = "";
-     	String ACTIVITY             = "";
-     	String DIV                  = "";
-
-     	//new add start
-		String PRODUCTENTITYTYPE    = "";
-		int    iPRODUCTENTITYID		= 0;
-		String PRODUCTENTITYID		= "";
-		String PRICEPOINTENTITYTYPE	= "";
-		String PRICEPOINTENTITYID 	= "";
-		//new add end
-
-		String PDHDOMAIN			= "";
-		String PRODUCTCATEGORY 		= "";
-		String MKTGNAME 			= "";
-		String INVNAME 				= "";
-		boolean isESW  = false;
-
-		PriceInfo priceInfo = null;
-		Vector temp 		= null;
-		int result_size     = 0;
-		
-		//TODO
-		Hashtable DIVTable = getDIVTEXTTable(ADSDIVTEXT);
-        while(result.next()) {
-
-         	 /**
-         	  * start count limit
-              * when priceTable is more than PRICE_ENTITY_LIMIT records
-              * and when the next key is not equal the current key,
-              * send the price data and clear the pricetable, the left price data
-              * will send later in the processThis
-              */
-	            if(result_size>=PRICE_ENTITY_LIMIT){
-	            	abr.addDebug("ADSPRICEABR EACM format clear priceTable result_size="+result_size+" \r\n");
-	            	needClear = true;
-	            	result_size = 0;
-	            }
-	            //wwprtPRODUCTENTITYID = convertValue(result.getString("ID"));
-
-
-
-				PRODUCTOFFERINGTYPE  = convertValue(result.getString("PRODUCTOFFERINGTYPE"));
-				OFFERING_TYPE        = convertValue(result.getString("OFFERING_TYPE"));
-				MACHTYPE    		 = convertValue(result.getString("MACHTYPEATR"));
-				MODEL          		 = convertValue(result.getString("MODELATR"));
-				FEATURECODE          = convertValue(result.getString("FEATURECODE"));
-				FROMMACHTYPE         = convertValue(result.getString("FROM_MACHTYPEATR"));//FROM_MACHTYPEATR
-				FROMMODEL            = convertValue(result.getString("FROM_MODELATR"));
-				FROMFEATURECODE      = convertValue(result.getString("FROM_FEATURECODE"));//FROM_FEATURECODE
-				SEOID                = convertValue(result.getString("PARTNUM"));//SEOID -->PARTNUM
-				OFFERING             = convertValue(result.getString("OFFERING"));
-				STARTDATE            = convertValue(result.getString("START_DATE"));
-
-				CURRENCY             = convertValue(result.getString("CURRENCY"));
-				CABLETYPE            = convertValue(result.getString("CABLETYPE"));//  add the column to db
-				CABLEID              = convertValue(result.getString("CABLEID"));// add the column to db
-				RELEASETS            = convertValue(result.getString("RELEASE_TS"));
-				PRICEVALUE           = convertValue(result.getString("PRICE_VALUE"));
-
-				PRICEPOINTTYPE       = convertValue(result.getString("PRICE_POINT_TYPE"));
-				PRICEPOINTVALUE      = convertValue(result.getString("PRICE_POINT_VALUE"));
-				COUNTRY              = convertValue(result.getString("COUNTRY"));
-				PRICETYPE            = convertValue(result.getString("PRICE_TYPE"));
-				ONSHORE              = convertValue(result.getString("ONSHORE"));
-
-				ENDDATE              = convertValue(result.getString("END_DATE"));
-				PRICEVALUEUSD        = convertValue(result.getString("PRICE_VALUE_USD"));
-				FACTOR               = convertValue(result.getString("FACTOR"));
-				ACTIVITY    		 = XMLElem.UPDATE_ACTIVITY;
-				if(!"".equals(ADSDIVTEXT)){
-					DIV              = convertValue(result.getString("DIV"));
-				}
-
-				//new add start
-				PRODUCTENTITYTYPE ="";
-				iPRODUCTENTITYID=0;
-				PRODUCTENTITYID="";
-				PRICEPOINTENTITYTYPE="";
-				PRICEPOINTENTITYID ="";
-				//new add end
-
-				PDHDOMAIN="";
-				PRODUCTCATEGORY ="";
-				MKTGNAME ="";
-				INVNAME = "";
-
-				count ++;
-
-				/**
-				 * Primary Key
-					+OFFERING
-					+PRICE_POINT_TYPE
-					+PRICE_POINT_VALUE
-					+PRICE_TYPE
-					+COUNTRY
-					+ONSHORE
-					+END_DATE
-				 */
-
-				PDHDOMAIN =  convertValue(result.getString("PDHDOMAIN"));
-				PRODUCTCATEGORY =  convertValue(result.getString("PRODUCTCATEGORY"));
-				MKTGNAME =  convertValue(result.getString("MKTGNAME"));
-				INVNAME  =  convertValue(result.getString("INVNAME"));
-
-				//RCQ00206104 WI- EACM - LA prices to support the LA CBS project and WW ESW prices
-				isESW = false;
-				if("EEE".equals(OFFERING_TYPE) || "OSP".equals(OFFERING_TYPE)){
-					isESW = true;
-				}
-
-
-				PRODUCTOFFERINGTYPE = convertValue(result.getString("PRODUCTOFFERINGTYPE"));
-				PRODUCTENTITYTYPE 	= convertValue(result.getString("PRODUCTENTITYTYPE"));
-
-				if(isESW){
-					PRODUCTENTITYID = "";
-				}else{
-					iPRODUCTENTITYID= result.getInt("PRODUCTENTITYID");
-					PRODUCTENTITYID =  String.valueOf(iPRODUCTENTITYID);
-				}
-
-				PRICEPOINTENTITYTYPE= convertValue(result.getString("PRICEPOINTENTITYTYPE"));
-				PRICEPOINTENTITYID  =  convertValue(result.getString("PRICEPOINTENTITYID"));
-
-
-				//PRODUCTCATEGORY LSEOBUNDLE	Derived
-				if("LSEOBUNDLE".equals(PRODUCTCATEGORY)){
-					PRODUCTCATEGORY = getBUNDLETYPE(abr.getDatabase(), rootEntity, iPRODUCTENTITYID, "LSEOBUNDLE");
-				}
-
-				//compare with the filter of ADSOFFCAT
-				if(ADSOFFCAT!=null && !"".equals(ADSOFFCAT)){
-					if(!PRODUCTCATEGORY.equals(ADSOFFCAT)){
-						continue;
-					}
-	            }
-				
-				/**
-				 * TODO add div filter
-				 */
-				if(!"".equals(ADSDIVTEXT)){
-					if(!DIVTable.containsKey(DIV)){
-						continue;
-					}				
-				}				
-				
-				/**
-				 * add ADSPDHDOMAIN to filter the PDHDOMAIN
-				 */
-				if(ADSPDHDOMAIN.size()>0){
-					if(isESW){
-						/**
-						 * ESW always has no domain,
-						 * so not need to check the domain, always true
-						 */
-					}else if(ADSPDHDOMAIN.size()==1 && ADSPDHDOMAIN.containsKey(NONEPDHDOMAIN)){
-						/**
-						 * always true
-						 */
-					}else if(PDHDOMAIN==null || "".equals(PDHDOMAIN)){
-						continue;
-					}else if(!ADSPDHDOMAIN.containsKey(PDHDOMAIN)){
-						continue;
-					}
-	            }
-
-				skey = 	PDHDOMAIN+ "|" +
-			       		PRODUCTCATEGORY + "|" +
-			       		PRODUCTOFFERINGTYPE + "|" +
-			       		COUNTRY + "|" +
-			       		PRICETYPE;
-				//abr.addDebug("ADSPRICEABR histroty historyPrice = "+historyPrice.size()+"\r\n");
-				priceInfo = new PriceInfo(
-						  PRODUCTOFFERINGTYPE, 	MACHTYPE, 			MODEL, 			FEATURECODE,			FROMMACHTYPE,
-						  FROMMODEL,			FROMFEATURECODE,	SEOID,			OFFERING,				STARTDATE,
-						  CURRENCY,				CABLETYPE,			CABLEID,		RELEASETS,				PRICEVALUE,
-						  PRICEPOINTTYPE,		PRICEPOINTVALUE,	COUNTRY,		PRICETYPE,				ONSHORE,
-						  ENDDATE,				PRICEVALUEUSD,		FACTOR,			ACTIVITY,				PDHDOMAIN,
-						  PRODUCTCATEGORY,		PRODUCTENTITYTYPE,	PRODUCTENTITYID,PRICEPOINTENTITYTYPE,	PRICEPOINTENTITYID,
-						  MKTGNAME,			    INVNAME,            null);
-
-				//abr.addDebug("ADSPRICEABR priceInfo.historyPrice = "+priceInfo.HISTORYPRICE+"\r\n");
-
-				temp = (Vector)priceTable.get(skey);
-				if(temp!=null && temp.size()>0 && !needClear){
-					temp.add(priceInfo);
-					priceTable.put(skey,temp);
-				}else{
-					needClear = clearPriceTable(abr, ADSPPFORMAT, rootEntity, profileT2, priceTable, needClear);
-					temp = new Vector();
-					temp.add(priceInfo);
-					priceTable.put(skey,temp);
-				}
-				result_size ++;
-         }
-         if (result!=null){
-			result.close();
-			result = null;
-         }
-         if (statement!=null) {
-			statement.close();
-			statement=null;
-         }
-
-         return priceTable;
-
-
-    }
-
-
-	/**
-	 * @param abr
-	 * @param ADSPPFORMAT
-	 * @param t1DTS
-	 * @param ADSCOUNTRY
-	 * @param ADSPRICETYPE
-	 * @param profileT2
-	 * @param ADSPUBTO
-	 * @param ADSXPRICETYPE
-	 * @param sqlSb
-	 */
-	private void getQuerySql(ADSABRSTATUS abr, String ADSPPFORMAT,
-			String t1DTS, String ADSOFFTYPE, String ADSCOUNTRY, String ADSPRICETYPE,
-			Profile profileT2, String ADSPUBTO, String ADSXPRICETYPE,
-			StringBuffer sqlSb) {
-		//getPriced(abr,t1DTS,t2DTS,ADSOFFTYPE,ADSOFFCAT,ADSCOUNTRY,ADSPRICETYPE,ADSPPABRSTATUS);
-		//new change If empty, then all are considered. If not empty, then this value must be <= PRICE.INSERT_TS
-		//INSERT_TS is later than the value for ADSDTS (aka T1) and less than T2.
-		String t2DTS = profileT2.getValOn();
-		abr.addDebug(" ADSPRICEABR t2DTS="+t2DTS +"\r\n");
-		
-		if(t1DTS!=null && t1DTS.length()==10){
-			sqlSb.append(" AND PRICE.INSERT_TS>=concat('").append(t1DTS).append("','-00.00.00.000000') and  PRICE.INSERT_TS<='").append(t2DTS).append("'  \r\n");
-		}else{
-			sqlSb.append(" AND PRICE.INSERT_TS>='").append(t1DTS).append("' and  PRICE.INSERT_TS<='").append(t2DTS).append("'  \r\n");
-		}
-		
-		
-
-		abr.addDebug("ADSPRICEABR INSERT_TS cause is PRICE.INSERT_TS>='"+t1DTS+"' and  PRICE.INSERT_TS<='"+t2DTS+"\r\n");
-
-		if(ADSCOUNTRY!=null && !"".equals(ADSCOUNTRY)){
-			if(ADSCOUNTRY.indexOf(",")>-1){
-				sqlSb.append(" AND PRICE.COUNTRY IN(").append(ADSCOUNTRY).append(") \r\n");
-			}else{
-				sqlSb.append(" AND PRICE.COUNTRY =").append(ADSCOUNTRY).append(" \r\n");
-			}
-
-		}
-		//Defect 779469 RCQ00212274-WI BH W1 R1 - H5 support - DCUT
-		if(ADSPRICETYPE!=null && !"".equals(ADSPRICETYPE)){
-			if(ADSPRICETYPE.indexOf(ALLPRICETYPE)>-1){
-				if(ADSXPRICETYPE!=null && !"".equals(ADSXPRICETYPE)){
-					if(ADSXPRICETYPE.indexOf(NONEPRICETYPE)==-1){
-						if(ADSXPRICETYPE.indexOf(",")>-1){
-							sqlSb.append(" AND PRICE.PRICE_TYPE NOT IN(").append(ADSXPRICETYPE).append(") \r\n");
-						}else{
-							sqlSb.append(" AND PRICE.PRICE_TYPE<>").append(ADSXPRICETYPE).append(" \r\n");
-						}
-					}
-		   		}
-			}else{
-				if(ADSPRICETYPE.indexOf(",")>-1){
-					sqlSb.append(" AND PRICE.PRICE_TYPE IN(").append(ADSPRICETYPE).append(") \r\n");
-				}else{
-					sqlSb.append(" AND PRICE.PRICE_TYPE=").append(ADSPRICETYPE).append(" \r\n");
-				}
-			}
-
-		}
-		if("EACM".equals(ADSPPFORMAT)){
-				/**
-				 * add ADSPUBTO to filter the history of price
-				 */
-				if(ADSPUBTO!=null && !"".equals(ADSPUBTO)){
-					sqlSb.append(" AND PRICE.END_DATE>=date('").append(ADSPUBTO).append("') \r\n");
-				}
-		}
-		if("WWPRT".equals(ADSPPFORMAT)){
-			/**
-			 * 11.	PUBTO is an optional DATE. If specified, then “VALID_TO?? must meet the following criteria:
-			 *		IF PUBTO is Empty
-			 *			“VALID_TO?? is greater than or equal DTS that the ABR started (aka T2)
-			 *		IF PUBTO is NOT Empty
-			 *			“VALID_TO?? => PUBTO
-			 */
-			if(ADSPUBTO!=null && !"".equals(ADSPUBTO)){
-				sqlSb.append(" AND PRICE.END_DATE>=date('").append(ADSPUBTO).append("') \r\n");
-			}else{
-				sqlSb.append(" AND PRICE.END_DATE>=date('").append(t2DTS).append("') \r\n");
-			}
-
-			//RCQ00206104 WI- EACM - LA prices to support the LA CBS project and WW ESW prices
-
-			if(ADSOFFTYPE!=null && !"".equals(ADSOFFTYPE)){
-				if("NULL".equals(ADSOFFTYPE)){
-					sqlSb.append(" AND PRICE.OFFERING_TYPE in('',").append(offeringtypes).append(") \r\n");
-				}else{
-					sqlSb.append(" AND PRICE.OFFERING_TYPE='").append(ADSOFFTYPE).append("' \r\n");
-				}
-			}
-			//Fix defect 751817 SIT testing with RDX - Performance issue
-			//remove the order by to improve the proformance
-			//sqlSb.append(" ORDER BY OFFERING,PRICE_POINT_TYPE,PRICE_POINT_VALUE,PRICE_TYPE,COUNTRY,END_DATE DESC ");
-		}
-		sqlSb.append(" WITH UR");
-		abr.addDebug(" ADSPRICEABR process Query SQL=\r\n"+sqlSb.toString());
-	}
-
-
-	/**
-	 * @param abr
-	 * @param ADSPPFORMAT
-	 * @param rootEntity
-	 * @param profileT2
-	 * @param priceTable
-	 * @param needClear
-	 * @return
-	 * @throws ParserConfigurationException
-	 * @throws DOMException
-	 * @throws TransformerException
-	 * @throws MissingResourceException
-	 */
-	public boolean clearPriceTable(ADSABRSTATUS abr, String ADSPPFORMAT, EntityItem rootEntity, Profile profileT2, Hashtable priceTable, boolean needClear) throws ParserConfigurationException, DOMException, TransformerException, MissingResourceException {
-		if(needClear){
-			if(ADSPPFORMAT!=null && "WWPRT".equals(ADSPPFORMAT)){
-				sendWWPRTXML(abr, profileT2, rootEntity, priceTable);
-			}else{
-				sendEACMXML(abr, profileT2, rootEntity, priceTable);
-			}
-			priceTable.clear();
-			isSended = true;
-			needClear = false;
-			System.gc();
-		}
-		return needClear;
-	}
-
-
-
-
-    /**
-     *
-     * @param dbCurrent
-     * @param item
-     * @param entityid
-     * @param entitytype
-     * @return
-     * @throws MiddlewareRequestException
-     * @throws SQLException
-     * @throws MiddlewareException
-     */
-    private String getBUNDLETYPE(Database dbCurrent, EntityItem item, int entityid, String entitytype) throws MiddlewareRequestException, SQLException, MiddlewareException {
-   	 	EntityList m_elist = dbCurrent.getEntityList(item.getProfile(),
-                new ExtractActionItem(null, dbCurrent, item.getProfile(),"dummy"),
-                new EntityItem[] { new EntityItem(null, item.getProfile(), entitytype, entityid) });
-   	 	EntityItem rootEntity  = m_elist.getParentEntityGroup().getEntityItem(0);
-   	 	String COFCAT = "";
-
-   	 	String attrcode = "BUNDLETYPE";
-   	 	EANFlagAttribute fAtt = (EANFlagAttribute)rootEntity.getAttribute(attrcode);
-   	 	if (fAtt!=null && fAtt.toString().length()>0){
-   	 		// Get the selected Flag codes.
-   	 		MetaFlag[] mfArray = (MetaFlag[]) fAtt.get();
-   	 		for (int i = 0; i < mfArray.length; i++){
-   	 			// get selection
-   	 			//get multi cofcat
-   	 			if (mfArray[i].isSelected()){
-	            	if(COFCAT.equals(CHEAT)){
-	            		COFCAT = (mfArray[i].toString());
-	            	}else{
-	            		COFCAT = COFCAT +  "," + (mfArray[i].toString());
-	            	}
-   	 			}
-   	 		}
-	   	 }
-	   	 if(COFCAT.indexOf("Hardware")>-1){
-			COFCAT ="Hardware";
-	   	 }else if(COFCAT.indexOf("Software")>-1){
-			COFCAT ="Software";
-	   	 }else{
-			COFCAT ="Service";
-	   	 }
-	   	 return COFCAT;
-	}
-
-
-
-
-    /**
-     * convert null to ""
-     * @param fromValue
-     * @return
-     */
-
-    private String convertValue(String fromValue){
-    	return fromValue==null?"":fromValue.trim();
-    }
-
-	private void sendWWPRTXML(ADSABRSTATUS abr, Profile profileT2, EntityItem rootEntity, Hashtable priceTable)
-	throws ParserConfigurationException, DOMException, TransformerException, MissingResourceException {
-		abr.addDebug("sendWWPRTXML found "+priceTable.size()+" PRICE");
-		//Vector mqVct = getMQPropertiesFN(rootEntity,abr);
-		Vector mqVct = getPeriodicMQ(rootEntity);
-		if (mqVct==null){
-			abr.addDebug("ADSPRICEABR: No MQ properties files, nothing will be generated.");
-			//NOT_REQUIRED = Not Required for {0}.
-			abr.addXMLGenMsg("NOT_REQUIRED", "PRICE");
-		}else{
-			//step 3 filter and send MQ
-			//DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			//DocumentBuilder builder = factory.newDocumentBuilder();
-
-			Enumeration Keys = priceTable.keys();
-			int priceTableCount = 0;
-			String key = "";
-			Vector priceVct = null;
-			StringBuffer pricexml = null;
-
-			int price_mq_count = 0;
-			int price_mq_all_count = 0;
-
-			while(Keys.hasMoreElements()){
-				PRICE_MESSAGE_COUNT = PRICE_MESSAGE_COUNT + 1;
-				key = (String) Keys.nextElement();
-				priceVct = (Vector)priceTable.get(key);
-
-				//Document document = builder.newDocument();
-				//Element parent = createWWPRTParent(key, document);
-				pricexml = new StringBuffer();
-				createWWPRTHead(key, pricexml);
-
-//				 create price for each one found
-				price_mq_count = 0;
-				price_mq_all_count = 0;
-				for (int i=0; i<priceVct.size(); i++){
-					PRICE_RECORD_COUNT = PRICE_RECORD_COUNT + 1;
-					//change for the pricexml
-					//parent.appendChild(document.createTextNode((String)priceVct.elementAt(i)));
-					pricexml.append((String)priceVct.elementAt(i));
-					//code for the PRICE_MQ_LIMIT
-					price_mq_count = price_mq_count +1 ;
-					price_mq_all_count = price_mq_all_count + 1 ;
-					if(price_mq_count==PRICE_MQ_LIMIT && price_mq_all_count!= priceVct.size()){
-
-						sendPriceWWPRTMessage(abr, mqVct, pricexml);
-						//after send, reset the document and the count and add the price message count
-						//document = builder.newDocument();
-						//parent = createWWPRTParent(key, document);
-						pricexml = new StringBuffer();
-						createWWPRTHead(key, pricexml);
-						price_mq_count = 0;
-						PRICE_MESSAGE_COUNT = PRICE_MESSAGE_COUNT + 1;
-						priceTableCount = priceTableCount + 1;
-					}
-
-				}//end for
-				//send one price xml
-				sendPriceWWPRTMessage(abr, mqVct, pricexml);
-
-			}
-			//release memory
-			priceTable.clear();
-		}
-
-	}
-
-
-	private void createWWPRTHead(String key, StringBuffer pricexml) {
-		pricexml.append("<wwprttxn xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" id=\"");
-		pricexml.append(key);
-		pricexml.append("\" type=\"price\" xsi:noNamespaceSchemaLocation=\"price.xsd\">");
-	}
-	/**
-	 * @param abr
-	 * @param mqVct
-	 * @param document
-	 * @throws ParserConfigurationException
-	 * @throws TransformerException
-	 * @throws MissingResourceException
-	 */
-	private void sendPriceWWPRTMessage(ADSABRSTATUS abr, Vector mqVct, StringBuffer pricexml) throws ParserConfigurationException, TransformerException, MissingResourceException {
-		long t1 = System.currentTimeMillis();
-		//String xml = abr.transformWWPRTXML(this, document);
-		String xml = pricexml.toString()+"</wwprttxn>";
-		
-		//new added
-		String entitytype = "";
-		if(xml.indexOf("offeringtype") != -1 ) {
-		entitytype = "XMLPRODPRICESETUP_W2";
-		}
-		else {
-			entitytype = "XMLPRODPRICESETUP_W1";
-		}
-		boolean ifpass = false;
-		String ifNeed = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("ADSABRSTATUS" ,"_"+entitytype+"_XSDNEEDED","NO");
-		if ("YES".equals(ifNeed.toUpperCase())) {
-		   String xsdfile = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("ADSABRSTATUS","_"+entitytype+"_XSDFILE","NONE");
-		    if ("NONE".equals(xsdfile)) {
-		    	abr.addError("there is no xsdfile for "+entitytype+" defined in the propertyfile ");
-		    } else {
-		    	long rtm = System.currentTimeMillis();
-		    	Class cs = this.getClass();
-		    	StringBuffer debugSb = new StringBuffer();
-		    	ifpass = ABRUtil.validatexml(cs,debugSb,xsdfile,xml);
-		    	if (debugSb.length()>0){
-		    		String s = debugSb.toString();
-					if (s.indexOf("fail") != -1)
-						abr.addError(s);
-					abr.addOutput(s);
-		    	}
-		    	long ltm = System.currentTimeMillis();
-				abr.addDebugComment(D.EBUG_DETAIL, "Time for validation: "+Stopwatch.format(ltm-rtm));
-		    	if (ifpass) {
-		    		abr.addDebug("the xml for "+entitytype+" passed the validation");
-		    	}
-		    }
-		} else {
-			abr.addOutput("the xml for "+entitytype+" doesn't need to be validated");
-			ifpass = true;
-		}
-		
-
-		//new added end
-
-		//add flag(new added)
-		if (xml != null && ifpass) {
-		if(!ADSABRSTATUS.USERXML_OFF_LOG){
-			abr.addDebug("ADSPRICEABR: Generated MQ xml:"+ADSABRSTATUS.NEWLINE+xml+ADSABRSTATUS.NEWLINE);
-		}
-		abr.notify(this, "PRICE", xml,mqVct);
-		long t2 =  System.currentTimeMillis();
-		if(!ADSABRSTATUS.USERXML_OFF_LOG){
-			abr.addDebug("Sending one wwprt message takes time:"+(t2-t1)+" ms");
-		}
-		ALL_WWPRT_SEND_TIME = ALL_WWPRT_SEND_TIME + (t2-t1);
-		}
-	}
-
-
-
-	/**
-	 * @param abr
-	 * @param mqVct
-	 * @param document
-	 * @throws ParserConfigurationException
-	 * @throws TransformerException
-	 * @throws MissingResourceException
-	 */
-	private void sendPriceMessage(ADSABRSTATUS abr, Vector mqVct, Document document) throws ParserConfigurationException, TransformerException, MissingResourceException {
-		String xml = abr.transformXML(this, document);
-//		new added
-		boolean ifpass = false;
-	//	String entitytype = rootEntity.getEntityType();
-		String entitytype = "XMLPRODPRICESETUP_E";
-		String ifNeed = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("ADSABRSTATUS" ,"_"+entitytype+"_XSDNEEDED","NO");
-		if ("YES".equals(ifNeed.toUpperCase())) {
-		   String xsdfile = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("ADSABRSTATUS","_"+entitytype+"_XSDFILE","NONE");
-		    if ("NONE".equals(xsdfile)) {
-		    	abr.addError("there is no xsdfile for "+entitytype+" defined in the propertyfile ");
-		    } else {
-		    	long rtm = System.currentTimeMillis();
-		    	Class cs = this.getClass();
-		    	StringBuffer debugSb = new StringBuffer();
-		    	ifpass = ABRUtil.validatexml(cs,debugSb,xsdfile,xml);
-		    	if (debugSb.length()>0){
-		    		String s = debugSb.toString();
-					if (s.indexOf("fail") != -1)
-						abr.addError(s);
-					abr.addOutput(s);
-		    	}
-		    	long ltm = System.currentTimeMillis();
-				abr.addDebugComment(D.EBUG_DETAIL, "Time for validation: "+Stopwatch.format(ltm-rtm));
-		    	if (ifpass) {
-		    		abr.addDebug("the xml for "+entitytype+" passed the validation");
-		    	}
-		    }
-		} else {
-			abr.addOutput("the xml for "+entitytype+" doesn't need to be validated");
-			ifpass = true;
-		}
-
-		//new added end
-
-
-		//add flag(new added)
-		if (xml != null && ifpass) {
-		if(!ADSABRSTATUS.USERXML_OFF_LOG){
-			abr.addDebug("ADSPRICEABR: Generated MQ xml:"+ADSABRSTATUS.NEWLINE+xml+ADSABRSTATUS.NEWLINE);
-		}
-		abr.notify(this, "PRICE", xml,mqVct);
-		}
-	}
-
-	/**
-	 * send EACM XML
-	 * @param abr
-	 * @param profileT2
-	 * @param rootEntity
-	 * @param priceVct
-	 * @throws ParserConfigurationException
-	 * @throws DOMException
-	 * @throws TransformerException
-	 * @throws MissingResourceException
-	 */
-	private void sendEACMXML(ADSABRSTATUS abr, Profile profileT2, EntityItem rootEntity, Hashtable priceTable) throws ParserConfigurationException, DOMException, TransformerException, MissingResourceException {
-		abr.addDebug("sendEACMXML found "+priceTable.size()+" PRICE");
-
-//		Vector mqVct = getMQPropertiesFN(rootEntity,abr);
-		Vector mqVct = getPeriodicMQ(rootEntity);
-		if (mqVct==null){
-			abr.addDebug("ADSPRICEABR: No MQ properties files, nothing will be generated.");
-			//NOT_REQUIRED = Not Required for {0}.
-			abr.addXMLGenMsg("NOT_REQUIRED", "PRICE");
-		}else{
-			//step 3 filter and send MQ
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = factory.newDocumentBuilder();
-
-			// create one XLATEELEMENT for each one found
-			Enumeration Keys = priceTable.keys();
-			int priceTableCount = 0;
-			String key = "";
-			Vector priceVct = null;
-			PriceInfo price = null;
-
-			Document document = null;
-			Element PRODUCTLIST = null;
-			Element elem;
-
-			int price_mq_count = 0;
-			int price_mq_all_count = 0;
-			Element PRODUCTELEMENT = null;
-
-//			Vector historyVector = null;
-//			PriceInfo _price  = null;
-
-			while(Keys.hasMoreElements()){
-				PRICE_MESSAGE_COUNT = PRICE_MESSAGE_COUNT + 1;
-				key = (String) Keys.nextElement();
-				priceVct = (Vector)priceTable.get(key);
-
-				price = (PriceInfo)priceVct.get(0);
-
-				document = builder.newDocument();  // Create
-				PRODUCTLIST = createEACMParent(profileT2, price, document);
-
-				price_mq_count = 0;
-				price_mq_all_count = 0;
-				for(int i=0;i<priceVct.size();i++){
-					PRICE_RECORD_COUNT = PRICE_RECORD_COUNT + 1;
-					price = (PriceInfo)priceVct.elementAt(i);
-
-					//3 PRODUCTELEMENT
-					PRODUCTELEMENT = (Element) document.createElement("PRODUCTELEMENT");
-					PRODUCTLIST.appendChild(PRODUCTELEMENT);
-
-					//4 PRODUCTENTITYTYPE
-					elem = (Element) document.createElement("PRODUCTENTITYTYPE");
-					elem.appendChild(document.createTextNode(price.PRODUCTENTITYTYPE));
-					PRODUCTELEMENT.appendChild(elem);
-
-					//4 PRODUCTENTITYID
-					elem = (Element) document.createElement("PRODUCTENTITYID");
-					elem.appendChild(document.createTextNode(price.PRODUCTENTITYID));
-					PRODUCTELEMENT.appendChild(elem);
-
-					//4 PRICEPOINTENTITYTYPE
-					elem = (Element) document.createElement("PRICEPOINTENTITYTYPE");
-					elem.appendChild(document.createTextNode(price.PRICEPOINTENTITYTYPE));
-					PRODUCTELEMENT.appendChild(elem);
-
-					//4 PRICEPOINTENTITYID
-					elem = (Element) document.createElement("PRICEPOINTENTITYID");
-					elem.appendChild(document.createTextNode(price.PRICEPOINTENTITYID));
-					PRODUCTELEMENT.appendChild(elem);
-
-					//From Dave 2011-11-03 even though the COLUMNs might be MACHTYPEATR and MODELATR
-					//-- the XML tags should be MACHTYPE and MODEL
-					//4 MACHTYPE
-					elem = (Element) document.createElement("MACHTYPE");
-					elem.appendChild(document.createTextNode(price.MACHTYPE));
-					PRODUCTELEMENT.appendChild(elem);
-					//4 MODEL
-					elem = (Element) document.createElement("MODEL");
-					elem.appendChild(document.createTextNode(price.MODEL));
-					PRODUCTELEMENT.appendChild(elem);
-					//4 FEATURECODE
-					elem = (Element) document.createElement("FEATURECODE");
-					elem.appendChild(document.createTextNode(price.FEATURECODE));
-					PRODUCTELEMENT.appendChild(elem);
-					//4 FROMMACHTYPE
-					elem = (Element) document.createElement("FROMMACHTYPE");
-					elem.appendChild(document.createTextNode(price.FROMMACHTYPE));
-					PRODUCTELEMENT.appendChild(elem);
-					//4 FROMMODEL
-					elem = (Element) document.createElement("FROMMODEL");
-					elem.appendChild(document.createTextNode(price.FROMMODEL));
-					PRODUCTELEMENT.appendChild(elem);
-					//4 FROMFEATURECODE
-					elem = (Element) document.createElement("FROMFEATURECODE");
-					elem.appendChild(document.createTextNode(price.FROMFEATURECODE));
-					PRODUCTELEMENT.appendChild(elem);
-					//4 SEOID
-					elem = (Element) document.createElement("SEOID");
-					elem.appendChild(document.createTextNode(price.SEOID));
-					PRODUCTELEMENT.appendChild(elem);
-					// 4 MKTGNAME
-					elem = (Element) document.createElement("MKTGNAME");
-					elem.appendChild(document.createTextNode(price.MKTGNAME));
-					PRODUCTELEMENT.appendChild(elem);
-					// 4 INVNAME
-					elem = (Element) document.createElement("INVNAME");
-					elem.appendChild(document.createTextNode(price.INVNAME));
-					PRODUCTELEMENT.appendChild(elem);
-					//4 PRICELIST
-					Element PRICELIST = (Element) document.createElement("PRICELIST");
-					PRODUCTELEMENT.appendChild(PRICELIST);
-
-					printPriceInfo(price, document, PRICELIST);
-//					//add start the history price
-//					historyVector = price.HISTORYPRICE;
-//					if(historyVector!=null && historyVector.size()>0){
-//						for(int h=0;h< historyVector.size();h++){
-//							_price = (PriceInfo)historyVector.get(h);
-//							printPriceInfo(_price, document, PRICELIST);
-//						}
-//					}
-//					//Add end the history price
-
-//					code for the PRICE_MQ_LIMIT
-					price_mq_count = price_mq_count +1 ;
-					price_mq_all_count = price_mq_all_count + 1;
-					if(price_mq_count==PRICE_MQ_LIMIT && price_mq_all_count!= priceVct.size()){
-						sendPriceMessage(abr, mqVct, document);
-						//after send, reset the document and the count and add the price message count
-						document = builder.newDocument();
-						PRODUCTLIST = createEACMParent(profileT2, price, document);
-						price_mq_count = 0;
-						PRICE_MESSAGE_COUNT = PRICE_MESSAGE_COUNT + 1;
-						priceTableCount = priceTableCount + 1;
-					}
-				}
-
-				// release memory
-				price.dereference();
-				sendPriceMessage(abr, mqVct, document);
-
-
-			}
-
-			// release memory
-			priceTable.clear();
-		}
-
-	}
-
-
-	/**
-	 * @param profileT2
-	 * @param price
-	 * @param document
-	 * @return
-	 * @throws DOMException
-	 */
-	private Element createEACMParent(Profile profileT2, PriceInfo price, Document document) throws DOMException {
-		Element parent = (Element) document.createElement("PRODUCT_PRICE_UPDATE");
-		parent.setAttribute("xmlns", "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/PRODUCT_PRICE_UPDATE");
-
-		//<!--PRODUCT_PRICE_UPDATE Version V Mod M-->
-		parent.appendChild(document.createComment("PRODUCT_PRICE_UPDATE Version "+XMLVERSION10+" Mod "+XMLMOD10));
-		// create the root
-		document.appendChild(parent);
-
-		//Level 2 DTSOFMSG
-		Element elem = (Element) document.createElement("DTSOFMSG");
-		elem.appendChild(document.createTextNode(profileT2.getEndOfDay()));
-		parent.appendChild(elem);
-		//2 ACTIVITY
-		elem = (Element) document.createElement("ACTIVITY");
-		elem.appendChild(document.createTextNode(price.ACTIVITY));
-		parent.appendChild(elem);
-		//2 ACTIVITY
-		elem = (Element) document.createElement("PDHDOMAIN");
-		elem.appendChild(document.createTextNode(price.PDHDOMAIN));
-		parent.appendChild(elem);
-		//2 PRODUCTCATEGORY
-		elem = (Element) document.createElement("PRODUCTCATEGORY");
-		elem.appendChild(document.createTextNode(price.PRODUCTCATEGORY));
-		parent.appendChild(elem);
-		//2 PRODUCTOFFERINGTYPE
-		elem = (Element) document.createElement("PRODUCTOFFERINGTYPE");
-		elem.appendChild(document.createTextNode(price.PRODUCTOFFERINGTYPE));
-		parent.appendChild(elem);
-		//2 PRODUCTLIST
-		Element PRODUCTLIST = (Element) document.createElement("PRODUCTLIST");
-		parent.appendChild(PRODUCTLIST);
-		return PRODUCTLIST;
-	}
-
-
-	/**
-	 * @param price
-	 * @param document
-	 * @param PRICELIST
-	 * @throws DOMException
-	 */
-	private void printPriceInfo(PriceInfo price, Document document, Element PRICELIST) throws DOMException {
-		Element elem;
-		//5 price
-		Element priceELEMENT = (Element) document.createElement("price");
-		PRICELIST.appendChild(priceELEMENT);
-
-		//LEVEL 6 OFFERING
-		elem = (Element) document.createElement("offering");
-		elem.appendChild(document.createTextNode(price.OFFERING));
-		priceELEMENT.appendChild(elem);
-
-		elem = (Element) document.createElement("startdate");
-		elem.appendChild(document.createTextNode(price.STARTDATE));
-		priceELEMENT.appendChild(elem);
-
-		elem = (Element) document.createElement("currency");
-		elem.appendChild(document.createTextNode(price.CURRENCY));
-		priceELEMENT.appendChild(elem);
-
-		elem = (Element) document.createElement("cabletype");
-		elem.appendChild(document.createTextNode(price.CABLETYPE));
-		priceELEMENT.appendChild(elem);
-
-		elem = (Element) document.createElement("cableid");
-		elem.appendChild(document.createTextNode(price.CABLEID));
-		priceELEMENT.appendChild(elem);
-
-		elem = (Element) document.createElement("releasets");
-		elem.appendChild(document.createTextNode(price.RELEASETS));
-		priceELEMENT.appendChild(elem);
-
-		elem = (Element) document.createElement("pricevalue");
-		elem.appendChild(document.createTextNode(price.PRICEVALUE));
-		priceELEMENT.appendChild(elem);
-
-		elem = (Element) document.createElement("pricepointtype");
-		elem.appendChild(document.createTextNode(price.PRICEPOINTTYPE));
-		priceELEMENT.appendChild(elem);
-
-		elem = (Element) document.createElement("pricepointvalue");
-		elem.appendChild(document.createTextNode(price.PRICEPOINTVALUE));
-		priceELEMENT.appendChild(elem);
-
-		elem = (Element) document.createElement("country");
-		elem.appendChild(document.createTextNode(price.COUNTRY));
-		priceELEMENT.appendChild(elem);
-
-		elem = (Element) document.createElement("pricetype");
-		elem.appendChild(document.createTextNode(price.PRICETYPE));
-		priceELEMENT.appendChild(elem);
-
-		elem = (Element) document.createElement("onshore");
-		elem.appendChild(document.createTextNode(price.ONSHORE));
-		priceELEMENT.appendChild(elem);
-
-		elem = (Element) document.createElement("enddate");
-		elem.appendChild(document.createTextNode(price.ENDDATE));
-		priceELEMENT.appendChild(elem);
-
-		elem = (Element) document.createElement("pricevalueusd");
-		elem.appendChild(document.createTextNode(price.PRICEVALUEUSD));
-		priceELEMENT.appendChild(elem);
-
-		elem = (Element) document.createElement("factor");
-		elem.appendChild(document.createTextNode(price.FACTOR));
-		priceELEMENT.appendChild(elem);
-	}
-
-	/**
-     * get the description of the item
-     * @param item
-     * @param code
-     * @return
-     */
-	private String getDescription(EntityItem item, String code,String type) {
-		String value="";
-		EANFlagAttribute fAtt = (EANFlagAttribute)item.getAttribute(code);
-        if (fAtt!=null && fAtt.toString().length()>0){
-            // Get the selected Flag codes.
-            MetaFlag[] mfArray = (MetaFlag[]) fAtt.get();
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < mfArray.length; i++){
-                // get selection
-                if (mfArray[i].isSelected())
-                {
-                	if (sb.length()>0) {
-                        sb.append(",");
-                    }
-                	if(type.equals("short")) {
-                		sb.append(mfArray[i].getShortDescription());
-                	} else if(type.equals("long")) {
-                		sb.append(mfArray[i].getLongDescription());
-                	} else if(type.equals("flag")) {
-                		sb.append(mfArray[i].getFlagCode());
-                	}
-                	else{
-                		sb.append(mfArray[i].toString());
-                	}
-                }
-            }//
-            value = sb.toString();
-        }
-        return value;
-	}
-
-	/**
-     * get the description of the item
-     * @param item
-     * @param code
-     * @return
-     */
-	private String getMultiDescription(EntityItem item, String code,String type) {
-		String value="";
-		EANFlagAttribute fAtt = (EANFlagAttribute)item.getAttribute(code);
-        if (fAtt!=null && fAtt.toString().length()>0){
-            // Get the selected Flag codes.
-            MetaFlag[] mfArray = (MetaFlag[]) fAtt.get();
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < mfArray.length; i++){
-                // get selection
-                if (mfArray[i].isSelected())
-                {
-                	if (sb.length()>0) {
-                        sb.append(",");
-                    }
-                	if(type.equals("short")) {
-                		sb.append("'").append(mfArray[i].getShortDescription()).append("'");
-                	} else if(type.equals("long")) {
-                		sb.append("'").append(mfArray[i].getLongDescription()).append("'");
-                	} else if(type.equals("flag")) {
-                		sb.append("'").append(mfArray[i].getFlagCode()).append("'");
-                	}
-                	else{
-                		sb.append("'").append(mfArray[i].toString()).append("'");
-                	}
-                }
-            }//
-            value = sb.toString();
-        }
-        return value;
-	}
-
-	/**
-	 *
-	 * @param item
-	 * @param code
-	 * @param type
-	 * @return
-	 */
-	private Hashtable getDescriptionTable(EntityItem item, String code,String type) {
-		Hashtable htable= new Hashtable();
-		EANFlagAttribute fAtt = (EANFlagAttribute)item.getAttribute(code);
-        if (fAtt!=null && fAtt.toString().length()>0){
-            // Get the selected Flag codes.
-            MetaFlag[] mfArray = (MetaFlag[]) fAtt.get();
-            for (int i = 0; i < mfArray.length; i++){
-                // get selection
-                if (mfArray[i].isSelected())
-                {
-                	if(type.equals("short")) {
-                		htable.put(mfArray[i].getShortDescription(), mfArray[i].getShortDescription());
-                	} else if(type.equals("long")) {
-                		htable.put(mfArray[i].getLongDescription(), mfArray[i].getLongDescription());
-                	} else if(type.equals("flag")) {
-                		htable.put(mfArray[i].getFlagCode(), mfArray[i].getFlagCode());
-                	}
-                	else{
-                		htable.put(mfArray[i].toString(), mfArray[i].toString());
-                	}
-                }
-            }//
-        }
-        return htable;
-	}
-	
-	/**
-	 * getDivText
-	 * @param item
-	 * @param code
-	 * @param type
-	 * @return
-	 */
-	private Hashtable getDIVTEXTTable(String DIVTEXT) {
-		Hashtable DIVTable = new Hashtable();
-		if(!"".equals(DIVTEXT)){
-			StringTokenizer str = new StringTokenizer(DIVTEXT, ",");
-			String DIVvalue = ""; 
-			while (str.hasMoreTokens()) {						
-				DIVvalue = str.nextToken();
-				if("".equals(DIVTEXT)){
-					return new Hashtable();
-				}else{
-					DIVTable.put(DIVvalue, DIVvalue);
-				}
-			}			
-		}
-        return DIVTable;
-	}
-
-
-
-    /**********************************
-    *
-	A.	MQ-Series CID
-    */
-    public String getMQCID() { return MQCID; }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getVersion()
-    {
-        return "1.2";
-    }
-
-//    private static final String PRICE_EACM_HISTORY_SQL =
-//    	"  SELECT                                                                       \r\n"+
-//    	"    PRICE.OFFERING AS OFFERING,                                                \r\n"+
-//    	"    PRICE.START_DATE AS START_DATE,                                            \r\n"+
-//    	"    PRICE.CURRENCY AS CURRENCY,                                                \r\n"+
-//    	"    PRICE.CABLETYPE AS CABLETYPE,                                              \r\n"+
-//    	"    PRICE.CABLEID AS CABLEID,                                                  \r\n"+
-//    	"    PRICE.RELEASE_TS AS RELEASE_TS,                                            \r\n"+
-//    	"    PRICE.PRICE_VALUE AS PRICE_VALUE,                                          \r\n"+
-//    	"    PRICE.PRICE_POINT_TYPE AS PRICE_POINT_TYPE,                                \r\n"+
-//    	"    PRICE.PRICE_POINT_VALUE AS PRICE_POINT_VALUE,                              \r\n"+
-//    	"    PRICE.COUNTRY AS COUNTRY,                                                  \r\n"+
-//    	"    PRICE.PRICE_TYPE AS PRICE_TYPE,                                            \r\n"+
-//    	"    PRICE.ONSHORE AS ONSHORE,                                                  \r\n"+
-//    	"    PRICE.END_DATE AS END_DATE,                                                \r\n"+
-//    	"    PRICE.PRICE_VALUE_USD AS PRICE_VALUE_USD,                                  \r\n"+
-//    	"    PRICE.FACTOR AS FACTOR                                                     \r\n"+
-//    	"  FROM PRICE.PRICE AS PRICE                                                    \r\n"+
-//    	"  WHERE                                                                        \r\n"+
-//    	"    PRICE.ACTION = 'I' AND                                                     \r\n"+
-//    	"    PRICE.END_DATE<>'12/31/9999'                                               \r\n";
-
-
-
-//    private static final String PRICE_EACM_SQL =
-//    	"  SELECT                                                                       \r\n"+
-//    	"    PRICE.ID AS ID,                                                            \r\n"+
-//    	"    PRICE.INSERT_TS AS INSERT_TS,                                              \r\n"+
-//    	"    '' AS PDHDOMAIN,                                                           \r\n"+
-//    	"    CASE                                                                       \r\n"+
-//    	"        WHEN PRICE.PRICE_POINT_TYPE='MOD' THEN ''                              \r\n"+
-//    	"        WHEN PRICE.PRICE_POINT_TYPE='FEA' THEN ''                              \r\n"+
-//    	"        WHEN PRICE.PRICE_POINT_TYPE='RPQ' THEN ''                              \r\n"+
-//    	"        WHEN PRICE.PRICE_POINT_TYPE='SWF' THEN ''                              \r\n"+
-//    	"        WHEN PRICE.PRICE_POINT_TYPE='WSF' THEN ''                              \r\n"+
-//    	"        WHEN PRICE.PRICE_POINT_TYPE='FUP' THEN 'Hardware'                      \r\n"+
-//    	"        WHEN PRICE.PRICE_POINT_TYPE='MUP' THEN 'Hardware'                      \r\n"+
-//    	"        WHEN PRICE.PRICE_POINT_TYPE='TFU' THEN 'Hardware'                      \r\n"+
-//    	"        WHEN PRICE.PRICE_POINT_TYPE='TMU' THEN 'Hardware'                      \r\n"+
-//    	"        WHEN PRICE.PRICE_POINT_TYPE=''    THEN ''                              \r\n"+
-//    	"        ELSE ''                                                                \r\n"+
-//    	"    END AS PRODUCTCATEGORY,                                                    \r\n"+
-//    	"    CASE                                                                       \r\n"+
-//    	"        WHEN PRICE.PRICE_POINT_TYPE='MOD' THEN 'MODEL'                         \r\n"+
-//    	"        WHEN PRICE.PRICE_POINT_TYPE='FEA' THEN 'FEATURE'                       \r\n"+
-//    	"        WHEN PRICE.PRICE_POINT_TYPE='RPQ' THEN 'FEATURE'                       \r\n"+
-//    	"        WHEN PRICE.PRICE_POINT_TYPE='SWF' THEN 'SW FEATURE'                    \r\n"+
-//    	"        WHEN PRICE.PRICE_POINT_TYPE='WSF' THEN 'WW SW FEATURE'                 \r\n"+
-//    	"        WHEN PRICE.PRICE_POINT_TYPE='FUP' THEN 'Feature Upgrade'               \r\n"+
-//    	"        WHEN PRICE.PRICE_POINT_TYPE='MUP' THEN 'Model Upgrade'                 \r\n"+
-//    	"        WHEN PRICE.PRICE_POINT_TYPE='TFU' THEN 'Type Feature Upgrade'          \r\n"+
-//    	"        WHEN PRICE.PRICE_POINT_TYPE='TMU' THEN 'Type Model Upgrade'            \r\n"+
-//    	"        WHEN PRICE.PRICE_POINT_TYPE=''    THEN                                 \r\n"+
-//        "              case when PRICE.OFFERING_TYPE=''    THEN 'SEO'                   \r\n"+
-//        "                   when PRICE.OFFERING_TYPE='SEO' THEN 'SEO'                   \r\n"+
-//        "                   else '' end                                                 \r\n"+
-//    	"        ELSE ''                                                                \r\n"+
-//    	"    END AS PRODUCTOFFERINGTYPE,                                                \r\n"+
-//    	"    PRICE.OFFERING_TYPE AS OFFERING_TYPE,                                      \r\n"+
-//    	"    '' AS PRODUCTENTITYTYPE,                                                   \r\n"+
-//    	"    '' AS PRODUCTENTITYID,                                                     \r\n"+
-//    	"    '' AS PRICEPOINTENTITYTYPE,                                                \r\n"+
-//    	"    '' AS PRICEPOINTENTITYID,                                                  \r\n"+
-//    	"    PRICE.MACHTYPEATR AS MACHTYPEATR,                                          \r\n"+
-//    	"    PRICE.MODELATR AS MODELATR,                                                \r\n"+
-//    	"    PRICE.FEATURECODE AS FEATURECODE,                                          \r\n"+
-//    	"    PRICE.FROM_MACHTYPEATR AS FROM_MACHTYPEATR,                                \r\n"+
-//    	"    PRICE.FROM_MODELATR AS FROM_MODELATR,                                      \r\n"+
-//    	"    PRICE.FROM_FEATURECODE AS FROM_FEATURECODE,                                \r\n"+
-//    	"    PRICE.PARTNUM AS PARTNUM,                                                  \r\n"+
-//    	"    '' AS MKTGNAME,                                                            \r\n"+
-//    	"    '' AS INVNAME,                                                             \r\n"+
-//    	"    PRICE.OFFERING AS OFFERING,                                                \r\n"+
-//    	"    PRICE.START_DATE AS START_DATE,                                            \r\n"+
-//    	"    PRICE.CURRENCY AS CURRENCY,                                                \r\n"+
-//    	"    PRICE.CABLETYPE AS CABLETYPE,                                              \r\n"+
-//    	"    PRICE.CABLEID AS CABLEID,                                                  \r\n"+
-//    	"    PRICE.RELEASE_TS AS RELEASE_TS,                                            \r\n"+
-//    	"    PRICE.PRICE_VALUE AS PRICE_VALUE,                                          \r\n"+
-//    	"     PRICE.PRICE_POINT_TYPE AS PRICE_POINT_TYPE,                               \r\n"+
-//    	"     PRICE.PRICE_POINT_VALUE AS PRICE_POINT_VALUE,                             \r\n"+
-//    	"     PRICE.COUNTRY AS COUNTRY,                                                 \r\n"+
-//    	"     PRICE.PRICE_TYPE AS PRICE_TYPE,                                           \r\n"+
-//    	"     PRICE.ONSHORE AS ONSHORE,                                                 \r\n"+
-//    	"     PRICE.END_DATE AS END_DATE,                                               \r\n"+
-//    	"     PRICE.PRICE_VALUE_USD AS PRICE_VALUE_USD,                                 \r\n"+
-//    	"     PRICE.FACTOR AS FACTOR                                                    \r\n"+
-//    	"   FROM PRICE.PRICE AS PRICE                                                   \r\n"+
-//    	"   WHERE                                                                       \r\n"+
-//    	"     PRICE.ACTION = 'I' AND                                                    \r\n"+
-//    	"     PRICE.END_DATE='12/31/9999'                                               \r\n";
-
-    private static final String PRICE_WWPRT_SQL =
-    	"  SELECT                                                                       \r\n"+
-    	"     PRICE.ID AS ID,                                                           \r\n"+
-    	"     PRICE.PRICEXML AS PRICEXML                                                \r\n"+
-    	"   FROM PRICE.PRICE AS PRICE                                                   \r\n"+
-    	"   WHERE                                                                       \r\n"+
-    	"     PRICE.ACTION = 'I'                                                        \r\n";
-
-    private static String SQL_MODEL =
-    	"  SELECT                                                                       \r\n"+
-    	"    PRICE.ID AS ID,                                                            \r\n"+
-    	"    PRICE.INSERT_TS AS INSERT_TS,                                              \r\n"+
-    	"    MODEL.PDHDOMAIN AS PDHDOMAIN,                                              \r\n"+
-    	"    MODEL.COFCAT AS PRODUCTCATEGORY,                                           \r\n"+
-    	"    PRICE.OFFERING_TYPE AS PRODUCTOFFERINGTYPE,                                \r\n"+
-    	"    PRICE.OFFERING_TYPE AS OFFERING_TYPE,                                      \r\n"+
-    	"    'MACHTYPE' AS PRODUCTENTITYTYPE,                                           \r\n"+
-    	"    MODEL.MACHID AS PRODUCTENTITYID,                                           \r\n"+
-    	"    'MODEL' AS PRICEPOINTENTITYTYPE,                                           \r\n"+
-    	"    MODEL.MDLID AS PRICEPOINTENTITYID,                                         \r\n"+
-    	"    MODEL.MACHTYPEATR AS MACHTYPEATR,                                          \r\n"+
-    	"    MODEL.MODELATR AS MODELATR,                                                \r\n"+
-    	"    '' AS FEATURECODE,                                                         \r\n"+
-    	"    '' AS FROM_MACHTYPEATR,                                                    \r\n"+
-    	"    '' AS FROM_MODELATR,                                                       \r\n"+
-    	"    '' AS FROM_FEATURECODE,                                                    \r\n"+
-    	"    '' AS PARTNUM,                                                             \r\n"+
-    	"    MODEL.MKTGNAME AS MKTGNAME,                                                \r\n"+
-    	"    MODEL.INVNAME AS INVNAME,                                                  \r\n"+
-    	"    PRICE.OFFERING AS OFFERING,                                                \r\n"+
-    	"    PRICE.START_DATE AS START_DATE,                                            \r\n"+
-    	"    PRICE.CURRENCY AS CURRENCY,                                                \r\n"+
-    	"    PRICE.CABLETYPE AS CABLETYPE,                                              \r\n"+
-    	"    PRICE.CABLEID AS CABLEID,                                                  \r\n"+
-    	"    PRICE.RELEASE_TS AS RELEASE_TS,                                            \r\n"+
-    	"    PRICE.PRICE_VALUE AS PRICE_VALUE,                                          \r\n"+
-    	"    PRICE.PRICE_POINT_TYPE AS PRICE_POINT_TYPE,                                \r\n"+
-    	"    PRICE.PRICE_POINT_VALUE AS PRICE_POINT_VALUE,                              \r\n"+
-    	"    PRICE.COUNTRY AS COUNTRY,                                                  \r\n"+
-    	"    PRICE.PRICE_TYPE AS PRICE_TYPE,                                            \r\n"+
-    	"    PRICE.ONSHORE AS ONSHORE,                                                  \r\n"+
-    	"    PRICE.END_DATE AS END_DATE,                                                \r\n"+
-    	"    PRICE.PRICE_VALUE_USD AS PRICE_VALUE_USD,                                  \r\n"+
-    	"    PRICE.FACTOR AS FACTOR,                                                    \r\n"+
-    	"    MODEL.DIV AS DIV                                                           \r\n"+
-    	"  FROM PRICE.PRICE AS PRICE                                                    \r\n"+
-    	"  INNER JOIN PRICE.MDLINFO AS MODEL ON                                         \r\n"+
-    	"    PRICE.MACHTYPEATR = MODEL.MACHTYPEATR AND                                  \r\n"+
-    	"    PRICE.MODELATR = MODEL.MODELATR                                            \r\n"+
-    	"  WHERE                                                                        \r\n"+
-    	"    PRICE.ACTION = 'I' AND                                                     \r\n"+
-    	"    PRICE.PRICE_POINT_TYPE='MOD'                                               \r\n";
-
-
-    private static String SQL_FEATURE =
-    	"  SELECT                                                                                          \r\n"+
-    	"    PRICE.ID AS ID,                                                                               \r\n"+
-    	"    PRICE.INSERT_TS AS INSERT_TS,                                                                 \r\n"+
-    	"    TMF.PDHDOMAIN AS PDHDOMAIN,                                                                   \r\n"+
-    	"    TMF.COFCAT AS PRODUCTCATEGORY,                                                                \r\n"+
-     	"    TMF.OFFTYPE AS PRODUCTOFFERINGTYPE,                                                           \r\n"+
-     	"    TMF.OFFTYPE AS OFFERING_TYPE,                                                                 \r\n"+
-    	"    TMF.PRODTYPE AS PRODUCTENTITYTYPE,                                                            \r\n"+
-    	"    TMF.MACHID AS PRODUCTENTITYID,                                                                \r\n"+
-    	"    TMF.FEATTYPE AS PRICEPOINTENTITYTYPE,                                                         \r\n"+
-    	"    TMF.FEATID AS PRICEPOINTENTITYID,                                                             \r\n"+
-    	"    TMF.MACHTYPEATR AS MACHTYPEATR,                                                               \r\n"+
-    	"    PRICE.MODELATR AS MODELATR,                                                                   \r\n"+
-    	"    TMF.FEATURECODE AS FEATURECODE,                                                               \r\n"+
-    	"                                                                                                  \r\n"+
-    	"    '' AS FROM_MACHTYPEATR,                                                                       \r\n"+
-    	"    '' AS FROM_MODELATR,                                                                          \r\n"+
-    	"    '' AS FROM_FEATURECODE,                                                                       \r\n"+
-    	"    '' AS PARTNUM,                                                                                \r\n"+
-    	"    TMF.MKTGNAME AS MKTGNAME,                                                                     \r\n"+
-    	"    TMF.BHINVNAME AS INVNAME,                                                                     \r\n"+
-    	"    PRICE.OFFERING AS OFFERING,                                                                   \r\n"+
-    	"    PRICE.START_DATE AS START_DATE,                                                               \r\n"+
-    	"    PRICE.CURRENCY AS CURRENCY,                                                                   \r\n"+
-    	"    PRICE.CABLETYPE AS CABLETYPE,                                                                 \r\n"+
-    	"    PRICE.CABLEID AS CABLEID,                                                                     \r\n"+
-    	"    PRICE.RELEASE_TS AS RELEASE_TS,                                                               \r\n"+
-    	"    PRICE.PRICE_VALUE AS PRICE_VALUE,                                                             \r\n"+
-    	"    PRICE.PRICE_POINT_TYPE AS PRICE_POINT_TYPE,                                                   \r\n"+
-    	"    PRICE.PRICE_POINT_VALUE AS PRICE_POINT_VALUE,                                                 \r\n"+
-    	"    PRICE.COUNTRY AS COUNTRY,                                                                     \r\n"+
-    	"    PRICE.PRICE_TYPE AS PRICE_TYPE,                                                               \r\n"+
-    	"    PRICE.ONSHORE AS ONSHORE,                                                                     \r\n"+
-    	"    PRICE.END_DATE AS END_DATE,                                                                   \r\n"+
-    	"    PRICE.PRICE_VALUE_USD AS PRICE_VALUE_USD,                                                     \r\n"+
-    	"    PRICE.FACTOR AS FACTOR,                                                                       \r\n"+
-    	"    TMF.DIV AS DIV                                                                                \r\n"+
-    	"  FROM PRICE.PRICE AS PRICE                                                                       \r\n"+
-    	"  INNER JOIN PRICE.TMF TMF ON                                                                     \r\n"+
-     	"  PRICE.MACHTYPEATR = TMF.MACHTYPEATR AND                                                         \r\n"+
-    	"  PRICE.FEATURECODE = TMF.FEATURECODE                                                             \r\n"+
-    	"  WHERE                                                                                           \r\n"+
-    	"    PRICE.ACTION = 'I' AND                                                                        \r\n"+
-    	"    PRICE.PRICE_POINT_TYPE in ('FEA','RPQ')                                                       \r\n";
-
-
-//    private static String SQL_FEATURE =
-//    	"  SELECT                                                                                          \r\n"+
-//    	"    PRICE.ID AS ID,                                                                               \r\n"+
-//    	"    PRICE.INSERT_TS AS INSERT_TS,                                                                 \r\n"+
-//    	"    CASE                                                                                          \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='FEA' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN                                               \r\n"+
-//    	"            (CASE WHEN PRCPT.ENTITYID IS NULL THEN NULL ELSE FLAG.FLAGDESCRIPTION END)            \r\n"+
-//    	"         ELSE FEATURE.PDHDOMAIN END)                                                              \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='RPQ' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN NULL                                          \r\n"+
-//    	"         ELSE FEATURE.PDHDOMAIN END)                                                              \r\n"+
-//    	"    ELSE NULL                                                                                     \r\n"+
-//    	"    END AS PDHDOMAIN,                                                                             \r\n"+
-//    	"                                                                                                  \r\n"+
-//    	"    CASE                                                                                          \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='FEA' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN                                               \r\n"+
-//    	"            (CASE WHEN PRCPT.ENTITYID IS NULL THEN NULL ELSE 'Service' END)                       \r\n"+
-//    	"         ELSE MODEL.COFCAT END)                                                                   \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='RPQ' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN NULL                                          \r\n"+
-//    	"         ELSE MODEL.COFCAT END)                                                                   \r\n"+
-//    	"    ELSE NULL                                                                                     \r\n"+
-//    	"    END AS PRODUCTCATEGORY,                                                                       \r\n"+
-//    	"                                                                                                  \r\n"+
-//    	"    CASE                                                                                          \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='FEA' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN                                               \r\n"+
-//    	"            (CASE WHEN PRCPT.ENTITYID IS NULL THEN NULL ELSE 'SVCMOD' END)                        \r\n"+
-//    	"         ELSE PRICE.OFFERING_TYPE END)                                                            \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='RPQ' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN NULL                                          \r\n"+
-//    	"         ELSE PRICE.OFFERING_TYPE END)                                                            \r\n"+
-//    	"    ELSE NULL                                                                                     \r\n"+
-//    	"    END AS PRODUCTOFFERINGTYPE,                                                                   \r\n"+
-//    	"                                                                                                  \r\n"+
-//    	"    CASE                                                                                          \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='FEA' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN                                               \r\n"+
-//    	"            (CASE WHEN PRCPT.ENTITYID IS NULL THEN NULL ELSE 'SVCMOD' END)                        \r\n"+
-//    	"         ELSE 'MACHTYPE' END)                                                                     \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='RPQ' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN NULL                                          \r\n"+
-//    	"         ELSE 'MACHTYPE' END)                                                                     \r\n"+
-//    	"    ELSE NULL                                                                                     \r\n"+
-//    	"    END AS PRODUCTENTITYTYPE,                                                                     \r\n"+
-//    	"                                                                                                  \r\n"+
-//    	"    CASE                                                                                          \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='FEA' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN                                               \r\n"+
-//    	"            (CASE WHEN PRCPT.ENTITYID IS NULL THEN NULL ELSE SVCMOD.ENTITYID END)                 \r\n"+
-//    	"         ELSE MACHTYPE.ENTITYID END)                                                              \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='RPQ' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN NULL                                          \r\n"+
-//    	"         ELSE MACHTYPE.ENTITYID END)                                                              \r\n"+
-//    	"    ELSE NULL                                                                                     \r\n"+
-//    	"    END AS PRODUCTENTITYID,                                                                       \r\n"+
-//    	"                                                                                                  \r\n"+
-//    	"    CASE                                                                                          \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='FEA' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN                                               \r\n"+
-//    	"            (CASE WHEN PRCPT.ENTITYID IS NULL THEN NULL ELSE 'PRCPT' END)                         \r\n"+
-//    	"         ELSE 'FEATURE' END)                                                                      \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='RPQ' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN NULL                                          \r\n"+
-//    	"         ELSE 'FEATURE' END)                                                                      \r\n"+
-//    	"    ELSE NULL                                                                                     \r\n"+
-//    	"    END AS PRICEPOINTENTITYTYPE,                                                                  \r\n"+
-//    	"                                                                                                  \r\n"+
-//    	"    CASE                                                                                          \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='FEA' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN                                               \r\n"+
-//    	"            (CASE WHEN PRCPT.ENTITYID IS NULL THEN NULL ELSE PRCPT.ENTITYID END)                  \r\n"+
-//    	"         ELSE FEATURE.ENTITYID END)                                                               \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='RPQ' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN NULL                                          \r\n"+
-//    	"         ELSE FEATURE.ENTITYID END)                                                               \r\n"+
-//    	"    ELSE NULL                                                                                     \r\n"+
-//    	"    END AS PRICEPOINTENTITYID,                                                                    \r\n"+
-//    	"                                                                                                  \r\n"+
-//    	"    CASE                                                                                          \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='FEA' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN                                               \r\n"+
-//    	"            (CASE WHEN PRCPT.ENTITYID IS NULL THEN PRICE.MACHTYPEATR ELSE SVCMOD.SMACHTYPEATR END)\r\n"+
-//    	"         ELSE MACHTYPE.MACHTYPEATR END)                                                           \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='RPQ' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN PRICE.MACHTYPEATR                             \r\n"+
-//    	"         ELSE MACHTYPE.MACHTYPEATR END)                                                           \r\n"+
-//    	"    ELSE NULL                                                                                     \r\n"+
-//    	"    END AS MACHTYPEATR,                                                                           \r\n"+
-//    	"                                                                                                  \r\n"+
-//    	"    PRICE.MODELATR AS MODELATR,                                                                   \r\n"+
-//    	"                                                                                                  \r\n"+
-//    	"    CASE                                                                                          \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='FEA' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN                                               \r\n"+
-//    	"            (CASE WHEN PRCPT.ENTITYID IS NULL THEN PRICE.FEATURECODE ELSE '' END)                 \r\n"+
-//    	"         ELSE FEATURE.FEATURECODE END)                                                            \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='RPQ' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN PRICE.FEATURECODE                             \r\n"+
-//    	"         ELSE FEATURE.FEATURECODE END)                                                            \r\n"+
-//    	"    ELSE NULL                                                                                     \r\n"+
-//    	"    END AS FEATURECODE,                                                                           \r\n"+
-//    	"                                                                                                  \r\n"+
-//    	"    '' AS FROM_MACHTYPEATR,                                                                       \r\n"+
-//    	"    '' AS FROM_MODELATR,                                                                          \r\n"+
-//    	"    '' AS FROM_FEATURECODE,                                                                       \r\n"+
-//    	"    '' AS PARTNUM,                                                                                \r\n"+
-//    	"                                                                                                  \r\n"+
-//    	"    CASE                                                                                          \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='FEA' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN                                               \r\n"+
-//    	"            (CASE WHEN PRCPT.ENTITYID IS NULL THEN NULL ELSE PRCPT.MKTGNAME END)                  \r\n"+
-//    	"         ELSE FEATURE.MKTGNAME END)                                                               \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='RPQ' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN NULL                                          \r\n"+
-//    	"         ELSE FEATURE.MKTGNAME END)                                                               \r\n"+
-//    	"    ELSE NULL                                                                                     \r\n"+
-//    	"    END AS MKTGNAME,                                                                              \r\n"+
-//    	"                                                                                                  \r\n"+
-//    	"    CASE                                                                                          \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='FEA' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN                                               \r\n"+
-//    	"            (CASE WHEN PRCPT.ENTITYID IS NULL THEN NULL ELSE PRCPT.INVNAME END)                   \r\n"+
-//    	"         ELSE FEATURE.BHINVNAME END)                                                              \r\n"+
-//    	"    WHEN PRICE.PRICE_POINT_TYPE='RPQ' THEN                                                        \r\n"+
-//    	"        (CASE WHEN PRODSTRUCT.ENTITYID IS NULL THEN NULL                                          \r\n"+
-//    	"         ELSE FEATURE.BHINVNAME END)                                                              \r\n"+
-//    	"    ELSE NULL                                                                                     \r\n"+
-//    	"    END AS INVNAME,                                                                               \r\n"+
-//    	"                                                                                                  \r\n"+
-//    	"    PRICE.OFFERING AS OFFERING,                                                                   \r\n"+
-//    	"    PRICE.START_DATE AS START_DATE,                                                               \r\n"+
-//    	"    PRICE.CURRENCY AS CURRENCY,                                                                   \r\n"+
-//    	"    PRICE.CABLETYPE AS CABLETYPE,                                                                 \r\n"+
-//    	"    PRICE.CABLEID AS CABLEID,                                                                     \r\n"+
-//    	"    PRICE.RELEASE_TS AS RELEASE_TS,                                                               \r\n"+
-//    	"    PRICE.PRICE_VALUE AS PRICE_VALUE,                                                             \r\n"+
-//    	"    PRICE.PRICE_POINT_TYPE AS PRICE_POINT_TYPE,                                                   \r\n"+
-//    	"    PRICE.PRICE_POINT_VALUE AS PRICE_POINT_VALUE,                                                 \r\n"+
-//    	"    PRICE.COUNTRY AS COUNTRY,                                                                     \r\n"+
-//    	"    PRICE.PRICE_TYPE AS PRICE_TYPE,                                                               \r\n"+
-//    	"    PRICE.ONSHORE AS ONSHORE,                                                                     \r\n"+
-//    	"    PRICE.END_DATE AS END_DATE,                                                                   \r\n"+
-//    	"    PRICE.PRICE_VALUE_USD AS PRICE_VALUE_USD,                                                     \r\n"+
-//    	"    PRICE.FACTOR AS FACTOR                                                                        \r\n"+
-//    	"  FROM PRICE.PRICE AS PRICE                                                                       \r\n"+
-//    	"  LEFT JOIN PRICE.MODEL AS MODEL ON                                                               \r\n"+
-//    	"    PRICE.MACHTYPEATR = MODEL.MACHTYPEATR                                                         \r\n"+
-//    	"  LEFT JOIN PRICE.MACHTYPE AS MACHTYPE ON                                                         \r\n"+
-//    	"    MODEL.MACHTYPEATR = MACHTYPE.MACHTYPEATR                                                      \r\n"+
-//    	"  LEFT JOIN PRICE.FEATURE AS FEATURE ON                                                           \r\n"+
-//    	"    PRICE.FEATURECODE = FEATURE.FEATURECODE                                                       \r\n"+
-//    	"  LEFT JOIN OPICM.RELATOR AS REL ON                                                               \r\n"+
-//    	"    REL.ENTITYTYPE = 'PRODSTRUCT' AND                                                             \r\n"+
-//    	"    REL.ENTITY1ID = FEATURE.ENTITYID AND                                                          \r\n"+
-//    	"    REL.ENTITY2ID = MODEL.ENTITYID AND                                                            \r\n"+
-//    	"    REL.VALTO > CURRENT TIMESTAMP AND                                                             \r\n"+
-//    	"    REL.EFFTO > CURRENT TIMESTAMP                                                                 \r\n"+
-//    	"  LEFT JOIN PRICE.PRODSTRUCT AS PRODSTRUCT ON                                                     \r\n"+
-//    	"    PRODSTRUCT.ENTITYID = REL.ENTITYID                                                            \r\n"+
-//    	"  LEFT JOIN PRICE.SVCMOD AS SVCMOD ON                                                             \r\n"+
-//    	"    PRICE.MACHTYPEATR = SVCMOD.SMACHTYPEATR                                                       \r\n"+
-//    	"  LEFT JOIN PRICE.FLAG AS FLAG ON                                                                 \r\n"+
-//    	"    FLAG.ENTITYID=SVCMOD.ENTITYID AND                                                             \r\n"+
-//    	"    FLAG.ENTITYTYPE='SVCMOD' AND                                                                  \r\n"+
-//    	"    FLAG.ATTRIBUTECODE='PDHDOMAIN'                                                                \r\n"+
-//    	"  LEFT JOIN OPICM.RELATOR AS SVCMODCHRGCOMP ON                                                    \r\n"+
-//    	"    SVCMODCHRGCOMP.ENTITY1ID = SVCMOD.ENTITYID AND                                                \r\n"+
-//    	"    SVCMODCHRGCOMP.ENTITY1TYPE='SVCMOD' AND                                                       \r\n"+
-//    	"    SVCMODCHRGCOMP.ENTITYTYPE='SVCMODCHRGCOMP' AND                                                \r\n"+
-//    	"    SVCMODCHRGCOMP.VALTO > CURRENT TIMESTAMP AND                                                  \r\n"+
-//    	"    SVCMODCHRGCOMP.EFFTO > CURRENT TIMESTAMP                                                      \r\n"+
-//    	"  LEFT JOIN OPICM.RELATOR AS CHRGCOMPPRCPT ON                                                     \r\n"+
-//    	"    CHRGCOMPPRCPT.ENTITY1ID = SVCMODCHRGCOMP.ENTITY2ID AND                                        \r\n"+
-//    	"    CHRGCOMPPRCPT.ENTITYTYPE='CHRGCOMPPRCPT' AND                                                  \r\n"+
-//    	"    CHRGCOMPPRCPT.VALTO > CURRENT TIMESTAMP AND                                                   \r\n"+
-//    	"    CHRGCOMPPRCPT.EFFTO > CURRENT TIMESTAMP                                                       \r\n"+
-//    	"  LEFT JOIN PRICE.PRCPT AS PRCPT ON                                                               \r\n"+
-//    	"    PRCPT.ENTITYID = CHRGCOMPPRCPT.ENTITY2ID AND                                                  \r\n"+
-//    	"    PRCPT.PRCPTID = PRICE.MODELATR                                                                \r\n"+
-//    	"  WHERE                                                                                           \r\n"+
-//    	"    PRICE.ACTION = 'I' AND                                                                        \r\n"+
-//    	"    PRICE.END_DATE='12/31/9999' AND                                                               \r\n"+
-//    	"    PRICE.OFFERING_TYPE = 'FEATURE' AND                                                           \r\n"+
-//    	"    PRICE.PRICE_POINT_TYPE in ('FEA','RPQ') AND                                                   \r\n"+
-//    	"    (                                                                                             \r\n"+
-//    	"      (                                                                                           \r\n"+
-//    	"         SVCMOD.ENTITYID IS NOT NULL AND                                                          \r\n"+
-//    	"         SVCMODCHRGCOMP.ENTITYID IS NOT NULL AND                                                  \r\n"+
-//    	"         CHRGCOMPPRCPT.ENTITYID IS NOT NULL AND                                                   \r\n"+
-//    	"         PRCPT.ENTITYID IS NOT NULL                                                               \r\n"+
-//    	"      ) OR                                                                                        \r\n"+
-//    	"      (                                                                                           \r\n"+
-//    	"         MACHTYPE.ENTITYID IS NOT NULL AND                                                        \r\n"+
-//    	"         MODEL.ENTITYID IS NOT NULL AND                                                           \r\n"+
-//    	"         FEATURE.ENTITYID IS NOT NULL AND                                                         \r\n"+
-//    	"         PRODSTRUCT.ENTITYID IS NOT NULL                                                          \r\n"+
-//    	"      )                                                                                           \r\n"+
-//    	"    )                                                                                             \r\n";
-
-    private static String SQL_SWFEATURE =
-    	"  SELECT                                                                       \r\n"+
-    	"    PRICE.ID AS ID,                                                            \r\n"+
-    	"    PRICE.INSERT_TS AS INSERT_TS,                                              \r\n"+
-    	"    SWTMF.PDHDOMAIN AS PDHDOMAIN,                                              \r\n"+
-    	"    SWTMF.COFCAT AS PRODUCTCATEGORY,                                           \r\n"+
-    	"    PRICE.OFFERING_TYPE AS PRODUCTOFFERINGTYPE,                                \r\n"+
-    	"    PRICE.OFFERING_TYPE AS OFFERING_TYPE,                                      \r\n"+
-    	"    'MODEL' AS PRODUCTENTITYTYPE,                                              \r\n"+
-    	"    SWTMF.MDLID AS PRODUCTENTITYID,                                            \r\n"+
-    	"    'SWFEATURE' AS PRICEPOINTENTITYTYPE,                                       \r\n"+
-    	"    SWTMF.SWFEATID AS PRICEPOINTENTITYID,                                      \r\n"+
-    	"    SWTMF.MACHTYPEATR AS MACHTYPEATR,                                          \r\n"+
-    	"    SWTMF.MODELATR AS MODELATR,                                                \r\n"+
-    	"    SWTMF.FEATURECODE AS FEATURECODE,                                          \r\n"+
-    	"    '' AS FROM_MACHTYPEATR,                                                    \r\n"+
-    	"    '' AS FROM_MODELATR,                                                       \r\n"+
-    	"    '' AS FROM_FEATURECODE,                                                    \r\n"+
-    	"    '' AS PARTNUM,                                                             \r\n"+
-    	"    SWTMF.SWFEATDESC AS MKTGNAME,                                              \r\n"+
-    	"    SWTMF.BHINVNAME AS INVNAME,                                                \r\n"+
-    	"    PRICE.OFFERING AS OFFERING,                                                \r\n"+
-    	"    PRICE.START_DATE AS START_DATE,                                            \r\n"+
-    	"    PRICE.CURRENCY AS CURRENCY,                                                \r\n"+
-    	"    PRICE.CABLETYPE AS CABLETYPE,                                              \r\n"+
-    	"    PRICE.CABLEID AS CABLEID,                                                  \r\n"+
-    	"    PRICE.RELEASE_TS AS RELEASE_TS,                                            \r\n"+
-    	"    PRICE.PRICE_VALUE AS PRICE_VALUE,                                          \r\n"+
-    	"    PRICE.PRICE_POINT_TYPE AS PRICE_POINT_TYPE,                                \r\n"+
-    	"    PRICE.PRICE_POINT_VALUE AS PRICE_POINT_VALUE,                              \r\n"+
-    	"    PRICE.COUNTRY AS COUNTRY,                                                  \r\n"+
-    	"    PRICE.PRICE_TYPE AS PRICE_TYPE,                                            \r\n"+
-    	"    PRICE.ONSHORE AS ONSHORE,                                                  \r\n"+
-    	"    PRICE.END_DATE AS END_DATE,                                                \r\n"+
-    	"    PRICE.PRICE_VALUE_USD AS PRICE_VALUE_USD,                                  \r\n"+
-    	"    PRICE.FACTOR AS FACTOR                                                     \r\n"+
-    	"  FROM PRICE.PRICE AS PRICE                                                    \r\n"+
-    	"  INNER JOIN PRICE.SWTMF AS SWTMF ON                                           \r\n"+
-    	"    PRICE.OFFERING=CONCAT(SWTMF.MACHTYPEATR,SWTMF.MODELATR) AND                \r\n"+
-    	"    PRICE.PRICE_POINT_VALUE=SWTMF.FEATURECODE                                  \r\n"+
-    	"  WHERE                                                                        \r\n"+
-    	"    PRICE.ACTION = 'I' AND                                                     \r\n"+
-    	"    PRICE.PRICE_POINT_TYPE in ('SWF','WSF')                                    \r\n";
-
-    private static String SQL_FCTRANSACTION =
-    	"  SELECT                                                                       \r\n"+
-    	"    PRICE.ID AS ID,                                                            \r\n"+
-    	"    PRICE.INSERT_TS AS INSERT_TS,                                              \r\n"+
-    	"    FCTRANSACTION.PDHDOMAIN AS PDHDOMAIN,                                      \r\n"+
-    	"    'Hardware' AS PRODUCTCATEGORY,                                             \r\n"+
-    	"    CASE                                                                       \r\n"+
-    	"        WHEN PRICE.PRICE_POINT_TYPE='FUP' THEN 'Feature Upgrade'               \r\n"+
-    	"        WHEN PRICE.PRICE_POINT_TYPE='TFU' THEN 'Type Feature Upgrade'          \r\n"+
-    	"        ELSE ''                                                                \r\n"+
-    	"    END AS PRODUCTOFFERINGTYPE,                                                \r\n"+
-    	"    PRICE.OFFERING_TYPE AS OFFERING_TYPE,                                      \r\n"+
-    	"    'FCTRANSACTION' AS PRODUCTENTITYTYPE,                                      \r\n"+
-    	"    FCTRANSACTION.ENTITYID AS PRODUCTENTITYID,                                 \r\n"+
-    	"    '' AS PRICEPOINTENTITYTYPE,                                                \r\n"+
-    	"    '' AS PRICEPOINTENTITYID,                                                  \r\n"+
-    	"    PRICE.MACHTYPEATR AS MACHTYPEATR,                                          \r\n"+
-    	"    FCTRANSACTION.TOMODEL AS MODELATR,                                         \r\n"+
-    	"    PRICE.FEATURECODE AS FEATURECODE,                                          \r\n"+
-    	"    PRICE.FROM_MACHTYPEATR AS FROM_MACHTYPEATR,                                \r\n"+
-    	"    FCTRANSACTION.FROMMODEL AS FROM_MODELATR,                                  \r\n"+
-    	"    PRICE.FROM_FEATURECODE AS FROM_FEATURECODE,                                \r\n"+
-    	"    '' AS PARTNUM,                                                             \r\n"+
-    	"    '' AS MKTGNAME,                                                            \r\n"+
-    	"    '' AS INVNAME,                                                             \r\n"+
-    	"    PRICE.OFFERING AS OFFERING,                                                \r\n"+
-    	"    PRICE.START_DATE AS START_DATE,                                            \r\n"+
-    	"    PRICE.CURRENCY AS CURRENCY,                                                \r\n"+
-    	"    PRICE.CABLETYPE AS CABLETYPE,                                              \r\n"+
-    	"    PRICE.CABLEID AS CABLEID,                                                  \r\n"+
-    	"    PRICE.RELEASE_TS AS RELEASE_TS,                                            \r\n"+
-    	"    PRICE.PRICE_VALUE AS PRICE_VALUE,                                          \r\n"+
-    	"    PRICE.PRICE_POINT_TYPE AS PRICE_POINT_TYPE,                                \r\n"+
-    	"    PRICE.PRICE_POINT_VALUE AS PRICE_POINT_VALUE,                              \r\n"+
-    	"    PRICE.COUNTRY AS COUNTRY,                                                  \r\n"+
-    	"    PRICE.PRICE_TYPE AS PRICE_TYPE,                                            \r\n"+
-    	"    PRICE.ONSHORE AS ONSHORE,                                                  \r\n"+
-    	"    PRICE.END_DATE AS END_DATE,                                                \r\n"+
-    	"    PRICE.PRICE_VALUE_USD AS PRICE_VALUE_USD,                                  \r\n"+
-    	"    PRICE.FACTOR AS FACTOR                                                     \r\n"+
-    	"  FROM PRICE.PRICE AS PRICE                                                    \r\n"+
-    	"  INNER JOIN PRICE.FCTRANSACTION AS FCTRANSACTION ON                           \r\n"+
-    	"    CAST(PRICE.FROM_MACHTYPEATR AS INTEGER)=  FCTRANSACTION.FROMMACHTYPE AND   \r\n"+
-    	"    PRICE.FROM_FEATURECODE = FCTRANSACTION.FROMFEATURECODE AND                 \r\n"+
-    	"    CAST(PRICE.MACHTYPEATR AS INTEGER) = FCTRANSACTION.TOMACHTYPE AND          \r\n"+
-    	"    PRICE.FEATURECODE = FCTRANSACTION.TOFEATURECODE                            \r\n"+
-    	"  WHERE                                                                        \r\n"+
-    	"    PRICE.ACTION = 'I' AND                                                     \r\n"+
-    	"    PRICE.OFFERING_TYPE = 'FCTRANSACTION' AND                                  \r\n"+
-    	"    PRICE.PRICE_POINT_TYPE in('FUP','TFU')                                     \r\n";
-
-    private static String SQL_MODELCONVERT =
-    	"  SELECT                                                                       \r\n"+
-    	"    PRICE.ID AS ID,                                                            \r\n"+
-    	"    PRICE.INSERT_TS AS INSERT_TS,                                              \r\n"+
-    	"    MODELCONVERT.PDHDOMAIN AS PDHDOMAIN,                                       \r\n"+
-    	"    'Hardware' AS PRODUCTCATEGORY,                                             \r\n"+
-    	"    CASE                                                                       \r\n"+
-    	"        WHEN PRICE.PRICE_POINT_TYPE='MUP' THEN 'Model Upgrade'                 \r\n"+
-    	"        WHEN PRICE.PRICE_POINT_TYPE='TMU' THEN 'Type Model Upgrade'            \r\n"+
-    	"        ELSE ''                                                                \r\n"+
-    	"    END AS PRODUCTOFFERINGTYPE,                                                \r\n"+
-    	"    PRICE.OFFERING_TYPE AS OFFERING_TYPE,                                      \r\n"+
-    	"                                                                               \r\n"+
-    	"    'MODELCONVERT' AS PRODUCTENTITYTYPE,                                       \r\n"+
-    	"    MODELCONVERT.ENTITYID AS PRODUCTENTITYID,                                  \r\n"+
-    	"    '' AS PRICEPOINTENTITYTYPE,                                                \r\n"+
-    	"    '' AS PRICEPOINTENTITYID,                                                  \r\n"+
-    	"                                                                               \r\n"+
-    	"    PRICE.MACHTYPEATR AS MACHTYPEATR,                                          \r\n"+
-    	"    PRICE.MODELATR AS MODELATR,                                                \r\n"+
-    	"    '' AS FEATURECODE,                                                         \r\n"+
-    	"    PRICE.FROM_MACHTYPEATR AS FROM_MACHTYPEATR,                                \r\n"+
-    	"    PRICE.FROM_MODELATR AS FROM_MODELATR,                                      \r\n"+
-    	"    '' AS FROM_FEATURECODE,                                                    \r\n"+
-    	"    '' AS PARTNUM,                                                             \r\n"+
-    	"    '' AS MKTGNAME,                                                            \r\n"+
-    	"    '' AS INVNAME,                                                             \r\n"+
-    	"    PRICE.OFFERING AS OFFERING,                                                \r\n"+
-    	"    PRICE.START_DATE AS START_DATE,                                            \r\n"+
-    	"    PRICE.CURRENCY AS CURRENCY,                                                \r\n"+
-    	"    PRICE.CABLETYPE AS CABLETYPE,                                              \r\n"+
-    	"    PRICE.CABLEID AS CABLEID,                                                  \r\n"+
-    	"    PRICE.RELEASE_TS AS RELEASE_TS,                                            \r\n"+
-    	"    PRICE.PRICE_VALUE AS PRICE_VALUE,                                          \r\n"+
-    	"    PRICE.PRICE_POINT_TYPE AS PRICE_POINT_TYPE,                                \r\n"+
-    	"    PRICE.PRICE_POINT_VALUE AS PRICE_POINT_VALUE,                              \r\n"+
-    	"    PRICE.COUNTRY AS COUNTRY,                                                  \r\n"+
-    	"    PRICE.PRICE_TYPE AS PRICE_TYPE,                                            \r\n"+
-    	"    PRICE.ONSHORE AS ONSHORE,                                                  \r\n"+
-    	"    PRICE.END_DATE AS END_DATE,                                                \r\n"+
-    	"    PRICE.PRICE_VALUE_USD AS PRICE_VALUE_USD,                                  \r\n"+
-    	"    PRICE.FACTOR AS FACTOR                                                     \r\n"+
-    	"  FROM PRICE.PRICE AS PRICE                                                    \r\n"+
-    	"  INNER JOIN PRICE.MODELCONVERT AS MODELCONVERT ON                             \r\n"+
-    	"    CAST(PRICE.FROM_MACHTYPEATR AS INTEGER)=  MODELCONVERT.FROMMACHTYPE AND    \r\n"+
-    	"    PRICE.FROM_MODELATR = MODELCONVERT.FROMMODEL AND                           \r\n"+
-    	"    CAST(PRICE.MACHTYPEATR AS INTEGER) = MODELCONVERT.TOMACHTYPE AND           \r\n"+
-    	"    PRICE.MODELATR = MODELCONVERT.TOMODEL                                      \r\n"+
-    	"  WHERE                                                                        \r\n"+
-    	"    PRICE.ACTION = 'I' AND                                                     \r\n"+
-    	"    PRICE.OFFERING_TYPE = 'MODELCONVERT' AND                                   \r\n"+
-    	"    PRICE.PRICE_POINT_TYPE in ('MUP','TMU')                                    \r\n";
-
-
-    private static String SQL_LSEO =
-        "  SELECT                                                                       \r\n"+
-        "    PRICE.ID AS ID,                                                            \r\n"+
-        "    PRICE.INSERT_TS AS INSERT_TS,                                              \r\n"+
-        "    LSEO.PDHDOMAIN AS PDHDOMAIN,                                               \r\n"+
-        "    LSEO.COFCAT AS PRODUCTCATEGORY,                                            \r\n"+
-        "    LSEO.SEOTYPE AS PRODUCTOFFERINGTYPE,                                       \r\n"+
-        "    PRICE.OFFERING_TYPE AS OFFERING_TYPE,                                      \r\n"+
-        "    LSEO.SEOTYPE AS PRODUCTENTITYTYPE,                                         \r\n"+
-        "    LSEO.ENTITYID AS PRODUCTENTITYID,                                          \r\n"+
-        "    '' AS PRICEPOINTENTITYTYPE,                                                \r\n"+
-        "    '' AS PRICEPOINTENTITYID,                                                  \r\n"+
-        "    LSEO.MACHTYPEATR AS MACHTYPEATR,                                           \r\n"+
-        "    LSEO.MODELATR AS MODELATR,                                                 \r\n"+
-        "    '' AS FEATURECODE,                                                         \r\n"+
-        "    '' AS FROM_MACHTYPEATR,                                                    \r\n"+
-        "    '' AS FROM_MODELATR,                                                       \r\n"+
-        "    '' AS FROM_FEATURECODE,                                                    \r\n"+
-        "    LSEO.SEOID AS PARTNUM,                                                     \r\n"+
-        "    LSEO.MKTGDESC AS MKTGNAME,                                                 \r\n"+
-        "    LSEO.PRCFILENAM AS INVNAME,                                                \r\n"+
-        "    PRICE.OFFERING AS OFFERING,                                                \r\n"+
-        "    PRICE.START_DATE AS START_DATE,                                            \r\n"+
-        "    PRICE.CURRENCY AS CURRENCY,                                                \r\n"+
-        "    PRICE.CABLETYPE AS CABLETYPE,                                              \r\n"+
-        "    PRICE.CABLEID AS CABLEID,                                                  \r\n"+
-        "    PRICE.RELEASE_TS AS RELEASE_TS,                                            \r\n"+
-        "    PRICE.PRICE_VALUE AS PRICE_VALUE,                                          \r\n"+
-        "    PRICE.PRICE_POINT_TYPE AS PRICE_POINT_TYPE,                                \r\n"+
-        "    PRICE.PRICE_POINT_VALUE AS PRICE_POINT_VALUE,                              \r\n"+
-        "    PRICE.COUNTRY AS COUNTRY,                                                  \r\n"+
-        "    PRICE.PRICE_TYPE AS PRICE_TYPE,                                            \r\n"+
-        "    PRICE.ONSHORE AS ONSHORE,                                                  \r\n"+
-        "    PRICE.END_DATE AS END_DATE,                                                \r\n"+
-        "    PRICE.PRICE_VALUE_USD AS PRICE_VALUE_USD,                                  \r\n"+
-        "    PRICE.FACTOR AS FACTOR                                                     \r\n"+
-        "  FROM PRICE.PRICE AS PRICE                                                    \r\n"+
-        "  JOIN PRICE.LSEOINFO AS LSEO                                                  \r\n"+
-        "  ON PRICE.PARTNUM=LSEO.SEOID                                                  \r\n"+
-        "  WHERE                                                                        \r\n"+
-        "    PRICE.ACTION = 'I' AND                                                     \r\n"+
-        "    PRICE.PRICE_POINT_TYPE in('','SEO')                                        \r\n";
-
-
-    //RCQ00206104 WI- EACM - LA prices to support the LA CBS project and WW ESW prices
-    private static String SQL_ESW =
-    	"  SELECT                                                                       \r\n"+
-    	"    PRICE.ID AS ID,                                                            \r\n"+
-    	"    PRICE.INSERT_TS AS INSERT_TS,                                              \r\n"+
-    	"    '' AS PDHDOMAIN,                                                           \r\n"+
-    	"    PRICE.OFFERING_TYPE AS PRODUCTCATEGORY,                                    \r\n"+
-    	"    '' AS PRODUCTOFFERINGTYPE,                                                 \r\n"+
-    	"    PRICE.OFFERING_TYPE AS OFFERING_TYPE,                                      \r\n"+
-    	"                                                                               \r\n"+
-    	"    '' AS PRODUCTENTITYTYPE,                                                   \r\n"+
-    	"    '' AS PRODUCTENTITYID,                                                     \r\n"+
-    	"    '' AS PRICEPOINTENTITYTYPE,                                                \r\n"+
-    	"    '' AS PRICEPOINTENTITYID,                                                  \r\n"+
-    	"                                                                               \r\n"+
-    	"    '' AS MACHTYPEATR,                                                         \r\n"+
-    	"    '' AS MODELATR,                                                            \r\n"+
-    	"    '' AS FEATURECODE,                                                         \r\n"+
-    	"    '' AS FROM_MACHTYPEATR,                                                    \r\n"+
-    	"    '' AS FROM_MODELATR,                                                       \r\n"+
-    	"    '' AS FROM_FEATURECODE,                                                    \r\n"+
-    	"    '' AS PARTNUM,                                                             \r\n"+
-    	"    '' AS MKTGNAME,                                                            \r\n"+
-    	"    '' AS INVNAME,                                                             \r\n"+
-    	"    PRICE.OFFERING AS OFFERING,                                                \r\n"+
-    	"    PRICE.START_DATE AS START_DATE,                                            \r\n"+
-    	"    PRICE.CURRENCY AS CURRENCY,                                                \r\n"+
-    	"    PRICE.CABLETYPE AS CABLETYPE,                                              \r\n"+
-    	"    PRICE.CABLEID AS CABLEID,                                                  \r\n"+
-    	"    PRICE.RELEASE_TS AS RELEASE_TS,                                            \r\n"+
-    	"    PRICE.PRICE_VALUE AS PRICE_VALUE,                                          \r\n"+
-    	"    PRICE.PRICE_POINT_TYPE AS PRICE_POINT_TYPE,                                \r\n"+
-    	"    PRICE.PRICE_POINT_VALUE AS PRICE_POINT_VALUE,                              \r\n"+
-    	"    PRICE.COUNTRY AS COUNTRY,                                                  \r\n"+
-    	"    PRICE.PRICE_TYPE AS PRICE_TYPE,                                            \r\n"+
-    	"    PRICE.ONSHORE AS ONSHORE,                                                  \r\n"+
-    	"    PRICE.END_DATE AS END_DATE,                                                \r\n"+
-    	"    PRICE.PRICE_VALUE_USD AS PRICE_VALUE_USD,                                  \r\n"+
-    	"    PRICE.FACTOR AS FACTOR                                                     \r\n"+
-    	"  FROM PRICE.PRICE AS PRICE                                                    \r\n"+
-    	"  WHERE                                                                        \r\n"+
-    	"    PRICE.ACTION = 'I' AND                                                     \r\n"+
-    	"    PRICE.OFFERING_TYPE in ('EEE','OSP') AND                                   \r\n"+
-    	"    PRICE.PRICE_POINT_TYPE =''                                                 \r\n";
-
-
-    private static class PriceInfo{
-    	String PRODUCTOFFERINGTYPE = XMLElem.CHEAT;
-    	String MACHTYPE = XMLElem.CHEAT;
-    	String MODEL= XMLElem.CHEAT;
-    	String FEATURECODE= XMLElem.CHEAT;
-    	String FROMMACHTYPE= XMLElem.CHEAT;
-
-		String FROMMODEL= XMLElem.CHEAT;
-		String FROMFEATURECODE= XMLElem.CHEAT;
-		String SEOID= XMLElem.CHEAT;
-		String OFFERING= XMLElem.CHEAT;
-		String STARTDATE= XMLElem.CHEAT;
-
-		String CURRENCY= XMLElem.CHEAT;
-		String CABLETYPE= XMLElem.CHEAT;
-		String CABLEID= XMLElem.CHEAT;
-		String RELEASETS= XMLElem.CHEAT;
-		String PRICEVALUE= XMLElem.CHEAT;
-
-	    String PRICEPOINTTYPE= XMLElem.CHEAT;
-	    String PRICEPOINTVALUE= XMLElem.CHEAT;
-	    String COUNTRY= XMLElem.CHEAT;
-	    String PRICETYPE= XMLElem.CHEAT;
-	    String ONSHORE= XMLElem.CHEAT;
-
-		String ENDDATE= XMLElem.CHEAT;
-		String PRICEVALUEUSD= XMLElem.CHEAT;
-		String FACTOR = XMLElem.CHEAT;
-		String ACTIVITY= XMLElem.CHEAT;
-		String PDHDOMAIN= XMLElem.CHEAT;
-
-		String PRODUCTCATEGORY= XMLElem.CHEAT;
-		String PRODUCTENTITYTYPE = XMLElem.CHEAT;
-		String PRODUCTENTITYID= XMLElem.CHEAT;
-		String PRICEPOINTENTITYTYPE = XMLElem.CHEAT;
-		String PRICEPOINTENTITYID = XMLElem.CHEAT;
-
-		String MKTGNAME= XMLElem.CHEAT;
-		String INVNAME= XMLElem.CHEAT;
-		//Vector HISTORYPRICE = null;
-
-		PriceInfo(String PRODUCTOFFERINGTYPE,	String MACHTYPE,			String MODEL,			String FEATURECODE,			String FROMMACHTYPE,
-				  String FROMMODEL,			    String FROMFEATURECODE,		String SEOID,			String OFFERING,			String STARTDATE,
-				  String CURRENCY,				String CABLETYPE,			String CABLEID,			String RELEASETS,			String PRICEVALUE,
-				  String PRICEPOINTTYPE,		String PRICEPOINTVALUE, 	String COUNTRY, 		String PRICETYPE,			String ONSHORE,
-				  String ENDDATE,				String PRICEVALUEUSD,   	String FACTOR,  		String ACTIVITY,			String PDHDOMAIN,
-				  String PRODUCTCATEGORY,       String PRODUCTENTITYTYPE, 	String PRODUCTENTITYID,	String PRICEPOINTENTITYTYPE,String PRICEPOINTENTITYID,
-				  String MKTGNAME,			    String INVNAME,         Vector historyPrice){
-			//
-			if (PRODUCTOFFERINGTYPE != null){	this.PRODUCTOFFERINGTYPE = PRODUCTOFFERINGTYPE.trim();}
-			if (MACHTYPE != null){				this.MACHTYPE = MACHTYPE.trim();				}
-			if (MODEL != null){					this.MODEL = MODEL.trim();						}
-			if (FEATURECODE != null){			this.FEATURECODE = FEATURECODE.trim();			}
-			if (FROMMACHTYPE != null){			this.FROMMACHTYPE = FROMMACHTYPE.trim();		}
-
-			if (FROMMODEL != null){				this.FROMMODEL = FROMMODEL.trim();				}
-			if (FROMFEATURECODE != null){		this.FROMFEATURECODE = FROMFEATURECODE.trim();	}
-			if (SEOID != null){					this.SEOID = SEOID.trim();						}
-			if (OFFERING != null){				this.OFFERING = OFFERING.trim();				}
-			if (STARTDATE != null){				this.STARTDATE = STARTDATE.trim();				}
-
-			if (CURRENCY != null){				this.CURRENCY = CURRENCY.trim();				}
-			if (CABLETYPE != null){				this.CABLETYPE = CABLETYPE.trim();				}
-			if (CABLEID != null){				this.CABLEID = CABLEID.trim();					}
-			if (RELEASETS != null){				this.RELEASETS = RELEASETS.trim();				}
-			if (PRICEVALUE != null){			this.PRICEVALUE = PRICEVALUE.trim();			}
-
-			if (PRICEPOINTTYPE != null){		this.PRICEPOINTTYPE = PRICEPOINTTYPE.trim();	}
-			if (PRICEPOINTVALUE != null){		this.PRICEPOINTVALUE = PRICEPOINTVALUE.trim();	}
-			if (COUNTRY != null){				this.COUNTRY = COUNTRY.trim();					}
-			if (PRICETYPE != null){				this.PRICETYPE = PRICETYPE.trim();				}
-			if (ONSHORE != null){				this.ONSHORE = ONSHORE.trim();					}
-
-			if (ENDDATE != null){				this.ENDDATE = ENDDATE.trim();					}
-			if (PRICEVALUEUSD != null){			this.PRICEVALUEUSD = PRICEVALUEUSD.trim();		}
-			if (FACTOR != null){				this.FACTOR = FACTOR.trim();					}
-			if (ACTIVITY != null){				this.ACTIVITY = ACTIVITY.trim();				}
-			if (PDHDOMAIN != null){				this.PDHDOMAIN = PDHDOMAIN.trim();				}
-
-			if (PRODUCTCATEGORY != null){		this.PRODUCTCATEGORY = PRODUCTCATEGORY.trim();			}
-			if (PRODUCTENTITYTYPE != null){		this.PRODUCTENTITYTYPE = PRODUCTENTITYTYPE.trim();		}
-			if (PRODUCTENTITYID != null){		this.PRODUCTENTITYID = PRODUCTENTITYID.trim();			}
-			if (PRICEPOINTENTITYTYPE != null){	this.PRICEPOINTENTITYTYPE = PRICEPOINTENTITYTYPE.trim();}
-			if (PRICEPOINTENTITYID != null){	this.PRICEPOINTENTITYID = PRICEPOINTENTITYID.trim();	}
-
-			if (MKTGNAME != null){				this.MKTGNAME = MKTGNAME.trim();				}
-			if (INVNAME != null){				this.INVNAME = INVNAME.trim();					}
-			//if (historyPrice!= null){           this.HISTORYPRICE = historyPrice;}
-		}
-		void dereference(){
-			PRODUCTOFFERINGTYPE = null;
-			MACHTYPE = null;
-			MODEL= null;
-			FEATURECODE= null;
-			FROMMACHTYPE= null;
-
-			FROMMODEL= null;
-			FROMFEATURECODE= null;
-			SEOID= null;
-			OFFERING= null;
-			STARTDATE= null;
-
-			CURRENCY= null;
-			CABLETYPE= null;
-			CABLEID= null;
-			RELEASETS= null;
-			PRICEVALUE= null;
-
-			PRICEPOINTTYPE= null;
-			PRICEPOINTVALUE= null;
-			COUNTRY= null;
-			PRICETYPE= null;
-			ONSHORE= null;
-
-			ENDDATE= null;
-			PRICEVALUEUSD= null;
-			FACTOR = null;
-			ACTIVITY= null;
-			PDHDOMAIN= null;
-
-			PRODUCTCATEGORY= null;
-			PRODUCTENTITYTYPE = null;
-			PRODUCTENTITYID=null;
-			PRICEPOINTENTITYTYPE = null;
-			PRICEPOINTENTITYID = null;
-
-			MKTGNAME= null;
-			INVNAME= null;
-			//HISTORYPRICE = null;
-
-		}
-	}
-
-
-
-}
+/*      */ package COM.ibm.eannounce.abr.ln.adsxmlbh1;
+/*      */ 
+/*      */ import COM.ibm.eannounce.abr.util.ABRUtil;
+/*      */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*      */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.EntityList;
+/*      */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*      */ import COM.ibm.eannounce.objects.MetaFlag;
+/*      */ import COM.ibm.opicmpdh.middleware.Database;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*      */ import COM.ibm.opicmpdh.middleware.Profile;
+/*      */ import COM.ibm.opicmpdh.middleware.Stopwatch;
+/*      */ import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.io.IOException;
+/*      */ import java.rmi.RemoteException;
+/*      */ import java.sql.Connection;
+/*      */ import java.sql.PreparedStatement;
+/*      */ import java.sql.ResultSet;
+/*      */ import java.sql.SQLException;
+/*      */ import java.util.Enumeration;
+/*      */ import java.util.Hashtable;
+/*      */ import java.util.MissingResourceException;
+/*      */ import java.util.StringTokenizer;
+/*      */ import java.util.Vector;
+/*      */ import javax.xml.parsers.DocumentBuilder;
+/*      */ import javax.xml.parsers.DocumentBuilderFactory;
+/*      */ import javax.xml.parsers.ParserConfigurationException;
+/*      */ import javax.xml.transform.TransformerException;
+/*      */ import org.w3c.dom.DOMException;
+/*      */ import org.w3c.dom.Document;
+/*      */ import org.w3c.dom.Element;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public class ADSPRICEABR
+/*      */   extends XMLMQAdapter
+/*      */ {
+/*      */   private static final String NONEPDHDOMAIN;
+/*      */   private static final String ALLPRICETYPE;
+/*      */   private static final String NONEPRICETYPE;
+/*      */   private static final String OFFERINGTYPE;
+/*  114 */   private String MQCID = "";
+/*      */ 
+/*      */   
+/*      */   private static final int PRICE_ENTITY_LIMIT;
+/*      */   
+/*      */   private static final int PRICE_MQ_LIMIT;
+/*      */   
+/*      */   protected static int PRICE_MESSAGE_COUNT;
+/*      */   
+/*      */   protected static int PRICE_RECORD_COUNT;
+/*      */   
+/*  125 */   private long ALL_WWPRT_SEND_TIME = 0L; private boolean isSended = false; private static final String PRICE_WWPRT_SQL = "  SELECT                                                                       \r\n     PRICE.ID AS ID,                                                           \r\n     PRICE.PRICEXML AS PRICEXML                                                \r\n   FROM PRICE.PRICE AS PRICE                                                   \r\n   WHERE                                                                       \r\n     PRICE.ACTION = 'I'                                                        \r\n"; private static String SQL_MODEL; private static String SQL_FEATURE; private static String SQL_SWFEATURE; private static String SQL_FCTRANSACTION; private static String SQL_MODELCONVERT; private static String SQL_LSEO;
+/*  126 */   private static String offeringtypes = "";
+/*      */   private static String SQL_ESW;
+/*  128 */   public void processThis(ADSABRSTATUS paramADSABRSTATUS, Profile paramProfile1, Profile paramProfile2, EntityItem paramEntityItem) throws SQLException, MiddlewareException, ParserConfigurationException, RemoteException, EANBusinessRuleException, MiddlewareShutdownInProgressException, IOException, TransformerException, MissingResourceException { String str1 = paramProfile1.getValOn(); String str2 = paramProfile2.getValOn(); paramADSABRSTATUS.addDebug("ADSPRICEABR process t1DTS=" + str1); paramADSABRSTATUS.addDebug("ADSPRICEABR process t2DTS=" + str2); PRICE_MESSAGE_COUNT = 0; PRICE_RECORD_COUNT = 0; String str3 = getDescription(paramEntityItem, "ADSPPFORMAT", "long"); if (str3 != null && "WWPRT".equals(str3)) { this.MQCID = "PRICE"; } else if ("EACM".equals(str3)) { this.MQCID = "PRODUCT_PRICE_UPDATE"; }  String str4 = getDescription(paramEntityItem, "ADSOFFTYPE", "long"); String str5 = getDescription(paramEntityItem, "ADSOFFCAT", "long"); String str6 = getMultiDescription(paramEntityItem, "ADSCOUNTRY", "long"); String str7 = getMultiDescription(paramEntityItem, "ADSPRICETYPE", "flag"); String str8 = getDescription(paramEntityItem, "ADSPPABRSTATUS", "long"); Hashtable hashtable = getDescriptionTable(paramEntityItem, "PDHDOMAIN", "long"); String str9 = PokUtils.getAttributeValue(paramEntityItem, "PUBTO", ",", "", false); String str10 = getMultiDescription(paramEntityItem, "ADSXPRICETYPE", "flag"); String str11 = PokUtils.getAttributeValue(paramEntityItem, "DIVTEXT", ",", "", false); paramADSABRSTATUS.addDebug("ADSPRICEABR0 ADSPPFORMAT=" + str3); paramADSABRSTATUS.addDebug("ADSPRICEABR2 ADSOFFTYPE=" + str4); paramADSABRSTATUS.addDebug("ADSPRICEABR2 ADSOFFCAT=" + str5); paramADSABRSTATUS.addDebug("ADSPRICEABR3 ADSCOUNTRY=" + str6); paramADSABRSTATUS.addDebug("ADSPRICEABR4 ADSPRICETYPE=" + str7); paramADSABRSTATUS.addDebug("ADSPRICEABR5 ADSPPABRSTATUS=" + str8); paramADSABRSTATUS.addDebug("ADSPRICEABR6 ADSPDHDOMAIN=" + hashtable); paramADSABRSTATUS.addDebug("ADSPRICEABR7 ADSPUBTO=" + str9); paramADSABRSTATUS.addDebug("ADSPRICEABR8 ADSXPRICETYPE=" + str10); paramADSABRSTATUS.addDebug("ADSPRICEABR9 ADSDIVTEXT=" + str11); Hashtable<Object, Object> hashtable1 = new Hashtable<>(); hashtable1 = getPriceTable(paramADSABRSTATUS, str3, str1, str4, str5, str6, str7, paramEntityItem, paramProfile2, hashtable, str9, str10, str11); if (hashtable1.size() == 0 && !this.isSended) { paramADSABRSTATUS.addXMLGenMsg("NO_CHANGES_FND", "PRICE"); } else if (hashtable1.size() != 0 || this.isSended != true) { if (str3 != null && "WWPRT".equals(str3)) { sendWWPRTXML(paramADSABRSTATUS, paramProfile2, paramEntityItem, hashtable1); } else { sendEACMXML(paramADSABRSTATUS, paramProfile2, paramEntityItem, hashtable1); }  paramADSABRSTATUS.addXMLGenMsg("SUCCESS", "total " + PRICE_MESSAGE_COUNT + " Messsages for the price."); paramADSABRSTATUS.addXMLGenMsg("SUCCESS", "total " + PRICE_RECORD_COUNT + " records for the price."); }  if (str3 != null && "WWPRT".equals(str3)) paramADSABRSTATUS.addDebug("Sending WWPRT MQ message total takes time: " + this.ALL_WWPRT_SEND_TIME + " ms");  } private Hashtable getPriceTable(ADSABRSTATUS paramADSABRSTATUS, String paramString1, String paramString2, String paramString3, String paramString4, String paramString5, String paramString6, EntityItem paramEntityItem, Profile paramProfile, Hashtable paramHashtable, String paramString7, String paramString8, String paramString9) throws SQLException, NumberFormatException, MiddlewareRequestException, MiddlewareException, DOMException, MissingResourceException, ParserConfigurationException, TransformerException { Hashtable<Object, Object> hashtable = new Hashtable<>(); StringBuffer stringBuffer = null; if (paramString1 != null && !"".equals(paramString1)) { if ("WWPRT".equals(paramString1)) { stringBuffer = new StringBuffer(); stringBuffer.append("  SELECT                                                                       \r\n     PRICE.ID AS ID,                                                           \r\n     PRICE.PRICEXML AS PRICEXML                                                \r\n   FROM PRICE.PRICE AS PRICE                                                   \r\n   WHERE                                                                       \r\n     PRICE.ACTION = 'I'                                                        \r\n"); getQuerySql(paramADSABRSTATUS, paramString1, paramString2, paramString3, paramString5, paramString6, paramProfile, paramString7, paramString8, stringBuffer); hashtable = processWWPRTPrice(hashtable, paramADSABRSTATUS, stringBuffer.toString(), paramEntityItem, paramProfile); } else if ("EACM".equals(paramString1)) { if ("MODEL".equals(paramString3)) { stringBuffer = new StringBuffer(); stringBuffer.append(SQL_MODEL); getQuerySql(paramADSABRSTATUS, paramString1, paramString2, paramString3, paramString5, paramString6, paramProfile, paramString7, paramString8, stringBuffer); hashtable = processEACMPrice(hashtable, paramADSABRSTATUS, stringBuffer.toString(), paramString1, paramString4, paramEntityItem, paramProfile, paramHashtable, paramString9); } else if ("FEATURE".equals(paramString3)) { stringBuffer = new StringBuffer(); stringBuffer.append(SQL_FEATURE); getQuerySql(paramADSABRSTATUS, paramString1, paramString2, paramString3, paramString5, paramString6, paramProfile, paramString7, paramString8, stringBuffer); hashtable = processEACMPrice(hashtable, paramADSABRSTATUS, stringBuffer.toString(), paramString1, paramString4, paramEntityItem, paramProfile, paramHashtable, paramString9); } else if ("SWFEATURE".equals(paramString3)) { stringBuffer = new StringBuffer(); stringBuffer.append(SQL_SWFEATURE); getQuerySql(paramADSABRSTATUS, paramString1, paramString2, paramString3, paramString5, paramString6, paramProfile, paramString7, paramString8, stringBuffer); hashtable = processEACMPrice(hashtable, paramADSABRSTATUS, stringBuffer.toString(), paramString1, paramString4, paramEntityItem, paramProfile, paramHashtable, ""); } else if ("FCTRANSACTION".equals(paramString3)) { stringBuffer = new StringBuffer(); stringBuffer.append(SQL_FCTRANSACTION); getQuerySql(paramADSABRSTATUS, paramString1, paramString2, paramString3, paramString5, paramString6, paramProfile, paramString7, paramString8, stringBuffer); hashtable = processEACMPrice(hashtable, paramADSABRSTATUS, stringBuffer.toString(), paramString1, paramString4, paramEntityItem, paramProfile, paramHashtable, ""); } else if ("MODELCONVERT".equals(paramString3)) { stringBuffer = new StringBuffer(); stringBuffer.append(SQL_MODELCONVERT); getQuerySql(paramADSABRSTATUS, paramString1, paramString2, paramString3, paramString5, paramString6, paramProfile, paramString7, paramString8, stringBuffer); hashtable = processEACMPrice(hashtable, paramADSABRSTATUS, stringBuffer.toString(), paramString1, paramString4, paramEntityItem, paramProfile, paramHashtable, ""); } else if ("NULL".equals(paramString3)) { stringBuffer = new StringBuffer(); stringBuffer.append(SQL_LSEO); getQuerySql(paramADSABRSTATUS, paramString1, paramString2, paramString3, paramString5, paramString6, paramProfile, paramString7, paramString8, stringBuffer); hashtable = processEACMPrice(hashtable, paramADSABRSTATUS, stringBuffer.toString(), paramString1, paramString4, paramEntityItem, paramProfile, paramHashtable, ""); } else if ("".equals(paramString3)) { stringBuffer = new StringBuffer(); stringBuffer.append(SQL_MODEL); getQuerySql(paramADSABRSTATUS, paramString1, paramString2, paramString3, paramString5, paramString6, paramProfile, paramString7, paramString8, stringBuffer); hashtable = processEACMPrice(hashtable, paramADSABRSTATUS, stringBuffer.toString(), paramString1, paramString4, paramEntityItem, paramProfile, paramHashtable, paramString9); stringBuffer = new StringBuffer(); stringBuffer.append(SQL_FEATURE); getQuerySql(paramADSABRSTATUS, paramString1, paramString2, paramString3, paramString5, paramString6, paramProfile, paramString7, paramString8, stringBuffer); hashtable = processEACMPrice(hashtable, paramADSABRSTATUS, stringBuffer.toString(), paramString1, paramString4, paramEntityItem, paramProfile, paramHashtable, paramString9); stringBuffer = new StringBuffer(); stringBuffer.append(SQL_SWFEATURE); getQuerySql(paramADSABRSTATUS, paramString1, paramString2, paramString3, paramString5, paramString6, paramProfile, paramString7, paramString8, stringBuffer); hashtable = processEACMPrice(hashtable, paramADSABRSTATUS, stringBuffer.toString(), paramString1, paramString4, paramEntityItem, paramProfile, paramHashtable, ""); stringBuffer = new StringBuffer(); stringBuffer.append(SQL_MODELCONVERT); getQuerySql(paramADSABRSTATUS, paramString1, paramString2, paramString3, paramString5, paramString6, paramProfile, paramString7, paramString8, stringBuffer); hashtable = processEACMPrice(hashtable, paramADSABRSTATUS, stringBuffer.toString(), paramString1, paramString4, paramEntityItem, paramProfile, paramHashtable, ""); stringBuffer = new StringBuffer(); stringBuffer.append(SQL_LSEO); getQuerySql(paramADSABRSTATUS, paramString1, paramString2, paramString3, paramString5, paramString6, paramProfile, paramString7, paramString8, stringBuffer); hashtable = processEACMPrice(hashtable, paramADSABRSTATUS, stringBuffer.toString(), paramString1, paramString4, paramEntityItem, paramProfile, paramHashtable, ""); stringBuffer = new StringBuffer(); stringBuffer.append(SQL_ESW); getQuerySql(paramADSABRSTATUS, paramString1, paramString2, paramString3, paramString5, paramString6, paramProfile, paramString7, paramString8, stringBuffer); hashtable = processEACMPrice(hashtable, paramADSABRSTATUS, stringBuffer.toString(), paramString1, paramString4, paramEntityItem, paramProfile, paramHashtable, ""); }  } else { return new Hashtable<>(); }  } else { return new Hashtable<>(); }  return hashtable; } private Hashtable processWWPRTPrice(Hashtable<String, Vector<String>> paramHashtable, ADSABRSTATUS paramADSABRSTATUS, String paramString, EntityItem paramEntityItem, Profile paramProfile) throws MiddlewareException, SQLException, DOMException, MissingResourceException, ParserConfigurationException, TransformerException { Connection connection = null; PreparedStatement preparedStatement = null; ResultSet resultSet = null; connection = paramADSABRSTATUS.getDB().getODSConnection(); preparedStatement = connection.prepareStatement(paramString); resultSet = preparedStatement.executeQuery(); String str1 = ""; boolean bool = false; String str2 = ""; String str3 = ""; Vector<String> vector = null; byte b = 0; while (resultSet.next()) { if (b >= PRICE_ENTITY_LIMIT) { paramADSABRSTATUS.addDebug("ADSPRICEABR WWPRT format clear priceTable result_size=" + b + " \r\n"); bool = true; b = 0; }  str2 = convertValue(resultSet.getString("ID")); str3 = resultSet.getString("PRICEXML"); str1 = str2.trim(); vector = (Vector)paramHashtable.get(str1); if (vector != null && vector.size() > 0 && !bool) { vector.add(str3); paramHashtable.put(str1, vector); } else { bool = clearPriceTable(paramADSABRSTATUS, "WWPRT", paramEntityItem, paramProfile, paramHashtable, bool); vector = new Vector<>(); vector.add(str3); paramHashtable.put(str1, vector); }  b++; }  if (resultSet != null) { resultSet.close(); resultSet = null; }  if (preparedStatement != null) { preparedStatement.close(); preparedStatement = null; }  return paramHashtable; } private Hashtable processEACMPrice(Hashtable<String, Vector<PriceInfo>> paramHashtable1, ADSABRSTATUS paramADSABRSTATUS, String paramString1, String paramString2, String paramString3, EntityItem paramEntityItem, Profile paramProfile, Hashtable paramHashtable2, String paramString4) throws MiddlewareException, SQLException, DOMException, MissingResourceException, ParserConfigurationException, TransformerException { Connection connection = null; PreparedStatement preparedStatement = null; ResultSet resultSet = null; connection = paramADSABRSTATUS.getDB().getODSConnection(); preparedStatement = connection.prepareStatement(paramString1); resultSet = preparedStatement.executeQuery(); byte b1 = 0; String str1 = ""; boolean bool = false; String str2 = ""; String str3 = ""; String str4 = ""; String str5 = ""; String str6 = ""; String str7 = ""; String str8 = ""; String str9 = ""; String str10 = ""; String str11 = ""; String str12 = ""; String str13 = ""; String str14 = ""; String str15 = ""; String str16 = ""; String str17 = ""; String str18 = ""; String str19 = ""; String str20 = ""; String str21 = ""; String str22 = ""; String str23 = ""; String str24 = ""; String str25 = ""; String str26 = ""; String str27 = ""; String str28 = ""; int i = 0; String str29 = ""; String str30 = ""; String str31 = ""; String str32 = ""; String str33 = ""; String str34 = ""; String str35 = ""; boolean bool1 = false; PriceInfo priceInfo = null; Vector<PriceInfo> vector = null; byte b2 = 0; Hashtable hashtable = getDIVTEXTTable(paramString4); while (resultSet.next()) { if (b2 >= PRICE_ENTITY_LIMIT) { paramADSABRSTATUS.addDebug("ADSPRICEABR EACM format clear priceTable result_size=" + b2 + " \r\n"); bool = true; b2 = 0; }  str2 = convertValue(resultSet.getString("PRODUCTOFFERINGTYPE")); str3 = convertValue(resultSet.getString("OFFERING_TYPE")); str4 = convertValue(resultSet.getString("MACHTYPEATR")); str5 = convertValue(resultSet.getString("MODELATR")); str6 = convertValue(resultSet.getString("FEATURECODE")); str7 = convertValue(resultSet.getString("FROM_MACHTYPEATR")); str8 = convertValue(resultSet.getString("FROM_MODELATR")); str9 = convertValue(resultSet.getString("FROM_FEATURECODE")); str10 = convertValue(resultSet.getString("PARTNUM")); str11 = convertValue(resultSet.getString("OFFERING")); str12 = convertValue(resultSet.getString("START_DATE")); str13 = convertValue(resultSet.getString("CURRENCY")); str14 = convertValue(resultSet.getString("CABLETYPE")); str15 = convertValue(resultSet.getString("CABLEID")); str16 = convertValue(resultSet.getString("RELEASE_TS")); str17 = convertValue(resultSet.getString("PRICE_VALUE")); str18 = convertValue(resultSet.getString("PRICE_POINT_TYPE")); str19 = convertValue(resultSet.getString("PRICE_POINT_VALUE")); str20 = convertValue(resultSet.getString("COUNTRY")); str21 = convertValue(resultSet.getString("PRICE_TYPE")); str22 = convertValue(resultSet.getString("ONSHORE")); str23 = convertValue(resultSet.getString("END_DATE")); str24 = convertValue(resultSet.getString("PRICE_VALUE_USD")); str25 = convertValue(resultSet.getString("FACTOR")); str26 = "Update"; if (!"".equals(paramString4)) str27 = convertValue(resultSet.getString("DIV"));  str28 = ""; i = 0; str29 = ""; str30 = ""; str31 = ""; str32 = ""; str33 = ""; str34 = ""; str35 = ""; b1++; str32 = convertValue(resultSet.getString("PDHDOMAIN")); str33 = convertValue(resultSet.getString("PRODUCTCATEGORY")); str34 = convertValue(resultSet.getString("MKTGNAME")); str35 = convertValue(resultSet.getString("INVNAME")); bool1 = false; if ("EEE".equals(str3) || "OSP".equals(str3)) bool1 = true;  str2 = convertValue(resultSet.getString("PRODUCTOFFERINGTYPE")); str28 = convertValue(resultSet.getString("PRODUCTENTITYTYPE")); if (bool1) { str29 = ""; } else { i = resultSet.getInt("PRODUCTENTITYID"); str29 = String.valueOf(i); }  str30 = convertValue(resultSet.getString("PRICEPOINTENTITYTYPE")); str31 = convertValue(resultSet.getString("PRICEPOINTENTITYID")); if ("LSEOBUNDLE".equals(str33)) str33 = getBUNDLETYPE(paramADSABRSTATUS.getDatabase(), paramEntityItem, i, "LSEOBUNDLE");  if (paramString3 != null && !"".equals(paramString3) && !str33.equals(paramString3)) continue;  if (!"".equals(paramString4) && !hashtable.containsKey(str27)) continue;  if (paramHashtable2.size() > 0 && !bool1) if (paramHashtable2.size() != 1 || !paramHashtable2.containsKey(NONEPDHDOMAIN)) { if (str32 == null || "".equals(str32)) continue;  if (!paramHashtable2.containsKey(str32)) continue;  }   str1 = str32 + "|" + str33 + "|" + str2 + "|" + str20 + "|" + str21; priceInfo = new PriceInfo(str2, str4, str5, str6, str7, str8, str9, str10, str11, str12, str13, str14, str15, str16, str17, str18, str19, str20, str21, str22, str23, str24, str25, str26, str32, str33, str28, str29, str30, str31, str34, str35, null); vector = (Vector)paramHashtable1.get(str1); if (vector != null && vector.size() > 0 && !bool) { vector.add(priceInfo); paramHashtable1.put(str1, vector); } else { bool = clearPriceTable(paramADSABRSTATUS, paramString2, paramEntityItem, paramProfile, paramHashtable1, bool); vector = new Vector<>(); vector.add(priceInfo); paramHashtable1.put(str1, vector); }  b2++; }  if (resultSet != null) { resultSet.close(); resultSet = null; }  if (preparedStatement != null) { preparedStatement.close(); preparedStatement = null; }  return paramHashtable1; } private void getQuerySql(ADSABRSTATUS paramADSABRSTATUS, String paramString1, String paramString2, String paramString3, String paramString4, String paramString5, Profile paramProfile, String paramString6, String paramString7, StringBuffer paramStringBuffer) { String str = paramProfile.getValOn(); paramADSABRSTATUS.addDebug(" ADSPRICEABR t2DTS=" + str + "\r\n"); if (paramString2 != null && paramString2.length() == 10) { paramStringBuffer.append(" AND PRICE.INSERT_TS>=concat('").append(paramString2).append("','-00.00.00.000000') and  PRICE.INSERT_TS<='").append(str).append("'  \r\n"); } else { paramStringBuffer.append(" AND PRICE.INSERT_TS>='").append(paramString2).append("' and  PRICE.INSERT_TS<='").append(str).append("'  \r\n"); }  paramADSABRSTATUS.addDebug("ADSPRICEABR INSERT_TS cause is PRICE.INSERT_TS>='" + paramString2 + "' and  PRICE.INSERT_TS<='" + str + "\r\n"); if (paramString4 != null && !"".equals(paramString4)) if (paramString4.indexOf(",") > -1) { paramStringBuffer.append(" AND PRICE.COUNTRY IN(").append(paramString4).append(") \r\n"); } else { paramStringBuffer.append(" AND PRICE.COUNTRY =").append(paramString4).append(" \r\n"); }   if (paramString5 != null && !"".equals(paramString5)) if (paramString5.indexOf(ALLPRICETYPE) > -1) { if (paramString7 != null && !"".equals(paramString7) && paramString7.indexOf(NONEPRICETYPE) == -1) if (paramString7.indexOf(",") > -1) { paramStringBuffer.append(" AND PRICE.PRICE_TYPE NOT IN(").append(paramString7).append(") \r\n"); } else { paramStringBuffer.append(" AND PRICE.PRICE_TYPE<>").append(paramString7).append(" \r\n"); }   } else if (paramString5.indexOf(",") > -1) { paramStringBuffer.append(" AND PRICE.PRICE_TYPE IN(").append(paramString5).append(") \r\n"); } else { paramStringBuffer.append(" AND PRICE.PRICE_TYPE=").append(paramString5).append(" \r\n"); }   if ("EACM".equals(paramString1)) if (paramString6 != null && !"".equals(paramString6)) paramStringBuffer.append(" AND PRICE.END_DATE>=date('").append(paramString6).append("') \r\n");   if ("WWPRT".equals(paramString1)) { if (paramString6 != null && !"".equals(paramString6)) { paramStringBuffer.append(" AND PRICE.END_DATE>=date('").append(paramString6).append("') \r\n"); } else { paramStringBuffer.append(" AND PRICE.END_DATE>=date('").append(str).append("') \r\n"); }  if (paramString3 != null && !"".equals(paramString3)) if ("NULL".equals(paramString3)) { paramStringBuffer.append(" AND PRICE.OFFERING_TYPE in('',").append(offeringtypes).append(") \r\n"); } else { paramStringBuffer.append(" AND PRICE.OFFERING_TYPE='").append(paramString3).append("' \r\n"); }   }  paramStringBuffer.append(" WITH UR"); paramADSABRSTATUS.addDebug(" ADSPRICEABR process Query SQL=\r\n" + paramStringBuffer.toString()); } public boolean clearPriceTable(ADSABRSTATUS paramADSABRSTATUS, String paramString, EntityItem paramEntityItem, Profile paramProfile, Hashtable paramHashtable, boolean paramBoolean) throws ParserConfigurationException, DOMException, TransformerException, MissingResourceException { if (paramBoolean) { if (paramString != null && "WWPRT".equals(paramString)) { sendWWPRTXML(paramADSABRSTATUS, paramProfile, paramEntityItem, paramHashtable); } else { sendEACMXML(paramADSABRSTATUS, paramProfile, paramEntityItem, paramHashtable); }  paramHashtable.clear(); this.isSended = true; paramBoolean = false; System.gc(); }  return paramBoolean; } private String getBUNDLETYPE(Database paramDatabase, EntityItem paramEntityItem, int paramInt, String paramString) throws MiddlewareRequestException, SQLException, MiddlewareException { EntityList entityList = paramDatabase.getEntityList(paramEntityItem.getProfile(), new ExtractActionItem(null, paramDatabase, paramEntityItem.getProfile(), "dummy"), new EntityItem[] { new EntityItem(null, paramEntityItem.getProfile(), paramString, paramInt) }); EntityItem entityItem = entityList.getParentEntityGroup().getEntityItem(0); String str1 = ""; String str2 = "BUNDLETYPE"; EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute(str2); if (eANFlagAttribute != null && eANFlagAttribute.toString().length() > 0) { MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get(); for (byte b = 0; b < arrayOfMetaFlag.length; b++) { if (arrayOfMetaFlag[b].isSelected()) if (str1.equals("@@@")) { str1 = arrayOfMetaFlag[b].toString(); } else { str1 = str1 + "," + arrayOfMetaFlag[b].toString(); }   }  }  if (str1.indexOf("Hardware") > -1) { str1 = "Hardware"; } else if (str1.indexOf("Software") > -1) { str1 = "Software"; } else { str1 = "Service"; }  return str1; } private String convertValue(String paramString) { return (paramString == null) ? "" : paramString.trim(); } private void sendWWPRTXML(ADSABRSTATUS paramADSABRSTATUS, Profile paramProfile, EntityItem paramEntityItem, Hashtable paramHashtable) throws ParserConfigurationException, DOMException, TransformerException, MissingResourceException { paramADSABRSTATUS.addDebug("sendWWPRTXML found " + paramHashtable.size() + " PRICE"); Vector vector = getPeriodicMQ(paramEntityItem); if (vector == null) { paramADSABRSTATUS.addDebug("ADSPRICEABR: No MQ properties files, nothing will be generated."); paramADSABRSTATUS.addXMLGenMsg("NOT_REQUIRED", "PRICE"); } else { Enumeration<String> enumeration = paramHashtable.keys(); int i = 0; String str = ""; Vector<String> vector1 = null; StringBuffer stringBuffer = null; int j = 0; int k = 0; while (enumeration.hasMoreElements()) { PRICE_MESSAGE_COUNT++; str = enumeration.nextElement(); vector1 = (Vector)paramHashtable.get(str); stringBuffer = new StringBuffer(); createWWPRTHead(str, stringBuffer); j = 0; k = 0; for (byte b = 0; b < vector1.size(); b++) { PRICE_RECORD_COUNT++; stringBuffer.append(vector1.elementAt(b)); j++; k++; if (j == PRICE_MQ_LIMIT && k != vector1.size()) { sendPriceWWPRTMessage(paramADSABRSTATUS, vector, stringBuffer); stringBuffer = new StringBuffer(); createWWPRTHead(str, stringBuffer); j = 0; PRICE_MESSAGE_COUNT++; i++; }  }  sendPriceWWPRTMessage(paramADSABRSTATUS, vector, stringBuffer); }  paramHashtable.clear(); }  } private void createWWPRTHead(String paramString, StringBuffer paramStringBuffer) { paramStringBuffer.append("<wwprttxn xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" id=\""); paramStringBuffer.append(paramString); paramStringBuffer.append("\" type=\"price\" xsi:noNamespaceSchemaLocation=\"price.xsd\">"); } private void sendPriceWWPRTMessage(ADSABRSTATUS paramADSABRSTATUS, Vector paramVector, StringBuffer paramStringBuffer) throws ParserConfigurationException, TransformerException, MissingResourceException { long l = System.currentTimeMillis(); String str1 = paramStringBuffer.toString() + "</wwprttxn>"; String str2 = ""; if (str1.indexOf("offeringtype") != -1) { str2 = "XMLPRODPRICESETUP_W2"; } else { str2 = "XMLPRODPRICESETUP_W1"; }  boolean bool = false; String str3 = ABRServerProperties.getValue("ADSABRSTATUS", "_" + str2 + "_XSDNEEDED", "NO"); if ("YES".equals(str3.toUpperCase())) { String str = ABRServerProperties.getValue("ADSABRSTATUS", "_" + str2 + "_XSDFILE", "NONE"); if ("NONE".equals(str)) { paramADSABRSTATUS.addError("there is no xsdfile for " + str2 + " defined in the propertyfile "); } else { long l1 = System.currentTimeMillis(); Class<?> clazz = getClass(); StringBuffer stringBuffer = new StringBuffer(); bool = ABRUtil.validatexml(clazz, stringBuffer, str, str1); if (stringBuffer.length() > 0) { String str4 = stringBuffer.toString(); if (str4.indexOf("fail") != -1) paramADSABRSTATUS.addError(str4);  paramADSABRSTATUS.addOutput(str4); }  long l2 = System.currentTimeMillis(); paramADSABRSTATUS.addDebugComment(3, "Time for validation: " + Stopwatch.format(l2 - l1)); if (bool) paramADSABRSTATUS.addDebug("the xml for " + str2 + " passed the validation");  }  } else { paramADSABRSTATUS.addOutput("the xml for " + str2 + " doesn't need to be validated"); bool = true; }  if (str1 != null && bool) { if (!ADSABRSTATUS.USERXML_OFF_LOG) paramADSABRSTATUS.addDebug("ADSPRICEABR: Generated MQ xml:" + ADSABRSTATUS.NEWLINE + str1 + ADSABRSTATUS.NEWLINE);  paramADSABRSTATUS.notify(this, "PRICE", str1, paramVector); long l1 = System.currentTimeMillis(); if (!ADSABRSTATUS.USERXML_OFF_LOG) paramADSABRSTATUS.addDebug("Sending one wwprt message takes time:" + (l1 - l) + " ms");  this.ALL_WWPRT_SEND_TIME += l1 - l; }  } private void sendPriceMessage(ADSABRSTATUS paramADSABRSTATUS, Vector paramVector, Document paramDocument) throws ParserConfigurationException, TransformerException, MissingResourceException { String str1 = paramADSABRSTATUS.transformXML(this, paramDocument); boolean bool = false; String str2 = "XMLPRODPRICESETUP_E"; String str3 = ABRServerProperties.getValue("ADSABRSTATUS", "_" + str2 + "_XSDNEEDED", "NO"); if ("YES".equals(str3.toUpperCase())) { String str = ABRServerProperties.getValue("ADSABRSTATUS", "_" + str2 + "_XSDFILE", "NONE"); if ("NONE".equals(str)) { paramADSABRSTATUS.addError("there is no xsdfile for " + str2 + " defined in the propertyfile "); } else { long l1 = System.currentTimeMillis(); Class<?> clazz = getClass(); StringBuffer stringBuffer = new StringBuffer(); bool = ABRUtil.validatexml(clazz, stringBuffer, str, str1); if (stringBuffer.length() > 0) { String str4 = stringBuffer.toString(); if (str4.indexOf("fail") != -1) paramADSABRSTATUS.addError(str4);  paramADSABRSTATUS.addOutput(str4); }  long l2 = System.currentTimeMillis(); paramADSABRSTATUS.addDebugComment(3, "Time for validation: " + Stopwatch.format(l2 - l1)); if (bool) paramADSABRSTATUS.addDebug("the xml for " + str2 + " passed the validation");  }  } else { paramADSABRSTATUS.addOutput("the xml for " + str2 + " doesn't need to be validated"); bool = true; }  if (str1 != null && bool) { if (!ADSABRSTATUS.USERXML_OFF_LOG) paramADSABRSTATUS.addDebug("ADSPRICEABR: Generated MQ xml:" + ADSABRSTATUS.NEWLINE + str1 + ADSABRSTATUS.NEWLINE);  paramADSABRSTATUS.notify(this, "PRICE", str1, paramVector); }  } private void sendEACMXML(ADSABRSTATUS paramADSABRSTATUS, Profile paramProfile, EntityItem paramEntityItem, Hashtable paramHashtable) throws ParserConfigurationException, DOMException, TransformerException, MissingResourceException { paramADSABRSTATUS.addDebug("sendEACMXML found " + paramHashtable.size() + " PRICE"); Vector vector = getPeriodicMQ(paramEntityItem); if (vector == null) { paramADSABRSTATUS.addDebug("ADSPRICEABR: No MQ properties files, nothing will be generated."); paramADSABRSTATUS.addXMLGenMsg("NOT_REQUIRED", "PRICE"); } else { DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance(); DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder(); Enumeration<String> enumeration = paramHashtable.keys(); int i = 0; String str = ""; Vector<PriceInfo> vector1 = null; PriceInfo priceInfo = null; Document document = null; Element element1 = null; int j = 0; int k = 0; Element element2 = null; while (enumeration.hasMoreElements()) { PRICE_MESSAGE_COUNT++; str = enumeration.nextElement(); vector1 = (Vector)paramHashtable.get(str); priceInfo = vector1.get(0); document = documentBuilder.newDocument(); element1 = createEACMParent(paramProfile, priceInfo, document); j = 0; k = 0; for (byte b = 0; b < vector1.size(); b++) { PRICE_RECORD_COUNT++; priceInfo = vector1.elementAt(b); element2 = document.createElement("PRODUCTELEMENT"); element1.appendChild(element2); Element element3 = document.createElement("PRODUCTENTITYTYPE"); element3.appendChild(document.createTextNode(priceInfo.PRODUCTENTITYTYPE)); element2.appendChild(element3); element3 = document.createElement("PRODUCTENTITYID"); element3.appendChild(document.createTextNode(priceInfo.PRODUCTENTITYID)); element2.appendChild(element3); element3 = document.createElement("PRICEPOINTENTITYTYPE"); element3.appendChild(document.createTextNode(priceInfo.PRICEPOINTENTITYTYPE)); element2.appendChild(element3); element3 = document.createElement("PRICEPOINTENTITYID"); element3.appendChild(document.createTextNode(priceInfo.PRICEPOINTENTITYID)); element2.appendChild(element3); element3 = document.createElement("MACHTYPE"); element3.appendChild(document.createTextNode(priceInfo.MACHTYPE)); element2.appendChild(element3); element3 = document.createElement("MODEL"); element3.appendChild(document.createTextNode(priceInfo.MODEL)); element2.appendChild(element3); element3 = document.createElement("FEATURECODE"); element3.appendChild(document.createTextNode(priceInfo.FEATURECODE)); element2.appendChild(element3); element3 = document.createElement("FROMMACHTYPE"); element3.appendChild(document.createTextNode(priceInfo.FROMMACHTYPE)); element2.appendChild(element3); element3 = document.createElement("FROMMODEL"); element3.appendChild(document.createTextNode(priceInfo.FROMMODEL)); element2.appendChild(element3); element3 = document.createElement("FROMFEATURECODE"); element3.appendChild(document.createTextNode(priceInfo.FROMFEATURECODE)); element2.appendChild(element3); element3 = document.createElement("SEOID"); element3.appendChild(document.createTextNode(priceInfo.SEOID)); element2.appendChild(element3); element3 = document.createElement("MKTGNAME"); element3.appendChild(document.createTextNode(priceInfo.MKTGNAME)); element2.appendChild(element3); element3 = document.createElement("INVNAME"); element3.appendChild(document.createTextNode(priceInfo.INVNAME)); element2.appendChild(element3); Element element4 = document.createElement("PRICELIST"); element2.appendChild(element4); printPriceInfo(priceInfo, document, element4); j++; k++; if (j == PRICE_MQ_LIMIT && k != vector1.size()) { sendPriceMessage(paramADSABRSTATUS, vector, document); document = documentBuilder.newDocument(); element1 = createEACMParent(paramProfile, priceInfo, document); j = 0; PRICE_MESSAGE_COUNT++; i++; }  }  priceInfo.dereference(); sendPriceMessage(paramADSABRSTATUS, vector, document); }  paramHashtable.clear(); }  } private Element createEACMParent(Profile paramProfile, PriceInfo paramPriceInfo, Document paramDocument) throws DOMException { Element element1 = paramDocument.createElement("PRODUCT_PRICE_UPDATE"); element1.setAttribute("xmlns", "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/PRODUCT_PRICE_UPDATE"); element1.appendChild(paramDocument.createComment("PRODUCT_PRICE_UPDATE Version 1 Mod 0")); paramDocument.appendChild(element1); Element element2 = paramDocument.createElement("DTSOFMSG"); element2.appendChild(paramDocument.createTextNode(paramProfile.getEndOfDay())); element1.appendChild(element2); element2 = paramDocument.createElement("ACTIVITY"); element2.appendChild(paramDocument.createTextNode(paramPriceInfo.ACTIVITY)); element1.appendChild(element2); element2 = paramDocument.createElement("PDHDOMAIN"); element2.appendChild(paramDocument.createTextNode(paramPriceInfo.PDHDOMAIN)); element1.appendChild(element2); element2 = paramDocument.createElement("PRODUCTCATEGORY"); element2.appendChild(paramDocument.createTextNode(paramPriceInfo.PRODUCTCATEGORY)); element1.appendChild(element2); element2 = paramDocument.createElement("PRODUCTOFFERINGTYPE"); element2.appendChild(paramDocument.createTextNode(paramPriceInfo.PRODUCTOFFERINGTYPE)); element1.appendChild(element2); Element element3 = paramDocument.createElement("PRODUCTLIST"); element1.appendChild(element3); return element3; } static { String str1 = ABRServerProperties.getValue("ADSABRSTATUS", "_PRICE_ENTITY_LIMIT", "50000");
+/*  129 */     String str2 = ABRServerProperties.getValue("ADSABRSTATUS", "_PRICE_MQ_LIMIT", "1000");
+/*  130 */     PRICE_ENTITY_LIMIT = Integer.parseInt(str1);
+/*  131 */     PRICE_MQ_LIMIT = Integer.parseInt(str2);
+/*  132 */     NONEPDHDOMAIN = ABRServerProperties.getValue("ADSABRSTATUS", "_NONEPDHDOMAIN", "$None$");
+/*  133 */     ALLPRICETYPE = ABRServerProperties.getValue("ADSABRSTATUS", "_ALLPRICETYPE", "$ALL$");
+/*  134 */     NONEPRICETYPE = ABRServerProperties.getValue("ADSABRSTATUS", "_NONEPRICETYPE", "$NONE$");
+/*  135 */     OFFERINGTYPE = ABRServerProperties.getValue("ADSABRSTATUS", "_OFFERINGTYPE", "SEO,EEE,OSP");
+/*      */     
+/*  137 */     String[] arrayOfString = OFFERINGTYPE.split(",");
+/*  138 */     for (byte b = 0; b < arrayOfString.length; b++) {
+/*  139 */       if (b == 0) { offeringtypes = "'" + arrayOfString[b] + "'"; }
+/*  140 */       else { offeringtypes += ",'" + arrayOfString[b] + "'"; }
+/*      */     
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1703 */     SQL_MODEL = "  SELECT                                                                       \r\n    PRICE.ID AS ID,                                                            \r\n    PRICE.INSERT_TS AS INSERT_TS,                                              \r\n    MODEL.PDHDOMAIN AS PDHDOMAIN,                                              \r\n    MODEL.COFCAT AS PRODUCTCATEGORY,                                           \r\n    PRICE.OFFERING_TYPE AS PRODUCTOFFERINGTYPE,                                \r\n    PRICE.OFFERING_TYPE AS OFFERING_TYPE,                                      \r\n    'MACHTYPE' AS PRODUCTENTITYTYPE,                                           \r\n    MODEL.MACHID AS PRODUCTENTITYID,                                           \r\n    'MODEL' AS PRICEPOINTENTITYTYPE,                                           \r\n    MODEL.MDLID AS PRICEPOINTENTITYID,                                         \r\n    MODEL.MACHTYPEATR AS MACHTYPEATR,                                          \r\n    MODEL.MODELATR AS MODELATR,                                                \r\n    '' AS FEATURECODE,                                                         \r\n    '' AS FROM_MACHTYPEATR,                                                    \r\n    '' AS FROM_MODELATR,                                                       \r\n    '' AS FROM_FEATURECODE,                                                    \r\n    '' AS PARTNUM,                                                             \r\n    MODEL.MKTGNAME AS MKTGNAME,                                                \r\n    MODEL.INVNAME AS INVNAME,                                                  \r\n    PRICE.OFFERING AS OFFERING,                                                \r\n    PRICE.START_DATE AS START_DATE,                                            \r\n    PRICE.CURRENCY AS CURRENCY,                                                \r\n    PRICE.CABLETYPE AS CABLETYPE,                                              \r\n    PRICE.CABLEID AS CABLEID,                                                  \r\n    PRICE.RELEASE_TS AS RELEASE_TS,                                            \r\n    PRICE.PRICE_VALUE AS PRICE_VALUE,                                          \r\n    PRICE.PRICE_POINT_TYPE AS PRICE_POINT_TYPE,                                \r\n    PRICE.PRICE_POINT_VALUE AS PRICE_POINT_VALUE,                              \r\n    PRICE.COUNTRY AS COUNTRY,                                                  \r\n    PRICE.PRICE_TYPE AS PRICE_TYPE,                                            \r\n    PRICE.ONSHORE AS ONSHORE,                                                  \r\n    PRICE.END_DATE AS END_DATE,                                                \r\n    PRICE.PRICE_VALUE_USD AS PRICE_VALUE_USD,                                  \r\n    PRICE.FACTOR AS FACTOR,                                                    \r\n    MODEL.DIV AS DIV                                                           \r\n  FROM PRICE.PRICE AS PRICE                                                    \r\n  INNER JOIN PRICE.MDLINFO AS MODEL ON                                         \r\n    PRICE.MACHTYPEATR = MODEL.MACHTYPEATR AND                                  \r\n    PRICE.MODELATR = MODEL.MODELATR                                            \r\n  WHERE                                                                        \r\n    PRICE.ACTION = 'I' AND                                                     \r\n    PRICE.PRICE_POINT_TYPE='MOD'                                               \r\n";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1749 */     SQL_FEATURE = "  SELECT                                                                                          \r\n    PRICE.ID AS ID,                                                                               \r\n    PRICE.INSERT_TS AS INSERT_TS,                                                                 \r\n    TMF.PDHDOMAIN AS PDHDOMAIN,                                                                   \r\n    TMF.COFCAT AS PRODUCTCATEGORY,                                                                \r\n    TMF.OFFTYPE AS PRODUCTOFFERINGTYPE,                                                           \r\n    TMF.OFFTYPE AS OFFERING_TYPE,                                                                 \r\n    TMF.PRODTYPE AS PRODUCTENTITYTYPE,                                                            \r\n    TMF.MACHID AS PRODUCTENTITYID,                                                                \r\n    TMF.FEATTYPE AS PRICEPOINTENTITYTYPE,                                                         \r\n    TMF.FEATID AS PRICEPOINTENTITYID,                                                             \r\n    TMF.MACHTYPEATR AS MACHTYPEATR,                                                               \r\n    PRICE.MODELATR AS MODELATR,                                                                   \r\n    TMF.FEATURECODE AS FEATURECODE,                                                               \r\n                                                                                                  \r\n    '' AS FROM_MACHTYPEATR,                                                                       \r\n    '' AS FROM_MODELATR,                                                                          \r\n    '' AS FROM_FEATURECODE,                                                                       \r\n    '' AS PARTNUM,                                                                                \r\n    TMF.MKTGNAME AS MKTGNAME,                                                                     \r\n    TMF.BHINVNAME AS INVNAME,                                                                     \r\n    PRICE.OFFERING AS OFFERING,                                                                   \r\n    PRICE.START_DATE AS START_DATE,                                                               \r\n    PRICE.CURRENCY AS CURRENCY,                                                                   \r\n    PRICE.CABLETYPE AS CABLETYPE,                                                                 \r\n    PRICE.CABLEID AS CABLEID,                                                                     \r\n    PRICE.RELEASE_TS AS RELEASE_TS,                                                               \r\n    PRICE.PRICE_VALUE AS PRICE_VALUE,                                                             \r\n    PRICE.PRICE_POINT_TYPE AS PRICE_POINT_TYPE,                                                   \r\n    PRICE.PRICE_POINT_VALUE AS PRICE_POINT_VALUE,                                                 \r\n    PRICE.COUNTRY AS COUNTRY,                                                                     \r\n    PRICE.PRICE_TYPE AS PRICE_TYPE,                                                               \r\n    PRICE.ONSHORE AS ONSHORE,                                                                     \r\n    PRICE.END_DATE AS END_DATE,                                                                   \r\n    PRICE.PRICE_VALUE_USD AS PRICE_VALUE_USD,                                                     \r\n    PRICE.FACTOR AS FACTOR,                                                                       \r\n    TMF.DIV AS DIV                                                                                \r\n  FROM PRICE.PRICE AS PRICE                                                                       \r\n  INNER JOIN PRICE.TMF TMF ON                                                                     \r\n  PRICE.MACHTYPEATR = TMF.MACHTYPEATR AND                                                         \r\n  PRICE.FEATURECODE = TMF.FEATURECODE                                                             \r\n  WHERE                                                                                           \r\n    PRICE.ACTION = 'I' AND                                                                        \r\n    PRICE.PRICE_POINT_TYPE in ('FEA','RPQ')                                                       \r\n";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1998 */     SQL_SWFEATURE = "  SELECT                                                                       \r\n    PRICE.ID AS ID,                                                            \r\n    PRICE.INSERT_TS AS INSERT_TS,                                              \r\n    SWTMF.PDHDOMAIN AS PDHDOMAIN,                                              \r\n    SWTMF.COFCAT AS PRODUCTCATEGORY,                                           \r\n    PRICE.OFFERING_TYPE AS PRODUCTOFFERINGTYPE,                                \r\n    PRICE.OFFERING_TYPE AS OFFERING_TYPE,                                      \r\n    'MODEL' AS PRODUCTENTITYTYPE,                                              \r\n    SWTMF.MDLID AS PRODUCTENTITYID,                                            \r\n    'SWFEATURE' AS PRICEPOINTENTITYTYPE,                                       \r\n    SWTMF.SWFEATID AS PRICEPOINTENTITYID,                                      \r\n    SWTMF.MACHTYPEATR AS MACHTYPEATR,                                          \r\n    SWTMF.MODELATR AS MODELATR,                                                \r\n    SWTMF.FEATURECODE AS FEATURECODE,                                          \r\n    '' AS FROM_MACHTYPEATR,                                                    \r\n    '' AS FROM_MODELATR,                                                       \r\n    '' AS FROM_FEATURECODE,                                                    \r\n    '' AS PARTNUM,                                                             \r\n    SWTMF.SWFEATDESC AS MKTGNAME,                                              \r\n    SWTMF.BHINVNAME AS INVNAME,                                                \r\n    PRICE.OFFERING AS OFFERING,                                                \r\n    PRICE.START_DATE AS START_DATE,                                            \r\n    PRICE.CURRENCY AS CURRENCY,                                                \r\n    PRICE.CABLETYPE AS CABLETYPE,                                              \r\n    PRICE.CABLEID AS CABLEID,                                                  \r\n    PRICE.RELEASE_TS AS RELEASE_TS,                                            \r\n    PRICE.PRICE_VALUE AS PRICE_VALUE,                                          \r\n    PRICE.PRICE_POINT_TYPE AS PRICE_POINT_TYPE,                                \r\n    PRICE.PRICE_POINT_VALUE AS PRICE_POINT_VALUE,                              \r\n    PRICE.COUNTRY AS COUNTRY,                                                  \r\n    PRICE.PRICE_TYPE AS PRICE_TYPE,                                            \r\n    PRICE.ONSHORE AS ONSHORE,                                                  \r\n    PRICE.END_DATE AS END_DATE,                                                \r\n    PRICE.PRICE_VALUE_USD AS PRICE_VALUE_USD,                                  \r\n    PRICE.FACTOR AS FACTOR                                                     \r\n  FROM PRICE.PRICE AS PRICE                                                    \r\n  INNER JOIN PRICE.SWTMF AS SWTMF ON                                           \r\n    PRICE.OFFERING=CONCAT(SWTMF.MACHTYPEATR,SWTMF.MODELATR) AND                \r\n    PRICE.PRICE_POINT_VALUE=SWTMF.FEATURECODE                                  \r\n  WHERE                                                                        \r\n    PRICE.ACTION = 'I' AND                                                     \r\n    PRICE.PRICE_POINT_TYPE in ('SWF','WSF')                                    \r\n";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 2042 */     SQL_FCTRANSACTION = "  SELECT                                                                       \r\n    PRICE.ID AS ID,                                                            \r\n    PRICE.INSERT_TS AS INSERT_TS,                                              \r\n    FCTRANSACTION.PDHDOMAIN AS PDHDOMAIN,                                      \r\n    'Hardware' AS PRODUCTCATEGORY,                                             \r\n    CASE                                                                       \r\n        WHEN PRICE.PRICE_POINT_TYPE='FUP' THEN 'Feature Upgrade'               \r\n        WHEN PRICE.PRICE_POINT_TYPE='TFU' THEN 'Type Feature Upgrade'          \r\n        ELSE ''                                                                \r\n    END AS PRODUCTOFFERINGTYPE,                                                \r\n    PRICE.OFFERING_TYPE AS OFFERING_TYPE,                                      \r\n    'FCTRANSACTION' AS PRODUCTENTITYTYPE,                                      \r\n    FCTRANSACTION.ENTITYID AS PRODUCTENTITYID,                                 \r\n    '' AS PRICEPOINTENTITYTYPE,                                                \r\n    '' AS PRICEPOINTENTITYID,                                                  \r\n    PRICE.MACHTYPEATR AS MACHTYPEATR,                                          \r\n    FCTRANSACTION.TOMODEL AS MODELATR,                                         \r\n    PRICE.FEATURECODE AS FEATURECODE,                                          \r\n    PRICE.FROM_MACHTYPEATR AS FROM_MACHTYPEATR,                                \r\n    FCTRANSACTION.FROMMODEL AS FROM_MODELATR,                                  \r\n    PRICE.FROM_FEATURECODE AS FROM_FEATURECODE,                                \r\n    '' AS PARTNUM,                                                             \r\n    '' AS MKTGNAME,                                                            \r\n    '' AS INVNAME,                                                             \r\n    PRICE.OFFERING AS OFFERING,                                                \r\n    PRICE.START_DATE AS START_DATE,                                            \r\n    PRICE.CURRENCY AS CURRENCY,                                                \r\n    PRICE.CABLETYPE AS CABLETYPE,                                              \r\n    PRICE.CABLEID AS CABLEID,                                                  \r\n    PRICE.RELEASE_TS AS RELEASE_TS,                                            \r\n    PRICE.PRICE_VALUE AS PRICE_VALUE,                                          \r\n    PRICE.PRICE_POINT_TYPE AS PRICE_POINT_TYPE,                                \r\n    PRICE.PRICE_POINT_VALUE AS PRICE_POINT_VALUE,                              \r\n    PRICE.COUNTRY AS COUNTRY,                                                  \r\n    PRICE.PRICE_TYPE AS PRICE_TYPE,                                            \r\n    PRICE.ONSHORE AS ONSHORE,                                                  \r\n    PRICE.END_DATE AS END_DATE,                                                \r\n    PRICE.PRICE_VALUE_USD AS PRICE_VALUE_USD,                                  \r\n    PRICE.FACTOR AS FACTOR                                                     \r\n  FROM PRICE.PRICE AS PRICE                                                    \r\n  INNER JOIN PRICE.FCTRANSACTION AS FCTRANSACTION ON                           \r\n    CAST(PRICE.FROM_MACHTYPEATR AS INTEGER)=  FCTRANSACTION.FROMMACHTYPE AND   \r\n    PRICE.FROM_FEATURECODE = FCTRANSACTION.FROMFEATURECODE AND                 \r\n    CAST(PRICE.MACHTYPEATR AS INTEGER) = FCTRANSACTION.TOMACHTYPE AND          \r\n    PRICE.FEATURECODE = FCTRANSACTION.TOFEATURECODE                            \r\n  WHERE                                                                        \r\n    PRICE.ACTION = 'I' AND                                                     \r\n    PRICE.OFFERING_TYPE = 'FCTRANSACTION' AND                                  \r\n    PRICE.PRICE_POINT_TYPE in('FUP','TFU')                                     \r\n";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 2093 */     SQL_MODELCONVERT = "  SELECT                                                                       \r\n    PRICE.ID AS ID,                                                            \r\n    PRICE.INSERT_TS AS INSERT_TS,                                              \r\n    MODELCONVERT.PDHDOMAIN AS PDHDOMAIN,                                       \r\n    'Hardware' AS PRODUCTCATEGORY,                                             \r\n    CASE                                                                       \r\n        WHEN PRICE.PRICE_POINT_TYPE='MUP' THEN 'Model Upgrade'                 \r\n        WHEN PRICE.PRICE_POINT_TYPE='TMU' THEN 'Type Model Upgrade'            \r\n        ELSE ''                                                                \r\n    END AS PRODUCTOFFERINGTYPE,                                                \r\n    PRICE.OFFERING_TYPE AS OFFERING_TYPE,                                      \r\n                                                                               \r\n    'MODELCONVERT' AS PRODUCTENTITYTYPE,                                       \r\n    MODELCONVERT.ENTITYID AS PRODUCTENTITYID,                                  \r\n    '' AS PRICEPOINTENTITYTYPE,                                                \r\n    '' AS PRICEPOINTENTITYID,                                                  \r\n                                                                               \r\n    PRICE.MACHTYPEATR AS MACHTYPEATR,                                          \r\n    PRICE.MODELATR AS MODELATR,                                                \r\n    '' AS FEATURECODE,                                                         \r\n    PRICE.FROM_MACHTYPEATR AS FROM_MACHTYPEATR,                                \r\n    PRICE.FROM_MODELATR AS FROM_MODELATR,                                      \r\n    '' AS FROM_FEATURECODE,                                                    \r\n    '' AS PARTNUM,                                                             \r\n    '' AS MKTGNAME,                                                            \r\n    '' AS INVNAME,                                                             \r\n    PRICE.OFFERING AS OFFERING,                                                \r\n    PRICE.START_DATE AS START_DATE,                                            \r\n    PRICE.CURRENCY AS CURRENCY,                                                \r\n    PRICE.CABLETYPE AS CABLETYPE,                                              \r\n    PRICE.CABLEID AS CABLEID,                                                  \r\n    PRICE.RELEASE_TS AS RELEASE_TS,                                            \r\n    PRICE.PRICE_VALUE AS PRICE_VALUE,                                          \r\n    PRICE.PRICE_POINT_TYPE AS PRICE_POINT_TYPE,                                \r\n    PRICE.PRICE_POINT_VALUE AS PRICE_POINT_VALUE,                              \r\n    PRICE.COUNTRY AS COUNTRY,                                                  \r\n    PRICE.PRICE_TYPE AS PRICE_TYPE,                                            \r\n    PRICE.ONSHORE AS ONSHORE,                                                  \r\n    PRICE.END_DATE AS END_DATE,                                                \r\n    PRICE.PRICE_VALUE_USD AS PRICE_VALUE_USD,                                  \r\n    PRICE.FACTOR AS FACTOR                                                     \r\n  FROM PRICE.PRICE AS PRICE                                                    \r\n  INNER JOIN PRICE.MODELCONVERT AS MODELCONVERT ON                             \r\n    CAST(PRICE.FROM_MACHTYPEATR AS INTEGER)=  MODELCONVERT.FROMMACHTYPE AND    \r\n    PRICE.FROM_MODELATR = MODELCONVERT.FROMMODEL AND                           \r\n    CAST(PRICE.MACHTYPEATR AS INTEGER) = MODELCONVERT.TOMACHTYPE AND           \r\n    PRICE.MODELATR = MODELCONVERT.TOMODEL                                      \r\n  WHERE                                                                        \r\n    PRICE.ACTION = 'I' AND                                                     \r\n    PRICE.OFFERING_TYPE = 'MODELCONVERT' AND                                   \r\n    PRICE.PRICE_POINT_TYPE in ('MUP','TMU')                                    \r\n";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 2147 */     SQL_LSEO = "  SELECT                                                                       \r\n    PRICE.ID AS ID,                                                            \r\n    PRICE.INSERT_TS AS INSERT_TS,                                              \r\n    LSEO.PDHDOMAIN AS PDHDOMAIN,                                               \r\n    LSEO.COFCAT AS PRODUCTCATEGORY,                                            \r\n    LSEO.SEOTYPE AS PRODUCTOFFERINGTYPE,                                       \r\n    PRICE.OFFERING_TYPE AS OFFERING_TYPE,                                      \r\n    LSEO.SEOTYPE AS PRODUCTENTITYTYPE,                                         \r\n    LSEO.ENTITYID AS PRODUCTENTITYID,                                          \r\n    '' AS PRICEPOINTENTITYTYPE,                                                \r\n    '' AS PRICEPOINTENTITYID,                                                  \r\n    LSEO.MACHTYPEATR AS MACHTYPEATR,                                           \r\n    LSEO.MODELATR AS MODELATR,                                                 \r\n    '' AS FEATURECODE,                                                         \r\n    '' AS FROM_MACHTYPEATR,                                                    \r\n    '' AS FROM_MODELATR,                                                       \r\n    '' AS FROM_FEATURECODE,                                                    \r\n    LSEO.SEOID AS PARTNUM,                                                     \r\n    LSEO.MKTGDESC AS MKTGNAME,                                                 \r\n    LSEO.PRCFILENAM AS INVNAME,                                                \r\n    PRICE.OFFERING AS OFFERING,                                                \r\n    PRICE.START_DATE AS START_DATE,                                            \r\n    PRICE.CURRENCY AS CURRENCY,                                                \r\n    PRICE.CABLETYPE AS CABLETYPE,                                              \r\n    PRICE.CABLEID AS CABLEID,                                                  \r\n    PRICE.RELEASE_TS AS RELEASE_TS,                                            \r\n    PRICE.PRICE_VALUE AS PRICE_VALUE,                                          \r\n    PRICE.PRICE_POINT_TYPE AS PRICE_POINT_TYPE,                                \r\n    PRICE.PRICE_POINT_VALUE AS PRICE_POINT_VALUE,                              \r\n    PRICE.COUNTRY AS COUNTRY,                                                  \r\n    PRICE.PRICE_TYPE AS PRICE_TYPE,                                            \r\n    PRICE.ONSHORE AS ONSHORE,                                                  \r\n    PRICE.END_DATE AS END_DATE,                                                \r\n    PRICE.PRICE_VALUE_USD AS PRICE_VALUE_USD,                                  \r\n    PRICE.FACTOR AS FACTOR                                                     \r\n  FROM PRICE.PRICE AS PRICE                                                    \r\n  JOIN PRICE.LSEOINFO AS LSEO                                                  \r\n  ON PRICE.PARTNUM=LSEO.SEOID                                                  \r\n  WHERE                                                                        \r\n    PRICE.ACTION = 'I' AND                                                     \r\n    PRICE.PRICE_POINT_TYPE in('','SEO')                                        \r\n";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 2192 */     SQL_ESW = "  SELECT                                                                       \r\n    PRICE.ID AS ID,                                                            \r\n    PRICE.INSERT_TS AS INSERT_TS,                                              \r\n    '' AS PDHDOMAIN,                                                           \r\n    PRICE.OFFERING_TYPE AS PRODUCTCATEGORY,                                    \r\n    '' AS PRODUCTOFFERINGTYPE,                                                 \r\n    PRICE.OFFERING_TYPE AS OFFERING_TYPE,                                      \r\n                                                                               \r\n    '' AS PRODUCTENTITYTYPE,                                                   \r\n    '' AS PRODUCTENTITYID,                                                     \r\n    '' AS PRICEPOINTENTITYTYPE,                                                \r\n    '' AS PRICEPOINTENTITYID,                                                  \r\n                                                                               \r\n    '' AS MACHTYPEATR,                                                         \r\n    '' AS MODELATR,                                                            \r\n    '' AS FEATURECODE,                                                         \r\n    '' AS FROM_MACHTYPEATR,                                                    \r\n    '' AS FROM_MODELATR,                                                       \r\n    '' AS FROM_FEATURECODE,                                                    \r\n    '' AS PARTNUM,                                                             \r\n    '' AS MKTGNAME,                                                            \r\n    '' AS INVNAME,                                                             \r\n    PRICE.OFFERING AS OFFERING,                                                \r\n    PRICE.START_DATE AS START_DATE,                                            \r\n    PRICE.CURRENCY AS CURRENCY,                                                \r\n    PRICE.CABLETYPE AS CABLETYPE,                                              \r\n    PRICE.CABLEID AS CABLEID,                                                  \r\n    PRICE.RELEASE_TS AS RELEASE_TS,                                            \r\n    PRICE.PRICE_VALUE AS PRICE_VALUE,                                          \r\n    PRICE.PRICE_POINT_TYPE AS PRICE_POINT_TYPE,                                \r\n    PRICE.PRICE_POINT_VALUE AS PRICE_POINT_VALUE,                              \r\n    PRICE.COUNTRY AS COUNTRY,                                                  \r\n    PRICE.PRICE_TYPE AS PRICE_TYPE,                                            \r\n    PRICE.ONSHORE AS ONSHORE,                                                  \r\n    PRICE.END_DATE AS END_DATE,                                                \r\n    PRICE.PRICE_VALUE_USD AS PRICE_VALUE_USD,                                  \r\n    PRICE.FACTOR AS FACTOR                                                     \r\n  FROM PRICE.PRICE AS PRICE                                                    \r\n  WHERE                                                                        \r\n    PRICE.ACTION = 'I' AND                                                     \r\n    PRICE.OFFERING_TYPE in ('EEE','OSP') AND                                   \r\n    PRICE.PRICE_POINT_TYPE =''                                                 \r\n"; }
+/*      */   private void printPriceInfo(PriceInfo paramPriceInfo, Document paramDocument, Element paramElement) throws DOMException { Element element2 = paramDocument.createElement("price"); paramElement.appendChild(element2); Element element1 = paramDocument.createElement("offering"); element1.appendChild(paramDocument.createTextNode(paramPriceInfo.OFFERING)); element2.appendChild(element1); element1 = paramDocument.createElement("startdate"); element1.appendChild(paramDocument.createTextNode(paramPriceInfo.STARTDATE)); element2.appendChild(element1); element1 = paramDocument.createElement("currency"); element1.appendChild(paramDocument.createTextNode(paramPriceInfo.CURRENCY)); element2.appendChild(element1); element1 = paramDocument.createElement("cabletype"); element1.appendChild(paramDocument.createTextNode(paramPriceInfo.CABLETYPE)); element2.appendChild(element1); element1 = paramDocument.createElement("cableid"); element1.appendChild(paramDocument.createTextNode(paramPriceInfo.CABLEID)); element2.appendChild(element1); element1 = paramDocument.createElement("releasets"); element1.appendChild(paramDocument.createTextNode(paramPriceInfo.RELEASETS)); element2.appendChild(element1); element1 = paramDocument.createElement("pricevalue"); element1.appendChild(paramDocument.createTextNode(paramPriceInfo.PRICEVALUE)); element2.appendChild(element1); element1 = paramDocument.createElement("pricepointtype"); element1.appendChild(paramDocument.createTextNode(paramPriceInfo.PRICEPOINTTYPE)); element2.appendChild(element1); element1 = paramDocument.createElement("pricepointvalue"); element1.appendChild(paramDocument.createTextNode(paramPriceInfo.PRICEPOINTVALUE)); element2.appendChild(element1); element1 = paramDocument.createElement("country"); element1.appendChild(paramDocument.createTextNode(paramPriceInfo.COUNTRY)); element2.appendChild(element1); element1 = paramDocument.createElement("pricetype"); element1.appendChild(paramDocument.createTextNode(paramPriceInfo.PRICETYPE)); element2.appendChild(element1); element1 = paramDocument.createElement("onshore"); element1.appendChild(paramDocument.createTextNode(paramPriceInfo.ONSHORE)); element2.appendChild(element1); element1 = paramDocument.createElement("enddate"); element1.appendChild(paramDocument.createTextNode(paramPriceInfo.ENDDATE)); element2.appendChild(element1); element1 = paramDocument.createElement("pricevalueusd"); element1.appendChild(paramDocument.createTextNode(paramPriceInfo.PRICEVALUEUSD)); element2.appendChild(element1); element1 = paramDocument.createElement("factor"); element1.appendChild(paramDocument.createTextNode(paramPriceInfo.FACTOR)); element2.appendChild(element1); }
+/*      */   private String getDescription(EntityItem paramEntityItem, String paramString1, String paramString2) { String str = ""; EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)paramEntityItem.getAttribute(paramString1); if (eANFlagAttribute != null && eANFlagAttribute.toString().length() > 0) { MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get(); StringBuffer stringBuffer = new StringBuffer(); for (byte b = 0; b < arrayOfMetaFlag.length; b++) { if (arrayOfMetaFlag[b].isSelected()) { if (stringBuffer.length() > 0)
+/*      */             stringBuffer.append(",");  if (paramString2.equals("short")) { stringBuffer.append(arrayOfMetaFlag[b].getShortDescription()); }
+/*      */           else if (paramString2.equals("long")) { stringBuffer.append(arrayOfMetaFlag[b].getLongDescription()); }
+/*      */           else if (paramString2.equals("flag")) { stringBuffer.append(arrayOfMetaFlag[b].getFlagCode()); }
+/*      */           else { stringBuffer.append(arrayOfMetaFlag[b].toString()); }
+/*      */            }
+/*      */          }
+/*      */        str = stringBuffer.toString(); }
+/*      */      return str; }
+/*      */   private String getMultiDescription(EntityItem paramEntityItem, String paramString1, String paramString2) { String str = ""; EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)paramEntityItem.getAttribute(paramString1); if (eANFlagAttribute != null && eANFlagAttribute.toString().length() > 0) { MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get(); StringBuffer stringBuffer = new StringBuffer(); for (byte b = 0; b < arrayOfMetaFlag.length; b++) { if (arrayOfMetaFlag[b].isSelected()) {
+/*      */           if (stringBuffer.length() > 0)
+/*      */             stringBuffer.append(",");  if (paramString2.equals("short")) {
+/*      */             stringBuffer.append("'").append(arrayOfMetaFlag[b].getShortDescription()).append("'");
+/*      */           } else if (paramString2.equals("long")) {
+/*      */             stringBuffer.append("'").append(arrayOfMetaFlag[b].getLongDescription()).append("'");
+/*      */           } else if (paramString2.equals("flag")) {
+/*      */             stringBuffer.append("'").append(arrayOfMetaFlag[b].getFlagCode()).append("'");
+/*      */           } else {
+/*      */             stringBuffer.append("'").append(arrayOfMetaFlag[b].toString()).append("'");
+/*      */           } 
+/*      */         }  }
+/*      */        str = stringBuffer.toString(); }
+/*      */      return str; }
+/*      */   private Hashtable getDescriptionTable(EntityItem paramEntityItem, String paramString1, String paramString2) { Hashtable<Object, Object> hashtable = new Hashtable<>(); EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)paramEntityItem.getAttribute(paramString1); if (eANFlagAttribute != null && eANFlagAttribute.toString().length() > 0) {
+/*      */       MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get(); for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/*      */         if (arrayOfMetaFlag[b].isSelected())
+/*      */           if (paramString2.equals("short")) {
+/*      */             hashtable.put(arrayOfMetaFlag[b].getShortDescription(), arrayOfMetaFlag[b].getShortDescription());
+/*      */           } else if (paramString2.equals("long")) {
+/*      */             hashtable.put(arrayOfMetaFlag[b].getLongDescription(), arrayOfMetaFlag[b].getLongDescription());
+/*      */           } else if (paramString2.equals("flag")) {
+/*      */             hashtable.put(arrayOfMetaFlag[b].getFlagCode(), arrayOfMetaFlag[b].getFlagCode());
+/*      */           } else {
+/*      */             hashtable.put(arrayOfMetaFlag[b].toString(), arrayOfMetaFlag[b].toString());
+/*      */           }  
+/*      */       } 
+/*      */     }  return hashtable; }
+/*      */   private Hashtable getDIVTEXTTable(String paramString) { Hashtable<Object, Object> hashtable = new Hashtable<>(); if (!"".equals(paramString)) {
+/*      */       StringTokenizer stringTokenizer = new StringTokenizer(paramString, ","); String str = ""; while (stringTokenizer.hasMoreTokens()) {
+/*      */         str = stringTokenizer.nextToken(); if ("".equals(paramString))
+/*      */           return new Hashtable<>();  hashtable.put(str, str);
+/*      */       } 
+/*      */     }  return hashtable; } public String getMQCID() { return this.MQCID; } public String getVersion() { return "1.2"; } private static class PriceInfo
+/*      */   {
+/* 2238 */     String PRODUCTOFFERINGTYPE = "@@";
+/* 2239 */     String MACHTYPE = "@@";
+/* 2240 */     String MODEL = "@@";
+/* 2241 */     String FEATURECODE = "@@";
+/* 2242 */     String FROMMACHTYPE = "@@";
+/*      */     
+/* 2244 */     String FROMMODEL = "@@";
+/* 2245 */     String FROMFEATURECODE = "@@";
+/* 2246 */     String SEOID = "@@";
+/* 2247 */     String OFFERING = "@@";
+/* 2248 */     String STARTDATE = "@@";
+/*      */     
+/* 2250 */     String CURRENCY = "@@";
+/* 2251 */     String CABLETYPE = "@@";
+/* 2252 */     String CABLEID = "@@";
+/* 2253 */     String RELEASETS = "@@";
+/* 2254 */     String PRICEVALUE = "@@";
+/*      */     
+/* 2256 */     String PRICEPOINTTYPE = "@@";
+/* 2257 */     String PRICEPOINTVALUE = "@@";
+/* 2258 */     String COUNTRY = "@@";
+/* 2259 */     String PRICETYPE = "@@";
+/* 2260 */     String ONSHORE = "@@";
+/*      */     
+/* 2262 */     String ENDDATE = "@@";
+/* 2263 */     String PRICEVALUEUSD = "@@";
+/* 2264 */     String FACTOR = "@@";
+/* 2265 */     String ACTIVITY = "@@";
+/* 2266 */     String PDHDOMAIN = "@@";
+/*      */     
+/* 2268 */     String PRODUCTCATEGORY = "@@";
+/* 2269 */     String PRODUCTENTITYTYPE = "@@";
+/* 2270 */     String PRODUCTENTITYID = "@@";
+/* 2271 */     String PRICEPOINTENTITYTYPE = "@@";
+/* 2272 */     String PRICEPOINTENTITYID = "@@";
+/*      */     
+/* 2274 */     String MKTGNAME = "@@";
+/* 2275 */     String INVNAME = "@@";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     PriceInfo(String param1String1, String param1String2, String param1String3, String param1String4, String param1String5, String param1String6, String param1String7, String param1String8, String param1String9, String param1String10, String param1String11, String param1String12, String param1String13, String param1String14, String param1String15, String param1String16, String param1String17, String param1String18, String param1String19, String param1String20, String param1String21, String param1String22, String param1String23, String param1String24, String param1String25, String param1String26, String param1String27, String param1String28, String param1String29, String param1String30, String param1String31, String param1String32, Vector param1Vector) {
+/* 2286 */       if (param1String1 != null) this.PRODUCTOFFERINGTYPE = param1String1.trim(); 
+/* 2287 */       if (param1String2 != null) this.MACHTYPE = param1String2.trim(); 
+/* 2288 */       if (param1String3 != null) this.MODEL = param1String3.trim(); 
+/* 2289 */       if (param1String4 != null) this.FEATURECODE = param1String4.trim(); 
+/* 2290 */       if (param1String5 != null) this.FROMMACHTYPE = param1String5.trim();
+/*      */       
+/* 2292 */       if (param1String6 != null) this.FROMMODEL = param1String6.trim(); 
+/* 2293 */       if (param1String7 != null) this.FROMFEATURECODE = param1String7.trim(); 
+/* 2294 */       if (param1String8 != null) this.SEOID = param1String8.trim(); 
+/* 2295 */       if (param1String9 != null) this.OFFERING = param1String9.trim(); 
+/* 2296 */       if (param1String10 != null) this.STARTDATE = param1String10.trim();
+/*      */       
+/* 2298 */       if (param1String11 != null) this.CURRENCY = param1String11.trim(); 
+/* 2299 */       if (param1String12 != null) this.CABLETYPE = param1String12.trim(); 
+/* 2300 */       if (param1String13 != null) this.CABLEID = param1String13.trim(); 
+/* 2301 */       if (param1String14 != null) this.RELEASETS = param1String14.trim(); 
+/* 2302 */       if (param1String15 != null) this.PRICEVALUE = param1String15.trim();
+/*      */       
+/* 2304 */       if (param1String16 != null) this.PRICEPOINTTYPE = param1String16.trim(); 
+/* 2305 */       if (param1String17 != null) this.PRICEPOINTVALUE = param1String17.trim(); 
+/* 2306 */       if (param1String18 != null) this.COUNTRY = param1String18.trim(); 
+/* 2307 */       if (param1String19 != null) this.PRICETYPE = param1String19.trim(); 
+/* 2308 */       if (param1String20 != null) this.ONSHORE = param1String20.trim();
+/*      */       
+/* 2310 */       if (param1String21 != null) this.ENDDATE = param1String21.trim(); 
+/* 2311 */       if (param1String22 != null) this.PRICEVALUEUSD = param1String22.trim(); 
+/* 2312 */       if (param1String23 != null) this.FACTOR = param1String23.trim(); 
+/* 2313 */       if (param1String24 != null) this.ACTIVITY = param1String24.trim(); 
+/* 2314 */       if (param1String25 != null) this.PDHDOMAIN = param1String25.trim();
+/*      */       
+/* 2316 */       if (param1String26 != null) this.PRODUCTCATEGORY = param1String26.trim(); 
+/* 2317 */       if (param1String27 != null) this.PRODUCTENTITYTYPE = param1String27.trim(); 
+/* 2318 */       if (param1String28 != null) this.PRODUCTENTITYID = param1String28.trim(); 
+/* 2319 */       if (param1String29 != null) this.PRICEPOINTENTITYTYPE = param1String29.trim(); 
+/* 2320 */       if (param1String30 != null) this.PRICEPOINTENTITYID = param1String30.trim();
+/*      */       
+/* 2322 */       if (param1String31 != null) this.MKTGNAME = param1String31.trim(); 
+/* 2323 */       if (param1String32 != null) this.INVNAME = param1String32.trim(); 
+/*      */     }
+/*      */     
+/*      */     void dereference() {
+/* 2327 */       this.PRODUCTOFFERINGTYPE = null;
+/* 2328 */       this.MACHTYPE = null;
+/* 2329 */       this.MODEL = null;
+/* 2330 */       this.FEATURECODE = null;
+/* 2331 */       this.FROMMACHTYPE = null;
+/*      */       
+/* 2333 */       this.FROMMODEL = null;
+/* 2334 */       this.FROMFEATURECODE = null;
+/* 2335 */       this.SEOID = null;
+/* 2336 */       this.OFFERING = null;
+/* 2337 */       this.STARTDATE = null;
+/*      */       
+/* 2339 */       this.CURRENCY = null;
+/* 2340 */       this.CABLETYPE = null;
+/* 2341 */       this.CABLEID = null;
+/* 2342 */       this.RELEASETS = null;
+/* 2343 */       this.PRICEVALUE = null;
+/*      */       
+/* 2345 */       this.PRICEPOINTTYPE = null;
+/* 2346 */       this.PRICEPOINTVALUE = null;
+/* 2347 */       this.COUNTRY = null;
+/* 2348 */       this.PRICETYPE = null;
+/* 2349 */       this.ONSHORE = null;
+/*      */       
+/* 2351 */       this.ENDDATE = null;
+/* 2352 */       this.PRICEVALUEUSD = null;
+/* 2353 */       this.FACTOR = null;
+/* 2354 */       this.ACTIVITY = null;
+/* 2355 */       this.PDHDOMAIN = null;
+/*      */       
+/* 2357 */       this.PRODUCTCATEGORY = null;
+/* 2358 */       this.PRODUCTENTITYTYPE = null;
+/* 2359 */       this.PRODUCTENTITYID = null;
+/* 2360 */       this.PRICEPOINTENTITYTYPE = null;
+/* 2361 */       this.PRICEPOINTENTITYID = null;
+/*      */       
+/* 2363 */       this.MKTGNAME = null;
+/* 2364 */       this.INVNAME = null;
+/*      */     }
+/*      */   }
+/*      */ }
+
+
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\ln\adsxmlbh1\ADSPRICEABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

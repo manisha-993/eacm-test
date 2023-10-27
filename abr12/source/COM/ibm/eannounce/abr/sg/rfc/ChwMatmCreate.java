@@ -1,878 +1,940 @@
-/* Copyright IBM Corp. 2016 */
-package COM.ibm.eannounce.abr.sg.rfc;
+/*     */ package COM.ibm.eannounce.abr.sg.rfc;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.CountryPlantTax;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.Generalarea;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.HSN;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmm00;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh1;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh2;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh5;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh6;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh7;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_geo;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_plant;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_sales_org;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_tax_country;
+/*     */ import COM.ibm.eannounce.abr.util.DateUtility;
+/*     */ import COM.ibm.eannounce.abr.util.RFCConfig;
+/*     */ import COM.ibm.eannounce.abr.util.RfcConfigProperties;
+/*     */ import com.google.gson.annotations.SerializedName;
+/*     */ import java.text.SimpleDateFormat;
+/*     */ import java.util.ArrayList;
+/*     */ import java.util.Date;
+/*     */ import java.util.HashSet;
+/*     */ import java.util.List;
+/*     */ import java.util.Set;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class ChwMatmCreate
+/*     */   extends RdhBase
+/*     */ {
+/*     */   @SerializedName("TYPE")
+/*     */   private String type;
+/*     */   @SerializedName("BMM00")
+/*     */   private List<RdhMatm_bmm00> bmm00;
+/*     */   @SerializedName("BMMH1")
+/*     */   private List<RdhMatm_bmmh1> bmmh1;
+/*     */   @SerializedName("BMMH2")
+/*     */   private List<RdhMatm_bmmh2> bmmh2;
+/*     */   @Foo
+/*  47 */   SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+/*     */   
+/*     */   @SerializedName("BMMH5")
+/*     */   private List<RdhMatm_bmmh5> bmmh5;
+/*     */   
+/*     */   @SerializedName("BMMH6")
+/*     */   private List<RdhMatm_bmmh6> bmmh6;
+/*     */   
+/*     */   @SerializedName("BMMH7")
+/*     */   private List<RdhMatm_bmmh7> bmmh7;
+/*     */   
+/*     */   @SerializedName("GEO")
+/*     */   private List<RdhMatm_geo> geos;
+/*     */   
+/*     */   @SerializedName("IS_MULTI_PLANTS")
+/*     */   private String is_multi_plants;
+/*     */ 
+/*     */   
+/*     */   public ChwMatmCreate(MODEL model, String materialType, String materialID, String rfaNum) {
+/*  66 */     super(rfaNum, "Z_DM_SAP_MATM_CREATE".toLowerCase(), null);
+/*     */     
+/*  68 */     this.pims_identity = "H";
+/*  69 */     ((RdhMatm_bmm00)this.bmm00.get(0)).setMatnr(materialID);
+/*  70 */     ((RdhMatm_bmm00)this.bmm00.get(0)).setMtart(materialType);
+/*  71 */     ((RdhMatm_bmm00)this.bmm00.get(0)).setMbrsh("M");
+/*     */     
+/*  73 */     ((RdhMatm_bmm00)this.bmm00.get(0)).setVtweg("00");
+/*     */     
+/*  75 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setMatkl("000");
+/*  76 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setMeins("EA");
+/*     */ 
+/*     */     
+/*  79 */     for (int i = 0; i < model.getAVAILABILITYLIST().size(); i++) {
+/*  80 */       String ann = ((AVAILABILITY)model.getAVAILABILITYLIST().get(i)).getANNNUMBER();
+/*  81 */       if (ann != null && ann.trim().length() > 0) {
+/*  82 */         ((RdhMatm_bmmh1)this.bmmh1.get(0)).setZeinr(ann);
+/*     */         break;
+/*     */       } 
+/*     */     } 
+/*  86 */     if (((RdhMatm_bmmh1)this.bmmh1.get(0)).getZeinr() == null) {
+/*  87 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setZeinr("");
+/*  88 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setZeiar("");
+/*     */     } else {
+/*     */       
+/*  91 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setZeiar("RFA");
+/*     */     } 
+/*  93 */     if (materialID.endsWith("UPG")) {
+/*  94 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setStprs("0.00");
+/*     */     } else {
+/*     */       
+/*  97 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setStprs("0.01");
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 109 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setAeszn(getEarliestAnnDate(model));
+/* 110 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setGewei("KG");
+/* 111 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setTragr("0001");
+/* 112 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setSpart("00");
+/*     */ 
+/*     */     
+/* 115 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setMaabc("A");
+/* 116 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setEkgrp("ZZZ");
+/* 117 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setDismm("PD");
+/* 118 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setDispo("000");
+/* 119 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setPerkz("M");
+/* 120 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setDisls("EX");
+/* 121 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setBeskz("X");
+/* 122 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setSbdkz("1");
+/* 123 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setFhori("000");
+/*     */     
+/* 125 */     if ("Hardware".equals(model.getCATEGORY())) {
+/*     */       
+/* 127 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setLadgr("H001");
+/* 128 */       if ("ZMAT".equals(materialType))
+/*     */       {
+/* 130 */         ((RdhMatm_bmmh1)this.bmmh1.get(0)).setXchpf("X");
+/*     */       }
+/*     */     } 
+/*     */     
+/* 134 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setMtvfp("ZE");
+/* 135 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setKautb("X");
+/* 136 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setPrctr(model.getPRFTCTR());
+/* 137 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setFxhor("0");
+/* 138 */     if ("ZMAT".equals(materialType)) {
+/*     */       
+/* 140 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setDisgr("Z025");
+/* 141 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setVprsv("V");
+/* 142 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setBklas("7920");
+/* 143 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setVmvpr("V");
+/* 144 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setVmbkl("7920");
+/* 145 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setVjvpr("V");
+/* 146 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setVjbkl("7920");
+/*     */     
+/*     */     }
+/* 149 */     else if ("ZPRT".equals(materialType)) {
+/* 150 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setDisgr("Z010");
+/* 151 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setVprsv("S");
+/* 152 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setBklas("7900");
+/* 153 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setVmvpr("S");
+/* 154 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setVmbkl("7900");
+/* 155 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setVjvpr("S");
+/* 156 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setVjbkl("7900");
+/*     */     } 
+/*     */ 
+/*     */     
+/* 160 */     if (materialID.endsWith("NEW")) {
+/* 161 */       if ("LBS".equals(model.getPHANTOMMODINDC()) || "'6661', '6662', '6663', '6664', '6665', '6668', '6669', '9602', '9604'".contains(model.getMACHTYPE()) || (
+/* 162 */         "Storage Tier','STORAGE TIER','storage tier','Power Tier'".contains(model.getSUBGROUP()) && model.getSUBGROUP().length() > 0)) {
+/* 163 */         ((RdhMatm_bmmh1)this.bmmh1.get(0)).setSernp("NONE");
+/* 164 */       } else if ("'2063', '2068', '2059', '2057', '2058'".contains(model.getMACHTYPE())) {
+/* 165 */         ((RdhMatm_bmmh1)this.bmmh1.get(0)).setSernp("GG01");
+/*     */       } else {
+/* 167 */         ((RdhMatm_bmmh1)this.bmmh1.get(0)).setSernp("ZZ06");
+/*     */       } 
+/* 169 */     } else if (materialID.endsWith("MTC") || materialID.endsWith("UPG")) {
+/* 170 */       if ("LBS".equals(model.getPHANTOMMODINDC()) || "Power Tier".equals(model.getSUBGROUP())) {
+/* 171 */         ((RdhMatm_bmmh1)this.bmmh1.get(0)).setSernp("NONE");
+/*     */       } else {
+/*     */         
+/* 174 */         ((RdhMatm_bmmh1)this.bmmh1.get(0)).setSernp("ZZ06");
+/*     */       }
+/*     */     
+/* 177 */     } else if ("ZPRT".equals(materialType)) {
+/* 178 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setSernp("NONE");
+/*     */     } 
+/* 180 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setPeinh("1");
+/* 181 */     if ("Hardware".equals(model.getCATEGORY()) && "ZMAT".equals(materialType)) {
+/* 182 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setBwtty("X");
+/*     */     }
+/*     */     
+/* 185 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setVersg("1");
+/* 186 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setSktof("X");
+/* 187 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setAumng("1");
+/* 188 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setLfmng("1");
+/* 189 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setScmng("1");
+/*     */     
+/* 191 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setMtpos(getMtpos(model));
+/* 192 */     ((RdhMatm_bmmh1)this.bmmh1.get(0)).setProdh(model.getPRODHIERCD());
+/*     */     
+/* 194 */     if (materialID.endsWith("NEW")) {
+/* 195 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setKtgrm("01");
+/* 196 */     } else if (materialID.endsWith("UPG") || materialID.endsWith("MTC")) {
+/* 197 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setKtgrm("29");
+/*     */     
+/*     */     }
+/* 200 */     else if ("ZPRT".equals(materialType)) {
+/* 201 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setKtgrm(model.getACCTASGNGRP());
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */     
+/* 206 */     List<TAXCODE> taxcodes = model.getTAXCODELIST();
+/* 207 */     if (taxcodes != null && taxcodes.size() > 0) {
+/* 208 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setMvgr5(((TAXCODE)taxcodes.get(0)).getTAXCODE());
+/*     */     }
+/*     */ 
+/*     */     
+/* 212 */     if ("ZMAT".equals(materialType)) {
+/*     */       
+/* 214 */       ((RdhMatm_bmmh1)this.bmmh1.get(0)).setKzkfg("X");
+/* 215 */       if ("Y".equals(model.getDEFAULTCUSTOMIZEABLE())) {
+/* 216 */         ((RdhMatm_bmmh1)this.bmmh1.get(0)).setZconf("E");
+/*     */       }
+/* 218 */       else if ("N".equals(model.getDEFAULTCUSTOMIZEABLE())) {
+/* 219 */         ((RdhMatm_bmmh1)this.bmmh1.get(0)).setZconf("F");
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 223 */     ((RdhMatm_bmm00)this.bmm00.get(0)).setXeib1("X");
+/* 224 */     ((RdhMatm_bmm00)this.bmm00.get(0)).setXeid1("X");
+/* 225 */     ((RdhMatm_bmm00)this.bmm00.get(0)).setXeik1("X");
+/* 226 */     ((RdhMatm_bmm00)this.bmm00.get(0)).setXeiv1("X");
+/* 227 */     ((RdhMatm_bmm00)this.bmm00.get(0)).setXeie1("X");
+/* 228 */     List<LANGUAGE> languages = model.getLANGUAGELIST();
+/* 229 */     if (languages != null && languages.size() > 0) {
+/* 230 */       String nlsid = ((LANGUAGE)languages.get(0)).getNLSID();
+/* 231 */       if ("1".equals(nlsid)) {
+/* 232 */         ((RdhMatm_bmmh5)this.bmmh5.get(0)).setSpras("E");
+/* 233 */       } else if ("2".equals(nlsid)) {
+/* 234 */         ((RdhMatm_bmmh5)this.bmmh5.get(0)).setSpras("D");
+/*     */       }
+/* 236 */       else if ("11".equals(nlsid)) {
+/* 237 */         ((RdhMatm_bmmh5)this.bmmh5.get(0)).setSpras("1");
+/*     */       } 
+/*     */       
+/* 240 */       if (materialID.endsWith("NEW")) {
+/* 241 */         if ("'Storage Tier', 'Power Tier'".contains(model.getSUBGROUP()) && !"".equals(model.getSUBGROUP())) {
+/* 242 */           ((RdhMatm_bmmh5)this.bmmh5.get(0)).setMaktx("Expert Care " + model.getMACHTYPE());
+/* 243 */         } else if ("STaaS".equals(model.getSUBGROUP())) {
+/* 244 */           ((RdhMatm_bmmh5)this.bmmh5.get(0)).setMaktx("STaaS " + model.getMACHTYPE());
+/* 245 */         } else if ("PWaaS".equals(model.getSUBGROUP())) {
+/* 246 */           ((RdhMatm_bmmh5)this.bmmh5.get(0)).setMaktx("PWaaS " + model.getMACHTYPE());
+/*     */         } else {
+/* 248 */           ((RdhMatm_bmmh5)this.bmmh5.get(0)).setMaktx("MACHINE TYPE " + model.getMACHTYPE() + " - Model NEW");
+/*     */         } 
+/* 250 */         ((RdhMatm_bmmh5)this.bmmh5.get(0)).setTdline("MACHINE TYPE " + model.getMACHTYPE() + " - Model NEW");
+/*     */       
+/*     */       }
+/* 253 */       else if (materialID.endsWith("UPG")) {
+/* 254 */         ((RdhMatm_bmmh5)this.bmmh5.get(0)).setMaktx("MACHINE TYPE " + model.getMACHTYPE() + " - Model UPG");
+/* 255 */         ((RdhMatm_bmmh5)this.bmmh5.get(0)).setTdline("MACHINE TYPE " + model.getMACHTYPE() + " - Model UPG");
+/* 256 */       } else if (materialID.endsWith("MTC")) {
+/* 257 */         ((RdhMatm_bmmh5)this.bmmh5.get(0)).setMaktx("MACHINE TYPE " + model.getMACHTYPE() + " - Model MTC");
+/* 258 */         ((RdhMatm_bmmh5)this.bmmh5.get(0)).setTdline("MACHINE TYPE " + model.getMACHTYPE() + " - Model MTC");
+/*     */       } else {
+/* 260 */         ((RdhMatm_bmmh5)this.bmmh5.get(0)).setMaktx(((LANGUAGE)languages.get(0)).getINVNAME());
+/* 261 */         ((RdhMatm_bmmh5)this.bmmh5.get(0)).setTdline(((LANGUAGE)languages.get(0)).getMKTGNAME());
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 265 */     List<AVAILABILITY> availabilities = model.getAVAILABILITYLIST();
+/* 266 */     List<TAXCATEGORY> taxcategories = model.getTAXCATEGORYLIST();
+/*     */     
+/* 268 */     RdhMatm_geo geo = new RdhMatm_geo();
+/* 269 */     geo.setName("WW1");
+/* 270 */     geo.setVmsta("Z0");
+/* 271 */     if (materialID.endsWith("UPG")) {
+/* 272 */       String pubfrom = DateUtility.getTodayStringWithSapFormat();
+/* 273 */       geo.setVmstd(pubfrom);
+/*     */     } else {
+/* 275 */       geo.setVmstd(getEarliestPUBFROM(model));
+/*     */     } 
+/*     */ 
+/*     */     
+/* 279 */     Set<SLEORGNPLNTCODE> sset = new HashSet<>();
+/* 280 */     Set<TAXCATEGORY> cset = new HashSet<>();
+/* 281 */     Set<String> slorgSet = new HashSet<>();
+/* 282 */     Set<String> plntSet = new HashSet<>();
+/* 283 */     List<RdhMatm_sales_org> sales_orgList = new ArrayList<>();
+/* 284 */     List<RdhMatm_plant> plantList = new ArrayList<>();
+/* 285 */     Set<String> set = new HashSet<>();
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 333 */     List<RdhMatm_tax_country> tax_countries = new ArrayList<>();
+/* 334 */     List<CountryPlantTax> taxs = RFCConfig.getTaxs();
+/* 335 */     List<Generalarea> generalareas = RFCConfig.getGeneralareas();
+/* 336 */     Set<String> plntcdtSet = new HashSet<>();
+/* 337 */     Set<String> saleorgSet = new HashSet<>();
+/* 338 */     Set<String> countrySet = new HashSet<>();
+/*     */     int j;
+/* 340 */     for (j = 0; j < taxs.size(); j++) {
+/*     */       
+/* 342 */       CountryPlantTax tax = taxs.get(j);
+/* 343 */       if ("2".equals(tax.getINTERFACE_ID())) {
+/*     */         
+/* 345 */         String plntcd = tax.getPLNT_CD();
+/* 346 */         String salesorg = tax.getSALES_ORG();
+/* 347 */         if (!plntcdtSet.contains(plntcd)) {
+/* 348 */           plntcdtSet.add(plntcd);
+/* 349 */           RdhMatm_plant plant = new RdhMatm_plant();
+/* 350 */           plant.setWerks(plntcd);
+/* 351 */           plant.setEkgrp("ZZZ");
+/*     */           
+/* 353 */           if (tax.getTAX_COUNTRY() != null && !tax.getTAX_COUNTRY().equals("")) {
+/* 354 */             plant.setSteuc(getSteucCodeNew(model, tax.getTAX_COUNTRY()));
+/*     */           }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */           
+/* 365 */           plantList.add(plant);
+/*     */         } 
+/* 367 */         if (!saleorgSet.contains(salesorg)) {
+/* 368 */           saleorgSet.add(salesorg);
+/* 369 */           RdhMatm_sales_org sales_org = new RdhMatm_sales_org();
+/* 370 */           sales_org.setVkorg(salesorg);
+/* 371 */           sales_org.setDwerk(salesorg);
+/* 372 */           if (RFCConfig.getDwerk("2", sales_org.getVkorg()) != null) {
+/*     */             
+/* 374 */             sales_org.setDwerk(RFCConfig.getDwerk("2", sales_org.getVkorg()));
+/* 375 */             String countrt = null;
+/* 376 */             if ("0147".equals(sales_org.getVkorg())) {
+/* 377 */               countrt = "US";
+/* 378 */             } else if ("0026".equals(sales_org.getVkorg())) {
+/* 379 */               countrt = "Canada";
+/*     */             } 
+/* 381 */             if (countrt != null) {
+/*     */ 
+/*     */               
+/* 384 */               sales_org.setZtaxclsf(getZtaxclsf(model, countrt));
+/* 385 */               if (sales_org != null) {
+/* 386 */                 sales_org.setZsabrtax(getZsabrtax(sales_org.getZtaxclsf()));
+/*     */               }
+/*     */             } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */             
+/* 394 */             if (!set.contains(String.valueOf(sales_org.getVkorg()) + sales_org.getDwerk())) {
+/*     */               
+/* 396 */               sales_orgList.add(sales_org);
+/* 397 */               set.add(String.valueOf(sales_org.getVkorg()) + sales_org.getDwerk());
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 404 */     if (materialID.endsWith("UPG") || materialID.endsWith("MTC")) {
+/* 405 */       for (j = 0; j < taxs.size(); j++) {
+/* 406 */         CountryPlantTax tax = taxs.get(j);
+/*     */         
+/* 408 */         if ("2".equals(tax.getINTERFACE_ID()) && 
+/* 409 */           !countrySet.contains(tax.getTAX_COUNTRY()))
+/*     */         {
+/* 411 */           countrySet.add(tax.getTAX_COUNTRY());
+/* 412 */           RdhMatm_tax_country tax_country = new RdhMatm_tax_country();
+/* 413 */           tax_country.setAland(tax.getTAX_COUNTRY());
+/* 414 */           tax_country.setTaty1(tax.getTAX_CAT());
+/* 415 */           tax_country.setTaxm1(tax.getTAX_CLAS());
+/* 416 */           tax_country.setTaxm2(tax.getTAX_CLAS());
+/* 417 */           tax_country.setTaxm3(tax.getTAX_CLAS());
+/* 418 */           tax_country.setTaxm4(tax.getTAX_CLAS());
+/* 419 */           tax_country.setTaxm5(tax.getTAX_CLAS());
+/* 420 */           tax_country.setTaxm6(tax.getTAX_CLAS());
+/* 421 */           tax_country.setTaxm7(tax.getTAX_CLAS());
+/* 422 */           tax_country.setTaxm8(tax.getTAX_CLAS());
+/* 423 */           tax_country.setTaxm9(tax.getTAX_CLAS());
+/*     */           
+/* 425 */           if (tax_country.getAland() != null) {
+/* 426 */             tax_countries.add(tax_country);
+/*     */           }
+/*     */         }
+/*     */       
+/*     */       } 
+/* 431 */     } else if (materialID.endsWith("NEW") || "ZPRT".equals(materialType)) {
+/*     */ 
+/*     */       
+/* 434 */       for (j = 0; j < taxcategories.size(); j++) {
+/* 435 */         TAXCATEGORY taxcategory = taxcategories.get(j);
+/* 436 */         List<COUNTRY> countrys = taxcategory.getCOUNTRYLIST();
+/* 437 */         if (taxcategory.getTAXCLASSIFICATION() != null && !"".equals(taxcategory.getTAXCLASSIFICATION().trim()))
+/*     */         {
+/*     */           
+/* 440 */           for (int k = 0; k < countrys.size(); k++) {
+/* 441 */             COUNTRY country = countrys.get(k);
+/* 442 */             boolean notmatch = false;
+/* 443 */             if ("1652".equals(country.getCOUNTRY_FC())) {
+/* 444 */               List<SLEORGGRP> sleorggrps = taxcategory.getSLEORGGRPLIST();
+/* 445 */               notmatch = true;
+/* 446 */               for (int m = 0; m < sleorggrps.size(); m++) {
+/*     */                 
+/* 448 */                 if ("US".equals(((SLEORGGRP)sleorggrps.get(m)).getSLEORGGRP())) {
+/* 449 */                   notmatch = false;
+/*     */ 
+/*     */                   
+/*     */                   break;
+/*     */                 } 
+/*     */               } 
+/*     */             } 
+/*     */             
+/* 457 */             if (!notmatch && !countrySet.contains(country.getCOUNTRY_FC())) {
+/* 458 */               countrySet.add(country.getCOUNTRY_FC());
+/*     */ 
+/*     */               
+/* 461 */               RdhMatm_tax_country tax_country = new RdhMatm_tax_country();
+/* 462 */               tax_country.setAland(RFCConfig.getAland(country.getCOUNTRY_FC()));
+/* 463 */               tax_country.setTaty1(taxcategory.getTAXCATEGORYVALUE());
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */               
+/* 476 */               tax_country.setTaxm1("1");
+/* 477 */               tax_country.setTaxm2("1");
+/* 478 */               tax_country.setTaxm3("1");
+/* 479 */               tax_country.setTaxm4("1");
+/* 480 */               tax_country.setTaxm5("1");
+/* 481 */               tax_country.setTaxm6("1");
+/* 482 */               tax_country.setTaxm7("1");
+/* 483 */               tax_country.setTaxm8("1");
+/* 484 */               tax_country.setTaxm9("1");
+/*     */               
+/* 486 */               if (tax_country.getAland() != null) {
+/* 487 */                 tax_countries.add(tax_country);
+/*     */               }
+/*     */             } 
+/*     */           } 
+/*     */         }
+/*     */       } 
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */     
+/* 497 */     geo.setPlants(plantList);
+/* 498 */     geo.setSales_orgs(sales_orgList);
+/* 499 */     geo.setTax_countries(tax_countries);
+/* 500 */     this.geos.add(geo);
+/*     */ 
+/*     */     
+/* 503 */     ((RdhMatm_bmm00)this.bmm00.get(0)).setTcode("MM01");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String getSteucCode(MODEL model, String country) {
+/* 509 */     System.out.println("Getting HSN Steuc Code");
+/* 510 */     String steucCode = null;
+/* 511 */     String machTypeMatch = model.getMACHTYPE();
+/* 512 */     System.out.println("Machine type model passed " + machTypeMatch);
+/* 513 */     System.out.println("County code passed " + country);
+/*     */     
+/* 515 */     List<HSN> hsns = RFCConfig.getHsns();
+/*     */     
+/* 517 */     for (int i = 0; i < hsns.size(); i++) {
+/* 518 */       HSN hsn = hsns.get(i);
+/* 519 */       if (hsn.getCountry().equals(country) && hsn.getMachType().equals(machTypeMatch))
+/* 520 */         steucCode = hsn.getSteuc(); 
+/*     */     } 
+/* 522 */     System.out.println("returned HSN Steuc Code " + steucCode);
+/* 523 */     return steucCode;
+/*     */   }
+/*     */   
+/*     */   private String getSteucCodeNew(MODEL model, String aland) {
+/* 527 */     System.out.println("Getting HSN Steuc Code");
+/* 528 */     String steucCode = null;
+/* 529 */     String machTypeMatch = model.getMACHTYPE();
+/* 530 */     System.out.println("Machine type model passed " + machTypeMatch);
+/* 531 */     System.out.println("Aland code passed " + aland);
+/*     */     
+/* 533 */     List<HSN> hsns = RFCConfig.getHsns();
+/*     */     
+/* 535 */     for (int i = 0; i < hsns.size(); i++) {
+/* 536 */       HSN hsn = hsns.get(i);
+/* 537 */       if (hsn.getMachType().equals(machTypeMatch) && hsn.getaLand().equals(aland))
+/* 538 */         steucCode = hsn.getSteuc(); 
+/*     */     } 
+/* 540 */     System.out.println("returned HSN Steuc Code " + steucCode);
+/* 541 */     return steucCode;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   private String getZsabrtax(String ztaxclsf) {
+/* 546 */     return RfcConfigProperties.getZsabrtaxPropertys(ztaxclsf);
+/*     */   }
+/*     */   
+/*     */   private String getZtaxclsf(MODEL model, String country) {
+/* 550 */     List<TAXCATEGORY> taxs = model.getTAXCATEGORYLIST();
+/* 551 */     if (taxs != null && taxs.size() > 0) {
+/* 552 */       for (int i = 0; i < taxs.size(); i++) {
+/* 553 */         List<SLEORGGRP> list = ((TAXCATEGORY)taxs.get(i)).getSLEORGGRPLIST();
+/* 554 */         if (list != null && list.size() > 0) {
+/* 555 */           for (int j = 0; j < list.size(); j++) {
+/* 556 */             if (country.equals(((SLEORGGRP)list.get(j)).getSLEORGGRP())) {
+/* 557 */               return ((TAXCATEGORY)taxs.get(i)).getTAXCLASSIFICATION();
+/*     */             }
+/*     */           } 
+/*     */         }
+/*     */       } 
+/*     */     }
+/* 563 */     return null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String getMtpos(MODEL model) {
+/* 569 */     String result = "";
+/* 570 */     String var = (model.getPHANTOMMODINDC() == null) ? "" : model.getPHANTOMMODINDC().toUpperCase();
+/* 571 */     String materialID = ((RdhMatm_bmm00)this.bmm00.get(0)).getMatnr();
+/*     */     
+/* 573 */     if (materialID.endsWith("NEW")) {
+/* 574 */       if ("NORM".equals(var)) {
+/* 575 */         result = "ZPT1";
+/* 576 */       } else if ("REACH".equals(var)) {
+/* 577 */         result = "ZPT2";
+/* 578 */       } else if (RfcConfigProperties.getMtposMachtype().contains(model.getMACHTYPE())) {
+/* 579 */         result = "ZPT4";
+/* 580 */       } else if ("LBS".equals(var)) {
+/* 581 */         result = "ZPT3";
+/*     */       } else {
+/* 583 */         result = "Z002";
+/*     */       } 
+/* 585 */       if ("P1030".equals(model.getPRFTCTR())) {
+/* 586 */         result = "ZHCR";
+/*     */       }
+/* 588 */     } else if (materialID.endsWith("UPG") || materialID.endsWith("MTC")) {
+/* 589 */       if ("NORM".equals(var)) {
+/* 590 */         result = "ZPT1";
+/* 591 */       } else if ("REACH".equals(var)) {
+/* 592 */         result = "ZPT2";
+/*     */       }
+/* 594 */       else if ("LBS".equals(var)) {
+/* 595 */         result = "ZPT3";
+/*     */       } else {
+/*     */         
+/* 598 */         result = "Z002";
+/*     */       }
+/*     */     
+/* 601 */     } else if ("ZPRT".equals(((RdhMatm_bmm00)this.bmm00.get(0)).getMtart()) && 
+/* 602 */       "Hardware".equals(model.getCATEGORY())) {
+/* 603 */       result = "ZSUP";
+/*     */     } 
+/*     */ 
+/*     */     
+/* 607 */     return result;
+/*     */   }
+/*     */   
+/*     */   public String getMtart(SVCMOD svcmod) {
+/* 611 */     String mtart = "ZSV1";
+/* 612 */     if (svcmod == null)
+/* 613 */       return mtart; 
+/* 614 */     if ("Service".equals(svcmod.getCATEGORY())) {
+/* 615 */       if ("Custom".equals(svcmod.getSUBCATEGORY())) {
+/* 616 */         mtart = "ZSV1";
+/* 617 */       } else if ("Facility".equals(svcmod.getSUBCATEGORY())) {
+/* 618 */         mtart = "ZSV2";
+/* 619 */       } else if ("Productized Services".equals(svcmod.getSUBCATEGORY()) && 
+/* 620 */         "Non-Federated".equals(svcmod.getGROUP())) {
+/* 621 */         mtart = "ZSV5";
+/*     */       } 
+/* 623 */     } else if ("IP".equals(svcmod.getCATEGORY()) && "SC".equals(svcmod.getSUBCATEGORY())) {
+/* 624 */       mtart = "ZSV1";
+/*     */     } 
+/* 626 */     return mtart;
+/*     */   }
+/*     */   
+/*     */   public String getMeins(SVCMOD svcmod) {
+/* 630 */     String reslut = "EA";
+/* 631 */     if (svcmod == null)
+/* 632 */       return reslut; 
+/* 633 */     if ("Service".equals(svcmod.getCATEGORY())) {
+/* 634 */       if ("Custom".equals(svcmod.getSUBCATEGORY())) {
+/* 635 */         reslut = "EA";
+/* 636 */       } else if ("Facility".equals(svcmod.getSUBCATEGORY())) {
+/* 637 */         reslut = "EA";
+/* 638 */       } else if ("Productized Services".equals(svcmod.getSUBCATEGORY()) && 
+/* 639 */         "Non-Federated".equals(svcmod.getGROUP())) {
+/* 640 */         reslut = "EA";
+/*     */       } 
+/* 642 */     } else if ("IP".equals(svcmod.getCATEGORY()) && "SC".equals(svcmod.getSUBCATEGORY())) {
+/* 643 */       reslut = "EA";
+/*     */     } 
+/* 645 */     return reslut;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String getEarliestAnnDate(MODEL model) {
+/* 812 */     Date annDate = null;
+/* 813 */     String result = "";
+/* 814 */     List<AVAILABILITY> list = model.getAVAILABILITYLIST();
+/* 815 */     if (list != null && list.size() > 0) {
+/* 816 */       for (int i = 0; i < list.size(); i++) {
+/*     */         try {
+/* 818 */           if (annDate == null) {
+/* 819 */             result = ((AVAILABILITY)list.get(i)).getANNDATE();
+/*     */             
+/* 821 */             annDate = this.sdf.parse(result);
+/*     */           } else {
+/*     */             
+/* 824 */             annDate = this.sdf.parse(((AVAILABILITY)list.get(i)).getANNDATE());
+/*     */             
+/* 826 */             if (annDate.before(this.sdf.parse(result))) {
+/* 827 */               result = ((AVAILABILITY)list.get(i)).getANNDATE();
+/*     */             }
+/*     */           } 
+/* 830 */         } catch (Exception e) {
+/* 831 */           e.printStackTrace();
+/*     */         } 
+/*     */       } 
+/*     */     }
+/*     */ 
+/*     */ 
+/*     */     
+/* 838 */     if (result != null)
+/* 839 */       result = result.replace("-", ""); 
+/* 840 */     if (result != null && result.length() > 6) {
+/* 841 */       result = result.substring(result.length() - 6);
+/*     */     }
+/* 843 */     return result;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String getEarliestPUBFROM(MODEL model) {
+/* 853 */     Date PUBFROM = null;
+/* 854 */     String result = "";
+/* 855 */     List<AVAILABILITY> list = model.getAVAILABILITYLIST();
+/* 856 */     if (list != null && list.size() > 0) {
+/* 857 */       for (int i = 0; i < list.size(); i++) {
+/*     */         try {
+/* 859 */           if (PUBFROM == null) {
+/* 860 */             result = ((AVAILABILITY)list.get(i)).getPUBFROM();
+/* 861 */             PUBFROM = this.sdf.parse(result);
+/*     */           } else {
+/*     */             
+/* 864 */             PUBFROM = this.sdf.parse(((AVAILABILITY)list.get(i)).getPUBFROM());
+/* 865 */             if (PUBFROM.before(this.sdf.parse(result))) {
+/* 866 */               result = ((AVAILABILITY)list.get(i)).getPUBFROM();
+/*     */             }
+/*     */           } 
+/* 869 */         } catch (Exception e) {
+/* 870 */           e.printStackTrace();
+/*     */         } 
+/*     */       } 
+/*     */     }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 882 */     return result;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void setDefaultValues() {
+/* 892 */     this.is_multi_plants = "TRUE";
+/* 893 */     RdhMatm_bmm00 bm0 = new RdhMatm_bmm00();
+/* 894 */     this.bmm00 = new ArrayList<>();
+/* 895 */     this.bmm00.add(bm0);
+/* 896 */     RdhMatm_bmmh1 bmh1 = new RdhMatm_bmmh1();
+/* 897 */     this.bmmh1 = new ArrayList<>();
+/* 898 */     this.bmmh1.add(bmh1);
+/* 899 */     RdhMatm_bmmh5 bmh5 = new RdhMatm_bmmh5();
+/* 900 */     this.bmmh5 = new ArrayList<>();
+/* 901 */     this.bmmh5.add(bmh5);
+/*     */     
+/* 903 */     this.bmmh6 = new ArrayList<>();
+/*     */     
+/* 905 */     RdhMatm_bmmh7 bmh7 = new RdhMatm_bmmh7();
+/* 906 */     this.bmmh7 = new ArrayList<>();
+/* 907 */     this.bmmh7.add(bmh7);
+/* 908 */     this.geos = new ArrayList<>();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean isReadyToExecute() {
+/* 916 */     if (getRfcrc() != 0) {
+/* 917 */       return false;
+/*     */     }
+/* 919 */     return true;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String transformAddDate(String time) {
+/* 929 */     StringBuffer add_date = new StringBuffer(time);
+/* 930 */     add_date.insert(6, "-");
+/* 931 */     add_date.insert(4, "-");
+/* 932 */     return add_date.toString();
+/*     */   }
+/*     */ }
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
-import COM.ibm.eannounce.abr.sg.rfc.entity.CountryPlantTax;
-import COM.ibm.eannounce.abr.sg.rfc.entity.Generalarea;
-import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmm00;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh1;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh2;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh5;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh6;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh7;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_geo;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_plant;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_sales_org;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_tax_country;
-import COM.ibm.eannounce.abr.util.DateUtility;
-import COM.ibm.eannounce.abr.util.RFCConfig;
-import COM.ibm.eannounce.abr.util.RfcConfigProperties;
-
-import com.google.gson.annotations.SerializedName;
-
-/**
- * ChwMatmCreate.
- * 
- * @author wangyul
- *
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\ChwMatmCreate.class
+ * Java compiler version: 7 (51.0)
+ * JD-Core Version:       1.1.3
  */
-public class ChwMatmCreate extends RdhBase {
-	@SerializedName("TYPE")
-	private String type;
-	@SerializedName("BMM00")
-	private List<RdhMatm_bmm00> bmm00;
-	@SerializedName("BMMH1")
-	private List<RdhMatm_bmmh1> bmmh1;
-	@SerializedName("BMMH2")
-	private List<RdhMatm_bmmh2> bmmh2;
-	@SerializedName("BMMH5")
-	private List<RdhMatm_bmmh5> bmmh5;
-	@SerializedName("BMMH6")
-	private List<RdhMatm_bmmh6> bmmh6;
-	@SerializedName("BMMH7")
-	private List<RdhMatm_bmmh7> bmmh7;
-	@SerializedName("GEO")
-	private List<RdhMatm_geo> geos;
-	@SerializedName("IS_MULTI_PLANTS")
-	private String is_multi_plants;
-	@Foo
-	SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd" );
-	public ChwMatmCreate(MODEL model, String materialType,String materialID, String rfaNum) {
-		super(rfaNum, "Z_DM_SAP_MATM_CREATE".toLowerCase(), null);
-		// RdhMatm_bmm00 matnr Copy from <SoftwareProduct.productIdentifier>.
-		pims_identity="H";
-		bmm00.get(0).setMatnr(materialID);
-		bmm00.get(0).setMtart(materialType);
-		bmm00.get(0).setMbrsh("M");
-		//bmm00.get(0).setWerks("00");
-		bmm00.get(0).setVtweg("00");
-
-		bmmh1.get(0).setMatkl("000");
-		bmmh1.get(0).setMeins("EA");
-		//If <materialID> like "%UPG", then copy from MODEL_UPDATE/AVAILABILITYLIST/AVAILABILITYELEMENT/ANNNUMBER.
-		//Else set to blank.
-		for(int i=0;i<model.getAVAILABILITYLIST().size();i++) {
-			String ann = model.getAVAILABILITYLIST().get(i).getANNNUMBER();
-			if(ann!=null&&ann.trim().length()>0) {
-				bmmh1.get(0).setZeinr(ann);
-				break;
-			}
-			
-		}if(bmmh1.get(0).getZeinr()==null) {
-			bmmh1.get(0).setZeinr("");
-			bmmh1.get(0).setZeiar("");
-		}
-		else {
-			bmmh1.get(0).setZeiar("RFA");
-		}
-		if(materialID.endsWith("UPG")) {
-			bmmh1.get(0).setStprs("0.00");
-		}
-		else {
-			bmmh1.get(0).setStprs("0.01");
-
-		}
-		
-		
-		/*
-		 * If <materialID> like "%UPG", then If there is a value in <ANNNUMBER>, set to
-		 * "RFA". else if MODEL_UPDATE/PRPQINDC = "Yes", load "SPB" else set to blank.
-		 * Else set to blank.
-		 */
-		//bmmh1.get(0).setZeiar("RFA");
-
-		bmmh1.get(0).setAeszn(getEarliestAnnDate(model));
-		bmmh1.get(0).setGewei("KG");
-		bmmh1.get(0).setTragr("0001");
-		bmmh1.get(0).setSpart("00");
-		//prdha
-		//bmmh1.get(0).setPrdha(model.getPRODHIERCD());
-		bmmh1.get(0).setMaabc("A");
-		bmmh1.get(0).setEkgrp("ZZZ");
-		bmmh1.get(0).setDismm("PD");
-		bmmh1.get(0).setDispo("000");
-		bmmh1.get(0).setPerkz("M");
-		bmmh1.get(0).setDisls("EX");
-		bmmh1.get(0).setBeskz("X");
-		bmmh1.get(0).setSbdkz("1");
-		bmmh1.get(0).setFhori("000");
-		//If MODEL_UPDATE/CATEGORY='Hardware', then set ladgr = "H001";
-		if("Hardware".equals(model.getCATEGORY()))
-		{
-			bmmh1.get(0).setLadgr("H001");
-			if("ZMAT".equals(materialType))
-			{
-				bmmh1.get(0).setXchpf("X");
-			}
-			
-		}
-		bmmh1.get(0).setMtvfp("ZE");
-		bmmh1.get(0).setKautb("X");
-		bmmh1.get(0).setPrctr(model.getPRFTCTR());
-		bmmh1.get(0).setFxhor("0");
-		if("ZMAT".equals(materialType))
-		{
-			bmmh1.get(0).setDisgr("Z025");
-			bmmh1.get(0).setVprsv("V");
-			bmmh1.get(0).setBklas("7920");
-			bmmh1.get(0).setVmvpr("V");
-			bmmh1.get(0).setVmbkl("7920");
-			bmmh1.get(0).setVjvpr("V");
-			bmmh1.get(0).setVjbkl("7920");
-			
-		}
-		else if ("ZPRT".equals(materialType)) {
-			bmmh1.get(0).setDisgr("Z010");
-			bmmh1.get(0).setVprsv("S");
-			bmmh1.get(0).setBklas("7900");
-			bmmh1.get(0).setVmvpr("S");
-			bmmh1.get(0).setVmbkl("7900");
-			bmmh1.get(0).setVjvpr("S");
-			bmmh1.get(0).setVjbkl("7900");
-
-		}
-		//Todo
-		if(materialID.endsWith("NEW")) {
-			if("LBS".equals(model.getPHANTOMMODINDC())||"'6661', '6662', '6663', '6664', '6665', '6668', '6669', '9602', '9604'".contains(model.getMACHTYPE()
-					)||("Storage Tier','STORAGE TIER','storage tier','Power Tier'".contains(model.getSUBGROUP())&&model.getSUBGROUP().length()>0)) {
-				bmmh1.get(0).setSernp("NONE");
-			}else if ("'2063', '2068', '2059', '2057', '2058'".contains(model.getMACHTYPE())) {
-				bmmh1.get(0).setSernp("GG01");
-			}else {
-				bmmh1.get(0).setSernp("ZZ06");
-			}
-		}else if (materialID.endsWith("MTC")||materialID.endsWith("UPG")) {
-			if("LBS".equals(model.getPHANTOMMODINDC())||"Power Tier".equals(model.getSUBGROUP())){
-				bmmh1.get(0).setSernp("NONE");
-			}
-			else {
-				bmmh1.get(0).setSernp("ZZ06");
-			}
-		}
-		else if ("ZPRT".equals(materialType)) {
-			bmmh1.get(0).setSernp("NONE");
-		}
-		bmmh1.get(0).setPeinh("1");
-		if("Hardware".equals(model.getCATEGORY())&&"ZMAT".equals(materialType)){
-			bmmh1.get(0).setBwtty("X");
-		}
-		//bmmh1.get(0).bwtty ("V");?
-		bmmh1.get(0).setVersg("1");
-		bmmh1.get(0).setSktof("X");
-		bmmh1.get(0).setAumng("1");
-		bmmh1.get(0).setLfmng("1");
-		bmmh1.get(0).setScmng("1");
-		//todo
-		bmmh1.get(0).setMtpos(getMtpos(model));
-		bmmh1.get(0).setProdh(model.getPRODHIERCD());
-		
-		if (materialID.endsWith("NEW")) {
-			bmmh1.get(0).setKtgrm("01");
-		}else if (materialID.endsWith("UPG")||materialID.endsWith("MTC")) {
-			bmmh1.get(0).setKtgrm("29");
-
-		}
-		else if ("ZPRT".equals(materialType)) {
-			bmmh1.get(0).setKtgrm(model.getACCTASGNGRP());
-
-		}
-		
-
-		List<TAXCODE> taxcodes = model.getTAXCODELIST();
-		if (taxcodes != null && taxcodes.size() > 0) {
-			bmmh1.get(0).setMvgr5(taxcodes.get(0).getTAXCODE());
-		}
-		//bmmh1.get(0).setXeib1("X");
-		// bmmh1.get(0).setp;
-		 if ("ZMAT".equals(materialType))
-		 {
-			bmmh1.get(0).setKzkfg("X");
-			if("Y".equals(model.getDEFAULTCUSTOMIZEABLE())) {
-				bmmh1.get(0).setZconf("E");
-			}
-			else if("N".equals(model.getDEFAULTCUSTOMIZEABLE())) {
-				bmmh1.get(0).setZconf("F");
-			}
-			
-		}
-		 bmm00.get(0).setXeib1("X");
-		 bmm00.get(0).setXeid1("X");
-		 bmm00.get(0).setXeik1("X");
-		 bmm00.get(0).setXeiv1("X");
-		 bmm00.get(0).setXeie1("X");
-		List<LANGUAGE> languages = model.getLANGUAGELIST();
-		if (languages != null && languages.size() > 0) {
-			String nlsid = languages.get(0).getNLSID();
-			if("1".equals(nlsid)) {
-				bmmh5.get(0).setSpras("E");
-			}else if ("2".equals(nlsid)) {
-				bmmh5.get(0).setSpras("D");
-			}
-			else if ("11".equals(nlsid)) {
-				bmmh5.get(0).setSpras("1");
-			}
-			
-			if (materialID.endsWith("NEW")) {
-				if("'Storage Tier', 'Power Tier'".contains(model.getSUBGROUP())&&!"".equals(model.getSUBGROUP())) {
-					bmmh5.get(0).setMaktx("Expert Care" + " " + model.getMACHTYPE());
-				}else if("STaaS".equals(model.getSUBGROUP())){
-					bmmh5.get(0).setMaktx("STaaS" + " " + model.getMACHTYPE());
-				}else if("PWaaS".equals(model.getSUBGROUP())){
-					bmmh5.get(0).setMaktx("PWaaS" + " " + model.getMACHTYPE());
-				}else {
-					bmmh5.get(0).setMaktx("MACHINE TYPE " + model.getMACHTYPE() + " - Model NEW");
-				}
-				bmmh5.get(0).setTdline("MACHINE TYPE "+model.getMACHTYPE()+" - Model NEW");
-
-			}
-			else if (materialID.endsWith("UPG")) {
-				bmmh5.get(0).setMaktx("MACHINE TYPE "+model.getMACHTYPE()+" - Model UPG");
-				bmmh5.get(0).setTdline("MACHINE TYPE "+model.getMACHTYPE()+" - Model UPG");
-			}else if (materialID.endsWith("MTC")) {
-				bmmh5.get(0).setMaktx("MACHINE TYPE "+model.getMACHTYPE()+" - Model MTC");
-				bmmh5.get(0).setTdline("MACHINE TYPE "+model.getMACHTYPE()+" - Model MTC");
-			}else {
-				bmmh5.get(0).setMaktx(languages.get(0).getINVNAME());
-				bmmh5.get(0).setTdline(languages.get(0).getMKTGNAME());
-
-			}
-		} 
-		List<AVAILABILITY> availabilities = model.getAVAILABILITYLIST();
-		List<TAXCATEGORY> taxcategories = model.getTAXCATEGORYLIST();
-
-		RdhMatm_geo geo = new RdhMatm_geo();
-		geo.setName("WW1");
-		geo.setVmsta("Z0");
-		if(materialID.endsWith("UPG")) {
-			String pubfrom = DateUtility.getTodayStringWithSapFormat();
-			geo.setVmstd(pubfrom);
-		}else {
-			geo.setVmstd(this.getEarliestPUBFROM(model));			
-			//geo.setVmstd(pubfrom.replace("-", "")); 
-		}
-		
-		Set<SLEORGNPLNTCODE> sset  = new HashSet<SLEORGNPLNTCODE>();
-		Set<TAXCATEGORY> cset = new HashSet<TAXCATEGORY>();
-		Set<String> slorgSet = new HashSet<String>();
-		Set<String> plntSet = new HashSet<String>();
-		List<RdhMatm_sales_org> sales_orgList = new ArrayList<RdhMatm_sales_org>();
-		List<RdhMatm_plant> plantList = new ArrayList<RdhMatm_plant>();
-		Set<String> set = new HashSet<String>();
-
-		/*if (availabilities != null && availabilities.size() > 0) {
-
-			for (int i = 0; i < availabilities.size(); i++) {
-				
-				List<SLEORGNPLNTCODE> list = availabilities.get(i).getSLEORGNPLNTCODELIST();
-				for (int j = 0; j < list.size(); j++) {
-					slorgSet.add(list.get(j).getSLEORG());
-					plntSet.add(list.get(j).getPLNTCD());
-				}
-			}
-		}
-		
-		Iterator<String> pIterator = plntSet.iterator();
-		while (pIterator.hasNext()) {
-			String plntcd = (String) pIterator.next();
-			
-			RdhMatm_plant plant = new RdhMatm_plant();
-			plant.setWerks(plntcd);
-			plant.setEkgrp("ZZZ");
-			plantList.add(plant);
-		}
-		Iterator<String> slorgIterator = slorgSet.iterator();
-		while (slorgIterator.hasNext()) {
-			String slorg = (String) slorgIterator.next();
-			
-			RdhMatm_sales_org sales_org = new RdhMatm_sales_org();
-			sales_org.setVkorg(slorg);
-			sales_org.setDwerk(slorg);
-			if(RFCConfig.getDwerk("2",sales_org.getVkorg())!=null)
-			{
-				sales_org.setDwerk(RFCConfig.getDwerk("2",sales_org.getVkorg()));
-				
-				if("0147".equals(sales_org.getVkorg())){
-					sales_org.setZtaxclsf("1");
-					sales_org.setZsabrtax("01");
-				}else if ("0026".equals(sales_org.getVkorg())) {
-					sales_org.setZsabrtax("HW");
-				}
-				if(!set.contains(sales_org.getVkorg()+sales_org.getDwerk()))
-				{
-					sales_orgList.add(sales_org);
-					set.add(sales_org.getVkorg()+sales_org.getDwerk());
-				}
-			}
-		}*/
-		
-		List<RdhMatm_tax_country> tax_countries = new  ArrayList<RdhMatm_tax_country>();
-		List<CountryPlantTax> taxs = RFCConfig.getTaxs();
-		List<Generalarea> generalareas = RFCConfig.getGeneralareas();
-		Set<String> plntcdtSet = new HashSet<String>();
-		Set<String> saleorgSet = new HashSet<String>();
-		Set<String> countrySet = new HashSet<String>();
-		
-		for (int i = 0; i < taxs.size(); i++) {
-			
-			CountryPlantTax tax = taxs.get(i);
-			if(!"2".equals(tax.getINTERFACE_ID()))
-				continue;
-			String plntcd = tax.getPLNT_CD();
-			String salesorg = tax.getSALES_ORG();
-			if(!plntcdtSet.contains(plntcd)) {
-				plntcdtSet.add(plntcd);
-				RdhMatm_plant plant = new RdhMatm_plant();
-				plant.setWerks(plntcd);
-				plant.setEkgrp("ZZZ");
-				plantList.add(plant);
-			}
-			if(!saleorgSet.contains(salesorg)) {
-				saleorgSet.add(salesorg);
-				RdhMatm_sales_org sales_org = new RdhMatm_sales_org();
-				sales_org.setVkorg(salesorg);
-				sales_org.setDwerk(salesorg);
-				if(RFCConfig.getDwerk("2",sales_org.getVkorg())!=null)
-				{
-					sales_org.setDwerk(RFCConfig.getDwerk("2",sales_org.getVkorg()));
-					String countrt=null;
-					if("0147".equals(sales_org.getVkorg())) {
-						countrt="US";
-					}else if ("0026".equals(sales_org.getVkorg())) {
-						countrt="Canada";
-					}
-					if(countrt!=null) {
-						//0026 C
-						//0147 
-						sales_org.setZtaxclsf(getZtaxclsf(model,countrt));
-						if(sales_org!=null) {
-							sales_org.setZsabrtax(getZsabrtax(sales_org.getZtaxclsf()));
-						}
-					}
-					/*
-					 * if("0147".equals(sales_org.getVkorg())){ sales_org.setZtaxclsf("1");
-					 * sales_org.setZsabrtax("01"); }else if ("0026".equals(sales_org.getVkorg())) {
-					 * sales_org.setZsabrtax("HW"); }
-					 */
-					if(!set.contains(sales_org.getVkorg()+sales_org.getDwerk()))
-					{
-						sales_orgList.add(sales_org);
-						set.add(sales_org.getVkorg()+sales_org.getDwerk());
-					}
-				}
-			}
-			
-		}
-		
-		if(materialID.endsWith("UPG")||materialID.endsWith("MTC")) {
-		for (int i = 0; i < taxs.size(); i++) {
-			CountryPlantTax tax = taxs.get(i);
-			
-			if("2".equals(tax.getINTERFACE_ID())) {
-				if(countrySet.contains(tax.getTAX_COUNTRY()))
-					continue;
-				countrySet.add(tax.getTAX_COUNTRY());
-				RdhMatm_tax_country tax_country = new RdhMatm_tax_country();
-				tax_country.setAland(tax.getTAX_COUNTRY());
-				tax_country.setTaty1(tax.getTAX_CAT());
-				tax_country.setTaxm1(tax.getTAX_CLAS());
-				tax_country.setTaxm2(tax.getTAX_CLAS());
-				tax_country.setTaxm3(tax.getTAX_CLAS());
-				tax_country.setTaxm4(tax.getTAX_CLAS());
-				tax_country.setTaxm5(tax.getTAX_CLAS());
-				tax_country.setTaxm6(tax.getTAX_CLAS());
-				tax_country.setTaxm7(tax.getTAX_CLAS());
-				tax_country.setTaxm8(tax.getTAX_CLAS());
-				tax_country.setTaxm9(tax.getTAX_CLAS());
-
-				if(tax_country.getAland()!=null) {
-				tax_countries.add(tax_country);
-				}
-				
-			}
-		}
-		}else if (materialID.endsWith("NEW")||"ZPRT".equals(materialType)) {
-			//Set<String> countrySet = new HashSet<String>();
-			
-			for (int i = 0; i <taxcategories.size(); i++) {
-				TAXCATEGORY taxcategory = taxcategories.get(i);
-				List<COUNTRY> countrys = taxcategory.getCOUNTRYLIST();
-				if(null==taxcategory.getTAXCLASSIFICATION()||"".equals(taxcategory.getTAXCLASSIFICATION().trim())) {
-					continue;
-				}
-				for (int j = 0; j < countrys.size(); j++) {
-					COUNTRY country = countrys.get(j);
-					boolean notmatch = false;
-					if("1652".equals(country.getCOUNTRY_FC())) {
-					List<SLEORGGRP> sleorggrps=	taxcategory.getSLEORGGRPLIST();
-					notmatch = true;
-					for(int m =0;m<sleorggrps.size();m++)
-					{
-						if("US".equals(sleorggrps.get(m).getSLEORGGRP())) {
-							notmatch = false;
-							break;
-						}
-						
-					}
-					
-					}
-					
-					if(!notmatch&&!countrySet.contains(country.getCOUNTRY_FC())) {
-						countrySet.add(country.getCOUNTRY_FC());
-						
-						
-						RdhMatm_tax_country tax_country = new RdhMatm_tax_country();
-						tax_country.setAland(RFCConfig.getAland(country.getCOUNTRY_FC()));
-						tax_country.setTaty1(taxcategory.getTAXCATEGORYVALUE());
-						/*
-						 * tax_country.setTaxm1(taxcategory.getTAXCLASSIFICATION());
-						 * tax_country.setTaxm2(taxcategory.getTAXCLASSIFICATION());
-						 * tax_country.setTaxm3(taxcategory.getTAXCLASSIFICATION());
-						 * tax_country.setTaxm4(taxcategory.getTAXCLASSIFICATION());
-						 * tax_country.setTaxm5(taxcategory.getTAXCLASSIFICATION());
-						 * tax_country.setTaxm6(taxcategory.getTAXCLASSIFICATION());
-						 * tax_country.setTaxm7(taxcategory.getTAXCLASSIFICATION());
-						 * tax_country.setTaxm8(taxcategory.getTAXCLASSIFICATION());
-						 * tax_country.setTaxm9(taxcategory.getTAXCLASSIFICATION());
-						 */
-						
-						  tax_country.setTaxm1("1");
-						  tax_country.setTaxm2("1");
-						  tax_country.setTaxm3("1");
-						  tax_country.setTaxm4("1");
-						  tax_country.setTaxm5("1");
-						  tax_country.setTaxm6("1");
-						  tax_country.setTaxm7("1");
-						  tax_country.setTaxm8("1");
-						  tax_country.setTaxm9("1");
-						 
-						if(tax_country.getAland()!=null) {
-						tax_countries.add(tax_country);
-						}
-					}
-					
-				}
-				
-				
-			}
-		}
-		
-				geo.setPlants(plantList);
-				geo.setSales_orgs(sales_orgList);
-				geo.setTax_countries(tax_countries);
-				geos.add(geo);
-
-
-	bmm00.get(0).setTcode("MM01");
-	
-	}
-
-	private String getZsabrtax(String ztaxclsf) {
-		// TODO Auto-generated method stub
-		return RfcConfigProperties.getZsabrtaxPropertys(ztaxclsf);
-	}
-
-	private String getZtaxclsf(MODEL model,String country) {
-		List<TAXCATEGORY> taxs = model.getTAXCATEGORYLIST();
-		if (taxs != null && taxs.size() > 0) {
-			for (int i = 0; i < taxs.size(); i++) {
-				List<SLEORGGRP> list = taxs.get(i).getSLEORGGRPLIST();
-				if (list != null && list.size() > 0) {
-					for (int j = 0; j < list.size(); j++) {
-						if (country.equals(list.get(j).getSLEORGGRP())) {
-							return taxs.get(i).getTAXCLASSIFICATION();
-						}
-					}
-				}
-			}
-		}
-		return null;
-
-	}
-
-	private String getMtpos(MODEL model) {
-		// TODO Auto-generated method stub
-		String result = "";
-		String var = model.getPHANTOMMODINDC()==null?"":model.getPHANTOMMODINDC().toUpperCase();
-		String materialID = bmm00.get(0).getMatnr();
-		
-		if(materialID.endsWith("NEW")) {
-			if ("NORM".equals(var)) {
-				result="ZPT1";
-			}else if ("REACH".equals(var)) {
-				result ="ZPT2";
-			}else if (RfcConfigProperties.getMtposMachtype().contains(model.getMACHTYPE())) {
-				result="ZPT4";
-			}else if ("LBS".equals(var)) {
-				result="ZPT3";
-			}else {
-				result="Z002";
-			}
-			if ("P1030".equals(model.getPRFTCTR())) {
-				result="ZHCR";
-			}
-		}else if (materialID.endsWith("UPG")||materialID.endsWith("MTC")) {
-			if ("NORM".equals(var)) {
-				result="ZPT1";
-			}else if ("REACH".equals(var)) {
-				result ="ZPT2";
-			}
-			else if ("LBS".equals(var)) {
-				result="ZPT3";
-			}
-			else {
-				result="Z002";
-			}	
-		}
-		else if("ZPRT".equals(bmm00.get(0).getMtart())) {
-		   if("Hardware".equals(model.getCATEGORY())) {
-			   result ="ZSUP";
-		   }
-		}
-		
-		return result;
-	}
-
-	public String getMtart(SVCMOD svcmod) {
-		String mtart = "ZSV1";
-		if (svcmod == null)
-			return mtart;
-		if ("Service".equals(svcmod.getCATEGORY())) {
-			if ("Custom".equals(svcmod.getSUBCATEGORY())) {
-				mtart = "ZSV1";
-			} else if ("Facility".equals(svcmod.getSUBCATEGORY())) {
-				mtart = "ZSV2";
-			} else if ("Productized Services".equals(svcmod.getSUBCATEGORY())
-					&& "Non-Federated".equals(svcmod.getGROUP())) {
-				mtart = "ZSV5";
-			}
-		} else if ("IP".equals(svcmod.getCATEGORY()) && "SC".equals(svcmod.getSUBCATEGORY())) {
-			mtart = "ZSV1";
-		}
-		return mtart;
-	}
-
-	public String getMeins(SVCMOD svcmod) {
-		String reslut = "EA";
-		if (svcmod == null)
-			return reslut;
-		if ("Service".equals(svcmod.getCATEGORY())) {
-			if ("Custom".equals(svcmod.getSUBCATEGORY())) {
-				reslut = "EA";
-			} else if ("Facility".equals(svcmod.getSUBCATEGORY())) {
-				reslut = "EA";
-			} else if ("Productized Services".equals(svcmod.getSUBCATEGORY())
-					&& "Non-Federated".equals(svcmod.getGROUP())) {
-				reslut = "EA";
-			}
-		} else if ("IP".equals(svcmod.getCATEGORY()) && "SC".equals(svcmod.getSUBCATEGORY())) {
-			reslut = "EA";
-		}
-		return reslut;
-	}
-
-	/*
-	 * public RdhMatmCreate(ProductSchedule productSchedule, SoftwareProduct
-	 * softwareProduct, LicensedFunction licensedFunction) {
-	 * super(productSchedule.getMainProduct().getProductIdentifier() + "_" +
-	 * productSchedule.getId(), "Z_DM_SAP_MATM_CREATE".toLowerCase(),
-	 * softwareProduct.getEnablementProcess().getKwValue()); this.type = "ZZEE"; try
-	 * { RdhClassDefaultValuesUtility.setDefaultValues(this, type); } catch
-	 * (Exception e) { this.setRfcrc(8);
-	 * this.setError_text("Get Default value  - Exception " + e.getMessage()); }
-	 * bmm00.get(0).setMatnr(licensedFunction.getMaterialID());
-	 * bmmh1.get(0).setSpart(softwareProduct.getOwningDivision().getName());
-	 * if(softwareProduct.getVendorLogoAAG() != null) {
-	 * bmmh1.get(0).setKtgrm(softwareProduct
-	 * .getVendorLogoAAG().getEswAccountAssignGroup()); }
-	 * bmmh5.get(0).setSpras("E");
-	 * bmmh5.get(0).setMaktx(licensedFunction.getShortName());
-	 * 
-	 * setGeoSalesOrgCountry(softwareProduct,licensedFunction,null,null); }
-	 * 
-	 * public RdhMatmCreate(ProductSchedule productSchedule, SoftwareProduct
-	 * softwareProduct, OrderableSupply orderableSupply, String orderableSupplyName)
-	 * { super(productSchedule.getMainProduct().getProductIdentifier() + "_" +
-	 * productSchedule.getId(), "Z_DM_SAP_MATM_CREATE".toLowerCase(),
-	 * softwareProduct.getEnablementProcess().getKwValue()); this.type = "ZOSP"; try
-	 * { RdhClassDefaultValuesUtility.setDefaultValues(this, type); } catch
-	 * (Exception e) { this.setRfcrc(8);
-	 * this.setError_text("Get Default value  - Exception " + e.getMessage()); }
-	 * bmm00.get(0).setMatnr(orderableSupply.getMaterialId());
-	 * bmmh1.get(0).setSpart(softwareProduct.getOwningDivision().getName());
-	 * bmmh5.get(0).setSpras("E"); bmmh5.get(0).setMaktx(orderableSupplyName);
-	 * setGeoSalesOrgCountry(softwareProduct,null,orderableSupply, null); }
-	 * 
-	 * public RdhMatmCreate(ProductSchedule productSchedule, SoftwareProduct
-	 * softwareProduct, SliceGroupEsw sliceGroupEsw){
-	 * super(productSchedule.getMainProduct().getProductIdentifier() + "_" +
-	 * productSchedule.getId(), "Z_DM_SAP_MATM_CREATE".toLowerCase(),
-	 * softwareProduct.getEnablementProcess().getKwValue()); this.type = "ZGRP"; try
-	 * { RdhClassDefaultValuesUtility.setDefaultValues(this, type); } catch
-	 * (Exception e) { this.setRfcrc(8);
-	 * this.setError_text("Get Default value  - Exception " + e.getMessage()); }
-	 * bmm00.get(0).setMatnr(sliceGroupEsw.getMaterialId());
-	 * bmmh1.get(0).setSpart(softwareProduct.getOwningDivision().getName());
-	 * bmmh5.get(0).setSpras("E"); String srel = ""; if(srel != null) { srel =
-	 * " SREL" + ("DBS".equals(sliceGroupEsw.getSRel()) ? "DB" :
-	 * sliceGroupEsw.getSRel()); }
-	 * 
-	 * String language = sliceGroupEsw.getLanguageName() != null ? " " +
-	 * sliceGroupEsw.getLanguageName() : ""; String mediaTypeCdsId =
-	 * sliceGroupEsw.getMediaTypeCdsId() != null ? " " +
-	 * sliceGroupEsw.getMediaTypeCdsId().substring(0, 3) +
-	 * sliceGroupEsw.getMediaTypeCdsId().substring(8, 11) : "";
-	 * bmmh5.get(0).setMaktx("Grp for" + srel + language + mediaTypeCdsId);
-	 * setGeoSalesOrgCountry(softwareProduct, null, null, sliceGroupEsw);
-	 * 
-	 * }
-	 * 
-	 * 
-	 * private void setGeoSalesOrgCountry(SoftwareProduct
-	 * softwareProduct,LicensedFunction licensedFunction, OrderableSupply
-	 * orderableSupply, SliceGroupEsw sliceGroupEsw) { geos.clear(); String
-	 * sapFeedId = "ESW_FEED_ALL";//default for esw -
-	 * <SoftwareProduct.enablementProcess> = "SWPIMS" List<SapGeo> sapGeos =
-	 * softwareProduct.getSapGeoObjects(); if(this.isAas(softwareProduct)) {
-	 * if(softwareProduct.getIsSwmaOffered()) { sapFeedId = "CSW_FEED_IERP_SWMA";
-	 * }else { sapFeedId = "CSW_FEED_IERP_LIC"; } sapGeos =
-	 * softwareProduct.getSapGeoObjectsBasedOnSapFeedId(sapFeedId); }
-	 * 
-	 * for(SapGeo sapGeo : sapGeos) { boolean isSetSalesStatus = false;
-	 * List<GeoAvailStatus> availStatuses = null;// for different case, will get the
-	 * geoavailstatus by different way if(licensedFunction != null) { availStatuses
-	 * = licensedFunction.getGeoAvailStatusObjects(); } else if(orderableSupply
-	 * !=null) { availStatuses = orderableSupply.getGeoAvailStatusObjects(); } else
-	 * if(sliceGroupEsw !=null) { availStatuses =
-	 * softwareProduct.getGeoAvailStatusObjects(); } else { availStatuses =
-	 * softwareProduct.getGeoAvailStatusObjects(); isSetSalesStatus = true; }
-	 * if(availStatuses == null || availStatuses.isEmpty()) { continue; } for
-	 * (GeoAvailStatus availStatus : availStatuses) { if
-	 * (availStatus.getBusinessGeo().getKwValue().equals(sapGeo
-	 * .getBusinessGeo().getKwValue())) { Date withdrawMarketingDate =
-	 * softwareProduct.getWithdrawDateAllOSPs() != null ?
-	 * softwareProduct.getWithdrawDateAllOSPs() :
-	 * availStatus.getWithdrawMarketingDate(); Date announcementDate =
-	 * availStatus.getAnnouncementDate(); RdhMatm_geo geo =
-	 * generateGeoStructure(softwareProduct, orderableSupply, sliceGroupEsw, sapGeo,
-	 * isSetSalesStatus, announcementDate, withdrawMarketingDate); geos.add(geo); }
-	 * 
-	 * } if("WW".equals(sapGeo.getBusinessGeo().getKwValue())) //no matched GAS for
-	 * WW { RdhMatm_geo geo = generateGeoStructure(softwareProduct, orderableSupply,
-	 * sliceGroupEsw, sapGeo, isSetSalesStatus,
-	 * this.getEarliestAnnDate(softwareProduct),null); geos.add(geo); } } }
-	 * 
-	 * private RdhMatm_geo generateGeoStructure(SoftwareProduct softwareProduct,
-	 * OrderableSupply orderableSupply, SliceGroupEsw sliceGroupEsw, SapGeo sapGeo,
-	 * boolean isSetSalesStatus, Date annDate, Date wdDate) { RdhMatm_geo geo = new
-	 * RdhMatm_geo();
-	 * 
-	 * geo.setName(sapGeo.getBusinessGeo().getKwValue());//Copy from
-	 * <SapGeo.getBusinessGeo().value>. if(isSetSalesStatus) {
-	 * 
-	 * if(this.isSWPIMs(softwareProduct)) { if(wdDate != null &&
-	 * !DateUtility.isAfterToday(wdDate)) { geo.setVmsta("ZJ"); }else {
-	 * geo.setVmsta("Z0"); } if(wdDate != null && !DateUtility.isAfterToday(wdDate))
-	 * { geo.setVmstd(DateUtility.getDateStringWithSapFormat(wdDate)); } else
-	 * if(annDate != null && DateUtility.isBeforeToday(annDate)) {
-	 * geo.setVmstd(DateUtility.getDateStringWithSapFormat(annDate)); } else {
-	 * geo.setVmstd(DateUtility.getTodayStringWithSapFormat()); } }else
-	 * if(this.isAas(softwareProduct)) { geo.setVmsta("Z0");
-	 * if("WW".equals(sapGeo.getBusinessGeo().getKwValue())) { Date earliestDate =
-	 * this.getEarliestAnnDate(softwareProduct); if(earliestDate != null) {
-	 * geo.setVmstd(DateUtility.getDateStringWithSapFormat(earliestDate)); } }else {
-	 * geo.setVmstd(DateUtility.getDateStringWithSapFormat(annDate)); } } } //set
-	 * plant List<RdhMatm_plant> plants = new ArrayList<RdhMatm_plant>();
-	 * for(SapPlant sapplant : sapGeo.getSapPlants()) { RdhMatm_plant plant = new
-	 * RdhMatm_plant(); plant.setWerks(sapplant.getPlantCode());
-	 * plant.setLgort(sapplant.getStorageLocation()); plants.add(plant); }
-	 * geo.setPlants(plants);
-	 * 
-	 * List<RdhMatm_sales_org> sales_orgs = new ArrayList<RdhMatm_sales_org>();
-	 * for(SapSalesOrg salesorg : sapGeo.getSapSalesOrgs()) { RdhMatm_sales_org
-	 * sales_org = new RdhMatm_sales_org(); sales_orgs.add(sales_org);
-	 * sales_org.setVkorg(salesorg.getSalesOrg());
-	 * sales_org.setDwerk(salesorg.getDeliveryPlant());
-	 * if("0147".equals(salesorg.getSalesOrg())) {
-	 * sales_org.setZtaxclsf(softwareProduct.getUsTaxClass().getKwValue()); }
-	 * 
-	 * } geo.setSales_orgs(sales_orgs);
-	 * 
-	 * List<RdhMatm_tax_country> tax_countries = new
-	 * ArrayList<RdhMatm_tax_country>(); for(SapCountry country :
-	 * sapGeo.getSapCountries()) { RdhMatm_tax_country tax_cnty = new
-	 * RdhMatm_tax_country(); tax_countries.add(tax_cnty);
-	 * 
-	 * tax_cnty.setAland(country.getIsoCountry());
-	 * tax_cnty.setTaxm1(country.getTaxClass()); if(sliceGroupEsw != null) {
-	 * if("2".equals(country.getTaxClassRule())) {
-	 * tax_cnty.setTaxm1(softwareProduct.getUsTaxClass() != null ?
-	 * softwareProduct.getUsTaxClass().getKwValue() : ""); }else {
-	 * tax_cnty.setTaxm1(country.getTaxClass()); } } if(orderableSupply != null) {
-	 * if("0".equals(country.getTaxClassRule())) {
-	 * tax_cnty.setTaxm1(country.getTaxClass()); }else
-	 * if("1".equals(country.getTaxClassRule()) ||
-	 * "3".equals(country.getTaxClassRule())) {
-	 * if("PRINT-PAPER".equals(orderableSupply.getMediaType().getName())) {
-	 * tax_cnty.setTaxm1(country.getTaxClassAlt()); }else {
-	 * tax_cnty.setTaxm1(country.getTaxClass()); } }else
-	 * if("2".equals(country.getTaxClassRule())) {
-	 * tax_cnty.setTaxm1(softwareProduct.getUsTaxClass() != null ?
-	 * softwareProduct.getUsTaxClass().getKwValue() : ""); }else {
-	 * tax_cnty.setTaxm1(country.getTaxClass()); } }
-	 * tax_cnty.setTaty1(country.getTaxCategory());
-	 * tax_cnty.setTaxm2(country.getTaxm2()); tax_cnty.setTaxm3(country.getTaxm3());
-	 * tax_cnty.setTaxm4(country.getTaxm4()); tax_cnty.setTaxm5(country.getTaxm5());
-	 * tax_cnty.setTaxm6(country.getTaxm6()); tax_cnty.setTaxm7(country.getTaxm7());
-	 * tax_cnty.setTaxm8(country.getTaxm8()); tax_cnty.setTaxm9(country.getTaxm9());
-	 * }
-	 * 
-	 * geo.setTax_countries(tax_countries); return geo; }
-	 */
-	/**
-	 * 
-	 * @param model
-	 * @return
-	 */
-	private String getEarliestAnnDate(MODEL model) {
-		Date annDate = null;
-		String result = "";
-		List<AVAILABILITY> list = model.getAVAILABILITYLIST();
-		if (list != null && list.size() > 0) {
-			for (int i = 0; i < list.size(); i++) {
-				try {
-					if (annDate == null) {
-						result = list.get(i).getANNDATE();
-						 
-						 annDate= sdf.parse(result);
-
-					} else {
-						annDate = sdf.parse(list.get(i).getANNDATE());;
-
-						if (annDate.before(sdf.parse(result))) {
-							result = list.get(i).getANNDATE();
-						}
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
-			}
-
-		}
-
-		if (result != null)
-			result = result.replace("-", "");
-		if (result != null && result.length() > 6) {
-			result = result.substring(result.length() - 6);
-		}
-		return result;
-	}
-	
-	
-	/**
-	 * 
-	 * @param model
-	 * @return
-	 */
-	private String getEarliestPUBFROM(MODEL model) {
-		Date PUBFROM = null;
-		String result = "";
-		List<AVAILABILITY> list = model.getAVAILABILITYLIST();
-		if (list != null && list.size() > 0) {
-			for (int i = 0; i < list.size(); i++) {
-				try {
-					if (PUBFROM == null) {
-						result = list.get(i).getPUBFROM();						 
-						PUBFROM= sdf.parse(result);
-
-					} else {
-						PUBFROM = sdf.parse(list.get(i).getPUBFROM());
-						if (PUBFROM.before(sdf.parse(result))) {
-							result = list.get(i).getPUBFROM();
-						}
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
-			}
-
-		}
-
-//		if (result != null)
-//			result = result.replace("-", "");
-//		if (result != null && result.length() > 6) {
-//			result = result.substring(result.length() - 6);
-//		}
-		return result;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.ibm.sdpi.cmd.interfaces.esw.rdh.RdhBase#setDefaultValues()
-	 */
-	@Override
-	protected void setDefaultValues() {
-		this.is_multi_plants = "TRUE";
-		RdhMatm_bmm00 bm0 = new RdhMatm_bmm00();
-		bmm00 = new ArrayList<RdhMatm_bmm00>();
-		bmm00.add(bm0);
-		RdhMatm_bmmh1 bmh1 = new RdhMatm_bmmh1();
-		bmmh1 = new ArrayList<RdhMatm_bmmh1>();
-		bmmh1.add(bmh1);
-		RdhMatm_bmmh5 bmh5 = new RdhMatm_bmmh5();
-		bmmh5 = new ArrayList<RdhMatm_bmmh5>();
-		bmmh5.add(bmh5);
-	
-		bmmh6 = new ArrayList<RdhMatm_bmmh6>();
-		
-		RdhMatm_bmmh7 bmh7 = new RdhMatm_bmmh7();
-		bmmh7 = new ArrayList<RdhMatm_bmmh7>();
-		bmmh7.add(bmh7);
-		geos = new ArrayList<RdhMatm_geo>();
-		// geos.add(new RdhMatm_geo());
-		// sales_orgs = new ArrayList<RdhMatm_sales_org>();
-		// tax_countries = new ArrayList<RdhMatm_tax_country>();
-	}
- 
-	@Override
-	protected boolean isReadyToExecute() {
-		if (this.getRfcrc() != 0) {
-			return false; 
-		} else { 
-			return true;
-		}
-	} 
-	/**
-	 * Change add_date to yyyy-MM-dd
-	 * 
-	 * @param time
-	 * @return add_date
-	 */
-	private String transformAddDate(String time) {
-		StringBuffer add_date = new StringBuffer(time);
-		add_date.insert(6, "-");
-		add_date.insert(4, "-");
-		return add_date.toString();
-	}
-
-}

@@ -1,289 +1,294 @@
-//javac -classpath $HOME/abrgenerator/script/ibmwebas.jar:.:./db2java.zip:/usr/java_dev2/jre/lib/rt.jar:$HOME/generator/source/middleware.jar PokBaseABR.java > errors
-//
-// (c) Copyright International Business Machines Corporation, 2001
-// All Rights Reserved.
+/*     */ package COM.ibm.eannounce.abr.pcd;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.EnterpriseUtil;
+/*     */ import COM.ibm.eannounce.abr.util.LockPDHEntityException;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.abr.util.UpdatePDHEntityException;
+/*     */ import COM.ibm.eannounce.abr.util.XLABRQueueUtil;
+/*     */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.opicmpdh.translation.MaxTranslationException;
+/*     */ import COM.ibm.opicmpdh.translation.PackageID;
+/*     */ import COM.ibm.opicmpdh.translation.Translation;
+/*     */ import COM.ibm.opicmpdh.translation.TranslationPackage;
+/*     */ import java.io.PrintWriter;
+/*     */ import java.io.StringWriter;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class XLABR11
+/*     */   extends PokBaseABR
+/*     */ {
+/* 107 */   public static int TARGET_NLSID = 11;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/*     */     try {
+/* 124 */       start_ABRBuild(false);
+/* 125 */       buildReportHeader();
+/* 126 */       setNow();
+/*     */ 
+/*     */       
+/* 129 */       EntityGroup entityGroup = this.m_db.getEntityGroup(this.m_prof, this.m_abri.getEntityType(), "Edit");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 136 */       EntityItem entityItem = new EntityItem(entityGroup, this.m_prof, this.m_db, this.m_abri.getEntityType(), this.m_abri.getEntityID());
+/*     */       
+/* 138 */       EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("BILLINGCODE");
+/* 139 */       String str = "";
+/* 140 */       if (eANFlagAttribute != null) {
+/* 141 */         str = eANFlagAttribute.getFirstActiveFlagCode();
+/*     */       }
+/* 143 */       if (str.equals("PCD")) {
+/* 144 */         str = "";
+/*     */       }
+/*     */       
+/* 147 */       println("<b><tr><td class=\"PsgText\" width=\"100%\" >" + 
+/*     */           
+/* 149 */           getEntityType() + ":</b></td><b><td class=\"PsgText\" width=\"100%\">" + 
+/*     */           
+/* 151 */           getEntityID() + "</b></td>");
+/*     */       
+/* 153 */       printNavigateAttributes(entityItem, entityGroup, true);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 158 */       PackageID packageID = new PackageID(getEntityType(), getEntityID(), TARGET_NLSID, "N/A", this.m_strNow, str);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 164 */       TranslationPackage translationPackage = Translation.getETSPackage(this.m_db, this.m_prof, packageID);
+/* 165 */       if (translationPackage == null) {
+/* 166 */         println("<br><br><b>Failed. ETSPackage is empty");
+/*     */       } else {
+/* 168 */         Translation.postETSPackage(this.m_db, this.m_prof, packageID, EnterpriseUtil.isLastEnterpriseVersion(this.m_prof));
+/* 169 */         setReturnCode(0);
+/* 170 */         setControlBlock();
+/* 171 */         XLABRQueueUtil.queueTranslationPostProcessABR(this.m_db, this.m_prof, entityItem, this.m_cbOn);
+/*     */       } 
+/*     */       
+/* 174 */       println("<br /><b>" + 
+/*     */           
+/* 176 */           buildMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 179 */               getABRDescription(), 
+/* 180 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }) + "</b>");
+/*     */     }
+/* 183 */     catch (MaxTranslationException maxTranslationException) {
+/* 184 */       setReturnCode(-1);
+/* 185 */       println(maxTranslationException.toHtml());
+/* 186 */     } catch (LockPDHEntityException lockPDHEntityException) {
+/* 187 */       setReturnCode(-2);
+/* 188 */       println("<h3><font color=red>IAB1007E: Could not get soft lock.  Rule execution is terminated.<br />" + lockPDHEntityException
+/*     */ 
+/*     */ 
+/*     */           
+/* 192 */           .getMessage() + "</font></h3>");
+/*     */     }
+/* 194 */     catch (UpdatePDHEntityException updatePDHEntityException) {
+/* 195 */       setReturnCode(-2);
+/* 196 */       println("<h3><font color=red>UpdatePDH error: " + updatePDHEntityException
+/*     */           
+/* 198 */           .getMessage() + "</font></h3>");
+/*     */     }
+/* 200 */     catch (Exception exception) {
+/*     */       
+/* 202 */       println("Error in " + this.m_abri.getABRCode() + ":" + exception.getMessage());
+/* 203 */       println("" + exception);
+/*     */ 
+/*     */       
+/* 206 */       if (getABRReturnCode() != -2) {
+/* 207 */         setReturnCode(-3);
+/*     */       }
+/* 209 */       exception.printStackTrace();
+/*     */       
+/* 211 */       StringWriter stringWriter = new StringWriter();
+/* 212 */       exception.printStackTrace(new PrintWriter(stringWriter));
+/* 213 */       String str = stringWriter.toString();
+/* 214 */       println(str);
+/*     */     }
+/*     */     finally {
+/*     */       
+/* 218 */       setDGString(getABRReturnCode());
+/* 219 */       setDGRptName("XLABR11");
+/* 220 */       printDGSubmitString();
+/*     */       
+/* 222 */       buildReportFooter();
+/* 223 */       if (!isReadOnly()) {
+/* 224 */         clearSoftLock();
+/*     */       }
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getABREntityDesc(String paramString, int paramInt) {
+/* 234 */     return null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 242 */     return "<br /><br />";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getStyle() {
+/* 250 */     return "";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getRevision() {
+/* 260 */     return new String("$Revision: 1.23 $");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void printPassMessage() {
+/* 269 */     println("<br /><b>send to Production Management</b><br /><br />");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String getVersion() {
+/* 279 */     return "$Id: XLABR11.java,v 1.23 2010/04/23 15:40:48 lucasrg Exp $";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 286 */     return getVersion();
+/*     */   }
+/*     */ }
 
-// $Log: XLABR11.java,v $
-// Revision 1.23  2010/04/23 15:40:48  lucasrg
-// Fixed Queue Post Process ABR method (added Database m_db parameter)
-//
-// Revision 1.22  2010/04/23 14:23:58  lucasrg
-// Added setControlBlock (was causing an error when trying to queue the Post Process ABR)
-//
-// Revision 1.21  2010/04/22 17:34:10  lucasrg
-// Fixed Queue Post Proceess ABR method for XLABRs
-//
-// Revision 1.20  2010/03/26 19:31:20  lucasrg
-// Added XLABRQueueUtil to trigger the Translation post process ABR (XLPOSTPROCABR)
-//
-// Revision 1.19  2010/03/26 18:09:56  lucasrg
-// XLABR now using EnterpriseUtil to verify enterprise related rules
-//
-// Revision 1.18  2010/03/25 18:46:26  lucasrg
-// Handle translation's max length depending on the enterprise
-//
-// Revision 1.17  2010/03/25 14:47:09  lucasrg
-// XLABRs now handling max length translation exception
-//
-// Revision 1.16  2008/01/30 19:27:20  wendy
-// Cleanup RSA warnings
-//
-// Revision 1.15  2006/03/03 19:24:11  bala
-// remove reference to Constants.CSS
-//
-// Revision 1.14  2006/01/25 17:46:06  yang
-// Jtest changes
-//
-// Revision 1.13  2005/01/27 16:39:54  joan
-// changes for Jtest
-//
-// Revision 1.12  2004/11/05 17:13:40  yang
-// adjust for package id
-//
-// Revision 1.11  2004/11/05 00:08:58  joan
-// adjust code for PackageID constructor change
-//
-// Revision 1.10  2003/09/18 19:37:56  yang
-// adding bala's stuff to finally {
-//
-// Revision 1.9  2003/09/09 21:47:11  dave
-// expanding translation ABR's to cover meta
-//
-// Revision 1.8  2003/08/26 23:48:29  yang
-// removed setFlagValue
-//
-// Revision 1.7  2003/08/26 23:18:50  yang
-// updated postETSPackage
-//
-// Revision 1.6  2003/08/26 23:03:50  yang
-// updated getETSPackage
-//
-// Revision 1.5  2003/08/26 22:50:44  yang
-// more syntax
-//
-// Revision 1.4  2003/08/26 22:42:57  yang
-// syntax
-//
-// Revision 1.3  2003/08/26 21:59:38  yang
-// syntax
-//
-// Revision 1.2  2003/08/26 21:21:29  yang
-// fix null pointer
-//
-// Revision 1.1  2003/08/26 20:19:38  yang
-// adding XLABR11
-//
 
-package COM.ibm.eannounce.abr.pcd;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import COM.ibm.eannounce.abr.util.EnterpriseUtil;
-import COM.ibm.eannounce.abr.util.LockPDHEntityException;
-import COM.ibm.eannounce.abr.util.PokBaseABR;
-import COM.ibm.eannounce.abr.util.UpdatePDHEntityException;
-import COM.ibm.eannounce.abr.util.XLABRQueueUtil;
-import COM.ibm.eannounce.objects.EANFlagAttribute;
-import COM.ibm.eannounce.objects.EntityGroup;
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.opicmpdh.translation.MaxTranslationException;
-import COM.ibm.opicmpdh.translation.PackageID;
-import COM.ibm.opicmpdh.translation.Translation;
-import COM.ibm.opicmpdh.translation.TranslationPackage;
-
-/**
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- *
- * @author Administrator
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\pcd\XLABR11.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class XLABR11 extends PokBaseABR {
-
-  /**
-     * TARGET_NLSID
-     *
-     */
-    public static int TARGET_NLSID = 11;
-
-  /**
-   * @see COM.ibm.opicmpdh.middleware.taskmaster.AbstractTask#execute_run()
-   * @author Administrator
-   */
-  public void execute_run() {
-    EntityGroup eg;
-    EntityItem ei;
-    EANFlagAttribute fa;
-    String strBillingCode;
-    PackageID pkID;
-    TranslationPackage etspk;
-    StringWriter writer;
-    String x;
-    try {
-
-      start_ABRBuild(false);
-      buildReportHeader();
-      setNow();
-
-      eg =
-        m_db.getEntityGroup(m_prof, m_abri.getEntityType(), "Edit");
-      ei =
-        new EntityItem(
-          eg,
-          m_prof,
-          m_db,
-          m_abri.getEntityType(),
-          m_abri.getEntityID());
-      fa =
-        (EANFlagAttribute) ei.getAttribute("BILLINGCODE");
-      strBillingCode = "";
-      if (fa != null) {
-        strBillingCode = fa.getFirstActiveFlagCode();
-      }
-      if (strBillingCode.equals("PCD")) {
-        strBillingCode = "";
-      }
-
-      println(
-        "<b><tr><td class=\"PsgText\" width=\"100%\" >"
-          + getEntityType()
-          + ":</b></td><b><td class=\"PsgText\" width=\"100%\">"
-          + getEntityID()
-          + "</b></td>");
-      printNavigateAttributes(ei, eg, true);
-
-      pkID =
-        new PackageID(
-          getEntityType(),
-          getEntityID(),
-          TARGET_NLSID,
-          "N/A",
-          m_strNow,
-          strBillingCode);
-      etspk =
-        Translation.getETSPackage(m_db, m_prof, pkID);
-      if (etspk == null) {
-        println("<br><br><b>Failed. ETSPackage is empty");
-      } else {
-        Translation.postETSPackage(m_db, m_prof, pkID, EnterpriseUtil.isLastEnterpriseVersion(m_prof));
-        setReturnCode(PASS);
-        setControlBlock();
-        XLABRQueueUtil.queueTranslationPostProcessABR(m_db, m_prof, ei, m_cbOn);
-      }
-
-      println(
-        "<br /><b>"
-          + buildMessage(
-            MSG_IAB2016I,
-            new String[] {
-              getABRDescription(),
-              (getReturnCode() == PASS ? "Passed" : "Failed")})
-          + "</b>");
-
-    } catch (MaxTranslationException e) {
-      setReturnCode(FAIL);
-  	  println(e.toHtml());
-    } catch (LockPDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>"
-          + ERR_IAB1007E
-          + "<br />"
-          + le.getMessage()
-          + "</font></h3>");
-    } catch (UpdatePDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>UpdatePDH error: "
-          + le.getMessage()
-          + "</font></h3>");
-    } catch (Exception exc) {
-
-      println("Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-      println("" + exc);
-
-      // don't overwrite an update exception
-      if (getABRReturnCode() != UPDATE_ERROR) {
-        setReturnCode(INTERNAL_ERROR);
-      }
-      exc.printStackTrace();
-
-      writer = new StringWriter();
-      exc.printStackTrace(new PrintWriter(writer));
-      x = writer.toString();
-      println(x);
-
-    } finally {
-
-      setDGString(getABRReturnCode());
-      setDGRptName("XLABR11"); //Set the report name
-      printDGSubmitString();
-      //Stuff into report for subscription and notification
-      buildReportFooter();
-      if (!isReadOnly()) {
-        clearSoftLock();
-      }
-    }
-  }
-
-  /**
-   * @see COM.ibm.eannounce.abr.util.PokBaseABR#getABREntityDesc(java.lang.String, int)
-   * @author Administrator
-   */
-  protected String getABREntityDesc(String entityType, int entityId) {
-    return null;
-  }
-
-  /**
-   * @see COM.ibm.eannounce.abr.util.PokBaseABR#getDescription()
-   * @author Administrator
-   */
-  public String getDescription() {
-    return "<br /><br />";
-  }
-
-  /**
-   * @see COM.ibm.eannounce.abr.util.PokBaseABR#getStyle()
-   * @author Administrator
-   */
-  protected String getStyle() {
-    return "";
-  }
-
-  /**
-     * getevision
-     *
-     * @return
-     * @author Administrator
-     */
-  public String getRevision() {
-    return new String("$Revision: 1.23 $");
-  }
-
-  /**
-     * printPassMessage
-     *
-     * @author Administrator
-     */
-  public void printPassMessage() {
-    println("<br /><b>send to Production Management</b><br /><br />");
-  }
-
-  /**
-     * getVersion
-     *
-     * @return
-     * @author Administrator
-     */
-  public static String getVersion() {
-    return ("$Id: XLABR11.java,v 1.23 2010/04/23 15:40:48 lucasrg Exp $");
-  }
-  /**
-   * @see COM.ibm.eannounce.abr.util.PokBaseABR#getABRVersion()
-   * @author Administrator
-   */
-  public String getABRVersion() {
-    return getVersion();
-  }
-
-}

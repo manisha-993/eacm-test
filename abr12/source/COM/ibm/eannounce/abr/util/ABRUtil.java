@@ -1,922 +1,928 @@
-//Licensed Materials -- Property of IBM
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.BlobAttribute;
+/*     */ import COM.ibm.eannounce.objects.CreateActionItem;
+/*     */ import COM.ibm.eannounce.objects.EANAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EANDataFoundation;
+/*     */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.eannounce.objects.LongTextAttribute;
+/*     */ import COM.ibm.eannounce.objects.MetaBlobAttribute;
+/*     */ import COM.ibm.eannounce.objects.MetaFlag;
+/*     */ import COM.ibm.eannounce.objects.MetaLongTextAttribute;
+/*     */ import COM.ibm.eannounce.objects.MetaMultiFlagAttribute;
+/*     */ import COM.ibm.eannounce.objects.MetaSingleFlagAttribute;
+/*     */ import COM.ibm.eannounce.objects.MetaStatusAttribute;
+/*     */ import COM.ibm.eannounce.objects.MetaTextAttribute;
+/*     */ import COM.ibm.eannounce.objects.MetaXMLAttribute;
+/*     */ import COM.ibm.eannounce.objects.MultiFlagAttribute;
+/*     */ import COM.ibm.eannounce.objects.PDGUtility;
+/*     */ import COM.ibm.eannounce.objects.SBRException;
+/*     */ import COM.ibm.eannounce.objects.SingleFlagAttribute;
+/*     */ import COM.ibm.eannounce.objects.StatusAttribute;
+/*     */ import COM.ibm.eannounce.objects.TextAttribute;
+/*     */ import COM.ibm.eannounce.objects.XMLAttribute;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+/*     */ import java.io.BufferedInputStream;
+/*     */ import java.io.BufferedOutputStream;
+/*     */ import java.io.BufferedReader;
+/*     */ import java.io.FileInputStream;
+/*     */ import java.io.FileOutputStream;
+/*     */ import java.io.IOException;
+/*     */ import java.io.InputStream;
+/*     */ import java.io.InputStreamReader;
+/*     */ import java.net.URL;
+/*     */ import java.net.URLConnection;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.Locale;
+/*     */ import java.util.Vector;
+/*     */ import javax.xml.parsers.SAXParser;
+/*     */ import javax.xml.parsers.SAXParserFactory;
+/*     */ import org.dom4j.Document;
+/*     */ import org.dom4j.DocumentHelper;
+/*     */ import org.dom4j.io.SAXValidator;
+/*     */ import org.dom4j.util.XMLErrorHandler;
+/*     */ import org.xml.sax.ErrorHandler;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class ABRUtil
+/*     */ {
+/*     */   private static final int BUFFER_SIZE = 8192;
+/*     */   
+/*     */   public static EntityItem[] doSearch(Database paramDatabase, Profile paramProfile, String paramString1, String paramString2, boolean paramBoolean, Vector<Object> paramVector1, Vector<Object> paramVector2, StringBuffer paramStringBuffer) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException, SBRException {
+/* 136 */     if (paramVector1 == null) {
+/* 137 */       throw new IllegalArgumentException("AttributeCode vector cannot be null");
+/*     */     }
+/* 139 */     if (paramVector2 == null) {
+/* 140 */       throw new IllegalArgumentException("AttributeValue vector cannot be null");
+/*     */     }
+/* 142 */     if (paramVector2.size() != paramVector1.size()) {
+/* 143 */       throw new IllegalArgumentException("AttributeValue vector must have the same number of elements as the AttributeCode vector");
+/*     */     }
+/* 145 */     PDGUtility pDGUtility = new PDGUtility();
+/* 146 */     StringBuffer stringBuffer = new StringBuffer();
+/* 147 */     for (byte b = 0; b < paramVector1.size(); b++) {
+/* 148 */       if (stringBuffer.length() > 0) {
+/* 149 */         stringBuffer.append(";");
+/*     */       }
+/* 151 */       Object object1 = paramVector2.elementAt(b);
+/* 152 */       Object object2 = paramVector1.elementAt(b);
+/* 153 */       if (object1 == null) {
+/* 154 */         throw new IllegalArgumentException("AttributeValue vector cannot have a null value. Value[" + b + "] is null");
+/*     */       }
+/* 156 */       if (object2 == null) {
+/* 157 */         throw new IllegalArgumentException("AttributeCode vector cannot have a null Attribute. Attribute[" + b + "] is null");
+/*     */       }
+/* 159 */       String str1 = paramVector2.elementAt(b).toString();
+/* 160 */       String str2 = paramVector1.elementAt(b).toString();
+/* 161 */       stringBuffer.append("map_" + str2 + "=" + str1);
+/*     */     } 
+/*     */     
+/* 164 */     append(paramStringBuffer, "ABRUtil.doSearch: Using " + paramString1 + ", useListSrch:" + paramBoolean + " to search for " + paramString2 + " using " + stringBuffer.toString() + "\n");
+/*     */     
+/* 166 */     EntityItem[] arrayOfEntityItem = null;
+/* 167 */     if (!paramBoolean) {
+/* 168 */       arrayOfEntityItem = pDGUtility.dynaSearch(paramDatabase, paramProfile, null, paramString1, paramString2, stringBuffer.toString());
+/*     */     } else {
+/* 170 */       EntityList entityList = pDGUtility.dynaSearchIIForEntityList(paramDatabase, paramProfile, null, paramString1, paramString2, stringBuffer
+/* 171 */           .toString());
+/*     */       
+/* 173 */       EntityGroup entityGroup = entityList.getEntityGroup(paramString2);
+/* 174 */       if (entityGroup != null && entityGroup.getEntityItemCount() > 0) {
+/* 175 */         arrayOfEntityItem = entityGroup.getEntityItemsAsArray();
+/*     */       } else {
+/* 177 */         append(paramStringBuffer, "ABRUtil.doSearch: No " + paramString2 + " found\n");
+/*     */       } 
+/*     */     } 
+/* 180 */     return arrayOfEntityItem;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static EntityItem createEntity(Database paramDatabase, Profile paramProfile, String paramString1, EntityItem paramEntityItem, String paramString2, Vector<String> paramVector, Hashtable paramHashtable, StringBuffer paramStringBuffer) throws MiddlewareRequestException, SQLException, MiddlewareException, EANBusinessRuleException, RemoteException, MiddlewareShutdownInProgressException {
+/* 207 */     append(paramStringBuffer, "ABRUtil.createEntity: Using " + paramString1 + ", child:" + paramString2 + " parent: " + paramEntityItem.getKey() + "\n");
+/* 208 */     EntityItem entityItem = null;
+/*     */     
+/* 210 */     CreateActionItem createActionItem = new CreateActionItem(null, paramDatabase, paramProfile, paramString1);
+/* 211 */     EntityList entityList = new EntityList(paramDatabase, paramProfile, createActionItem, new EntityItem[] { paramEntityItem });
+/*     */     
+/* 213 */     EntityGroup entityGroup = entityList.getEntityGroup(paramString2);
+/* 214 */     if (entityGroup != null && entityGroup.getEntityItemCount() == 1) {
+/* 215 */       EntityItem entityItem1 = null;
+/*     */       
+/* 217 */       entityItem = entityGroup.getEntityItem(0);
+/*     */       
+/* 219 */       for (byte b = 0; b < paramVector.size(); b++) {
+/* 220 */         String str = paramVector.elementAt(b);
+/*     */         
+/* 222 */         EANMetaAttribute eANMetaAttribute = entityGroup.getMetaAttribute(str);
+/* 223 */         if (eANMetaAttribute == null) {
+/* 224 */           append(paramStringBuffer, "ABRUtil.createEntity: MetaAttribute cannot be found " + entityGroup.getEntityType() + "." + str + "\n");
+/*     */         } else {
+/*     */           
+/* 227 */           Object object = paramHashtable.get(str);
+/* 228 */           if (object == null) {
+/* 229 */             append(paramStringBuffer, "ABRUtil.createEntity: Value not found for " + str + "\n");
+/*     */           } else {
+/*     */             String str1; Vector vector;
+/* 232 */             switch (eANMetaAttribute.getAttributeType().charAt(0)) {
+/*     */ 
+/*     */ 
+/*     */               
+/*     */               case 'L':
+/*     */               case 'T':
+/*     */               case 'X':
+/* 239 */                 setText(entityItem, str, object.toString(), paramStringBuffer);
+/*     */                 break;
+/*     */ 
+/*     */               
+/*     */               case 'S':
+/*     */               case 'U':
+/* 245 */                 str1 = null;
+/* 246 */                 if (object instanceof Vector) {
+/* 247 */                   str1 = ((Vector<E>)object).firstElement().toString();
+/* 248 */                   append(paramStringBuffer, "ABRUtil.createEntity: Vector passed in for " + eANMetaAttribute
+/* 249 */                       .getAttributeType() + " type for " + str + " using " + str1 + " vct was " + object + "\n");
+/*     */                 } else {
+/*     */                   
+/* 252 */                   str1 = object.toString();
+/*     */                 } 
+/* 254 */                 setUniqueFlag(entityItem, str, str1, paramStringBuffer);
+/*     */                 break;
+/*     */ 
+/*     */               
+/*     */               case 'F':
+/* 259 */                 str1 = null;
+/* 260 */                 if (object instanceof String) {
+/* 261 */                   vector = new Vector();
+/* 262 */                   vector.addElement(object);
+/*     */                 } else {
+/* 264 */                   vector = (Vector)object;
+/*     */                 } 
+/*     */                 
+/* 267 */                 setMultiFlag(entityItem, str, vector, paramStringBuffer);
+/*     */                 break;
+/*     */ 
+/*     */               
+/*     */               default:
+/* 272 */                 append(paramStringBuffer, "ABRUtil.createEntity: MetaAttribute Type=" + eANMetaAttribute.getAttributeType() + " is not supported yet " + entityGroup
+/* 273 */                     .getEntityType() + "." + str + "\n");
+/*     */                 break;
+/*     */             } 
+/*     */ 
+/*     */           
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/* 281 */       entityItem.commit(paramDatabase, null);
+/*     */       
+/* 283 */       entityItem1 = (EntityItem)entityItem.getUpLink(0);
+/* 284 */       if (entityItem1 != null && !entityItem1.getEntityGroup().isAssoc()) {
+/* 285 */         entityItem1.commit(paramDatabase, null);
+/*     */       }
+/*     */       
+/* 288 */       append(paramStringBuffer, "ABRUtil.createEntity() created Entity: " + entityItem.getKey() + ((entityItem1 == null) ? "" : (" and Relator: " + entityItem1
+/* 289 */           .getKey())) + "\n");
+/*     */     } 
+/*     */ 
+/*     */     
+/* 293 */     return entityItem;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static void setUniqueFlag(EntityItem paramEntityItem, String paramString1, String paramString2, StringBuffer paramStringBuffer) throws MiddlewareRequestException, EANBusinessRuleException {
+/* 310 */     if (paramString2 != null && paramString2.trim().length() == 0) {
+/* 311 */       paramString2 = null;
+/*     */     }
+/* 313 */     if (paramString2 == null) {
+/* 314 */       EANAttribute eANAttribute = paramEntityItem.getAttribute(paramString1);
+/* 315 */       if (eANAttribute == null || eANAttribute.toString().trim().length() == 0) {
+/*     */         return;
+/*     */       }
+/*     */     } 
+/* 319 */     EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)createAttr(paramEntityItem, paramString1, paramStringBuffer);
+/* 320 */     if (eANFlagAttribute != null) {
+/* 321 */       if (paramString2 == null) {
+/* 322 */         eANFlagAttribute.put(null);
+/* 323 */         append(paramStringBuffer, "ABRUtil.setUniqueFlag: deactivating " + paramString1 + "\n");
+/*     */       } else {
+/* 325 */         MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/*     */         byte b1;
+/* 327 */         for (b1 = 0; b1 < arrayOfMetaFlag.length; b1++) {
+/* 328 */           arrayOfMetaFlag[b1].setSelected(false);
+/*     */         }
+/*     */         
+/* 331 */         b1 = 0;
+/* 332 */         for (byte b2 = 0; b2 < arrayOfMetaFlag.length; b2++) {
+/* 333 */           if (arrayOfMetaFlag[b2].getFlagCode().equals(paramString2) || arrayOfMetaFlag[b2]
+/* 334 */             .toString().equals(paramString2)) {
+/*     */             
+/* 336 */             arrayOfMetaFlag[b2].setSelected(true);
+/* 337 */             eANFlagAttribute.put(arrayOfMetaFlag);
+/* 338 */             b1 = 1;
+/* 339 */             append(paramStringBuffer, "ABRUtil.setUniqueFlag: setting " + paramString1 + " to " + arrayOfMetaFlag[b2] + "[" + arrayOfMetaFlag[b2]
+/* 340 */                 .getFlagCode() + "]\n");
+/*     */             break;
+/*     */           } 
+/*     */         } 
+/* 344 */         if (b1 == 0) {
+/* 345 */           StringBuffer stringBuffer = new StringBuffer("FlagCode " + paramString2 + " could not be found in " + paramString1 + " MetaFlags [ ");
+/*     */           
+/* 347 */           for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/* 348 */             stringBuffer.append(arrayOfMetaFlag[b].getFlagCode() + " ");
+/*     */           }
+/* 350 */           stringBuffer.append("]");
+/* 351 */           throw new MiddlewareRequestException(stringBuffer.toString());
+/*     */         } 
+/*     */       } 
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static boolean validatexml(Class paramClass, StringBuffer paramStringBuffer, String paramString1, String paramString2) {
+/* 363 */     String str = "/COM/ibm/eannounce/abr/sg/adsxmlbh1";
+/* 364 */     boolean bool = true;
+/*     */     try {
+/* 366 */       XMLErrorHandler xMLErrorHandler = new XMLErrorHandler();
+/* 367 */       SAXParserFactory sAXParserFactory = SAXParserFactory.newInstance();
+/* 368 */       sAXParserFactory.setValidating(true);
+/* 369 */       sAXParserFactory.setNamespaceAware(true);
+/* 370 */       SAXParser sAXParser = sAXParserFactory.newSAXParser();
+/* 371 */       Document document = DocumentHelper.parseText(paramString2);
+/*     */ 
+/*     */       
+/* 374 */       paramString1 = (paramString1.indexOf("/") > -1) ? (str + paramString1.substring(paramString1.indexOf("/"))) : (str + "/" + paramString1.trim());
+/*     */       
+/* 376 */       InputStream inputStream = paramClass.getResourceAsStream(paramString1);
+/*     */       
+/* 378 */       append(paramStringBuffer, "validatexml packagePath=" + str + "\n");
+/* 379 */       append(paramStringBuffer, "111 validatexml xsdfile=" + paramString1 + "\n");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 389 */       sAXParser.setProperty("http://java.sun.com/xml/jaxp/properties/schemaLanguage", "http://www.w3.org/2001/XMLSchema");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 396 */       sAXParser.setProperty("http://java.sun.com/xml/jaxp/properties/schemaSource", inputStream);
+/*     */ 
+/*     */ 
+/*     */       
+/* 400 */       SAXValidator sAXValidator = new SAXValidator(sAXParser.getXMLReader());
+/* 401 */       sAXValidator.setErrorHandler((ErrorHandler)xMLErrorHandler);
+/* 402 */       sAXValidator.validate(document);
+/*     */       
+/* 404 */       if (xMLErrorHandler.getErrors().hasContent()) {
+/* 405 */         String str1 = xMLErrorHandler.getErrors().asXML();
+/*     */         
+/* 407 */         append(paramStringBuffer, "the validation for this xml failed because: " + str1 + "\n");
+/* 408 */         bool = false;
+/*     */       } else {
+/* 410 */         append(paramStringBuffer, "the validation for this xml successfully\n");
+/*     */       } 
+/* 412 */     } catch (Exception exception) {
+/*     */       
+/* 414 */       append(paramStringBuffer, "Error:the validation for xml failed,because:" + exception.getMessage() + "\n");
+/* 415 */       bool = false;
+/*     */     } 
+/* 417 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static void setMultiFlag(EntityItem paramEntityItem, String paramString, Vector paramVector, StringBuffer paramStringBuffer) throws MiddlewareRequestException, EANBusinessRuleException {
+/* 436 */     if (paramVector == null || paramVector.size() == 0) {
+/* 437 */       EANAttribute eANAttribute = paramEntityItem.getAttribute(paramString);
+/* 438 */       if (eANAttribute == null || eANAttribute.toString().trim().length() == 0) {
+/*     */         return;
+/*     */       }
+/*     */     } 
+/* 442 */     EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)createAttr(paramEntityItem, paramString, paramStringBuffer);
+/* 443 */     if (eANFlagAttribute != null) {
+/* 444 */       if (paramVector == null || paramVector.size() == 0) {
+/* 445 */         eANFlagAttribute.put(null);
+/* 446 */         append(paramStringBuffer, "ABRUtil.setMultiFlag: deactivating " + paramString + "\n");
+/*     */       } else {
+/* 448 */         MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/*     */         byte b1;
+/* 450 */         for (b1 = 0; b1 < arrayOfMetaFlag.length; b1++) {
+/* 451 */           arrayOfMetaFlag[b1].setSelected(false);
+/*     */         }
+/*     */         
+/* 454 */         b1 = 0;
+/* 455 */         for (byte b2 = 0; b2 < arrayOfMetaFlag.length; b2++) {
+/* 456 */           if (paramVector.contains(arrayOfMetaFlag[b2].getFlagCode()) || paramVector
+/* 457 */             .contains(arrayOfMetaFlag[b2].toString())) {
+/*     */             
+/* 459 */             arrayOfMetaFlag[b2].setSelected(true);
+/* 460 */             eANFlagAttribute.put(arrayOfMetaFlag);
+/* 461 */             b1++;
+/* 462 */             append(paramStringBuffer, "ABRUtil.setMultiFlag: setting " + paramString + " to " + arrayOfMetaFlag[b2] + "[" + arrayOfMetaFlag[b2]
+/* 463 */                 .getFlagCode() + "]\n");
+/*     */           } 
+/*     */         } 
+/* 466 */         if (b1 != paramVector.size()) {
+/* 467 */           StringBuffer stringBuffer = new StringBuffer("One or more FlagCodes in " + paramVector + " could not be found in " + paramString + " MetaFlags [ ");
+/*     */           
+/* 469 */           for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/* 470 */             stringBuffer.append(arrayOfMetaFlag[b].getFlagCode() + " ");
+/*     */           }
+/* 472 */           stringBuffer.append("]");
+/* 473 */           throw new MiddlewareRequestException(stringBuffer.toString());
+/*     */         } 
+/*     */       } 
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static void setText(EntityItem paramEntityItem, String paramString1, String paramString2, StringBuffer paramStringBuffer) throws MiddlewareRequestException, EANBusinessRuleException {
+/* 492 */     if (paramString2 != null && paramString2.trim().length() == 0) {
+/* 493 */       paramString2 = null;
+/*     */     }
+/* 495 */     if (paramString2 == null) {
+/* 496 */       EANAttribute eANAttribute1 = paramEntityItem.getAttribute(paramString1);
+/* 497 */       if (eANAttribute1 == null || eANAttribute1.toString().trim().length() == 0) {
+/*     */         return;
+/*     */       }
+/*     */     } 
+/* 501 */     EANAttribute eANAttribute = createAttr(paramEntityItem, paramString1, paramStringBuffer);
+/* 502 */     if (eANAttribute != null) {
+/* 503 */       eANAttribute.put(paramString2);
+/* 504 */       if (paramString2 != null) {
+/* 505 */         append(paramStringBuffer, "ABRUtil.setText: setting " + paramString1 + " to " + paramString2 + "\n");
+/*     */       } else {
+/* 507 */         append(paramStringBuffer, "ABRUtil.setText: deactivating " + paramString1 + "\n");
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private static EANAttribute createAttr(EntityItem paramEntityItem, String paramString, StringBuffer paramStringBuffer) throws MiddlewareRequestException {
+/*     */     MultiFlagAttribute multiFlagAttribute;
+/* 523 */     EANAttribute eANAttribute = paramEntityItem.getAttribute(paramString);
+/* 524 */     if (eANAttribute == null)
+/* 525 */     { EntityGroup entityGroup = paramEntityItem.getEntityGroup();
+/* 526 */       EANMetaAttribute eANMetaAttribute = entityGroup.getMetaAttribute(paramString);
+/* 527 */       if (eANMetaAttribute == null)
+/* 528 */       { append(paramStringBuffer, "ABRUtil.createAttr: MetaAttribute cannot be found to Create " + paramEntityItem.getEntityType() + "." + paramString + "\n"); }
+/*     */       else
+/*     */       { TextAttribute textAttribute1; SingleFlagAttribute singleFlagAttribute1; StatusAttribute statusAttribute1; BlobAttribute blobAttribute1; LongTextAttribute longTextAttribute1; TextAttribute textAttribute2; SingleFlagAttribute singleFlagAttribute2; StatusAttribute statusAttribute2; BlobAttribute blobAttribute2; LongTextAttribute longTextAttribute2; XMLAttribute xMLAttribute; MultiFlagAttribute multiFlagAttribute1;
+/* 531 */         switch (eANMetaAttribute.getAttributeType().charAt(0))
+/*     */         
+/*     */         { 
+/*     */           case 'T':
+/* 535 */             textAttribute2 = new TextAttribute((EANDataFoundation)paramEntityItem, null, (MetaTextAttribute)eANMetaAttribute);
+/* 536 */             paramEntityItem.putAttribute((EANAttribute)textAttribute2);
+/* 537 */             return (EANAttribute)textAttribute2;
+/*     */ 
+/*     */ 
+/*     */           
+/*     */           case 'U':
+/* 542 */             singleFlagAttribute2 = new SingleFlagAttribute((EANDataFoundation)paramEntityItem, null, (MetaSingleFlagAttribute)eANMetaAttribute);
+/* 543 */             paramEntityItem.putAttribute((EANAttribute)singleFlagAttribute2);
+/* 544 */             return (EANAttribute)singleFlagAttribute2;
+/*     */ 
+/*     */ 
+/*     */           
+/*     */           case 'S':
+/* 549 */             statusAttribute2 = new StatusAttribute((EANDataFoundation)paramEntityItem, null, (MetaStatusAttribute)eANMetaAttribute);
+/* 550 */             paramEntityItem.putAttribute((EANAttribute)statusAttribute2);
+/* 551 */             return (EANAttribute)statusAttribute2;
+/*     */ 
+/*     */ 
+/*     */           
+/*     */           case 'B':
+/* 556 */             blobAttribute2 = new BlobAttribute((EANDataFoundation)paramEntityItem, null, (MetaBlobAttribute)eANMetaAttribute);
+/* 557 */             paramEntityItem.putAttribute((EANAttribute)blobAttribute2);
+/* 558 */             return (EANAttribute)blobAttribute2;
+/*     */ 
+/*     */ 
+/*     */           
+/*     */           case 'L':
+/* 563 */             longTextAttribute2 = new LongTextAttribute((EANDataFoundation)paramEntityItem, null, (MetaLongTextAttribute)eANMetaAttribute);
+/* 564 */             paramEntityItem.putAttribute((EANAttribute)longTextAttribute2);
+/* 565 */             return (EANAttribute)longTextAttribute2;
+/*     */ 
+/*     */ 
+/*     */           
+/*     */           case 'X':
+/* 570 */             xMLAttribute = new XMLAttribute((EANDataFoundation)paramEntityItem, null, (MetaXMLAttribute)eANMetaAttribute);
+/* 571 */             paramEntityItem.putAttribute((EANAttribute)xMLAttribute);
+/* 572 */             return (EANAttribute)xMLAttribute;
+/*     */ 
+/*     */ 
+/*     */           
+/*     */           case 'F':
+/* 577 */             multiFlagAttribute1 = new MultiFlagAttribute((EANDataFoundation)paramEntityItem, null, (MetaMultiFlagAttribute)eANMetaAttribute);
+/* 578 */             paramEntityItem.putAttribute((EANAttribute)multiFlagAttribute1);
+/* 579 */             multiFlagAttribute = multiFlagAttribute1;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */             
+/* 591 */             return (EANAttribute)multiFlagAttribute; }  append(paramStringBuffer, "ABRUtil.createAttr: MetaAttribute Type=" + eANMetaAttribute.getAttributeType() + " is not supported yet " + paramEntityItem.getEntityType() + "." + paramString + "\n"); }  }  return (EANAttribute)multiFlagAttribute;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static Locale getLocale(int paramInt) {
+/* 601 */     Locale locale = null;
+/* 602 */     switch (paramInt)
+/*     */     
+/*     */     { case 1:
+/* 605 */         locale = Locale.US;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 629 */         return locale;case 2: locale = Locale.GERMAN; return locale;case 3: locale = Locale.ITALIAN; return locale;case 4: locale = Locale.JAPANESE; return locale;case 5: locale = Locale.FRENCH; return locale;case 6: locale = new Locale("es", "ES"); return locale;case 7: locale = Locale.UK; return locale; }  locale = Locale.US; return locale;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String ftpRead(String paramString) throws IOException {
+/* 642 */     BufferedInputStream bufferedInputStream = null;
+/* 643 */     String str = null;
+/*     */     
+/* 645 */     if (!paramString.startsWith("ftp://")) {
+/* 646 */       paramString = "ftp://" + paramString;
+/*     */     }
+/*     */     try {
+/* 649 */       URLConnection uRLConnection = (new URL(paramString)).openConnection();
+/* 650 */       if (uRLConnection != null) {
+/* 651 */         uRLConnection.setDoInput(true);
+/* 652 */         bufferedInputStream = new BufferedInputStream(uRLConnection.getInputStream(), 8192);
+/* 653 */         if (bufferedInputStream != null) {
+/* 654 */           byte[] arrayOfByte1 = new byte[0];
+/* 655 */           byte[] arrayOfByte2 = new byte[8192];
+/*     */           
+/*     */           int i;
+/* 658 */           while ((i = bufferedInputStream.read(arrayOfByte2)) >= 0) {
+/* 659 */             byte[] arrayOfByte = new byte[arrayOfByte1.length + i];
+/* 660 */             System.arraycopy(arrayOfByte1, 0, arrayOfByte, 0, arrayOfByte1.length);
+/* 661 */             System.arraycopy(arrayOfByte2, 0, arrayOfByte, arrayOfByte1.length, i);
+/* 662 */             arrayOfByte1 = arrayOfByte;
+/*     */           } 
+/* 664 */           str = new String(arrayOfByte1);
+/*     */         } 
+/*     */       } 
+/*     */     } finally {
+/* 668 */       if (bufferedInputStream != null) {
+/*     */         try {
+/* 670 */           bufferedInputStream.close();
+/* 671 */         } catch (IOException iOException) {}
+/*     */ 
+/*     */         
+/* 674 */         bufferedInputStream = null;
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 678 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static void ftpReadToFile(String paramString1, String paramString2) throws IOException {
+/* 689 */     BufferedInputStream bufferedInputStream = null;
+/* 690 */     FileOutputStream fileOutputStream = null;
+/*     */     
+/* 692 */     if (!paramString1.startsWith("ftp://")) {
+/* 693 */       paramString1 = "ftp://" + paramString1;
+/*     */     }
+/*     */     try {
+/* 696 */       URLConnection uRLConnection = (new URL(paramString1)).openConnection();
+/* 697 */       if (uRLConnection != null) {
+/* 698 */         uRLConnection.setDoInput(true);
+/* 699 */         bufferedInputStream = new BufferedInputStream(uRLConnection.getInputStream(), 8192);
+/* 700 */         if (bufferedInputStream != null) {
+/* 701 */           fileOutputStream = new FileOutputStream(paramString2);
+/* 702 */           int i = 0;
+/* 703 */           byte[] arrayOfByte = new byte[8192];
+/* 704 */           while ((i = bufferedInputStream.read(arrayOfByte)) >= 0) {
+/* 705 */             fileOutputStream.write(arrayOfByte, 0, i);
+/*     */           }
+/*     */         } 
+/*     */       } 
+/*     */     } finally {
+/* 710 */       if (bufferedInputStream != null) {
+/*     */         try {
+/* 712 */           bufferedInputStream.close();
+/* 713 */         } catch (IOException iOException) {}
+/*     */ 
+/*     */         
+/* 716 */         bufferedInputStream = null;
+/*     */       } 
+/* 718 */       if (fileOutputStream != null) {
+/*     */         try {
+/* 720 */           fileOutputStream.close();
+/* 721 */         } catch (IOException iOException) {}
+/*     */ 
+/*     */         
+/* 724 */         fileOutputStream = null;
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static void ftpWrite(String paramString, StringBuffer paramStringBuffer) throws IOException {
+/* 750 */     BufferedOutputStream bufferedOutputStream = null;
+/* 751 */     if (!paramString.startsWith("ftp://")) {
+/* 752 */       paramString = "ftp://" + paramString;
+/*     */     }
+/*     */     
+/*     */     try {
+/* 756 */       URLConnection uRLConnection = (new URL(paramString)).openConnection();
+/* 757 */       if (uRLConnection != null) {
+/* 758 */         uRLConnection.setDoOutput(true);
+/*     */ 
+/*     */         
+/* 761 */         bufferedOutputStream = new BufferedOutputStream(uRLConnection.getOutputStream());
+/*     */ 
+/*     */         
+/* 764 */         bufferedOutputStream.write(paramStringBuffer.toString().getBytes("UTF8"));
+/* 765 */         bufferedOutputStream.flush();
+/*     */       } 
+/*     */     } finally {
+/* 768 */       if (bufferedOutputStream != null) {
+/*     */         try {
+/* 770 */           bufferedOutputStream.close();
+/* 771 */         } catch (IOException iOException) {}
+/*     */ 
+/*     */         
+/* 774 */         bufferedOutputStream = null;
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static void ftpWriteFile(String paramString1, String paramString2) throws IOException {
+/* 795 */     BufferedOutputStream bufferedOutputStream = null;
+/* 796 */     FileInputStream fileInputStream = null;
+/* 797 */     if (!paramString1.startsWith("ftp://")) {
+/* 798 */       paramString1 = "ftp://" + paramString1;
+/*     */     }
+/*     */     try {
+/* 801 */       URLConnection uRLConnection = (new URL(paramString1)).openConnection();
+/* 802 */       if (uRLConnection != null) {
+/* 803 */         uRLConnection.setDoOutput(true);
+/*     */         
+/* 805 */         bufferedOutputStream = new BufferedOutputStream(uRLConnection.getOutputStream());
+/*     */ 
+/*     */         
+/* 808 */         fileInputStream = new FileInputStream(paramString2);
+/* 809 */         byte[] arrayOfByte = new byte[8192];
+/*     */         while (true) {
+/* 811 */           int i = fileInputStream.read(arrayOfByte);
+/* 812 */           if (i <= 0) {
+/*     */             break;
+/*     */           }
+/* 815 */           bufferedOutputStream.write(arrayOfByte, 0, i);
+/*     */         } 
+/* 817 */         bufferedOutputStream.flush();
+/*     */       } 
+/*     */     } finally {
+/* 820 */       if (fileInputStream != null) {
+/*     */         try {
+/* 822 */           fileInputStream.close();
+/* 823 */         } catch (IOException iOException) {}
+/*     */ 
+/*     */         
+/* 826 */         fileInputStream = null;
+/*     */       } 
+/* 828 */       if (bufferedOutputStream != null) {
+/*     */         try {
+/* 830 */           bufferedOutputStream.close();
+/* 831 */         } catch (IOException iOException) {}
+/*     */ 
+/*     */         
+/* 834 */         bufferedOutputStream = null;
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String runScript(String paramString) throws IOException, InterruptedException {
+/* 845 */     StringBuffer stringBuffer = new StringBuffer();
+/* 846 */     Runtime runtime = Runtime.getRuntime();
+/* 847 */     Process process = runtime.exec(paramString);
+/* 848 */     process.waitFor();
+/* 849 */     int i = process.exitValue();
+/* 850 */     if (i == 0) {
+/* 851 */       stringBuffer.append(displayOutput(process.getInputStream()));
+/*     */     } else {
+/* 853 */       stringBuffer.append(paramString + " exited with RC = " + i);
+/* 854 */       stringBuffer.append(displayOutput(process.getErrorStream()));
+/* 855 */       stringBuffer.append(displayOutput(process.getInputStream()));
+/*     */     } 
+/* 857 */     return stringBuffer.toString();
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   private static String displayOutput(InputStream paramInputStream) {
+/* 862 */     StringBuffer stringBuffer = new StringBuffer();
+/*     */     
+/*     */     try {
+/* 865 */       BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(paramInputStream)); String str;
+/* 866 */       while ((str = bufferedReader.readLine()) != null) {
+/* 867 */         stringBuffer.append(str + "\n");
+/*     */       }
+/* 869 */     } catch (IOException iOException) {
+/* 870 */       iOException.printStackTrace();
+/*     */     } 
+/* 872 */     return stringBuffer.toString();
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public static String showMemory() {
+/* 877 */     System.gc();
+/* 878 */     Runtime runtime = Runtime.getRuntime();
+/* 879 */     return "TotMem:" + runtime.totalMemory() + ", FreeMem:" + runtime.freeMemory() + ", UsedMem:" + ((runtime.totalMemory() - runtime.freeMemory()) / 1000L / 1000L) + "M";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static void append(StringBuffer paramStringBuffer, String paramString) {
+/* 887 */     int i = ABRServerProperties.getABRDebugLevel("ADSABRSTATUS");
+/* 888 */     if (i == 4) {
+/* 889 */       paramStringBuffer.append(paramString);
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static void main(String[] paramArrayOfString) {
+/* 897 */     String str1 = "opicmadm:mice8chs@eacm.lexington.ibm.com/bala/checkdel.sql;type=a";
+/* 898 */     String str2 = "opicmadm:mice8chs@eacm.lexington.ibm.com/bala/ADSmetaissues.txt;type=i";
+/* 899 */     String str3 = "opicmadm:mice8chs@eacm.lexington.ibm.com/bala/chqisoproblems.txt;type=a";
+/* 900 */     StringBuffer stringBuffer = new StringBuffer();
+/* 901 */     stringBuffer.append("as of 05/07/08\n");
+/* 902 */     stringBuffer.append("----------------------------------------------\n");
+/* 903 */     stringBuffer.append("IX. Catalog Category Navigation \n");
+/* 904 */     stringBuffer.append("    - cant test because CATNAVIMG relator seems to be missing.  The VE is incomplete when forced to run.\n");
+/* 905 */     stringBuffer.append("    gbl8104 doesnt find any changes because the meta is incomplete.\n");
+/* 906 */     stringBuffer.append("<!-- EntityList for 1980-01-01-00.00.00.000000 extract ADSCATNAV contains the following entities: \n");
+/* 907 */     stringBuffer.append("CATNAV : 1 parent items. IDs( 1265233)\n");
+/* 908 */     stringBuffer.append("CATNAVIMG : 0 entity items. \n");
+/* 909 */     stringBuffer.append(" -->\n");
+/*     */     
+/*     */     try {
+/* 912 */       String str = ftpRead(str1);
+/* 913 */       System.err.println("ftpRead returned:" + str + ":");
+/* 914 */       ftpReadToFile(str1, "\\dev\\abr12\\source\\ftpd.txt");
+/* 915 */       ftpWrite(str2, stringBuffer);
+/* 916 */       ftpWriteFile(str3, "\\dev\\abr12\\source\\chqisoproblems.txt");
+/* 917 */     } catch (Exception exception) {
+/* 918 */       System.err.println(exception.getMessage());
+/* 919 */       exception.printStackTrace(System.err);
+/*     */     } 
+/*     */   }
+/*     */ }
 
-//(C) Copyright IBM Corp. 2008,2010  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-package COM.ibm.eannounce.abr.util;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.rmi.RemoteException;
-import java.sql.SQLException;
-import java.util.Hashtable;
-import java.util.Locale;
-import java.util.Vector;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-import org.dom4j.io.SAXValidator;
-import org.dom4j.util.XMLErrorHandler;
-
-import COM.ibm.eannounce.objects.BlobAttribute;
-import COM.ibm.eannounce.objects.CreateActionItem;
-import COM.ibm.eannounce.objects.EANAttribute;
-import COM.ibm.eannounce.objects.EANBusinessRuleException;
-import COM.ibm.eannounce.objects.EANFlagAttribute;
-import COM.ibm.eannounce.objects.EANMetaAttribute;
-import COM.ibm.eannounce.objects.EntityGroup;
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.eannounce.objects.EntityList;
-import COM.ibm.eannounce.objects.LongTextAttribute;
-import COM.ibm.eannounce.objects.MetaBlobAttribute;
-import COM.ibm.eannounce.objects.MetaFlag;
-import COM.ibm.eannounce.objects.MetaLongTextAttribute;
-import COM.ibm.eannounce.objects.MetaMultiFlagAttribute;
-import COM.ibm.eannounce.objects.MetaSingleFlagAttribute;
-import COM.ibm.eannounce.objects.MetaStatusAttribute;
-import COM.ibm.eannounce.objects.MetaTextAttribute;
-import COM.ibm.eannounce.objects.MetaXMLAttribute;
-import COM.ibm.eannounce.objects.MultiFlagAttribute;
-import COM.ibm.eannounce.objects.PDGUtility;
-import COM.ibm.eannounce.objects.SingleFlagAttribute;
-import COM.ibm.eannounce.objects.StatusAttribute;
-import COM.ibm.eannounce.objects.TextAttribute;
-import COM.ibm.eannounce.objects.XMLAttribute;
-import COM.ibm.opicmpdh.middleware.D;
-import COM.ibm.opicmpdh.middleware.Database;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
-import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
-import COM.ibm.opicmpdh.middleware.Profile;
-
-/**********************************************************************************
- * Utilities for ABRs
- */ 
-//$Log: ABRUtil.java,v $
-//Revision 1.14  2015/02/04 14:50:58  wangyul
-//RCQ00337765-RQ change the XML mapping to pull DIV from PROJ for Lenovo
-//
-//Revision 1.13  2015/01/26 15:53:39  wangyul
-//fix the issue PR24222 -- SPF ADS abr string buffer
-//
-//Revision 1.12  2015/01/08 08:02:28  wangyul
-//add run info in the utility class
-//
-//Revision 1.11  2013/12/11 08:42:03  guobin
-//xsd validation for generalarea, reconcile, wwcompat and price XML
-//
-//Revision 1.10  2011/06/06 15:52:42  wendy
-//protect against invalid search arguments
-//
-//Revision 1.9  2010/02/04 13:38:55  wendy
-//Add support for 'S' type
-//
-//Revision 1.8  2010/01/13 17:33:35  wendy
-//Add support for S type attr
-//
-//Revision 1.7  2009/08/05 17:29:20  wendy
-//Make PDGUtility local instead of static, cant reuse after deref
-//
-//Revision 1.6  2009/05/28 17:14:56  wendy
-//Support executing a script
-//
-//Revision 1.5  2009/05/06 12:34:24  wendy
-//support create without parent relator
-//
-//Revision 1.4  2009/02/13 12:58:57  wendy
-//Accept empty string to deactivate attr
-//
-//Revision 1.3  2009/02/12 20:41:47  wendy
-//Support attribute deactivation
-//
-//Revision 1.2  2009/02/04 21:22:46  wendy
-//CQ00016165 - Automated QSM feed from ePIMS HW to support the late change request from BIDS
-//
-//Revision 1.1  2009/01/20 19:37:50  wendy
-//CQ00016138-RQ: STG - HVEC EACM Inbound Feed from LEADS - New Feed
-//CQ00002984-RQ: STG - EACM Inbound Feed from LEADS - New Feed
-//
-public class ABRUtil {
-	private static final int BUFFER_SIZE = 8192;
-
-	/**********************************************************************************
-	 * search for entity(s) using search action, attributes and values passed in
-	 *
-	 * @param db
-	 * @param prof
-	 * @param searchAction
-	 * @param srchType
-	 * @param useListSrch
-	 * @param attrVct
-	 * @param valVct
-	 * @param debugSb
-	 * @return
-	 * @throws java.sql.SQLException
-	 * @throws COM.ibm.opicmpdh.middleware.MiddlewareException
-	 * @throws COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-	 * @throws COM.ibm.eannounce.objects.SBRException
-	 */
-	public static EntityItem[] doSearch(Database db, Profile prof, String searchAction, String srchType, 
-			boolean useListSrch, Vector attrVct, Vector valVct, StringBuffer debugSb)
-	throws java.sql.SQLException, COM.ibm.opicmpdh.middleware.MiddlewareException,
-	COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-	COM.ibm.eannounce.objects.SBRException
-	{
-		if(attrVct==null){
-			throw new IllegalArgumentException("AttributeCode vector cannot be null");
-		}
-		if(valVct==null){
-			throw new IllegalArgumentException("AttributeValue vector cannot be null");
-		}
-		if(valVct.size()!=attrVct.size()){
-			throw new IllegalArgumentException("AttributeValue vector must have the same number of elements as the AttributeCode vector");
-		}
-		PDGUtility pdgUtility = new PDGUtility();
-		StringBuffer sb = new StringBuffer();
-		for (int i=0; i<attrVct.size(); i++){
-			if (sb.length()>0){
-				sb.append(";");
-			}
-			Object objValue = valVct.elementAt(i);
-			Object objAttr = attrVct.elementAt(i);
-			if(objValue==null){
-				throw new IllegalArgumentException("AttributeValue vector cannot have a null value. Value["+i+"] is null");
-			}
-			if(objAttr==null){
-				throw new IllegalArgumentException("AttributeCode vector cannot have a null Attribute. Attribute["+i+"] is null");
-			}
-			String value = valVct.elementAt(i).toString();
-			String attr = attrVct.elementAt(i).toString();
-			sb.append("map_"+attr+"="+value);
-		}
-
-		ABRUtil.append(debugSb,"ABRUtil.doSearch: Using "+searchAction+", useListSrch:"+useListSrch+" to search for "+srchType+" using "+sb.toString()+"\n");
-
-		EntityItem[] aei = null;
-		if (!useListSrch){
-			aei = pdgUtility.dynaSearch(db, prof, null, searchAction, srchType, sb.toString());
-		}else{
-			EntityList list = pdgUtility.dynaSearchIIForEntityList(db, prof, null, searchAction,
-					srchType, sb.toString());
-			// group will be null if no matches are found
-			EntityGroup psgrp = list.getEntityGroup(srchType);
-			if (psgrp !=null && psgrp.getEntityItemCount()>0){
-				aei = psgrp.getEntityItemsAsArray();
-			}else{
-				ABRUtil.append(debugSb,"ABRUtil.doSearch: No "+srchType+" found\n");
-			}
-		}
-		return aei;
-	}	
-
-	/*****************************************************
-	 * Create Entity
-	 * 
-	 * @param dbCurrent
-	 * @param profile
-	 * @param actionName
-	 * @param parentItem
-	 * @param childType
-	 * @param attrCodeVct
-	 * @param attrValTbl
-	 * @param debugSb
-	 * @return
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws EANBusinessRuleException
-	 * @throws RemoteException
-	 * @throws MiddlewareShutdownInProgressException
-	 */
-	public static EntityItem createEntity(Database dbCurrent, Profile profile, String actionName, EntityItem parentItem,  
-			String childType, Vector attrCodeVct, Hashtable attrValTbl, StringBuffer debugSb) 
-	throws MiddlewareRequestException, SQLException, MiddlewareException, EANBusinessRuleException, 
-	RemoteException, MiddlewareShutdownInProgressException
-	{
-		ABRUtil.append(debugSb,"ABRUtil.createEntity: Using "+actionName+", child:"+childType+" parent: "+parentItem.getKey()+"\n");
-		EntityItem childItem = null;
-		// create the entity
-		CreateActionItem cai = new CreateActionItem(null,dbCurrent, profile, actionName);
-		EntityList list = new EntityList(dbCurrent, profile, cai, 
-				new EntityItem[] {parentItem}); 
-		EntityGroup eGrp = list.getEntityGroup(childType);
-		if (eGrp!= null && eGrp.getEntityItemCount() == 1)	{
-			EntityItem relator = null;
-			// write the attributes
-			childItem = eGrp.getEntityItem(0);
-
-			for (int i=0; i<attrCodeVct.size(); i++){
-				String attrCode = (String)attrCodeVct.elementAt(i);
-				// get the meta attribute
-				EANMetaAttribute ma = eGrp.getMetaAttribute(attrCode);
-				if (ma==null) {
-					ABRUtil.append(debugSb,"ABRUtil.createEntity: MetaAttribute cannot be found "+eGrp.getEntityType()+"."+attrCode+"\n");
-					continue;
-				}
-				Object value = attrValTbl.get(attrCode);
-				if (value==null){
-					ABRUtil.append(debugSb,"ABRUtil.createEntity: Value not found for "+attrCode+"\n");
-					continue;
-				}
-				switch (ma.getAttributeType().charAt(0))
-				{
-				case 'T':
-				case 'L':
-				case 'X':
-				{   
-					// save the Text attributes
-					setText(childItem,attrCode, value.toString(), debugSb); 
-					break;
-				}
-				case 'S':
-				case 'U':
-				{
-					String tmp = null;
-					if (value instanceof Vector){
-						tmp = ((Vector)value).firstElement().toString(); // just use first value
-						ABRUtil.append(debugSb,"ABRUtil.createEntity: Vector passed in for "+
-								ma.getAttributeType()+" type for "+
-								attrCode+" using "+tmp+" vct was "+value+"\n");
-					}else {
-						tmp = value.toString();
-					}
-					setUniqueFlag(childItem,attrCode, tmp,debugSb); 
-					break;
-				}
-				case 'F':
-				{
-					Vector tmp = null;
-					if (value instanceof String){
-						tmp = new Vector();
-						tmp.addElement(value);
-					}else {
-						tmp = (Vector)value;
-					}
-
-					setMultiFlag(childItem,attrCode,tmp,debugSb); // make sure flagcodes are passed in 
-					break;
-				}
-				default:
-				{
-					ABRUtil.append(debugSb,"ABRUtil.createEntity: MetaAttribute Type="+ma.getAttributeType()+
-							" is not supported yet "+eGrp.getEntityType()+"."+attrCode+"\n");
-					// could not get anything
-					break;
-				}			         
-				}				
-			}
-
-			// must commit new entity and the relator to the PDH
-			childItem.commit(dbCurrent, null);
-			// Commit the relator too
-			relator = (EntityItem) childItem.getUpLink(0);
-			if (relator != null && !relator.getEntityGroup().isAssoc()){
-				relator.commit(dbCurrent, null);
-			}
-
-			ABRUtil.append(debugSb,"ABRUtil.createEntity() created Entity: "+childItem.getKey()+
-					(relator==null?"":" and Relator: "+relator.getKey())+"\n");
-		}
-
-
-		return childItem;
-	}	
-
-	/********************************************************************************
-	 * Create unique flag attribute and set it
-	 * @param item
-	 * @param attrCode
-	 * @param flagCode
-	 * @param debugSb
-	 * @throws COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-	 * @throws COM.ibm.eannounce.objects.EANBusinessRuleException
-	 */
-	public static void setUniqueFlag(EntityItem item,String attrCode, String flagCode,
-			StringBuffer debugSb) throws
-			COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-			COM.ibm.eannounce.objects.EANBusinessRuleException
-	{
-		if (flagCode!=null && flagCode.trim().length()==0){
-			flagCode = null;
-		}
-		if (flagCode==null) { // will be deactivated
-			EANAttribute attr =item.getAttribute(attrCode);
-			if (attr==null || attr.toString().trim().length()==0){ // nothing to do
-				return;
-			}
-		}
-		EANFlagAttribute flagAttr = (EANFlagAttribute)createAttr(item,attrCode,debugSb);
-		if (flagAttr !=null){
-			if (flagCode==null){
-				flagAttr.put(null);
-				ABRUtil.append(debugSb,"ABRUtil.setUniqueFlag: deactivating "+attrCode+"\n");
-			}else{
-				MetaFlag[] mfa = (MetaFlag[]) flagAttr.get();
-				// reset all first just in case default turned one on 
-				for (int i = 0; i < mfa.length; i++){
-					mfa[i].setSelected(false);
-				}
-
-				boolean flagFound = false;
-				for (int i = 0; i < mfa.length; i++){
-					if (mfa[i].getFlagCode().equals(flagCode) || // match flag code or flag description
-							mfa[i].toString().equals(flagCode))
-					{
-						mfa[i].setSelected(true);
-						flagAttr.put(mfa);
-						flagFound = true;
-						ABRUtil.append(debugSb,"ABRUtil.setUniqueFlag: setting "+attrCode+" to "+mfa[i]+
-								"["+mfa[i].getFlagCode()+"]\n");
-						break;
-					}
-				}
-				if (!flagFound){
-					StringBuffer sb = new StringBuffer("FlagCode "+flagCode+
-							" could not be found in "+attrCode+" MetaFlags [ ");
-					for (int i = 0; i < mfa.length; i++){
-						sb.append(mfa[i].getFlagCode()+" ");
-					}
-					sb.append("]");
-					throw new COM.ibm.opicmpdh.middleware.MiddlewareRequestException(sb.toString());
-				}
-			}
-		}
-	}
-	
-	//new added validation
-	 /**********************************
-     * use dom4j validate xml file(new added)
-     */
-    public static boolean validatexml(Class cs, StringBuffer debugSb, String xsdfile, String xmlfile) {
-
-    	String packagePath ="/COM/ibm/eannounce/abr/sg/adsxmlbh1";
-	    boolean ifpass = true;
-        try {
-            XMLErrorHandler errorHandler = new XMLErrorHandler();
-            SAXParserFactory factory = SAXParserFactory.newInstance();
-            factory.setValidating(true);
-            factory.setNamespaceAware(true);
-            SAXParser parser = factory.newSAXParser();
-            Document xmldoc = DocumentHelper.parseText(xmlfile);
-            //new added(2013-10-11)
-            //abr.addDebug("validatexml begin:");
-            xsdfile =xsdfile.indexOf("/")>-1 ? packagePath + xsdfile.substring(xsdfile.indexOf("/")): packagePath + "/" + xsdfile.trim();
-          //  xsdfile =packagePath + xsdfile.substring(xsdfile.indexOf("/"));
-            InputStream inputStream=cs.getResourceAsStream(xsdfile);
-//            abr.addDebug("validatexml inputStream is" + (inputStream!=null?" not null.":" is null"));
-            ABRUtil.append(debugSb,"validatexml packagePath="+ packagePath+"\n");
-            ABRUtil.append(debugSb,"111 validatexml xsdfile="+ xsdfile+"\n");
-            
-            
-//            URL url = this.getClass().getResource(xsdfile);
-//            
-//            File file = new File(url.getPath());
-//            abr.addDebug("validatexml url="+ url);
-//            abr.addDebug("validatexml url.getPath="+ url.getPath());
-            
-            //new added end
-            parser.setProperty(
-                    "http://java.sun.com/xml/jaxp/properties/schemaLanguage",
-                    "http://www.w3.org/2001/XMLSchema");
-            //parser.setProperty(
-                //    "http://java.sun.com/xml/jaxp/properties/schemaSource",
-                //    "file:" + xsdfile);
-          //new added(2013-10-11)
-            parser.setProperty(
-                             "http://java.sun.com/xml/jaxp/properties/schemaSource",
-                             inputStream);
-            //new added end
-            SAXValidator validator = new SAXValidator(parser.getXMLReader());
-            validator.setErrorHandler(errorHandler);
-            validator.validate(xmldoc);
-
-            if (errorHandler.getErrors().hasContent()) {
-                String st = errorHandler.getErrors().asXML();
-              //  abr.addError("the validation for this xml failed because: "+st);
-                ABRUtil.append(debugSb,"the validation for this xml failed because: "+st+"\n");
-                ifpass = false;
-            } else {
-            	ABRUtil.append(debugSb,"the validation for this xml successfully"+"\n");
-            }
-        } catch (Exception ex) {
-        	//abr.addError("Error:the validation for xml failed,because:"+ex.getMessage());
-        	ABRUtil.append(debugSb,"Error:the validation for xml failed,because:"+ex.getMessage()+"\n");
-            ifpass = false;
-        }
-        return ifpass;
-    }
-
-	//new added end
-
-	/********************************************************************************
-	 * Create multi flag attribute and set it
-	 * @param item
-	 * @param attrCode
-	 * @param flagCodeVct
-	 * @param debugSb
-	 * @throws COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-	 * @throws COM.ibm.eannounce.objects.EANBusinessRuleException
-	 */
-	public static void setMultiFlag(EntityItem item,String attrCode, Vector flagCodeVct,
-			StringBuffer debugSb) throws
-			COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-			COM.ibm.eannounce.objects.EANBusinessRuleException
-	{
-		if (flagCodeVct==null || flagCodeVct.size()==0){ // will be deactivated
-			EANAttribute attr =item.getAttribute(attrCode);
-			if (attr==null || attr.toString().trim().length()==0){ // nothing to do
-				return;
-			}
-		}		
-		EANFlagAttribute flagAttr = (EANFlagAttribute)createAttr(item,attrCode,debugSb);
-		if (flagAttr !=null) {
-			if (flagCodeVct==null || flagCodeVct.size()==0){
-				flagAttr.put(null);
-				ABRUtil.append(debugSb,"ABRUtil.setMultiFlag: deactivating "+attrCode+"\n");
-			}else{
-				MetaFlag[] mfa = (MetaFlag[]) flagAttr.get();
-				// reset all first just in case default turned one on
-				for (int i = 0; i < mfa.length; i++){
-					mfa[i].setSelected(false);
-				}
-
-				int matchCnt = 0;
-				for (int i = 0; i < mfa.length; i++){
-					if (flagCodeVct.contains(mfa[i].getFlagCode()) ||  // match on flag code
-							flagCodeVct.contains(mfa[i].toString()))   // or flag description
-					{
-						mfa[i].setSelected(true);
-						flagAttr.put(mfa);
-						matchCnt++;
-						ABRUtil.append(debugSb,"ABRUtil.setMultiFlag: setting "+attrCode+" to "+mfa[i]+
-								"["+mfa[i].getFlagCode()+"]\n");
-					}
-				}
-				if (matchCnt!=flagCodeVct.size()){
-					StringBuffer sb = new StringBuffer("One or more FlagCodes in "+flagCodeVct+
-							" could not be found in "+attrCode+" MetaFlags [ ");
-					for (int i = 0; i < mfa.length; i++){
-						sb.append(mfa[i].getFlagCode()+" ");
-					}
-					sb.append("]");
-					throw new COM.ibm.opicmpdh.middleware.MiddlewareRequestException(sb.toString());
-				}
-			}
-		}
-	}
-
-	/********************************************************************************
-	 * Create text attribute and set it
-	 * @param item
-	 * @param attrCode
-	 * @param value
-	 * @param debugSb
-	 * @throws COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-	 * @throws COM.ibm.eannounce.objects.EANBusinessRuleException
-	 */
-	public static void setText(EntityItem item,String attrCode, String value, StringBuffer debugSb)   throws
-	COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-	COM.ibm.eannounce.objects.EANBusinessRuleException
-	{
-		if (value!=null && value.trim().length()==0){
-			value = null;
-		}
-		if (value==null) { // will be deactivated
-			EANAttribute attr =item.getAttribute(attrCode);
-			if (attr==null || attr.toString().trim().length()==0){ // nothing to do
-				return;
-			}
-		}
-		EANAttribute textAttr = createAttr(item,attrCode, debugSb);
-		if (textAttr != null) {
-			textAttr.put(value);
-			if (value!= null){
-				ABRUtil.append(debugSb,"ABRUtil.setText: setting "+attrCode+" to "+value+"\n");
-			}else{
-				ABRUtil.append(debugSb,"ABRUtil.setText: deactivating "+attrCode+"\n");	
-			}
-		}
-	}
-
-	/********************************************************************************
-	 * Create specified attribute
-	 * @param item
-	 * @param attrCode
-	 * @param debugSb
-	 * @return
-	 * @throws COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-	 */
-	private static EANAttribute createAttr(EntityItem item, String attrCode, StringBuffer debugSb) throws
-	COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-	{
-		EANAttribute attr =item.getAttribute(attrCode);
-		if (attr==null){
-			EntityGroup eGrp = item.getEntityGroup();
-			EANMetaAttribute ma = eGrp.getMetaAttribute(attrCode);
-			if (ma==null){
-				ABRUtil.append(debugSb,"ABRUtil.createAttr: MetaAttribute cannot be found to Create "+item.getEntityType()+"."+attrCode+"\n");
-			}
-			else {
-				switch (ma.getAttributeType().charAt(0))
-				{
-				case 'T':
-				{
-					TextAttribute ta = new TextAttribute(item, null, (MetaTextAttribute) ma);
-					item.putAttribute(ta);
-					attr=ta;
-					break;
-				}
-				case 'U':
-				{
-					SingleFlagAttribute sfa = new SingleFlagAttribute(item, null, (MetaSingleFlagAttribute) ma);
-					item.putAttribute(sfa);
-					attr=sfa;
-					break;
-				}
-		        case 'S':
-		        {
-		        	StatusAttribute sa = new StatusAttribute(item, null, (MetaStatusAttribute) ma);
-		        	item.putAttribute(sa);
-		        	attr=sa;
-		        	break;
-		        }
-				case 'B':
-				{
-					BlobAttribute ba = new BlobAttribute(item, null, (MetaBlobAttribute) ma);
-					item.putAttribute(ba);
-					attr=ba;
-					break;
-				}
-				case 'L':
-				{
-					LongTextAttribute ta = new LongTextAttribute(item, null, (MetaLongTextAttribute) ma);
-					item.putAttribute(ta);
-					attr=ta;
-					break;
-				} 
-				case 'X':
-				{
-					XMLAttribute xa = new XMLAttribute(item, null, (MetaXMLAttribute) ma);
-					item.putAttribute(xa);
-					attr=xa;
-					break;
-				} 
-				case 'F':
-				{
-					MultiFlagAttribute mfa = new MultiFlagAttribute(item, null, (MetaMultiFlagAttribute) ma);
-					item.putAttribute(mfa);
-					attr = mfa;
-					break;
-				}
-				default:
-				{
-					ABRUtil.append(debugSb,"ABRUtil.createAttr: MetaAttribute Type="+ma.getAttributeType()+" is not supported yet "+item.getEntityType()+"."+attrCode+"\n");
-					// could not get anything
-					break;
-				}
-				}
-			}
-		}
-		return attr;
-	}	
-	
-	/**********************************************************************************
-	 *  Get Locale based on NLSID
-	 *
-	 *@return java.util.Locale
-	 */
-	public static Locale getLocale(int nlsID)
-	{
-		Locale locale = null;
-		switch (nlsID)
-		{
-		case 1:
-			locale = Locale.US;
-			break;
-		case 2:
-			locale = Locale.GERMAN;
-			break;
-		case 3:
-			locale = Locale.ITALIAN;
-			break;
-		case 4:
-			locale = Locale.JAPANESE;
-			break;
-		case 5:
-			locale = Locale.FRENCH;
-			break;
-		case 6:
-			locale = new Locale("es", "ES");
-			break;
-		case 7:
-			locale = Locale.UK;
-			break;
-		default:
-			locale = Locale.US;
-		break;
-		}
-		return locale;
-	}
-
-	/***************************************************
-	 * Download the file from the specified host 
-	 * and return contents as string
-	 * 
-	 * @param strURL = username:password@ftp.whatever.com/file.zip;type=a
-	 * @return String
-	 * @throws IOException
-	 */	
-	public static String ftpRead(String strURL) throws IOException
-	{
-		BufferedInputStream is = null;
-		String ftpData = null;
-			
-		if (!strURL.startsWith("ftp://")){
-			strURL ="ftp://"+strURL;
-		}		
-		try {
-			URLConnection connection = (new URL(strURL)).openConnection();
-			if (connection != null) {
-				connection.setDoInput(true);
-				is = new BufferedInputStream(connection.getInputStream(), BUFFER_SIZE);
-				if (is != null) {
-					byte[] buffer = new byte[0];
-					byte[] chunk = new byte[BUFFER_SIZE];
-					int count;
-					// get the data
-					while ((count = is.read(chunk)) >= 0) {
-						byte[] t = new byte [buffer.length + count];
-						System.arraycopy(buffer, 0, t, 0, buffer.length);
-						System.arraycopy(chunk, 0, t, buffer.length,count);
-						buffer = t;
-					}
-					ftpData = new String(buffer);
-				}
-			}
-		}finally{
-			if (is != null){
-				try{
-					is.close();					
-				}catch(IOException ioe){
-					//ignore
-				}
-				is = null;
-			}
-		}
-		
-		return ftpData;
-	}
-
-	/***************************************************
-	 * Download the file from the specified host and store in file
-	 * 
-	 * @param strURL = username:password@ftp.whatever.com/file.zip;type=i
-	 * @throws IOException
-	 */
-	public static void ftpReadToFile(String strURL, String localfile) throws IOException
-	{
-		BufferedInputStream is = null;
-		FileOutputStream out = null;
-			
-		if (!strURL.startsWith("ftp://")){
-			strURL ="ftp://"+strURL;
-		}
-		try {
-			URLConnection connection = (new URL(strURL)).openConnection();
-			if (connection != null) {
-				connection.setDoInput(true);
-				is = new BufferedInputStream(connection.getInputStream(), BUFFER_SIZE);
-				if (is != null) {
-					out = new FileOutputStream(localfile);
-					int i = 0;
-					byte[] bytesIn = new byte[BUFFER_SIZE];
-					while ((i = is.read(bytesIn)) >= 0) {
-					    out.write(bytesIn, 0, i);
-					}
-				}
-			}
-		}finally{
-			if (is != null){
-				try{
-					is.close();					
-				}catch(IOException ioe){
-					//ignore
-				}
-				is = null;
-			}
-			if (out != null){
-				try{
-					out.close();					
-				}catch(IOException ioe){
-					//ignore
-				}
-				out = null;
-			}
-		}
-	}	
-	/*******************************************************
-	 * Write this string data to the specified host and file
-	 * @param strURL
-	 * @param sb
-	 * @throws IOException
-	 */
-	
-	/***************************************************
-	 * java.net.URL and java.net.URLConnection are the public APIs to access ftp resources, eg:-
-
-String loc = "ftp://user:password@server/etc/motd;type=a";  specifying the type this way doesnt seem to work
-"ftp://username:password@ftp.whatever.com/file.zip;type=i"
-URLConnection uc = (new URL(loc)).openConnection();
-
-If you want to download the file then call URLConnection's getInputStream() method. 
-If you want to upload you call getOutputStream() method and write to the output stream. 
-	 * @param strURL
-	 * @return
-	 * @throws IOException
-	 */
-	public static void ftpWrite(String strURL, StringBuffer sb) throws IOException
-	{
-		BufferedOutputStream bos=null;
-		if (!strURL.startsWith("ftp://")){
-			strURL ="ftp://"+strURL;
-		}			
-		
-		try {
-			URLConnection connection = (new URL(strURL)).openConnection();
-			if (connection != null) {
-				connection.setDoOutput(true);
-
-				// get an output stream, buffering improves performance
-                bos = new BufferedOutputStream(connection.getOutputStream());
-
-                // write fields to stream
-                bos.write(sb.toString().getBytes("UTF8"));
-                bos.flush();
-			}
-		}finally{
-			if (bos != null){
-				try{
-					bos.close();
-				}catch(IOException ioe){
-					// ignore
-				}
-				bos = null;
-			}
-		}
-	}
-	
-	/***************************************************
-	 * java.net.URL and java.net.URLConnection are the public APIs to access ftp resources, eg:-
-
-String loc = "ftp://user:password@server/etc/motd;type=a";
-"ftp://username:password@ftp.whatever.com/file.zip;type=i"
-URLConnection uc = (new URL(loc)).openConnection();
-
-If you want to download the file then call URLConnection's getInputStream() method. 
-If you want to upload you call getOutputStream() method and write to the output stream. 
-          
-	 * @param strURL
-	 * @return
-	 * @throws IOException
-	 */
-	public static void ftpWriteFile(String strURL, String localFileName) throws IOException
-	{
-		BufferedOutputStream bos=null;
-		FileInputStream is=null;
-		if (!strURL.startsWith("ftp://")){
-			strURL ="ftp://"+strURL;
-		}			
-		try {
-			URLConnection connection = (new URL(strURL)).openConnection();
-			if (connection != null) {
-				connection.setDoOutput(true);
-				// get an output stream, buffering improves performance
-                bos = new BufferedOutputStream(connection.getOutputStream());
-
-                // write file to stream
-                is=  new FileInputStream(localFileName);
-                byte[] buf= new byte[BUFFER_SIZE];
-                while (true) {
-                	int c= is.read(buf);
-                	if (c<= 0) {
-                		break;
-                	}
-                	bos.write(buf, 0, c);
-                }
-                bos.flush();
-			}
-		}finally{
-			if (is != null){
-				try{
-					is.close();
-				}catch(IOException ioe){
-					// ignore
-				}
-				is = null;
-			}
-			if (bos != null){
-				try{
-					bos.close();
-				}catch(IOException ioe){
-					// ignore
-				}
-				bos = null;
-			}
-		}
-	}	
-	/**
-	 * run a script from within java
-	 * @param command - should be fully qualified path and can have parameters
-	 * @throws IOException
-	 * @throws InterruptedException
-	 */
-	public static String runScript(String command) throws IOException, InterruptedException{
-		StringBuffer sb = new StringBuffer();
-		Runtime rtime = Runtime.getRuntime();// Get the current RunTime environment.   
-		Process shell = rtime.exec(command);// Submit the script   
-		shell.waitFor();// Wait till the script finishes.   
-		int rc = shell.exitValue();// get the exit code of the script.   
-		if ( rc == 0 ) {// Display the normal o/p if script completed successfully.   
-			sb.append(displayOutput(shell.getInputStream()));   
-		} else {// Display the normal and the error o/p if script failed.    
-			sb.append(command + " exited with RC = " + rc);   
-			sb.append(displayOutput(shell.getErrorStream()));   
-			sb.append(displayOutput(shell.getInputStream()));   
-		}   
-		return sb.toString();
-	}
-	/** This method diplays the contents of the InputStream class passed to it as an argument. */  
-	private static String displayOutput(InputStream is) 
-	{   	
-		StringBuffer sb = new StringBuffer();
-		try {
-			String s;   
-			BufferedReader br = new BufferedReader(new InputStreamReader(is));  
-			while ((s = br.readLine()) != null)  {   
-				sb.append(s+"\n");   
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}   
-		return sb.toString();
-	}   
-	
-	/** show the Total memory and free memory */
-	public static String showMemory() {
-		System.gc();
-		Runtime runtime = Runtime.getRuntime();
-		return ("TotMem:" + runtime.totalMemory() + ", FreeMem:" + runtime.freeMemory() +", UsedMem:" + ( runtime.totalMemory() - runtime.freeMemory())/1000/1000 +"M" );
-	}
-	
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void append(StringBuffer sb, String msg){
-		int debuglevel = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getABRDebugLevel("ADSABRSTATUS");
-		if(debuglevel==D.EBUG_SPEW){
-			sb.append(msg);			
-		}else{
-			
-		}		
-	}
-
-    public static void main(String[] args)
-    {
-    	String readloc = "opicmadm:mice8chs@eacm.lexington.ibm.com/bala/checkdel.sql;type=a";
-    	String writeloc = "opicmadm:mice8chs@eacm.lexington.ibm.com/bala/ADSmetaissues.txt;type=i";
-    	String writeloc2 = "opicmadm:mice8chs@eacm.lexington.ibm.com/bala/chqisoproblems.txt;type=a";
-    	StringBuffer sb = new StringBuffer();
-    	sb.append("as of 05/07/08\n");
-    	sb.append("----------------------------------------------\n");
-    	sb.append("IX. Catalog Category Navigation \n");
-    	sb.append("    - cant test because CATNAVIMG relator seems to be missing.  The VE is incomplete when forced to run.\n");
-    	sb.append("    gbl8104 doesnt find any changes because the meta is incomplete.\n");
-    	sb.append("<!-- EntityList for 1980-01-01-00.00.00.000000 extract ADSCATNAV contains the following entities: \n");
-    	sb.append("CATNAV : 1 parent items. IDs( 1265233)\n");
-    	sb.append("CATNAVIMG : 0 entity items. \n");
-    	sb.append(" -->\n");
-        try {
-        	// read a file
-        	String read = ftpRead(readloc);
-        	System.err.println("ftpRead returned:"+read+":");
-        	ftpReadToFile(readloc,"\\dev\\abr12\\source\\ftpd.txt");
-        	ftpWrite(writeloc, sb);
-        	ftpWriteFile(writeloc2, "\\dev\\abr12\\source\\chqisoproblems.txt");
-        }catch(Exception ex){
-        	System.err.println(ex.getMessage());
-        	ex.printStackTrace(System.err);
-        }
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\ABRUtil.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

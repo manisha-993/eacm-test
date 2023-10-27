@@ -1,60 +1,65 @@
-/* Copyright IBM Corp. 2021 */
-package COM.ibm.eannounce.abr.sg.rfc;
+/*    */ package COM.ibm.eannounce.abr.sg.rfc;
+/*    */ 
+/*    */ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhTssMatCharEntity;
+/*    */ import com.google.gson.annotations.SerializedName;
+/*    */ import java.util.ArrayList;
+/*    */ import java.util.List;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class RdhTssMatChar
+/*    */   extends RdhBase
+/*    */ {
+/*    */   @SerializedName("Z_GEO")
+/*    */   private String z_geo;
+/*    */   @SerializedName("I_MATCHAR")
+/*    */   private List<RdhTssMatCharEntity> entities;
+/*    */   
+/*    */   public RdhTssMatChar(SVCMOD svcmod) {
+/* 21 */     super(String.valueOf(svcmod.getMACHTYPE()) + svcmod.getMODEL(), "RDH_YMDM_MATCHAR".toLowerCase(), null);
+/*    */     
+/* 23 */     List<PRODSTRUCT> prodStructs = svcmod.getPRODSTRUCTLIST();
+/* 24 */     if (prodStructs != null && !prodStructs.isEmpty())
+/*    */     {
+/* 26 */       for (PRODSTRUCT prodStruct : prodStructs) {
+/*    */         
+/* 28 */         RdhTssMatCharEntity entity = new RdhTssMatCharEntity();
+/* 29 */         entity.setMaterial_number(String.valueOf(svcmod.getMACHTYPE()) + svcmod.getMODEL());
+/* 30 */         entity.setFeature_id(prodStruct.getFEATURECODE());
+/* 31 */         entity.setFeature_name(prodStruct.getMKTGNAME());
+/* 32 */         entity.setManopt_flag(prodStruct.getMNATORYOPT());
+/* 33 */         entity.setBukrs("");
+/* 34 */         entity.setWithdrawdate(prodStruct.getWITHDRAWDATE().replaceAll("-", ""));
+/* 35 */         entity.setWthdrweffctvdate(prodStruct.getWTHDRWEFFCTVDATE().replaceAll("-", ""));
+/* 36 */         entity.setEffective_date(prodStruct.getEFFECTIVEDATE().replaceAll("-", ""));
+/* 37 */         entity.setEnd_date(prodStruct.getENDDATE().replaceAll("-", ""));
+/*    */         
+/* 39 */         this.entities.add(entity);
+/*    */       } 
+/*    */     }
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   protected void setDefaultValues() {
+/* 51 */     this.entities = new ArrayList<>();
+/* 52 */     this.z_geo = "WW";
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   protected boolean isReadyToExecute() {
+/* 57 */     return true;
+/*    */   }
+/*    */ }
 
-import java.util.ArrayList;
-import java.util.List;
 
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhTssMatCharEntity;
-import COM.ibm.eannounce.abr.util.RfcConfigProperties;
-
-import com.google.gson.annotations.SerializedName;
-
-
-public class RdhTssMatChar extends RdhBase {
-	@SerializedName("Z_GEO")
-	private String z_geo;
-	@SerializedName("I_MATCHAR")
-	private List<RdhTssMatCharEntity> entities;
-
-	public RdhTssMatChar(SVCMOD svcmod) {	
-		super(svcmod.getMACHTYPE() + svcmod.getMODEL(), "RDH_YMDM_MATCHAR"
-				.toLowerCase(), null);
-		
-		List<PRODSTRUCT> prodStructs = svcmod.getPRODSTRUCTLIST();
-		if (prodStructs!=null && !prodStructs.isEmpty())
-		{
-			for (PRODSTRUCT prodStruct : prodStructs)
-			{
-				RdhTssMatCharEntity entity = new RdhTssMatCharEntity();
-				entity.setMaterial_number(svcmod.getMACHTYPE() + svcmod.getMODEL());
-				entity.setFeature_id(prodStruct.getFEATURECODE());
-				entity.setFeature_name(prodStruct.getMKTGNAME());
-				entity.setManopt_flag(prodStruct.getMNATORYOPT());
-				entity.setBukrs("");
-				entity.setWithdrawdate(prodStruct.getWITHDRAWDATE().replaceAll("-", ""));
-				entity.setWthdrweffctvdate(prodStruct.getWTHDRWEFFCTVDATE().replaceAll("-", ""));
-				entity.setEffective_date(prodStruct.getEFFECTIVEDATE().replaceAll("-", ""));
-				entity.setEnd_date(prodStruct.getENDDATE().replaceAll("-", ""));
-				
-				entities.add(entity);
-			}
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.ibm.sdpi.cmd.interfaces.esw.rdh.RdhBase#setDefaultValues()
-	 */
-	@Override
-	protected void setDefaultValues() {
-		this.entities = new ArrayList<RdhTssMatCharEntity>();
-		this.z_geo = "WW";
-	}
-
-	@Override
-	protected boolean isReadyToExecute() {
-		return true;
-	}
-
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\RdhTssMatChar.class
+ * Java compiler version: 7 (51.0)
+ * JD-Core Version:       1.1.3
+ */

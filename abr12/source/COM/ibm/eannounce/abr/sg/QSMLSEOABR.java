@@ -1,581 +1,587 @@
-//Licensed Materials -- Property of IBM
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.XLColumn;
+/*     */ import COM.ibm.eannounce.abr.util.XLFixedColumn;
+/*     */ import COM.ibm.eannounce.abr.util.XLIdColumn;
+/*     */ import COM.ibm.eannounce.abr.util.XLRow;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.eannounce.objects.PDGUtility;
+/*     */ import com.ibm.transform.oim.eacm.diff.DiffEntity;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.util.HashSet;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.Vector;
+/*     */ import org.apache.poi.hssf.usermodel.HSSFCell;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class QSMLSEOABR
+/*     */   implements QSMABRInterface
+/*     */ {
+/*     */   private static final String COFCAT_HW = "100";
+/*     */   private static final String COFCAT_SW = "101";
+/* 146 */   private static final Vector COLUMN_VCT = new Vector();
+/*     */   
+/*     */   static {
+/* 149 */     XLColumn xLColumn = new XLColumn("RFAnumber", "LSEO", "QSMRFANUMBER");
+/* 150 */     xLColumn.setAlwaysShow();
+/* 151 */     xLColumn.setFFColumnLabel("RFANUM");
+/* 152 */     xLColumn.setColumnWidth(6);
+/* 153 */     xLColumn.setJustified(false);
+/* 154 */     COLUMN_VCT.addElement(xLColumn);
+/*     */     
+/* 156 */     xLColumn = new XLColumn("AnnDate", "LSEO", "LSEOPUBDATEMTRGT");
+/* 157 */     xLColumn.setFFColumnLabel("ANNDATE___");
+/* 158 */     xLColumn.setColumnWidth(10);
+/* 159 */     COLUMN_VCT.addElement(xLColumn);
+/*     */     
+/* 161 */     xLColumn = new XLColumn("GADate", "LSEO", "LSEOPUBDATEMTRGT");
+/* 162 */     xLColumn.setFFColumnLabel("GADATE____");
+/* 163 */     xLColumn.setColumnWidth(10);
+/* 164 */     COLUMN_VCT.addElement(xLColumn);
+/*     */     
+/* 166 */     xLColumn = new XLColumn("WDDate", "LSEO", "LSEOUNPUBDATEMTRGT");
+/* 167 */     xLColumn.setFFColumnLabel("WDDATE____");
+/* 168 */     xLColumn.setColumnWidth(10);
+/* 169 */     COLUMN_VCT.addElement(xLColumn);
+/*     */     
+/* 171 */     xLColumn = new XLColumn("IBMPartno", "LSEO", "SEOID");
+/* 172 */     xLColumn.setFFColumnLabel("IBMPART_____");
+/* 173 */     xLColumn.setColumnWidth(12);
+/* 174 */     xLColumn.setAlwaysShow();
+/* 175 */     xLColumn.setJustified(true);
+/* 176 */     COLUMN_VCT.addElement(xLColumn);
+/*     */     
+/* 178 */     xLColumn = new XLColumn("Description", "WWSEO", "PRCFILENAM");
+/* 179 */     xLColumn.setFFColumnLabel("DESCRIPTION___________________");
+/* 180 */     xLColumn.setColumnWidth(30);
+/* 181 */     COLUMN_VCT.addElement(xLColumn);
+/*     */     
+/* 183 */     xLColumn = new XLColumn("Div", "PROJ", "DIV");
+/* 184 */     xLColumn.setFFColumnLabel("DV");
+/* 185 */     xLColumn.setColumnWidth(2);
+/* 186 */     COLUMN_VCT.addElement(xLColumn);
+/*     */     
+/* 188 */     xLColumn = new XLColumn("SegA", "SGMNTACRNYM", "ACRNYM");
+/* 189 */     xLColumn.setFFColumnLabel("SGA");
+/* 190 */     xLColumn.setColumnWidth(3);
+/* 191 */     COLUMN_VCT.addElement(xLColumn);
+/*     */     
+/* 193 */     xLColumn = new XLColumn("ProdID", "WWSEO", "PRODID");
+/* 194 */     xLColumn.setFFColumnLabel("P");
+/* 195 */     xLColumn.setColumnWidth(1);
+/* 196 */     COLUMN_VCT.addElement(xLColumn);
+/*     */     
+/* 198 */     xLColumn = new XLColumn("SysOrOpt", "WWSEO", "SEOORDERCODE");
+/* 199 */     xLColumn.setFFColumnLabel("I");
+/* 200 */     xLColumn.setColumnWidth(1);
+/* 201 */     COLUMN_VCT.addElement(xLColumn);
+/*     */     
+/* 203 */     xLColumn = new XLColumn("PlntOfMfg", "GEOMOD", "PLNTOFMFR");
+/* 204 */     xLColumn.setFFColumnLabel("PLT");
+/* 205 */     xLColumn.setColumnWidth(3);
+/* 206 */     COLUMN_VCT.addElement(xLColumn);
+/*     */     
+/* 208 */     xLColumn = new XLColumn("IndDefCat", "LSEO", "INDDEFNCATG");
+/* 209 */     xLColumn.setFFColumnLabel("IDC");
+/* 210 */     xLColumn.setColumnWidth(3);
+/* 211 */     COLUMN_VCT.addElement(xLColumn);
+/*     */     
+/* 213 */     xLColumn = new XLColumn("FtnClass", "MODEL", "FUNCCLS");
+/* 214 */     xLColumn.setFFColumnLabel("CLAS");
+/* 215 */     xLColumn.setColumnWidth(4);
+/* 216 */     COLUMN_VCT.addElement(xLColumn);
+/*     */     
+/* 218 */     xLColumn = new XLColumn("Brand", "GEOMOD", "EMEABRANDCD");
+/* 219 */     xLColumn.setFFColumnLabel("B");
+/* 220 */     xLColumn.setColumnWidth(1);
+/* 221 */     COLUMN_VCT.addElement(xLColumn);
+/*     */     
+/* 223 */     xLColumn = new XLColumn("USPartNo", "LSEO", "SEOID");
+/* 224 */     xLColumn.setFFColumnLabel("USPN___");
+/* 225 */     xLColumn.setColumnWidth(7);
+/* 226 */     COLUMN_VCT.addElement(xLColumn);
+/*     */     
+/* 228 */     xLColumn = new XLColumn("SPECBID", "WWSEO", "SPECBID");
+/* 229 */     xLColumn.setFFColumnLabel("S");
+/* 230 */     xLColumn.setColumnWidth(1);
+/* 231 */     COLUMN_VCT.addElement(xLColumn);
+/*     */     
+/* 233 */     XLFixedColumn xLFixedColumn = new XLFixedColumn("SEOType", "LSEO");
+/* 234 */     xLFixedColumn.setFFColumnLabel("SEOTYPE___");
+/* 235 */     xLFixedColumn.setColumnWidth(10);
+/* 236 */     xLFixedColumn.setAlwaysShow();
+/* 237 */     COLUMN_VCT.addElement(xLFixedColumn);
+/*     */     
+/* 239 */     XLIdColumn xLIdColumn = new XLIdColumn("EntityId", "LSEO");
+/* 240 */     xLIdColumn.setFFColumnLabel("ENTITYID__");
+/* 241 */     xLIdColumn.setAlwaysShow();
+/* 242 */     xLIdColumn.setJustified(false);
+/* 243 */     xLIdColumn.setColumnWidth(10);
+/* 244 */     COLUMN_VCT.addElement(xLIdColumn);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public boolean canGenerateReport(EntityItem paramEntityItem, QSMRPTABRSTATUS paramQSMRPTABRSTATUS) {
+/* 276 */     boolean bool = true;
+/* 277 */     String str = PokUtils.getAttributeFlagValue(paramEntityItem, "STATUS");
+/* 278 */     paramQSMRPTABRSTATUS.addDebug("QSMLSEOABR.generateReport: " + paramEntityItem.getKey() + " STATUS: " + 
+/* 279 */         PokUtils.getAttributeValue(paramEntityItem, "STATUS", ", ", "", false) + " [" + str + "]");
+/* 280 */     if (!"0020".equals(str)) {
+/*     */       
+/* 282 */       paramQSMRPTABRSTATUS.addError("NOT_FINAL_ERR", null);
+/* 283 */       bool = false;
+/*     */     } 
+/*     */     
+/* 286 */     HashSet<String> hashSet = new HashSet();
+/* 287 */     for (byte b = 0; b < QSMRPTABRSTATUS.GEOS.length; b++) {
+/* 288 */       hashSet.add(QSMRPTABRSTATUS.GEOS[b]);
+/*     */     }
+/* 290 */     hashSet.add("1999");
+/*     */     
+/* 292 */     if (!PokUtils.contains(paramEntityItem, "GENAREASELECTION", hashSet)) {
+/* 293 */       bool = false;
+/* 294 */       paramQSMRPTABRSTATUS.addOutput("LSEO does not have required 'General Area Selection' value.");
+/* 295 */       paramQSMRPTABRSTATUS.addDebug("GENAREASELECTION did not include " + hashSet + ", [" + 
+/* 296 */           PokUtils.getAttributeValue(paramEntityItem, "GENAREASELECTION", ", ", "", false) + "]");
+/* 297 */       paramQSMRPTABRSTATUS.setNoReport();
+/*     */     } 
+/* 299 */     hashSet.clear();
+/*     */     
+/* 301 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public boolean canGenerateReport(EntityList paramEntityList, QSMRPTABRSTATUS paramQSMRPTABRSTATUS) {
+/* 316 */     boolean bool = false;
+/* 317 */     EntityItem entityItem = paramEntityList.getParentEntityGroup().getEntityItem(0);
+/*     */ 
+/*     */ 
+/*     */     
+/* 321 */     Vector<EntityItem> vector1 = PokUtils.getAllLinkedEntities(entityItem, "WWSEOLSEO", "WWSEO");
+/* 322 */     Vector<EntityItem> vector2 = PokUtils.getAllLinkedEntities(vector1, "MODELWWSEO", "MODEL"); byte b;
+/* 323 */     for (b = 0; b < vector2.size(); b++) {
+/* 324 */       EntityItem entityItem1 = vector2.elementAt(b);
+/* 325 */       String str = PokUtils.getAttributeFlagValue(entityItem1, "COFCAT");
+/* 326 */       paramQSMRPTABRSTATUS.addDebug("QSMLSEOABR.canGenerateReport " + entityItem.getKey() + " " + entityItem1
+/* 327 */           .getKey() + " cofcat:" + str);
+/* 328 */       if ("100".equals(str) || "101".equals(str)) {
+/* 329 */         bool = true;
+/*     */         
+/*     */         break;
+/*     */       } 
+/*     */     } 
+/* 334 */     if (!bool) {
+/* 335 */       paramQSMRPTABRSTATUS.addOutput("Hardware or Software Model was not found.");
+/*     */     }
+/*     */     
+/* 338 */     vector2.clear();
+/*     */     
+/* 340 */     for (b = 0; b < vector1.size(); b++) {
+/* 341 */       EntityItem entityItem1 = vector1.elementAt(b);
+/* 342 */       String str = PokUtils.getAttributeFlagValue(entityItem1, "SPECBID");
+/* 343 */       paramQSMRPTABRSTATUS.addDebug(entityItem1.getKey() + " SPECBID: " + str);
+/* 344 */       if ("11457".equals(str) || str == null) {
+/* 345 */         paramQSMRPTABRSTATUS.addOutput("WWSEO is not a special bid.");
+/* 346 */         bool = false;
+/*     */         
+/*     */         break;
+/*     */       } 
+/*     */     } 
+/* 351 */     vector1.clear();
+/*     */     
+/* 353 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVeName() {
+/* 361 */     return "QSMLSEO";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVersion() {
+/* 370 */     return "1.8";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public int getColumnCount() {
+/* 377 */     return COLUMN_VCT.size();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getColumnLabel(int paramInt) {
+/* 384 */     return ((XLColumn)COLUMN_VCT.elementAt(paramInt)).getColumnLabel();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getFFColumnLabel(int paramInt) {
+/* 392 */     return ((XLColumn)COLUMN_VCT.elementAt(paramInt)).getFFColumnLabel();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public int getColumnWidth(int paramInt) {
+/* 400 */     return ((XLColumn)COLUMN_VCT.elementAt(paramInt)).getColumnWidth();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setColumnValue(HSSFCell paramHSSFCell, String paramString, Hashtable paramHashtable, int paramInt) {
+/* 406 */     ((XLColumn)COLUMN_VCT.elementAt(paramInt)).setColumnValue(paramHSSFCell, paramHashtable);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getColumnValue(String paramString, Hashtable paramHashtable, int paramInt) {
+/* 413 */     return ((XLColumn)COLUMN_VCT.elementAt(paramInt)).getColumnValue(paramHashtable);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public boolean isChanged(String paramString, Hashtable paramHashtable, int paramInt) {
+/* 420 */     return ((XLColumn)COLUMN_VCT.elementAt(paramInt)).isChanged(paramHashtable);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public Vector getRowItems(EntityList paramEntityList, Hashtable paramHashtable, String paramString, QSMRPTABRSTATUS paramQSMRPTABRSTATUS) {
+/* 434 */     Vector<XLRow> vector = new Vector();
+/*     */     
+/* 436 */     EntityItem entityItem = null;
+/* 437 */     if (paramHashtable != null) {
+/* 438 */       Vector<DiffEntity> vector2 = (Vector)paramHashtable.get("ROOT");
+/* 439 */       entityItem = ((DiffEntity)vector2.firstElement()).getCurrentEntityItem();
+/*     */     } else {
+/* 441 */       entityItem = paramEntityList.getParentEntityGroup().getEntityItem(0);
+/*     */     } 
+/*     */     
+/* 444 */     paramQSMRPTABRSTATUS.addDebug("QSMLSEOABR.getRowItems " + entityItem.getKey());
+/*     */     
+/* 446 */     Vector<EntityItem> vector1 = PokUtils.getAllLinkedEntities(entityItem, "WWSEOLSEO", "WWSEO");
+/* 447 */     for (byte b = 0; b < vector1.size(); b++) {
+/* 448 */       EntityItem entityItem1 = vector1.elementAt(b);
+/*     */ 
+/*     */       
+/* 451 */       Vector<EntityItem> vector2 = PokUtils.getAllLinkedEntities(entityItem1, "WWSEOPROJA", "PROJ");
+/* 452 */       Vector<EntityItem> vector3 = PokUtils.getAllLinkedEntities(entityItem1, "MODELWWSEO", "MODEL");
+/* 453 */       for (byte b1 = 0; b1 < vector3.size(); b1++) {
+/* 454 */         EntityItem entityItem2 = vector3.elementAt(b1);
+/* 455 */         String str = PokUtils.getAttributeFlagValue(entityItem2, "COFCAT");
+/* 456 */         paramQSMRPTABRSTATUS.addDebug("QSMLSEOABR.getRowItems " + entityItem.getKey() + " " + entityItem2
+/* 457 */             .getKey() + " cofcat:" + str);
+/* 458 */         if ("100".equals(str) || "101".equals(str)) {
+/*     */           
+/* 460 */           XLRow xLRow = new XLRow((paramHashtable == null) ? entityItem : paramHashtable.get(entityItem.getKey()));
+/* 461 */           vector.addElement(xLRow);
+/*     */           
+/* 463 */           xLRow.addRowItem((paramHashtable == null) ? entityItem1 : paramHashtable
+/* 464 */               .get(entityItem1.getKey()));
+/* 465 */           xLRow.addRowItem((paramHashtable == null) ? entityItem2 : paramHashtable
+/* 466 */               .get(entityItem2.getKey()));
+/*     */           
+/* 468 */           Vector<EntityItem> vector4 = PokUtils.getAllLinkedEntities(entityItem2, "MODELGEOMOD", "GEOMOD");
+/*     */           
+/* 470 */           Vector<EntityItem> vector5 = PokUtils.getEntitiesWithMatchedAttr(vector4, "GENAREASELECTION", "1999");
+/* 471 */           paramQSMRPTABRSTATUS.addDebug("QSMLSEOABR.getRowItems GENAREASELECTION:1999 has wwgeomodVct.size: " + vector5
+/* 472 */               .size());
+/*     */           
+/* 474 */           if (vector5.size() == 0) {
+/*     */             
+/* 476 */             vector4 = PokUtils.getEntitiesWithMatchedAttr(vector4, "GENAREASELECTION", paramString);
+/* 477 */             paramQSMRPTABRSTATUS.addDebug("QSMLSEOABR.getRowItems GEOMOD GENAREASELECTION:" + paramString + " has geomodVct.size: " + vector4
+/* 478 */                 .size());
+/*     */           } else {
+/* 480 */             vector4 = vector5;
+/*     */           } 
+/* 482 */           if (vector4.size() > 0) {
+/* 483 */             if (vector4.size() > 1) {
+/* 484 */               for (byte b2 = 0; b2 < vector4.size(); b2++) {
+/* 485 */                 paramQSMRPTABRSTATUS.addDebug("QSMLSEOABR.getRowItems WARNING: Found more than one GEOMOD for " + entityItem2
+/* 486 */                     .getKey() + " " + ((EntityItem)vector4.elementAt(b2)).getKey());
+/*     */               }
+/*     */             }
+/* 489 */             EntityItem entityItem3 = vector4.firstElement();
+/* 490 */             xLRow.addRowItem((paramHashtable == null) ? entityItem3 : paramHashtable
+/* 491 */                 .get(entityItem3.getKey()));
+/* 492 */             vector4.clear();
+/*     */           } 
+/*     */           
+/* 495 */           if (vector2.size() > 0) {
+/* 496 */             EntityItem entityItem3 = vector2.firstElement();
+/* 497 */             xLRow.addRowItem((paramHashtable == null) ? entityItem3 : paramHashtable
+/* 498 */                 .get(entityItem3.getKey()));
+/*     */             
+/* 500 */             Vector<EntityItem> vector6 = PokUtils.getAllLinkedEntities(entityItem3, "PROJSGMNTACRNYMA", "SGMNTACRNYM");
+/* 501 */             if (vector6.size() > 0) {
+/* 502 */               EntityItem entityItem4 = vector6.firstElement();
+/* 503 */               xLRow.addRowItem((paramHashtable == null) ? entityItem4 : paramHashtable
+/* 504 */                   .get(entityItem4.getKey()));
+/* 505 */               vector6.clear();
+/*     */             } 
+/*     */           } 
+/* 508 */           paramQSMRPTABRSTATUS.addDebug("QSMLSEOABR.getRowItems Adding " + xLRow);
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 513 */     return vector;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public boolean withinDateRange(EntityItem paramEntityItem, String paramString, QSMRPTABRSTATUS paramQSMRPTABRSTATUS) {
+/* 522 */     boolean bool = false;
+/* 523 */     Object[] arrayOfObject = new Object[5];
+/* 524 */     String str1 = PokUtils.getAttributeValue(paramEntityItem, "LSEOPUBDATEMTRGT", "", "1980-01-01", false);
+/* 525 */     String str2 = PokUtils.getAttributeValue(paramEntityItem, "LSEOUNPUBDATEMTRGT", "", "9999-12-31", false);
+/* 526 */     PDGUtility pDGUtility = new PDGUtility();
+/* 527 */     String str3 = pDGUtility.getDate(paramString, 30);
+/*     */     
+/* 529 */     arrayOfObject[0] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "LSEOPUBDATEMTRGT", "LSEOPUBDATEMTRGT");
+/* 530 */     arrayOfObject[1] = str1;
+/* 531 */     arrayOfObject[2] = "";
+/* 532 */     arrayOfObject[3] = paramString;
+/* 533 */     arrayOfObject[4] = str3;
+/*     */     
+/* 535 */     paramQSMRPTABRSTATUS.addDebug("QSMLSEOABR.withinDateRange now " + paramString + " pubdate " + str1 + " unpubdate " + str2 + " nowPlus30 " + str3);
+/* 536 */     if (str3.compareTo(str1) >= 0 && str1.compareTo(paramString) >= 0) {
+/* 537 */       bool = true;
+/*     */     } else {
+/* 539 */       arrayOfObject[2] = "not";
+/*     */     } 
+/*     */     
+/* 542 */     paramQSMRPTABRSTATUS.addOutput("DATE_RANGE_MSG", arrayOfObject);
+/* 543 */     arrayOfObject[0] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "LSEOUNPUBDATEMTRGT", "LSEOUNPUBDATEMTRGT");
+/* 544 */     arrayOfObject[1] = str2;
+/* 545 */     arrayOfObject[2] = "";
+/* 546 */     if (str3.compareTo(str2) >= 0 && str2.compareTo(paramString) >= 0) {
+/* 547 */       bool = true;
+/*     */     } else {
+/* 549 */       arrayOfObject[2] = "not";
+/*     */     } 
+/*     */     
+/* 552 */     paramQSMRPTABRSTATUS.addOutput("DATE_RANGE_MSG", arrayOfObject);
+/*     */     
+/* 554 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getRowOne(EntityItem paramEntityItem) {
+/* 562 */     String str = PokUtils.getAttributeValue(paramEntityItem, "QSMRFANUMBER", "", "", false);
+/* 563 */     return XLColumn.formatToWidth(str, 6, false) + " SBD";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getRowTwoPrefix() {
+/* 578 */     return XLColumn.formatToWidth("Date______", 10) + " " + 
+/* 579 */       XLColumn.formatToWidth("Time___________", 15);
+/*     */   }
+/*     */ }
 
-//(C) Copyright IBM Corp. 2008  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
 
-package COM.ibm.eannounce.abr.sg;
-
-import java.sql.SQLException;
-import java.util.*;
-
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import com.ibm.transform.oim.eacm.diff.DiffEntity;
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-
-import com.ibm.transform.oim.eacm.util.*;
-/**********************************************************************************
-* QSM LSEO ABR 
-* 
-* QSMRPTABRSTATUS will launch the correct class
-* From "SG FS SysFeed QSM Load  20090709.doc" 
-*
-*C.	Change Report: LSEO
-*
-*If GENAREASELECTION  Not In ('6204'| '1999' | '6197') then  (no report now)
-*	Set QSMFEEDRESEND = "No" (No)
-*	Set Return Code = "0030" (Passed)
-*	Exit
-*End if
-*
-*If WWSEOLSEO-d: WWSEO.SPECBID = 11457 (N) then
-*	Do not send Spreadsheet; instead send HTML Report
-*	Set QSMFEEDRESEND = "No" (No)
-*	Set Return Code = "0030" (Passed)
-*	Exit
-*End if
-*
-*If RootEntity.STATUS <> "Final" (0020) then
-*	ErrorMessage LD(LSEO) NDN(LSEO) "was queued to send data; however, it is not Final"
-*	Set QSMFEEDRESEND = "No" (No)
-*	Set Return Code = "0040" (Failed)
-*	Exit
-*End if
-*
-*Select Case QSMFEEDRESEND
-*Case "New" (New) or Empty
-*	GenerateRFAnumber
-*	GenerateOutputAll
-*Case "Yes" (Yes)
-*	GenerateOutputAll
-*Case "No" (No)
-*	If (Now() + 30 days >= LSEOPUBDATEMTRGT => Now()) OR (Now() + 30 days >= LSEOUNPUBDATEMTRGT => Now()) then
-*		GenerateOutputDelta
-*	Else
-*		Do not send Spreadsheet; instead send HTML Report
-*		Set QSMFEEDRESEND = "No" (No)
-*		Set Return Code = "0030" (Passed)
-*		Exit
-*	End if
-*Case Else
-*	ErrorMessage LD(LSEO) NDN(LSEO) "Invalid data condition; the report was not generated."
-*	Set QSMFEEDRESEND = "No" (No)
-*	Set Return Code = "0040" (Failed)
-*	Exit
-*End Select Case
-*Set QSMFEEDRESEND = "No" (No)
-*Exit
-*
-*/
-//QSMLSEOABR.java,v
-//Revision 1.8  2013/05/22 14:35:30  wendy
-//Updates for RCQ00132040-WI
-//
-//Revision 1.7  2009/07/13 15:28:44  wendy
-//RCQ00055678 PRODID is now found on the parent WWSEO instead of the grandparent MODEL. PRODID changed from type "T" to type "U"
-//
-//Revision 1.6  2009/06/24 13:00:47  wendy
-//Make 'IBMPartno' Left justified instead of Right CQ00016165
-//
-//Revision 1.5  2009/03/13 14:32:45  wendy
-//CQ22294-LA CTO (XCC) - Update QSM Reports to Accept WW GenArea (WI CQ22265)
-//
-//Revision 1.4  2009/02/04 21:26:44  wendy
-//CQ00016165 - Automated QSM feed from ePIMS HW to support the late change request from BIDS
-//
-//Revision 1.3  2008/12/10 16:39:39  wendy
-//Spec change to reduce number of error rpts
-//
-//Revision 1.2  2008/11/19 21:18:56  wendy
-//Add check for null specbid or null cofcat and add msg for model
-//
-//Revision 1.1  2008/09/30 12:50:12  wendy
-//CQ00006066-WI LA CTO - EACM - Support GFS data Load of QSM (report)
-//
-
-public class QSMLSEOABR implements QSMABRInterface
-{	
-	//COFCAT	100	Hardware
-	//COFCAT	101	Software
-	//COFCAT	102	Service
-	private static final String COFCAT_HW="100";
-	private static final String COFCAT_SW="101";
-  
-	private static final Vector COLUMN_VCT;
-
-	static {	
-/*
-5.	WWSEOLSEO-u
-6.	MODELWWSEO-u
-7.	Include row MODEL where COFCAT in ('100', '101') 
-8.	MODELGEOMOD-d
-9.	Include data GEOMOD where GENAREASELECTION  In ('6204'| '1999' | '6197') since GEOMOD may not exist
-10.	Association WWSEOPROJA
-
-*/
-
-/*
-	 SS 		SS		Flat File							Special Bids	
-	 Column		Report	Column						Col		Col				LSEO	LSEO
-Col# Heading	Passed	Heading						Width	Justify	EACM Entity	EACM Attribute
-1						"2"							1		Left		"5"
-2						Date______					10		Left		
-3						Time___________				15		Left		
-4	RFAnumber	Always	RFANUM						6		Right	LSEO	QSMRFANUMBER
-5	AnnDate				ANNDATE___					10		Left	LSEO	LSEOPUBDATEMTRGT
-6	GADate				GADATE____					10		Left	LSEO	LSEOPUBDATEMTRGT
-7	WDDate				WDDATE____					10				LSEO	LSEOUNPUBDATEMTRGT
-8	IBMPartno	Always	IBMPART_____				12		Left	LSEO	SEOID
-9	Description			DESCRIPTION___________________	30	Left	WWSEO	PRCFILENAM
-10	Div					DV							2		Left	PROJ	DIV
-11	SegA				SGA							3		Left	SGMNTACRNYM	ACRNYM
-12	ProdID				P							1		Left	WWSEO	PRODID RCQ00055678 was MODEL
-13	SysOrOpt			I							1		Left	WWSEO	SEOORDERCODE
-14	PlntOfMfg			PLT							3		Left	GEOMOD	PLNTOFMFR
-15	IndDefCat			IDC							3		Left	LSEO	INDDEFNCATG
-16	FtnClass			CLAS						4		Left	MODEL	FUNCCLS
-17	Brand				B							1		Left	GEOMOD	EMEABRANDCD
-18	USPartNo			USPN___						7		Left	LSEO	SEOID
-19	SPECBID				S							1		Left	WWSEO	SPECBID
-20	SEOType		Always	SEOTYPE___					10		Left		"LSEO"
-21	EntityId	Always	ENTITYID__					10		Right	LSEO	Entityid	 
-*/		
-		
-		COLUMN_VCT = new Vector();
-		 		
-		//4	RFAnumber	Always	RFANUM						6		Right	LSEO	QSMRFANUMBER
-		XLColumn xlcCol = new XLColumn("RFAnumber","LSEO","QSMRFANUMBER");
-		xlcCol.setAlwaysShow();
-		xlcCol.setFFColumnLabel("RFANUM");
-		xlcCol.setColumnWidth(6);
-		xlcCol.setJustified(XLColumn.RIGHT);
-		COLUMN_VCT.addElement(xlcCol);
-		//5	AnnDate				ANNDATE___					10		Left	LSEO	LSEOPUBDATEMTRGT
-		xlcCol = new XLColumn("AnnDate","LSEO","LSEOPUBDATEMTRGT");
-		xlcCol.setFFColumnLabel("ANNDATE___");
-		xlcCol.setColumnWidth(10);
-		COLUMN_VCT.addElement(xlcCol);
-		//6	GADate				GADATE____					10		Left	LSEO	LSEOPUBDATEMTRGT
-		xlcCol = new XLColumn("GADate","LSEO","LSEOPUBDATEMTRGT");
-		xlcCol.setFFColumnLabel("GADATE____");
-		xlcCol.setColumnWidth(10);
-		COLUMN_VCT.addElement(xlcCol);
-		//7	WDDate				WDDATE____					10				LSEO	LSEOUNPUBDATEMTRGT
-		xlcCol = new XLColumn("WDDate","LSEO","LSEOUNPUBDATEMTRGT");
-		xlcCol.setFFColumnLabel("WDDATE____");
-		xlcCol.setColumnWidth(10);
-		COLUMN_VCT.addElement(xlcCol);
-		//8	IBMPartno	Always	IBMPART_____				12		Left	LSEO	SEOID
-		xlcCol = new XLColumn("IBMPartno","LSEO","SEOID");
-		xlcCol.setFFColumnLabel("IBMPART_____");
-		xlcCol.setColumnWidth(12);
-		xlcCol.setAlwaysShow();
-		xlcCol.setJustified(XLColumn.LEFT);
-		COLUMN_VCT.addElement(xlcCol);
-		//9	Description			DESCRIPTION___________________	30	Left	WWSEO	PRCFILENAM
-		xlcCol = new XLColumn("Description","WWSEO","PRCFILENAM");
-		xlcCol.setFFColumnLabel("DESCRIPTION___________________");
-		xlcCol.setColumnWidth(30);
-		COLUMN_VCT.addElement(xlcCol);
-		//10	Div					DV							2		Left	PROJ	DIV
-		xlcCol = new XLColumn("Div","PROJ","DIV");
-		xlcCol.setFFColumnLabel("DV");
-		xlcCol.setColumnWidth(2);
-		COLUMN_VCT.addElement(xlcCol);
-		//11	SegA				SGA							3		Left	SGMNTACRNYM	ACRNYM
-		xlcCol = new XLColumn("SegA","SGMNTACRNYM","ACRNYM");
-		xlcCol.setFFColumnLabel("SGA");
-		xlcCol.setColumnWidth(3);
-		COLUMN_VCT.addElement(xlcCol);
-		//12	ProdID				P							1		Left	WWSEO	PRODID
-		xlcCol = new XLColumn("ProdID","WWSEO","PRODID"); //RCQ00055678
-		xlcCol.setFFColumnLabel("P");
-		xlcCol.setColumnWidth(1);
-		COLUMN_VCT.addElement(xlcCol);
-		//13	SysOrOpt			I							1		Left	WWSEO	SEOORDERCODE
-		xlcCol = new XLColumn("SysOrOpt","WWSEO","SEOORDERCODE");
-		xlcCol.setFFColumnLabel("I");
-		xlcCol.setColumnWidth(1);
-		COLUMN_VCT.addElement(xlcCol);	
-		//14	PlntOfMfg			PLT							3		Left	GEOMOD	PLNTOFMFR
-		xlcCol = new XLColumn("PlntOfMfg","GEOMOD","PLNTOFMFR");
-		xlcCol.setFFColumnLabel("PLT");
-		xlcCol.setColumnWidth(3);
-		COLUMN_VCT.addElement(xlcCol);	
-		//15	IndDefCat			IDC							3		Left	LSEO	INDDEFNCATG
-		xlcCol = new XLColumn("IndDefCat","LSEO","INDDEFNCATG");
-		xlcCol.setFFColumnLabel("IDC");
-		xlcCol.setColumnWidth(3);
-		COLUMN_VCT.addElement(xlcCol);
-		//16	FtnClass			CLAS						4		Left	MODEL	FUNCCLS
-		xlcCol = new XLColumn("FtnClass","MODEL","FUNCCLS");
-		xlcCol.setFFColumnLabel("CLAS");
-		xlcCol.setColumnWidth(4);
-		COLUMN_VCT.addElement(xlcCol);	
-		//17	Brand				B							1		Left	GEOMOD	EMEABRANDCD
-		xlcCol = new XLColumn("Brand","GEOMOD","EMEABRANDCD");
-		xlcCol.setFFColumnLabel("B");
-		xlcCol.setColumnWidth(1);
-		COLUMN_VCT.addElement(xlcCol);
-		//18	USPartNo			USPN___						7		Left	LSEO	SEOID
-		xlcCol = new XLColumn("USPartNo","LSEO","SEOID");
-		xlcCol.setFFColumnLabel("USPN___");
-		xlcCol.setColumnWidth(7);
-		COLUMN_VCT.addElement(xlcCol);	
-		//19	SPECBID				S							1		Left	WWSEO	SPECBID
-		xlcCol = new XLColumn("SPECBID","WWSEO","SPECBID");
-		xlcCol.setFFColumnLabel("S");
-		xlcCol.setColumnWidth(1);
-		COLUMN_VCT.addElement(xlcCol);	
-		//20	SEOType		Always	SEOTYPE___					10		Left		"LSEO"
-		xlcCol = new XLFixedColumn("SEOType","LSEO");
-		xlcCol.setFFColumnLabel("SEOTYPE___");
-		xlcCol.setColumnWidth(10);
-		xlcCol.setAlwaysShow();
-		COLUMN_VCT.addElement(xlcCol);	
-		//21	EntityId	Always	ENTITYID__					10		Right	LSEO	Entityid
-		xlcCol = new XLIdColumn("EntityId","LSEO");
-		xlcCol.setFFColumnLabel("ENTITYID__");
-		xlcCol.setAlwaysShow();
-		xlcCol.setJustified(XLColumn.RIGHT);
-		xlcCol.setColumnWidth(10);
-		COLUMN_VCT.addElement(xlcCol);			
-	}
-	
-	/***********************************************
-	 * Should the report be generated for this root
-	 * Check for specified attributes on root - no structure available at this point in time
-	 * 
-	 * If WWSEOLSEO-d: WWSEO.SPECBID = 11457 (N) then
-	 * 	Do not send Spreadsheet; instead send HTML Report
-	 * 	Set QSMFEEDRESEND = "No" (No)
-	 * 	Set Return Code = "0030" (Passed)
-	 * 	Exit
-	 * End if
-	 * 
-	 * If RootEntity.STATUS <> "Final" (0020) then
-	 * 	ErrorMessage LD(LSEO) NDN(LSEO) "was queued to send data; however, it is not Final" 
-	 * 	Set QSMFEEDRESEND = "No" (No)
-	 * 	Set Return Code = "0040" (Failed)
-	 * 	Exit
-	 * End if
-	 * 
-	 * If GENAREASELECTION  Not In ('6204'| '1999' | '6197') then (no report now)
-	 * 	Set QSMFEEDRESEND = "No" (No)
-	 * 	Set Return Code = "0030" (Passed)
-	 * 	Exit
-	 * End if
-	 * 
-	 * @return boolean
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 */
-	public boolean canGenerateReport(EntityItem rootItem, QSMRPTABRSTATUS abr) {
-		boolean isOk = true;
-		String statusFlag = PokUtils.getAttributeFlagValue(rootItem, "STATUS");
-		abr.addDebug("QSMLSEOABR.generateReport: "+rootItem.getKey()+" STATUS: "+
-  			PokUtils.getAttributeValue(rootItem, "STATUS",", ", "", false)+" ["+statusFlag+"]");
-		if (!STATUS_FINAL.equals(statusFlag)){
-			// NOT_FINAL_ERR = was queued to send data; however, it is not Final
-			abr.addError("NOT_FINAL_ERR",null);
-			isOk = false;
-		}
-		
-		Set testSet = new HashSet();
-		for (int i=0; i<QSMRPTABRSTATUS.GEOS.length; i++){
-			testSet.add(QSMRPTABRSTATUS.GEOS[i]);
-		}
-		testSet.add(QSMRPTABRSTATUS.GENAREA_WW); // allow WW now CQ22265
-		
-		if (!PokUtils.contains(rootItem, "GENAREASELECTION", testSet)){ 
-			isOk = false;
-			abr.addOutput("LSEO does not have required 'General Area Selection' value.");
-			abr.addDebug("GENAREASELECTION did not include "+testSet+", ["+
-					PokUtils.getAttributeValue(rootItem, "GENAREASELECTION",", ", "", false)+"]");
-			abr.setNoReport();
-		}
-		testSet.clear();
-		
-		return isOk;
-	}
-	/***********************************************
-	 * Should the report be generated for this extract
-	 * Check for specified structure and attributes
-	 *5.	WWSEOLSEO-u
-	 *6.	MODELWWSEO-u
-	 *7.	Include row MODEL where COFCAT in ('100', '101')
-	 *8.	MODELGEOMOD-d
-	 *9.	Include data GEOMOD where GENAREASELECTION  In ('6204'| '1999' | '6197') since GEOMOD may not exist
-	 *10.	Association WWSEOPROJA
-	 *The path used for the ChangeSpecBid is similar to the preceding except the first three items are not applicable.
-	 *@return boolean
-	 */ 
-	public boolean canGenerateReport(EntityList list, QSMRPTABRSTATUS abr){
-		boolean isok = false;
-		EntityItem lseoitem = list.getParentEntityGroup().getEntityItem(0);
-
-		// LSEO must have a MODEL where COFCAT in ('100', '101') 		
-		// get its model
-		Vector wwseoVct = PokUtils.getAllLinkedEntities(lseoitem, "WWSEOLSEO", "WWSEO");
-		Vector mdlVct = PokUtils.getAllLinkedEntities(wwseoVct, "MODELWWSEO", "MODEL");
-		for (int m=0; m<mdlVct.size(); m++){
-			EntityItem mdlitem = (EntityItem)mdlVct.elementAt(m);
-			String cofcat = PokUtils.getAttributeFlagValue(mdlitem, "COFCAT");
-			abr.addDebug("QSMLSEOABR.canGenerateReport "+lseoitem.getKey()+
-					" "+mdlitem.getKey()+" cofcat:"+cofcat);
-			if (COFCAT_HW.equals(cofcat)||COFCAT_SW.equals(cofcat)){
-				isok = true;
-				break;
-			}
-		}
-		
-		if (!isok){
-			abr.addOutput("Hardware or Software Model was not found.");
-		}
-
-		mdlVct.clear();
-
-		for (int i=0; i<wwseoVct.size(); i++){
-			EntityItem wwseoItem = (EntityItem)wwseoVct.elementAt(i);
-			String specbid = PokUtils.getAttributeFlagValue(wwseoItem, "SPECBID");
-			abr.addDebug(wwseoItem.getKey()+" SPECBID: "+specbid);
-			if ("11457".equals(specbid) || specbid==null){  // is No
-				abr.addOutput("WWSEO is not a special bid.");
-				isok=false;
-				break;
-			}
-		}
-		
-		wwseoVct.clear();
-
-		return isok;
-	}
-	
-	/**********************************
-	 * get the name of the VE to use 
-	 * @see COM.ibm.eannounce.abr.sg.QSMABRInterface#getVeName()
-	 */
-	public String getVeName() { 
-		return "QSMLSEO";
-	}
-
-	/***********************************************
-	 *  Get the version
-	 *
-	 *@return java.lang.String
-	 */
-	public String getVersion(){
-		return "1.8";
-	}
-
-	/*********************************************************************************
-	 * @see COM.ibm.eannounce.abr.sg.QSMABRInterface#getColumnCount()
-	 */
-	public int getColumnCount() {
-		return COLUMN_VCT.size();
-	}
-
-	/*********************************************************************************
-	 * @see COM.ibm.eannounce.abr.sg.QSMABRInterface#getColumnLabel(int)
-	 */
-	public String getColumnLabel(int i) {
-		return ((XLColumn)COLUMN_VCT.elementAt(i)).getColumnLabel();
-	}	
-	/***********************************************
-	 *  Get the label for the specified column index for the flatfile
-	 *
-	 *@return String
-	 */
-	public String getFFColumnLabel(int i){
-		return ((XLColumn)COLUMN_VCT.elementAt(i)).getFFColumnLabel();
-	}	
-	/***********************************************
-	 *  Get the width for the specified column (used for flat files)  CQ00016165 
-	 *
-	 *@return int
-	 */
-	public int getColumnWidth(int i){
-		return ((XLColumn)COLUMN_VCT.elementAt(i)).getColumnWidth();
-	}
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.sg.QSMABRInterface#setColumnValue(org.apache.poi.hssf.usermodel.HSSFCell, java.lang.String, java.util.Hashtable, int)
-	 */
-	public void setColumnValue(HSSFCell cell,String rowtype, Hashtable itemTbl, int i) {
-		((XLColumn)COLUMN_VCT.elementAt(i)).setColumnValue(cell,itemTbl);	
-	}
-	/***********************************************
-	 *  get the value for the specified column index - flat file only
-	 * CQ00016165 
-	 */
-	public String getColumnValue(String rowtype, Hashtable itemTbl, int i){
-		return ((XLColumn)COLUMN_VCT.elementAt(i)).getColumnValue(itemTbl);
-	}
-	/*********************************************************************************
-	 * @see COM.ibm.eannounce.abr.sg.QSMABRInterface#isChanged(com.ibm.transform.oim.eacm.diff.DiffEntity, int)
-	 */
-	public boolean isChanged(String rowtype, Hashtable itemTbl, int i)
-	{
-		return ((XLColumn)COLUMN_VCT.elementAt(i)).isChanged(itemTbl);	
-	}
-	
-	/***********************************************
-	 *  Get the entity items to put in the ss for this geo
-	 *5.	WWSEOLSEO-u
-	 *6.	MODELWWSEO-u
-	 *7.	Include row MODEL where COFCAT in ('100', '101')
-	 *8.	MODELGEOMOD-d
-	 *9.	Include data GEOMOD where GENAREASELECTION  In ('6204'| '1999' | '6197') since GEOMOD may not exist
-	 *10.	Association WWSEOPROJA
-	 *@return Vector
-	 */
-	public Vector getRowItems(EntityList list,Hashtable diffTbl, String geo, QSMRPTABRSTATUS abr){
-		Vector rowVct = new Vector();
-
-		EntityItem lseoitem = null;
-		if (diffTbl!=null){
-			Vector lseoVct = (Vector)diffTbl.get("ROOT");
-			lseoitem = ((DiffEntity)lseoVct.firstElement()).getCurrentEntityItem();			
-		}else{
-			lseoitem = list.getParentEntityGroup().getEntityItem(0);
-		}
-
-		abr.addDebug("QSMLSEOABR.getRowItems "+lseoitem.getKey());
-		// the LSEO must have a MODEL where COFCAT in ('100', '101') 
-		Vector wwseoVct = PokUtils.getAllLinkedEntities(lseoitem, "WWSEOLSEO", "WWSEO");
-		for (int w=0; w<wwseoVct.size(); w++){
-			EntityItem wwseoitem = (EntityItem)wwseoVct.elementAt(w);
-
-			// get its model					
-			Vector projVct = PokUtils.getAllLinkedEntities(wwseoitem, "WWSEOPROJA", "PROJ");							
-			Vector mdlVct = PokUtils.getAllLinkedEntities(wwseoitem, "MODELWWSEO", "MODEL");
-			for (int m=0; m<mdlVct.size(); m++){
-				EntityItem mdlitem = (EntityItem)mdlVct.elementAt(m);
-				String cofcat = PokUtils.getAttributeFlagValue(mdlitem, "COFCAT");
-				abr.addDebug("QSMLSEOABR.getRowItems "+lseoitem.getKey()+
-						" "+mdlitem.getKey()+" cofcat:"+cofcat);
-				if (COFCAT_HW.equals(cofcat)||COFCAT_SW.equals(cofcat)){
-					XLRow xlrow = new XLRow(diffTbl==null?lseoitem:
-						diffTbl.get(lseoitem.getKey()));
-					rowVct.addElement(xlrow);
-
-					xlrow.addRowItem(diffTbl==null?wwseoitem:
-						diffTbl.get(wwseoitem.getKey()));
-					xlrow.addRowItem(diffTbl==null?mdlitem:
-						diffTbl.get(mdlitem.getKey()));
-
-					Vector geomodVct = PokUtils.getAllLinkedEntities(mdlitem, "MODELGEOMOD", "GEOMOD");
-					//CQ22265
-					Vector wwgeomodVct = PokUtils.getEntitiesWithMatchedAttr(geomodVct, "GENAREASELECTION",QSMRPTABRSTATUS.GENAREA_WW);
-					abr.addDebug("QSMLSEOABR.getRowItems GENAREASELECTION:"+QSMRPTABRSTATUS.GENAREA_WW+" has wwgeomodVct.size: "+
-							wwgeomodVct.size());
-					
-					if (wwgeomodVct.size()==0){
-						// none found for WW look for geo geomod, first one found is used so dont need to combine
-						geomodVct = PokUtils.getEntitiesWithMatchedAttr(geomodVct, "GENAREASELECTION",geo);
-						abr.addDebug("QSMLSEOABR.getRowItems GEOMOD GENAREASELECTION:"+geo+" has geomodVct.size: "+
-								geomodVct.size());
-					}else{
-						geomodVct = wwgeomodVct;
-					}
-					if (geomodVct.size()>0){
-						if (geomodVct.size()>1){// if more than one found, use first one
-							for (int g=0; g<geomodVct.size(); g++){
-								abr.addDebug("QSMLSEOABR.getRowItems WARNING: Found more than one GEOMOD for "+
-									mdlitem.getKey()+" "+((EntityItem)geomodVct.elementAt(g)).getKey());
-							}
-						}
-						EntityItem ei = (EntityItem)geomodVct.firstElement();
-						xlrow.addRowItem(diffTbl==null?ei:
-							diffTbl.get(ei.getKey()));
-						geomodVct.clear();
-					}
-
-					if (projVct.size()>0){
-						EntityItem ei = (EntityItem)projVct.firstElement();
-						xlrow.addRowItem(diffTbl==null?ei:
-							diffTbl.get(ei.getKey()));
-						// use Association PROJSGMNTACRNYMA to obtain SGMNTACRNYM.ACRNYM 
-						Vector sgVct = PokUtils.getAllLinkedEntities(ei, "PROJSGMNTACRNYMA", "SGMNTACRNYM");
-						if (sgVct.size()>0){
-							EntityItem sgei = (EntityItem)sgVct.firstElement();
-							xlrow.addRowItem(diffTbl==null?sgei:
-								diffTbl.get(sgei.getKey()));
-							sgVct.clear();
-						}
-					}
-					abr.addDebug("QSMLSEOABR.getRowItems Adding "+xlrow);
-				} // model is correct
-			} // model loop					
-		} // end wwseo loop
-			
-		return rowVct;
-	}
-	/***************************************************************
-	 * If (Now() + 30 days >= LSEOPUBDATEMTRGT >= Now()) OR 
-	 * (Now() + 30 days >= LSEOUNPUBDATEMTRGT >= Now()) 
-	 * then output rpt
-	 * @see COM.ibm.eannounce.abr.sg.QSMABRInterface#withinDateRange(COM.ibm.eannounce.objects.EntityItem, java.lang.String, COM.ibm.eannounce.abr.sg.QSMRPTABRSTATUS)
-	 */
-	public boolean withinDateRange(EntityItem rootitem, String now, QSMRPTABRSTATUS abr) {
-		boolean ok = false;
-		Object args[] = new Object[5];
-		String pubdate = PokUtils.getAttributeValue(rootitem, "LSEOPUBDATEMTRGT", "", DEFAULT_PUBFROM, false);
-		String unpubdate = PokUtils.getAttributeValue(rootitem, "LSEOUNPUBDATEMTRGT", "", DEFAULT_PUBTO, false);
-		PDGUtility pdgutil = new PDGUtility();
-		String nowPlus30 = pdgutil.getDate(now, 30);
-		
-		args[0] = PokUtils.getAttributeDescription(rootitem.getEntityGroup(), "LSEOPUBDATEMTRGT", "LSEOPUBDATEMTRGT");
-		args[1] = pubdate;
-		args[2] = "";
-		args[3] = now;
-		args[4] = nowPlus30;
-		
-		abr.addDebug("QSMLSEOABR.withinDateRange now "+now+" pubdate "+pubdate+" unpubdate "+unpubdate+" nowPlus30 "+nowPlus30);
-		if ((nowPlus30.compareTo(pubdate)>=0) && (pubdate.compareTo(now)>=0)){
-			ok = true;
-		}else{
-			args[2] = "not";
-		}
-		// DATE_RANGE_MSG = &quot;{0}&quot; value of &quot;{1}&quot; was {2} within range of {3} and {4}
-		abr.addOutput("DATE_RANGE_MSG",args);
-		args[0] = PokUtils.getAttributeDescription(rootitem.getEntityGroup(), "LSEOUNPUBDATEMTRGT", "LSEOUNPUBDATEMTRGT");
-		args[1] = unpubdate;
-		args[2] = "";
-		if ((nowPlus30.compareTo(unpubdate)>=0) && (unpubdate.compareTo(now)>=0)){
-			ok = true;
-		}else{
-			args[2] = "not";
-		}
-		// DATE_RANGE_MSG = &quot;{0}&quot; value of &quot;{1}&quot; was {2} within range of {3} and {4}
-		abr.addOutput("DATE_RANGE_MSG",args);
-		
-		return ok;
-	}
-	/***********************************************
-	 *  get row 1 - flat file only CQ00016165
-	 *  1 2009-01-13 11:33:42.123456  43635 NEW
-	 *  'SBD' for a special bid
-	 */
-	public String getRowOne(EntityItem rootitem) { 
-		String rfanum = PokUtils.getAttributeValue(rootitem, "QSMRFANUMBER", "", "", false);
-		return XLColumn.formatToWidth(rfanum,6,XLColumn.RIGHT)+" SBD";
-	}	
-	/***********************************************
-	 *  get row 1 - flat file only CQ00016165
-	 *  text		start	end width justification
-	 * Date______		3	12	10	Left
-	 * Time___________	14	28	15	Left
-	 * 
-	 * or
-	 * IFCDate___		3	12	10	Left
-	 * IFCTime________	14	28	15	Left
-	 * 
-	 */
-	public String getRowTwoPrefix(){
-		// first two columns are not part of the ss output and not in the 'template'
-		return XLColumn.formatToWidth("Date______", 10)+" "+
-			XLColumn.formatToWidth("Time___________", 15);
-	}
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\QSMLSEOABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

@@ -1,2861 +1,2863 @@
-//Licensed Materials -- Property of IBM
+/*      */ package COM.ibm.eannounce.abr.sg.bh;
+/*      */ 
+/*      */ import COM.ibm.eannounce.abr.util.ABRUtil;
+/*      */ import COM.ibm.eannounce.abr.util.EACustom;
+/*      */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*      */ import COM.ibm.eannounce.objects.AttributeChangeHistoryGroup;
+/*      */ import COM.ibm.eannounce.objects.AttributeChangeHistoryItem;
+/*      */ import COM.ibm.eannounce.objects.EANAttribute;
+/*      */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*      */ import COM.ibm.eannounce.objects.EANList;
+/*      */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*      */ import COM.ibm.eannounce.objects.EntityGroup;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.opicmpdh.middleware.D;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*      */ import COM.ibm.opicmpdh.middleware.ReturnDataResultSet;
+/*      */ import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
+/*      */ import COM.ibm.opicmpdh.middleware.ReturnStatus;
+/*      */ import COM.ibm.opicmpdh.middleware.Stopwatch;
+/*      */ import COM.ibm.opicmpdh.middleware.Validate;
+/*      */ import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+/*      */ import COM.ibm.opicmpdh.objects.Attribute;
+/*      */ import COM.ibm.opicmpdh.objects.SingleFlag;
+/*      */ import COM.ibm.opicmpdh.objects.Text;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.io.BufferedInputStream;
+/*      */ import java.io.BufferedReader;
+/*      */ import java.io.File;
+/*      */ import java.io.FileInputStream;
+/*      */ import java.io.FileOutputStream;
+/*      */ import java.io.InputStreamReader;
+/*      */ import java.io.OutputStreamWriter;
+/*      */ import java.io.PrintWriter;
+/*      */ import java.io.StringWriter;
+/*      */ import java.rmi.RemoteException;
+/*      */ import java.sql.PreparedStatement;
+/*      */ import java.sql.ResultSet;
+/*      */ import java.sql.SQLException;
+/*      */ import java.text.MessageFormat;
+/*      */ import java.util.HashSet;
+/*      */ import java.util.Hashtable;
+/*      */ import java.util.ResourceBundle;
+/*      */ import java.util.Set;
+/*      */ import java.util.Vector;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public class ADSIDLSTATUS
+/*      */   extends PokBaseABR
+/*      */ {
+/*      */   private static final String ADSIDLSTATUS = "ADSIDLSTATUS";
+/*      */   private static final String ADSIDLLASTRANDTS = "ADSIDLLASTRANDTS";
+/*      */   private static final int MAXFILE_SIZE = 5000000;
+/*  167 */   private StringBuffer rptSb = new StringBuffer();
+/*  168 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/*  169 */   static final String NEWLINE = new String(FOOL_JTEST);
+/*  170 */   private Object[] args = (Object[])new String[10];
+/*      */   
+/*      */   private static final String ADS_XMLEED_ATTR = "XMLIDLABRSTATUS";
+/*      */   
+/*      */   private static final String QUEUE_ATTR = "SYSFEEDRESEND";
+/*      */   
+/*      */   private static final String QUEUE_VALUE = "CUR";
+/*      */   
+/*      */   private static final String MQUEUE_ATTR = "XMLABRPROPFILE";
+/*      */   
+/*      */   private static boolean IS_SYSFEEDRESEND_CUR = false;
+/*      */   
+/*      */   private static final String SEARCH_KEY = "ADSIDL";
+/*      */   
+/*  184 */   private ResourceBundle rsBundle = null;
+/*  185 */   private Hashtable metaTbl = new Hashtable<>();
+/*  186 */   private String navName = "";
+/*  187 */   private PrintWriter dbgPw = null;
+/*  188 */   private String dbgfn = null;
+/*  189 */   private int dbgLen = 0;
+/*  190 */   private int abr_debuglvl = 0;
+/*  191 */   private Vector vctReturnsEntityKeys = new Vector();
+/*  192 */   private Vector vctReturnsQueueKeys = new Vector();
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private static final Set TBD_SET;
+/*      */ 
+/*      */ 
+/*      */   
+/*  201 */   private static final Hashtable FILTER_TBL = new Hashtable<>();
+/*  202 */   private static final Hashtable FILTERCACHE_TBL = new Hashtable<>();
+/*  203 */   private static final Hashtable REQFILTER_TBL = new Hashtable<>();
+/*  204 */   private static final Hashtable PERIODIC_TBL = new Hashtable<>(); static {
+/*  205 */     TBD_SET = new HashSet();
+/*      */ 
+/*      */     
+/*  208 */     FILTER_TBL.put("FEATURE", new String[] { "FCTYPE|U", "COUNTRYLIST|F", "WITHDRAWDATEEFF_T|D", "WITHDRAWDATEMIN|D" });
+/*  209 */     FILTER_TBL.put("MODEL", new String[] { "SPECBID|U", "COFCAT|U", "COFSUBCAT|U", "COFGRP|U", "COFSUBGRP|U", "COUNTRYLIST|F", "FLFILSYSINDC|F", "WTHDRWEFFCTVDATE|D", "WITHDRAWDATEMIN|D", "DIVTEXT|T" });
+/*  210 */     FILTER_TBL.put("SVCMOD", new String[] { "SVCMODCATG|U", "SVCMODGRP|U", "SVCMODSUBCATG|U", "SVCMODSUBGRP|U", "COUNTRYLIST|F", "WTHDRWEFFCTVDATE|D", "WITHDRAWDATEMIN|D", "DIVTEXT|T" });
+/*  211 */     FILTER_TBL.put("LSEOBUNDLE", new String[] { "SPECBID|U", "BUNDLETYPE|F", "COUNTRYLIST|F", "FLFILSYSINDC|F", "BUNDLUNPUBDATEMTRGT|D", "WITHDRAWDATEMIN|D", "DIVTEXT|T" });
+/*  212 */     FILTER_TBL.put("SWFEATURE", new String[] { "FCTYPE|U", "WITHDRAWDATEEFF_T|D", "WITHDRAWDATEMIN|D" });
+/*      */ 
+/*      */ 
+/*      */     
+/*  216 */     FILTER_TBL.put("LSEO", new String[] { "SPECBID|U", "COFCAT|U", "COFSUBCAT|U", "COFGRP|U", "COFSUBGRP|U", "COUNTRYLIST|F", "FLFILSYSINDC|F", "LSEOUNPUBDATEMTRGT|D", "WITHDRAWDATEMIN|D", "DIVTEXT|T" });
+/*      */ 
+/*      */     
+/*  219 */     FILTER_TBL.put("MODELCONVERT", new String[] { "MACHTYPEATR|U", "MODELATR|T", "COUNTRYLIST|F", "WTHDRWEFFCTVDATE|D", "WITHDRAWDATEMIN|D" });
+/*  220 */     FILTER_TBL.put("FCTRANSACTION", new String[] { "MACHTYPEATR|U", "MODELATR|T", "WTHDRWEFFCTVDATE|D", "WITHDRAWDATEMIN|D" });
+/*      */ 
+/*      */     
+/*  223 */     FILTER_TBL.put("PRODSTRUCT", new String[] { "FCTYPE|U", "MACHTYPEATR|U", "MODELATR|T", "COUNTRYLIST|F", "FLFILSYSINDC|F", "WTHDRWEFFCTVDATE|D", "WITHDRAWDATEMIN|D" });
+/*  224 */     FILTER_TBL.put("SWPRODSTRUCT", new String[] { "FCTYPE|U", "MACHTYPEATR|U", "MODELATR|T", "COUNTRYLIST|F", "WTHDRWEFFCTVDATE|D", "WITHDRAWDATEMIN|D" });
+/*      */     
+/*  226 */     FILTER_TBL.put("IMG", new String[] { "COUNTRYLIST|F" });
+/*  227 */     FILTER_TBL.put("CATNAV", new String[] { "FLFILSYSINDC|F" });
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  235 */     FILTERCACHE_TBL.put("FEATURE", new String[] { "ADSIDLLASTRANDTS|T" });
+/*  236 */     FILTERCACHE_TBL.put("MODEL", new String[] { "ADSIDLLASTRANDTS|T" });
+/*  237 */     FILTERCACHE_TBL.put("SVCMOD", new String[] { "ADSIDLLASTRANDTS|T" });
+/*  238 */     FILTERCACHE_TBL.put("LSEOBUNDLE", new String[] { "ADSIDLLASTRANDTS|T" });
+/*  239 */     FILTERCACHE_TBL.put("SWFEATURE", new String[] { "ADSIDLLASTRANDTS|T" });
+/*  240 */     FILTERCACHE_TBL.put("LSEO", new String[] { "ADSIDLLASTRANDTS|T" });
+/*  241 */     FILTERCACHE_TBL.put("MODELCONVERT", new String[] { "ADSIDLLASTRANDTS|T" });
+/*  242 */     FILTERCACHE_TBL.put("FCTRANSACTION", new String[] { "ADSIDLLASTRANDTS|T" });
+/*  243 */     FILTERCACHE_TBL.put("PRODSTRUCT", new String[] { "ADSIDLLASTRANDTS|T" });
+/*  244 */     FILTERCACHE_TBL.put("SWPRODSTRUCT", new String[] { "ADSIDLLASTRANDTS|T" });
+/*  245 */     FILTERCACHE_TBL.put("SLEORGNPLNTCODE", new String[] { "ADSIDLLASTRANDTS|T" });
+/*  246 */     FILTERCACHE_TBL.put("CATNAV", new String[] { "ADSIDLLASTRANDTS|T" });
+/*  247 */     FILTERCACHE_TBL.put("GBT", new String[] { "ADSIDLLASTRANDTS|T" });
+/*  248 */     FILTERCACHE_TBL.put("REVUNBUNDCOMP", new String[] { "ADSIDLLASTRANDTS|T" });
+/*  249 */     FILTERCACHE_TBL.put("SVCLEV", new String[] { "ADSIDLLASTRANDTS|T" });
+/*  250 */     FILTERCACHE_TBL.put("WARR", new String[] { "ADSIDLLASTRANDTS|T" });
+/*  251 */     FILTERCACHE_TBL.put("IMG", new String[] { "ADSIDLLASTRANDTS|T" });
+/*      */     
+/*  253 */     FILTERCACHE_TBL.put("REFOFER", new String[] { "ENDOFSVC|D", "ADSIDLLASTRANDTS|T" });
+/*  254 */     FILTERCACHE_TBL.put("REFOFERFEAT", new String[] { "ENDOFSVC|D", "ADSIDLLASTRANDTS|T" });
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  269 */     TBD_SET.add("WWCOMPAT");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  276 */     PERIODIC_TBL.put("GENERALAREA", "20");
+/*  277 */     PERIODIC_TBL.put("Deletes", "30");
+/*  278 */     PERIODIC_TBL.put("XLATE", "40");
+/*      */   }
+/*      */   
+/*      */   private void setupPrintWriter() {
+/*  282 */     String str = this.m_abri.getFileName();
+/*  283 */     int i = str.lastIndexOf(".");
+/*  284 */     this.dbgfn = str.substring(0, i + 1) + "dbg";
+/*      */     try {
+/*  286 */       this.dbgPw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.dbgfn, true), "UTF-8"));
+/*  287 */     } catch (Exception exception) {
+/*  288 */       D.ebug(0, "trouble creating debug PrintWriter " + exception);
+/*      */     } 
+/*      */   }
+/*      */   private void closePrintWriter() {
+/*  292 */     if (this.dbgPw != null) {
+/*  293 */       this.dbgPw.flush();
+/*  294 */       this.dbgPw.close();
+/*  295 */       this.dbgPw = null;
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void execute_run() {
+/*  318 */     String str1 = "<head>" + EACustom.getMetaTags(getDescription()) + NEWLINE + EACustom.getCSS() + NEWLINE + EACustom.getTitle("{0} {1}") + NEWLINE + "</head>" + NEWLINE + "<body id=\"ibm-com\">" + EACustom.getMastheadDiv() + NEWLINE + "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
+/*      */     
+/*  320 */     String str2 = "<table>" + NEWLINE + "<tr><th>Userid: </th><td>{0}</td></tr>" + NEWLINE + "<tr><th>Role: </th><td>{1}</td></tr>" + NEWLINE + "<tr><th>Workgroup: </th><td>{2}</td></tr>" + NEWLINE + "<tr><th>Date: </th><td>{3}</td></tr>" + NEWLINE + "<tr><th>Description: </th><td>{4}</td></tr>" + NEWLINE + "<tr><th>Return code: </th><td>{5}</td></tr>" + NEWLINE + "</table>" + NEWLINE + "<!-- {6} -->" + NEWLINE;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  331 */     String str3 = "";
+/*      */     
+/*  333 */     println(EACustom.getDocTypeHtml());
+/*      */ 
+/*      */     
+/*      */     try {
+/*  337 */       long l = System.currentTimeMillis();
+/*  338 */       start_ABRBuild();
+/*      */       
+/*  340 */       this.abr_debuglvl = ABRServerProperties.getABRDebugLevel(this.m_abri.getABRCode());
+/*      */       
+/*  342 */       setupPrintWriter();
+/*      */ 
+/*      */       
+/*  345 */       this.rsBundle = ResourceBundle.getBundle(getClass().getName(), ABRUtil.getLocale(this.m_prof.getReadLanguage().getNLSID()));
+/*      */       
+/*  347 */       EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*      */       
+/*  349 */       addDebug("DEBUG: " + getShortClassName(getClass()) + " entered for " + entityItem.getKey() + " extract: " + this.m_abri
+/*  350 */           .getVEName() + " using DTS: " + this.m_prof.getValOn() + NEWLINE + PokUtils.outputList(this.m_elist));
+/*      */ 
+/*      */       
+/*  353 */       setReturnCode(0);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  358 */       this.navName = getNavigationName(entityItem);
+/*      */ 
+/*      */       
+/*  361 */       String str5 = PokUtils.getAttributeValue(entityItem, "XMLENTITYTYPE", "", null, false);
+/*  362 */       String str6 = PokUtils.getAttributeValue(entityItem, "XMLSETUPTYPE", "", null, false);
+/*  363 */       String str7 = PokUtils.getAttributeFlagValue(entityItem, "XMLABRPROPFILE");
+/*      */       
+/*  365 */       addDebug("Executing for entityType: " + str5 + " mqueue: " + str7 + " setupType: " + str6);
+/*      */ 
+/*      */       
+/*  368 */       if (str6 == null) {
+/*  369 */         this.args[0] = PokUtils.getAttributeDescription(entityItem.getEntityGroup(), "XMLSETUPTYPE", "XMLSETUPTYPE");
+/*  370 */         addError("INVALID_ATTR_ERR", this.args);
+/*      */       }
+/*  372 */       else if ("Production".equals(str6)) {
+/*  373 */         this.args[0] = "Production";
+/*  374 */         addError("INVALID_SETUPTYPE_ERR", this.args);
+/*  375 */       } else if (str5 == null) {
+/*      */         
+/*  377 */         this.args[0] = PokUtils.getAttributeDescription(entityItem.getEntityGroup(), "XMLENTITYTYPE", "XMLENTITYTYPE");
+/*  378 */         addError("INVALID_ATTR_ERR", this.args);
+/*  379 */       } else if (TBD_SET.contains(str5)) {
+/*      */         
+/*  381 */         this.args[0] = getLD_Value(entityItem, "XMLENTITYTYPE");
+/*  382 */         addError("NOT_SUPPORTED", this.args);
+/*      */       } else {
+/*  384 */         String str8 = (String)PERIODIC_TBL.get(str5);
+/*  385 */         String str9 = str5;
+/*  386 */         String str10 = "";
+/*  387 */         if (str8 != null) {
+/*  388 */           str9 = "ADSXMLSETUP";
+/*  389 */           str10 = str9 + " for " + str5;
+/*      */         } else {
+/*  391 */           str10 = getLD_Value(entityItem, "XMLENTITYTYPE");
+/*      */         } 
+/*      */         
+/*  394 */         EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, str9, "Edit", false);
+/*      */ 
+/*      */ 
+/*      */         
+/*  398 */         EANMetaAttribute eANMetaAttribute = entityGroup.getMetaAttribute("XMLIDLABRSTATUS");
+/*  399 */         if (eANMetaAttribute == null) {
+/*      */           
+/*  401 */           this.args[0] = str10;
+/*  402 */           this.args[1] = "XMLIDLABRSTATUS";
+/*  403 */           addError("INVALID_META_ERR", this.args);
+/*      */         } 
+/*  405 */         eANMetaAttribute = entityGroup.getMetaAttribute("XMLABRPROPFILE");
+/*  406 */         if (eANMetaAttribute == null) {
+/*      */           
+/*  408 */           this.args[0] = str10;
+/*  409 */           this.args[1] = "XMLABRPROPFILE";
+/*  410 */           addError("INVALID_META_ERR", this.args);
+/*      */         } 
+/*      */       } 
+/*      */       
+/*  414 */       if ("IDL".equals(str6) && str7 == null) {
+/*      */         
+/*  416 */         this.args[0] = getLD_Value(entityItem, "XMLABRPROPFILE");
+/*  417 */         addError("INVALID_ATTR_ERR", this.args);
+/*      */       } 
+/*      */       
+/*  420 */       if ("Cache".equals(str6) && (String)PERIODIC_TBL.get(str5) != null) {
+/*      */         
+/*  422 */         this.args[0] = str5;
+/*  423 */         addError("INVALID_PERIODIC_ERR", this.args);
+/*      */       } 
+/*      */       
+/*  426 */       if ("Cache current".equals(str6) && (String)PERIODIC_TBL.get(str5) != null) {
+/*      */         
+/*  428 */         this.args[0] = str5;
+/*  429 */         addError("INVALID_PERIODIC_ERR", this.args);
+/*      */       } 
+/*      */       
+/*  432 */       if (getReturnCode() == 0) {
+/*  433 */         if ("Cache".equals(str6) || "Cache current".equals(str6)) {
+/*  434 */           if ("Cache current".equals(str6)) {
+/*  435 */             IS_SYSFEEDRESEND_CUR = true;
+/*  436 */             addDebug("case 1 IS_SYSFEEDRESEND_CUR= " + IS_SYSFEEDRESEND_CUR + ";setupType=" + str6);
+/*      */           } else {
+/*  438 */             IS_SYSFEEDRESEND_CUR = false;
+/*  439 */             addDebug("case 2 IS_SYSFEEDRESEND_CUR= " + IS_SYSFEEDRESEND_CUR + ";setupType=" + str6);
+/*      */           } 
+/*      */ 
+/*      */ 
+/*      */           
+/*  444 */           long l1 = System.currentTimeMillis();
+/*      */           
+/*  446 */           Vector<Integer> vector = getEntityIds(entityItem, str5);
+/*  447 */           if (getReturnCode() == 0) {
+/*  448 */             String str8 = (String)PERIODIC_TBL.get(str5);
+/*  449 */             String str9 = str5;
+/*  450 */             if (str8 != null) {
+/*  451 */               str9 = "ADSXMLSETUP with " + str5;
+/*  452 */               str5 = "ADSXMLSETUP";
+/*      */             } 
+/*  454 */             addDebug("Time to find entity ids: " + Stopwatch.format(System.currentTimeMillis() - l1));
+/*  455 */             addDebug("Update these entity ids.cnt: " + ((vector == null) ? "null" : ("" + vector.size())));
+/*  456 */             addDebug(2, "Update these ids: " + vector);
+/*  457 */             l1 = System.currentTimeMillis();
+/*  458 */             String[] arrayOfString = PokUtils.convertToArray(str7);
+/*      */             
+/*  460 */             if (vector != null && vector.size() > 0) {
+/*  461 */               String str = getQueuedValue("XMLIDLABRSTATUS"); int i;
+/*  462 */               for (i = 0; i < vector.size(); i++) {
+/*  463 */                 Integer integer = vector.elementAt(i);
+/*      */                 
+/*  465 */                 if (IS_SYSFEEDRESEND_CUR) setQueueValues(str5, integer.intValue()); 
+/*  466 */                 setValues(arrayOfString, str, str5, integer.intValue());
+/*      */ 
+/*      */ 
+/*      */                 
+/*  470 */                 if (this.vctReturnsEntityKeys.size() >= 500) {
+/*  471 */                   int j = this.vctReturnsEntityKeys.size();
+/*      */                   
+/*  473 */                   if (IS_SYSFEEDRESEND_CUR) updatePDHQueue();
+/*      */                   
+/*  475 */                   updatePDH();
+/*      */                   
+/*  477 */                   long l2 = System.currentTimeMillis();
+/*  478 */                   addDebug("Time to update " + j + " " + str5 + ": " + Stopwatch.format(l2 - l1));
+/*  479 */                   l1 = l2;
+/*      */                 } 
+/*      */               } 
+/*      */               
+/*  483 */               if (this.vctReturnsEntityKeys.size() > 0) {
+/*  484 */                 i = this.vctReturnsEntityKeys.size();
+/*      */                 
+/*  486 */                 if (IS_SYSFEEDRESEND_CUR) updatePDHQueue();
+/*      */                 
+/*  488 */                 updatePDH();
+/*  489 */                 addDebug("Time to update " + i + " " + str5 + ": " + 
+/*  490 */                     Stopwatch.format(System.currentTimeMillis() - l1));
+/*      */               } 
+/*  492 */               vector.clear();
+/*      */             } else {
+/*      */               
+/*  495 */               this.args[0] = str9;
+/*  496 */               addMessage("", "NONE_FOUND", this.args);
+/*      */             } 
+/*      */             
+/*  499 */             EANAttribute eANAttribute = entityItem.getAttribute("ADSIDLSTATUS");
+/*  500 */             if (eANAttribute != null) {
+/*  501 */               AttributeChangeHistoryGroup attributeChangeHistoryGroup = new AttributeChangeHistoryGroup(this.m_db, this.m_prof, eANAttribute);
+/*  502 */               if (attributeChangeHistoryGroup != null && attributeChangeHistoryGroup.getChangeHistoryItemCount() > 0) {
+/*  503 */                 int i = attributeChangeHistoryGroup.getChangeHistoryItemCount();
+/*  504 */                 AttributeChangeHistoryItem attributeChangeHistoryItem = (AttributeChangeHistoryItem)attributeChangeHistoryGroup.getChangeHistoryItem(i - 1);
+/*  505 */                 if (attributeChangeHistoryItem != null) {
+/*  506 */                   String str = attributeChangeHistoryItem.getFlagCode();
+/*  507 */                   addDebug("checking ADSIDLSTATUS :" + str);
+/*  508 */                   if ("0050".equals(str)) {
+/*  509 */                     String str10 = attributeChangeHistoryItem.getChangeDate();
+/*  510 */                     setTextValue(entityItem, "ADSIDLLASTRANDTS", str10);
+/*  511 */                     addDebug("set lastrunning time back to setup entity :" + str10);
+/*      */                   } 
+/*      */                 } 
+/*      */               } 
+/*      */             } 
+/*      */           } 
+/*  517 */         } else if ("IDL".equals(str6)) {
+/*  518 */           Vector<String> vector = new Vector();
+/*  519 */           vector.add("PDHDOMAIN");
+/*  520 */           vector.add("ADSIDLSTATUS");
+/*  521 */           vector.add("XMLENTITYTYPE");
+/*  522 */           vector.add("XMLABRPROPFILE");
+/*  523 */           vector.add("XMLSETUPTYPE");
+/*  524 */           vector.add("XMLSETUPDESC");
+/*  525 */           vector.add("XMLTARGETSYSTEM");
+/*  526 */           vector.add("XMLVERSION");
+/*  527 */           vector.add("XMLMOD");
+/*  528 */           vector.add("XMLSTATUS");
+/*  529 */           vector.add("XMLIDLREQDTS");
+/*  530 */           vector.add("XMLIDLMAXMSG");
+/*  531 */           vector.add("OLDINDC");
+/*      */           
+/*  533 */           String[] arrayOfString = (String[])FILTER_TBL.get(str5);
+/*  534 */           if (arrayOfString != null) {
+/*      */             
+/*  536 */             for (byte b = 0; b < arrayOfString.length; b++) {
+/*  537 */               String[] arrayOfString1 = PokUtils.convertToArray(arrayOfString[b]);
+/*  538 */               String str = arrayOfString1[0];
+/*      */ 
+/*      */               
+/*  541 */               vector.add(str);
+/*      */             } 
+/*      */             
+/*  544 */             checkExtraAttrs(entityItem, str5, vector);
+/*      */           } 
+/*  546 */           if (getReturnCode() == 0) {
+/*      */             
+/*  548 */             XMLFiterMQIDL xMLFiterMQIDL = new XMLFiterMQIDL(this);
+/*  549 */             xMLFiterMQIDL.getFullXmlAndSendToQue(entityItem);
+/*  550 */             String str = xMLFiterMQIDL.getReport();
+/*  551 */             addOutput(str);
+/*      */           } 
+/*      */         } 
+/*      */ 
+/*      */         
+/*  556 */         addDebug("Total Time: " + Stopwatch.format(System.currentTimeMillis() - l));
+/*      */       }
+/*      */     
+/*  559 */     } catch (Throwable throwable) {
+/*  560 */       StringWriter stringWriter = new StringWriter();
+/*  561 */       String str5 = "<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
+/*  562 */       String str6 = "<pre>{0}</pre>";
+/*  563 */       MessageFormat messageFormat1 = new MessageFormat(str5);
+/*  564 */       setReturnCode(-3);
+/*  565 */       throwable.printStackTrace(new PrintWriter(stringWriter));
+/*      */       
+/*  567 */       this.args[0] = throwable.getMessage();
+/*  568 */       this.rptSb.append(messageFormat1.format(this.args) + NEWLINE);
+/*  569 */       messageFormat1 = new MessageFormat(str6);
+/*  570 */       this.args[0] = stringWriter.getBuffer().toString();
+/*  571 */       this.rptSb.append(messageFormat1.format(this.args) + NEWLINE);
+/*  572 */       logError("Exception: " + throwable.getMessage());
+/*  573 */       logError(stringWriter.getBuffer().toString());
+/*      */     } finally {
+/*      */       
+/*  576 */       setDGTitle(this.navName);
+/*  577 */       setDGRptName(getShortClassName(getClass()));
+/*  578 */       setDGRptClass(getABRCode());
+/*      */       
+/*  580 */       if (!isReadOnly()) {
+/*  581 */         clearSoftLock();
+/*      */       }
+/*  583 */       closePrintWriter();
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/*  588 */     MessageFormat messageFormat = new MessageFormat(str1);
+/*  589 */     this.args[0] = getDescription();
+/*  590 */     this.args[1] = this.navName;
+/*  591 */     String str4 = messageFormat.format(this.args);
+/*  592 */     messageFormat = new MessageFormat(str2);
+/*  593 */     this.args[0] = this.m_prof.getOPName();
+/*  594 */     this.args[1] = this.m_prof.getRoleDescription();
+/*  595 */     this.args[2] = this.m_prof.getWGName();
+/*  596 */     this.args[3] = getNow();
+/*  597 */     this.args[4] = this.navName;
+/*  598 */     this.args[5] = (getReturnCode() == 0) ? "Passed" : "Failed";
+/*  599 */     this.args[6] = str3 + " " + getABRVersion();
+/*      */     
+/*  601 */     restoreXtraContent();
+/*      */     
+/*  603 */     this.rptSb.insert(0, str4 + messageFormat.format(this.args) + NEWLINE);
+/*      */     
+/*  605 */     println(this.rptSb.toString());
+/*  606 */     printDGSubmitString();
+/*  607 */     println(EACustom.getTOUDiv());
+/*  608 */     buildReportFooter();
+/*      */     
+/*  610 */     this.metaTbl.clear();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector getEntityIds(EntityItem paramEntityItem, String paramString) throws MiddlewareException, SQLException, MiddlewareShutdownInProgressException {
+/*  646 */     Vector vector = null;
+/*  647 */     Vector<String> vector1 = new Vector();
+/*  648 */     vector1.add("PDHDOMAIN");
+/*  649 */     vector1.add("ADSIDLSTATUS");
+/*  650 */     vector1.add("XMLENTITYTYPE");
+/*  651 */     vector1.add("XMLABRPROPFILE");
+/*  652 */     vector1.add("XMLSETUPTYPE");
+/*  653 */     vector1.add("XMLSETUPDESC");
+/*  654 */     vector1.add("XMLTARGETSYSTEM");
+/*  655 */     vector1.add("XMLVERSION");
+/*  656 */     vector1.add("XMLMOD");
+/*      */     
+/*  658 */     Vector<String> vector2 = new Vector();
+/*  659 */     Vector<String> vector3 = new Vector();
+/*  660 */     Vector<String> vector4 = new Vector();
+/*  661 */     Vector<String> vector5 = new Vector();
+/*      */ 
+/*      */     
+/*  664 */     Vector<String> vector6 = new Vector();
+/*  665 */     String str1 = PokUtils.getAttributeFlagValue(paramEntityItem, "PDHDOMAIN");
+/*  666 */     if (str1 != null) {
+/*  667 */       String[] arrayOfString = PokUtils.convertToArray(str1);
+/*  668 */       for (byte b = 0; b < arrayOfString.length; b++) {
+/*  669 */         vector6.add(arrayOfString[b]);
+/*      */       }
+/*      */     } 
+/*      */ 
+/*      */     
+/*  674 */     addDebug("domainVct " + vector6);
+/*      */     
+/*  676 */     String str2 = (String)PERIODIC_TBL.get(paramString);
+/*  677 */     if (str2 != null) {
+/*      */       
+/*  679 */       checkExtraAttrs(paramEntityItem, paramString, vector1);
+/*  680 */       if (getReturnCode() == 0) {
+/*  681 */         vector4.add(str2);
+/*  682 */         vector5.add("ADSTYPE");
+/*  683 */         addDebug("executing on entityType ADSXMLSETUP for " + paramString + " with flagAttrVct " + vector5 + " flagValuesVct " + vector4);
+/*      */ 
+/*      */         
+/*  686 */         this.rptSb.append("<br /><h2>Looking for ADSXMLSETUP with the following filters:<br />");
+/*  687 */         this.rptSb.append("ADSTYPE = " + str2 + " for " + paramString + "<br />");
+/*  688 */         String str = PokUtils.getAttributeValue(paramEntityItem, "PDHDOMAIN", " or ", null, false);
+/*  689 */         this.rptSb.append(PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "PDHDOMAIN", "PDHDOMAIN") + " = " + str + "<br />");
+/*      */ 
+/*      */         
+/*  692 */         this.rptSb.append("</h2>" + NEWLINE);
+/*      */         
+/*  694 */         vector = new Vector();
+/*      */         
+/*  696 */         for (byte b = 0; b < vector6.size(); b++) {
+/*  697 */           getMatchingTextAndFlagIds("ADSXMLSETUP", vector2, vector3, vector4, vector5, vector, vector6
+/*  698 */               .elementAt(b).toString());
+/*      */         }
+/*      */       } 
+/*      */     } else {
+/*      */       
+/*  703 */       String[] arrayOfString = (String[])FILTERCACHE_TBL.get(paramString);
+/*      */       
+/*  705 */       String str3 = null;
+/*  706 */       String str4 = null;
+/*      */ 
+/*      */       
+/*  709 */       if (arrayOfString != null)
+/*      */       {
+/*  711 */         for (byte b = 0; b < arrayOfString.length; b++) {
+/*  712 */           String[] arrayOfString1 = PokUtils.convertToArray(arrayOfString[b]);
+/*  713 */           String str5 = arrayOfString1[0];
+/*  714 */           String str6 = arrayOfString1[1];
+/*  715 */           String str7 = null;
+/*  716 */           vector1.add(str5);
+/*      */           
+/*  718 */           if (str6.equals("T")) {
+/*  719 */             str7 = PokUtils.getAttributeValue(paramEntityItem, str5, "", null, false);
+/*  720 */             if (str7 != null && str7.length() > 0) {
+/*  721 */               vector3.add(str5);
+/*  722 */               vector2.add(str7);
+/*  723 */             } else if (isRequired(paramString, str5)) {
+/*      */               
+/*  725 */               this.args[0] = str5;
+/*  726 */               this.args[1] = paramString;
+/*  727 */               addError("INVALID_FILTER_ERR", this.args);
+/*      */             } 
+/*  729 */           } else if (str6.equals("D")) {
+/*      */             
+/*  731 */             str7 = PokUtils.getAttributeValue(paramEntityItem, str5, "", null, false);
+/*  732 */             str3 = str5;
+/*  733 */             if (str7 == null || str7.length() == 0) {
+/*  734 */               str7 = this.m_strEpoch.substring(0, 10);
+/*      */             }
+/*  736 */             str4 = str7;
+/*      */           } else {
+/*  738 */             str7 = PokUtils.getAttributeFlagValue(paramEntityItem, str5);
+/*  739 */             if (str7 != null && str7.length() > 0) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */               
+/*  747 */               vector5.add(str5);
+/*  748 */               vector4.add(str7);
+/*      */             }
+/*  750 */             else if (isRequired(paramString, str5)) {
+/*      */               
+/*  752 */               this.args[0] = str5;
+/*  753 */               this.args[1] = paramString;
+/*  754 */               addError("INVALID_FILTER_ERR", this.args);
+/*      */             } 
+/*      */           } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */           
+/*  763 */           addDebug("entitytype " + paramString + " attrcode " + str5 + " value " + str7);
+/*      */         } 
+/*      */       }
+/*      */       
+/*  767 */       checkExtraAttrs(paramEntityItem, paramString, vector1);
+/*      */       
+/*  769 */       if (getReturnCode() == 0) {
+/*      */         
+/*  771 */         addDebug("executing on entityType " + paramString + " with flagAttrVct " + vector5 + " flagValuesVct " + vector4 + " txtAttrVct " + vector3 + " txtValuesVct " + vector2 + " dateAttr " + str3 + " dateValue " + str4);
+/*      */ 
+/*      */ 
+/*      */         
+/*  775 */         addHeadingInfo(paramEntityItem, paramString, vector3, vector5, str3, str4);
+/*      */         
+/*  777 */         String str5 = PokUtils.getAttributeValue(paramEntityItem, "ADSIDLLASTRANDTS", "|", null, false);
+/*      */         
+/*  779 */         if (str5 != null && !Validate.isoDate(str5)) {
+/*      */           
+/*  781 */           this.args[0] = "ADSIDLLASTRANDTS";
+/*  782 */           addError("INVAILD_DATE_ERR", this.args);
+/*      */         } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/*  796 */         long l1 = System.currentTimeMillis();
+/*  797 */         String str6 = "Time to filter " + paramString + ": ";
+/*  798 */         if ("MODEL".equals(paramString)) {
+/*  799 */           String str = null;
+/*  800 */           str = getFilteredModelSql(paramString, vector6, str5);
+/*  801 */           if (str != null) {
+/*  802 */             vector = getMatchingIds(str);
+/*      */           }
+/*      */           
+/*  805 */           str6 = "Time to filter on " + paramString + " with MODEL text and flags: ";
+/*  806 */         } else if (paramString.equals("REFOFER")) {
+/*  807 */           if (str3 != null) {
+/*  808 */             String str = null;
+/*  809 */             str = getFilteredDateSql(paramString, str3, str4, vector6, str5);
+/*  810 */             if (str != null) {
+/*  811 */               vector = getMatchingIds(str);
+/*      */             }
+/*      */           } 
+/*  814 */           str6 = "Time to filter on " + paramString + " with REFOFER text and flags: ";
+/*  815 */         } else if (paramString.equals("REFOFERFEAT")) {
+/*      */           
+/*  817 */           if (str3 != null) {
+/*  818 */             String str = null;
+/*  819 */             str = getFilteredREFOFERFEATDateSql(paramString, str3, str4, vector6, str5);
+/*  820 */             if (str != null) {
+/*  821 */               vector = getMatchingIds(str);
+/*      */             }
+/*      */           } 
+/*  824 */           str6 = "Time to filter on " + paramString + " with reference REFOFER text and flags: ";
+/*      */ 
+/*      */         
+/*      */         }
+/*      */         else {
+/*      */ 
+/*      */ 
+/*      */           
+/*  832 */           String str = null;
+/*  833 */           str = getFilteredSql(paramString, vector6, str5);
+/*  834 */           if (str != null) {
+/*  835 */             vector = getMatchingIds(str);
+/*      */           }
+/*  837 */           str6 = "Time to filter on root " + paramString + " PDHDomain and WithdrawEffectiveDate: ";
+/*      */         } 
+/*      */         
+/*  840 */         long l2 = System.currentTimeMillis();
+/*  841 */         addDebug(str6 + Stopwatch.format(l2 - l1));
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */     
+/*  846 */     vector2.clear();
+/*  847 */     vector3.clear();
+/*  848 */     vector4.clear();
+/*  849 */     vector5.clear();
+/*  850 */     vector6.clear();
+/*      */     
+/*  852 */     return vector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkExtraAttrs(EntityItem paramEntityItem, String paramString, Vector paramVector) {
+/*  869 */     for (byte b = 0; b < paramEntityItem.getAttributeCount(); b++) {
+/*  870 */       EANAttribute eANAttribute = paramEntityItem.getAttribute(b);
+/*  871 */       String str = eANAttribute.getAttributeCode();
+/*  872 */       if (!paramVector.contains(str)) {
+/*  873 */         String str1 = PokUtils.getAttributeValue(paramEntityItem, str, "", null, false);
+/*  874 */         addDebug("checkExtraAttrs attrcode " + str + " value " + str1);
+/*  875 */         if (str1 != null && str1.length() > 0) {
+/*      */           
+/*  877 */           this.args[0] = str;
+/*  878 */           this.args[1] = paramString;
+/*  879 */           addError("EXTRA_FILTER_ERR", this.args);
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addHeadingInfo(EntityItem paramEntityItem, String paramString1, Vector<E> paramVector1, Vector<E> paramVector2, String paramString2, String paramString3) {
+/*  896 */     this.rptSb.append("<br /><h2>Looking for " + paramString1 + " with the following filters:<br />");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     byte b;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  961 */     for (b = 0; b < paramVector1.size(); b++) {
+/*  962 */       String str1 = paramVector1.elementAt(b).toString();
+/*  963 */       String str2 = PokUtils.getAttributeValue(paramEntityItem, str1, "", null, false);
+/*  964 */       this.rptSb.append(paramString1 + " with " + 
+/*  965 */           PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), str1, str1) + " = " + str2 + "<br />");
+/*      */     } 
+/*      */     
+/*  968 */     for (b = 0; b < paramVector2.size(); b++) {
+/*  969 */       String str1 = paramVector2.elementAt(b).toString();
+/*  970 */       String str2 = PokUtils.getAttributeValue(paramEntityItem, str1, "", null, false);
+/*  971 */       this.rptSb.append(paramString1 + " with " + 
+/*  972 */           PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), str1, str1) + " = " + str2 + "<br />");
+/*      */     } 
+/*      */     
+/*  975 */     if (paramString2 != null) {
+/*  976 */       this.rptSb.append(paramString1 + " with " + 
+/*  977 */           PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), paramString2, paramString2) + " &gt;= " + paramString3 + " or not populated<br />");
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */     
+/*  982 */     String str = PokUtils.getAttributeValue(paramEntityItem, "PDHDOMAIN", " or ", null, false);
+/*  983 */     this.rptSb.append(PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "PDHDOMAIN", "PDHDOMAIN") + " = " + str + "<br />");
+/*      */ 
+/*      */     
+/*  986 */     this.rptSb.append("</h2>" + NEWLINE);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean isRequired(String paramString1, String paramString2) {
+/*  996 */     String[] arrayOfString = (String[])REQFILTER_TBL.get(paramString1);
+/*  997 */     boolean bool = false;
+/*  998 */     if (arrayOfString != null) {
+/*  999 */       for (byte b = 0; b < arrayOfString.length; b++) {
+/* 1000 */         if (paramString2.equals(arrayOfString[b])) {
+/* 1001 */           bool = true;
+/*      */           break;
+/*      */         } 
+/*      */       } 
+/*      */     }
+/* 1006 */     return bool;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void getMatchingTextAndFlagIds(String paramString1, Vector<E> paramVector1, Vector<E> paramVector2, Vector<E> paramVector3, Vector<E> paramVector4, Vector<Integer> paramVector5, String paramString2) throws SQLException, MiddlewareException {
+/* 1531 */     ReturnStatus returnStatus = new ReturnStatus(-1);
+/* 1532 */     int i = this.m_db.getNewSessionID();
+/*      */     
+/*      */     try {
+/* 1535 */       byte b1 = 0;
+/* 1536 */       ResultSet resultSet = null;
+/* 1537 */       ReturnDataResultSet returnDataResultSet = null;
+/*      */       
+/*      */       byte b2;
+/* 1540 */       for (b2 = 0; b2 < paramVector2.size(); b2++) {
+/* 1541 */         b1++;
+/* 1542 */         this.m_db.callGBL8119(returnStatus, i, b1, this.m_prof.getEnterprise(), paramString1, paramVector2
+/* 1543 */             .elementAt(b2).toString(), paramVector1.elementAt(b2).toString());
+/* 1544 */         this.m_db.commit();
+/* 1545 */         this.m_db.freeStatement();
+/* 1546 */         this.m_db.isPending();
+/*      */       } 
+/*      */ 
+/*      */       
+/* 1550 */       b1++;
+/* 1551 */       this.m_db.callGBL8119(returnStatus, i, b1, this.m_prof.getEnterprise(), paramString1, "PDHDOMAIN", paramString2);
+/*      */       
+/* 1553 */       this.m_db.commit();
+/* 1554 */       this.m_db.freeStatement();
+/* 1555 */       this.m_db.isPending();
+/*      */ 
+/*      */       
+/* 1558 */       for (b2 = 0; b2 < paramVector4.size(); b2++) {
+/* 1559 */         b1++;
+/*      */         
+/* 1561 */         this.m_db.callGBL8119(returnStatus, i, b1, this.m_prof.getEnterprise(), paramString1, paramVector4
+/* 1562 */             .elementAt(b2).toString(), paramVector3.elementAt(b2).toString());
+/* 1563 */         this.m_db.commit();
+/* 1564 */         this.m_db.freeStatement();
+/* 1565 */         this.m_db.isPending();
+/*      */       } 
+/*      */       
+/*      */       try {
+/* 1569 */         resultSet = this.m_db.callGBL9200(returnStatus, i, this.m_prof.getEnterprise(), "ADSIDL" + paramString1, 0, this.m_prof
+/* 1570 */             .getValOn(), this.m_prof.getEffOn(), getSPLimit());
+/* 1571 */         returnDataResultSet = new ReturnDataResultSet(resultSet);
+/*      */       } finally {
+/*      */         
+/* 1574 */         if (resultSet != null) {
+/* 1575 */           resultSet.close();
+/* 1576 */           resultSet = null;
+/*      */         } 
+/* 1578 */         this.m_db.commit();
+/* 1579 */         this.m_db.freeStatement();
+/* 1580 */         this.m_db.isPending();
+/*      */       } 
+/* 1582 */       for (b2 = 0; b2 < returnDataResultSet.size(); b2++) {
+/* 1583 */         String str = returnDataResultSet.getColumn(b2, 0);
+/* 1584 */         int j = returnDataResultSet.getColumnInt(b2, 1);
+/* 1585 */         if (str.equals(paramString1) && j > 0) {
+/* 1586 */           Integer integer = new Integer(j);
+/* 1587 */           if (!paramVector5.contains(integer)) {
+/* 1588 */             paramVector5.add(integer);
+/*      */           }
+/*      */         } else {
+/* 1591 */           addDebug("getMatchingTextAndFlagIds skipping strEntityType " + str + " iEntityID " + j);
+/*      */         } 
+/* 1593 */         this.m_db.debug(4, "ADSIDLSTATUS.getMatchingTextAndFlagIds gbl9200:answer:" + str + ":" + j);
+/*      */       } 
+/*      */     } finally {
+/*      */       
+/* 1597 */       this.m_db.commit();
+/* 1598 */       this.m_db.freeStatement();
+/* 1599 */       this.m_db.isPending();
+/*      */       
+/* 1601 */       D.ebug(4, "ADSIDLSTATUS cleanup session id's: " + i);
+/* 1602 */       byte b = 3;
+/*      */       do {
+/* 1604 */         returnStatus = new ReturnStatus(-1);
+/* 1605 */         this.m_db.callGBL8105(returnStatus, i);
+/* 1606 */         this.m_db.commit();
+/* 1607 */         this.m_db.freeStatement();
+/* 1608 */         this.m_db.isPending();
+/* 1609 */         if (returnStatus.intValue() == 0)
+/* 1610 */           continue;  D.ebug(3, "GBL8105 did not return SP_OK");
+/*      */         try {
+/* 1612 */           Thread.sleep(1000L);
+/* 1613 */         } catch (InterruptedException interruptedException) {
+/* 1614 */           D.ebug(3, interruptedException.getMessage());
+/*      */         }
+/*      */       
+/* 1617 */       } while (returnStatus.intValue() != 0 && b-- > 0);
+/*      */     } 
+/*      */     
+/* 1620 */     addDebug("getMatchingTextAndFlagIds domain " + paramString2 + " entitytype " + paramString1 + " idVct.cnt: " + paramVector5.size());
+/* 1621 */     addDebug(2, "getMatchingTextAndFlagIds entitytype " + paramString1 + " idVct: " + paramVector5);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getFilteredDateSql(String paramString1, String paramString2, String paramString3, Vector<E> paramVector, String paramString4) {
+/* 1841 */     StringBuffer stringBuffer1 = new StringBuffer();
+/* 1842 */     for (byte b = 0; b < paramVector.size(); b++) {
+/* 1843 */       if (stringBuffer1.length() > 0) {
+/* 1844 */         stringBuffer1.append(',');
+/*      */       }
+/* 1846 */       stringBuffer1.append("'" + paramVector.elementAt(b).toString() + "'");
+/*      */     } 
+/* 1848 */     StringBuffer stringBuffer2 = new StringBuffer("select distinct mdl.entityid from opicm.entity mdl ");
+/* 1849 */     stringBuffer2.append("join opicm.flag f on mdl.entitytype=f.entitytype and mdl.entityid=f.entityid ");
+/* 1850 */     stringBuffer2.append("join opicm.flag f1 on mdl.entitytype=f1.entitytype and mdl.entityid=f1.entityid ");
+/* 1851 */     stringBuffer2.append("where mdl.entitytype='" + paramString1 + "' ");
+/* 1852 */     stringBuffer2.append("and mdl.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 1853 */     stringBuffer2.append("and mdl.valto>current timestamp ");
+/* 1854 */     stringBuffer2.append("and mdl.effto>current timestamp ");
+/* 1855 */     stringBuffer2.append("and f.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 1856 */     stringBuffer2.append("and f.valto>current timestamp ");
+/* 1857 */     stringBuffer2.append("and f.effto>current timestamp ");
+/* 1858 */     stringBuffer2.append("and f.attributecode='PDHDOMAIN' ");
+/* 1859 */     stringBuffer2.append("and f.attributevalue in (" + stringBuffer1.toString() + ") ");
+/* 1860 */     stringBuffer2.append("and f1.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 1861 */     stringBuffer2.append("and f1.valto>current timestamp ");
+/* 1862 */     stringBuffer2.append("and f1.effto>current timestamp ");
+/* 1863 */     stringBuffer2.append("and f1.attributecode='STATUS' ");
+/* 1864 */     stringBuffer2.append("and f1.attributevalue <> '0010' ");
+/* 1865 */     if (paramString4 != null) {
+/* 1866 */       stringBuffer2.append("and f1.valfrom>'" + paramString4 + "' ");
+/*      */     }
+/* 1868 */     stringBuffer2.append("and not exists ");
+/* 1869 */     stringBuffer2.append("(select t.entityid from opicm.text t where ");
+/* 1870 */     stringBuffer2.append("t.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 1871 */     stringBuffer2.append("and t.entitytype='" + paramString1 + "' ");
+/* 1872 */     stringBuffer2.append("and t.entityid=mdl.entityid ");
+/* 1873 */     stringBuffer2.append("and t.attributecode='" + paramString2 + "' ");
+/* 1874 */     stringBuffer2.append("and t.valto>current timestamp ");
+/* 1875 */     stringBuffer2.append("and t.effto>current timestamp) ");
+/* 1876 */     stringBuffer2.append("union ");
+/* 1877 */     stringBuffer2.append("select distinct mdl.entityid from opicm.entity mdl ");
+/* 1878 */     stringBuffer2.append("join opicm.text t on t.entitytype=mdl.entitytype and t.entityid=mdl.entityid ");
+/* 1879 */     stringBuffer2.append("join opicm.flag f on mdl.entitytype=f.entitytype and mdl.entityid=f.entityid ");
+/* 1880 */     stringBuffer2.append("join opicm.flag f1 on mdl.entitytype=f1.entitytype and mdl.entityid=f1.entityid ");
+/* 1881 */     stringBuffer2.append("where mdl.entitytype='" + paramString1 + "' ");
+/* 1882 */     stringBuffer2.append("and mdl.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 1883 */     stringBuffer2.append("and mdl.valto>current timestamp ");
+/* 1884 */     stringBuffer2.append("and mdl.effto>current timestamp ");
+/* 1885 */     stringBuffer2.append("and f.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 1886 */     stringBuffer2.append("and f.valto>current timestamp ");
+/* 1887 */     stringBuffer2.append("and f.effto>current timestamp ");
+/* 1888 */     stringBuffer2.append("and f.attributecode='PDHDOMAIN' ");
+/* 1889 */     stringBuffer2.append("and f.attributevalue in (" + stringBuffer1.toString() + ") ");
+/* 1890 */     stringBuffer2.append("and f1.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 1891 */     stringBuffer2.append("and f1.valto>current timestamp ");
+/* 1892 */     stringBuffer2.append("and f1.effto>current timestamp ");
+/* 1893 */     stringBuffer2.append("and f1.attributecode='STATUS' ");
+/* 1894 */     stringBuffer2.append("and f1.attributevalue <> '0010' ");
+/* 1895 */     if (paramString4 != null) {
+/* 1896 */       stringBuffer2.append("and f1.valfrom>'" + paramString4 + "' ");
+/*      */     }
+/* 1898 */     stringBuffer2.append("and t.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 1899 */     stringBuffer2.append("and t.attributecode='" + paramString2 + "' ");
+/* 1900 */     stringBuffer2.append("and t.valto>current timestamp ");
+/* 1901 */     stringBuffer2.append("and t.effto>current timestamp ");
+/* 1902 */     stringBuffer2.append("and t.attributevalue>='" + paramString3 + "' with ur");
+/*      */     
+/* 1904 */     return stringBuffer2.toString();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getFilteredSql(String paramString1, Vector<E> paramVector, String paramString2) {
+/* 1921 */     StringBuffer stringBuffer1 = new StringBuffer();
+/* 1922 */     for (byte b = 0; b < paramVector.size(); b++) {
+/* 1923 */       if (stringBuffer1.length() > 0) {
+/* 1924 */         stringBuffer1.append(',');
+/*      */       }
+/* 1926 */       stringBuffer1.append("'" + paramVector.elementAt(b).toString() + "'");
+/*      */     } 
+/* 1928 */     StringBuffer stringBuffer2 = new StringBuffer("select distinct mdl.entityid from opicm.entity mdl ");
+/* 1929 */     stringBuffer2.append("join opicm.flag f on mdl.entitytype=f.entitytype and mdl.entityid=f.entityid ");
+/* 1930 */     stringBuffer2.append("join opicm.flag f1 on mdl.entitytype=f1.entitytype and mdl.entityid=f1.entityid ");
+/* 1931 */     stringBuffer2.append("where mdl.entitytype='" + paramString1 + "' ");
+/* 1932 */     stringBuffer2.append("and mdl.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 1933 */     stringBuffer2.append("and mdl.valto>current timestamp ");
+/* 1934 */     stringBuffer2.append("and mdl.effto>current timestamp ");
+/* 1935 */     stringBuffer2.append("and f.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 1936 */     stringBuffer2.append("and f.valto>current timestamp ");
+/* 1937 */     stringBuffer2.append("and f.effto>current timestamp ");
+/* 1938 */     stringBuffer2.append("and f.attributecode='PDHDOMAIN' ");
+/* 1939 */     stringBuffer2.append("and f.attributevalue in (" + stringBuffer1.toString() + ") ");
+/* 1940 */     stringBuffer2.append("and f1.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 1941 */     stringBuffer2.append("and f1.valto>current timestamp ");
+/* 1942 */     stringBuffer2.append("and f1.effto>current timestamp ");
+/* 1943 */     stringBuffer2.append("and f1.attributecode='STATUS' ");
+/* 1944 */     stringBuffer2.append("and f1.attributevalue <> '0010' ");
+/* 1945 */     if (paramString2 != null) {
+/* 1946 */       stringBuffer2.append("and f1.valfrom>'" + paramString2 + "' ");
+/*      */     }
+/* 1948 */     stringBuffer2.append(" with ur");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1991 */     return stringBuffer2.toString();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getFilteredREFOFERFEATDateSql(String paramString1, String paramString2, String paramString3, Vector<E> paramVector, String paramString4) {
+/* 2009 */     StringBuffer stringBuffer1 = new StringBuffer();
+/* 2010 */     for (byte b = 0; b < paramVector.size(); b++) {
+/* 2011 */       if (stringBuffer1.length() > 0) {
+/* 2012 */         stringBuffer1.append(',');
+/*      */       }
+/* 2014 */       stringBuffer1.append("'" + paramVector.elementAt(b).toString() + "'");
+/*      */     } 
+/* 2016 */     StringBuffer stringBuffer2 = new StringBuffer("select distinct reffeature.entityid from opicm.entity reffeature ");
+/* 2017 */     stringBuffer2.append("join opicm.flag f on reffeature.entitytype=f.entitytype and reffeature.entityid=f.entityid ");
+/* 2018 */     stringBuffer2.append("join opicm.flag f1 on reffeature.entitytype=f1.entitytype and reffeature.entityid=f1.entityid ");
+/* 2019 */     stringBuffer2.append("join opicm.relator r on reffeature.entitytype=r.entity2type and reffeature.entityid=r.entity2id ");
+/* 2020 */     stringBuffer2.append("where reffeature.entitytype='" + paramString1 + "' ");
+/* 2021 */     stringBuffer2.append("and reffeature.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 2022 */     stringBuffer2.append("and reffeature.valto>current timestamp ");
+/* 2023 */     stringBuffer2.append("and reffeature.effto>current timestamp ");
+/* 2024 */     stringBuffer2.append("and f.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 2025 */     stringBuffer2.append("and f.valto>current timestamp ");
+/* 2026 */     stringBuffer2.append("and f.effto>current timestamp ");
+/* 2027 */     stringBuffer2.append("and f.attributecode='PDHDOMAIN' ");
+/* 2028 */     stringBuffer2.append("and f.attributevalue in (" + stringBuffer1.toString() + ") ");
+/* 2029 */     stringBuffer2.append("and f1.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 2030 */     stringBuffer2.append("and f1.valto>current timestamp ");
+/* 2031 */     stringBuffer2.append("and f1.effto>current timestamp ");
+/* 2032 */     stringBuffer2.append("and f1.attributecode='STATUS' ");
+/* 2033 */     stringBuffer2.append("and f1.attributevalue <> '0010' ");
+/* 2034 */     stringBuffer2.append("and r.enterprise ='" + this.m_prof.getEnterprise() + "' ");
+/* 2035 */     stringBuffer2.append("and r.entitytype='REFOFERREFOFERFEAT' ");
+/* 2036 */     stringBuffer2.append("and r.valto>current timestamp ");
+/* 2037 */     stringBuffer2.append("and r.effto>current timestamp ");
+/* 2038 */     if (paramString4 != null) {
+/* 2039 */       stringBuffer2.append("and f1.valfrom>'" + paramString4 + "' ");
+/*      */     }
+/* 2041 */     stringBuffer2.append("and not exists ");
+/* 2042 */     stringBuffer2.append("(select distinct t.entityid from opicm.text t where ");
+/* 2043 */     stringBuffer2.append("t.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 2044 */     stringBuffer2.append("and t.entitytype=r.entity1type ");
+/* 2045 */     stringBuffer2.append("and t.entityid=r.entity1id ");
+/* 2046 */     stringBuffer2.append("and t.attributecode='" + paramString2 + "' ");
+/* 2047 */     stringBuffer2.append("and t.valto>current timestamp ");
+/* 2048 */     stringBuffer2.append("and t.effto>current timestamp) ");
+/* 2049 */     stringBuffer2.append("union ");
+/* 2050 */     stringBuffer2.append("select distinct reffeature.entityid from opicm.entity reffeature ");
+/* 2051 */     stringBuffer2.append("join opicm.flag f on reffeature.entitytype=f.entitytype and reffeature.entityid=f.entityid ");
+/* 2052 */     stringBuffer2.append("join opicm.flag f1 on reffeature.entitytype=f1.entitytype and reffeature.entityid=f1.entityid ");
+/* 2053 */     stringBuffer2.append("join opicm.relator r on reffeature.entitytype=r.entity2type and reffeature.entityid=r.entity2id ");
+/* 2054 */     stringBuffer2.append("join opicm.text t on t.entitytype=r.entity1type and t.entityid=r.entity1id ");
+/* 2055 */     stringBuffer2.append("where reffeature.entitytype='" + paramString1 + "' ");
+/* 2056 */     stringBuffer2.append("and reffeature.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 2057 */     stringBuffer2.append("and reffeature.valto>current timestamp ");
+/* 2058 */     stringBuffer2.append("and reffeature.effto>current timestamp ");
+/* 2059 */     stringBuffer2.append("and f.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 2060 */     stringBuffer2.append("and f.valto>current timestamp ");
+/* 2061 */     stringBuffer2.append("and f.effto>current timestamp ");
+/* 2062 */     stringBuffer2.append("and f.attributecode='PDHDOMAIN' ");
+/* 2063 */     stringBuffer2.append("and f.attributevalue in (" + stringBuffer1.toString() + ") ");
+/* 2064 */     stringBuffer2.append("and f1.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 2065 */     stringBuffer2.append("and f1.valto>current timestamp ");
+/* 2066 */     stringBuffer2.append("and f1.effto>current timestamp ");
+/* 2067 */     stringBuffer2.append("and f1.attributecode='STATUS' ");
+/* 2068 */     stringBuffer2.append("and f1.attributevalue <> '0010' ");
+/* 2069 */     stringBuffer2.append("and r.enterprise ='" + this.m_prof.getEnterprise() + "' ");
+/* 2070 */     stringBuffer2.append("and r.entitytype='REFOFERREFOFERFEAT' ");
+/* 2071 */     stringBuffer2.append("and r.valto>current timestamp ");
+/* 2072 */     stringBuffer2.append("and r.effto>current timestamp ");
+/* 2073 */     if (paramString4 != null) {
+/* 2074 */       stringBuffer2.append("and f1.valfrom>'" + paramString4 + "' ");
+/*      */     }
+/* 2076 */     stringBuffer2.append("and t.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 2077 */     stringBuffer2.append("and t.attributecode='" + paramString2 + "' ");
+/* 2078 */     stringBuffer2.append("and t.valto>current timestamp ");
+/* 2079 */     stringBuffer2.append("and t.effto>current timestamp ");
+/* 2080 */     stringBuffer2.append("and t.attributevalue>='" + paramString3 + "' with ur");
+/* 2081 */     return stringBuffer2.toString();
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private String getFilteredModelSql(String paramString1, Vector<E> paramVector, String paramString2) {
+/* 2086 */     StringBuffer stringBuffer1 = new StringBuffer();
+/* 2087 */     for (byte b = 0; b < paramVector.size(); b++) {
+/* 2088 */       if (stringBuffer1.length() > 0) {
+/* 2089 */         stringBuffer1.append(',');
+/*      */       }
+/* 2091 */       stringBuffer1.append("'" + paramVector.elementAt(b).toString() + "'");
+/*      */     } 
+/* 2093 */     StringBuffer stringBuffer2 = new StringBuffer("select distinct mdl.entityid from opicm.entity mdl ");
+/* 2094 */     stringBuffer2.append("join opicm.flag f on mdl.entitytype=f.entitytype and mdl.entityid=f.entityid ");
+/* 2095 */     stringBuffer2.append("join opicm.flag f1 on mdl.entitytype=f1.entitytype and mdl.entityid=f1.entityid ");
+/* 2096 */     stringBuffer2.append("join opicm.flag f2 on mdl.entitytype=f2.entitytype and mdl.entityid=f2.entityid and f2.attributecode = 'COFCAT' ");
+/* 2097 */     stringBuffer2.append("join opicm.flag f3 on mdl.entitytype=f3.entitytype and mdl.entityid=f3.entityid and f3.attributecode = 'COFSUBCAT' ");
+/* 2098 */     stringBuffer2.append("join opicm.flag f4 on mdl.entitytype=f4.entitytype and mdl.entityid=f4.entityid and f4.attributecode = 'COFGRP' ");
+/* 2099 */     stringBuffer2.append("join opicm.filter_model filter on (f2.attributevalue = filter.cofcat or filter.cofcat = '*') and (f3.attributevalue = filter.cofsubcat or filter.cofsubcat = '*') and (f4.attributevalue = filter.cofgrp or filter.cofgrp = '*') ");
+/*      */ 
+/*      */     
+/* 2102 */     stringBuffer2.append("where mdl.entitytype='" + paramString1 + "' ");
+/* 2103 */     stringBuffer2.append("and mdl.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 2104 */     stringBuffer2.append("and mdl.valto>current timestamp ");
+/* 2105 */     stringBuffer2.append("and mdl.effto>current timestamp ");
+/* 2106 */     stringBuffer2.append("and f.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 2107 */     stringBuffer2.append("and f.valto>current timestamp ");
+/* 2108 */     stringBuffer2.append("and f.effto>current timestamp ");
+/* 2109 */     stringBuffer2.append("and f.attributecode='PDHDOMAIN' ");
+/* 2110 */     stringBuffer2.append("and f.attributevalue in (" + stringBuffer1.toString() + ") ");
+/* 2111 */     stringBuffer2.append("and f1.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 2112 */     stringBuffer2.append("and f1.valto>current timestamp ");
+/* 2113 */     stringBuffer2.append("and f1.effto>current timestamp ");
+/* 2114 */     stringBuffer2.append("and f1.attributecode='STATUS' ");
+/* 2115 */     stringBuffer2.append("and f1.attributevalue <> '0010' ");
+/* 2116 */     stringBuffer2.append("and f2.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 2117 */     stringBuffer2.append("and f2.valto>current timestamp ");
+/* 2118 */     stringBuffer2.append("and f2.effto>current timestamp ");
+/* 2119 */     stringBuffer2.append("and f3.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 2120 */     stringBuffer2.append("and f3.valto>current timestamp ");
+/* 2121 */     stringBuffer2.append("and f3.effto>current timestamp ");
+/* 2122 */     stringBuffer2.append("and f4.enterprise='" + this.m_prof.getEnterprise() + "' ");
+/* 2123 */     stringBuffer2.append("and f4.valto>current timestamp ");
+/* 2124 */     stringBuffer2.append("and f4.effto>current timestamp ");
+/* 2125 */     if (paramString2 != null) {
+/* 2126 */       stringBuffer2.append("and f1.valfrom>'" + paramString2 + "' ");
+/*      */     }
+/* 2128 */     stringBuffer2.append(" with ur");
+/* 2129 */     return stringBuffer2.toString();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector getMatchingIds(String paramString) throws SQLException, MiddlewareException {
+/* 2364 */     Vector<Integer> vector = new Vector();
+/*      */     
+/* 2366 */     addDebug("getMatchingDateIds executing with " + PokUtils.convertToHTML(paramString));
+/* 2367 */     PreparedStatement preparedStatement = null;
+/* 2368 */     ResultSet resultSet = null;
+/*      */     
+/*      */     try {
+/* 2371 */       preparedStatement = this.m_db.getPDHConnection().prepareStatement(paramString);
+/*      */       
+/* 2373 */       resultSet = preparedStatement.executeQuery();
+/* 2374 */       HashSet<Integer> hashSet = new HashSet();
+/* 2375 */       while (resultSet.next()) {
+/* 2376 */         int i = resultSet.getInt(1);
+/* 2377 */         if (i > 0) {
+/* 2378 */           hashSet.add(new Integer(i));
+/*      */         }
+/*      */       } 
+/* 2381 */       vector.addAll(hashSet);
+/* 2382 */       addDebug("getMatchingDateIds all matchIdVct.cnt " + vector.size());
+/* 2383 */       addDebug(2, "getMatchingDateIds all matchIdVct " + vector);
+/*      */     } finally {
+/* 2385 */       if (resultSet != null) {
+/*      */         try {
+/* 2387 */           resultSet.close();
+/* 2388 */         } catch (Exception exception) {
+/* 2389 */           System.err.println("getMatchingDateIds(), unable to close result. " + exception);
+/*      */         } 
+/* 2391 */         resultSet = null;
+/*      */       } 
+/*      */       
+/* 2394 */       if (preparedStatement != null) {
+/*      */         try {
+/* 2396 */           preparedStatement.close();
+/* 2397 */         } catch (Exception exception) {
+/* 2398 */           System.err.println("getMatchingDateIds(), unable to close ps. " + exception);
+/*      */         } 
+/* 2400 */         preparedStatement = null;
+/*      */       } 
+/*      */       
+/* 2403 */       this.m_db.commit();
+/* 2404 */       this.m_db.freeStatement();
+/* 2405 */       this.m_db.isPending();
+/*      */     } 
+/*      */     
+/* 2408 */     return vector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getQueuedValue(String paramString) {
+/* 2416 */     return ABRServerProperties.getABRQueuedValue(this.m_abri
+/* 2417 */         .getABRCode() + "_" + paramString);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void restoreXtraContent() {
+/* 2425 */     if (this.dbgLen + this.rptSb.length() < 5000000) {
+/*      */       
+/* 2427 */       BufferedInputStream bufferedInputStream = null;
+/* 2428 */       FileInputStream fileInputStream = null;
+/* 2429 */       BufferedReader bufferedReader = null;
+/*      */       try {
+/* 2431 */         fileInputStream = new FileInputStream(this.dbgfn);
+/* 2432 */         bufferedInputStream = new BufferedInputStream(fileInputStream);
+/*      */         
+/* 2434 */         String str = null;
+/* 2435 */         StringBuffer stringBuffer = new StringBuffer();
+/* 2436 */         bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream, "UTF-8"));
+/*      */         
+/* 2438 */         while ((str = bufferedReader.readLine()) != null) {
+/* 2439 */           stringBuffer.append(str + NEWLINE);
+/*      */         }
+/* 2441 */         this.rptSb.append("<!-- " + stringBuffer.toString() + " -->" + NEWLINE);
+/*      */ 
+/*      */         
+/* 2444 */         File file = new File(this.dbgfn);
+/* 2445 */         if (file.exists()) {
+/* 2446 */           file.delete();
+/*      */         }
+/* 2448 */       } catch (Exception exception) {
+/* 2449 */         exception.printStackTrace();
+/*      */       } finally {
+/* 2451 */         if (bufferedInputStream != null) {
+/*      */           try {
+/* 2453 */             bufferedInputStream.close();
+/* 2454 */           } catch (Exception exception) {
+/* 2455 */             exception.printStackTrace();
+/*      */           } 
+/*      */         }
+/* 2458 */         if (fileInputStream != null) {
+/*      */           try {
+/* 2460 */             fileInputStream.close();
+/* 2461 */           } catch (Exception exception) {
+/* 2462 */             exception.printStackTrace();
+/*      */           } 
+/*      */         }
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getLD_Value(EntityItem paramEntityItem, String paramString) {
+/* 2475 */     return PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), paramString, paramString) + ": " + 
+/* 2476 */       PokUtils.getAttributeValue(paramEntityItem, paramString, ",", "<em>** Not Populated **</em>", false);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void dereference() {
+/* 2483 */     super.dereference();
+/*      */     
+/* 2485 */     this.rsBundle = null;
+/* 2486 */     this.rptSb = null;
+/* 2487 */     this.args = null;
+/*      */     
+/* 2489 */     this.metaTbl = null;
+/* 2490 */     this.navName = null;
+/* 2491 */     this.vctReturnsEntityKeys.clear();
+/* 2492 */     this.vctReturnsEntityKeys = null;
+/*      */     
+/* 2494 */     this.vctReturnsQueueKeys.clear();
+/* 2495 */     this.vctReturnsQueueKeys = null;
+/*      */     
+/* 2497 */     this.dbgPw = null;
+/* 2498 */     this.dbgfn = null;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getABRVersion() {
+/* 2504 */     return "$Revision: 1.27 $";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getDescription() {
+/* 2511 */     return "ADSIDLSTATUS";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addOutput(String paramString) {
+/* 2517 */     this.rptSb.append("<p>" + paramString + "</p>" + NEWLINE);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addDebug(String paramString) {
+/* 2524 */     this.dbgLen += paramString.length();
+/* 2525 */     this.dbgPw.println(paramString);
+/* 2526 */     this.dbgPw.flush();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addDebug(int paramInt, String paramString) {
+/* 2535 */     if (paramInt <= this.abr_debuglvl) {
+/* 2536 */       addDebug(paramString);
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addError(String paramString, Object[] paramArrayOfObject) {
+/* 2548 */     setReturnCode(-1);
+/*      */ 
+/*      */     
+/* 2551 */     addMessage(this.rsBundle.getString("ERROR_PREFIX"), paramString, paramArrayOfObject);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addError(String paramString) {
+/* 2557 */     addOutput(paramString);
+/* 2558 */     setReturnCode(-1);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private int getSPLimit() {
+/* 2567 */     String str = ABRServerProperties.getValue(this.m_abri.getABRCode(), "_splimit", "200000");
+/*      */ 
+/*      */     
+/* 2570 */     return Integer.parseInt(str);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean isSampleMode() {
+/* 2578 */     return Boolean.valueOf(ABRServerProperties.getValue(this.m_abri.getABRCode(), "_sampleMode", "false"))
+/* 2579 */       .booleanValue();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addMessage(String paramString1, String paramString2, Object[] paramArrayOfObject) {
+/* 2587 */     String str = this.rsBundle.getString(paramString2);
+/*      */     
+/* 2589 */     if (paramArrayOfObject != null) {
+/* 2590 */       MessageFormat messageFormat = new MessageFormat(str);
+/* 2591 */       str = messageFormat.format(paramArrayOfObject);
+/*      */     } 
+/*      */     
+/* 2594 */     addOutput(paramString1 + " " + str);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getNavigationName(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 2604 */     StringBuffer stringBuffer = new StringBuffer();
+/*      */ 
+/*      */ 
+/*      */     
+/* 2608 */     EANList eANList = (EANList)this.metaTbl.get(paramEntityItem.getEntityType());
+/* 2609 */     if (eANList == null) {
+/* 2610 */       EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, paramEntityItem.getEntityType(), "Navigate");
+/* 2611 */       eANList = entityGroup.getMetaAttribute();
+/* 2612 */       this.metaTbl.put(paramEntityItem.getEntityType(), eANList);
+/*      */     } 
+/* 2614 */     for (byte b = 0; b < eANList.size(); b++) {
+/* 2615 */       EANMetaAttribute eANMetaAttribute = (EANMetaAttribute)eANList.getAt(b);
+/* 2616 */       stringBuffer.append(PokUtils.getAttributeValue(paramEntityItem, eANMetaAttribute.getAttributeCode(), ", ", "", false));
+/* 2617 */       if (b + 1 < eANList.size()) {
+/* 2618 */         stringBuffer.append(" ");
+/*      */       }
+/*      */     } 
+/*      */     
+/* 2622 */     return stringBuffer.toString().trim();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setValues(String[] paramArrayOfString, String paramString1, String paramString2, int paramInt) {
+/* 2635 */     if (this.m_cbOn == null) {
+/* 2636 */       setControlBlock();
+/*      */     }
+/*      */     
+/* 2639 */     ReturnEntityKey returnEntityKey = new ReturnEntityKey(paramString2, paramInt, true);
+/* 2640 */     Vector<SingleFlag> vector = new Vector();
+/* 2641 */     returnEntityKey.m_vctAttributes = vector;
+/* 2642 */     this.vctReturnsEntityKeys.addElement(returnEntityKey);
+/*      */ 
+/*      */ 
+/*      */     
+/* 2646 */     SingleFlag singleFlag = new SingleFlag(this.m_prof.getEnterprise(), paramString2, paramInt, "XMLIDLABRSTATUS", paramString1, 1, this.m_cbOn);
+/*      */ 
+/*      */     
+/* 2649 */     singleFlag.setDeferredPost(true);
+/*      */     
+/* 2651 */     vector.addElement(singleFlag);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setQueueValues(String paramString, int paramInt) {
+/* 2672 */     if (this.m_cbOn == null) {
+/* 2673 */       setControlBlock();
+/*      */     }
+/*      */     
+/* 2676 */     ReturnEntityKey returnEntityKey = new ReturnEntityKey(paramString, paramInt, true);
+/* 2677 */     Vector<SingleFlag> vector = new Vector();
+/* 2678 */     returnEntityKey.m_vctAttributes = vector;
+/* 2679 */     this.vctReturnsQueueKeys.addElement(returnEntityKey);
+/*      */ 
+/*      */ 
+/*      */     
+/* 2683 */     SingleFlag singleFlag = new SingleFlag(this.m_prof.getEnterprise(), paramString, paramInt, "SYSFEEDRESEND", "CUR", 1, this.m_cbOn);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 2688 */     vector.addElement(singleFlag);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void updatePDH() throws SQLException, MiddlewareException, RemoteException, MiddlewareShutdownInProgressException, EANBusinessRuleException {
+/* 2710 */     int i = this.vctReturnsEntityKeys.size();
+/* 2711 */     logMessage(getDescription() + " updating PDH with " + this.vctReturnsEntityKeys.size() + " entitykeys");
+/* 2712 */     addDebug("updatePDH entered for vctReturnsEntityKeys: " + i);
+/* 2713 */     if (this.vctReturnsEntityKeys.size() > 0) {
+/*      */       try {
+/* 2715 */         if (isSampleMode()) {
+/* 2716 */           addOutput("<b>WARNING: Running in sample mode, not queueing all entities!</b>");
+/* 2717 */           ReturnEntityKey returnEntityKey = this.vctReturnsEntityKeys.firstElement();
+/* 2718 */           addOutput("<b>WARNING: Queued " + returnEntityKey.getEntityType() + returnEntityKey.getEntityID() + "</b>");
+/* 2719 */           Vector<ReturnEntityKey> vector = new Vector(1);
+/* 2720 */           vector.add(returnEntityKey);
+/* 2721 */           this.m_db.update(this.m_prof, vector, false, false);
+/* 2722 */           vector.clear();
+/*      */         } else {
+/* 2724 */           this.m_db.update(this.m_prof, this.vctReturnsEntityKeys, false, false);
+/*      */         } 
+/*      */ 
+/*      */         
+/*      */         try {
+/* 2729 */           ReturnEntityKey returnEntityKey = this.vctReturnsEntityKeys.firstElement();
+/* 2730 */           if (returnEntityKey.m_vctAttributes.size() == 1) {
+/* 2731 */             Attribute attribute = returnEntityKey.m_vctAttributes.elementAt(0);
+/*      */             
+/* 2733 */             this.args[0] = attribute.getAttributeCode();
+/* 2734 */             this.args[1] = attribute.getAttributeValue();
+/* 2735 */             this.args[2] = "" + i;
+/* 2736 */             this.args[3] = returnEntityKey.getEntityType();
+/* 2737 */             addMessage("", "ATTRS_SET", this.args);
+/*      */           } else {
+/* 2739 */             addDebug("no attribute value update!");
+/*      */           }
+/*      */         
+/* 2742 */         } catch (Exception exception) {
+/* 2743 */           exception.printStackTrace();
+/* 2744 */           addDebug("exception trying to output msg " + exception);
+/*      */         } 
+/*      */       } finally {
+/*      */         
+/* 2748 */         this.vctReturnsEntityKeys.clear();
+/* 2749 */         this.m_db.commit();
+/* 2750 */         this.m_db.freeStatement();
+/* 2751 */         this.m_db.isPending("finally after updatePDH");
+/*      */       } 
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void updatePDHQueue() throws SQLException, MiddlewareException, RemoteException, MiddlewareShutdownInProgressException, EANBusinessRuleException {
+/* 2767 */     int i = this.vctReturnsQueueKeys.size();
+/* 2768 */     logMessage(getDescription() + " updating PDH with " + this.vctReturnsQueueKeys.size() + " entitykeys");
+/* 2769 */     addDebug("updatePDH entered for vctReturnsQueueKeys: " + i);
+/* 2770 */     if (this.vctReturnsQueueKeys.size() > 0) {
+/*      */       try {
+/* 2772 */         if (isSampleMode()) {
+/* 2773 */           addOutput("<b>WARNING: Running in sample mode, not queueing all entities!</b>");
+/* 2774 */           ReturnEntityKey returnEntityKey = this.vctReturnsQueueKeys.firstElement();
+/* 2775 */           addOutput("<b>WARNING: Queued " + returnEntityKey.getEntityType() + returnEntityKey.getEntityID() + "</b>");
+/* 2776 */           Vector<ReturnEntityKey> vector = new Vector(1);
+/* 2777 */           vector.add(returnEntityKey);
+/* 2778 */           this.m_db.update(this.m_prof, vector, false, false);
+/* 2779 */           vector.clear();
+/*      */         } else {
+/* 2781 */           this.m_db.update(this.m_prof, this.vctReturnsQueueKeys, false, false);
+/*      */         } 
+/*      */ 
+/*      */         
+/*      */         try {
+/* 2786 */           ReturnEntityKey returnEntityKey = this.vctReturnsQueueKeys.firstElement();
+/* 2787 */           if (returnEntityKey.m_vctAttributes.size() == 1) {
+/* 2788 */             Attribute attribute = returnEntityKey.m_vctAttributes.elementAt(0);
+/*      */             
+/* 2790 */             this.args[0] = attribute.getAttributeCode();
+/* 2791 */             this.args[1] = attribute.getAttributeValue();
+/* 2792 */             this.args[2] = "" + i;
+/* 2793 */             this.args[3] = returnEntityKey.getEntityType();
+/* 2794 */             addMessage("", "ATTRS_SET", this.args);
+/*      */           } else {
+/* 2796 */             addDebug("no attribute value update!");
+/*      */           }
+/*      */         
+/* 2799 */         } catch (Exception exception) {
+/* 2800 */           exception.printStackTrace();
+/* 2801 */           addDebug("exception trying to output msg " + exception);
+/*      */         } 
+/*      */       } finally {
+/*      */         
+/* 2805 */         this.vctReturnsQueueKeys.clear();
+/* 2806 */         this.m_db.commit();
+/* 2807 */         this.m_db.freeStatement();
+/* 2808 */         this.m_db.isPending("finally after updatePDH");
+/*      */       } 
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void setTextValue(EntityItem paramEntityItem, String paramString1, String paramString2) throws SQLException, MiddlewareException {
+/* 2817 */     log(" ADSIDLSTATUS ***** " + paramString1 + " set to: " + paramString2);
+/* 2818 */     log("setTextValue entered for " + paramString1 + " set to: " + paramString2);
+/*      */ 
+/*      */     
+/* 2821 */     EANMetaAttribute eANMetaAttribute = paramEntityItem.getEntityGroup().getMetaAttribute(paramString1);
+/* 2822 */     if (eANMetaAttribute == null) {
+/* 2823 */       log("setTextValue: " + paramString1 + " was not in meta for " + paramEntityItem.getEntityType() + ", nothing to do");
+/* 2824 */       log("ADSIDLSTATUS ***** " + paramString1 + " was not in meta for " + paramEntityItem
+/* 2825 */           .getEntityType() + ", nothing to do");
+/*      */       return;
+/*      */     } 
+/* 2828 */     if (paramString2 != null)
+/*      */       
+/*      */       try {
+/* 2831 */         if (this.m_cbOn == null) {
+/* 2832 */           setControlBlock();
+/*      */         }
+/*      */         
+/* 2835 */         ReturnEntityKey returnEntityKey = new ReturnEntityKey(getEntityType(), getEntityID(), true);
+/*      */ 
+/*      */         
+/* 2838 */         Text text = new Text(this.m_prof.getEnterprise(), returnEntityKey.getEntityType(), returnEntityKey.getEntityID(), paramString1, paramString2, 1, this.m_cbOn);
+/*      */ 
+/*      */ 
+/*      */         
+/* 2842 */         Vector<Text> vector = new Vector();
+/* 2843 */         Vector<ReturnEntityKey> vector1 = new Vector();
+/* 2844 */         vector.addElement(text);
+/* 2845 */         returnEntityKey.m_vctAttributes = vector;
+/* 2846 */         vector1.addElement(returnEntityKey);
+/*      */         
+/* 2848 */         this.m_db.update(this.m_prof, vector1, false, false);
+/* 2849 */         addDebug(paramEntityItem.getKey() + " had " + paramString1 + " set to: " + paramString2);
+/*      */       } finally {
+/*      */         
+/* 2852 */         this.m_db.commit();
+/* 2853 */         this.m_db.freeStatement();
+/* 2854 */         this.m_db.isPending("finally after update in setTextValue ");
+/*      */       }  
+/*      */   }
+/*      */ }
 
-//(C) Copyright IBM Corp. 2010  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office. 
 
-package COM.ibm.eannounce.abr.sg.bh;
-
-import java.io.*;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.MessageFormat;
-import java.util.*;
-
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-
-import COM.ibm.opicmpdh.middleware.*;
-
-import COM.ibm.opicmpdh.objects.Attribute;
-import COM.ibm.opicmpdh.objects.SingleFlag;
-import COM.ibm.opicmpdh.objects.Text;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
-/****
- * BH FS ABR XML IDL 20101027.doc
- * need meta
- * 		missing XMLENTITYTYPE flags for Deletes and XLATE
- * 		ADSXMLSETUP missing XMLABRPROPFILE and XMLIDLABRSTATUS
- * 		ADSXMLSETUP.ADSTYPE missing flags for Deletes and XLATE
- * 
- * from BH FS ABR XML IDL 20101007.doc
- * This ABR queues the Data Transformation System Feed (aka XML feed) 
- *  
- * IV.	Background 
- * EACM feeds downstream systems via a set of XML messages. There exists a need to perform an Initial 
- * Data Load (IDL) for new downstream systems. There may also be a need to refresh a downstream system 
- * via an IDL based on a downstream system request.
- * 
- * V.	User Interface
- * 
- * An authorized user (Role = BHFEED) will setup an IDL request via a setup entity and then queue this 
- * ABR via a workflow action. This ABR will then queue XML message generation for offering information 
- * that meets the criteria specified via the setup entity.
- * 
- * VI.	Setup Entity
- * The XML IDL Setup Entity(EXTXMLIDL) is defined as follows:
- * 
- * Attribute Code	Type	Long Description		Applicable
- * XMLSETUPDESC		T		XML IDL Description	 
- * XMLABRPROPFILE	F		Name of ABR Properties File
- * XMLTARGETSYSTEM	L		Target System Name
- * XMLENTITYTYPE	U		Root Entity Type
- * FCTYPE*			U		Feature Type			FEATURE
- * COFCAT*			U		Model Category			MODEL
- * COFGRP			U		Model Group				MODEL |LSEO
- * COFSUBCAT		U		Model Subcategory		MODEL
- * MACHTYPEATR*		U		Machine Type			PRODSTRUCT |SWPRODSTRUCT |MODELCONVERT |FCTRANSACTION
- * MODELATR*		T		Model					PRODSTRUCT |SWPRODSTRUCT
- * SVCMODCATG*		U		Service Model Categoy	SVCMOD
- * SVCMODGRP*		U		Service Model Group		SVCMOD
- * SVCMODSUBCATG*	U		Service Model SubCategoy	SVCMOD
- * SVCMODSUBGRP*	U		Service Model SubGroup	SVCMOD
- * none				U	 	SWFEATURE |GENERALAREA |SVCLEV |SLEORGNPLNTCODE |REVUNBUNDCOMP |CATNAV | GBT |WARR | XLATE
- * WITHDRAWDATEEFF_T	T	Global Withdrawal Date Effective	FEATURE |SWFEATURE
- * LSEOUNPUBDATEMTRGT	T	LSEO Unpublish Date - Target	LSEO
- * BUNDLUNPUBDATEMTRGT	T	Bundle Unpublish Date - Target	LSEOBUNDLE
- * WTHDRWEFFCTVDATE	T	Withdrawal Effective Date	MODEL |PRODSTRUCT |SWPRODSTRUCT |MODELCONVERT |FCTRANSACTION
- * ADSIDLSTATUS		A		ADS IDL XML Feed ABR
- * BRANDCD			U		Brand Code				WWCOMPAT
- * PDHDOMAIN **		F		Domains
-
-
-ADSIDLSTATUS_SUBSCRVE=WWDERDATASNVE
-ADSIDLSTATUS_CAT1: RptClass. XMLIDLABR
-ADSIDLSTATUS_CAT2: EXTXMLIDL.PDHDOMAIN
-ADSIDLSTATUS_CAT3: RptStatus
-ADSIDLSTATUS_CAT4: 
------------------------------
-
-ADSIDLSTATUS_class=COM.ibm.eannounce.abr.sg.bh.ADSIDLSTATUS
-ADSIDLSTATUS_enabled=true
-ADSIDLSTATUS_idler_class=D
-ADSIDLSTATUS_keepfile=true
-ADSIDLSTATUS_read_only=false
-ADSIDLSTATUS_vename=dummy
-ADSIDLSTATUS_CAT1=RPTCLASS.XMLIDLABR
-ADSIDLSTATUS_CAT2=ROOTTYPE.PDHDOMAIN
-ADSIDLSTATUS_CAT3=RPTSTATUS
-ADSIDLSTATUS_CAT4=
-ADSIDLSTATUS_SUBSCRVE=WWDERDATASNVE
-ADSIDLSTATUS_splimit=200000
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\bh\ADSIDLSTATUS.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-//$Log: ADSIDLSTATUS.java,v $
-//Revision 1.27  2019/02/26 07:18:09  xujianbo
-//roll back code for Story 1909631 EACM XML version control by XSLT
-//
-//Revision 1.25  2015/08/13 08:43:27  wangyul
-//Remove semicolon after "with ur;" of the query to fix the DB2 SQL Error: SQLCODE=-104, SQLSTATE=42601, SQLERRMC=;;
-//
-//Revision 1.24  2014/01/17 11:24:20  wangyulo
-//the ABR changes needed to comply with V17 standards
-//
-//Revision 1.23  2014/01/07 13:06:11  guobin
-//Fix CR of BH FS ABR XML System Feed 20130904.doc
-//
-//Revision 1.22  2013/08/12 13:35:30  liuweimi
-// IDL - change to add Division filter to XML product feed
-//
-//Revision 1.21  2013/03/29 06:47:24  wangyulo
-//support initialize CACHE after IDL base on BH FS ABR XML System Feed 20121210.doc
-//
-//Revision 1.20  2011/12/06 22:10:34  liuweimi
-//fix - Errors encountered in Cache load
-//
-//Revision 1.19  2011/10/28 03:18:04  liuweimi
-//Delta cache and special filter for MODEL
-//
-//Revision 1.18  2011/10/13 14:40:39  liuweimi
-//*** empty log message ***
-//
-//Revision 1.15  2011/10/13 13:28:45  guobin
-//fix the  code problem
-//
-//Revision 1.12  2011/09/27 01:29:25  guobin
-//corrected filtering. Corrected REFOFER & REFOFERFEAT.
-//
-//Revision 1.11  2011/08/19 07:20:43  guobin
-//filter for REFOFER  and REFOFERFEAT
-//
-//Revision 1.10  2011/07/20 13:27:37  guobin
-//Change current IDL to support Delta IDL based on document - BH FS ABR XML IDL 20110707.doc.
-//
-//Revision 1.9  2011/07/07 13:28:20  guobin
-//add XMLSTATUS as filter condition
-//
-//Revision 1.8  2011/07/06 13:46:13  guobin
-//filter status <> 0010 when entitytype is SWPRODSTRUCT
-//
-//Revision 1.7  2011/06/23 12:34:13  guobin
-//Changes to EXTXMLFEED to filter marked entities by STATUS value
-//
-//Revision 1.6  2011/06/13 14:39:03  guobin
-//modelconvert and fctransaction add modelatr IDL filter
-//
-//Revision 1.5  2011/06/10 07:43:00  guobin
-//update IDL function
-//
-//Revision 1.4  2011/06/07 14:16:02  guobin
-//change to new IDL put and get xml to  Cache table
-//
-//Revision 1.3  2010/11/16 15:59:45  wendy
-//add support for periodic types
-//
-//Revision 1.2  2010/10/27 20:02:42  wendy
-//updates for BH FS ABR XML IDL 20101027.doc, still need meta to complete, added defer post
-//
-//Revision 1.1  2010/10/11 19:21:30  wendy
-//Init for BH FS ABR XML IDL 20101007.doc
-//
-public class ADSIDLSTATUS extends PokBaseABR {
-	private static final String ADSIDLSTATUS = "ADSIDLSTATUS";
-	private static final String ADSIDLLASTRANDTS = "ADSIDLLASTRANDTS";
-	private static final int MAXFILE_SIZE=5000000;
-	private StringBuffer rptSb = new StringBuffer();
-	private static final char[] FOOL_JTEST = {'\n'};
-	static final String NEWLINE = new String(FOOL_JTEST);
-	private Object[] args = new String[10];
-
-	private static final String ADS_XMLEED_ATTR="XMLIDLABRSTATUS"; // attr to queue
-	private static final String QUEUE_ATTR ="SYSFEEDRESEND";
-	private static final String QUEUE_VALUE ="CUR";
-	private static final String MQUEUE_ATTR="XMLABRPROPFILE";  // attr to put xml mq info into
-	private static boolean IS_SYSFEEDRESEND_CUR = false;
-    //private static final String COFGRP_Base= "150";//COFGRP defaults to(150) if not specified
-
-	// these are used in the search sps and the trsnav table
-	// entitytype will be appended to make each entity srch key unique
-	//private static final String SEARCHREL_KEY = "ADSIDLREL"; 
-	private static final String SEARCH_KEY = "ADSIDL";
-	
-	private ResourceBundle rsBundle = null;
-	private Hashtable metaTbl = new Hashtable();
-	private String navName = "";
-	private PrintWriter dbgPw=null;
-	private String dbgfn = null;
-	private int dbgLen=0; 
-    private int abr_debuglvl=D.EBUG_ERR;
-	private Vector vctReturnsEntityKeys = new Vector();
-	private Vector vctReturnsQueueKeys = new Vector();
-	
-
-	private static final Set TBD_SET;	//Entity types in spec but not yet handled
-	private static final Hashtable FILTER_TBL;	//Entity and filter Attributes for IDL
-	private static final Hashtable FILTERCACHE_TBL; //Entity and filter Attributes for Cache
-	private static final Hashtable REQFILTER_TBL;	//Entity and required filter Attributes for ADSIDLSTATUS
-	private static final Hashtable PERIODIC_TBL;	//Entity and ADSTYPE flag code needed for search
-	static{
-		FILTER_TBL = new Hashtable();
-		FILTERCACHE_TBL = new Hashtable();
-		REQFILTER_TBL = new Hashtable();
-		PERIODIC_TBL = new Hashtable();
-		TBD_SET = new HashSet();
-	    
-		//they must be in ATTRCODE|type format where type is T for text, U for flag and D for date 
-		FILTER_TBL.put("FEATURE", new String[]{"FCTYPE|U","COUNTRYLIST|F","WITHDRAWDATEEFF_T|D","WITHDRAWDATEMIN|D"});
-		FILTER_TBL.put("MODEL", new String[]{"SPECBID|U","COFCAT|U","COFSUBCAT|U","COFGRP|U","COFSUBGRP|U","COUNTRYLIST|F","FLFILSYSINDC|F","WTHDRWEFFCTVDATE|D","WITHDRAWDATEMIN|D","DIVTEXT|T"});
-		FILTER_TBL.put("SVCMOD", new String[]{"SVCMODCATG|U","SVCMODGRP|U","SVCMODSUBCATG|U","SVCMODSUBGRP|U","COUNTRYLIST|F","WTHDRWEFFCTVDATE|D","WITHDRAWDATEMIN|D","DIVTEXT|T"});
-		FILTER_TBL.put("LSEOBUNDLE", new String[]{"SPECBID|U","BUNDLETYPE|F","COUNTRYLIST|F","FLFILSYSINDC|F","BUNDLUNPUBDATEMTRGT|D","WITHDRAWDATEMIN|D","DIVTEXT|T"});
-		FILTER_TBL.put("SWFEATURE", new String[]{"FCTYPE|U","WITHDRAWDATEEFF_T|D","WITHDRAWDATEMIN|D"});
-		//FILTER_TBL.put("WWCOMPAT", 	new String[]{"BRANDCD|U"}); //WWCOMPAT doesnt exist
-
-		//COFGRP will be on the MODEL
-		FILTER_TBL.put("LSEO", new String[]{"SPECBID|U","COFCAT|U","COFSUBCAT|U","COFGRP|U","COFSUBGRP|U","COUNTRYLIST|F","FLFILSYSINDC|F","LSEOUNPUBDATEMTRGT|D","WITHDRAWDATEMIN|D","DIVTEXT|T"});
-
-		//MACHTYPEATR used for TOMACHTYPE T, WTHDRWEFFCTVDATE will be on the MODEL
-		FILTER_TBL.put("MODELCONVERT", new String[]{"MACHTYPEATR|U","MODELATR|T","COUNTRYLIST|F","WTHDRWEFFCTVDATE|D","WITHDRAWDATEMIN|D"});
-		FILTER_TBL.put("FCTRANSACTION", new String[]{"MACHTYPEATR|U","MODELATR|T","WTHDRWEFFCTVDATE|D","WITHDRAWDATEMIN|D"});
-
-		//these attributes will be on the MODEL  (SW)PRODSTRUCT-d: MODEL.WTHDRWEFFCTVDATE
-		FILTER_TBL.put("PRODSTRUCT", new String[]{"FCTYPE|U","MACHTYPEATR|U","MODELATR|T","COUNTRYLIST|F","FLFILSYSINDC|F","WTHDRWEFFCTVDATE|D","WITHDRAWDATEMIN|D"});
-		FILTER_TBL.put("SWPRODSTRUCT", new String[]{"FCTYPE|U","MACHTYPEATR|U","MODELATR|T","COUNTRYLIST|F","WTHDRWEFFCTVDATE|D","WITHDRAWDATEMIN|D"});
-		
-		FILTER_TBL.put("IMG", new String[]{"COUNTRYLIST|F"});
-		FILTER_TBL.put("CATNAV", new String[]{"FLFILSYSINDC|F"});
-		
-		//elaborated on REFOFER filtering
-		//FILTER_TBL.put("REFOFER", new String[]{"COUNTRYLIST|F","ENDOFSVC|T"});
-		//FILTER_TBL.put("REFOFERFEAT", new String[]{"COUNTRYLIST|F","ENDOFSVC|T"});
-		
-		
-		//Entity and filter Attributes for Cache,delete withdrawn date based on BH FS ABR XML IDL 20110929.doc, only EndofSvc need to be filtered
-		FILTERCACHE_TBL.put("FEATURE", new String[]{"ADSIDLLASTRANDTS|T"});
-		FILTERCACHE_TBL.put("MODEL", new String[]{"ADSIDLLASTRANDTS|T"});
-	    FILTERCACHE_TBL.put("SVCMOD", new String[]{"ADSIDLLASTRANDTS|T"});
-	    FILTERCACHE_TBL.put("LSEOBUNDLE", new String[]{"ADSIDLLASTRANDTS|T"});
-	    FILTERCACHE_TBL.put("SWFEATURE", new String[]{"ADSIDLLASTRANDTS|T"});
-	    FILTERCACHE_TBL.put("LSEO", new String[]{"ADSIDLLASTRANDTS|T"});
-	    FILTERCACHE_TBL.put("MODELCONVERT", new String[]{"ADSIDLLASTRANDTS|T"});
-		FILTERCACHE_TBL.put("FCTRANSACTION", new String[]{"ADSIDLLASTRANDTS|T"});
-		FILTERCACHE_TBL.put("PRODSTRUCT", new String[]{"ADSIDLLASTRANDTS|T"});
-		FILTERCACHE_TBL.put("SWPRODSTRUCT", new String[]{"ADSIDLLASTRANDTS|T"});
-		FILTERCACHE_TBL.put("SLEORGNPLNTCODE", new String[]{"ADSIDLLASTRANDTS|T"});
-		FILTERCACHE_TBL.put("CATNAV", new String[]{"ADSIDLLASTRANDTS|T"});
-		FILTERCACHE_TBL.put("GBT", new String[]{"ADSIDLLASTRANDTS|T"});
-		FILTERCACHE_TBL.put("REVUNBUNDCOMP", new String[]{"ADSIDLLASTRANDTS|T"});
-		FILTERCACHE_TBL.put("SVCLEV", new String[]{"ADSIDLLASTRANDTS|T"});
-		FILTERCACHE_TBL.put("WARR", new String[]{"ADSIDLLASTRANDTS|T"});
-		FILTERCACHE_TBL.put("IMG", new String[]{"ADSIDLLASTRANDTS|T"});
-		
-		FILTERCACHE_TBL.put("REFOFER", new String[]{"ENDOFSVC|D","ADSIDLLASTRANDTS|T"});
-		FILTERCACHE_TBL.put("REFOFERFEAT", new String[]{"ENDOFSVC|D","ADSIDLLASTRANDTS|T"});
-	    				
-	    
-	    
-		//COFGRP defaults to (150) if not specified
-		//REQFILTER_TBL.put("FEATURE", new String[]{"FCTYPE"});
-		//REQFILTER_TBL.put("MODEL", new String[]{"COFCAT"});
-		//REQFILTER_TBL.put("SVCMOD", new String[]{"SVCMODCATG","SVCMODGRP","SVCMODSUBCATG","SVCMODSUBGRP"});
-		//MODELCONVERT and FCTRANSACTION whether require MACHTYPEATR
-		//REQFILTER_TBL.put("MODELCONVERT", new String[]{"MACHTYPEATR|U"});
-		//REQFILTER_TBL.put("FCTRANSACTION", new String[]{"MACHTYPEATR|U"});
-		//REQFILTER_TBL.put("PRODSTRUCT", new String[]{"MACHTYPEATR","MODELATR"});
-		//REQFILTER_TBL.put("SWPRODSTRUCT", new String[]{"MACHTYPEATR","MODELATR"});
-		
-		// none of these are ready yet in the spec, others are TBD like GBT, IMG and WARR, but they are real entity types
-		TBD_SET.add("WWCOMPAT");// this is derived
-		// these are periodic
-		//ADSTYPE	10	Service Model
-		//ADSTYPE	20	GENERALAREA
-		//ADSTYPE	30	Deletes
-		//ADSTYPE	40	XLATE
-
-		PERIODIC_TBL.put("GENERALAREA", "20");
-		PERIODIC_TBL.put("Deletes", "30"); 
-		PERIODIC_TBL.put("XLATE", "40");
-	}
-
-	private void setupPrintWriter(){
-		String fn = m_abri.getFileName();
-		int extid = fn.lastIndexOf(".");
-		dbgfn = fn.substring(0,extid+1)+"dbg";
-		try {
-			dbgPw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(dbgfn, true), "UTF-8"));
-		} catch (Exception x) {
-			D.ebug(D.EBUG_ERR, "trouble creating debug PrintWriter " + x);
-		}
-	}
-	private void closePrintWriter() {
-		if (dbgPw != null){
-			dbgPw.flush();
-			dbgPw.close();
-			dbgPw = null;
-		}
-	}
-	/**********************************
-	 *  Execute ABR.
-	 */
-	public void execute_run()
-	{
-		/*
-        The Report should identify:
-            USERID (USERTOKEN)
-            Role
-            Workgroup
-            Date/Time
-            EntityType LongDescription
-			Any errors or list LSEO created or changed
-		 */
-		// must split because too many arguments for messageformat, max of 10.. this was 11
-		String HEADER = "<head>"+
-		EACustom.getMetaTags(getDescription()) + NEWLINE +
-		EACustom.getCSS() + NEWLINE +
-		EACustom.getTitle("{0} {1}") + NEWLINE +
-		"</head>" + NEWLINE + "<body id=\"ibm-com\">" +
-		EACustom.getMastheadDiv() + NEWLINE +
-		"<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
-		String HEADER2 = "<table>"+NEWLINE +
-		"<tr><th>Userid: </th><td>{0}</td></tr>"+NEWLINE +
-		"<tr><th>Role: </th><td>{1}</td></tr>"+NEWLINE +
-		"<tr><th>Workgroup: </th><td>{2}</td></tr>"+NEWLINE +
-		"<tr><th>Date: </th><td>{3}</td></tr>"+NEWLINE +
-		"<tr><th>Description: </th><td>{4}</td></tr>"+NEWLINE +
-		"<tr><th>Return code: </th><td>{5}</td></tr>"+NEWLINE +
-		"</table>"+NEWLINE+
-		"<!-- {6} -->" + NEWLINE;
-
-		MessageFormat msgf;
-		String abrversion="";
-
-		println(EACustom.getDocTypeHtml()); //Output the doctype and html
-
-		try
-		{
-			long startTime = System.currentTimeMillis();
-			start_ABRBuild(); // pull dummy VE
-
-		    abr_debuglvl = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getABRDebugLevel(m_abri.getABRCode());
-		       
-			setupPrintWriter();
-
-			//get properties file for the base class
-			rsBundle = ResourceBundle.getBundle(getClass().getName(), ABRUtil.getLocale(m_prof.getReadLanguage().getNLSID()));
-			// get root from VE
-			EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-			// debug display list of groups
-			addDebug("DEBUG: "+getShortClassName(getClass())+" entered for " +rootEntity.getKey()+
-					" extract: "+m_abri.getVEName()+" using DTS: "+m_prof.getValOn()+NEWLINE + PokUtils.outputList(m_elist));
-
-			//Default set to pass
-			setReturnCode(PASS);
-//			fixme remove this.. avoid msgs to userid for testing
-//			setCreateDGEntity(false);
-
-			//NAME is navigate attributes
-			navName = getNavigationName(rootEntity);
-
-			// get entitytype, it is U but get the long description
-			String entityType = PokUtils.getAttributeValue(rootEntity, "XMLENTITYTYPE", "", null, false);
-			String setupType = PokUtils.getAttributeValue(rootEntity, "XMLSETUPTYPE", "", null, false);
-			String mqueue = PokUtils.getAttributeFlagValue(rootEntity, MQUEUE_ATTR);
-			
-			addDebug("Executing for entityType: "+entityType+" mqueue: "+mqueue + " setupType: " + setupType);
-
-			
-			if (setupType==null){
-				args[0] = PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), "XMLSETUPTYPE", "XMLSETUPTYPE");
-				addError("INVALID_ATTR_ERR",args);
-				
-			}else if ("Production".equals(setupType)){
-				args[0] = "Production";
-				addError("INVALID_SETUPTYPE_ERR",args);
-			}else if (entityType==null) {
-				//INVALID_ATTR_ERR = {0} does not have a value
-				args[0] = PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), "XMLENTITYTYPE", "XMLENTITYTYPE");
-				addError("INVALID_ATTR_ERR",args);
-			}else if (TBD_SET.contains(entityType)){
-				//NOT_SUPPORTED = {0} is not supported at this time.
-				args[0] = getLD_Value(rootEntity, "XMLENTITYTYPE"); 
-				addError("NOT_SUPPORTED",args);
-			}else{
-				String periodicFlag = (String)PERIODIC_TBL.get(entityType);
-				String tmptype = entityType;
-				String arg0 = "";
-				if(periodicFlag != null){ // these are periodic
-					tmptype = "ADSXMLSETUP";
-					arg0 = tmptype+" for "+entityType;
-				}else{
-					arg0 = getLD_Value(rootEntity, "XMLENTITYTYPE");
-				}
-				
-				EntityGroup eg = new EntityGroup(null,m_db, m_prof, tmptype, "Edit", false);
-
-				// check if it has an XMLIDLABRSTATUS attr
-				// if meta does not have this attribute, there is nothing to do
-				EANMetaAttribute metaAttr = eg.getMetaAttribute(ADS_XMLEED_ATTR);
-				if (metaAttr==null) {
-					//INVALID_META_ERR = {0} does not have {1} attribute in meta
-					args[0] = arg0;
-					args[1] = ADS_XMLEED_ATTR;
-					addError("INVALID_META_ERR",args);
-				}
-				metaAttr = eg.getMetaAttribute(MQUEUE_ATTR);
-				if (metaAttr==null) {
-					//INVALID_META_ERR = {0} does not have {1} attribute in meta
-					args[0] = arg0;
-					args[1] = MQUEUE_ATTR;
-					addError("INVALID_META_ERR",args);
-				}
-			}
-			
-			if ("IDL".equals(setupType) && mqueue==null) {
-				//INVALID_ATTR_ERR = {0} does not have a value
-				args[0] = getLD_Value(rootEntity,MQUEUE_ATTR); 
-				addError("INVALID_ATTR_ERR",args);
-			}
-			
-			if ("Cache".equals(setupType) && (String)PERIODIC_TBL.get(entityType) != null) {
-				//INVALID_ATTR_ERR = {0} does not have a value
-				args[0] = entityType; 
-				addError("INVALID_PERIODIC_ERR",args);
-			}
-			
-			if ("Cache current".equals(setupType) && (String)PERIODIC_TBL.get(entityType) != null) {
-				//INVALID_ATTR_ERR = {0} does not have a value
-				args[0] = entityType; 
-				addError("INVALID_PERIODIC_ERR",args);
-			}
-
-			if (getReturnCode()==PASS){
-                if ("Cache".equals(setupType) || "Cache current".equals(setupType)){
-                	if("Cache current".equals(setupType)) {
-                		IS_SYSFEEDRESEND_CUR = true;
-                		addDebug("case 1 IS_SYSFEEDRESEND_CUR= "+IS_SYSFEEDRESEND_CUR+";setupType="+setupType);
-                	}else{
-                		IS_SYSFEEDRESEND_CUR = false;
-                		addDebug("case 2 IS_SYSFEEDRESEND_CUR= "+IS_SYSFEEDRESEND_CUR + ";setupType=" + setupType);
-                	}
-                	
-                	//addDebug("@@@@ IS_SYSFEEDRESEND_CUR= "+IS_SYSFEEDRESEND_CUR);
-                	
-                	long curtime = System.currentTimeMillis();
-    				// find all ids for this root type and filters
-    				Vector idsVct = getEntityIds(rootEntity,entityType);
-    				if (getReturnCode()==PASS){
-    					String periodicFlag = (String)PERIODIC_TBL.get(entityType);
-    					String tmptype = entityType;
-    					if(periodicFlag != null){ // these are periodic
-    						tmptype = "ADSXMLSETUP with "+entityType;
-    						entityType = "ADSXMLSETUP";
-    					}
-    					addDebug("Time to find entity ids: "+Stopwatch.format(System.currentTimeMillis()-curtime));
-    					addDebug("Update these entity ids.cnt: "+(idsVct==null?"null":""+idsVct.size()));
-    					addDebug(D.EBUG_INFO,"Update these ids: "+idsVct);
-    					curtime = System.currentTimeMillis();
-    					String mqFlags[] = PokUtils.convertToArray(mqueue);
-    					// queue any ids found
-    					if(idsVct !=null && idsVct.size()>0){
-    						String queuedValue = getQueuedValue(ADS_XMLEED_ATTR);
-    						for (int i=0; i<idsVct.size(); i++){
-    							Integer eid = (Integer)idsVct.elementAt(i);  
-    							//add for the SYSFEEDRESEND Current
-    							if(IS_SYSFEEDRESEND_CUR) setQueueValues(entityType, eid.intValue());
-    							setValues(mqFlags, queuedValue, entityType, eid.intValue());
-    							
-    							// this entity does not put it on the queue.. the ADS abr does
-    							// so it must copy this mq info into the entity.. the ADS abr must clear this attr!!!!!
-    							if(vctReturnsEntityKeys.size()>=500){
-    								int cnt = vctReturnsEntityKeys.size();
-    								//add for the SYSFEEDRESEND Current
-    								if(IS_SYSFEEDRESEND_CUR) updatePDHQueue();
-    								// update the pdh 
-    								updatePDH();
-    								
-    								long curtime2 = System.currentTimeMillis();
-    								addDebug("Time to update "+cnt+" "+entityType+": "+Stopwatch.format(curtime2-curtime));
-    								curtime = curtime2;
-    							}
-    						}
-
-    						if(vctReturnsEntityKeys.size()>0){
-    							int cnt = vctReturnsEntityKeys.size();    							 
-    							//add for the SYSFEEDRESEND Current
-    							if(IS_SYSFEEDRESEND_CUR) updatePDHQueue();
-    							// update the pdh
-    							updatePDH();    							
-    							addDebug("Time to update "+cnt+
-    									" "+entityType+": "+Stopwatch.format(System.currentTimeMillis()-curtime));
-    						}
-    						idsVct.clear();
-    					}else{
-    						//NONE_FOUND = No {0} entities found meeting specified criteria
-    						args[0] = tmptype;
-    						addMessage("", "NONE_FOUND", args);
-    					}
-    					// set lastrunning time back to setup entity,must get the refresh date     						
-						EANAttribute att = rootEntity.getAttribute(ADSIDLSTATUS);
-						if(att !=null){
-							AttributeChangeHistoryGroup attrHistory = new AttributeChangeHistoryGroup(m_db, m_prof, att);
-							if(attrHistory != null && attrHistory.getChangeHistoryItemCount() > 0){
-								int count = attrHistory.getChangeHistoryItemCount();
-								AttributeChangeHistoryItem achi = (AttributeChangeHistoryItem) attrHistory.getChangeHistoryItem(count - 1);
-								if(achi != null){
-									String status = achi.getFlagCode();
-		    						addDebug("checking ADSIDLSTATUS :" +status );
-		    						if("0050".equals(status)){
-		    							String valfrom = achi.getChangeDate();
-		    							this.setTextValue(rootEntity, ADSIDLLASTRANDTS, valfrom);
-		    							addDebug("set lastrunning time back to setup entity :" +valfrom );
-		    						}
-								}
-							}
-						}
-    				}// no errors after parsing attributes
-             }else if ("IDL".equals(setupType)){
-            	Vector allowedVct = new Vector();
-				allowedVct.add("PDHDOMAIN");  // always allowed
-				allowedVct.add(ADSIDLSTATUS); 
-				allowedVct.add("XMLENTITYTYPE"); 
-				allowedVct.add("XMLABRPROPFILE");
-				allowedVct.add("XMLSETUPTYPE"); // "Production" | "IDL" | "Cache" | "Cache current"
-				allowedVct.add("XMLSETUPDESC"); 
-				allowedVct.add("XMLTARGETSYSTEM");
-				allowedVct.add("XMLVERSION");
-				allowedVct.add("XMLMOD");
-				allowedVct.add("XMLSTATUS");
-				allowedVct.add("XMLIDLREQDTS");
-				allowedVct.add("XMLIDLMAXMSG");
-				allowedVct.add("OLDINDC");
-				
-				String filters[] = (String[])FILTER_TBL.get(entityType);
-				if (filters!=null){
-					// get each attribute and type
-					for (int i=0; i<filters.length; i++){
-						String codetype[] = PokUtils.convertToArray(filters[i]);
-						String attrcode = codetype[0];
-//						String attrtype = codetype[1];
-//						String value=null;
-						allowedVct.add(attrcode);
-						
-					}
-					checkExtraAttrs(rootEntity, entityType, allowedVct);
-				}
-				if(getReturnCode()==PASS){
-            	 //TODO
-					XMLFiterMQIDL idl = new XMLFiterMQIDL(this);
-					idl.getFullXmlAndSendToQue(rootEntity);
-					String report = idl.getReport();
-					addOutput(report);
-					
-				}
-             }
-				
-			addDebug("Total Time: "+Stopwatch.format(System.currentTimeMillis()-startTime));
-		
-			}
-		}catch(Throwable exc) {
-			java.io.StringWriter exBuf = new java.io.StringWriter();
-			String Error_EXCEPTION="<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
-			String Error_STACKTRACE="<pre>{0}</pre>";
-			msgf = new MessageFormat(Error_EXCEPTION);
-			setReturnCode(INTERNAL_ERROR);
-			exc.printStackTrace(new java.io.PrintWriter(exBuf));
-			// Put exception into document
-			args[0] = exc.getMessage();
-			rptSb.append(msgf.format(args) + NEWLINE);
-			msgf = new MessageFormat(Error_STACKTRACE);
-			args[0] = exBuf.getBuffer().toString();
-			rptSb.append(msgf.format(args) + NEWLINE);
-			logError("Exception: "+exc.getMessage());
-			logError(exBuf.getBuffer().toString());
-		}
-		finally	{
-			setDGTitle(navName);
-			setDGRptName(getShortClassName(getClass()));
-			setDGRptClass(getABRCode());
-			// make sure the lock is released
-			if(!isReadOnly()) {
-				clearSoftLock();
-			}
-			closePrintWriter();
-		}
-
-		//Print everything up to </html>
-		//Insert Header into beginning of report
-		msgf = new MessageFormat(HEADER);
-		args[0] = getDescription();
-		args[1] = navName;
-		String header1 = msgf.format(args);
-		msgf = new MessageFormat(HEADER2);
-		args[0] = m_prof.getOPName();
-		args[1] = m_prof.getRoleDescription();
-		args[2] = m_prof.getWGName();
-		args[3] = getNow();
-		args[4] = navName;
-		args[5] = (this.getReturnCode()==PokBaseABR.PASS?"Passed":"Failed");
-		args[6] = abrversion+" "+getABRVersion();
-
-		restoreXtraContent();
-
-		rptSb.insert(0, header1+msgf.format(args) + NEWLINE);
-
-		println(rptSb.toString()); // Output the Report
-		printDGSubmitString();
-		println(EACustom.getTOUDiv());
-		buildReportFooter(); // Print </html>
-
-		metaTbl.clear();
-	}
-	/**
-	 * B.	Attributes for Filtering Data
-	 * 
-	 * The rest of the attributes are used as filters. The column labeled Classified Filter indicates the 
-	 * entity type for which the filter attribute is applicable. For example, Feature Type (FCTYPE) is only 
-	 * applicable for Feature (FEATURE).
-	 * 
-	 * The attributes FCTYPE through SVCMODSUBGRP are used to filter data if there is a value specified. 
-	 * The value specified must match the value in the data in order for the data to be queued. If a value 
-	 * is not specified (empty), then it does not participate in filtering the data.
-	 * 
-	 * Note: MACHTYPEATR is used to filter on TOMACHTYPE for MODELCONVERT and FCTRANSACTION.
-	 * 
-	 * Similarly, the date attributes WITHDRAWDATEEFF_T through WITHDRWEFFCTVDATE, if not empty, are used to 
-	 * filter data that is withdrawn. If the data being considered does not have a value for this attribute, 
-	 * then the data is not withdrawn and will be included. If the data being considered has a value, then 
-	 * the setup entity date must be less than or equal to the date specified for the data in order to 
-	 * be considered. This allows, for example, data to be sent even though it was withdrawn 90 days ago.
-	 * If the setup entity date field is empty, then assume a value of NOW().
-	 * 
-	 * Note: There are entities (XMLENTITYTYPE) that do not have filtering attributes. For example, 
-	 * GBT does not have any filtering other than PDHDOMAIN.
-	 * 
-	 * @param rootItem
-	 * @param entityType
-	 * @return
-	 * @throws MiddlewareException
-	 * @throws SQLException
-	 * @throws MiddlewareShutdownInProgressException 
-	 * 
-	 */
-	private Vector getEntityIds(EntityItem rootItem,String entityType) throws MiddlewareException, 
-	SQLException, MiddlewareShutdownInProgressException
-	{
-		Vector idVct = null;
-		Vector allowedVct = new Vector();
-		allowedVct.add("PDHDOMAIN");  // always allowed
-		allowedVct.add(ADSIDLSTATUS); 
-		allowedVct.add("XMLENTITYTYPE"); 
-		allowedVct.add("XMLABRPROPFILE");
-		allowedVct.add("XMLSETUPTYPE"); // "Production" | "IDL" | "Cache"
-		allowedVct.add("XMLSETUPDESC"); 
-		allowedVct.add("XMLTARGETSYSTEM");
-		allowedVct.add("XMLVERSION");
-		allowedVct.add("XMLMOD");
-
-		Vector txtValuesVct = new Vector(); 
-		Vector txtAttrVct = new Vector();
-		Vector flagValuesVct = new Vector(); 
-		Vector flagAttrVct = new Vector();
-		
-		// build a pdhdomain vct, filter sps need something
-		Vector domainVct = new Vector();
-		String domainStr = PokUtils.getAttributeFlagValue(rootItem, "PDHDOMAIN");
-		if (domainStr != null){
-			String domains[] = PokUtils.convertToArray(domainStr);
-			for(int i=0; i<domains.length; i++){
-				domainVct.add(domains[i]);
-			}
-		}
-		
-
-		addDebug("domainVct "+domainVct);
-		
-		String periodicFlag = (String)PERIODIC_TBL.get(entityType);
-		if(periodicFlag != null){ // these are periodic
-			// make sure other attrs are not specified
-			checkExtraAttrs(rootItem, entityType, allowedVct);
-			if(getReturnCode()==PASS){
-				flagValuesVct.add(periodicFlag);
-				flagAttrVct.add("ADSTYPE");
-				addDebug("executing on entityType ADSXMLSETUP for "+entityType+" with flagAttrVct "+flagAttrVct+
-						" flagValuesVct "+flagValuesVct);
-				
-				rptSb.append("<br /><h2>Looking for ADSXMLSETUP with the following filters:<br />");
-				rptSb.append("ADSTYPE = "+periodicFlag+" for "+entityType+"<br />");
-				String domain = PokUtils.getAttributeValue(rootItem, "PDHDOMAIN", " or ", null, false);
-				rptSb.append(PokUtils.getAttributeDescription(rootItem.getEntityGroup(), "PDHDOMAIN", "PDHDOMAIN")+
-						" = "+domain+"<br />");
-
-				rptSb.append("</h2>"+NEWLINE);
-				
-				idVct = new Vector();
-				// do one domain at a time
-				for (int d=0; d<domainVct.size(); d++){
-					getMatchingTextAndFlagIds("ADSXMLSETUP", txtValuesVct, txtAttrVct, 
-							flagValuesVct, flagAttrVct, idVct, domainVct.elementAt(d).toString());
-				}
-			}
-		}else{
-			// get filters
-			String filters[] = (String[])FILTERCACHE_TBL.get(entityType);
-
-			String dateAttr = null;
-			String dateValue = null;
-	
-			// add any filters
-			if (filters!=null){
-				// get each attribute and type
-				for (int i=0; i<filters.length; i++){
-					String codetype[] = PokUtils.convertToArray(filters[i]);
-					String attrcode = codetype[0];
-					String attrtype = codetype[1];
-					String value=null;
-					allowedVct.add(attrcode);
-					
-					if (attrtype.equals("T")){
-						value = PokUtils.getAttributeValue(rootItem, attrcode, "", null, false);
-						if (value!=null && value.length()>0){
-							txtAttrVct.add(attrcode);
-							txtValuesVct.add(value);
-						}else if (isRequired(entityType, attrcode)){
-							//INVALID_FILTER_ERR = {0} is a required filter for {1} but does not have a value
-							args[0] = attrcode; 
-							args[1] = entityType;
-							addError("INVALID_FILTER_ERR",args);
-						}
-					}else if (attrtype.equals("D")){// there is only one
-						// update through withdreweffectivedate to endofsvc, If the value in the EXTXMLFEED is empty, then all are used. updates of System Feed 20110908.doc
-						value = PokUtils.getAttributeValue(rootItem, attrcode, "", null, false);
-						dateAttr = attrcode;
-						if (value==null || value.length()==0){
-							value = m_strEpoch.substring(0,10);
-						}
-						dateValue = value;
-					}else{
-						value = PokUtils.getAttributeFlagValue(rootItem, attrcode);
-						if (value!=null && value.length()>0){
-							//MODELCONVERT = MACHTYPEATR|U are used as TOMACHTYPE|T
-							//FCTRANSACTION = MACHTYPEATR|U
-//							if(attrcode.equals("MACHTYPEATR")&&
-//									(entityType.equals("MODELCONVERT") || entityType.equals("FCTRANSACTION"))){
-//								txtAttrVct.add("TOMACHTYPE");
-//								txtValuesVct.add(value);
-//							}else{
-								flagAttrVct.add(attrcode);
-								flagValuesVct.add(value);
-//							}
-						}else if (isRequired(entityType, attrcode)){
-							//INVALID_FILTER_ERR = {0} is a required filter for {1} but does not have a value
-							args[0] = attrcode; 
-							args[1] = entityType;
-							addError("INVALID_FILTER_ERR",args);
-						}
-//						if(attrcode.equals("COFGRP") && entityType.equals("LSEO")){
-//							// because of dependencies, these must be specified, so allow them
-//							allowedVct.add("COFCAT");
-//							allowedVct.add("COFSUBCAT");
-//						}
-					}
-
-					addDebug("entitytype "+entityType+" attrcode "+attrcode+" value "+value);
-				}
-			}
-			
-			checkExtraAttrs(rootItem, entityType, allowedVct);
-
-			if(getReturnCode()==PASS){
-
-				addDebug("executing on entityType "+entityType+" with flagAttrVct "+flagAttrVct+
-						" flagValuesVct "+flagValuesVct+" txtAttrVct "+txtAttrVct+" txtValuesVct "+
-						txtValuesVct+" dateAttr "+dateAttr+" dateValue "+dateValue);
-				
-				addHeadingInfo(rootItem,entityType,txtAttrVct,flagAttrVct,dateAttr, dateValue);
-				//add lastrunning time to support delta initial cache
-				String lastrunningTime = PokUtils.getAttributeValue(rootItem, ADSIDLLASTRANDTS, "|", null, false);
-				//check lastrunningTime format
-				if(lastrunningTime != null && !Validate.isoDate(lastrunningTime)){
-					//INVAILD_DATE_ERR = {0} is not allowed for this format {1}
-					args[0] = ADSIDLLASTRANDTS; 
-					addError("INVAILD_DATE_ERR",args);
-				}
-				//TODO change the getFilteredXXXSql
-				/**
-				 * base on the BH FS ABR XML System Feed 20130904.doc Page 60
-				 * If the root entity being considered has STATUS <> 鈥淒raft鈥� (0010), then
-						o	If ADSIDLLASTRANDTS is not empty, 
-								then find VALFROM for the most recent value 鈥淪tatus鈥� (STATUS). 
-								If the VALFROM of STATUS > ADSIDLLASTRANDTS 
-						飩�			then set entitytype.XMLIDLABRSTATUS = 鈥淨ueued鈥� (0020) for the root entity being considered.
-						飩�		Else, skip this entity (do not queue XMLIDLABRSTATUS)
-						o	Else Sets entitytype.XMLIDLABRSTATUS = 鈥淨ueued鈥� (0020)
-							where entitytype is the root entitytype
-				 */
-				long startTime = System.currentTimeMillis();
-				String timetxt="Time to filter "+entityType+": ";
-				if("MODEL".equals(entityType)){
-					String sql = null;
-					sql = getFilteredModelSql(entityType, domainVct, lastrunningTime);
-					if (sql != null){
-						idVct = getMatchingIds(sql);
-					} 
-				
-					timetxt="Time to filter on "+entityType+" with MODEL text and flags: ";
-				}else if (entityType.equals("REFOFER")){				
-					if (dateAttr!=null){
-						String sql = null;
-						sql = getFilteredDateSql(entityType, dateAttr, dateValue, domainVct, lastrunningTime);
-						if (sql != null){
-							idVct = getMatchingIds(sql);
-						} 
-					}
-					timetxt="Time to filter on "+entityType+" with REFOFER text and flags: ";
-				}else if (entityType.equals("REFOFERFEAT")){
-//					 must match attr on the MODEL
-					if (dateAttr!=null){
-						String sql = null;
-						sql = getFilteredREFOFERFEATDateSql(entityType, dateAttr, dateValue, domainVct, lastrunningTime);
-						if (sql != null){
-							idVct = getMatchingIds(sql);
-						} 
-					}
-					timetxt="Time to filter on "+entityType+" with reference REFOFER text and flags: ";
-					
-				}else{
-//					// do one domain at a time
-//					for (int d=0; d<domainVct.size(); d++){
-//						getMatchingTextAndFlagIds(entityType, txtValuesVct, txtAttrVct, 
-//								flagValuesVct, flagAttrVct, tmpidVct, domainVct.elementAt(d).toString());
-//					}
-					String sql = null;
-					sql = getFilteredSql(entityType, domainVct, lastrunningTime);
-					if (sql != null){
-						idVct = getMatchingIds(sql);
-					}
-					timetxt="Time to filter on root "+entityType+" PDHDomain and WithdrawEffectiveDate: ";
-				}
-
-				long curtime = System.currentTimeMillis();
-				addDebug(timetxt+Stopwatch.format(curtime-startTime));
-			}// end all ok
-		}
-		
-		//release memory
-		txtValuesVct.clear();
-		txtAttrVct.clear();
-		flagValuesVct.clear();
-		flagAttrVct.clear();
-		domainVct.clear();
-		
-		return idVct;
-	}
-
-	/**
-	 * make sure extra attributes are not specified for this entitytype
-	 * 
-	 * Classification is not supported by eAnnounce for attributes used on a second entity type. Hence the
-	 *  ABR will have to handle thepplicable via code. Only an Attribute Code that is applicable for
-	 *  the entity type indicated and has a singleust have a value for that entity type. If an Attribute
-	 *  Code ispplicable does not have this indicator, then having a value is optional. If an Attribute
-	 *  Code is not applicable, then it must not have a value.
-	 *  
-	 * @param rootItem
-	 * @param entityType
-	 * @param allowedVct
-	 */
-	private void checkExtraAttrs(EntityItem rootItem, String entityType, Vector allowedVct){
-		for (int i=0; i<rootItem.getAttributeCount(); i++){
-			EANAttribute attr = rootItem.getAttribute(i);
-			String attrcode = attr.getAttributeCode();
-			if (!allowedVct.contains(attrcode)){
-				String value = PokUtils.getAttributeValue(rootItem, attrcode, "", null, false);
-				addDebug("checkExtraAttrs attrcode "+attrcode+" value "+value);
-				if (value!=null && value.length()>0){
-					//EXTRA_FILTER_ERR = {0} is not allowed for {1}
-					args[0] = attrcode; 
-					args[1] = entityType;
-					addError("EXTRA_FILTER_ERR",args);
-				}
-			}
-		}
-	}
-
-	/**
-	 * add information to the report about what this abr is looking for and its filters
-	 * @param entityType
-	 * @param txtAttrVct
-	 * @param flagAttrVct
-	 * @param dateAttr
-	 * @param dateValue
-	 */
-	private void addHeadingInfo(EntityItem rootEntity, String entityType,Vector txtAttrVct, 
-			Vector flagAttrVct,String dateAttr, String dateValue){
-		
-		rptSb.append("<br /><h2>Looking for "+entityType+" with the following filters:<br />");
-//		if (entityType.equals("LSEO")){
-//			// must match COFGRP on the MODEL, the date is on LSEO
-//			//LSEO    = COFGRP,LSEOUNPUBDATEMTRGT
-//			rptSb.append(entityType+" with "+
-//					PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), dateAttr, dateAttr)+
-//					" &gt;= "+dateValue+" or not populated<br />");
-//			String cofgrp = flagAttrVct.firstElement().toString();
-//			String cofgrpValue = PokUtils.getAttributeValue(rootEntity, "COFGRP", "", null, false);
-//			if(cofgrpValue==null){
-//				cofgrpValue="Base";
-//			}
-//			rptSb.append("and has a Model with "+
-//					PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), cofgrp, cofgrp)+
-//					" = "+cofgrpValue+"<br />");
-//		}else if (entityType.equals("MODELCONVERT")||entityType.equals("FCTRANSACTION")){
-//			//MODELCONVERT = MACHTYPEATR,WTHDRWEFFCTVDATE
-//			//FCTRANSACTION = MACHTYPEATR,WTHDRWEFFCTVDATE
-//			// must match WTHDRWEFFCTVDATE on the MODEL and MACHTYPEATR used for TOMACHTYPE on root
-//			String value = PokUtils.getAttributeValue(rootEntity, "MACHTYPEATR", "", null, false);
-//			rptSb.append(entityType+" with TOMACHTYPE ="+value+"<br />");
-//			rptSb.append("and a To Model with "+
-//					PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), "MACHTYPEATR", "MACHTYPEATR")+
-//					" = "+value+"<br />");
-//			rptSb.append(" and "+
-//					PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), dateAttr, dateAttr)+
-//					" &gt;= "+dateValue+" or not populated<br />");
-//		}else if (entityType.equals("PRODSTRUCT")||entityType.equals("SWPRODSTRUCT")){
-//			// must match attr on the MODEL
-//			//PRODSTRUCT   = MACHTYPEATR,MODELATR,WTHDRWEFFCTVDATE
-//			//SWPRODSTRUCT = MACHTYPEATR,MODELATR,WTHDRWEFFCTVDATE
-//			String value = PokUtils.getAttributeValue(rootEntity, "MACHTYPEATR", "", null, false);
-//			rptSb.append(entityType+" linked to a Model with "+
-//					PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), "MACHTYPEATR", "MACHTYPEATR")+
-//					" = "+value+"<br />");
-//			value = PokUtils.getAttributeValue(rootEntity, "MODELATR", "", null, false);
-//			rptSb.append(" and "+
-//					PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), "MODELATR", "MODELATR")+
-//					" = "+value+"<br />");
-//			rptSb.append(" and "+
-//					PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), dateAttr, dateAttr)+
-//					" &gt;= "+dateValue+" or not populated<br />");
-//		}else if (entityType.equals("MODEL")){
-//			// must match COFGRP 
-//			//MODEL   = COFCAT,COFGRP,COFSUBCAT,WTHDRWEFFCTVDATE
-//			for (int i=0; i<flagAttrVct.size(); i++){
-//				String attrcode = flagAttrVct.elementAt(i).toString();
-//				String value = PokUtils.getAttributeValue(rootEntity, attrcode, "", null, false);
-//				if(attrcode.equals("COFGRP") && value==null){
-//					value="Base";
-//				}
-//				rptSb.append(entityType+" with "+
-//						PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), attrcode, attrcode)+
-//						" = "+value+"<br />");
-//			}
-//			rptSb.append(entityType+" with "+
-//					PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), dateAttr, dateAttr)+
-//					" &gt;= "+dateValue+" or not populated<br />");
-//
-//		}else{
-			//FEATURE = FCTYPE,WITHDRAWDATEEFF_T
-			//SVCMOD  = SVCMODCATG,SVCMODGRP,SVCMODSUBCATG,SVCMODSUBGRP,WTHDRWEFFCTVDATE
-			//LSEOBUNDLE = BUNDLUNPUBDATEMTRGT
-			//SWFEATURE  = WITHDRAWDATEEFF_T
-			//WWCOMPAT = BRANDCD
-		for (int i=0; i<txtAttrVct.size(); i++){
-			String attrcode = txtAttrVct.elementAt(i).toString();
-			String value = PokUtils.getAttributeValue(rootEntity, attrcode, "", null, false);
-			rptSb.append(entityType+" with "+
-					PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), attrcode, attrcode)+
-					" = "+value+"<br />");
-		}
-		for (int i=0; i<flagAttrVct.size(); i++){
-			String attrcode = flagAttrVct.elementAt(i).toString();
-			String value = PokUtils.getAttributeValue(rootEntity, attrcode, "", null, false);
-			rptSb.append(entityType+" with "+
-					PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), attrcode, attrcode)+
-					" = "+value+"<br />");
-		}
-		if(dateAttr!=null){
-			rptSb.append(entityType+" with "+
-					PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), dateAttr, dateAttr)+
-					" &gt;= "+dateValue+" or not populated<br />");
-		}
-//		}
-
-		String domain = PokUtils.getAttributeValue(rootEntity, "PDHDOMAIN", " or ", null, false);
-		rptSb.append(PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), "PDHDOMAIN", "PDHDOMAIN")+
-				" = "+domain+"<br />");
-
-		rptSb.append("</h2>"+NEWLINE);
-		
-	}
-	/**
-	 * is this attribute required as a filter, meta classifications were not working properly
-	 * @param entityType
-	 * @param attrcode
-	 * @return
-	 */
-	private boolean isRequired(String entityType, String attrcode){
-		String required[] = (String[])REQFILTER_TBL.get(entityType);
-		boolean isreq = false;
-		if(required!=null){
-			for(int i=0; i<required.length; i++){
-				if(attrcode.equals(required[i])){
-					isreq=true;
-					break;
-				}
-			}
-		}
-		return isreq;
-	}
-//	/**
-//	 * find all relator entity ids with MODEL that meet the filter criteria one domain at a time
-//	 * @param featType
-//	 * @param relatorType
-//	 * @param txtValuesVct
-//	 * @param txtAttrVct
-//	 * @param flagValuesVct
-//	 * @param flagAttrVct
-//	 * @param idVct
-//	 * @param domain
-//	 * @throws SQLException
-//	 * @throws MiddlewareException
-//	 */
-//	private void getMatchingModelTextAndFlagIds(String featType, String relatorType, 
-//			Vector txtValuesVct, Vector txtAttrVct, 
-//			Vector flagValuesVct, Vector flagAttrVct, Vector idVct, String domain) throws SQLException, MiddlewareException{
-//		// duplicate search like action with all but date attribute
-//		ReturnStatus returnStatus = new ReturnStatus( -1);
-//		int iSessionID = m_db.getNewSessionID();
-//		int iNextSessionID = -1;
-//
-//		try{
-//			// search for entities 1 first
-//			int iStep1 = 1;
-//			ResultSet rs = null;
-//			ReturnDataResultSet rdrs = null;
-//			ReturnDataResultSet rdrs1 = null;
-//
-//			// Now.. lets fill out the search table
-//			//load pdhdomain here for features
-//			m_db.callGBL8119(returnStatus, iSessionID, iStep1, m_prof.getEnterprise(), featType,
-//					"PDHDOMAIN", domain);
-//			m_db.commit();
-//			m_db.freeStatement();
-//			m_db.isPending();
-//
-//			// find entity 1 first
-//			try {
-//				rs =m_db.callGBL9200(returnStatus, iSessionID, m_prof.getEnterprise(), SEARCHREL_KEY+relatorType,
-//						0, m_prof.getValOn(), m_prof.getEffOn(), getSPLimit());
-//				rdrs = new ReturnDataResultSet(rs);
-//			}
-//			finally {
-//				if (rs!=null){
-//					rs.close();
-//					rs = null;
-//				}
-//				m_db.commit();
-//				m_db.freeStatement();
-//				m_db.isPending();
-//			}
-//
-//			if (rdrs.size() > 0) {
-//
-//				iNextSessionID = m_db.getNewSessionID();
-//
-//				// Just for Debug here..
-//				for (int i = 0; i < rdrs.size(); i++) {
-//					String strEntityType = rdrs.getColumn(i, 0);
-//					int iEntityID = rdrs.getColumnInt(i, 1);
-//					m_db.debug(D.EBUG_SPEW, "ADSIDLSTATUS.getMatchingModelTextAndFlagIds gbl9200:answer:" + strEntityType + ":" + iEntityID);
-//				}
-//
-//				// o.k.  let call one sp that moves the relator and all the info
-//				// back into the trsNavigate  table.. with a complete image
-//				try {
-//					rs = m_db.callGBL2954(returnStatus, m_prof.getOPWGID(), iSessionID, iNextSessionID, 
-//							m_prof.getEnterprise(), SEARCHREL_KEY+relatorType,
-//							relatorType, m_prof.getValOn(), m_prof.getEffOn());
-//					rdrs1 = new ReturnDataResultSet(rs);
-//				}
-//				finally {
-//					if (rs !=null){
-//						rs.close();
-//						rs = null;
-//					}
-//					m_db.commit();
-//					m_db.freeStatement();
-//					m_db.isPending();
-//				}
-//				//
-//				// OK.. we are now using a new session id
-//				int tmp = iSessionID;
-//				iSessionID = iNextSessionID;
-//				iNextSessionID = tmp;
-//
-//				// if any e2's were found.. there is at least on potential relator out there
-//				// and the  e2's are sitting there in the queue table.
-//				//
-//				if (rdrs1.size() > 0) {
-//					int iStep2 = 0;
-//
-//					// Now.. lets fill out the search table
-//					// D.W.B.  Do the Text first.. because they should yield quicker results than flags
-//					for (int ii = 0; ii < txtAttrVct.size(); ii++) {
-//						iStep2++;
-//						m_db.callGBL8119(returnStatus, iSessionID, iStep2, m_prof.getEnterprise(), "MODEL", 
-//								txtAttrVct.elementAt(ii).toString(),txtValuesVct.elementAt(ii).toString());
-//						m_db.commit();
-//						m_db.freeStatement();
-//						m_db.isPending();
-//					}
-//
-//					// D.W.B.  Do non Text second
-//					for (int ii = 0; ii < flagAttrVct.size(); ii++) {
-//						iStep2++;
-//						m_db.callGBL8119(returnStatus, iSessionID, iStep2, m_prof.getEnterprise(), "MODEL", 
-//								flagAttrVct.elementAt(ii).toString(),flagValuesVct.elementAt(ii).toString());
-//						m_db.commit();
-//						m_db.freeStatement();
-//						m_db.isPending();
-//					}
-//
-//					// Lets have an augmented search
-//					try{
-//						rs = m_db.callGBL9203(returnStatus, iSessionID, m_prof.getEnterprise(), SEARCHREL_KEY+relatorType,
-//								0, m_prof.getValOn(), m_prof.getEffOn());
-//						rdrs = new ReturnDataResultSet(rs);
-//					}
-//					finally {
-//						if (rs !=null){
-//							rs.close();
-//							rs = null;
-//						}
-//						m_db.commit();
-//						m_db.freeStatement();
-//						m_db.isPending();
-//					}
-//
-//					for (int i = 0; i < rdrs.size(); i++) {
-//
-//						String strEntity1Type = rdrs.getColumn(i, 0);
-//						int iEntity1ID = rdrs.getColumnInt(i, 1);
-//						String strEntityType = rdrs.getColumn(i, 2);
-//						int iEntityID = rdrs.getColumnInt(i, 3);
-//						String strEntity2Type = rdrs.getColumn(i, 4);
-//						int iEntity2ID = rdrs.getColumnInt(i, 5);
-//						if(relatorType.equals(strEntityType) && iEntityID>0){ // bypass default entities
-//							Integer eid = new Integer(iEntityID);
-//							if (!idVct.contains(eid)){
-//								idVct.add(eid);
-//							}
-//						}else{
-//							addDebug("getMatchingModelTextAndFlagIds skipping strEntityType "+strEntityType+" iEntityID "+iEntityID);
-//							addDebug(D.EBUG_SPEW,
-//									"gbl9203:answer:" + strEntity1Type + ":" + iEntity1ID + ":" + strEntityType + ":" +
-//									iEntityID + ":" + strEntity2Type + ":" + iEntity2ID);
-//						}
-//			             m_db.debug(D.EBUG_SPEW,
-//                                 "ADSIDLSTATUS.getMatchingModelTextAndFlagIds gbl9203:answer:" + strEntity1Type + ":" + iEntity1ID + ":" + strEntityType + ":" +
-//                                 iEntityID + ":" + strEntity2Type + ":" + iEntity2ID);
-//					}
-//				}
-//			}
-//		}finally{
-//			m_db.commit();
-//			m_db.freeStatement();
-//			m_db.isPending();
-//			// Now remove all the records to clean up after yourself
-//			D.ebug(D.EBUG_SPEW, "ADSIDLSTATUS cleanup session id's: " + iSessionID + ", " + iNextSessionID);
-//			int nTries = 3;
-//			do {
-//				returnStatus = new ReturnStatus(-1);
-//				m_db.callGBL8105(returnStatus, iSessionID);
-//				m_db.commit();
-//				m_db.freeStatement();
-//				m_db.isPending();
-//				if (returnStatus.intValue() != 0) {
-//					D.ebug(D.EBUG_DETAIL, "ADSIDLSTATUS - GBL8105 did not return SP_OK");
-//					try {
-//						Thread.sleep(1000);
-//					} catch (InterruptedException e) {
-//						D.ebug(D.EBUG_DETAIL, e.getMessage());
-//					}
-//				}
-//			} while (returnStatus.intValue() != 0 && nTries-- > 0);
-//			nTries = 3;
-//			do {
-//				returnStatus = new ReturnStatus(-1);
-//				m_db.callGBL8105(returnStatus, iNextSessionID);
-//				m_db.commit();
-//				m_db.freeStatement();
-//				m_db.isPending();
-//				if (returnStatus.intValue() != 0) {
-//					D.ebug(D.EBUG_DETAIL, "ADSIDLSTATUS - GBL8105 did not return SP_OK");
-//					try {
-//						Thread.sleep(1000);
-//					} catch (InterruptedException e) {
-//						D.ebug(D.EBUG_DETAIL, e.getMessage());
-//					}
-//				}
-//			} while (returnStatus.intValue() != 0 && nTries-- > 0);
-//		}
-//
-//		addDebug("getMatchingModelTextAndFlagIds domain "+domain+" relatorType "+relatorType+" idVct.cnt: "+idVct.size());
-//		addDebug(D.EBUG_INFO,"getMatchingModelTextAndFlagIds relatorType "+relatorType+" idVct: "+idVct);
-//	}
-	/**
-	 * find all relator entity ids with MODEL that meet the filter criteria
-	 * 
-	 * @param featType
-	 * @param relatorType
-	 * @param txtValuesVct
-	 * @param txtAttrVct
-	 * @param flagValuesVct
-	 * @param flagAttrVct
-	 * @param domainVct
-	 * @return
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * /
-	private Vector getMatchingModelTextAndFlagIds(String featType, String relatorType, 
-			Vector txtValuesVct, Vector txtAttrVct, 
-			Vector flagValuesVct, Vector flagAttrVct, Vector domainVct) throws SQLException, MiddlewareException{
-
-		Vector idVct = new Vector();
-		// duplicate search like action with all but date attribute
-		ReturnStatus returnStatus = new ReturnStatus( -1);
-		int iSessionID = m_db.getNewSessionID();
-		int iNextSessionID = -1;
-
-		try{
-			// search for entities 1 first
-			int iStep1 = 1;
-			ResultSet rs = null;
-			ReturnDataResultSet rdrs = null;
-			ReturnDataResultSet rdrs1 = null;
-
-			// Now.. lets fill out the search table
-			//load pdhdomain here for features
-			for (int ii = 0; ii < domainVct.size(); ii++) {
-				m_db.callGBL8119(returnStatus, iSessionID, iStep1, m_prof.getEnterprise(), featType,
-						"PDHDOMAIN", domainVct.elementAt(ii).toString());
-				m_db.commit();
-				m_db.freeStatement();
-				m_db.isPending();
-			}
-
-			// find entity 1 first
-			try {
-				rs =m_db.callGBL9200(returnStatus, iSessionID, m_prof.getEnterprise(), SEARCHREL_KEY+relatorType,
-						0, m_prof.getValOn(), m_prof.getEffOn(), getSPLimit());
-				rdrs = new ReturnDataResultSet(rs);
-			}
-			finally {
-				if (rs!=null){
-					rs.close();
-					rs = null;
-				}
-				m_db.commit();
-				m_db.freeStatement();
-				m_db.isPending();
-			}
-
-			if (rdrs.size() > 0) {
-
-				iNextSessionID = m_db.getNewSessionID();
-
-				// Just for Debug here..
-				/ *for (int i = 0; i < rdrs.size(); i++) {
-					String strEntityType = rdrs.getColumn(i, 0);
-					int iEntityID = rdrs.getColumnInt(i, 1);
-					m_db.debug(D.EBUG_SPEW, "gbl9200:answer:" + strEntityType + ":" + iEntityID);
-				}* /
-
-				// o.k.  let call one sp that moves the relator and all the info
-				// back into the trsNavigate  table.. with a complete image
-				try {
-					rs = m_db.callGBL2954(returnStatus, m_prof.getOPWGID(), iSessionID, iNextSessionID, 
-							m_prof.getEnterprise(), SEARCHREL_KEY+relatorType,
-							relatorType, m_prof.getValOn(), m_prof.getEffOn());
-					rdrs1 = new ReturnDataResultSet(rs);
-				}
-				finally {
-					if (rs !=null){
-						rs.close();
-						rs = null;
-					}
-					m_db.commit();
-					m_db.freeStatement();
-					m_db.isPending();
-				}
-				//
-				// OK.. we are now using a new session id
-				int tmp = iSessionID;
-				iSessionID = iNextSessionID;
-				iNextSessionID = tmp;
-
-				// if any e2's were found.. there is at least on potential relator out there
-				// and the  e2's are sitting there in the queue table.
-				//
-				if (rdrs1.size() > 0) {
-					int iStep2 = 0;
-
-					// Now.. lets fill out the search table
-					// D.W.B.  Do the Text first.. because they should yield quicker results than flags
-					for (int ii = 0; ii < txtAttrVct.size(); ii++) {
-						iStep2++;
-						m_db.callGBL8119(returnStatus, iSessionID, iStep2, m_prof.getEnterprise(), "MODEL", 
-								txtAttrVct.elementAt(ii).toString(),txtValuesVct.elementAt(ii).toString());
-						m_db.commit();
-						m_db.freeStatement();
-						m_db.isPending();
-					}
-
-					// D.W.B.  Do non Text second
-					for (int ii = 0; ii < flagAttrVct.size(); ii++) {
-						iStep2++;
-						m_db.callGBL8119(returnStatus, iSessionID, iStep2, m_prof.getEnterprise(), "MODEL", 
-								flagAttrVct.elementAt(ii).toString(),flagValuesVct.elementAt(ii).toString());
-						m_db.commit();
-						m_db.freeStatement();
-						m_db.isPending();
-					}
-
-					// Lets have an augmented search
-					try{
-						rs = m_db.callGBL9203(returnStatus, iSessionID, m_prof.getEnterprise(), SEARCHREL_KEY+relatorType,
-								0, m_prof.getValOn(), m_prof.getEffOn());
-						rdrs = new ReturnDataResultSet(rs);
-					}
-					finally {
-						if (rs !=null){
-							rs.close();
-							rs = null;
-						}
-						m_db.commit();
-						m_db.freeStatement();
-						m_db.isPending();
-					}
-
-					for (int i = 0; i < rdrs.size(); i++) {
-
-						String strEntity1Type = rdrs.getColumn(i, 0);
-						int iEntity1ID = rdrs.getColumnInt(i, 1);
-						String strEntityType = rdrs.getColumn(i, 2);
-						int iEntityID = rdrs.getColumnInt(i, 3);
-						String strEntity2Type = rdrs.getColumn(i, 4);
-						int iEntity2ID = rdrs.getColumnInt(i, 5);
-						if(relatorType.equals(strEntityType) && iEntityID>0){ // bypass default entities
-							idVct.add(new Integer(iEntityID));
-						}else{
-							addDebug("getMatchingModelTextAndFlagIds skipping strEntityType "+strEntityType+" iEntityID "+iEntityID);
-							addDebug(D.EBUG_SPEW,
-									"gbl9203:answer:" + strEntity1Type + ":" + iEntity1ID + ":" + strEntityType + ":" +
-									iEntityID + ":" + strEntity2Type + ":" + iEntity2ID);
-						}
-					}
-				}
-			}
-		}finally{
-			m_db.commit();
-			m_db.freeStatement();
-			m_db.isPending();
-			// Now remove all the records to clean up after yourself
-			D.ebug(D.EBUG_SPEW, "ADSIDLSTATUS cleanup session id's: " + iSessionID + ", " + iNextSessionID);
-			int nTries = 3;
-			do {
-				returnStatus = new ReturnStatus(-1);
-				m_db.callGBL8105(returnStatus, iSessionID);
-				m_db.commit();
-				m_db.freeStatement();
-				m_db.isPending();
-				if (returnStatus.intValue() != 0) {
-					D.ebug(D.EBUG_DETAIL, "ADSIDLSTATUS - GBL8105 did not return SP_OK");
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						D.ebug(D.EBUG_DETAIL, e.getMessage());
-					}
-				}
-			} while (returnStatus.intValue() != 0 && nTries-- > 0);
-			nTries = 3;
-			do {
-				returnStatus = new ReturnStatus(-1);
-				m_db.callGBL8105(returnStatus, iNextSessionID);
-				m_db.commit();
-				m_db.freeStatement();
-				m_db.isPending();
-				if (returnStatus.intValue() != 0) {
-					D.ebug(D.EBUG_DETAIL, "ADSIDLSTATUS - GBL8105 did not return SP_OK");
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						D.ebug(D.EBUG_DETAIL, e.getMessage());
-					}
-				}
-			} while (returnStatus.intValue() != 0 && nTries-- > 0);
-		}
-
-		addDebug("getMatchingModelTextAndFlagIds relatorType "+relatorType+" idVct.cnt: "+idVct.size());
-		addDebug(D.EBUG_INFO,"getMatchingModelTextAndFlagIds relatorType "+relatorType+" idVct: "+idVct);
-		return idVct;
-	}*/
-	
-	
-	/** 
-	 * this uses the same sps that the searchaction uses to find entity ids for entities that meet these criteria
-	 * 
-	 * @param entityType
-	 * @param txtValuesVct
-	 * @param txtAttrVct
-	 * @param flagValuesVct
-	 * @param flagAttrVct
-	 * @param domainVct
-	 * @return
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * /
-	private Vector getMatchingTextAndFlagIds(String entityType, Vector txtValuesVct, Vector txtAttrVct, 
-			Vector flagValuesVct, Vector flagAttrVct, Vector domainVct) throws SQLException, MiddlewareException{
-		Vector idVct = new Vector();
-
-		// duplicate search like action with all but date attribute
-		ReturnStatus returnStatus = new ReturnStatus( -1);
-		int iSessionID = m_db.getNewSessionID();
-		try{
-			// Now.. lets fill out the search table
-			int iStep = 0;
-			ResultSet rs = null;
-			ReturnDataResultSet rdrs = null;
-
-			// D.W.B.  Do the Text first.. because they should yield quicker results than flags
-			for (int ii = 0; ii < txtAttrVct.size(); ii++) {
-				iStep++;
-				m_db.callGBL8119(returnStatus, iSessionID, iStep, m_prof.getEnterprise(), entityType, 
-						txtAttrVct.elementAt(ii).toString(),txtValuesVct.elementAt(ii).toString());
-				m_db.commit();
-				m_db.freeStatement();
-				m_db.isPending();
-			}
-			//load pdhdomain here for a filter, even those without a specified filter need something
-			iStep++; // one step for all domain values - this requires a match on all
-			for (int ii = 0; ii < domainVct.size(); ii++) {
-				m_db.callGBL8119(returnStatus, iSessionID, iStep, m_prof.getEnterprise(), entityType,
-						"PDHDOMAIN", domainVct.elementAt(ii).toString());
-				m_db.commit();
-				m_db.freeStatement();
-				m_db.isPending();
-			}
-
-			// D.W.B.  Do non Text second
-			for (int ii = 0; ii < flagAttrVct.size(); ii++) {
-				iStep++;
-
-				m_db.callGBL8119(returnStatus, iSessionID, iStep, m_prof.getEnterprise(), entityType,
-						flagAttrVct.elementAt(ii).toString(),flagValuesVct.elementAt(ii).toString());
-				m_db.commit();
-				m_db.freeStatement();
-				m_db.isPending();
-			}
-
-			try {
-				rs = m_db.callGBL9200(returnStatus, iSessionID, m_prof.getEnterprise(), SEARCH_KEY+entityType,
-						0, m_prof.getValOn(), m_prof.getEffOn(), getSPLimit());
-				rdrs = new ReturnDataResultSet(rs);
-			}
-			finally {
-				if (rs!=null){
-					rs.close();
-					rs = null;
-				}
-				m_db.commit();
-				m_db.freeStatement();
-				m_db.isPending();
-			}
-			for (int i = 0; i < rdrs.size(); i++) {
-				String strEntityType = rdrs.getColumn(i, 0);
-				int iEntityID = rdrs.getColumnInt(i, 1);
-				if (strEntityType.equals(entityType) && iEntityID>0){ // bypass default entities
-					idVct.add(new Integer(iEntityID));
-				}else{
-					addDebug("getMatchingTextAndFlagIds skipping strEntityType "+strEntityType+" iEntityID "+iEntityID);					
-				}
-			}
-		}
-		finally {
-			m_db.commit();
-			m_db.freeStatement();
-			m_db.isPending();
-			// Now remove all the records to clean up after yourself
-			D.ebug(D.EBUG_SPEW, "ADSIDLSTATUS cleanup session id's: " + iSessionID );
-			int nTries = 3;
-			do {
-				returnStatus = new ReturnStatus(-1);
-				m_db.callGBL8105(returnStatus, iSessionID);
-				m_db.commit();
-				m_db.freeStatement();
-				m_db.isPending();
-				if (returnStatus.intValue() != 0) {
-					D.ebug(D.EBUG_DETAIL, "GBL8105 did not return SP_OK");
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						D.ebug(D.EBUG_DETAIL, e.getMessage());
-					}
-				}
-			} while (returnStatus.intValue() != 0 && nTries-- > 0);
-		}
-
-		addDebug("getMatchingTextAndFlagIds entitytype "+entityType+" idVct.cnt: "+idVct.size());
-		addDebug(D.EBUG_INFO,"getMatchingTextAndFlagIds entitytype "+entityType+" idVct: "+idVct);
-		return idVct;
-	}*/
-
-	/**
-	 * do the search one domain at a time, otherwise it looks for entities that match all
-	 * this uses the same sps that the searchaction uses to find entity ids for entities that meet these criteria
-	 * 
-	 * @param entityType
-	 * @param txtValuesVct
-	 * @param txtAttrVct
-	 * @param flagValuesVct
-	 * @param flagAttrVct
-	 * @param idVct
-	 * @param domain
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	private void getMatchingTextAndFlagIds(String entityType, Vector txtValuesVct, Vector txtAttrVct, 
-			Vector flagValuesVct, Vector flagAttrVct, Vector idVct, String domain) throws SQLException, MiddlewareException{
-
-		// duplicate search like action with all but date attribute
-		ReturnStatus returnStatus = new ReturnStatus( -1);
-		int iSessionID = m_db.getNewSessionID();
-		try{
-			// Now.. lets fill out the search table
-			int iStep = 0;
-			ResultSet rs = null;
-			ReturnDataResultSet rdrs = null;
-
-			// D.W.B.  Do the Text first.. because they should yield quicker results than flags
-			for (int ii = 0; ii < txtAttrVct.size(); ii++) {
-				iStep++;
-				m_db.callGBL8119(returnStatus, iSessionID, iStep, m_prof.getEnterprise(), entityType, 
-						txtAttrVct.elementAt(ii).toString(),txtValuesVct.elementAt(ii).toString());
-				m_db.commit();
-				m_db.freeStatement();
-				m_db.isPending();
-			}
-			//load pdhdomain here for a filter, even those without a specified filter need something
-			// done one at a time because if all are loaded, the match is on all at once
-			iStep++; 
-			m_db.callGBL8119(returnStatus, iSessionID, iStep, m_prof.getEnterprise(), entityType,
-					"PDHDOMAIN", domain);
-			m_db.commit();
-			m_db.freeStatement();
-			m_db.isPending();
-
-			// D.W.B.  Do non Text second
-			for (int ii = 0; ii < flagAttrVct.size(); ii++) {
-				iStep++;
-
-				m_db.callGBL8119(returnStatus, iSessionID, iStep, m_prof.getEnterprise(), entityType,
-						flagAttrVct.elementAt(ii).toString(),flagValuesVct.elementAt(ii).toString());
-				m_db.commit();
-				m_db.freeStatement();
-				m_db.isPending();
-			}
-
-			try {
-				rs = m_db.callGBL9200(returnStatus, iSessionID, m_prof.getEnterprise(), SEARCH_KEY+entityType,
-						0, m_prof.getValOn(), m_prof.getEffOn(), getSPLimit());
-				rdrs = new ReturnDataResultSet(rs);
-			}
-			finally {
-				if (rs!=null){
-					rs.close();
-					rs = null;
-				}
-				m_db.commit();
-				m_db.freeStatement();
-				m_db.isPending();
-			}
-			for (int i = 0; i < rdrs.size(); i++) {
-				String strEntityType = rdrs.getColumn(i, 0);
-				int iEntityID = rdrs.getColumnInt(i, 1);
-				if (strEntityType.equals(entityType) && iEntityID>0){ // bypass default entities
-					Integer eid = new Integer(iEntityID);
-					if (!idVct.contains(eid)){ // if one entity has multiple domains, only add it once
-						idVct.add(eid);
-					}
-				}else{
-					addDebug("getMatchingTextAndFlagIds skipping strEntityType "+strEntityType+" iEntityID "+iEntityID);					
-				}
-		        m_db.debug(D.EBUG_SPEW, "ADSIDLSTATUS.getMatchingTextAndFlagIds gbl9200:answer:" + strEntityType + ":" + iEntityID);
-			}
-		}
-		finally {
-			m_db.commit();
-			m_db.freeStatement();
-			m_db.isPending();
-			// Now remove all the records to clean up after yourself
-			D.ebug(D.EBUG_SPEW, "ADSIDLSTATUS cleanup session id's: " + iSessionID );
-			int nTries = 3;
-			do {
-				returnStatus = new ReturnStatus(-1);
-				m_db.callGBL8105(returnStatus, iSessionID);
-				m_db.commit();
-				m_db.freeStatement();
-				m_db.isPending();
-				if (returnStatus.intValue() != 0) {
-					D.ebug(D.EBUG_DETAIL, "GBL8105 did not return SP_OK");
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						D.ebug(D.EBUG_DETAIL, e.getMessage());
-					}
-				}
-			} while (returnStatus.intValue() != 0 && nTries-- > 0);
-		}
-
-		addDebug("getMatchingTextAndFlagIds domain "+domain+" entitytype "+entityType+" idVct.cnt: "+idVct.size());
-		addDebug(D.EBUG_INFO,"getMatchingTextAndFlagIds entitytype "+entityType+" idVct: "+idVct);
-	}
-//	/**
-//	 * get the LSEOs with MODEL that has a matching COFGRP and filter on the LSEO.LSEOUNPUBDATEMTRGT date
-//	 * 
-//	 * @param flagValuesVct
-//	 * @param flagAttrVct
-//	 * @param dateAttr
-//	 * @param dateValue
-//	 * @param domainVct
-//	 * @return
-//	 * @throws SQLException
-//	 * @throws MiddlewareException
-//	 */
-//	private Vector getMatchingLSEOIds(
-//			Vector flagValuesVct, Vector flagAttrVct, String dateAttr, String dateValue,Vector domainVct) 
-//	throws SQLException, MiddlewareException
-//	{
-//		String sql = getFilteredLSEOSql(dateAttr, dateValue, flagAttrVct.firstElement().toString(), 
-//				flagValuesVct.firstElement().toString(),domainVct);
-//
-//		Vector matchIdVct = new Vector();
-//
-//		addDebug("getMatchingLSEOIds executing with "+PokUtils.convertToHTML(sql));
-//		PreparedStatement ps = null;
-//		ResultSet result=null;
-//
-//		try{
-//			ps = m_db.getPDHConnection().prepareStatement(sql);
-//
-//			result = ps.executeQuery();
-//
-//			while(result.next()) {   
-//				int iEntityID = result.getInt(1);
-//				if(iEntityID>0){ // bypass default entities
-//					matchIdVct.add(new Integer(iEntityID));  
-//				}
-//			}
-//			addDebug("getMatchingLSEOIds all matchIdVct.cnt "+matchIdVct.size());
-//			//addDebug(D.EBUG_INFO,"getMatchingLSEOIds all matchIdVct "+matchIdVct);
-//		}finally{
-//			if (result!=null){
-//				try {
-//					result.close();
-//				}catch(Exception e){
-//					System.err.println("getMatchingLSEOIds(), unable to close result. "+ e);
-//				}
-//				result=null;
-//			}
-//
-//			if (ps !=null) {
-//				try {
-//					ps.close();
-//				}catch(Exception e){
-//					System.err.println("getMatchingLSEOIds(), unable to close ps. "+ e);
-//				}
-//				ps=null;
-//			}
-//
-//			m_db.commit();
-//			m_db.freeStatement();
-//			m_db.isPending();
-//		}
-//
-//		return matchIdVct;
-//	}
-
-//	/**
-//	 * get the FCTRANSACTIONs or MODELCONVERTs with MODEL that has a matching MACHTYPEATR 
-//	 * and filter on the MODEL.wddate date
-//	 * 
-//	 * @param entitytype
-//	 * @param textValuesVct
-//	 * @param dateAttr
-//	 * @param dateValue
-//	 * @param domainVct
-//	 * @return
-//	 * @throws SQLException
-//	 * @throws MiddlewareException
-//	 */
-//	private Vector getMatchingConversionIds(String entitytype,
-//			Vector textValuesVct, String dateAttr, String dateValue,Vector domainVct) 
-//	throws SQLException, MiddlewareException
-//	{
-//		String sql = getFilteredConversionSql(entitytype,dateAttr, dateValue,  
-//				textValuesVct.firstElement().toString(), domainVct);
-//
-//		Vector matchIdVct = new Vector();
-//
-//		addDebug("getMatchingConversionIds executing with "+PokUtils.convertToHTML(sql));
-//		PreparedStatement ps = null;
-//		ResultSet result=null;
-//
-//		try{
-//			ps = m_db.getPDHConnection().prepareStatement(sql);
-//
-//			result = ps.executeQuery();
-//
-//			while(result.next()) {                   
-//				int iEntityID = result.getInt(1);
-//				if(iEntityID>0){ // bypass default entities
-//					matchIdVct.add(new Integer(iEntityID));  
-//				}
-//			}
-//			addDebug("getMatchingConversionIds all matchIdVct.cnt "+matchIdVct.size());
-//			//addDebug(D.EBUG_INFO,"getMatchingConversionIds all matchIdVct "+matchIdVct);
-//		}finally{
-//			if (result!=null){
-//				try {
-//					result.close();
-//				}catch(Exception e){
-//					System.err.println("getMatchingConversionIds(), unable to close result. "+ e);
-//				}
-//				result=null;
-//			}
-//
-//			if (ps !=null) {
-//				try {
-//					ps.close();
-//				}catch(Exception e){
-//					System.err.println("getMatchingConversionIds(), unable to close ps. "+ e);
-//				}
-//				ps=null;
-//			}
-//
-//			m_db.commit();
-//			m_db.freeStatement();
-//			m_db.isPending();
-//		}
-//
-//		return matchIdVct;
-//	}	
-//			
-	/** 
-	 * get the query to use to find (sw)prodstructs with models that meet the date criteria
-	 * 
-	 * This query returns active (sw)prodstructs for models which either do not have an active WTHDRWEFFCTVDATE
-	 * attribute or the value of this attribute is >= to the value of the parameter
-	 *  
-	 * @param entityType
-	 * @param dateAttr
-	 * @param dateValue
-	 * @param domainVct
-	 * @return
-	 */
-//	private String getFilteredModelDateSql(String entityType, String dateAttr, String dateValue, Vector domainVct){
-//		StringBuffer domainsb  = new StringBuffer();
-//		for (int i=0; i<domainVct.size(); i++){
-//			if (domainsb.length()>0){
-//				domainsb.append(',');
-//			}
-//			domainsb.append("'"+domainVct.elementAt(i).toString()+"'");
-//		}
-//		StringBuffer sb = new StringBuffer("select distinct ps.entityid from opicm.relator ps ");
-//		sb.append("join opicm.flag f on ps.entitytype=f.entitytype and ps.entityid=f.entityid "); 
-//		sb.append("join opicm.flag f1 on ps.entitytype=f1.entitytype and ps.entityid=f1.entityid "); 
-//		sb.append("where ps.entitytype='"+entityType+"' ");
-//		sb.append("and ps.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and ps.valto>current timestamp ");
-//		sb.append("and ps.effto>current timestamp ");
-//		sb.append("and f.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and f.valto>current timestamp ");
-//		sb.append("and f.effto>current timestamp ");
-//		sb.append("and f.attributecode='PDHDOMAIN' ");
-//		sb.append("and f.attributevalue in ("+domainsb.toString()+") ");
-//		sb.append("and f1.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and f1.valto>current timestamp ");
-//		sb.append("and f1.effto>current timestamp ");
-//		sb.append("and f1.attributecode='STATUS' ");
-//		sb.append("and f1.attributevalue <> '0010' ");
-//		sb.append("and not exists ");
-//		sb.append("(select t.entityid from opicm.text t where ");
-//		sb.append("t.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and t.entitytype='MODEL' ");
-//		sb.append("and t.entityid=ps.entity2id ");
-//		sb.append("and t.attributecode='"+dateAttr+"' ");
-//		sb.append("and t.valto>current timestamp ");
-//		sb.append("and t.effto>current timestamp) ");
-//		sb.append("union ");
-//		sb.append("select distinct ps.entityid from opicm.relator ps ");
-//		sb.append("join opicm.text t on t.entitytype=ps.entity2type and t.entityid=ps.entity2id ");
-//		sb.append("join opicm.flag f on ps.entitytype=f.entitytype and ps.entityid=f.entityid "); 
-//		sb.append("join opicm.flag f1 on ps.entitytype=f1.entitytype and ps.entityid=f1.entityid ");
-//		sb.append("where ps.entitytype='"+entityType+"' ");
-//		sb.append("and ps.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and ps.valto>current timestamp ");
-//		sb.append("and ps.effto>current timestamp ");
-//		sb.append("and f.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and f.valto>current timestamp ");
-//		sb.append("and f.effto>current timestamp ");
-//		sb.append("and f.attributecode='PDHDOMAIN' ");
-//		sb.append("and f.attributevalue in ("+domainsb.toString()+") ");
-//		sb.append("and f1.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and f1.valto>current timestamp ");
-//		sb.append("and f1.effto>current timestamp ");
-//		sb.append("and f1.attributecode='STATUS' ");
-//		sb.append("and f1.attributevalue <> '0010' ");
-//		sb.append("and t.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and t.attributecode='"+dateAttr+"' ");
-//		sb.append("and t.valto>current timestamp ");
-//		sb.append("and t.effto>current timestamp ");
-//		sb.append("and t.attributevalue>='"+dateValue+"' with ur");
-//		
-//		return sb.toString();
-//	}
-
-	/** 
-	 * get the query to use to find entities that meet the date criteria
-	 * 
-	 * This query returns active entities which either do not have an active withdrawdate
-	 * attribute or the value of this attribute is >= to the value of the parameter 
-	 * 
-	 * @param entityType
-	 * @param dateAttr
-	 * @param dateValue
-	 * @param domainVct
-	 * @param lastRunningTime 
-	 * @return
-	 */
-	private String getFilteredDateSql(String entityType, String dateAttr, String dateValue, Vector domainVct, String lastRunningTime){
-		StringBuffer domainsb  = new StringBuffer();
-		for (int i=0; i<domainVct.size(); i++){
-			if (domainsb.length()>0){
-				domainsb.append(',');
-			}
-			domainsb.append("'"+domainVct.elementAt(i).toString()+"'");
-		}
-		StringBuffer sb = new StringBuffer("select distinct mdl.entityid from opicm.entity mdl ");
-		sb.append("join opicm.flag f on mdl.entitytype=f.entitytype and mdl.entityid=f.entityid "); 
-		sb.append("join opicm.flag f1 on mdl.entitytype=f1.entitytype and mdl.entityid=f1.entityid "); 
-		sb.append("where mdl.entitytype='"+entityType+"' ");
-		sb.append("and mdl.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and mdl.valto>current timestamp ");
-		sb.append("and mdl.effto>current timestamp ");
-		sb.append("and f.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and f.valto>current timestamp ");
-		sb.append("and f.effto>current timestamp ");
-		sb.append("and f.attributecode='PDHDOMAIN' ");
-		sb.append("and f.attributevalue in ("+domainsb.toString()+") ");
-		sb.append("and f1.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and f1.valto>current timestamp ");
-		sb.append("and f1.effto>current timestamp ");
-		sb.append("and f1.attributecode='STATUS' ");
-		sb.append("and f1.attributevalue <> '0010' ");
-		if(lastRunningTime != null){
-			sb.append("and f1.valfrom>'" +lastRunningTime+"' ");
-		}
-		sb.append("and not exists ");
-		sb.append("(select t.entityid from opicm.text t where ");
-		sb.append("t.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and t.entitytype='"+entityType+"' ");
-		sb.append("and t.entityid=mdl.entityid ");
-		sb.append("and t.attributecode='"+dateAttr+"' ");
-		sb.append("and t.valto>current timestamp ");
-		sb.append("and t.effto>current timestamp) ");
-		sb.append("union ");
-		sb.append("select distinct mdl.entityid from opicm.entity mdl ");
-		sb.append("join opicm.text t on t.entitytype=mdl.entitytype and t.entityid=mdl.entityid ");
-		sb.append("join opicm.flag f on mdl.entitytype=f.entitytype and mdl.entityid=f.entityid ");
-		sb.append("join opicm.flag f1 on mdl.entitytype=f1.entitytype and mdl.entityid=f1.entityid ");
-		sb.append("where mdl.entitytype='"+entityType+"' ");
-		sb.append("and mdl.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and mdl.valto>current timestamp ");
-		sb.append("and mdl.effto>current timestamp ");
-		sb.append("and f.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and f.valto>current timestamp ");
-		sb.append("and f.effto>current timestamp ");
-		sb.append("and f.attributecode='PDHDOMAIN' ");
-		sb.append("and f.attributevalue in ("+domainsb.toString()+") ");
-		sb.append("and f1.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and f1.valto>current timestamp ");
-		sb.append("and f1.effto>current timestamp ");
-		sb.append("and f1.attributecode='STATUS' ");
-		sb.append("and f1.attributevalue <> '0010' ");
-		if(lastRunningTime != null){
-			sb.append("and f1.valfrom>'" +lastRunningTime+"' ");
-		}
-		sb.append("and t.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and t.attributecode='"+dateAttr+"' ");
-		sb.append("and t.valto>current timestamp ");
-		sb.append("and t.effto>current timestamp ");
-		sb.append("and t.attributevalue>='"+dateValue+"' with ur");
-
-		return sb.toString();
-	}
-	
-	/** 
-	 * get the query to use to find entities that meet the date criteria
-	 * 
-	 * This query returns active entities which either do not have an active withdrawdate
-	 * attribute or the value of this attribute is >= to the value of the parameter 
-	 * 
-	 * @param entityType
-	 * @param dateAttr
-	 * @param dateValue
-	 * @param domainVct
-	 * @param lastRunningTime 
-	 * @return
-	 */
-	private String getFilteredSql(String entityType, Vector domainVct, String lastRunningTime){
-		StringBuffer domainsb  = new StringBuffer();
-		for (int i=0; i<domainVct.size(); i++){
-			if (domainsb.length()>0){
-				domainsb.append(',');
-			}
-			domainsb.append("'"+domainVct.elementAt(i).toString()+"'");
-		}
-		StringBuffer sb = new StringBuffer("select distinct mdl.entityid from opicm.entity mdl ");
-		sb.append("join opicm.flag f on mdl.entitytype=f.entitytype and mdl.entityid=f.entityid "); 
-		sb.append("join opicm.flag f1 on mdl.entitytype=f1.entitytype and mdl.entityid=f1.entityid "); 
-		sb.append("where mdl.entitytype='"+entityType+"' ");
-		sb.append("and mdl.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and mdl.valto>current timestamp ");
-		sb.append("and mdl.effto>current timestamp ");
-		sb.append("and f.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and f.valto>current timestamp ");
-		sb.append("and f.effto>current timestamp ");
-		sb.append("and f.attributecode='PDHDOMAIN' ");
-		sb.append("and f.attributevalue in ("+domainsb.toString()+") ");
-		sb.append("and f1.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and f1.valto>current timestamp ");
-		sb.append("and f1.effto>current timestamp ");
-		sb.append("and f1.attributecode='STATUS' ");
-		sb.append("and f1.attributevalue <> '0010' ");
-		if(lastRunningTime != null){
-			sb.append("and f1.valfrom>'" +lastRunningTime+"' ");
-		}
-		sb.append(" with ur");
-//		sb.append("and not exists ");
-//		sb.append("(select t.entityid from opicm.text t where ");
-//		sb.append("t.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and t.entitytype='"+entityType+"' ");
-//		sb.append("and t.entityid=mdl.entityid ");
-//		sb.append("and t.attributecode='"+dateAttr+"' ");
-//		sb.append("and t.valto>current timestamp ");
-//		sb.append("and t.effto>current timestamp) ");
-//		sb.append("union ");
-//		sb.append("select mdl.entityid from opicm.entity mdl ");
-//		sb.append("join opicm.text t on t.entitytype=mdl.entitytype and t.entityid=mdl.entityid ");
-//		if(lastRunningTime != null){
-//			sb.append("join opicm.text t1 on mdl.entitytype=t1.entitytype and mdl.entityid=t1.entityid ");
-//		}
-//		sb.append("join opicm.flag f on mdl.entitytype=f.entitytype and mdl.entityid=f.entityid ");
-//		sb.append("join opicm.flag f1 on mdl.entitytype=f1.entitytype and mdl.entityid=f1.entityid ");
-//		sb.append("where mdl.entitytype='"+entityType+"' ");
-//		sb.append("and mdl.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and mdl.valto>current timestamp ");
-//		sb.append("and mdl.effto>current timestamp ");
-//		sb.append("and f.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and f.valto>current timestamp ");
-//		sb.append("and f.effto>current timestamp ");
-//		sb.append("and f.attributecode='PDHDOMAIN' ");
-//		sb.append("and f.attributevalue in ("+domainsb.toString()+") ");
-//		sb.append("and f1.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and f1.valto>current timestamp ");
-//		sb.append("and f1.effto>current timestamp ");
-//		sb.append("and f1.attributecode='STATUS' ");
-//		sb.append("and f1.attributevalue <> '0010' ");
-//		if(lastRunningTime != null){
-//			sb.append("and t1.enterprise='"+m_prof.getEnterprise()+"' ");
-//			sb.append("and t1.valfrom>'" +lastRunningTime+"' ");
-//			sb.append("and t1.attributecode='ADSABRSTATUS' ");
-//			sb.append("and t1.attributevalue = '0030' ");
-//		}
-//		sb.append("and t.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and t.attributecode='"+dateAttr+"' ");
-//		sb.append("and t.valto>current timestamp ");
-//		sb.append("and t.effto>current timestamp ");
-//		sb.append("and t.attributevalue>='"+dateValue+"' with ur");
-
-		return sb.toString();
-	}
-
-	
-	/** 
-	 * get the query to use to find REFOFERFEAT with reference REFOFER that meet the date criteria
-	 * 
-	 * This query returns active REFOFERFEAT for REFOFER which either do not have an active ENDOFSVC
-	 * attribute or the value of this attribute is >= to the value of the parameter
-	 *  
-	 * @param entityType
-	 * @param dateAttr
-	 * @param dateValue
-	 * @param domainVct
-	 * @param lastRunningTime 
-	 * @return
-	 */
-	private String getFilteredREFOFERFEATDateSql(String entityType, String dateAttr, String dateValue, Vector domainVct, String lastRunningTime){
-		StringBuffer domainsb  = new StringBuffer();
-		for (int i=0; i<domainVct.size(); i++){
-			if (domainsb.length()>0){
-				domainsb.append(',');
-			}
-			domainsb.append("'"+domainVct.elementAt(i).toString()+"'");
-		}
-		StringBuffer sb = new StringBuffer("select distinct reffeature.entityid from opicm.entity reffeature ");
-		sb.append("join opicm.flag f on reffeature.entitytype=f.entitytype and reffeature.entityid=f.entityid "); 
-		sb.append("join opicm.flag f1 on reffeature.entitytype=f1.entitytype and reffeature.entityid=f1.entityid "); 
-		sb.append("join opicm.relator r on reffeature.entitytype=r.entity2type and reffeature.entityid=r.entity2id ");
-		sb.append("where reffeature.entitytype='"+entityType+"' ");
-		sb.append("and reffeature.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and reffeature.valto>current timestamp ");
-		sb.append("and reffeature.effto>current timestamp ");
-		sb.append("and f.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and f.valto>current timestamp ");
-		sb.append("and f.effto>current timestamp ");
-		sb.append("and f.attributecode='PDHDOMAIN' ");
-		sb.append("and f.attributevalue in ("+domainsb.toString()+") ");
-		sb.append("and f1.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and f1.valto>current timestamp ");
-		sb.append("and f1.effto>current timestamp ");
-		sb.append("and f1.attributecode='STATUS' ");
-		sb.append("and f1.attributevalue <> '0010' ");
-		sb.append("and r.enterprise ='"+m_prof.getEnterprise()+"' ");
-		sb.append("and r.entitytype='REFOFERREFOFERFEAT' ");
-		sb.append("and r.valto>current timestamp ");
-		sb.append("and r.effto>current timestamp ");
-		if(lastRunningTime != null){
-			sb.append("and f1.valfrom>'" +lastRunningTime+"' ");
-		}
-		sb.append("and not exists ");
-		sb.append("(select distinct t.entityid from opicm.text t where ");
-		sb.append("t.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and t.entitytype=r.entity1type ");
-		sb.append("and t.entityid=r.entity1id ");
-		sb.append("and t.attributecode='"+dateAttr+"' ");
-		sb.append("and t.valto>current timestamp ");
-		sb.append("and t.effto>current timestamp) ");
-		sb.append("union ");
-		sb.append("select distinct reffeature.entityid from opicm.entity reffeature ");
-		sb.append("join opicm.flag f on reffeature.entitytype=f.entitytype and reffeature.entityid=f.entityid "); 
-		sb.append("join opicm.flag f1 on reffeature.entitytype=f1.entitytype and reffeature.entityid=f1.entityid "); 
-		sb.append("join opicm.relator r on reffeature.entitytype=r.entity2type and reffeature.entityid=r.entity2id ");
-		sb.append("join opicm.text t on t.entitytype=r.entity1type and t.entityid=r.entity1id ");
-		sb.append("where reffeature.entitytype='"+entityType+"' ");
-		sb.append("and reffeature.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and reffeature.valto>current timestamp ");
-		sb.append("and reffeature.effto>current timestamp ");
-		sb.append("and f.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and f.valto>current timestamp ");
-		sb.append("and f.effto>current timestamp ");
-		sb.append("and f.attributecode='PDHDOMAIN' ");
-		sb.append("and f.attributevalue in ("+domainsb.toString()+") ");
-		sb.append("and f1.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and f1.valto>current timestamp ");
-		sb.append("and f1.effto>current timestamp ");
-		sb.append("and f1.attributecode='STATUS' ");
-		sb.append("and f1.attributevalue <> '0010' ");
-		sb.append("and r.enterprise ='"+m_prof.getEnterprise()+"' ");
-		sb.append("and r.entitytype='REFOFERREFOFERFEAT' ");
-		sb.append("and r.valto>current timestamp ");
-		sb.append("and r.effto>current timestamp ");
-		if(lastRunningTime != null){
-			sb.append("and f1.valfrom>'" +lastRunningTime+"' ");
-		}
-		sb.append("and t.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and t.attributecode='"+dateAttr+"' ");
-		sb.append("and t.valto>current timestamp ");
-		sb.append("and t.effto>current timestamp ");
-		sb.append("and t.attributevalue>='"+dateValue+"' with ur");	
-		return sb.toString();
-	}
-	
-	private String getFilteredModelSql(String entityType, Vector domainVct, String lastRunningTime ) {
-		
-		StringBuffer domainsb  = new StringBuffer();
-		for (int i=0; i<domainVct.size(); i++){
-			if (domainsb.length()>0){
-				domainsb.append(',');
-			}
-			domainsb.append("'"+domainVct.elementAt(i).toString()+"'");
-		}
-		StringBuffer sb = new StringBuffer("select distinct mdl.entityid from opicm.entity mdl ");
-		sb.append("join opicm.flag f on mdl.entitytype=f.entitytype and mdl.entityid=f.entityid "); 
-		sb.append("join opicm.flag f1 on mdl.entitytype=f1.entitytype and mdl.entityid=f1.entityid "); 
-		sb.append("join opicm.flag f2 on mdl.entitytype=f2.entitytype and mdl.entityid=f2.entityid and f2.attributecode = 'COFCAT' "); 
-		sb.append("join opicm.flag f3 on mdl.entitytype=f3.entitytype and mdl.entityid=f3.entityid and f3.attributecode = 'COFSUBCAT' "); 
-		sb.append("join opicm.flag f4 on mdl.entitytype=f4.entitytype and mdl.entityid=f4.entityid and f4.attributecode = 'COFGRP' "); 
-		sb.append("join opicm.filter_model filter on (f2.attributevalue = filter.cofcat or filter.cofcat = '*') " +
-				"and (f3.attributevalue = filter.cofsubcat or filter.cofsubcat = '*') " +
-				"and (f4.attributevalue = filter.cofgrp or filter.cofgrp = '*') ");
-		sb.append("where mdl.entitytype='"+entityType+"' ");
-		sb.append("and mdl.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and mdl.valto>current timestamp ");
-		sb.append("and mdl.effto>current timestamp ");
-		sb.append("and f.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and f.valto>current timestamp ");
-		sb.append("and f.effto>current timestamp ");
-		sb.append("and f.attributecode='PDHDOMAIN' ");
-		sb.append("and f.attributevalue in ("+domainsb.toString()+") ");
-		sb.append("and f1.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and f1.valto>current timestamp ");
-		sb.append("and f1.effto>current timestamp ");
-		sb.append("and f1.attributecode='STATUS' ");
-		sb.append("and f1.attributevalue <> '0010' ");
-		sb.append("and f2.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and f2.valto>current timestamp ");
-		sb.append("and f2.effto>current timestamp ");
-		sb.append("and f3.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and f3.valto>current timestamp ");
-		sb.append("and f3.effto>current timestamp ");
-		sb.append("and f4.enterprise='"+m_prof.getEnterprise()+"' ");
-		sb.append("and f4.valto>current timestamp ");
-		sb.append("and f4.effto>current timestamp ");
-		if(lastRunningTime != null){
-			sb.append("and f1.valfrom>'" +lastRunningTime+"' ");
-		}
-		sb.append(" with ur");
-		return sb.toString();
-	}
-//	/**
-//	 * This query returns active LSEOs which either do not have an active LSEOUNPUBDATEMTRGT
-//	 * attribute or the value of this attribute is >= to the value of the parameter
-//	 * and
-//	 * The LSEO's MODEL COFGRP attribute matches the parameter
-//	 *  
-//	 * @param dateAttr
-//	 * @param dateValue
-//	 * @param cofgrpAttr
-//	 * @param cofgrpValue
-//	 * @param domainVct
-//	 * @return
-//	 */
-//	private String getFilteredLSEOSql(String dateAttr, String dateValue, String cofgrpAttr, 
-//			String cofgrpValue, Vector domainVct){
-//		StringBuffer domainsb  = new StringBuffer();
-//		for (int i=0; i<domainVct.size(); i++){
-//			if (domainsb.length()>0){
-//				domainsb.append(',');
-//			}
-//			domainsb.append("'"+domainVct.elementAt(i).toString()+"'");
-//		}
-//		StringBuffer sb = new StringBuffer("select lseo.entityid from opicm.entity lseo ");
-//		sb.append("join opicm.relator r1 on lseo.entitytype=r1.entity2type and lseo.entityid=r1.entity2id ");
-//		sb.append("join opicm.relator r2 on r1.entity1type=r2.entity2type and r1.entity1id=r2.entity2id ");
-//		sb.append("join opicm.flag f on r2.entity1type=f.entitytype and r2.entity1id=f.entityid ");
-//		sb.append("join opicm.flag f1 on lseo.entitytype=f1.entitytype and lseo.entityid=f1.entityid ");
-//		sb.append("where lseo.entitytype='LSEO' ");
-//		sb.append("and lseo.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and lseo.valto>current timestamp "); 
-//		sb.append("and lseo.effto>current timestamp ");
-//		sb.append("and r1.entitytype='WWSEOLSEO' ");
-//		sb.append("and r1.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and r1.valto>current timestamp ");
-//		sb.append("and r1.effto>current timestamp ");
-//		sb.append("and r2.entitytype='MODELWWSEO' ");
-//		sb.append("and r2.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and r2.valto>current timestamp ");
-//		sb.append("and r2.effto>current timestamp ");
-//		sb.append("and f.attributecode='"+cofgrpAttr+"' ");
-//		sb.append("and f.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and f.valto>current timestamp ");
-//		sb.append("and f.effto>current timestamp ");
-//		sb.append("and f.attributevalue='"+cofgrpValue+"' ");
-//		sb.append("and f1.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and f1.valto>current timestamp ");
-//		sb.append("and f1.effto>current timestamp ");
-//		sb.append("and f1.attributecode='PDHDOMAIN' ");
-//		sb.append("and f1.attributevalue in ("+domainsb.toString()+") ");
-//		sb.append("and not exists  ");
-//		sb.append("(select t.entityid from opicm.text t where "); 
-//		sb.append("t.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and t.entitytype='LSEO' "); 
-//		sb.append("and t.entityid=lseo.entityid "); 
-//		sb.append("and t.attributecode='"+dateAttr+"' "); 
-//		sb.append("and t.valto>current timestamp  ");
-//		sb.append("and t.effto>current timestamp) ");
-//		sb.append("union  ");
-//		sb.append("select lseo.entityid from opicm.entity lseo ");
-//		sb.append("join opicm.text t on t.entitytype=lseo.entitytype and t.entityid=lseo.entityid ");
-//		sb.append("join opicm.relator r1 on lseo.entitytype=r1.entity2type and lseo.entityid=r1.entity2id ");
-//		sb.append("join opicm.relator r2 on r1.entity1type=r2.entity2type and r1.entity1id=r2.entity2id ");
-//		sb.append("join opicm.flag f on r2.entity1type=f.entitytype and r2.entity1id=f.entityid ");
-//		sb.append("join opicm.flag f1 on lseo.entitytype=f1.entitytype and lseo.entityid=f1.entityid ");
-//		sb.append("where lseo.entitytype='LSEO' ");
-//		sb.append("and lseo.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and lseo.valto>current timestamp "); 
-//		sb.append("and lseo.effto>current timestamp ");
-//		sb.append("and t.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and t.attributecode='"+dateAttr+"' ");
-//		sb.append("and t.valto>current timestamp ");
-//		sb.append("and t.effto>current timestamp ");
-//		sb.append("and t.attributevalue>='"+dateValue+"' ");
-//		sb.append("and r1.entitytype='WWSEOLSEO' ");
-//		sb.append("and r1.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and r1.valto>current timestamp ");
-//		sb.append("and r1.effto>current timestamp ");
-//		sb.append("and r2.entitytype='MODELWWSEO' ");
-//		sb.append("and r2.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and r2.valto>current timestamp ");
-//		sb.append("and r2.effto>current timestamp ");
-//		sb.append("and f.attributecode='"+cofgrpAttr+"' ");
-//		sb.append("and f.enterprise='"+m_prof.getEnterprise()+"' "); 
-//		sb.append("and f.valto>current timestamp ");
-//		sb.append("and f.effto>current timestamp ");
-//		sb.append("and f.attributevalue='"+cofgrpValue+"' ");
-//		sb.append("and f1.enterprise='"+m_prof.getEnterprise()+"' ");
-//		sb.append("and f1.valto>current timestamp ");
-//		sb.append("and f1.effto>current timestamp ");
-//		sb.append("and f1.attributecode='PDHDOMAIN' ");
-//		sb.append("and f1.attributevalue in ("+domainsb.toString()+") with ur; ");
-//
-//		return sb.toString();
-//	}
-
-//	/**
-//	 * This query returns active FCTRANSACTION or MODELCONVERT which have TOMODELs which either 
-//	 * do not have an active wddate attribute or the value of this attribute is >= to the value of the parameter
-//	 * and
-//	 * The MODEL MACHTYPEATR attribute matches the parameter
-//	 * 
-//	 * @param entitytype
-//	 * @param dateAttr
-//	 * @param dateValue
-//	 * @param machtypeValue
-//	 * @param domainVct
-//	 * @return
-//	 */
-//	private String getFilteredConversionSql(String entitytype,String dateAttr, String dateValue,  
-//			String machtypeValue, Vector domainVct){
-//		StringBuffer domainsb  = new StringBuffer();
-//		for (int i=0; i<domainVct.size(); i++){
-//			if (domainsb.length()>0){
-//				domainsb.append(',');
-//			}
-//			domainsb.append("'"+domainVct.elementAt(i).toString()+"'");
-//		}
-//		StringBuffer sb = new StringBuffer("select fcx.entityid from opicm.entity fcx "); 
-//		sb.append("join opicm.text t on fcx.entitytype=t.entitytype and fcx.entityid=t.entityid "); 
-//		sb.append("join opicm.text t1 on fcx.entitytype=t1.entitytype and fcx.entityid=t1.entityid "); 
-//		sb.append("join opicm.flag fdom on fcx.entitytype=fdom.entitytype and fcx.entityid=fdom.entityid "); 
-//		sb.append("where fcx.entitytype='"+entitytype+"' ");  
-//		sb.append("and fcx.enterprise='"+m_prof.getEnterprise()+"' "); 
-//		sb.append("and fcx.valto>current timestamp ");  
-//		sb.append("and fcx.effto>current timestamp "); 
-//		sb.append("and t.enterprise='"+m_prof.getEnterprise()+"' "); 
-//		sb.append("and t.valto>current timestamp "); 
-//		sb.append("and t.effto>current timestamp "); 
-//		sb.append("and t.attributecode='TOMACHTYPE' "); 
-//		sb.append("and t.attributevalue='"+machtypeValue+"' "); 
-//		sb.append("and t1.enterprise='"+m_prof.getEnterprise()+"' "); 
-//		sb.append("and t1.valto>current timestamp "); 
-//		sb.append("and t1.effto>current timestamp "); 
-//		sb.append("and t1.attributecode='TOMODEL' "); 
-//		sb.append("and fdom.enterprise='"+m_prof.getEnterprise()+"' "); 
-//		sb.append("and fdom.valto>current timestamp "); 
-//		sb.append("and fdom.effto>current timestamp ");  
-//		sb.append("and fdom.attributecode='PDHDOMAIN' ");   
-//		sb.append("and fdom.attributevalue in ("+domainsb.toString()+") "); 
-//		sb.append("and exists ( ");  
-//		sb.append("select mdl.entityid from opicm.entity mdl "); 
-//		sb.append("join opicm.flag f on mdl.entitytype=f.entitytype and mdl.entityid=f.entityid "); 
-//		sb.append("join opicm.text t2 on mdl.entitytype=t2.entitytype and mdl.entityid=t2.entityid "); 
-//		sb.append("join opicm.flag fdom1 on mdl.entitytype=fdom1.entitytype and mdl.entityid=fdom1.entityid "); 
-//		sb.append("left join opicm.text t3 on mdl.entitytype=t3.entitytype and mdl.entityid=t3.entityid "); 
-//		sb.append("and t3.enterprise='"+m_prof.getEnterprise()+"' and t3.valto>current timestamp and t3.effto>current timestamp "); 
-//		sb.append("and t3.attributecode='"+dateAttr+"' "); 
-//		sb.append("where mdl.entitytype='MODEL' "); 
-//		sb.append("and f.enterprise='"+m_prof.getEnterprise()+"' "); 
-//		sb.append("and f.valto>current timestamp ");  
-//		sb.append("and f.effto>current timestamp "); 
-//		sb.append("and f.attributecode='MACHTYPEATR' ");   
-//		sb.append("and f.attributevalue='"+machtypeValue+"' ");  
-//		sb.append("and t2.enterprise='"+m_prof.getEnterprise()+"' "); 
-//		sb.append("and t2.valto>current timestamp "); 
-//		sb.append("and t2.effto>current timestamp "); 
-//		sb.append("and t2.attributecode='MODELATR' "); 
-//		sb.append("and t2.attributevalue=t1.attributevalue "); 
-//		sb.append("and fdom1.enterprise='"+m_prof.getEnterprise()+"' "); 
-//		sb.append("and fdom1.valto>current timestamp "); 
-//		sb.append("and fdom1.effto>current timestamp ");  
-//		sb.append("and fdom1.attributecode='PDHDOMAIN' ");   
-//		sb.append("and fdom1.attributevalue in ("+domainsb.toString()+") "); 
-//		sb.append("and (t3.entityid is null or t3.attributevalue>='"+dateValue+"') ) with ur"); 
-//
-//		return sb.toString();
-//	}
-//	/**
-//	 * find ids that meet the withdrawn date conditions
-//	 * @param sql
-//	 * @param idVct
-//	 * @return
-//	 * @throws SQLException
-//	 * @throws MiddlewareException
-//	 */
-//	private Vector getMatchingDateIds(String sql, Vector idVct) throws SQLException, MiddlewareException{
-//		Vector matchIdVct = new Vector();
-//
-//		addDebug("getMatchingDateIds executing with "+PokUtils.convertToHTML(sql));
-//		PreparedStatement ps = null;
-//		ResultSet result=null;
-//
-//		try{
-//			ps = m_db.getPDHConnection().prepareStatement(sql);
-//
-//			result = ps.executeQuery();
-//
-//			while(result.next()) {                  
-//				int iEntityID = result.getInt(1);
-//				if(iEntityID>0){ // bypass default entities
-//					matchIdVct.add(new Integer(iEntityID));  
-//				}
-//			}
-//			addDebug("getMatchingDateIds all matchIdVct.cnt "+matchIdVct.size());
-//			addDebug(D.EBUG_INFO,"getMatchingDateIds all matchIdVct "+matchIdVct);
-//			//find the intersection of the 2 sets
-//			matchIdVct.retainAll(idVct);
-//			addDebug("getMatchingDateIds after retainall matchIdVct "+matchIdVct.size());
-//		}finally{
-//			if (result!=null){
-//				try {
-//					result.close();
-//				}catch(Exception e){
-//					System.err.println("getMatchingDateIds(), unable to close result. "+ e);
-//				}
-//				result=null;
-//			}
-//
-//			if (ps !=null) {
-//				try {
-//					ps.close();
-//				}catch(Exception e){
-//					System.err.println("getMatchingDateIds(), unable to close ps. "+ e);
-//				}
-//				ps=null;
-//			}
-//
-//			m_db.commit();
-//			m_db.freeStatement();
-//			m_db.isPending();
-//		}
-//
-//		return matchIdVct;
-//	}
-	/**
-	 * find ids that meet the withdrawn date conditions
-	 * @param sql
-	 * @param idVct
-	 * @return
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	private Vector getMatchingIds(String sql) throws SQLException, MiddlewareException{
-		Vector matchIdVct = new Vector();
-
-		addDebug("getMatchingDateIds executing with "+PokUtils.convertToHTML(sql));
-		PreparedStatement ps = null;
-		ResultSet result=null;
-
-		try{
-			ps = m_db.getPDHConnection().prepareStatement(sql);
-
-			result = ps.executeQuery();
-			Set allid = new HashSet();
-			while(result.next()) {                  
-				int iEntityID = result.getInt(1);
-				if(iEntityID>0){ // bypass default entities
-					allid.add(new Integer(iEntityID));  
-				}
-			}
-			matchIdVct.addAll(allid);
-			addDebug("getMatchingDateIds all matchIdVct.cnt "+matchIdVct.size());
-			addDebug(D.EBUG_INFO,"getMatchingDateIds all matchIdVct "+matchIdVct);
-		}finally{
-			if (result!=null){
-				try {
-					result.close();
-				}catch(Exception e){
-					System.err.println("getMatchingDateIds(), unable to close result. "+ e);
-				}
-				result=null;
-			}
-
-			if (ps !=null) {
-				try {
-					ps.close();
-				}catch(Exception e){
-					System.err.println("getMatchingDateIds(), unable to close ps. "+ e);
-				}
-				ps=null;
-			}
-
-			m_db.commit();
-			m_db.freeStatement();
-			m_db.isPending();
-		}
-
-		return matchIdVct;
-	}
-	/**
-	 * ADSIDLSTATUS_XMLIDLABRSTATUS_queuedValue=0090
-	 * @param abrcode
-	 * @return
-	 */
-	private String getQueuedValue(String abrcode){
-		return COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getABRQueuedValue(
-				m_abri.getABRCode()+"_"+abrcode);
-	}
-
-	/**
-	 * merge debug info into html rpt if possible
-	 */
-	private void restoreXtraContent(){
-		// if written to file and still small enough, restore debug to the abr rpt and delete the file
-		if (dbgLen+rptSb.length()<MAXFILE_SIZE){
-			// read the file in and put into the stringbuffer
-			InputStream is = null;
-			FileInputStream fis = null;
-			BufferedReader rdr = null;
-			try{
-				fis = new FileInputStream(dbgfn);
-				is = new BufferedInputStream(fis);
-
-				String s=null;
-				StringBuffer sb = new StringBuffer();
-				rdr = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-				// append lines until done
-				while((s=rdr.readLine()) !=null){
-					sb.append(s+NEWLINE);
-				}
-				rptSb.append("<!-- "+sb.toString()+" -->"+NEWLINE);
-
-				// remove the file
-				File f1 = new File(dbgfn);
-				if (f1.exists()) {
-					f1.delete();
-				}
-			}catch(Exception e){
-				e.printStackTrace();
-			}finally{
-				if (is!=null){
-					try{
-						is.close();
-					}catch(Exception x){
-						x.printStackTrace();
-					}
-				}
-				if (fis!=null){
-					try{
-						fis.close();
-					}catch(Exception x){
-						x.printStackTrace();
-					}
-				}
-			}
-		}
-	}
-
-	/************************************
-	 * @param item
-	 * @param attrCode
-	 * @return
-	 */
-	private String getLD_Value(EntityItem item, String attrCode)   {
-		return PokUtils.getAttributeDescription(item.getEntityGroup(), attrCode, attrCode)+": "+
-		PokUtils.getAttributeValue(item, attrCode, ",", PokUtils.DEFNOTPOPULATED, false);
-	}
-
-	/******
-	 * @see COM.ibm.eannounce.abr.util.PokBaseABR#dereference()
-	 */
-	public void dereference(){
-		super.dereference();
-
-		rsBundle = null;
-		rptSb = null;
-		args = null;
-
-		metaTbl = null;
-		navName = null;
-		vctReturnsEntityKeys.clear();
-		vctReturnsEntityKeys = null;
-		
-		vctReturnsQueueKeys.clear();
-		vctReturnsQueueKeys = null;
-
-		dbgPw=null;
-		dbgfn = null;
-	}
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.util.PokBaseABR#getABRVersion()
-	 */
-	public String getABRVersion() {
-		return "$Revision: 1.27 $";
-	}
-
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.util.PokBaseABR#getDescription()
-	 */
-	public String getDescription() {
-		return ADSIDLSTATUS;
-	}
-	/**********************************
-	 * add msg to report output
-	 * @param msg
-	 */
-	protected void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
-
-	/**********************************
-	 * add debug info as html comment
-	 * @param msg
-	 */
-	protected void addDebug(String msg) { 
-		dbgLen+=msg.length();
-		dbgPw.println(msg);
-		dbgPw.flush();
-		//rptSb.append("<!-- "+msg+" -->"+NEWLINE);
-	}
-	/**********************
-	 * support conditional msgs
-	 * @param level
-	 * @param msg
-	 */
-	protected void addDebug(int level,String msg) { 
-		if (level <= abr_debuglvl) {
-			addDebug(msg);
-		}
-	}
-	/**********************************
-	 * used for error output
-	 * Prefix with LD(EntityType) NDN(EntityType) of the EntityType that the ABR is checking
-	 * (root EntityType)
-	 *
-	 * The entire message should be prefixed with 'Error: '
-	 *
-	 */
-	protected void addError(String errCode, Object args[]){
-		setReturnCode(FAIL);
-
-		//ERROR_PREFIX = Error:  reduce size of output, do not prepend root info
-		addMessage(rsBundle.getString("ERROR_PREFIX"), errCode, args);
-	} 
-    /**********************************
-     * add error info and fail abr
-     */
-    protected void addError(String msg) {
-        addOutput(msg);
-        setReturnCode(FAIL);
-    }
-
-	/**
-	 * ADSIDLSTATUS_splimit=200000
-	 * get the maximum limit to use for search sps
-	 * @return
-	 */
-	private int getSPLimit(){
-		String limit =  COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue(m_abri.getABRCode(),
-				"_splimit","200000");
-
-		return Integer.parseInt(limit);
-	}
-	/**
-	 * ADSIDLSTATUS_sampleMode=true
-	 * only queue a sample set of entities, not all found
-	 * @return
-	 */
-	private boolean isSampleMode(){
-		 return Boolean.valueOf(COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue(m_abri.getABRCode(),
-				"_sampleMode","false")).booleanValue();
-	}
-	/**********************************
-	 * used for warning or error output
-	 *
-	 */
-	private void addMessage(String msgPrefix, String errCode, Object args[])
-	{
-		String msg = rsBundle.getString(errCode);
-		// get message to output
-		if (args!=null){
-			MessageFormat msgf = new MessageFormat(msg);
-			msg = msgf.format(args);
-		}
-
-		addOutput(msgPrefix+" "+msg);
-	}
-
-	/**********************************************************************************
-	 *  Get Name based on navigation attributes for specified entity
-	 *
-	 *@return java.lang.String
-	 */
-	private String getNavigationName(EntityItem theItem) throws java.sql.SQLException, MiddlewareException
-	{
-		StringBuffer navName = new StringBuffer();
-
-		// NAME is navigate attributes
-		// check hashtable to see if we already got this meta
-		EANList metaList = (EANList)metaTbl.get(theItem.getEntityType());
-		if (metaList==null)	{
-			EntityGroup eg = new EntityGroup(null, m_db, m_prof, theItem.getEntityType(), "Navigate");
-			metaList = eg.getMetaAttribute();  // iterator does not maintain navigate order
-			metaTbl.put(theItem.getEntityType(), metaList);
-		}
-		for (int ii=0; ii<metaList.size(); ii++){
-			EANMetaAttribute ma = (EANMetaAttribute)metaList.getAt(ii);
-			navName.append(PokUtils.getAttributeValue(theItem, ma.getAttributeCode(),", ", "", false));
-			if (ii+1<metaList.size()){
-				navName.append(" ");
-			}
-		}
-
-		return navName.toString().trim();
-	}
-
-	/***********************************************
-	 *  Sets the specified Attributes on the specified Entity
-	 *
-	 * @param mqFlags
-	 * @param queuedValue
-	 * @param etype
-	 * @param eid
-	 */
-	private void setValues(String mqFlags[], String queuedValue, String etype, int eid)
-	{
-		if (m_cbOn==null){
-			setControlBlock(); // needed for attribute updates
-		}
-
-		ReturnEntityKey rek = new ReturnEntityKey(etype,eid, true);
-		Vector vctAtts = new Vector();
-		rek.m_vctAttributes = vctAtts;
-		vctReturnsEntityKeys.addElement(rek);
-	
-
-		// queue the abr
-		SingleFlag sf = new SingleFlag (m_prof.getEnterprise(), etype, eid,
-				ADS_XMLEED_ATTR, queuedValue, 1, m_cbOn);
-		// tm was picking it up before the propfile is set, so defer it
-		sf.setDeferredPost(true);
-		
-		vctAtts.addElement(sf);
-		
-		// copy XMLABRPROPFILE into entity for downstream feed
-//		for (int i=0; i<mqFlags.length; i++){
-//			MultipleFlag mf = new MultipleFlag(m_prof.getEnterprise(),
-//					etype, eid, MQUEUE_ATTR, mqFlags[i], 1, m_cbOn);
-//			vctAtts.addElement(mf);
-//		}
-		
-	}
-	
-	/***********************************************
-	 *  Sets the specified Attributes on the specified Entity
-	 *
-	 * @param mqFlags
-	 * @param queuedValue
-	 * @param etype
-	 * @param eid
-	 */
-	private void setQueueValues(String etype, int eid)
-	{
-		if (m_cbOn==null){
-			setControlBlock(); // needed for attribute updates
-		}
-
-		ReturnEntityKey rek = new ReturnEntityKey(etype,eid, true);
-		Vector vctAtts = new Vector();
-		rek.m_vctAttributes = vctAtts;
-		vctReturnsQueueKeys.addElement(rek);
-	
-
-		// queue the abr
-		SingleFlag sf = new SingleFlag (m_prof.getEnterprise(), etype, eid,
-				QUEUE_ATTR, QUEUE_VALUE, 1, m_cbOn);
-		// tm was picking it up before the propfile is set, so defer it
-		//sf.setDeferredPost(true);
-		
-		vctAtts.addElement(sf);
-		
-		// copy XMLABRPROPFILE into entity for downstream feed
-//		for (int i=0; i<mqFlags.length; i++){
-//			MultipleFlag mf = new MultipleFlag(m_prof.getEnterprise(),
-//					etype, eid, MQUEUE_ATTR, mqFlags[i], 1, m_cbOn);
-//			vctAtts.addElement(mf);
-//		}
-		
-	}
-
-	/***********************************************
-	 * Update the PDH with the values in the vector, do all at once
-	 *
-	 */
-	private void updatePDH()
-	throws java.sql.SQLException,
-	COM.ibm.opicmpdh.middleware.MiddlewareException,
-	java.rmi.RemoteException,
-	COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-	COM.ibm.eannounce.objects.EANBusinessRuleException
-	{
-		int iSize  = vctReturnsEntityKeys.size();
-		logMessage(getDescription()+" updating PDH with "+vctReturnsEntityKeys.size()+" entitykeys");
-		addDebug("updatePDH entered for vctReturnsEntityKeys: "+iSize);
-		if(vctReturnsEntityKeys.size()>0) {
-			try {
-				if(isSampleMode()){
-					addOutput("<b>WARNING: Running in sample mode, not queueing all entities!</b>");
-					ReturnEntityKey rek = (ReturnEntityKey)vctReturnsEntityKeys.firstElement();
-					addOutput("<b>WARNING: Queued "+rek.getEntityType()+rek.getEntityID()+"</b>");
-					Vector tmp = new Vector(1);
-					tmp.add(rek);
-					m_db.update(m_prof, tmp, false, false);
-					tmp.clear();
-				}else{
-					m_db.update(m_prof, vctReturnsEntityKeys, false, false);			
-				}
-
-				try{  
-					//build one msg for all set
-					ReturnEntityKey rek = (ReturnEntityKey)vctReturnsEntityKeys.firstElement();
-					if (rek.m_vctAttributes.size() == 1){
-						Attribute attr = (Attribute)rek.m_vctAttributes.elementAt(0);
-						//ATTRS_SET = {0} was set to {1} and {2} was set to {3} for {4} {5}
-						args[0] = attr.getAttributeCode();
-						args[1] = attr.getAttributeValue();
-						args[2] = ""+iSize;
-						args[3] = rek.getEntityType();
-						addMessage("", "ATTRS_SET", args);
-					} else {
-						addDebug("no attribute value update!");
-					}
-					
-				}catch(Exception exc){
-					exc.printStackTrace();
-					addDebug("exception trying to output msg "+exc);
-				}
-			}
-			finally {
-				vctReturnsEntityKeys.clear();
-				m_db.commit();
-				m_db.freeStatement();
-				m_db.isPending("finally after updatePDH");
-			}
-		}
-	}
-	
-	/***********************************************
-	 * Update the PDH with the values in the vector, do all at once
-	 *
-	 */
-	private void updatePDHQueue()
-	throws java.sql.SQLException,
-	COM.ibm.opicmpdh.middleware.MiddlewareException,
-	java.rmi.RemoteException,
-	COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-	COM.ibm.eannounce.objects.EANBusinessRuleException
-	{
-		int iSize  = vctReturnsQueueKeys.size();
-		logMessage(getDescription()+" updating PDH with "+vctReturnsQueueKeys.size()+" entitykeys");
-		addDebug("updatePDH entered for vctReturnsQueueKeys: "+iSize);
-		if(vctReturnsQueueKeys.size()>0) {
-			try {
-				if(isSampleMode()){
-					addOutput("<b>WARNING: Running in sample mode, not queueing all entities!</b>");
-					ReturnEntityKey rek = (ReturnEntityKey)vctReturnsQueueKeys.firstElement();
-					addOutput("<b>WARNING: Queued "+rek.getEntityType()+rek.getEntityID()+"</b>");
-					Vector tmp = new Vector(1);
-					tmp.add(rek);
-					m_db.update(m_prof, tmp, false, false);
-					tmp.clear();
-				}else{
-					m_db.update(m_prof, vctReturnsQueueKeys, false, false);			
-				}
-
-				try{  
-					//build one msg for all set
-					ReturnEntityKey rek = (ReturnEntityKey)vctReturnsQueueKeys.firstElement();
-					if (rek.m_vctAttributes.size() == 1){
-						Attribute attr = (Attribute)rek.m_vctAttributes.elementAt(0);
-						//ATTRS_SET = {0} was set to {1} and {2} was set to {3} for {4} {5}
-						args[0] = attr.getAttributeCode();
-						args[1] = attr.getAttributeValue();
-						args[2] = ""+iSize;
-						args[3] = rek.getEntityType();
-						addMessage("", "ATTRS_SET", args);
-					} else {
-						addDebug("no attribute value update!");
-					}
-					
-				}catch(Exception exc){
-					exc.printStackTrace();
-					addDebug("exception trying to output msg "+exc);
-				}
-			}
-			finally {
-				vctReturnsQueueKeys.clear();
-				m_db.commit();
-				m_db.freeStatement();
-				m_db.isPending("finally after updatePDH");
-			}
-		}
-	}
-	
-	protected void setTextValue(EntityItem entity, String strAttributeCode, String strAttributeValue)
-    throws java.sql.SQLException,
-    COM.ibm.opicmpdh.middleware.MiddlewareException
-    {
-        log(" ADSIDLSTATUS ***** "+strAttributeCode+" set to: " + strAttributeValue);
-        log("setTextValue entered for "+strAttributeCode+" set to: " + strAttributeValue);
-
-		// if meta does not have this attribute, there is nothing to do
-        EANMetaAttribute metaAttr = entity.getEntityGroup().getMetaAttribute(strAttributeCode);
-        if (metaAttr==null) {
-			log("setTextValue: "+strAttributeCode+" was not in meta for "+entity.getEntityType()+", nothing to do");
-        	log("ADSIDLSTATUS ***** "+strAttributeCode+" was not in meta for "+
-        			entity.getEntityType()+", nothing to do");
-			return;
-		}
-        if (strAttributeValue != null) {
-
-			try {
-				if (m_cbOn == null) {
-					setControlBlock(); // needed for attribute updates
-				}
-				ReturnEntityKey rek = new ReturnEntityKey(getEntityType(),
-						getEntityID(), true);
-
-				Text t = new Text(m_prof.getEnterprise(), rek.getEntityType(),
-						rek.getEntityID(), strAttributeCode, strAttributeValue,
-						1, m_cbOn);
-				//                    SingleFlag sf = new SingleFlag (m_prof.getEnterprise(), rek.getEntityType(), rek.getEntityID(),
-				//                        strAttributeCode, strAttributeValue, 1, m_cbOn);
-				Vector vctAtts = new Vector();
-				Vector vctReturnsEntityKeys = new Vector();
-				vctAtts.addElement(t);
-				rek.m_vctAttributes = vctAtts;
-				vctReturnsEntityKeys.addElement(rek);
-
-				m_db.update(m_prof, vctReturnsEntityKeys, false, false);
-				addDebug(entity.getKey() + " had " + strAttributeCode
-						+ " set to: " + strAttributeValue);
-			} finally {
-				m_db.commit();
-				m_db.freeStatement();
-				m_db.isPending("finally after update in setTextValue ");
-			}
-
-		}
-    }
-	
-}
-

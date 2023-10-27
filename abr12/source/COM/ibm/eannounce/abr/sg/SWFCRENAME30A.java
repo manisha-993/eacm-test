@@ -1,452 +1,456 @@
-//  (c) Copyright International Business Machines Corporation, 2001
-//  All Rights Reserved.</pre>
-//
-//SWFCRENAME30A.java,v
-//Revision 1.4  2008/01/30 19:39:16  wendy
-//Cleanup RSA warnings
-//
-//Revision 1.3  2006/03/03 19:23:30  bala
-//remove reference to Constants.CSS
-//
-//Revision 1.2  2006/01/24 17:12:05  yang
-//Jtest Changes
-//
-//Revision 1.1  2005/01/19 00:04:52  bala
-//check in
-//
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.LockPDHEntityException;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.abr.util.UpdatePDHEntityException;
+/*     */ import COM.ibm.eannounce.objects.EANAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
+/*     */ import COM.ibm.opicmpdh.objects.ControlBlock;
+/*     */ import COM.ibm.opicmpdh.objects.Text;
+/*     */ import java.io.PrintWriter;
+/*     */ import java.io.StringWriter;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Vector;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class SWFCRENAME30A
+/*     */   extends PokBaseABR
+/*     */ {
+/*     */   public static final String ABR = "SWFCRENAME30A";
+/*     */   
+/*     */   public static String getVersion() {
+/*  48 */     return "SWFCRENAME30A.java,v 1.4 2008/01/30 19:39:16 wendy Exp";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/*  58 */     return getVersion();
+/*     */   }
+/*     */   
+/*  61 */   private EntityGroup m_egSWFeature = null;
+/*  62 */   private EntityItem m_eiSWfeature = null;
+/*     */   
+/*  64 */   private EntityGroup m_egSWProdstruct = null;
+/*  65 */   private EntityItem m_eiSWProdStruct = null;
+/*  66 */   private StringBuffer errMessage = new StringBuffer();
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/*  74 */     String str1 = null;
+/*  75 */     String str2 = null;
+/*     */     
+/*  77 */     String str3 = null;
+/*     */     
+/*     */     try {
+/*  80 */       start_ABRBuild();
+/*     */ 
+/*     */       
+/*  83 */       this.m_egSWFeature = this.m_elist.getParentEntityGroup();
+/*  84 */       this
+/*  85 */         .m_eiSWfeature = (this.m_egSWFeature == null) ? null : this.m_egSWFeature.getEntityItem(0);
+/*     */       
+/*  87 */       this.m_egSWProdstruct = this.m_elist.getEntityGroup("SWPRODSTRUCT");
+/*     */       
+/*  89 */       if (this.m_egSWFeature == null) {
+/*  90 */         logMessage("SWFCRENAME30A:" + 
+/*     */ 
+/*     */             
+/*  93 */             getVersion() + ":ERROR:1: m_egSWFeature cannot be established.");
+/*     */         
+/*  95 */         setReturnCode(-1);
+/*     */         return;
+/*     */       } 
+/*  98 */       if (this.m_eiSWfeature == null) {
+/*  99 */         logMessage("SWFCRENAME30A:" + 
+/*     */ 
+/*     */             
+/* 102 */             getVersion() + ":ERROR:2: m_eiSWfeature cannot be established.");
+/*     */         
+/* 104 */         setReturnCode(-1);
+/*     */         return;
+/*     */       } 
+/* 107 */       logMessage("SWFCRENAME30A:" + 
+/*     */ 
+/*     */           
+/* 110 */           getVersion() + ":Request to Work on Entity:" + this.m_eiSWfeature
+/*     */           
+/* 112 */           .getEntityType() + ":" + this.m_eiSWfeature
+/*     */           
+/* 114 */           .getEntityID());
+/*     */       
+/* 116 */       setControlBlock();
+/*     */       
+/* 118 */       logMessage("SWFCRENAME30A:" + 
+/*     */ 
+/*     */           
+/* 121 */           getVersion() + ":Setup Complete:" + this.m_eiSWfeature
+/*     */           
+/* 123 */           .getEntityType() + ":" + this.m_eiSWfeature
+/*     */           
+/* 125 */           .getEntityID());
+/*     */       
+/* 127 */       setDGTitle(setDGName(this.m_eiSWfeature, "SWFCRENAME30A"));
+/* 128 */       buildReportHeader();
+/*     */ 
+/*     */       
+/* 131 */       setReturnCode(0);
+/*     */ 
+/*     */ 
+/*     */       
+/* 135 */       str1 = (getAttributeValue(this.m_eiSWfeature, "FEATURECODE").length() > 0) ? getAttributeValue(this.m_eiSWfeature, "FEATURECODE") : "";
+/*     */ 
+/*     */       
+/* 138 */       if (str1.indexOf("#") >= 0) {
+/* 139 */         logMessage("SWFCRENAME30A:" + 
+/*     */ 
+/*     */             
+/* 142 */             getVersion() + ":ERROR:3:dummy featurecode EXISTS and not changed to real FC");
+/*     */         
+/* 144 */         setReturnCode(-1);
+/*     */ 
+/*     */         
+/*     */         return;
+/*     */       } 
+/*     */       
+/* 150 */       if (getReturnCode() == 0) {
+/*     */ 
+/*     */ 
+/*     */         
+/* 154 */         String str = (getAttributeValue(this.m_eiSWfeature, "COMNAME").length() > 0) ? getAttributeValue(this.m_eiSWfeature, "COMNAME") : "";
+/*     */ 
+/*     */         
+/* 157 */         str = replaceFCDummy(str1, str);
+/*     */         
+/* 159 */         setAttrValue(this.m_eiSWfeature, "COMNAME", str);
+/*     */ 
+/*     */         
+/* 162 */         logMessage("Checking SWPRODStruct: found " + this.m_egSWProdstruct
+/*     */             
+/* 164 */             .getEntityItemCount());
+/* 165 */         byte b = 0;
+/* 166 */         for (; b < this.m_egSWProdstruct.getEntityItemCount(); 
+/* 167 */           b++) {
+/* 168 */           this.m_eiSWProdStruct = this.m_egSWProdstruct.getEntityItem(b);
+/*     */ 
+/*     */ 
+/*     */           
+/* 172 */           str2 = (getAttributeValue(this.m_eiSWProdStruct, "COMNAME").length() > 0) ? getAttributeValue(this.m_eiSWProdStruct, "COMNAME") : "";
+/*     */ 
+/*     */           
+/* 175 */           str2 = replaceFCDummy(str1, str2);
+/*     */ 
+/*     */           
+/* 178 */           setAttrValue(this.m_eiSWProdStruct, "COMNAME", str2);
+/*     */         } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 184 */         println("<br><br><FONT SIZE=4>" + 
+/*     */             
+/* 186 */             getABRDescription() + " has Passed, no report provided");
+/*     */       } 
+/*     */ 
+/*     */ 
+/*     */       
+/* 191 */       println("<br><br>");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 197 */       if (getReturnCode() == -1) {
+/* 198 */         displayHeader(this.m_egSWFeature, this.m_eiSWfeature);
+/* 199 */         if (this.m_eiSWProdStruct != null) {
+/* 200 */           println(
+/* 201 */               displayStatuses(this.m_eiSWProdStruct, this.m_eiSWProdStruct
+/*     */                 
+/* 203 */                 .getEntityGroup()));
+/* 204 */           println(
+/* 205 */               displayNavAttributes(this.m_eiSWProdStruct, this.m_eiSWProdStruct
+/*     */                 
+/* 207 */                 .getEntityGroup()));
+/*     */         } 
+/* 209 */         println(this.errMessage.toString());
+/*     */         
+/* 211 */         println("<BR><br /><b>" + 
+/*     */             
+/* 213 */             buildMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */                 
+/* 216 */                 getABRDescription(), 
+/* 217 */                 (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */               }) + "</b>");
+/*     */ 
+/*     */         
+/* 221 */         log(
+/* 222 */             buildLogMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */                 
+/* 225 */                 getABRDescription(), 
+/* 226 */                 (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */               }));
+/*     */       } 
+/* 229 */     } catch (LockPDHEntityException lockPDHEntityException) {
+/* 230 */       setReturnCode(-2);
+/* 231 */       println("<h3><font color=red>IAB1007E: Could not get soft lock.  Rule execution is terminated.<br />" + lockPDHEntityException
+/*     */ 
+/*     */ 
+/*     */           
+/* 235 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 237 */       logError(lockPDHEntityException.getMessage());
+/* 238 */       lockPDHEntityException.printStackTrace();
+/* 239 */     } catch (UpdatePDHEntityException updatePDHEntityException) {
+/* 240 */       setReturnCode(-2);
+/* 241 */       println("<h3><font color=red>UpdatePDH error: " + updatePDHEntityException
+/*     */           
+/* 243 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 245 */       logError(updatePDHEntityException.getMessage());
+/* 246 */       updatePDHEntityException.printStackTrace();
+/* 247 */     } catch (Exception exception) {
+/* 248 */       println("Error in " + this.m_abri.getABRCode() + ":" + exception.getMessage());
+/* 249 */       println("" + exception);
+/*     */ 
+/*     */       
+/* 252 */       if (getABRReturnCode() != -2) {
+/* 253 */         setReturnCode(-3);
+/*     */       }
+/* 255 */       exception.printStackTrace();
+/*     */       
+/* 257 */       StringWriter stringWriter = new StringWriter();
+/* 258 */       exception.printStackTrace(new PrintWriter(stringWriter));
+/* 259 */       str3 = stringWriter.toString();
+/* 260 */       println(str3);
+/*     */       
+/* 262 */       logMessage("Error in " + this.m_abri
+/* 263 */           .getABRCode() + ":" + exception.getMessage());
+/* 264 */       logMessage("" + exception);
+/*     */     }
+/*     */     finally {
+/*     */       
+/* 268 */       setDGString(getABRReturnCode());
+/* 269 */       setDGRptName("SWFCRENAME30A");
+/* 270 */       setDGRptClass("SWFCRENAME30A");
+/* 271 */       printDGSubmitString();
+/*     */ 
+/*     */       
+/* 274 */       buildReportFooter();
+/*     */       
+/* 276 */       if (!isReadOnly()) {
+/* 277 */         clearSoftLock();
+/*     */       }
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String replaceFCDummy(String paramString1, String paramString2) {
+/* 285 */     String str = paramString2;
+/* 286 */     if (paramString2.indexOf("#") > -1) {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 291 */       String str1 = paramString2.substring(0, paramString2.indexOf("#")).trim();
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 296 */       String str2 = paramString2.substring(paramString2.indexOf("#")).trim();
+/*     */       
+/* 298 */       String str3 = str2.substring(str2.indexOf(" ")).trim();
+/*     */       
+/* 300 */       str = str1 + " " + paramString1 + " " + str3;
+/*     */     } else {
+/*     */       
+/* 303 */       logMessage(this.m_abri
+/* 304 */           .getABRCode() + " Dummy FC not found to replace in " + paramString2);
+/*     */     } 
+/*     */ 
+/*     */     
+/* 308 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setAttrValue(EntityItem paramEntityItem, String paramString1, String paramString2) throws SQLException, MiddlewareException {
+/*     */     try {
+/* 332 */       ReturnEntityKey returnEntityKey = new ReturnEntityKey(paramEntityItem.getEntityType(), paramEntityItem.getEntityID(), true);
+/*     */ 
+/*     */       
+/* 335 */       Vector<Text> vector = new Vector();
+/* 336 */       Vector<ReturnEntityKey> vector1 = new Vector();
+/* 337 */       Text text = null;
+/*     */       
+/* 339 */       EntityGroup entityGroup = paramEntityItem.getEntityGroup();
+/* 340 */       EANMetaAttribute eANMetaAttribute = entityGroup.getMetaAttribute(paramString1);
+/*     */       
+/* 342 */       switch (eANMetaAttribute.getAttributeType().charAt(0)) {
+/*     */         case 'T':
+/* 344 */           if (paramString2.length() == 0) {
+/* 345 */             EANAttribute eANAttribute = paramEntityItem.getAttribute(paramString1);
+/* 346 */             if (eANAttribute.toString() != null && eANAttribute
+/* 347 */               .toString().length() > 0)
+/*     */             {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */               
+/* 355 */               ControlBlock controlBlock = new ControlBlock(this.m_strNow, this.m_strNow, this.m_strNow, this.m_strNow, this.m_prof.getOPWGID(), this.m_prof.getTranID());
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */               
+/* 362 */               text = new Text(this.m_prof.getEnterprise(), returnEntityKey.getEntityType(), returnEntityKey.getEntityID(), paramString1, eANAttribute.toString(), 1, controlBlock);
+/*     */             }
+/*     */           
+/*     */           } else {
+/*     */             
+/* 367 */             if (paramString2.lastIndexOf('-') > 0)
+/*     */             {
+/* 369 */               paramString2 = paramString2.substring(0, paramString2
+/*     */                   
+/* 371 */                   .length() - 1);
+/*     */             }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */             
+/* 380 */             ControlBlock controlBlock = new ControlBlock(this.m_strNow, this.m_strForever, this.m_strNow, this.m_strForever, this.m_prof.getOPWGID(), this.m_prof.getTranID());
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */             
+/* 385 */             text = new Text(this.m_prof.getEnterprise(), returnEntityKey.getEntityType(), returnEntityKey.getEntityID(), paramString1, paramString2, 1, controlBlock);
+/*     */           } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */           
+/* 391 */           vector.addElement(text);
+/*     */           break;
+/*     */       } 
+/* 394 */       returnEntityKey.m_vctAttributes = vector;
+/* 395 */       vector1.addElement(returnEntityKey);
+/*     */       
+/* 397 */       this.m_db.update(this.m_prof, vector1);
+/* 398 */       this.m_db.commit();
+/* 399 */       this.m_db.freeStatement();
+/* 400 */       this.m_db.isPending();
+/*     */     }
+/* 402 */     catch (MiddlewareException middlewareException) {
+/* 403 */       logMessage("setAttrValue: " + middlewareException.getMessage());
+/* 404 */     } catch (Exception exception) {
+/* 405 */       logMessage("setAttrValue: " + exception.getMessage());
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getABREntityDesc(String paramString, int paramInt) {
+/* 419 */     return null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 429 */     return "This ABR is used to search/copy the FEATURECODE value from the selected SWFEATURE  to COMNAME on SWFEATURE and SWPRODSTRUCT respectively";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getStyle() {
+/* 438 */     return "";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getRevision() {
+/* 448 */     return new String("1.4");
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.sg;
 
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.opicmpdh.objects.*;
-//import COM.ibm.opicmpdh.transactions.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.eannounce.abr.util.*;
-import java.util.*;
-import java.io.*;
-import java.sql.*;
-
-/**
- * SWFCRENAME30A
- *
- * @author Owner
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\SWFCRENAME30A.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class SWFCRENAME30A extends PokBaseABR {
-  /**
-  *  Execute ABR.
-  */
-  //ABR
-  public final static String ABR = "SWFCRENAME30A";
-
-  /**
-     * getVersion
-     *
-     * @return
-     * @author Owner
-     */
-    public static String getVersion() {
-    return ("SWFCRENAME30A.java,v 1.4 2008/01/30 19:39:16 wendy Exp");
-  }
-
-  /**
-     * getABRVersion
-     *
-     * @return
-     * @author Owner
-     */
-    public String getABRVersion() {
-    return getVersion();
-  }
-
-  private EntityGroup m_egSWFeature = null;
-  private EntityItem m_eiSWfeature = null;
-
-  private EntityGroup m_egSWProdstruct = null;
-  private EntityItem m_eiSWProdStruct = null;
-  private StringBuffer errMessage = new StringBuffer();
-
-  /**
-     * execute_run
-     *
-     * @author Owner
-     */
-    public void execute_run() {
-    String SWFEATURE_FEATURECODE = null;
-    String SWPRODSTRUCT_COMNAME = null;
-    StringWriter writer;
-    String x = null;
-    try {
-
-      start_ABRBuild();
-      //logMessage(m_elist.dump(false));
-      //Get Some Vital information
-      m_egSWFeature = m_elist.getParentEntityGroup();
-      m_eiSWfeature =
-        (m_egSWFeature == null ? null : m_egSWFeature.getEntityItem(0));
-
-      m_egSWProdstruct = m_elist.getEntityGroup("SWPRODSTRUCT");
-
-      if (m_egSWFeature == null) {
-        logMessage(
-          ABR
-            + ":"
-            + getVersion()
-            + ":ERROR:1: m_egSWFeature cannot be established.");
-        setReturnCode(FAIL);
-        return;
-      }
-      if (m_eiSWfeature == null) {
-        logMessage(
-          ABR
-            + ":"
-            + getVersion()
-            + ":ERROR:2: m_eiSWfeature cannot be established.");
-        setReturnCode(FAIL);
-        return;
-      }
-      logMessage(
-        ABR
-          + ":"
-          + getVersion()
-          + ":Request to Work on Entity:"
-          + m_eiSWfeature.getEntityType()
-          + ":"
-          + m_eiSWfeature.getEntityID());
-
-      setControlBlock();
-
-      logMessage(
-        ABR
-          + ":"
-          + getVersion()
-          + ":Setup Complete:"
-          + m_eiSWfeature.getEntityType()
-          + ":"
-          + m_eiSWfeature.getEntityID());
-
-      setDGTitle(setDGName(m_eiSWfeature, ABR));
-      buildReportHeader();
-
-      // Default the thing to pass...
-      setReturnCode(PASS);
-
-      SWFEATURE_FEATURECODE =
-        getAttributeValue(m_eiSWfeature, "FEATURECODE").length() > 0
-            ? getAttributeValue(m_eiSWfeature, "FEATURECODE")
-            : "";
-      //Check for a dummy feature code in the featurecode attribute
-      if (SWFEATURE_FEATURECODE.indexOf("#") >= 0) {
-        logMessage(
-          ABR
-            + ":"
-            + getVersion()
-            + ":ERROR:3:dummy featurecode EXISTS and not changed to real FC");
-        setReturnCode(FAIL);
-        return;
-      }
-
-      // when it passes , set attribute value and do not print to report
-
-      if (getReturnCode() == PASS) {
-
-        String SWFEATURE_COMNAME =
-          getAttributeValue(m_eiSWfeature, "COMNAME").length() > 0
-                ? getAttributeValue(m_eiSWfeature, "COMNAME")
-                : "";
-        SWFEATURE_COMNAME =
-          replaceFCDummy(SWFEATURE_FEATURECODE, SWFEATURE_COMNAME);
-
-        setAttrValue(m_eiSWfeature, "COMNAME", SWFEATURE_COMNAME);
-
-        //Now set the values in SWPRODSTRUCT
-        logMessage(
-          "Checking SWPRODStruct: found "
-            + m_egSWProdstruct.getEntityItemCount());
-        for (int i = 0;
-          i < m_egSWProdstruct.getEntityItemCount();
-          i++) {
-          m_eiSWProdStruct = m_egSWProdstruct.getEntityItem(i);
-          SWPRODSTRUCT_COMNAME =
-            getAttributeValue(m_eiSWProdStruct, "COMNAME").length()
-                    > 0
-                    ? getAttributeValue(m_eiSWProdStruct, "COMNAME")
-                    : "";
-          SWPRODSTRUCT_COMNAME =
-            replaceFCDummy(
-              SWFEATURE_FEATURECODE,
-              SWPRODSTRUCT_COMNAME);
-          setAttrValue(
-            m_eiSWProdStruct,
-            "COMNAME",
-            SWPRODSTRUCT_COMNAME);
-        }
-
-        println(
-          "<br><br><FONT SIZE=4>"
-            + getABRDescription()
-            + " has Passed, no report provided");
-
-      }
-
-      println("<br><br>");
-
-      // Print to the report when it fails
-      // Then print to the log file
-      //
-
-      if (getReturnCode() == FAIL) {
-        displayHeader(m_egSWFeature, m_eiSWfeature);
-        if (m_eiSWProdStruct != null) {
-          println(
-            displayStatuses(
-              m_eiSWProdStruct,
-              m_eiSWProdStruct.getEntityGroup()));
-          println(
-            displayNavAttributes(
-              m_eiSWProdStruct,
-              m_eiSWProdStruct.getEntityGroup()));
-        }
-        println(errMessage.toString());
-
-        println(
-          "<BR><br /><b>"
-            + buildMessage(
-              MSG_IAB2016I,
-              new String[] {
-                getABRDescription(),
-                (getReturnCode() == PASS
-                  ? "Passed"
-                  : "Failed")})
-            + "</b>");
-        log(
-          buildLogMessage(
-            MSG_IAB2016I,
-            new String[] {
-              getABRDescription(),
-              (getReturnCode() == PASS ? "Passed" : "Failed")}));
-      }
-
-    } catch (LockPDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>"
-          + ERR_IAB1007E
-          + "<br />"
-          + le.getMessage()
-          + "</font></h3>");
-      logError(le.getMessage());
-      le.printStackTrace();
-    } catch (UpdatePDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>UpdatePDH error: "
-          + le.getMessage()
-          + "</font></h3>");
-      logError(le.getMessage());
-      le.printStackTrace();
-    } catch (Exception exc) {
-      println("Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-      println("" + exc);
-
-      // don't overwrite an update exception
-      if (getABRReturnCode() != UPDATE_ERROR) {
-        setReturnCode(INTERNAL_ERROR);
-      }
-      exc.printStackTrace();
-
-      writer = new StringWriter();
-      exc.printStackTrace(new PrintWriter(writer));
-      x = writer.toString();
-      println(x);
-
-      logMessage(
-        "Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-      logMessage("" + exc);
-
-    } finally {
-      // set DG submit string
-      setDGString(getABRReturnCode());
-      setDGRptName("SWFCRENAME30A"); //Set the report name
-      setDGRptClass("SWFCRENAME30A"); //Set the report class
-      printDGSubmitString();
-      //Stuff into report for subscription and notification
-      // Tack on the DGString
-      buildReportFooter();
-      // make sure the lock is released
-      if (!isReadOnly()) {
-        clearSoftLock();
-      }
-    }
-  }
-
-  private String replaceFCDummy(
-    String _strFCString,
-    String _strReplaceString) {
-    String strReturn = _strReplaceString;
-    if (_strReplaceString.indexOf("#") > -1) {
-      //           System.out.println("Found dummy");
-      String strTemp1 =
-        _strReplaceString
-        .substring(0, _strReplaceString.indexOf("#"))
-        .trim();
-      //           System.out.println(strTemp1);
-      String strTemp2 =
-        _strReplaceString
-        .substring(_strReplaceString.indexOf("#"))
-        .trim();
-      //           System.out.println(strTemp2);
-      String strTemp3 = strTemp2.substring(strTemp2.indexOf(" ")).trim();
-      //           System.out.println(strTemp3);
-      strReturn = strTemp1 + " " + _strFCString + " " + strTemp3;
-      //           System.out.println(strReturn);
-    } else {
-      logMessage(
-        m_abri.getABRCode()
-          + " Dummy FC not found to replace in "
-          + _strReplaceString);
-    }
-    return strReturn;
-  }
-
-  /**
-     * setAttrValue
-     *
-     * @param _ei
-     * @param _attributeCode
-     * @param _attributeValue
-     * @throws java.sql.SQLException
-     * @throws COM.ibm.opicmpdh.middleware.MiddlewareException
-     * @author Owner
-     */
-    public void setAttrValue(
-    EntityItem _ei,
-    String _attributeCode,
-    String _attributeValue)
-    throws SQLException, MiddlewareException {
-    try {
-      ControlBlock cbOn;
-      //OPICMList ol;
-      ReturnEntityKey rek =
-        new ReturnEntityKey(
-          _ei.getEntityType(),
-          _ei.getEntityID(),
-          true);
-
-      Vector vctAtts = new Vector();
-      Vector vctReturnsEntityKeys = new Vector();
-      Text txtAtt = null;
-
-      EntityGroup eg = _ei.getEntityGroup();
-      EANMetaAttribute ma = eg.getMetaAttribute(_attributeCode);
-
-      switch (ma.getAttributeType().charAt(0)) {
-            case 'T' :
-                if (_attributeValue.length() == 0) {
-                    EANAttribute ea = _ei.getAttribute(_attributeCode);
-                    if (ea.toString() != null
-                        && ea.toString().length() > 0) {
-                        ControlBlock cbOff =
-                            new ControlBlock(
-                                m_strNow,
-                                m_strNow,
-                m_strNow,
-                m_strNow,
-                m_prof.getOPWGID(),
-                m_prof.getTranID());
-                        txtAtt =
-                        new Text(
-                            m_prof.getEnterprise(),
-                            rek.getEntityType(),
-                            rek.getEntityID(),
-                            _attributeCode,
-                            ea.toString(),
-              1,
-              cbOff);
-                    }
-                } else {
-                    if (_attributeValue.lastIndexOf('-') > 0)
-                        _attributeValue =
-                        _attributeValue.substring(
-                                0,
-                                _attributeValue.length() - 1);
-
-                    cbOn =
-                    new ControlBlock(
-                        m_strNow,
-            m_strForever,
-            m_strNow,
-            m_strForever,
-            m_prof.getOPWGID(),
-            m_prof.getTranID());
-                    txtAtt =
-          new Text(
-            m_prof.getEnterprise(),
-            rek.getEntityType(),
-            rek.getEntityID(),
-            _attributeCode,
-            _attributeValue,
-            1,
-            cbOn);
-                }
-                vctAtts.addElement(txtAtt);
-      }
-
-      rek.m_vctAttributes = vctAtts;
-      vctReturnsEntityKeys.addElement(rek);
-     // ol = 
-    	  m_db.update(m_prof, vctReturnsEntityKeys);
-      m_db.commit();
-      m_db.freeStatement();
-      m_db.isPending();
-
-    } catch (COM.ibm.opicmpdh.middleware.MiddlewareException e) {
-      logMessage("setAttrValue: " + e.getMessage());
-    } catch (Exception e) {
-      logMessage("setAttrValue: " + e.getMessage());
-    }
-
-  }
-
-  /**
-     * getABREntityDesc
-     *
-     * @param entityType
-     * @param entityId
-     * @return
-     * @author Owner
-     */
-    protected String getABREntityDesc(String entityType, int entityId) {
-    return null;
-  }
-
-  /**
-     * getDescription
-     *
-     * @return
-     * @author Owner
-     */
-    public String getDescription() {
-    return "This ABR is used to search/copy the FEATURECODE value from the selected SWFEATURE  to COMNAME on SWFEATURE and SWPRODSTRUCT respectively";
-  }
-  /**
-     * getStyle
-     *
-     * @return
-     * @author Owner
-     */
-    protected String getStyle() {
-    return "";
-  }
-
-  /**
-     * getRevision
-     *
-     * @return
-     * @author Owner
-     */
-    public String getRevision() {
-    return new String("1.4");
-  }
-}
-
-//insert into opicm.metalinkattr values ('SG13','Action/Entity','EXTSWFCRENAME','SWPRODSTRUCT','U','0','1980-01-01-00.00.00.000000','9999-12-31-00.00.00.000000','1980-01-01-00.00.00.000000','9999-12-31-00.00.00.000000',0812,7342);

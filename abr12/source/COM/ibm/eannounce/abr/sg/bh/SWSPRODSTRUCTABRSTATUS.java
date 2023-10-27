@@ -1,185 +1,191 @@
-package COM.ibm.eannounce.abr.sg.bh;
+/*     */ package COM.ibm.eannounce.abr.sg.bh;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Vector;
+/*     */ 
+/*     */ public class SWSPRODSTRUCTABRSTATUS extends DQABRSTATUS {
+/*  11 */   private Object[] args = new Object[3];
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean isVEneeded(String paramString) {
+/*  17 */     return true;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void completeNowR4RProcessing() throws SQLException, MiddlewareException, MiddlewareRequestException {
+/*  31 */     EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*  37 */     String str = PokUtils.getAttributeFlagValue(entityItem, "LIFECYCLE");
+/*     */     
+/*  39 */     if (str == null || str.length() == 0) {
+/*  40 */       str = "LF01";
+/*     */     }
+/*  42 */     if ("LF01".equals(str) || "LF02"
+/*  43 */       .equals(str)) {
+/*  44 */       Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(entityItem, "SWSTMFAVAIL", "AVAIL");
+/*  45 */       for (byte b = 0; b < vector.size(); b++) {
+/*  46 */         EntityItem entityItem1 = vector.elementAt(b);
+/*  47 */         if (statusIsRFRorFinal(entityItem1)) {
+/*  48 */           setFlagValue(this.m_elist.getProfile(), "ADSABRSTATUS", getRFRQueuedValueForItem(entityItem, "ADSABRSTATUS"), entityItem);
+/*     */           break;
+/*     */         } 
+/*     */       } 
+/*  52 */       vector.clear();
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void completeNowFinalProcessing() throws SQLException, MiddlewareException, MiddlewareRequestException {
+/*  70 */     EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*  76 */     Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(entityItem, "SWSTMFAVAIL", "AVAIL");
+/*  77 */     for (byte b = 0; b < vector.size(); b++) {
+/*  78 */       EntityItem entityItem1 = vector.elementAt(b);
+/*  79 */       if (statusIsFinal(entityItem1)) {
+/*  80 */         setFlagValue(this.m_elist.getProfile(), "ADSABRSTATUS", getQueuedValue("ADSABRSTATUS"));
+/*     */         break;
+/*     */       } 
+/*     */     } 
+/*  84 */     vector.clear();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void doDQChecking(EntityItem paramEntityItem, String paramString) throws Exception {
+/*  97 */     addHeading(2, paramEntityItem.getEntityGroup().getLongDescription() + " Checks:");
+/*     */     
+/*  99 */     int i = getCheck_W_E_E(paramString);
+/* 100 */     EntityItem entityItem1 = this.m_elist.getEntityGroup("SVCMOD").getEntityItem(0);
+/* 101 */     EntityItem entityItem2 = this.m_elist.getEntityGroup("SWSFEATURE").getEntityItem(0);
+/*     */     
+/* 103 */     checkStatusVsDQ(entityItem1, "STATUS", paramEntityItem, 4);
+/* 104 */     checkStatusVsDQ(entityItem2, "STATUS", paramEntityItem, 4);
+/*     */     
+/* 106 */     checkAvail(paramEntityItem);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void checkAvail(EntityItem paramEntityItem) {
+/* 122 */     addHeading(3, this.m_elist.getEntityGroup("AVAIL").getLongDescription() + " Planned Avail Checks:");
+/*     */     
+/* 124 */     Vector vector1 = PokUtils.getAllLinkedEntities(paramEntityItem, "SWSTMFAVAIL", "AVAIL");
+/* 125 */     Vector vector2 = PokUtils.getEntitiesWithMatchedAttr(vector1, "AVAILTYPE", "146");
+/*     */     
+/* 127 */     checkPlannedAvailsExist(vector2, 3);
+/* 128 */     checkPlannedAvailsType(vector2, 3);
+/* 129 */     checkPlannedAvailsStatus(vector2, paramEntityItem, 3);
+/*     */     
+/* 131 */     vector2.clear();
+/* 132 */     vector1.clear();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void checkPlannedAvailsType(Vector paramVector, int paramInt) {
+/* 138 */     if (paramVector != null && paramVector.size() > 0) {
+/* 139 */       boolean bool = false;
+/* 140 */       for (EntityItem entityItem : paramVector) {
+/*     */         
+/* 142 */         String str = PokUtils.getAttributeFlagValue(entityItem, "AVAILANNTYPE");
+/* 143 */         addDebug("check plannedavail " + entityItem.getKey() + " AVAILANNTYPE: " + str);
+/* 144 */         if (!"NORFA".equalsIgnoreCase(str)) {
+/* 145 */           bool = true;
+/*     */           break;
+/*     */         } 
+/*     */       } 
+/* 149 */       if (bool) {
+/* 150 */         this.args[0] = "Planned Availability type";
+/* 151 */         this.args[1] = "NORFA";
+/* 152 */         createMessage(paramInt, "MUST_BE_ERR", this.args);
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getLCRFRWFName() {
+/* 162 */     return "WFLCSWSPRODSTRFR"; } protected String getLCFinalWFName() {
+/* 163 */     return "WFLCSWSPRODSTFINAL";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 172 */     return "SWSPRODSTRUCT ABR";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 183 */     return "1.0";
+/*     */   }
+/*     */ }
 
-import java.util.Iterator;
-import java.util.Vector;
 
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-import COM.ibm.eannounce.objects.EntityItem;
-
-public class SWSPRODSTRUCTABRSTATUS extends DQABRSTATUS{
-	private Object args[] = new Object[3];
-
-	/**********************************
-	* always check if not final, but need navigation name from model and fc
-	*/
-	protected boolean isVEneeded(String statusFlag) {
-		return true;
-	}
-
-    /**********************************
-    * complete abr processing after status moved to readyForReview; (status was chgreq)
-	* C.	Status changed to Ready for Review
-	1.	Set ADSABRSTATUS = 0020 (Queued)
-    */
-    protected void completeNowR4RProcessing() throws
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-    {
-
-    	EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-    	
-    	//	IF			MAINTPRODSTRUCT	STATUS	=	"Ready for Review" (0040)		
-    	//	AND			MAINTPRODSTRUCT	LIFECYCLE	=	"Develop" (LF02)  | "Plan" (LF01)		
-    	//	IF			MAINTMFAVAIL-d	AVAIL	STATUS	=	"Final" (0020) | "Ready for Review" (0040)		
-    	//	SET			MAINTPRODSTRUCT				ADSABRSTATUS	&ADSFEEDRFR
-		String lifecycle = PokUtils.getAttributeFlagValue(rootEntity, "LIFECYCLE");
-//		addDebug("doR4R_R10Processing: "+theItem.getKey()+" availRel "+availRel+" lifecycle "+lifecycle);
-		if (lifecycle==null || lifecycle.length()==0){ 
-			lifecycle = LIFECYCLE_Plan;
-		}
-		if (LIFECYCLE_Plan.equals(lifecycle) ||  // first time moving to RFR
-				LIFECYCLE_Develop.equals(lifecycle)){ // been RFR before
-			Vector availVct= PokUtils.getAllLinkedEntities(rootEntity, "SWSTMFAVAIL", "AVAIL");
-			availloop:for (int ai=0; ai<availVct.size(); ai++){
-				EntityItem avail = (EntityItem)availVct.elementAt(ai);
-				if (statusIsRFRorFinal(avail)){				
-					setFlagValue(m_elist.getProfile(),"ADSABRSTATUS", getRFRQueuedValueForItem(rootEntity,"ADSABRSTATUS"),rootEntity);
-					break availloop;
-				}
-			}// end avail loop
-			availVct.clear();
-		}
-    	
-    }
-
-	/**********************************
-	* complete abr processing after status moved to final; (status was r4r)
-	D.	STATUS changed to Final
-
-	1.	Set ADSABRSTATUS = 0020 (Queued)
-
-	*
-	*/
-	protected void completeNowFinalProcessing() throws
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-	{
-		EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-
-		//IF			MAINTPRODSTRUCT	STATUS	=	"Final" (0020)			
-		//IF		MAINTMFAVAIL-d	AVAIL	STATUS	=	"Final" (0020)			
-		//SET			MAINTPRODSTRUCT				ADSABRSTATUS		&ADSFEED
-			
-		Vector availVct= PokUtils.getAllLinkedEntities(rootEntity, "SWSTMFAVAIL", "AVAIL");
-		availloop:for (int ai=0; ai<availVct.size(); ai++){
-			EntityItem avail = (EntityItem)availVct.elementAt(ai);	
-			if (statusIsFinal(avail)){
-				setFlagValue(m_elist.getProfile(),"ADSABRSTATUS", getQueuedValue("ADSABRSTATUS"));
-				break availloop;
-			}
-		}
-		availVct.clear();
-		
-	}
-
-    /**********************************
-	2.00	MAINTFEATURE 		MAINTPRODSTRUCT-u								MAINTFEATURE 	
-	3.00			STATUS	=>	MAINTPRODSTRUCT	DATAQUALITY		E	E	E		{LD: STATUS} can not be higher than the {LD: MAINTFEATURE } {NDN: MAINTFEATURE }
-			SVCMOD				MAINTPRODSTRUCT-d									
-	4.00			STATUS	=>	MAINTPRODSTRUCT	DATAQUALITY		E	E	E		{LD: STATUS} can not be higher than the {LD: SVCMOD} {NDN: SVCMOD} {LD: STATUS} {STATUS}
-
-	*/
-    protected void doDQChecking(EntityItem rootEntity, String statusFlag) throws Exception
-    {
-    	addHeading(2,rootEntity.getEntityGroup().getLongDescription()+" Checks:");
-    	
-    	int checklvl = getCheck_W_E_E(statusFlag); 
-		EntityItem mdlItem = m_elist.getEntityGroup("SVCMOD").getEntityItem(0); // has to exist
-		EntityItem fcItem = m_elist.getEntityGroup("SWSFEATURE").getEntityItem(0); // has to exist
-		
-		checkStatusVsDQ(mdlItem, "STATUS", rootEntity, CHECKLEVEL_E);
-		checkStatusVsDQ(fcItem, "STATUS", rootEntity, CHECKLEVEL_E);
-		
-		checkAvail(rootEntity);
-				
-	}
-
-    /**
-    5.00	AVAIL	A	MAINTPRODSTRUCT-u:MAINTMFAVAIL-d								Feature AVAIL	
-	6.00	WHEN		AVAILTYPE	=	"Planned Availability"							
-	7.00			CountOf	=>	1			RE*1	RE*1	RE*1		must have at lease one "Planned Availability"
-	8.20	WHEN		"Final" (FINAL)	=	MAINTPRODSTRUCT	DATAQUALITY						
-	8.22	IF		STATUS	=	"Ready for Review" (0040)							
-	8.24	OR		STATUS	=	"Final" (0020)							
-	8.26			CountOf	=>	1					RE*1		must have at least one "Planned Availability" that is either "Ready for Review" or "Final" in order to be "Final"
-	8.28	END	8.20										
-     */
-    private void checkAvail(EntityItem rootEntity) {
-    	
-    	addHeading(3,m_elist.getEntityGroup("AVAIL").getLongDescription()+" Planned Avail Checks:");
-
-    	Vector availVct = PokUtils.getAllLinkedEntities(rootEntity, "SWSTMFAVAIL", "AVAIL");
-    	Vector plannedPsAvailVector = PokUtils.getEntitiesWithMatchedAttr(availVct, "AVAILTYPE", PLANNEDAVAIL);//Planned Availability
-		
-    	checkPlannedAvailsExist(plannedPsAvailVector, CHECKLEVEL_RE);
-    	checkPlannedAvailsType(plannedPsAvailVector, CHECKLEVEL_RE);
-    	checkPlannedAvailsStatus(plannedPsAvailVector, rootEntity, CHECKLEVEL_RE);
-    	
-    	plannedPsAvailVector.clear();
-    	availVct.clear();
-    	
-	}
-    
-    protected void checkPlannedAvailsType(Vector plannedAvailVct, int checkLevel){
-		
-			if(plannedAvailVct != null && plannedAvailVct.size() > 0){
-				boolean ishasRFRorFINALAvail = false;
-				for (Iterator it = plannedAvailVct.iterator(); it.hasNext();) {
-					EntityItem avail = (EntityItem) it.next();
-					String avail_type = PokUtils.getAttributeFlagValue(avail, "AVAILANNTYPE");
-					addDebug("check plannedavail "+avail.getKey()+" AVAILANNTYPE: "+ avail_type);
-					if(!"NORFA".equalsIgnoreCase(avail_type)){
-						ishasRFRorFINALAvail = true;
-						break;
-					}				
-				}
-				if(ishasRFRorFINALAvail){
-					args[0] = "Planned Availability type";
-					args[1] = "NORFA";
-					createMessage(checkLevel,"MUST_BE_ERR",args);
-				}
-			
-		}
-	}
-
-	/* (non-Javadoc)
-	 * update LIFECYCLE value when STATUS is updated
-	 * @see COM.ibm.eannounce.abr.sg.bh.DQABRSTATUS#doPostProcessing(COM.ibm.eannounce.objects.EntityItem, java.lang.String)
-	 */
-	protected String getLCRFRWFName(){ return "WFLCSWSPRODSTRFR";}
-	protected String getLCFinalWFName(){ return "WFLCSWSPRODSTFINAL";}
-	
-	/***********************************************
-    *  Get ABR description
-    *
-    *@return java.lang.String
-    */
-    public String getDescription()
-    {
-        String desc =  "SWSPRODSTRUCT ABR";
-        return desc;
-    }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getABRVersion()
-    {
-        return "1.0";
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\bh\SWSPRODSTRUCTABRSTATUS.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

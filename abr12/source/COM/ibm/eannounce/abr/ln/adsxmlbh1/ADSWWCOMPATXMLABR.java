@@ -1,1514 +1,1519 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2011  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.abr.ln.adsxmlbh1;
-
-
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-
-import java.util.*;
-import java.sql.*;
-import java.io.*;
-
-import javax.xml.parsers.*;
-import javax.xml.transform.TransformerException;
-
-import org.w3c.dom.*;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-/**********************************************************************************
-*/
-// $Log: ADSWWCOMPATXMLABR.java,v $
-// Revision 1.1  2015/02/04 14:55:48  wangyul
-// RCQ00337765-RQ change the XML mapping to pull DIV from PROJ for Lenovo
-//
-// Revision 1.22  2013/12/11 08:11:54  guobin
-// xsd validation for generalarea, reconcile, wwcompat and price XML
-//
-// Revision 1.21  2012/10/22 14:32:17  guobin
-// Build request - for defect 820634  update activity ='W' for withdraw offering.- spec BH FS ABR Catalog DB Compatibility Gen 20121011.doc
-//
-// Revision 1.20  2012/07/17 16:56:25  wangyulo
-// add the switch to turn on or turn off to generate the userxml file for the periodic ABR
-//
-// Revision 1.19  2012/04/10 15:12:03  wangyulo
-// the change for the  WWCOMPAT_UPDATE generation
-//
-// Revision 1.18  2012/04/06 12:52:37  wangyulo
-// the changes to WWCOMPAT_UPDATE generation
-//
-// Revision 1.17  2012/01/18 15:57:24  guobin
-// Fix the issue 635138 for WWCOMPAT:
-// 1. There should be <STATUS> tag after BRANDCD tag in LSEO xml
-//
-// Revision 1.16  2011/12/14 02:26:54  guobin
-// Update the Version V Mod M for the ADSABR
-//
-// Revision 1.15  2011/10/05 02:24:53  praveen
-// Fix OSENTITYID default value
-//
-// Revision 1.14  2011/10/05 01:53:30  praveen
-// fix addDebugComment stmt
-//
-// Revision 1.13  2011/10/05 01:40:22  praveen
-// Uncommented osentitytype, osentityid references, pointing them to default value
-//
-// Revision 1.12  2011/10/05 00:55:21  praveen
-// Commented OSENTITYTYPE, OSENTITYID as they are not in the xml
-//
-// Revision 1.11  2011/09/27 08:13:21  guobin
-// change SQL to do not select systemos and OS.  default chunking size is 500000
-//
-// Revision 1.10  2011/09/16 12:45:24  guobin
-// add chunking size for WWCOMPAT IDL
-//
-// Revision 1.9  2011/06/01 02:20:04  guobin
-// change the country filter for WWCOMPAT
-//
-// Revision 1.8  2011/05/20 05:57:19  guobin
-// change getMQPropertiesFN method
-//
-// Revision 1.7  2011/05/05 14:34:48  guobin
-// change to send xml 3K records at a time.
-//
-// Revision 1.6  2011/04/27 21:02:16  rick
-// changes to join to price tables to get information for LSEOs
-//
-//Revision 1.5  2011/02/15 10:59:50  lucasrg
-//Applied mapping updates for DM Cycle 2
-//
-//Revision 1.4  2011/02/01 20:17:22  rick
-//fixes
-//
-//Revision 1.3  2011/01/28 03:09:02  rick
-//more fixes
-//
-// Revision 1.2  2011/01/28 02:27:52  rick
-// fixes.
-//
-// Revision 1.1  2011/01/25 02:43:30  rick
-// adding ADSWWCOMPATXMLABR
-//
-//
-public class ADSWWCOMPATXMLABR extends XMLMQAdapter
-{
-	//private static final String COMPAT_SQL = "select activity,systementitytype,systementityid,"+
-    //            "systemos,groupentitytype,groupentityid,oktopub,osentitytype,osentityid,os,optionentitytype,"+
-    //            "optionentityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,"+
-    //            "brandcd_fc "+
-    //            "from gbli.wwtechcompat "+
-    //            "where updated BETWEEN ? AND ? with ur";
-
-	private static final int MW_ENTITY_LIMIT;
-	private static final int WWCOMPAT_ROW_LIMIT;
-	protected static int WWCOMPAT_MESSAGE_COUNT = 0;
-	Connection connection = null;
-	static {
-		String entitylimit = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("ADSABRSTATUS", "_entitylimit",
-			"3000");
-		MW_ENTITY_LIMIT = Integer.parseInt(entitylimit);
-		String rowlimit = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("ADSABRSTATUS", "_XMLGENCOUNT",
-		"500000");
-		WWCOMPAT_ROW_LIMIT = Integer.parseInt(rowlimit);		
-	}
-
-	private static final String COMPAT_SQL =
-		"select activity,'LSEO',left_lseo.entityid,"+
-        "groupentitytype,groupentityid,oktopub,'LSEO',"+
-        "right_lseo.entityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,"+
-        "brandcd_fc,"+
-        "left_lseo.seoid,right_lseo.seoid,"+
-        "left_model.machtypeatr,left_model.modelatr "+
-        "from gbli.wwtechcompat wwtc "+
-        "join price.wwseolseo left_wwseolseo on wwtc.systementityid=left_wwseolseo.id1 "+
-        "and left_wwseolseo.isactive=1 "+
-        "join price.lseo left_lseo on left_wwseolseo.id2=left_lseo.entityid and left_lseo.isactive=1 "+
-        "join price.wwseolseo right_wwseolseo on wwtc.optionentityid=right_wwseolseo.id1 "+
-        "and right_wwseolseo.isactive=1 "+
-        "join price.lseo right_lseo on right_wwseolseo.id2=right_lseo.entityid and right_lseo.isactive=1 "+
-        "join price.modelwwseo left_modelwwseo on left_modelwwseo.id2=wwtc.systementityid "+
-        "and left_modelwwseo.isactive=1 "+
-        "join price.model left_model on left_model.entityid=left_modelwwseo.id1 "+
-        "and left_model.isactive=1 "+
-        "where systementitytype='WWSEO' and optionentitytype='WWSEO' and "+
-        "updated BETWEEN ? AND ? "+
-        "and activity <> 'W' "+
-        //According to Doc BH FS Catolog DB Compatbility Gen 20121011b.doc Flow to downstream where activity <> 'W'
-        "union "+
-        "select activity,'MODEL',systementityid,"+
-        "groupentitytype,groupentityid,oktopub,'MODEL',"+
-        "optionentityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,"+
-        "brandcd_fc,cast(null as char),cast(null as char),"+
-        "left_model.machtypeatr,left_model.modelatr "+
-        "from gbli.wwtechcompat wwtc "+
-        "join price.model left_model on left_model.entityid=systementityid and left_model.isactive=1 "+
-        "where systementitytype='MODEL' and optionentitytype='MODEL' and "+
-        "updated BETWEEN ? AND ? "+
-        "and activity <> 'W' "+
-        //According to Doc BH FS Catolog DB Compatbility Gen 20121011b.doc Flow to downstream where activity <> 'W'
-        "union "+
-        "select activity,'MODEL',systementityid,"+
-        "groupentitytype,groupentityid,oktopub,'LSEO',"+
-        "right_lseo.entityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,"+
-        "brandcd_fc,cast(null as char),right_lseo.seoid,"+
-        "left_model.machtypeatr,left_model.modelatr "+
-        "from gbli.wwtechcompat wwtc "+
-        "join price.model left_model on left_model.entityid=systementityid and left_model.isactive=1 "+
-        "join price.wwseolseo right_wwseolseo on wwtc.optionentityid=right_wwseolseo.id1 "+
-        "and right_wwseolseo.isactive=1 "+
-        "join price.lseo right_lseo on right_wwseolseo.id2=right_lseo.entityid and right_lseo.isactive=1 "+
-        "where systementitytype='MODEL' and optionentitytype='WWSEO' and "+
-        "updated BETWEEN ? AND ? "+
-        "and activity <> 'W' "+
-        //According to Doc BH FS Catolog DB Compatbility Gen 20121011b.doc Flow to downstream where activity <> 'W'
-        "union "+
-        "select activity,'MODEL',systementityid,"+
-        "groupentitytype,groupentityid,oktopub,'LSEOBUNDLE',"+
-        "optionentityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,"+
-        "brandcd_fc,cast(null as char),right_lseobundle.seoid,"+
-        "left_model.machtypeatr,left_model.modelatr "+
-        "from gbli.wwtechcompat wwtc "+
-        "join price.model left_model on left_model.entityid=systementityid and left_model.isactive=1 "+
-        "join price.lseobundle right_lseobundle on right_lseobundle.entityid=optionentityid and "+
-        "right_lseobundle.isactive=1 "+
-        "where systementitytype='MODEL' and optionentitytype='LSEOBUNDLE' and "+
-        "updated BETWEEN ? AND ? "+
-        "and activity <> 'W' "+
-        //According to Doc BH FS Catolog DB Compatbility Gen 20121011b.doc Flow to downstream where activity <> 'W'
-        "union "+
-        "select activity,'LSEO',left_lseo.entityid,"+
-        "groupentitytype,groupentityid,oktopub,'LSEOBUNDLE',"+
-        "optionentityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,"+
-        "brandcd_fc,"+
-        "left_lseo.seoid,right_lseobundle.seoid,"+
-        "left_model.machtypeatr,left_model.modelatr "+
-        "from gbli.wwtechcompat wwtc "+
-        "join price.wwseolseo left_wwseolseo on wwtc.systementityid=left_wwseolseo.id1 "+
-        "and left_wwseolseo.isactive=1 "+
-        "join price.lseo left_lseo on left_wwseolseo.id2=left_lseo.entityid and left_lseo.isactive=1 "+
-        "join price.lseobundle right_lseobundle on right_lseobundle.entityid=optionentityid "+
-        "and right_lseobundle.isactive=1 "+
-        "join price.modelwwseo left_modelwwseo on left_modelwwseo.id2=wwtc.systementityid "+
-        "and left_modelwwseo.isactive=1 "+
-        "join price.model left_model on left_model.entityid=left_modelwwseo.id1 "+
-        "and left_model.isactive=1 "+
-        "where systementitytype='WWSEO' and optionentitytype='LSEOBUNDLE' and "+
-        "updated BETWEEN ? AND ? "+
-        "and activity <> 'W' "+
-        //According to Doc BH FS Catolog DB Compatbility Gen 20121011b.doc Flow to downstream where activity <> 'W'
-        "union "+
-        "select activity,'LSEOBUNDLE',systementityid,"+
-        "groupentitytype,groupentityid,oktopub,'LSEO',"+
-        "right_lseo.entityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,"+
-        "brandcd_fc,"+
-        "left_lseobundle.seoid,right_lseo.seoid,"+
-        "cast(null as char),cast(null as char) "+
-        "from gbli.wwtechcompat wwtc "+
-        "join price.lseobundle left_lseobundle on left_lseobundle.entityid=systementityid "+
-        "and left_lseobundle.isactive=1 "+
-        "join price.wwseolseo right_wwseolseo on wwtc.optionentityid=right_wwseolseo.id1 "+
-        "and right_wwseolseo.isactive=1 "+
-        "join price.lseo right_lseo on right_wwseolseo.id2=right_lseo.entityid and right_lseo.isactive=1 "+
-        "where systementitytype='LSEOBUNDLE' and optionentitytype='WWSEO' and "+
-        "updated BETWEEN ? AND ? "+
-        "and activity <> 'W' "+
-        //According to Doc BH FS Catolog DB Compatbility Gen 20121011b.doc Flow to downstream where activity <> 'W'
-        "union "+
-        "select activity,'LSEOBUNDLE',systementityid,"+
-        "groupentitytype,groupentityid,oktopub,'LSEOBUNDLE',"+
-        "optionentityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,"+
-        "brandcd_fc,"+
-        "left_lseobundle.seoid,right_lseobundle.seoid,"+
-        "cast(null as char),cast(null as char) "+
-        "from gbli.wwtechcompat wwtc "+
-        "join price.lseobundle left_lseobundle on left_lseobundle.entityid=systementityid "+
-        "and left_lseobundle.isactive=1 "+
-        "join price.lseobundle right_lseobundle on right_lseobundle.entityid=optionentityid "+
-        "and right_lseobundle.isactive=1 "+
-        "where systementitytype='LSEOBUNDLE' and optionentitytype='LSEOBUNDLE' and "+
-        "updated BETWEEN ? AND ? "+
-	    "and activity <> 'W' with ur";
-
-//		"select distinct activity,'LSEO',left_lseo.entityid,"+
-//        "systemos,groupentitytype,groupentityid,oktopub,osentitytype,osentityid,wwtc.os,'LSEO',"+
-//        "right_lseo.entityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,"+
-//        "brandcd_fc,"+
-//        "left_lseo.seoid,right_lseo.seoid,"+
-//        "left_model.machtypeatr,left_model.modelatr "+
-//        "from gbli.wwtechcompat wwtc "+
-//        "join price.wwseolseo left_wwseolseo on wwtc.systementityid=left_wwseolseo.id1 "+
-//        "and left_wwseolseo.isactive=1 "+
-//        "join price.lseo left_lseo on left_wwseolseo.id2=left_lseo.entityid and left_lseo.isactive=1 "+
-//        "join price.wwseolseo right_wwseolseo on wwtc.optionentityid=right_wwseolseo.id1 "+
-//        "and right_wwseolseo.isactive=1 "+
-//        "join price.lseo right_lseo on right_wwseolseo.id2=right_lseo.entityid and right_lseo.isactive=1 "+
-//        "join price.modelwwseo left_modelwwseo on left_modelwwseo.id2=wwtc.systementityid "+
-//        "and left_modelwwseo.isactive=1 "+
-//        "join price.model left_model on left_model.entityid=left_modelwwseo.id1 "+
-//        "and left_model.isactive=1 "+
-//        "where systementitytype='WWSEO' and optionentitytype='WWSEO' and "+
-//        "updated BETWEEN ? AND ? "+
-//        "union "+
-//        "select distinct activity,'MODEL',systementityid,"+
-//        "systemos,groupentitytype,groupentityid,oktopub,osentitytype,osentityid,wwtc.os,'MODEL',"+
-//        "optionentityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,"+
-//        "brandcd_fc,cast(null as char),cast(null as char),"+
-//        "left_model.machtypeatr,left_model.modelatr "+
-//        "from gbli.wwtechcompat wwtc "+
-//        "join price.model left_model on left_model.entityid=systementityid and left_model.isactive=1 "+
-//        "where systementitytype='MODEL' and optionentitytype='MODEL' and "+
-//        "updated BETWEEN ? AND ? "+
-//        "union "+
-//        "select distinct activity,'MODEL',systementityid,"+
-//        "systemos,groupentitytype,groupentityid,oktopub,osentitytype,osentityid,wwtc.os,'LSEO',"+
-//        "right_lseo.entityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,"+
-//        "brandcd_fc,cast(null as char),right_lseo.seoid,"+
-//        "left_model.machtypeatr,left_model.modelatr "+
-//        "from gbli.wwtechcompat wwtc "+
-//        "join price.model left_model on left_model.entityid=systementityid and left_model.isactive=1 "+
-//        "join price.wwseolseo right_wwseolseo on wwtc.optionentityid=right_wwseolseo.id1 "+
-//        "and right_wwseolseo.isactive=1 "+
-//        "join price.lseo right_lseo on right_wwseolseo.id2=right_lseo.entityid and right_lseo.isactive=1 "+
-//        "where systementitytype='MODEL' and optionentitytype='WWSEO' and "+
-//        "updated BETWEEN ? AND ? "+
-//        "union "+
-//        "select distinct activity,'MODEL',systementityid,"+
-//        "systemos,groupentitytype,groupentityid,oktopub,osentitytype,osentityid,wwtc.os,'LSEOBUNDLE',"+
-//        "optionentityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,"+
-//        "brandcd_fc,cast(null as char),right_lseobundle.seoid,"+
-//        "left_model.machtypeatr,left_model.modelatr "+
-//        "from gbli.wwtechcompat wwtc "+
-//        "join price.model left_model on left_model.entityid=systementityid and left_model.isactive=1 "+
-//        "join price.lseobundle right_lseobundle on right_lseobundle.entityid=optionentityid and "+
-//        "right_lseobundle.isactive=1 "+
-//        "where systementitytype='MODEL' and optionentitytype='LSEOBUNDLE' and "+
-//        "updated BETWEEN ? AND ? "+
-//        "union "+
-//        "select activity,'LSEO',left_lseo.entityid,"+
-//        "systemos,groupentitytype,groupentityid,oktopub,osentitytype,osentityid,wwtc.os,'LSEOBUNDLE',"+
-//        "optionentityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,"+
-//        "brandcd_fc,"+
-//        "left_lseo.seoid,right_lseobundle.seoid,"+
-//        "left_model.machtypeatr,left_model.modelatr "+
-//        "from gbli.wwtechcompat wwtc "+
-//        "join price.wwseolseo left_wwseolseo on wwtc.systementityid=left_wwseolseo.id1 "+
-//        "and left_wwseolseo.isactive=1 "+
-//        "join price.lseo left_lseo on left_wwseolseo.id2=left_lseo.entityid and left_lseo.isactive=1 "+
-//        "join price.lseobundle right_lseobundle on right_lseobundle.entityid=optionentityid "+
-//        "and right_lseobundle.isactive=1 "+
-//        "join price.modelwwseo left_modelwwseo on left_modelwwseo.id2=wwtc.systementityid "+
-//        "and left_modelwwseo.isactive=1 "+
-//        "join price.model left_model on left_model.entityid=left_modelwwseo.id1 "+
-//        "and left_model.isactive=1 "+
-//        "where systementitytype='WWSEO' and optionentitytype='LSEOBUNDLE' and "+
-//        "updated BETWEEN ? AND ? "+
-//        "union "+
-//        "select activity,'LSEOBUNDLE',systementityid,"+
-//        "systemos,groupentitytype,groupentityid,oktopub,osentitytype,osentityid,wwtc.os,'LSEO',"+
-//        "right_lseo.entityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,"+
-//        "brandcd_fc,"+
-//        "left_lseobundle.seoid,right_lseo.seoid,"+
-//        "cast(null as char),cast(null as char) "+
-//        "from gbli.wwtechcompat wwtc "+
-//        "join price.lseobundle left_lseobundle on left_lseobundle.entityid=systementityid "+
-//        "and left_lseobundle.isactive=1 "+
-//        "join price.wwseolseo right_wwseolseo on wwtc.optionentityid=right_wwseolseo.id1 "+
-//        "and right_wwseolseo.isactive=1 "+
-//        "join price.lseo right_lseo on right_wwseolseo.id2=right_lseo.entityid and right_lseo.isactive=1 "+
-//        "where systementitytype='LSEOBUNDLE' and optionentitytype='WWSEO' and "+
-//        "updated BETWEEN ? AND ? "+
-//        "union "+
-//        "select activity,'LSEOBUNDLE',systementityid,"+
-//        "systemos,groupentitytype,groupentityid,oktopub,osentitytype,osentityid,wwtc.os,'LSEOBUNDLE',"+
-//        "optionentityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,"+
-//        "brandcd_fc,"+
-//        "left_lseobundle.seoid,right_lseobundle.seoid,"+
-//        "cast(null as char),cast(null as char) "+
-//        "from gbli.wwtechcompat wwtc "+
-//        "join price.lseobundle left_lseobundle on left_lseobundle.entityid=systementityid "+
-//        "and left_lseobundle.isactive=1 "+
-//        "join price.lseobundle right_lseobundle on right_lseobundle.entityid=optionentityid "+
-//        "and right_lseobundle.isactive=1 "+
-//        "where systementitytype='LSEOBUNDLE' and optionentitytype='LSEOBUNDLE' and "+
-//        "updated BETWEEN ? AND ? with ur";
-	private static final String WITHDRAWUPDATE_SQL =
-		"update gbli.wwtechcompat set activity = 'W' where "+
-		"SYSTEMENTITYTYPE = ? "+
-		"and SYSTEMENTITYID = ? "+
-		"and SYSTEMOS = ? "+
-		"and GROUPENTITYTYPE = ? "+
-		"and GROUPENTITYID = ? "+
-		"and OSENTITYTYPE = ? "+
-		"and OSENTITYID = ? "+
-		"and OS = ? "+
-		"and OPTIONENTITYTYPE = ? "+
-		"and OPTIONENTITYID = ?";
-	
-	
-	
-	private static final String WITHDRAW_SQL =
-		"select SYSTEMENTITYTYPE,SYSTEMENTITYID,SYSTEMOS,GROUPENTITYTYPE,GROUPENTITYID,OSENTITYTYPE,OSENTITYID,wwtc.OS,OPTIONENTITYTYPE,optionentityid " +
-		"from gbli.wwtechcompat wwtc "+
-		"join price.wwseolseo right_wwseolseo on wwtc.optionentityid=right_wwseolseo.id1 "+
-		"and right_wwseolseo.isactive=1 "+
-		"join price.lseo right_lseo on right_wwseolseo.id2=right_lseo.entityid and right_lseo.isactive=1 "+
-		"and right_lseo.nlsid=1 "+
-		"and right_lseo.lseounpubdatemtrgt + 90 day < current date "+
-		"where optionentitytype='WWSEO' "+
-		"and activity in('A','C') "+
-		"and updated BETWEEN ? AND ? "+
-        "union "+
-	    "select SYSTEMENTITYTYPE,SYSTEMENTITYID,SYSTEMOS,GROUPENTITYTYPE,GROUPENTITYID,OSENTITYTYPE,OSENTITYID,wwtc.OS,OPTIONENTITYTYPE,optionentityid " +
-	    "from gbli.wwtechcompat wwtc "+
-	    "join price.model right_model on right_model.entityid=wwtc.optionentityid and right_model.isactive=1 "+
-	    "and right_model.nlsid=1 "+
-	    "and right_model.wthdrweffctvdate + 90 day < current date "+
-	    "where optionentitytype='MODEL' "+
-	    "and activity in('A','C') "+
-	    "and updated BETWEEN ? AND ? "+
-	    "union "+
-	    "select SYSTEMENTITYTYPE,SYSTEMENTITYID,SYSTEMOS,GROUPENTITYTYPE,GROUPENTITYID,OSENTITYTYPE,OSENTITYID,wwtc.OS,OPTIONENTITYTYPE,optionentityid " +
-	    "from gbli.wwtechcompat wwtc "+
-	    "join price.lseobundle right_lseobundle on right_lseobundle.entityid=wwtc.optionentityid "+
-	    "and right_lseobundle.isactive=1 "+
-	    "and right_lseobundle.nlsid=1 "+
-	    "and right_lseobundle.bundlunpubdatemtrgt + 90 day < current date "+
-	    "where optionentitytype='LSEOBUNDLE' "+
-	    "and activity in('A','C') "+
-	    "and updated BETWEEN ? AND ?  ";
-
-    /**********************************
-    * create xml and write to queue
-    */
-    public void processThis(ADSABRSTATUS abr, Profile profileT1, Profile profileT2, EntityItem rootEntity)
-    throws
-    java.sql.SQLException,
-    COM.ibm.opicmpdh.middleware.MiddlewareException,
-    ParserConfigurationException,
-    java.rmi.RemoteException,
-    COM.ibm.eannounce.objects.EANBusinessRuleException,
-    COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-    IOException,
-    javax.xml.transform.TransformerException,
-	MissingResourceException
-    {
-		String t1DTS = profileT1.getValOn();
-		String t2DTS = profileT2.getValOn();
-
-		abr.addDebug("ADSWWCOMPATXMLABR.processThis checking between "+t1DTS+" and "+t2DTS);
-		// find COMPATs
-		WWCOMPAT_MESSAGE_COUNT = 0;
-		abr.addDebug("ADSWWCOMPATXMLABR.withdraw offering set activity ='W' between "+t1DTS+" and "+t2DTS);
-	    withdrawOffering(abr,t1DTS,t2DTS);
-		processCompat(abr,t1DTS,t2DTS, profileT2, abr.getDatabase(),rootEntity);
-//		Vector compatVct = getCompat(abr,t1DTS,t2DTS, profileT2, abr.getDatabase());
-//		if (compatVct.size()==0){
-//			//NO_CHANGES_FND=No Changes found for {0}
-//			abr.addXMLGenMsg("NO_CHANGES_FND","ADSWWCOMPATXMLABR");
-//		}else{
-//			abr.addDebug("ADSWWCOMPATXMLABR.processThis found "+compatVct.size()+" WWTECHCOMPAT");
-//
-//			Vector mqVct =  getMQPropertiesFN(rootEntity,abr);
-//
-//			// filter wwcompat
-//			if(isFilterWWCOMPAT){
-//				Iterator it = wwcompMQTable.keySet().iterator();
-//		 		while (it.hasNext()){
-//		 			Vector filtercompatVct = new Vector();
-//		 			String key =(String)it.next();
-//		 			abr.addDebug("wwcompMQTable:key=" + key);
-//		 			mqVct = (Vector)wwcompMQTable.get(key);
-//		 			if(key.equals(CHEAT)){
-//		 				processMQ(abr, profileT2, compatVct, mqVct);
-//		 			}else{
-//		 				for(int i=0;i<compatVct.size();i++){
-//		 					CompatInfo ci = (CompatInfo)compatVct.elementAt(i);
-//		 					String brandcd_fc = ci.brandcd_fc_xml;
-//		 					if(key.equals(brandcd_fc)){
-//		 						filtercompatVct.add(compatVct.get(i));
-//		 					}
-//			 			}
-//		 				processMQ(abr, profileT2, filtercompatVct, mqVct);
-//		 				//release momery
-//		 				filtercompatVct.clear();
-//		 			}
-//		 		}
-//		 		wwcompMQTable.clear();
-//			}else{
-//				processMQ(abr, profileT2, compatVct, mqVct);
-//			}
-//
-//    		// release memory
-//			compatVct.clear();
-//		}
-    }
-
-	/**
-	 * @param abr
-	 * @param profileT2
-	 * @param compatVct
-	 * @param mqVct
-	 * @throws ParserConfigurationException
-	 * @throws DOMException
-	 * @throws TransformerException
-	 * @throws MissingResourceException
-	 */
-	private void processMQ(ADSABRSTATUS abr, Profile profileT2, Vector compatVct, Vector mqVct) throws ParserConfigurationException, DOMException, TransformerException, MissingResourceException {
-		if (mqVct==null){
-			abr.addDebug("ADSWWCOMPATXMLABR: No MQ properties files, nothing will be generated.");
-			//NOT_REQUIRED = Not Required for {0}.
-			abr.addXMLGenMsg("NOT_REQUIRED", "ADSWWCOMPATXMLABR");
-		}else{
-			// create one COMPATELEMENT for each one found
-			if (compatVct.size() > MW_ENTITY_LIMIT) {
-				int numGrps = 0;
-				int numUsed = 0;
-				Vector tmpVec = new Vector();
-				if (compatVct.size() % MW_ENTITY_LIMIT != 0){
-					numGrps = compatVct.size() / MW_ENTITY_LIMIT + 1;
-				}else {
-				    numGrps = compatVct.size() / MW_ENTITY_LIMIT;
-				}
-				WWCOMPAT_MESSAGE_COUNT = WWCOMPAT_MESSAGE_COUNT + numGrps;
-				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-				DocumentBuilder builder = factory.newDocumentBuilder();
-				for (int i = 0; i < numGrps; i++) {
-					for (int x = 0; x < MW_ENTITY_LIMIT; x++) {
-						if (numUsed == compatVct.size()) {
-							break;
-						}
-						tmpVec.add(compatVct.elementAt(numUsed++));
-					}
-					Document document = builder.newDocument();  // Create
-					String nodeName = "WWCOMPAT_UPDATE";
-					String xmlns = "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/" + nodeName;
-
-					// Element parent = (Element) document.createElement("WWCOMPAT_UPDATE");
-					Element parent = (Element) document.createElementNS(xmlns,nodeName);
-					// create the root
-					document.appendChild(parent);
-					parent.setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns",xmlns);
-					parent.appendChild(document.createComment("WWCOMPAT_UPDATE Version "+XMLVERSION10+" Mod "+XMLMOD10));
-
-		            Element elem = (Element) document.createElement("DTSOFMSG");
-					elem.appendChild(document.createTextNode(profileT2.getEndOfDay()));
-					parent.appendChild(elem);
-					for (int j=0; j<tmpVec.size(); j++){
-						CompatInfo ci = (CompatInfo)tmpVec.elementAt(j);
-						Element compat = (Element) document.createElement("COMPATELEMENT");
-						parent.appendChild(compat);
-
-						elem = (Element) document.createElement("ACTIVITY");
-						elem.appendChild(document.createTextNode(ci.activity_xml));
-						compat.appendChild(elem);
-
-//							Add	Ready	4,50		1	1,0	<BRANDCD>
-						elem = (Element) document.createElement("BRANDCD");
-						elem.appendChild(document.createTextNode(ci.brandcd_fc_xml));
-						compat.appendChild(elem);
-						
-						//Defect 635138 There should be <STATUS> tag after BRANDCD tag-- always 0020( Final ) 
-						elem = (Element) document.createElement("STATUS");
-						elem.appendChild(document.createTextNode(ADSABRSTATUS.STATUS_FINAL));
-						compat.appendChild(elem);
-
-						elem = (Element) document.createElement("SYSTEMENTITYTYPE");
-						elem.appendChild(document.createTextNode(ci.systementitytype_xml));
-						compat.appendChild(elem);
-
-						elem = (Element) document.createElement("SYSTEMENTITYID");
-						elem.appendChild(document.createTextNode(ci.systementityid_xml));
-						compat.appendChild(elem);
-
-						elem = (Element) document.createElement("SYSTEMMACHTYPE");
-						elem.appendChild(document.createTextNode(ci.systemmachtype_xml));
-						compat.appendChild(elem);
-
-		                elem = (Element) document.createElement("SYSTEMMODEL");
-						elem.appendChild(document.createTextNode(ci.systemmodel_xml));
-						compat.appendChild(elem);
-
-		                elem = (Element) document.createElement("SYSTEMSEOID");
-						elem.appendChild(document.createTextNode(ci.systemseoid_xml));
-						compat.appendChild(elem);
-
-		                elem = (Element) document.createElement("GROUPENTITYTYPE");
-						elem.appendChild(document.createTextNode(ci.groupentitytype_xml));
-						compat.appendChild(elem);
-
-		                elem = (Element) document.createElement("GROUPENTITYID");
-						elem.appendChild(document.createTextNode(ci.groupentityid_xml));
-						compat.appendChild(elem);
-
-		                elem = (Element) document.createElement("OKTOPUB");
-						elem.appendChild(document.createTextNode(ci.oktopub_xml));
-						compat.appendChild(elem);
-
-		                elem = (Element) document.createElement("OPTIONENTITYTYPE");
-						elem.appendChild(document.createTextNode(ci.optionentitytype_xml));
-						compat.appendChild(elem);
-
-		                elem = (Element) document.createElement("OPTIONENTITYID");
-						elem.appendChild(document.createTextNode(ci.optionentityid_xml));
-						compat.appendChild(elem);
-
-		                elem = (Element) document.createElement("OPTIONSEOID");
-						elem.appendChild(document.createTextNode(ci.optionseoid_xml));
-						compat.appendChild(elem);
-
-		                elem = (Element) document.createElement("COMPATPUBFLAG");
-						elem.appendChild(document.createTextNode(ci.compatibilitypublishingflag_xml));
-						compat.appendChild(elem);
-
-		                elem = (Element) document.createElement("RELTYPE");
-						elem.appendChild(document.createTextNode(ci.relationshiptype_xml));
-						compat.appendChild(elem);
-
-		                elem = (Element) document.createElement("PUBFROM");
-						elem.appendChild(document.createTextNode(ci.publishfrom_xml));
-						compat.appendChild(elem);
-
-		                elem = (Element) document.createElement("PUBTO");
-						elem.appendChild(document.createTextNode(ci.publishto_xml));
-						compat.appendChild(elem);
-
-						// release memory
-						ci.dereference();
-					}
-						tmpVec.clear();
-						String xml = abr.transformXML(this, document);
-						
-//						new added
-						boolean ifpass = false;
-					//	String entitytype = rootEntity.getEntityType();
-						String entitytype = "XMLCOMPATSETUP";
-						String ifNeed = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("ADSABRSTATUS" ,"_"+entitytype+"_XSDNEEDED","NO");
-						if ("YES".equals(ifNeed.toUpperCase())) {
-						   String xsdfile = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("ADSABRSTATUS","_"+entitytype+"_XSDFILE","NONE");
-						    if ("NONE".equals(xsdfile)) {
-						    	abr.addError("there is no xsdfile for "+entitytype+" defined in the propertyfile ");
-						    } else {
-						    	long rtm = System.currentTimeMillis();
-						    	Class cs = this.getClass();
-						    	StringBuffer debugSb = new StringBuffer();
-						    	ifpass = ABRUtil.validatexml(cs,debugSb,xsdfile,xml);
-						    	if (debugSb.length()>0){
-						    		String s = debugSb.toString();
-									if (s.indexOf("fail") != -1)
-										abr.addError(s);
-									abr.addOutput(s);
-						    	}
-						    	long ltm = System.currentTimeMillis();
-								abr.addDebugComment(D.EBUG_DETAIL, "Time for validation: "+Stopwatch.format(ltm-rtm));
-						    	if (ifpass) {
-						    		abr.addDebug("the xml for "+entitytype+" passed the validation");
-						    	}
-						    }
-						} else {
-							abr.addOutput("the xml for "+entitytype+" doesn't need to be validated");
-							ifpass = true;
-						}
-
-						//new added end
-
-						//add flag(new added)
-						if (xml != null && ifpass) {						
-						if(ADSABRSTATUS.USERXML_OFF_LOG){
-							//abr.addDebug("ADSWWCOMPATXMLABR: Generated MQ xml:"+ADSABRSTATUS.NEWLINE);
-						}else{
-							abr.addDebug("ADSWWCOMPATXMLABR: Generated MQ xml:"+ADSABRSTATUS.NEWLINE+xml+ADSABRSTATUS.NEWLINE);
-						}
-						abr.notify(this, "WWCOMPAT", xml, mqVct);
-						}
-						document = null;
-						System.gc();
-				}
-
-			}else {
-				WWCOMPAT_MESSAGE_COUNT = WWCOMPAT_MESSAGE_COUNT + 1;
-				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-				DocumentBuilder builder = factory.newDocumentBuilder();
-				Document document = builder.newDocument();  // Create
-				String nodeName = "WWCOMPAT_UPDATE";
-				String xmlns = "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/" + nodeName;
-
-				// Element parent = (Element) document.createElement("WWCOMPAT_UPDATE");
-				Element parent = (Element) document.createElementNS(xmlns,nodeName);
-				// create the root
-				document.appendChild(parent);
-				parent.setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns",xmlns);
-				parent.appendChild(document.createComment("WWCOMPAT_UPDATE Version "+XMLVERSION10+" Mod "+XMLMOD10));
-
-		        Element elem = (Element) document.createElement("DTSOFMSG");
-				elem.appendChild(document.createTextNode(profileT2.getEndOfDay()));
-				parent.appendChild(elem);
-				for (int i=0; i<compatVct.size(); i++){
-					CompatInfo ci = (CompatInfo)compatVct.elementAt(i);
-					Element compat = (Element) document.createElement("COMPATELEMENT");
-					parent.appendChild(compat);
-
-					elem = (Element) document.createElement("ACTIVITY");
-					elem.appendChild(document.createTextNode(ci.activity_xml));
-					compat.appendChild(elem);
-
-//						Add	Ready	4,50		1	1,0	<BRANDCD>
-					elem = (Element) document.createElement("BRANDCD");
-					elem.appendChild(document.createTextNode(ci.brandcd_fc_xml));
-					compat.appendChild(elem);
-					
-					//Defect 635138 There should be <STATUS> tag after BRANDCD tag-- always 0020( Final ) 
-					elem = (Element) document.createElement("STATUS");
-					elem.appendChild(document.createTextNode(ADSABRSTATUS.STATUS_FINAL));
-					compat.appendChild(elem);
-
-					elem = (Element) document.createElement("SYSTEMENTITYTYPE");
-					elem.appendChild(document.createTextNode(ci.systementitytype_xml));
-					compat.appendChild(elem);
-
-					elem = (Element) document.createElement("SYSTEMENTITYID");
-					elem.appendChild(document.createTextNode(ci.systementityid_xml));
-					compat.appendChild(elem);
-
-					elem = (Element) document.createElement("SYSTEMMACHTYPE");
-					elem.appendChild(document.createTextNode(ci.systemmachtype_xml));
-					compat.appendChild(elem);
-
-		            elem = (Element) document.createElement("SYSTEMMODEL");
-					elem.appendChild(document.createTextNode(ci.systemmodel_xml));
-					compat.appendChild(elem);
-
-		            elem = (Element) document.createElement("SYSTEMSEOID");
-					elem.appendChild(document.createTextNode(ci.systemseoid_xml));
-					compat.appendChild(elem);
-
-		            elem = (Element) document.createElement("GROUPENTITYTYPE");
-					elem.appendChild(document.createTextNode(ci.groupentitytype_xml));
-					compat.appendChild(elem);
-
-		            elem = (Element) document.createElement("GROUPENTITYID");
-					elem.appendChild(document.createTextNode(ci.groupentityid_xml));
-					compat.appendChild(elem);
-
-		            elem = (Element) document.createElement("OKTOPUB");
-					elem.appendChild(document.createTextNode(ci.oktopub_xml));
-					compat.appendChild(elem);
-
-		            elem = (Element) document.createElement("OPTIONENTITYTYPE");
-					elem.appendChild(document.createTextNode(ci.optionentitytype_xml));
-					compat.appendChild(elem);
-
-		            elem = (Element) document.createElement("OPTIONENTITYID");
-					elem.appendChild(document.createTextNode(ci.optionentityid_xml));
-					compat.appendChild(elem);
-
-		            elem = (Element) document.createElement("OPTIONSEOID");
-					elem.appendChild(document.createTextNode(ci.optionseoid_xml));
-					compat.appendChild(elem);
-
-		            elem = (Element) document.createElement("COMPATPUBFLAG");
-					elem.appendChild(document.createTextNode(ci.compatibilitypublishingflag_xml));
-					compat.appendChild(elem);
-
-		            elem = (Element) document.createElement("RELTYPE");
-					elem.appendChild(document.createTextNode(ci.relationshiptype_xml));
-					compat.appendChild(elem);
-
-		            elem = (Element) document.createElement("PUBFROM");
-					elem.appendChild(document.createTextNode(ci.publishfrom_xml));
-					compat.appendChild(elem);
-
-		            elem = (Element) document.createElement("PUBTO");
-					elem.appendChild(document.createTextNode(ci.publishto_xml));
-					compat.appendChild(elem);
-
-					// release memory
-					ci.dereference();
-			}
-
-			String xml = abr.transformXML(this, document);
-			
-			//new added
-			boolean ifpass = false;
-//			String entitytype = rootEntity.getEntityType();
-			String entitytype = "XMLCOMPATSETUP";
-			String ifNeed = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("ADSABRSTATUS" ,"_"+entitytype+"_XSDNEEDED","NO");
-			if ("YES".equals(ifNeed.toUpperCase())) {
-			   String xsdfile = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("ADSABRSTATUS","_"+entitytype+"_XSDFILE","NONE");
-			    if ("NONE".equals(xsdfile)) {
-			    	abr.addError("there is no xsdfile for "+entitytype+" defined in the propertyfile ");
-			    } else {
-			    	long rtm = System.currentTimeMillis();
-			    	Class cs = this.getClass();
-			    	StringBuffer debugSb = new StringBuffer();
-			    	ifpass = ABRUtil.validatexml(cs,debugSb,xsdfile,xml);
-			    	if (debugSb.length()>0){
-			    		String s = debugSb.toString();
-						if (s.indexOf("fail") != -1)
-							abr.addError(s);
-						abr.addOutput(s);
-			    	}
-			    	long ltm = System.currentTimeMillis();
-					abr.addDebugComment(D.EBUG_DETAIL, "Time for validation: "+Stopwatch.format(ltm-rtm));
-			    	if (ifpass) {
-			    		abr.addDebug("the xml for "+entitytype+" passed the validation");
-			    	}
-			    }
-			} else {
-				abr.addOutput("the xml for "+entitytype+" doesn't need to be validated");
-				ifpass = true;
-			}
-
-			//new added end
-			//add flag(new added)
-			if (xml != null && ifpass) {
-			if(ADSABRSTATUS.USERXML_OFF_LOG){
-				//abr.addDebug("ADSWWCOMPATXMLABR: Generated MQ xml:"+ADSABRSTATUS.NEWLINE);
-			}else{
-				abr.addDebug("ADSWWCOMPATXMLABR: Generated MQ xml:"+ADSABRSTATUS.NEWLINE+xml+ADSABRSTATUS.NEWLINE);
-			}
-			abr.notify(this, "WWCOMPAT", xml, mqVct);
-			}
-			document = null;
-		}
-
-}
-	}
-
-//	private Vector getCompat(ADSABRSTATUS abr,String t1DTS, String t2DTS, Profile profileT2,Database db)
-// 	throws java.sql.SQLException
-//	{
-//		Vector rootVct = new Vector();
-//        ResultSet result=null;
-//		Connection connection=null;
-//		PreparedStatement statement = null;
-//        try {
-//            connection = setupConnection();
-//			statement = connection.prepareStatement(COMPAT_SQL);
-//
-//            //statement.clearParameters();
-//            statement.setString(1, t1DTS);//"time1"
-//            statement.setString(3, t1DTS);//"time1"
-//            statement.setString(5, t1DTS);//"time1"
-//            statement.setString(7, t1DTS);//"time1"
-//            statement.setString(9, t1DTS);//"time1"
-//            statement.setString(11, t1DTS);//"time1"
-//            statement.setString(13, t1DTS);//"time1"
-//            statement.setString(2, t2DTS);//"time2"
-//            statement.setString(4, t2DTS);//"time2"
-//            statement.setString(6, t2DTS);//"time2"
-//            statement.setString(8, t2DTS);//"time2"
-//            statement.setString(10, t2DTS);//"time2"
-//            statement.setString(12, t2DTS);//"time2"
-//            statement.setString(14, t2DTS);//"time2"
-//
-//            result = statement.executeQuery();
-//            while(result.next()) {
-//			    String activity = result.getString(1);
-//                String systementitytype = result.getString(2);
-//                int    systementityid = result.getInt(3);
-//                String systemos = result.getString(4);
-//                String groupentitytype = result.getString(5);
-//                int    groupentityid = result.getInt(6);
-//                String oktopub = result.getString(7);
-//                String osentitytype = result.getString(8);
-//                int    osentityid = result.getInt(9);
-//                String os = result.getString(10);
-//                String optionentitytype = result.getString(11);
-//                int    optionentityid = result.getInt(12);
-//                String compatibilitypublishingflag = result.getString(13);
-//                String relationshiptype = result.getString(14);
-//                String publishfrom = result.getString(15);
-//                String publishto = result.getString(16);
-//                String brandcd_fc = result.getString(17);
-//                String systemseoid = result.getString(18);
-//                String optionseoid = result.getString(19);
-//                String systemmachtype = result.getString(20);
-//                String systemmodel = result.getString(21);
-//
-//                /*
-//
-//                if (systementitytype != null && systementityid != 0) {
-//                EntityGroup egs = new EntityGroup(null,db,profileT2,systementitytype.trim(),"Navigate");
-//                EntityItem eis = new EntityItem(egs, profileT2, db, systementitytype.trim(),systementityid);
-//                egs.putEntityItem(eis);
-//                abr.addDebug("getCompat:"+systementitytype+systementityid+" entityitem: "+eis.getKey());
-//                if (systementitytype.trim().equals("MODEL")) {
-//                systemmachtype = PokUtils.getAttributeValue(eis, "MACHTYPEATR",", ", "", false);
-//                if (systemmachtype.equals("")) systemmachtype = null;
-//                systemmodel = PokUtils.getAttributeValue(eis, "MODELATR",", ", "", false);
-//                if (systemmodel.equals("")) systemmodel = null;
-//                }
-//                else
-//                	if (systementitytype.trim().equals("WWSEO") || systementitytype.trim().equals("LSEOBUNDLE")) {
-//                	systemseoid = PokUtils.getAttributeValue(eis, "SEOID",", ", "", false);
-//                	if (systemseoid.equals("")) systemseoid = null;
-//                	}
-//                egs.dereference();
-//                }
-//
-//                if (optionentitytype != null && optionentityid != 0 &&
-//                	(optionentitytype.trim().equals("WWSEO") || optionentitytype.trim().equals("LSEOBUNDLE")) 	) {
-//                EntityGroup ego = new EntityGroup(null,db,profileT2,optionentitytype.trim(),"Navigate");
-//                EntityItem eio = new EntityItem(ego, profileT2, db, optionentitytype.trim(),optionentityid);
-//                abr.addDebug("getCompat:"+optionentitytype+optionentityid+" entityitem: "+eio.getKey());
-//                ego.putEntityItem(eio);
-//                optionseoid = PokUtils.getAttributeValue(eio, "SEOID",", ", "", false);
-//                if (optionseoid.equals("")) optionseoid = null;
-//                ego.dereference();
-//
-//                }
-//                */
-//
-//                abr.addDebug("getCompat activity:"+activity+" systementitytype:"+systementitytype+
-//                                " systementityid:"+systementityid+" systemos:"+systemos+" groupentitytype:"+groupentitytype+
-//                                " groupentityid:"+groupentityid+" oktopub:"+oktopub+" osentitytype:"+osentitytype+
-//                                " osentityid:"+osentityid+" osentityid:"+osentityid+" os:"+os+
-//                                " optionentitytype:"+optionentitytype+" optionentityid:"+optionentityid+" compatibilitypublishingflag:"+compatibilitypublishingflag+
-//                                " relationshiptype:"+relationshiptype+" publishfrom:"+publishfrom+" publishto:"+publishto+
-//                                " brandcd_fc:"+brandcd_fc+" systemmachtype:"+systemmachtype+" systemmodel:"+systemmodel+
-//                                " systemseoid:"+systemseoid+" optionseoid:"+optionseoid);
-//
-//				rootVct.add(new CompatInfo(activity,systementitytype,systementityid,systemos,
-//                                     groupentitytype,groupentityid,oktopub,osentitytype,osentityid,os,optionentitytype,
-//                                     optionentityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,
-//                                     brandcd_fc,systemmachtype,systemmodel,systemseoid,optionseoid));
-//
-//            }
-//        }
-//        //catch(COM.ibm.opicmpdh.middleware.MiddlewareRequestException x){
-//        //	abr.addDebug("MiddlewareRequestExeption"+x);
-//		//}
-//        //catch(COM.ibm.opicmpdh.middleware.MiddlewareException x){
-//        //	abr.addDebug("MiddlewareExeption"+x);
-//		//}
-//        finally{
-//			try {
-//				if (statement!=null) {
-//					statement.close();
-//					statement=null;
-//				}
-//			}catch(Exception e){
-//				System.err.println("getCompat(), unable to close statement. "+ e);
-//				abr.addDebug("getCompat unable to close statement. "+e);
-//			}
-//            if (result!=null){
-//                result.close();
-//            }
-//            closeConnection(connection);
-//        }
-//		return rootVct;
-//	}
-	/*//TODO
-	 * According to Doc BH FS Catolog DB Compatbility Gen 20121011b.doc 
-	 *  Withdrawn Offerings
-     *  A preprocessing step is required to remove all withdrawn products (options -  right side) from the table in (section VI. ABR)
-     *  that is generated by the ABRs. The first step is to set the Activity = W if the right side is withdrawn. 
-     *  Queries can be developed to facilitate this processing. 
-	 */
-	private void withdrawOffering(ADSABRSTATUS abr,String t1DTS, String t2DTS) throws SQLException{
-		ResultSet result=null;
-		Connection conn=null;
-		PreparedStatement statement = null;
-		Vector vct = new Vector();
-		long lastTime =System.currentTimeMillis();
-		long runTime = 0;
-        int counter = 0;
-        try {
-        	abr.addDebug("");
-        	conn = setupConnection();
-			statement = conn.prepareStatement(WITHDRAW_SQL);
-            statement.clearParameters();
-            statement.setString(1, t1DTS);//"time1"
-            statement.setString(2, t2DTS);//"time1"
-            statement.setString(3, t1DTS);//"time1"
-            statement.setString(4, t2DTS);//"time1"
-            statement.setString(5, t1DTS);//"time1"
-            statement.setString(6, t2DTS);//"time1"
-            result = statement.executeQuery();
-            runTime = System.currentTimeMillis();
-			abr.addDebugComment(D.EBUG_DETAIL, "Execute query SQL:" +WITHDRAW_SQL + "Time is : "+Stopwatch.format(runTime-lastTime)); 
-            while(result.next()) {
-                String systementitytype = result.getString(1);
-                int    systementityid = result.getInt(2);
-                String systemos = result.getString(3);
-                String groupentitytype = result.getString(4);
-                int    groupentityid = result.getInt(5);
-                String osentitytype = result.getString(6);
-                int    osentityid = result.getInt(7);
-                String os = result.getString(8);
-                String optionentitytype = result.getString(9);
-                int    optionentityid = result.getInt(10);
-                String[] list = new String[] {systementitytype,Integer.toString(systementityid),systemos,
-                	                          groupentitytype,Integer.toString(groupentityid), 
-                	                          osentitytype,Integer.toString(osentityid),os,
-                	                          optionentitytype, Integer.toString(optionentityid)};
-                vct.add(list);
-                counter++;
-                if (vct.size()>=5000)
-                	updateWithdrawAct(abr,vct);
-            }
-
-            if (vct.size()>0){
-            	updateWithdrawAct(abr,vct);
-            }     
-            runTime = System.currentTimeMillis();
-			abr.addDebugComment(D.EBUG_DETAIL, "" + "Process withdraw offerings options products count:"+ counter + ". Total time is : "+Stopwatch.format(runTime-lastTime));
-            
-        }finally{
-			try {
-				if (statement!=null) {
-					statement.close();
-					statement=null;
-				}
-			}catch(Exception e){
-				System.err.println("getCompat(), unable to close statement. "+ e);
-				abr.addDebug("getCompat unable to close statement. "+e);
-			}
-            if (result!=null){
-                result.close();
-            }
-            if (connection != null){
-            	connection.close();
-                connection = null;
-            }
-            
-            closeConnection(conn);
-        }
-		
-	}
-	/**
-	 * udpate activity = 'W' which withdraweffectivedate + 90 < current day
-	 * @param abr
-	 * @param vct
-	 * @throws SQLException
-	 */
-	private void updateWithdrawAct(ADSABRSTATUS abr, Vector vct) throws SQLException {
-		long startTime = System.currentTimeMillis();
-		Iterator list = vct.iterator();
-		
-		PreparedStatement ps = null;
-	
-		try {
-			//m_db.setAutoCommit(false);
-			if (connection == null){
-			    connection = setupConnection();
-			}
-		ps = connection.prepareStatement(WITHDRAWUPDATE_SQL);
-		while (list.hasNext()) {
-			String record[] = (String[]) list.next();
-			ps.setString(1, record[0]);
-			ps.setInt(2, Integer.parseInt(record[1]));
-			ps.setString(3, record[2]);
-			ps.setString(4, record[3]);
-			ps.setInt(5, Integer.parseInt(record[4]));
-			ps.setString(6, record[5]);
-			ps.setInt(7, Integer.parseInt(record[6]));
-			ps.setString(8, record[7]);
-			ps.setString(9, record[8]);
-			ps.setInt(10, Integer.parseInt(record[9]));
-			ps.addBatch();
-		}
-		ps.executeBatch();
-		if (connection != null){
-			connection.commit();
-		}
-		//m_db.commit();
-		abr.addDebug(vct.size() + " records was updated in the table wwtechcompat. Total Time: " + Stopwatch.format(System.currentTimeMillis() - startTime));
-		}catch (SQLException rx) {
-			abr.addDebug("SQLException on ? " + rx);
-		    rx.printStackTrace();
-		    throw rx;
-		}finally {
-			vct.clear();
-			if (ps != null)
-				try {
-					ps.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-		}		
-	}	
-	
-    /**
-     * processWWCOMPAT
-     * @param abr
-     * @param t1DTS
-     * @param t2DTS
-     * @param profileT2
-     * @param db
-     * @return
-     * @throws java.sql.SQLException
-     * @throws TransformerException
-     * @throws ParserConfigurationException
-     * @throws MissingResourceException
-     * @throws DOMException
-     */
-	private void processCompat(ADSABRSTATUS abr,String t1DTS, String t2DTS, Profile profileT2,Database db,EntityItem rootEntity)
- 	throws java.sql.SQLException, DOMException, MissingResourceException, ParserConfigurationException, TransformerException
-	{
-		Vector rootVct = new Vector();
-        ResultSet result=null;
-		Connection connection=null;
-		PreparedStatement statement = null;
-        try {
-            connection = setupConnection();
-			statement = connection.prepareStatement(COMPAT_SQL);
-
-            //statement.clearParameters();
-            statement.setString(1, t1DTS);//"time1"
-            statement.setString(3, t1DTS);//"time1"
-            statement.setString(5, t1DTS);//"time1"
-            statement.setString(7, t1DTS);//"time1"
-            statement.setString(9, t1DTS);//"time1"
-            statement.setString(11, t1DTS);//"time1"
-            statement.setString(13, t1DTS);//"time1"
-            statement.setString(2, t2DTS);//"time2"
-            statement.setString(4, t2DTS);//"time2"
-            statement.setString(6, t2DTS);//"time2"
-            statement.setString(8, t2DTS);//"time2"
-            statement.setString(10, t2DTS);//"time2"
-            statement.setString(12, t2DTS);//"time2"
-            statement.setString(14, t2DTS);//"time2"
-
-            result = statement.executeQuery();
-            int counter = 1;
-            int messageCount =0;
-            while(result.next()) {
-            	String activity = result.getString(1);
-                String systementitytype = result.getString(2);
-                int    systementityid = result.getInt(3);
-                //String systemos = result.getString(4);
-                String groupentitytype = result.getString(4);
-                int    groupentityid = result.getInt(5);
-                String oktopub = result.getString(6);
-                //String osentitytype = result.getString(7);
-                //int    osentityid = result.getInt(8);
-                //String os = result.getString(10);
-                String optionentitytype = result.getString(7);
-                int    optionentityid = result.getInt(8);
-                String compatibilitypublishingflag = result.getString(9);
-                String relationshiptype = result.getString(10);
-                String publishfrom = result.getString(11);
-                String publishto = result.getString(12);
-                String brandcd_fc = result.getString(13);
-                String systemseoid = result.getString(14);
-                String optionseoid = result.getString(15);
-                String systemmachtype = result.getString(16);
-                String systemmodel = result.getString(17);
-//			    String activity = result.getString(1);
-//                String systementitytype = result.getString(2);
-//                int    systementityid = result.getInt(3);
-//                String systemos = result.getString(4);
-//                String groupentitytype = result.getString(5);
-//                int    groupentityid = result.getInt(6);
-//                String oktopub = result.getString(7);
-//                String osentitytype = result.getString(8);
-//                int    osentityid = result.getInt(9);
-//                String os = result.getString(10);
-//                String optionentitytype = result.getString(11);
-//                int    optionentityid = result.getInt(12);
-//                String compatibilitypublishingflag = result.getString(13);
-//                String relationshiptype = result.getString(14);
-//                String publishfrom = result.getString(15);
-//                String publishto = result.getString(16);
-//                String brandcd_fc = result.getString(17);
-//                String systemseoid = result.getString(18);
-//                String optionseoid = result.getString(19);
-//                String systemmachtype = result.getString(20);
-//                String systemmodel = result.getString(21);
-
-                /*
-
-                if (systementitytype != null && systementityid != 0) {
-                EntityGroup egs = new EntityGroup(null,db,profileT2,systementitytype.trim(),"Navigate");
-                EntityItem eis = new EntityItem(egs, profileT2, db, systementitytype.trim(),systementityid);
-                egs.putEntityItem(eis);
-                abr.addDebug("getCompat:"+systementitytype+systementityid+" entityitem: "+eis.getKey());
-                if (systementitytype.trim().equals("MODEL")) {
-                systemmachtype = PokUtils.getAttributeValue(eis, "MACHTYPEATR",", ", "", false);
-                if (systemmachtype.equals("")) systemmachtype = null;
-                systemmodel = PokUtils.getAttributeValue(eis, "MODELATR",", ", "", false);
-                if (systemmodel.equals("")) systemmodel = null;
-                }
-                else
-                	if (systementitytype.trim().equals("WWSEO") || systementitytype.trim().equals("LSEOBUNDLE")) {
-                	systemseoid = PokUtils.getAttributeValue(eis, "SEOID",", ", "", false);
-                	if (systemseoid.equals("")) systemseoid = null;
-                	}
-                egs.dereference();
-                }
-
-                if (optionentitytype != null && optionentityid != 0 &&
-                	(optionentitytype.trim().equals("WWSEO") || optionentitytype.trim().equals("LSEOBUNDLE")) 	) {
-                EntityGroup ego = new EntityGroup(null,db,profileT2,optionentitytype.trim(),"Navigate");
-                EntityItem eio = new EntityItem(ego, profileT2, db, optionentitytype.trim(),optionentityid);
-                abr.addDebug("getCompat:"+optionentitytype+optionentityid+" entityitem: "+eio.getKey());
-                ego.putEntityItem(eio);
-                optionseoid = PokUtils.getAttributeValue(eio, "SEOID",", ", "", false);
-                if (optionseoid.equals("")) optionseoid = null;
-                ego.dereference();
-
-                }
-                */
-
-//                abr.addDebugComment(D.EBUG_INFO, "getCompat activity:"+activity+" systementitytype:"+systementitytype+
-//                                " systementityid:"+systementityid+" systemos:"+systemos+" groupentitytype:"+groupentitytype+
-//                                " groupentityid:"+groupentityid+" oktopub:"+oktopub+" osentitytype:"+osentitytype+
-//                                " osentityid:"+osentityid+" osentityid:"+osentityid+" os:"+os+
-//                                " optionentitytype:"+optionentitytype+" optionentityid:"+optionentityid+" compatibilitypublishingflag:"+compatibilitypublishingflag+
-//                                " relationshiptype:"+relationshiptype+" publishfrom:"+publishfrom+" publishto:"+publishto+
-//                                " brandcd_fc:"+brandcd_fc+" systemmachtype:"+systemmachtype+" systemmodel:"+systemmodel+
-//                                " systemseoid:"+systemseoid+" optionseoid:"+optionseoid);
-                if(!ADSABRSTATUS.USERXML_OFF_LOG){
-                	abr.addDebugComment(D.EBUG_INFO, "getCompat activity:"+activity+" systementitytype:"+systementitytype+
-                            " systementityid:"+systementityid+" groupentitytype:"+groupentitytype+
-                            " groupentityid:"+groupentityid+" oktopub:"+oktopub+
-                            " optionentitytype:"+optionentitytype+" optionentityid:"+optionentityid+" compatibilitypublishingflag:"+compatibilitypublishingflag+
-                            " relationshiptype:"+relationshiptype+" publishfrom:"+publishfrom+" publishto:"+publishto+
-                            " brandcd_fc:"+brandcd_fc+" systemmachtype:"+systemmachtype+" systemmodel:"+systemmodel+
-                            " systemseoid:"+systemseoid+" optionseoid:"+optionseoid);                	
-                }
-                
-				rootVct.add(new CompatInfo(activity,systementitytype,systementityid,XMLElem.CHEAT,
-                                     groupentitytype,groupentityid,oktopub,XMLElem.CHEAT,1,XMLElem.CHEAT,optionentitytype,
-                                     optionentityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,
-                                     brandcd_fc,systemmachtype,systemmodel,systemseoid,optionseoid));
-				if (rootVct.size()>=WWCOMPAT_ROW_LIMIT){
-					abr.addDebug("Chunking size is " +  WWCOMPAT_ROW_LIMIT + ". Start to run chunking "  + counter++  + " times.");
-					sentToMQ(abr,rootVct,profileT2,rootEntity);
-				}
-            }
-
-            if (rootVct.size()>0){
-            	sentToMQ(abr,rootVct,profileT2,rootEntity);
-            }
-            abr.addDebug("WWCOMPAT_MESSAGE_COUNT is " +  WWCOMPAT_MESSAGE_COUNT);
-            wwcompMQTable.clear();
-        }
-        //catch(COM.ibm.opicmpdh.middleware.MiddlewareRequestException x){
-        //	abr.addDebug("MiddlewareRequestExeption"+x);
-		//}
-        //catch(COM.ibm.opicmpdh.middleware.MiddlewareException x){
-        //	abr.addDebug("MiddlewareExeption"+x);
-		//}
-        finally{
-			try {
-				if (statement!=null) {
-					statement.close();
-					statement=null;
-				}
-			}catch(Exception e){
-				System.err.println("getCompat(), unable to close statement. "+ e);
-				abr.addDebug("getCompat unable to close statement. "+e);
-			}
-            if (result!=null){
-                result.close();
-            }
-            closeConnection(connection);
-        }
-	}
-
-	/**
-	 *  set to MQ
-	 * @param abr
-	 * @param compatVct
-	 * @param profileT2
-	 * @param rootEntity
-	 * @throws DOMException
-	 * @throws MissingResourceException
-	 * @throws ParserConfigurationException
-	 * @throws TransformerException
-	 */
-	private void sentToMQ(ADSABRSTATUS abr, Vector compatVct,Profile profileT2,EntityItem rootEntity) throws DOMException, MissingResourceException, ParserConfigurationException, TransformerException{
-		if (compatVct.size()==0){
-			//NO_CHANGES_FND=No Changes found for {0}
-			abr.addXMLGenMsg("NO_CHANGES_FND","ADSWWCOMPATXMLABR");
-		}else{
-			abr.addDebug("ADSWWCOMPATXMLABR.processThis found "+compatVct.size()+" WWTECHCOMPAT");
-
-//			Vector mqVct =  getMQPropertiesFN(rootEntity,abr);
-//
-//			// filter wwcompat
-//			if(isFilterWWCOMPAT){
-//				Iterator it = wwcompMQTable.keySet().iterator();
-//		 		while (it.hasNext()){
-//		 			Vector filtercompatVct = new Vector();
-//		 			String key =(String)it.next();
-//		 			abr.addDebug("wwcompMQTable:key=" + key);
-//		 			mqVct = (Vector)wwcompMQTable.get(key);
-//		 			if(key.equals(CHEAT)){
-//		 				processMQ(abr, profileT2, compatVct, mqVct);
-//		 			}else{
-//		 				for(int i=0;i<compatVct.size();i++){
-//		 					CompatInfo ci = (CompatInfo)compatVct.elementAt(i);
-//		 					String brandcd_fc = ci.brandcd_fc_xml;
-//		 					if(key.equals(brandcd_fc)){
-//		 						filtercompatVct.add(compatVct.get(i));
-//		 					}
-//			 			}
-//		 				processMQ(abr, profileT2, filtercompatVct, mqVct);
-//		 				//release momery
-//		 				filtercompatVct.clear();
-//		 			}
-//		 		}
-//			}else{
-//				processMQ(abr, profileT2, compatVct, mqVct);
-//			}
-			
-			Vector mqVct =  getPeriodicMQ(rootEntity);
-			//filter wwcompat
-			Vector filtercompatVct = new Vector();//get the filter comat data which filter by BRANDCD
- 			String key =convertValue(PokUtils.getAttributeFlagValue(rootEntity,"BRANDCD"));
- 			String keydesc = getDescription(rootEntity, "BRANDCD","long");
- 			if(key.equals("")) {
- 				key = CHEAT;
- 			}else{
- 				abr.addXMLGenMsg("FILTER", "WWCOMPAT Periodic ABR is filtered by BRANDCD="+key+"("+keydesc+")");
- 			} 			
- 			abr.addDebug("wwcompat filter key =" + key);
- 			abr.addDebug("wwcompat MQ vector  =" + mqVct);
- 			
-			if(key.equals(CHEAT)){
- 				processMQ(abr, profileT2, compatVct, mqVct);	 				
- 			}else{
- 				for(int i=0;i<compatVct.size();i++){
- 					CompatInfo ci = (CompatInfo)compatVct.elementAt(i);
- 					String brandcd_fc = ci.brandcd_fc_xml;
- 					if(key.equals(brandcd_fc)){
- 						filtercompatVct.add(compatVct.get(i));
- 					}
-	 			}
- 				processMQ(abr, profileT2, filtercompatVct, mqVct);
- 				//release momery
- 				filtercompatVct.clear();
- 			}
-    		// release memory
-			compatVct.clear();
-		}
-	}
-	
-	/**
-     * get the description of the item
-     * @param item
-     * @param code
-     * @return
-     */
-	private String getDescription(EntityItem item, String code,String type) {
-		String value=""; 
-		EANFlagAttribute fAtt = (EANFlagAttribute)item.getAttribute(code);
-        if (fAtt!=null && fAtt.toString().length()>0){
-            // Get the selected Flag codes.
-            MetaFlag[] mfArray = (MetaFlag[]) fAtt.get();
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < mfArray.length; i++){
-                // get selection            	
-                if (mfArray[i].isSelected())
-                {
-                	if (sb.length()>0) {
-                        sb.append(","); 
-                    }
-                	if(type.equals("short")) {
-                		sb.append(mfArray[i].getShortDescription());
-                	} else if(type.equals("long")) {
-                		sb.append(mfArray[i].getLongDescription());                	
-                	} else if(type.equals("flag")) {
-                		sb.append(mfArray[i].getFlagCode());                	
-                	}
-                	else{
-                		sb.append(mfArray[i].toString());
-                	}
-                }                
-            }//
-            value = sb.toString();
-        }
-        return value;
-	}
-	
-	private String convertValue(String fromValue){
-    	return fromValue==null?"":fromValue;
-    }
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getVersion() {
-        return "1.6";//"1.4";
-    }
-
-    /**********************************
-    *
-	A.	MQ-Series CID
-    */
-    public String getMQCID() { return "WWCOMPAT_UPDATE"; }
-
-    /**********************************
-    * get the status attribute to use for this ABR
-    */
-    public String getStatusAttr() { return "ADSABRSTATUS";}
-
-    private static class CompatInfo{
-
-                String activity_xml = XMLElem.CHEAT;
-                String systementitytype_xml = XMLElem.CHEAT;
-                String systementityid_xml = XMLElem.CHEAT;
-                String systemos_xml = XMLElem.CHEAT;
-                String groupentitytype_xml = XMLElem.CHEAT;
-                String groupentityid_xml = XMLElem.CHEAT;
-                String oktopub_xml = XMLElem.CHEAT;
-                String osentitytype_xml = XMLElem.CHEAT;
-                String osentityid_xml = XMLElem.CHEAT;
-                String os_xml = XMLElem.CHEAT;
-                String optionentitytype_xml = XMLElem.CHEAT;
-                String optionentityid_xml = XMLElem.CHEAT;
-                String compatibilitypublishingflag_xml = XMLElem.CHEAT;
-                String relationshiptype_xml = XMLElem.CHEAT;
-                String publishfrom_xml = XMLElem.CHEAT;
-                String publishto_xml = XMLElem.CHEAT;
-                String brandcd_fc_xml  = XMLElem.CHEAT;
-                String systemmachtype_xml  = XMLElem.CHEAT;
-                String systemmodel_xml  = XMLElem.CHEAT;
-                String systemseoid_xml  = XMLElem.CHEAT;
-                String optionseoid_xml  = XMLElem.CHEAT;
-
-		CompatInfo(String activity,
-                            String systementitytype,
-                            int    systementityid,
-                            String systemos,
-                            String groupentitytype,
-                            int    groupentityid,
-                            String oktopub,
-                            String osentitytype,
-                            int    osentityid,
-                            String os,
-                            String optionentitytype,
-                            int    optionentityid,
-                            String compatibilitypublishingflag,
-                            String relationshiptype,
-                            String publishfrom,
-                            String publishto,
-                            String brandcd_fc,
-                            String systemmachtype,
-                            String systemmodel,
-                            String systemseoid,
-                            String optionseoid)
-
-                        {
-			if (activity.equals("A") || activity.equals("C")){
-				activity_xml = XMLElem.UPDATE_ACTIVITY;
-			}
-            else    activity_xml = XMLElem.DELETE_ACTIVITY;
-
-			if (systementitytype != null){
-				systementitytype_xml = systementitytype.trim();
-			}
-
-			if (systementityid != 0){
-				systementityid_xml = Integer.toString(systementityid);
-			}
-
-			if (systemos != null){
-				systemos_xml = systemos.trim();
-			}
-
-            if (groupentitytype != null){
-				groupentitytype_xml = groupentitytype.trim();
-			}
-
-            if (groupentityid != 0){
-				groupentityid_xml = Integer.toString(groupentityid);
-			}
-
-            if (oktopub != null){
-				oktopub_xml = oktopub.trim();
-            }
-            if (osentitytype != null){
-				osentitytype_xml = osentitytype.trim();
-            }
-
-            if (osentityid != 0){
-				osentityid_xml = Integer.toString(osentityid);
-			}
-
-            if (os != null){
-				os_xml = os.trim();
-            }
-
-            if (optionentitytype != null){
-				optionentitytype_xml = optionentitytype.trim();
-            }
-
-            if (optionentityid != 0){
-				optionentityid_xml = Integer.toString(optionentityid);
-            }
-
-            if (compatibilitypublishingflag != null){
-				compatibilitypublishingflag_xml = compatibilitypublishingflag.trim();
-            }
-
-            if (relationshiptype != null){
-				relationshiptype_xml = relationshiptype.trim();
-            }
-
-            if (publishfrom != null){
-				publishfrom_xml = publishfrom.trim();
-            }
-
-            if (publishto != null){
-				publishto_xml = publishto.trim();
-            }
-
-            if (brandcd_fc != null){
-				brandcd_fc_xml = brandcd_fc.trim();
-            }
-
-            if (systemmachtype != null){
-				systemmachtype_xml = systemmachtype.trim();
-            }
-
-            if (systemmodel != null){
-				systemmodel_xml = systemmodel.trim();
-            }
-
-            if (systemseoid != null){
-				systemseoid_xml = systemseoid.trim();
-            }
-
-            if (optionseoid != null){
-				optionseoid_xml = optionseoid.trim();
-            }
-
-
-		}
-		void dereference(){
-		             activity_xml = null;
-                     systementitytype_xml = null;
-                     systementityid_xml = null;
-                     systemos_xml = null;
-                     groupentitytype_xml = null;
-                     groupentityid_xml = null;
-                     oktopub_xml = null;
-                     osentitytype_xml = null;
-                     osentityid_xml = null;
-                     os_xml = null;
-                     optionentitytype_xml = null;
-                     optionentityid_xml = null;
-                     compatibilitypublishingflag_xml = null;
-                     relationshiptype_xml = null;
-                     publishfrom_xml = null;
-                     publishto_xml = null;
-                     brandcd_fc_xml  = null;
-                     systemmachtype_xml = null;
-                     systemmodel_xml = null;
-                     systemseoid_xml = null;
-                     optionseoid_xml = null;
-
-		}
-	}
-}
+/*      */ package COM.ibm.eannounce.abr.ln.adsxmlbh1;
+/*      */ 
+/*      */ import COM.ibm.eannounce.abr.util.ABRUtil;
+/*      */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*      */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.MetaFlag;
+/*      */ import COM.ibm.opicmpdh.middleware.Database;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*      */ import COM.ibm.opicmpdh.middleware.Profile;
+/*      */ import COM.ibm.opicmpdh.middleware.Stopwatch;
+/*      */ import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.io.IOException;
+/*      */ import java.rmi.RemoteException;
+/*      */ import java.sql.Connection;
+/*      */ import java.sql.PreparedStatement;
+/*      */ import java.sql.ResultSet;
+/*      */ import java.sql.SQLException;
+/*      */ import java.util.Iterator;
+/*      */ import java.util.MissingResourceException;
+/*      */ import java.util.Vector;
+/*      */ import javax.xml.parsers.DocumentBuilder;
+/*      */ import javax.xml.parsers.DocumentBuilderFactory;
+/*      */ import javax.xml.parsers.ParserConfigurationException;
+/*      */ import javax.xml.transform.TransformerException;
+/*      */ import org.w3c.dom.DOMException;
+/*      */ import org.w3c.dom.Document;
+/*      */ import org.w3c.dom.Element;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public class ADSWWCOMPATXMLABR
+/*      */   extends XMLMQAdapter
+/*      */ {
+/*      */   private static final int MW_ENTITY_LIMIT;
+/*      */   private static final int WWCOMPAT_ROW_LIMIT;
+/*  110 */   protected static int WWCOMPAT_MESSAGE_COUNT = 0;
+/*  111 */   Connection connection = null;
+/*      */   static {
+/*  113 */     String str1 = ABRServerProperties.getValue("ADSABRSTATUS", "_entitylimit", "3000");
+/*      */     
+/*  115 */     MW_ENTITY_LIMIT = Integer.parseInt(str1);
+/*  116 */     String str2 = ABRServerProperties.getValue("ADSABRSTATUS", "_XMLGENCOUNT", "500000");
+/*      */     
+/*  118 */     WWCOMPAT_ROW_LIMIT = Integer.parseInt(str2);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private static final String COMPAT_SQL = "select activity,'LSEO',left_lseo.entityid,groupentitytype,groupentityid,oktopub,'LSEO',right_lseo.entityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,brandcd_fc,left_lseo.seoid,right_lseo.seoid,left_model.machtypeatr,left_model.modelatr from gbli.wwtechcompat wwtc join price.wwseolseo left_wwseolseo on wwtc.systementityid=left_wwseolseo.id1 and left_wwseolseo.isactive=1 join price.lseo left_lseo on left_wwseolseo.id2=left_lseo.entityid and left_lseo.isactive=1 join price.wwseolseo right_wwseolseo on wwtc.optionentityid=right_wwseolseo.id1 and right_wwseolseo.isactive=1 join price.lseo right_lseo on right_wwseolseo.id2=right_lseo.entityid and right_lseo.isactive=1 join price.modelwwseo left_modelwwseo on left_modelwwseo.id2=wwtc.systementityid and left_modelwwseo.isactive=1 join price.model left_model on left_model.entityid=left_modelwwseo.id1 and left_model.isactive=1 where systementitytype='WWSEO' and optionentitytype='WWSEO' and updated BETWEEN ? AND ? and activity <> 'W' union select activity,'MODEL',systementityid,groupentitytype,groupentityid,oktopub,'MODEL',optionentityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,brandcd_fc,cast(null as char),cast(null as char),left_model.machtypeatr,left_model.modelatr from gbli.wwtechcompat wwtc join price.model left_model on left_model.entityid=systementityid and left_model.isactive=1 where systementitytype='MODEL' and optionentitytype='MODEL' and updated BETWEEN ? AND ? and activity <> 'W' union select activity,'MODEL',systementityid,groupentitytype,groupentityid,oktopub,'LSEO',right_lseo.entityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,brandcd_fc,cast(null as char),right_lseo.seoid,left_model.machtypeatr,left_model.modelatr from gbli.wwtechcompat wwtc join price.model left_model on left_model.entityid=systementityid and left_model.isactive=1 join price.wwseolseo right_wwseolseo on wwtc.optionentityid=right_wwseolseo.id1 and right_wwseolseo.isactive=1 join price.lseo right_lseo on right_wwseolseo.id2=right_lseo.entityid and right_lseo.isactive=1 where systementitytype='MODEL' and optionentitytype='WWSEO' and updated BETWEEN ? AND ? and activity <> 'W' union select activity,'MODEL',systementityid,groupentitytype,groupentityid,oktopub,'LSEOBUNDLE',optionentityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,brandcd_fc,cast(null as char),right_lseobundle.seoid,left_model.machtypeatr,left_model.modelatr from gbli.wwtechcompat wwtc join price.model left_model on left_model.entityid=systementityid and left_model.isactive=1 join price.lseobundle right_lseobundle on right_lseobundle.entityid=optionentityid and right_lseobundle.isactive=1 where systementitytype='MODEL' and optionentitytype='LSEOBUNDLE' and updated BETWEEN ? AND ? and activity <> 'W' union select activity,'LSEO',left_lseo.entityid,groupentitytype,groupentityid,oktopub,'LSEOBUNDLE',optionentityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,brandcd_fc,left_lseo.seoid,right_lseobundle.seoid,left_model.machtypeatr,left_model.modelatr from gbli.wwtechcompat wwtc join price.wwseolseo left_wwseolseo on wwtc.systementityid=left_wwseolseo.id1 and left_wwseolseo.isactive=1 join price.lseo left_lseo on left_wwseolseo.id2=left_lseo.entityid and left_lseo.isactive=1 join price.lseobundle right_lseobundle on right_lseobundle.entityid=optionentityid and right_lseobundle.isactive=1 join price.modelwwseo left_modelwwseo on left_modelwwseo.id2=wwtc.systementityid and left_modelwwseo.isactive=1 join price.model left_model on left_model.entityid=left_modelwwseo.id1 and left_model.isactive=1 where systementitytype='WWSEO' and optionentitytype='LSEOBUNDLE' and updated BETWEEN ? AND ? and activity <> 'W' union select activity,'LSEOBUNDLE',systementityid,groupentitytype,groupentityid,oktopub,'LSEO',right_lseo.entityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,brandcd_fc,left_lseobundle.seoid,right_lseo.seoid,cast(null as char),cast(null as char) from gbli.wwtechcompat wwtc join price.lseobundle left_lseobundle on left_lseobundle.entityid=systementityid and left_lseobundle.isactive=1 join price.wwseolseo right_wwseolseo on wwtc.optionentityid=right_wwseolseo.id1 and right_wwseolseo.isactive=1 join price.lseo right_lseo on right_wwseolseo.id2=right_lseo.entityid and right_lseo.isactive=1 where systementitytype='LSEOBUNDLE' and optionentitytype='WWSEO' and updated BETWEEN ? AND ? and activity <> 'W' union select activity,'LSEOBUNDLE',systementityid,groupentitytype,groupentityid,oktopub,'LSEOBUNDLE',optionentityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,brandcd_fc,left_lseobundle.seoid,right_lseobundle.seoid,cast(null as char),cast(null as char) from gbli.wwtechcompat wwtc join price.lseobundle left_lseobundle on left_lseobundle.entityid=systementityid and left_lseobundle.isactive=1 join price.lseobundle right_lseobundle on right_lseobundle.entityid=optionentityid and right_lseobundle.isactive=1 where systementitytype='LSEOBUNDLE' and optionentitytype='LSEOBUNDLE' and updated BETWEEN ? AND ? and activity <> 'W' with ur";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private static final String WITHDRAWUPDATE_SQL = "update gbli.wwtechcompat set activity = 'W' where SYSTEMENTITYTYPE = ? and SYSTEMENTITYID = ? and SYSTEMOS = ? and GROUPENTITYTYPE = ? and GROUPENTITYID = ? and OSENTITYTYPE = ? and OSENTITYID = ? and OS = ? and OPTIONENTITYTYPE = ? and OPTIONENTITYID = ?";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private static final String WITHDRAW_SQL = "select SYSTEMENTITYTYPE,SYSTEMENTITYID,SYSTEMOS,GROUPENTITYTYPE,GROUPENTITYID,OSENTITYTYPE,OSENTITYID,wwtc.OS,OPTIONENTITYTYPE,optionentityid from gbli.wwtechcompat wwtc join price.wwseolseo right_wwseolseo on wwtc.optionentityid=right_wwseolseo.id1 and right_wwseolseo.isactive=1 join price.lseo right_lseo on right_wwseolseo.id2=right_lseo.entityid and right_lseo.isactive=1 and right_lseo.nlsid=1 and right_lseo.lseounpubdatemtrgt + 90 day < current date where optionentitytype='WWSEO' and activity in('A','C') and updated BETWEEN ? AND ? union select SYSTEMENTITYTYPE,SYSTEMENTITYID,SYSTEMOS,GROUPENTITYTYPE,GROUPENTITYID,OSENTITYTYPE,OSENTITYID,wwtc.OS,OPTIONENTITYTYPE,optionentityid from gbli.wwtechcompat wwtc join price.model right_model on right_model.entityid=wwtc.optionentityid and right_model.isactive=1 and right_model.nlsid=1 and right_model.wthdrweffctvdate + 90 day < current date where optionentitytype='MODEL' and activity in('A','C') and updated BETWEEN ? AND ? union select SYSTEMENTITYTYPE,SYSTEMENTITYID,SYSTEMOS,GROUPENTITYTYPE,GROUPENTITYID,OSENTITYTYPE,OSENTITYID,wwtc.OS,OPTIONENTITYTYPE,optionentityid from gbli.wwtechcompat wwtc join price.lseobundle right_lseobundle on right_lseobundle.entityid=wwtc.optionentityid and right_lseobundle.isactive=1 and right_lseobundle.nlsid=1 and right_lseobundle.bundlunpubdatemtrgt + 90 day < current date where optionentitytype='LSEOBUNDLE' and activity in('A','C') and updated BETWEEN ? AND ?  ";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void processThis(ADSABRSTATUS paramADSABRSTATUS, Profile paramProfile1, Profile paramProfile2, EntityItem paramEntityItem) throws SQLException, MiddlewareException, ParserConfigurationException, RemoteException, EANBusinessRuleException, MiddlewareShutdownInProgressException, IOException, TransformerException, MissingResourceException {
+/*  401 */     String str1 = paramProfile1.getValOn();
+/*  402 */     String str2 = paramProfile2.getValOn();
+/*      */     
+/*  404 */     paramADSABRSTATUS.addDebug("ADSWWCOMPATXMLABR.processThis checking between " + str1 + " and " + str2);
+/*      */     
+/*  406 */     WWCOMPAT_MESSAGE_COUNT = 0;
+/*  407 */     paramADSABRSTATUS.addDebug("ADSWWCOMPATXMLABR.withdraw offering set activity ='W' between " + str1 + " and " + str2);
+/*  408 */     withdrawOffering(paramADSABRSTATUS, str1, str2);
+/*  409 */     processCompat(paramADSABRSTATUS, str1, str2, paramProfile2, paramADSABRSTATUS.getDatabase(), paramEntityItem);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void processMQ(ADSABRSTATUS paramADSABRSTATUS, Profile paramProfile, Vector<CompatInfo> paramVector1, Vector paramVector2) throws ParserConfigurationException, DOMException, TransformerException, MissingResourceException {
+/*  463 */     if (paramVector2 == null) {
+/*  464 */       paramADSABRSTATUS.addDebug("ADSWWCOMPATXMLABR: No MQ properties files, nothing will be generated.");
+/*      */       
+/*  466 */       paramADSABRSTATUS.addXMLGenMsg("NOT_REQUIRED", "ADSWWCOMPATXMLABR");
+/*      */     
+/*      */     }
+/*  469 */     else if (paramVector1.size() > MW_ENTITY_LIMIT) {
+/*  470 */       int i = 0;
+/*  471 */       byte b1 = 0;
+/*  472 */       Vector<CompatInfo> vector = new Vector();
+/*  473 */       if (paramVector1.size() % MW_ENTITY_LIMIT != 0) {
+/*  474 */         i = paramVector1.size() / MW_ENTITY_LIMIT + 1;
+/*      */       } else {
+/*  476 */         i = paramVector1.size() / MW_ENTITY_LIMIT;
+/*      */       } 
+/*  478 */       WWCOMPAT_MESSAGE_COUNT += i;
+/*  479 */       DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+/*  480 */       DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+/*  481 */       for (byte b2 = 0; b2 < i; b2++) {
+/*  482 */         for (byte b3 = 0; b3 < MW_ENTITY_LIMIT && 
+/*  483 */           b1 != paramVector1.size(); b3++)
+/*      */         {
+/*      */           
+/*  486 */           vector.add(paramVector1.elementAt(b1++));
+/*      */         }
+/*  488 */         Document document = documentBuilder.newDocument();
+/*  489 */         String str1 = "WWCOMPAT_UPDATE";
+/*  490 */         String str2 = "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/" + str1;
+/*      */ 
+/*      */         
+/*  493 */         Element element1 = document.createElementNS(str2, str1);
+/*      */         
+/*  495 */         document.appendChild(element1);
+/*  496 */         element1.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", str2);
+/*  497 */         element1.appendChild(document.createComment("WWCOMPAT_UPDATE Version 1 Mod 0"));
+/*      */         
+/*  499 */         Element element2 = document.createElement("DTSOFMSG");
+/*  500 */         element2.appendChild(document.createTextNode(paramProfile.getEndOfDay()));
+/*  501 */         element1.appendChild(element2);
+/*  502 */         for (byte b4 = 0; b4 < vector.size(); b4++) {
+/*  503 */           CompatInfo compatInfo = vector.elementAt(b4);
+/*  504 */           Element element = document.createElement("COMPATELEMENT");
+/*  505 */           element1.appendChild(element);
+/*      */           
+/*  507 */           element2 = document.createElement("ACTIVITY");
+/*  508 */           element2.appendChild(document.createTextNode(compatInfo.activity_xml));
+/*  509 */           element.appendChild(element2);
+/*      */ 
+/*      */           
+/*  512 */           element2 = document.createElement("BRANDCD");
+/*  513 */           element2.appendChild(document.createTextNode(compatInfo.brandcd_fc_xml));
+/*  514 */           element.appendChild(element2);
+/*      */ 
+/*      */           
+/*  517 */           element2 = document.createElement("STATUS");
+/*  518 */           element2.appendChild(document.createTextNode("0020"));
+/*  519 */           element.appendChild(element2);
+/*      */           
+/*  521 */           element2 = document.createElement("SYSTEMENTITYTYPE");
+/*  522 */           element2.appendChild(document.createTextNode(compatInfo.systementitytype_xml));
+/*  523 */           element.appendChild(element2);
+/*      */           
+/*  525 */           element2 = document.createElement("SYSTEMENTITYID");
+/*  526 */           element2.appendChild(document.createTextNode(compatInfo.systementityid_xml));
+/*  527 */           element.appendChild(element2);
+/*      */           
+/*  529 */           element2 = document.createElement("SYSTEMMACHTYPE");
+/*  530 */           element2.appendChild(document.createTextNode(compatInfo.systemmachtype_xml));
+/*  531 */           element.appendChild(element2);
+/*      */           
+/*  533 */           element2 = document.createElement("SYSTEMMODEL");
+/*  534 */           element2.appendChild(document.createTextNode(compatInfo.systemmodel_xml));
+/*  535 */           element.appendChild(element2);
+/*      */           
+/*  537 */           element2 = document.createElement("SYSTEMSEOID");
+/*  538 */           element2.appendChild(document.createTextNode(compatInfo.systemseoid_xml));
+/*  539 */           element.appendChild(element2);
+/*      */           
+/*  541 */           element2 = document.createElement("GROUPENTITYTYPE");
+/*  542 */           element2.appendChild(document.createTextNode(compatInfo.groupentitytype_xml));
+/*  543 */           element.appendChild(element2);
+/*      */           
+/*  545 */           element2 = document.createElement("GROUPENTITYID");
+/*  546 */           element2.appendChild(document.createTextNode(compatInfo.groupentityid_xml));
+/*  547 */           element.appendChild(element2);
+/*      */           
+/*  549 */           element2 = document.createElement("OKTOPUB");
+/*  550 */           element2.appendChild(document.createTextNode(compatInfo.oktopub_xml));
+/*  551 */           element.appendChild(element2);
+/*      */           
+/*  553 */           element2 = document.createElement("OPTIONENTITYTYPE");
+/*  554 */           element2.appendChild(document.createTextNode(compatInfo.optionentitytype_xml));
+/*  555 */           element.appendChild(element2);
+/*      */           
+/*  557 */           element2 = document.createElement("OPTIONENTITYID");
+/*  558 */           element2.appendChild(document.createTextNode(compatInfo.optionentityid_xml));
+/*  559 */           element.appendChild(element2);
+/*      */           
+/*  561 */           element2 = document.createElement("OPTIONSEOID");
+/*  562 */           element2.appendChild(document.createTextNode(compatInfo.optionseoid_xml));
+/*  563 */           element.appendChild(element2);
+/*      */           
+/*  565 */           element2 = document.createElement("COMPATPUBFLAG");
+/*  566 */           element2.appendChild(document.createTextNode(compatInfo.compatibilitypublishingflag_xml));
+/*  567 */           element.appendChild(element2);
+/*      */           
+/*  569 */           element2 = document.createElement("RELTYPE");
+/*  570 */           element2.appendChild(document.createTextNode(compatInfo.relationshiptype_xml));
+/*  571 */           element.appendChild(element2);
+/*      */           
+/*  573 */           element2 = document.createElement("PUBFROM");
+/*  574 */           element2.appendChild(document.createTextNode(compatInfo.publishfrom_xml));
+/*  575 */           element.appendChild(element2);
+/*      */           
+/*  577 */           element2 = document.createElement("PUBTO");
+/*  578 */           element2.appendChild(document.createTextNode(compatInfo.publishto_xml));
+/*  579 */           element.appendChild(element2);
+/*      */ 
+/*      */           
+/*  582 */           compatInfo.dereference();
+/*      */         } 
+/*  584 */         vector.clear();
+/*  585 */         String str3 = paramADSABRSTATUS.transformXML(this, document);
+/*      */ 
+/*      */         
+/*  588 */         boolean bool = false;
+/*      */         
+/*  590 */         String str4 = "XMLCOMPATSETUP";
+/*  591 */         String str5 = ABRServerProperties.getValue("ADSABRSTATUS", "_" + str4 + "_XSDNEEDED", "NO");
+/*  592 */         if ("YES".equals(str5.toUpperCase())) {
+/*  593 */           String str = ABRServerProperties.getValue("ADSABRSTATUS", "_" + str4 + "_XSDFILE", "NONE");
+/*  594 */           if ("NONE".equals(str)) {
+/*  595 */             paramADSABRSTATUS.addError("there is no xsdfile for " + str4 + " defined in the propertyfile ");
+/*      */           } else {
+/*  597 */             long l1 = System.currentTimeMillis();
+/*  598 */             Class<?> clazz = getClass();
+/*  599 */             StringBuffer stringBuffer = new StringBuffer();
+/*  600 */             bool = ABRUtil.validatexml(clazz, stringBuffer, str, str3);
+/*  601 */             if (stringBuffer.length() > 0) {
+/*  602 */               String str6 = stringBuffer.toString();
+/*  603 */               if (str6.indexOf("fail") != -1)
+/*  604 */                 paramADSABRSTATUS.addError(str6); 
+/*  605 */               paramADSABRSTATUS.addOutput(str6);
+/*      */             } 
+/*  607 */             long l2 = System.currentTimeMillis();
+/*  608 */             paramADSABRSTATUS.addDebugComment(3, "Time for validation: " + Stopwatch.format(l2 - l1));
+/*  609 */             if (bool) {
+/*  610 */               paramADSABRSTATUS.addDebug("the xml for " + str4 + " passed the validation");
+/*      */             }
+/*      */           } 
+/*      */         } else {
+/*  614 */           paramADSABRSTATUS.addOutput("the xml for " + str4 + " doesn't need to be validated");
+/*  615 */           bool = true;
+/*      */         } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/*  621 */         if (str3 != null && bool) {
+/*  622 */           if (!ADSABRSTATUS.USERXML_OFF_LOG)
+/*      */           {
+/*      */             
+/*  625 */             paramADSABRSTATUS.addDebug("ADSWWCOMPATXMLABR: Generated MQ xml:" + ADSABRSTATUS.NEWLINE + str3 + ADSABRSTATUS.NEWLINE);
+/*      */           }
+/*  627 */           paramADSABRSTATUS.notify(this, "WWCOMPAT", str3, paramVector2);
+/*      */         } 
+/*  629 */         document = null;
+/*  630 */         System.gc();
+/*      */       } 
+/*      */     } else {
+/*      */       
+/*  634 */       WWCOMPAT_MESSAGE_COUNT++;
+/*  635 */       DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+/*  636 */       DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+/*  637 */       Document document = documentBuilder.newDocument();
+/*  638 */       String str1 = "WWCOMPAT_UPDATE";
+/*  639 */       String str2 = "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/" + str1;
+/*      */ 
+/*      */       
+/*  642 */       Element element1 = document.createElementNS(str2, str1);
+/*      */       
+/*  644 */       document.appendChild(element1);
+/*  645 */       element1.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", str2);
+/*  646 */       element1.appendChild(document.createComment("WWCOMPAT_UPDATE Version 1 Mod 0"));
+/*      */       
+/*  648 */       Element element2 = document.createElement("DTSOFMSG");
+/*  649 */       element2.appendChild(document.createTextNode(paramProfile.getEndOfDay()));
+/*  650 */       element1.appendChild(element2);
+/*  651 */       for (byte b = 0; b < paramVector1.size(); b++) {
+/*  652 */         CompatInfo compatInfo = paramVector1.elementAt(b);
+/*  653 */         Element element = document.createElement("COMPATELEMENT");
+/*  654 */         element1.appendChild(element);
+/*      */         
+/*  656 */         element2 = document.createElement("ACTIVITY");
+/*  657 */         element2.appendChild(document.createTextNode(compatInfo.activity_xml));
+/*  658 */         element.appendChild(element2);
+/*      */ 
+/*      */         
+/*  661 */         element2 = document.createElement("BRANDCD");
+/*  662 */         element2.appendChild(document.createTextNode(compatInfo.brandcd_fc_xml));
+/*  663 */         element.appendChild(element2);
+/*      */ 
+/*      */         
+/*  666 */         element2 = document.createElement("STATUS");
+/*  667 */         element2.appendChild(document.createTextNode("0020"));
+/*  668 */         element.appendChild(element2);
+/*      */         
+/*  670 */         element2 = document.createElement("SYSTEMENTITYTYPE");
+/*  671 */         element2.appendChild(document.createTextNode(compatInfo.systementitytype_xml));
+/*  672 */         element.appendChild(element2);
+/*      */         
+/*  674 */         element2 = document.createElement("SYSTEMENTITYID");
+/*  675 */         element2.appendChild(document.createTextNode(compatInfo.systementityid_xml));
+/*  676 */         element.appendChild(element2);
+/*      */         
+/*  678 */         element2 = document.createElement("SYSTEMMACHTYPE");
+/*  679 */         element2.appendChild(document.createTextNode(compatInfo.systemmachtype_xml));
+/*  680 */         element.appendChild(element2);
+/*      */         
+/*  682 */         element2 = document.createElement("SYSTEMMODEL");
+/*  683 */         element2.appendChild(document.createTextNode(compatInfo.systemmodel_xml));
+/*  684 */         element.appendChild(element2);
+/*      */         
+/*  686 */         element2 = document.createElement("SYSTEMSEOID");
+/*  687 */         element2.appendChild(document.createTextNode(compatInfo.systemseoid_xml));
+/*  688 */         element.appendChild(element2);
+/*      */         
+/*  690 */         element2 = document.createElement("GROUPENTITYTYPE");
+/*  691 */         element2.appendChild(document.createTextNode(compatInfo.groupentitytype_xml));
+/*  692 */         element.appendChild(element2);
+/*      */         
+/*  694 */         element2 = document.createElement("GROUPENTITYID");
+/*  695 */         element2.appendChild(document.createTextNode(compatInfo.groupentityid_xml));
+/*  696 */         element.appendChild(element2);
+/*      */         
+/*  698 */         element2 = document.createElement("OKTOPUB");
+/*  699 */         element2.appendChild(document.createTextNode(compatInfo.oktopub_xml));
+/*  700 */         element.appendChild(element2);
+/*      */         
+/*  702 */         element2 = document.createElement("OPTIONENTITYTYPE");
+/*  703 */         element2.appendChild(document.createTextNode(compatInfo.optionentitytype_xml));
+/*  704 */         element.appendChild(element2);
+/*      */         
+/*  706 */         element2 = document.createElement("OPTIONENTITYID");
+/*  707 */         element2.appendChild(document.createTextNode(compatInfo.optionentityid_xml));
+/*  708 */         element.appendChild(element2);
+/*      */         
+/*  710 */         element2 = document.createElement("OPTIONSEOID");
+/*  711 */         element2.appendChild(document.createTextNode(compatInfo.optionseoid_xml));
+/*  712 */         element.appendChild(element2);
+/*      */         
+/*  714 */         element2 = document.createElement("COMPATPUBFLAG");
+/*  715 */         element2.appendChild(document.createTextNode(compatInfo.compatibilitypublishingflag_xml));
+/*  716 */         element.appendChild(element2);
+/*      */         
+/*  718 */         element2 = document.createElement("RELTYPE");
+/*  719 */         element2.appendChild(document.createTextNode(compatInfo.relationshiptype_xml));
+/*  720 */         element.appendChild(element2);
+/*      */         
+/*  722 */         element2 = document.createElement("PUBFROM");
+/*  723 */         element2.appendChild(document.createTextNode(compatInfo.publishfrom_xml));
+/*  724 */         element.appendChild(element2);
+/*      */         
+/*  726 */         element2 = document.createElement("PUBTO");
+/*  727 */         element2.appendChild(document.createTextNode(compatInfo.publishto_xml));
+/*  728 */         element.appendChild(element2);
+/*      */ 
+/*      */         
+/*  731 */         compatInfo.dereference();
+/*      */       } 
+/*      */       
+/*  734 */       String str3 = paramADSABRSTATUS.transformXML(this, document);
+/*      */ 
+/*      */       
+/*  737 */       boolean bool = false;
+/*      */       
+/*  739 */       String str4 = "XMLCOMPATSETUP";
+/*  740 */       String str5 = ABRServerProperties.getValue("ADSABRSTATUS", "_" + str4 + "_XSDNEEDED", "NO");
+/*  741 */       if ("YES".equals(str5.toUpperCase())) {
+/*  742 */         String str = ABRServerProperties.getValue("ADSABRSTATUS", "_" + str4 + "_XSDFILE", "NONE");
+/*  743 */         if ("NONE".equals(str)) {
+/*  744 */           paramADSABRSTATUS.addError("there is no xsdfile for " + str4 + " defined in the propertyfile ");
+/*      */         } else {
+/*  746 */           long l1 = System.currentTimeMillis();
+/*  747 */           Class<?> clazz = getClass();
+/*  748 */           StringBuffer stringBuffer = new StringBuffer();
+/*  749 */           bool = ABRUtil.validatexml(clazz, stringBuffer, str, str3);
+/*  750 */           if (stringBuffer.length() > 0) {
+/*  751 */             String str6 = stringBuffer.toString();
+/*  752 */             if (str6.indexOf("fail") != -1)
+/*  753 */               paramADSABRSTATUS.addError(str6); 
+/*  754 */             paramADSABRSTATUS.addOutput(str6);
+/*      */           } 
+/*  756 */           long l2 = System.currentTimeMillis();
+/*  757 */           paramADSABRSTATUS.addDebugComment(3, "Time for validation: " + Stopwatch.format(l2 - l1));
+/*  758 */           if (bool) {
+/*  759 */             paramADSABRSTATUS.addDebug("the xml for " + str4 + " passed the validation");
+/*      */           }
+/*      */         } 
+/*      */       } else {
+/*  763 */         paramADSABRSTATUS.addOutput("the xml for " + str4 + " doesn't need to be validated");
+/*  764 */         bool = true;
+/*      */       } 
+/*      */ 
+/*      */ 
+/*      */       
+/*  769 */       if (str3 != null && bool) {
+/*  770 */         if (!ADSABRSTATUS.USERXML_OFF_LOG)
+/*      */         {
+/*      */           
+/*  773 */           paramADSABRSTATUS.addDebug("ADSWWCOMPATXMLABR: Generated MQ xml:" + ADSABRSTATUS.NEWLINE + str3 + ADSABRSTATUS.NEWLINE);
+/*      */         }
+/*  775 */         paramADSABRSTATUS.notify(this, "WWCOMPAT", str3, paramVector2);
+/*      */       } 
+/*  777 */       document = null;
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void withdrawOffering(ADSABRSTATUS paramADSABRSTATUS, String paramString1, String paramString2) throws SQLException {
+/*  915 */     ResultSet resultSet = null;
+/*  916 */     Connection connection = null;
+/*  917 */     PreparedStatement preparedStatement = null;
+/*  918 */     Vector<String[]> vector = new Vector();
+/*  919 */     long l1 = System.currentTimeMillis();
+/*  920 */     long l2 = 0L;
+/*  921 */     byte b = 0;
+/*      */     try {
+/*  923 */       paramADSABRSTATUS.addDebug("");
+/*  924 */       connection = setupConnection();
+/*  925 */       preparedStatement = connection.prepareStatement("select SYSTEMENTITYTYPE,SYSTEMENTITYID,SYSTEMOS,GROUPENTITYTYPE,GROUPENTITYID,OSENTITYTYPE,OSENTITYID,wwtc.OS,OPTIONENTITYTYPE,optionentityid from gbli.wwtechcompat wwtc join price.wwseolseo right_wwseolseo on wwtc.optionentityid=right_wwseolseo.id1 and right_wwseolseo.isactive=1 join price.lseo right_lseo on right_wwseolseo.id2=right_lseo.entityid and right_lseo.isactive=1 and right_lseo.nlsid=1 and right_lseo.lseounpubdatemtrgt + 90 day < current date where optionentitytype='WWSEO' and activity in('A','C') and updated BETWEEN ? AND ? union select SYSTEMENTITYTYPE,SYSTEMENTITYID,SYSTEMOS,GROUPENTITYTYPE,GROUPENTITYID,OSENTITYTYPE,OSENTITYID,wwtc.OS,OPTIONENTITYTYPE,optionentityid from gbli.wwtechcompat wwtc join price.model right_model on right_model.entityid=wwtc.optionentityid and right_model.isactive=1 and right_model.nlsid=1 and right_model.wthdrweffctvdate + 90 day < current date where optionentitytype='MODEL' and activity in('A','C') and updated BETWEEN ? AND ? union select SYSTEMENTITYTYPE,SYSTEMENTITYID,SYSTEMOS,GROUPENTITYTYPE,GROUPENTITYID,OSENTITYTYPE,OSENTITYID,wwtc.OS,OPTIONENTITYTYPE,optionentityid from gbli.wwtechcompat wwtc join price.lseobundle right_lseobundle on right_lseobundle.entityid=wwtc.optionentityid and right_lseobundle.isactive=1 and right_lseobundle.nlsid=1 and right_lseobundle.bundlunpubdatemtrgt + 90 day < current date where optionentitytype='LSEOBUNDLE' and activity in('A','C') and updated BETWEEN ? AND ?  ");
+/*  926 */       preparedStatement.clearParameters();
+/*  927 */       preparedStatement.setString(1, paramString1);
+/*  928 */       preparedStatement.setString(2, paramString2);
+/*  929 */       preparedStatement.setString(3, paramString1);
+/*  930 */       preparedStatement.setString(4, paramString2);
+/*  931 */       preparedStatement.setString(5, paramString1);
+/*  932 */       preparedStatement.setString(6, paramString2);
+/*  933 */       resultSet = preparedStatement.executeQuery();
+/*  934 */       l2 = System.currentTimeMillis();
+/*  935 */       paramADSABRSTATUS.addDebugComment(3, "Execute query SQL:select SYSTEMENTITYTYPE,SYSTEMENTITYID,SYSTEMOS,GROUPENTITYTYPE,GROUPENTITYID,OSENTITYTYPE,OSENTITYID,wwtc.OS,OPTIONENTITYTYPE,optionentityid from gbli.wwtechcompat wwtc join price.wwseolseo right_wwseolseo on wwtc.optionentityid=right_wwseolseo.id1 and right_wwseolseo.isactive=1 join price.lseo right_lseo on right_wwseolseo.id2=right_lseo.entityid and right_lseo.isactive=1 and right_lseo.nlsid=1 and right_lseo.lseounpubdatemtrgt + 90 day < current date where optionentitytype='WWSEO' and activity in('A','C') and updated BETWEEN ? AND ? union select SYSTEMENTITYTYPE,SYSTEMENTITYID,SYSTEMOS,GROUPENTITYTYPE,GROUPENTITYID,OSENTITYTYPE,OSENTITYID,wwtc.OS,OPTIONENTITYTYPE,optionentityid from gbli.wwtechcompat wwtc join price.model right_model on right_model.entityid=wwtc.optionentityid and right_model.isactive=1 and right_model.nlsid=1 and right_model.wthdrweffctvdate + 90 day < current date where optionentitytype='MODEL' and activity in('A','C') and updated BETWEEN ? AND ? union select SYSTEMENTITYTYPE,SYSTEMENTITYID,SYSTEMOS,GROUPENTITYTYPE,GROUPENTITYID,OSENTITYTYPE,OSENTITYID,wwtc.OS,OPTIONENTITYTYPE,optionentityid from gbli.wwtechcompat wwtc join price.lseobundle right_lseobundle on right_lseobundle.entityid=wwtc.optionentityid and right_lseobundle.isactive=1 and right_lseobundle.nlsid=1 and right_lseobundle.bundlunpubdatemtrgt + 90 day < current date where optionentitytype='LSEOBUNDLE' and activity in('A','C') and updated BETWEEN ? AND ?  Time is : " + Stopwatch.format(l2 - l1));
+/*  936 */       while (resultSet.next()) {
+/*  937 */         String str1 = resultSet.getString(1);
+/*  938 */         int i = resultSet.getInt(2);
+/*  939 */         String str2 = resultSet.getString(3);
+/*  940 */         String str3 = resultSet.getString(4);
+/*  941 */         int j = resultSet.getInt(5);
+/*  942 */         String str4 = resultSet.getString(6);
+/*  943 */         int k = resultSet.getInt(7);
+/*  944 */         String str5 = resultSet.getString(8);
+/*  945 */         String str6 = resultSet.getString(9);
+/*  946 */         int m = resultSet.getInt(10);
+/*      */ 
+/*      */ 
+/*      */         
+/*  950 */         String[] arrayOfString = { str1, Integer.toString(i), str2, str3, Integer.toString(j), str4, Integer.toString(k), str5, str6, Integer.toString(m) };
+/*  951 */         vector.add(arrayOfString);
+/*  952 */         b++;
+/*  953 */         if (vector.size() >= 5000) {
+/*  954 */           updateWithdrawAct(paramADSABRSTATUS, vector);
+/*      */         }
+/*      */       } 
+/*  957 */       if (vector.size() > 0) {
+/*  958 */         updateWithdrawAct(paramADSABRSTATUS, vector);
+/*      */       }
+/*  960 */       l2 = System.currentTimeMillis();
+/*  961 */       paramADSABRSTATUS.addDebugComment(3, "Process withdraw offerings options products count:" + b + ". Total time is : " + Stopwatch.format(l2 - l1));
+/*      */     } finally {
+/*      */       
+/*      */       try {
+/*  965 */         if (preparedStatement != null) {
+/*  966 */           preparedStatement.close();
+/*  967 */           preparedStatement = null;
+/*      */         } 
+/*  969 */       } catch (Exception exception) {
+/*  970 */         System.err.println("getCompat(), unable to close statement. " + exception);
+/*  971 */         paramADSABRSTATUS.addDebug("getCompat unable to close statement. " + exception);
+/*      */       } 
+/*  973 */       if (resultSet != null) {
+/*  974 */         resultSet.close();
+/*      */       }
+/*  976 */       if (this.connection != null) {
+/*  977 */         this.connection.close();
+/*  978 */         this.connection = null;
+/*      */       } 
+/*      */       
+/*  981 */       closeConnection(connection);
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void updateWithdrawAct(ADSABRSTATUS paramADSABRSTATUS, Vector paramVector) throws SQLException {
+/*  992 */     long l = System.currentTimeMillis();
+/*  993 */     Iterator<String[]> iterator = paramVector.iterator();
+/*      */     
+/*  995 */     PreparedStatement preparedStatement = null;
+/*      */ 
+/*      */     
+/*      */     try {
+/*  999 */       if (this.connection == null) {
+/* 1000 */         this.connection = setupConnection();
+/*      */       }
+/* 1002 */       preparedStatement = this.connection.prepareStatement("update gbli.wwtechcompat set activity = 'W' where SYSTEMENTITYTYPE = ? and SYSTEMENTITYID = ? and SYSTEMOS = ? and GROUPENTITYTYPE = ? and GROUPENTITYID = ? and OSENTITYTYPE = ? and OSENTITYID = ? and OS = ? and OPTIONENTITYTYPE = ? and OPTIONENTITYID = ?");
+/* 1003 */       while (iterator.hasNext()) {
+/* 1004 */         String[] arrayOfString = iterator.next();
+/* 1005 */         preparedStatement.setString(1, arrayOfString[0]);
+/* 1006 */         preparedStatement.setInt(2, Integer.parseInt(arrayOfString[1]));
+/* 1007 */         preparedStatement.setString(3, arrayOfString[2]);
+/* 1008 */         preparedStatement.setString(4, arrayOfString[3]);
+/* 1009 */         preparedStatement.setInt(5, Integer.parseInt(arrayOfString[4]));
+/* 1010 */         preparedStatement.setString(6, arrayOfString[5]);
+/* 1011 */         preparedStatement.setInt(7, Integer.parseInt(arrayOfString[6]));
+/* 1012 */         preparedStatement.setString(8, arrayOfString[7]);
+/* 1013 */         preparedStatement.setString(9, arrayOfString[8]);
+/* 1014 */         preparedStatement.setInt(10, Integer.parseInt(arrayOfString[9]));
+/* 1015 */         preparedStatement.addBatch();
+/*      */       } 
+/* 1017 */       preparedStatement.executeBatch();
+/* 1018 */       if (this.connection != null) {
+/* 1019 */         this.connection.commit();
+/*      */       }
+/*      */       
+/* 1022 */       paramADSABRSTATUS.addDebug(paramVector.size() + " records was updated in the table wwtechcompat. Total Time: " + Stopwatch.format(System.currentTimeMillis() - l));
+/* 1023 */     } catch (SQLException sQLException) {
+/* 1024 */       paramADSABRSTATUS.addDebug("SQLException on ? " + sQLException);
+/* 1025 */       sQLException.printStackTrace();
+/* 1026 */       throw sQLException;
+/*      */     } finally {
+/* 1028 */       paramVector.clear();
+/* 1029 */       if (preparedStatement != null) {
+/*      */         try {
+/* 1031 */           preparedStatement.close();
+/* 1032 */         } catch (SQLException sQLException) {
+/* 1033 */           sQLException.printStackTrace();
+/*      */         } 
+/*      */       }
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void processCompat(ADSABRSTATUS paramADSABRSTATUS, String paramString1, String paramString2, Profile paramProfile, Database paramDatabase, EntityItem paramEntityItem) throws SQLException, DOMException, MissingResourceException, ParserConfigurationException, TransformerException {
+/* 1055 */     Vector<CompatInfo> vector = new Vector();
+/* 1056 */     ResultSet resultSet = null;
+/* 1057 */     Connection connection = null;
+/* 1058 */     PreparedStatement preparedStatement = null;
+/*      */     try {
+/* 1060 */       connection = setupConnection();
+/* 1061 */       preparedStatement = connection.prepareStatement("select activity,'LSEO',left_lseo.entityid,groupentitytype,groupentityid,oktopub,'LSEO',right_lseo.entityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,brandcd_fc,left_lseo.seoid,right_lseo.seoid,left_model.machtypeatr,left_model.modelatr from gbli.wwtechcompat wwtc join price.wwseolseo left_wwseolseo on wwtc.systementityid=left_wwseolseo.id1 and left_wwseolseo.isactive=1 join price.lseo left_lseo on left_wwseolseo.id2=left_lseo.entityid and left_lseo.isactive=1 join price.wwseolseo right_wwseolseo on wwtc.optionentityid=right_wwseolseo.id1 and right_wwseolseo.isactive=1 join price.lseo right_lseo on right_wwseolseo.id2=right_lseo.entityid and right_lseo.isactive=1 join price.modelwwseo left_modelwwseo on left_modelwwseo.id2=wwtc.systementityid and left_modelwwseo.isactive=1 join price.model left_model on left_model.entityid=left_modelwwseo.id1 and left_model.isactive=1 where systementitytype='WWSEO' and optionentitytype='WWSEO' and updated BETWEEN ? AND ? and activity <> 'W' union select activity,'MODEL',systementityid,groupentitytype,groupentityid,oktopub,'MODEL',optionentityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,brandcd_fc,cast(null as char),cast(null as char),left_model.machtypeatr,left_model.modelatr from gbli.wwtechcompat wwtc join price.model left_model on left_model.entityid=systementityid and left_model.isactive=1 where systementitytype='MODEL' and optionentitytype='MODEL' and updated BETWEEN ? AND ? and activity <> 'W' union select activity,'MODEL',systementityid,groupentitytype,groupentityid,oktopub,'LSEO',right_lseo.entityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,brandcd_fc,cast(null as char),right_lseo.seoid,left_model.machtypeatr,left_model.modelatr from gbli.wwtechcompat wwtc join price.model left_model on left_model.entityid=systementityid and left_model.isactive=1 join price.wwseolseo right_wwseolseo on wwtc.optionentityid=right_wwseolseo.id1 and right_wwseolseo.isactive=1 join price.lseo right_lseo on right_wwseolseo.id2=right_lseo.entityid and right_lseo.isactive=1 where systementitytype='MODEL' and optionentitytype='WWSEO' and updated BETWEEN ? AND ? and activity <> 'W' union select activity,'MODEL',systementityid,groupentitytype,groupentityid,oktopub,'LSEOBUNDLE',optionentityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,brandcd_fc,cast(null as char),right_lseobundle.seoid,left_model.machtypeatr,left_model.modelatr from gbli.wwtechcompat wwtc join price.model left_model on left_model.entityid=systementityid and left_model.isactive=1 join price.lseobundle right_lseobundle on right_lseobundle.entityid=optionentityid and right_lseobundle.isactive=1 where systementitytype='MODEL' and optionentitytype='LSEOBUNDLE' and updated BETWEEN ? AND ? and activity <> 'W' union select activity,'LSEO',left_lseo.entityid,groupentitytype,groupentityid,oktopub,'LSEOBUNDLE',optionentityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,brandcd_fc,left_lseo.seoid,right_lseobundle.seoid,left_model.machtypeatr,left_model.modelatr from gbli.wwtechcompat wwtc join price.wwseolseo left_wwseolseo on wwtc.systementityid=left_wwseolseo.id1 and left_wwseolseo.isactive=1 join price.lseo left_lseo on left_wwseolseo.id2=left_lseo.entityid and left_lseo.isactive=1 join price.lseobundle right_lseobundle on right_lseobundle.entityid=optionentityid and right_lseobundle.isactive=1 join price.modelwwseo left_modelwwseo on left_modelwwseo.id2=wwtc.systementityid and left_modelwwseo.isactive=1 join price.model left_model on left_model.entityid=left_modelwwseo.id1 and left_model.isactive=1 where systementitytype='WWSEO' and optionentitytype='LSEOBUNDLE' and updated BETWEEN ? AND ? and activity <> 'W' union select activity,'LSEOBUNDLE',systementityid,groupentitytype,groupentityid,oktopub,'LSEO',right_lseo.entityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,brandcd_fc,left_lseobundle.seoid,right_lseo.seoid,cast(null as char),cast(null as char) from gbli.wwtechcompat wwtc join price.lseobundle left_lseobundle on left_lseobundle.entityid=systementityid and left_lseobundle.isactive=1 join price.wwseolseo right_wwseolseo on wwtc.optionentityid=right_wwseolseo.id1 and right_wwseolseo.isactive=1 join price.lseo right_lseo on right_wwseolseo.id2=right_lseo.entityid and right_lseo.isactive=1 where systementitytype='LSEOBUNDLE' and optionentitytype='WWSEO' and updated BETWEEN ? AND ? and activity <> 'W' union select activity,'LSEOBUNDLE',systementityid,groupentitytype,groupentityid,oktopub,'LSEOBUNDLE',optionentityid,compatibilitypublishingflag,relationshiptype,publishfrom,publishto,brandcd_fc,left_lseobundle.seoid,right_lseobundle.seoid,cast(null as char),cast(null as char) from gbli.wwtechcompat wwtc join price.lseobundle left_lseobundle on left_lseobundle.entityid=systementityid and left_lseobundle.isactive=1 join price.lseobundle right_lseobundle on right_lseobundle.entityid=optionentityid and right_lseobundle.isactive=1 where systementitytype='LSEOBUNDLE' and optionentitytype='LSEOBUNDLE' and updated BETWEEN ? AND ? and activity <> 'W' with ur");
+/*      */ 
+/*      */       
+/* 1064 */       preparedStatement.setString(1, paramString1);
+/* 1065 */       preparedStatement.setString(3, paramString1);
+/* 1066 */       preparedStatement.setString(5, paramString1);
+/* 1067 */       preparedStatement.setString(7, paramString1);
+/* 1068 */       preparedStatement.setString(9, paramString1);
+/* 1069 */       preparedStatement.setString(11, paramString1);
+/* 1070 */       preparedStatement.setString(13, paramString1);
+/* 1071 */       preparedStatement.setString(2, paramString2);
+/* 1072 */       preparedStatement.setString(4, paramString2);
+/* 1073 */       preparedStatement.setString(6, paramString2);
+/* 1074 */       preparedStatement.setString(8, paramString2);
+/* 1075 */       preparedStatement.setString(10, paramString2);
+/* 1076 */       preparedStatement.setString(12, paramString2);
+/* 1077 */       preparedStatement.setString(14, paramString2);
+/*      */       
+/* 1079 */       resultSet = preparedStatement.executeQuery();
+/* 1080 */       byte b = 1;
+/* 1081 */       boolean bool = false;
+/* 1082 */       while (resultSet.next()) {
+/* 1083 */         String str1 = resultSet.getString(1);
+/* 1084 */         String str2 = resultSet.getString(2);
+/* 1085 */         int i = resultSet.getInt(3);
+/*      */         
+/* 1087 */         String str3 = resultSet.getString(4);
+/* 1088 */         int j = resultSet.getInt(5);
+/* 1089 */         String str4 = resultSet.getString(6);
+/*      */ 
+/*      */ 
+/*      */         
+/* 1093 */         String str5 = resultSet.getString(7);
+/* 1094 */         int k = resultSet.getInt(8);
+/* 1095 */         String str6 = resultSet.getString(9);
+/* 1096 */         String str7 = resultSet.getString(10);
+/* 1097 */         String str8 = resultSet.getString(11);
+/* 1098 */         String str9 = resultSet.getString(12);
+/* 1099 */         String str10 = resultSet.getString(13);
+/* 1100 */         String str11 = resultSet.getString(14);
+/* 1101 */         String str12 = resultSet.getString(15);
+/* 1102 */         String str13 = resultSet.getString(16);
+/* 1103 */         String str14 = resultSet.getString(17);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1168 */         if (!ADSABRSTATUS.USERXML_OFF_LOG) {
+/* 1169 */           paramADSABRSTATUS.addDebugComment(2, "getCompat activity:" + str1 + " systementitytype:" + str2 + " systementityid:" + i + " groupentitytype:" + str3 + " groupentityid:" + j + " oktopub:" + str4 + " optionentitytype:" + str5 + " optionentityid:" + k + " compatibilitypublishingflag:" + str6 + " relationshiptype:" + str7 + " publishfrom:" + str8 + " publishto:" + str9 + " brandcd_fc:" + str10 + " systemmachtype:" + str13 + " systemmodel:" + str14 + " systemseoid:" + str11 + " optionseoid:" + str12);
+/*      */         }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1178 */         vector.add(new CompatInfo(str1, str2, i, "@@", str3, j, str4, "@@", 1, "@@", str5, k, str6, str7, str8, str9, str10, str13, str14, str11, str12));
+/*      */ 
+/*      */ 
+/*      */         
+/* 1182 */         if (vector.size() >= WWCOMPAT_ROW_LIMIT) {
+/* 1183 */           paramADSABRSTATUS.addDebug("Chunking size is " + WWCOMPAT_ROW_LIMIT + ". Start to run chunking " + b++ + " times.");
+/* 1184 */           sentToMQ(paramADSABRSTATUS, vector, paramProfile, paramEntityItem);
+/*      */         } 
+/*      */       } 
+/*      */       
+/* 1188 */       if (vector.size() > 0) {
+/* 1189 */         sentToMQ(paramADSABRSTATUS, vector, paramProfile, paramEntityItem);
+/*      */       }
+/* 1191 */       paramADSABRSTATUS.addDebug("WWCOMPAT_MESSAGE_COUNT is " + WWCOMPAT_MESSAGE_COUNT);
+/* 1192 */       this.wwcompMQTable.clear();
+/*      */     } finally {
+/*      */ 
+/*      */       
+/*      */       try {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1202 */         if (preparedStatement != null) {
+/* 1203 */           preparedStatement.close();
+/* 1204 */           preparedStatement = null;
+/*      */         } 
+/* 1206 */       } catch (Exception exception) {
+/* 1207 */         System.err.println("getCompat(), unable to close statement. " + exception);
+/* 1208 */         paramADSABRSTATUS.addDebug("getCompat unable to close statement. " + exception);
+/*      */       } 
+/* 1210 */       if (resultSet != null) {
+/* 1211 */         resultSet.close();
+/*      */       }
+/* 1213 */       closeConnection(connection);
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void sentToMQ(ADSABRSTATUS paramADSABRSTATUS, Vector<CompatInfo> paramVector, Profile paramProfile, EntityItem paramEntityItem) throws DOMException, MissingResourceException, ParserConfigurationException, TransformerException {
+/* 1229 */     if (paramVector.size() == 0) {
+/*      */       
+/* 1231 */       paramADSABRSTATUS.addXMLGenMsg("NO_CHANGES_FND", "ADSWWCOMPATXMLABR");
+/*      */     } else {
+/* 1233 */       paramADSABRSTATUS.addDebug("ADSWWCOMPATXMLABR.processThis found " + paramVector.size() + " WWTECHCOMPAT");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1264 */       Vector vector1 = getPeriodicMQ(paramEntityItem);
+/*      */       
+/* 1266 */       Vector vector2 = new Vector();
+/* 1267 */       String str1 = convertValue(PokUtils.getAttributeFlagValue(paramEntityItem, "BRANDCD"));
+/* 1268 */       String str2 = getDescription(paramEntityItem, "BRANDCD", "long");
+/* 1269 */       if (str1.equals("")) {
+/* 1270 */         str1 = "@@@";
+/*      */       } else {
+/* 1272 */         paramADSABRSTATUS.addXMLGenMsg("FILTER", "WWCOMPAT Periodic ABR is filtered by BRANDCD=" + str1 + "(" + str2 + ")");
+/*      */       } 
+/* 1274 */       paramADSABRSTATUS.addDebug("wwcompat filter key =" + str1);
+/* 1275 */       paramADSABRSTATUS.addDebug("wwcompat MQ vector  =" + vector1);
+/*      */       
+/* 1277 */       if (str1.equals("@@@")) {
+/* 1278 */         processMQ(paramADSABRSTATUS, paramProfile, paramVector, vector1);
+/*      */       } else {
+/* 1280 */         for (byte b = 0; b < paramVector.size(); b++) {
+/* 1281 */           CompatInfo compatInfo = paramVector.elementAt(b);
+/* 1282 */           String str = compatInfo.brandcd_fc_xml;
+/* 1283 */           if (str1.equals(str)) {
+/* 1284 */             vector2.add(paramVector.get(b));
+/*      */           }
+/*      */         } 
+/* 1287 */         processMQ(paramADSABRSTATUS, paramProfile, vector2, vector1);
+/*      */         
+/* 1289 */         vector2.clear();
+/*      */       } 
+/*      */       
+/* 1292 */       paramVector.clear();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getDescription(EntityItem paramEntityItem, String paramString1, String paramString2) {
+/* 1303 */     String str = "";
+/* 1304 */     EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)paramEntityItem.getAttribute(paramString1);
+/* 1305 */     if (eANFlagAttribute != null && eANFlagAttribute.toString().length() > 0) {
+/*      */       
+/* 1307 */       MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 1308 */       StringBuffer stringBuffer = new StringBuffer();
+/* 1309 */       for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/*      */         
+/* 1311 */         if (arrayOfMetaFlag[b].isSelected()) {
+/*      */           
+/* 1313 */           if (stringBuffer.length() > 0) {
+/* 1314 */             stringBuffer.append(",");
+/*      */           }
+/* 1316 */           if (paramString2.equals("short")) {
+/* 1317 */             stringBuffer.append(arrayOfMetaFlag[b].getShortDescription());
+/* 1318 */           } else if (paramString2.equals("long")) {
+/* 1319 */             stringBuffer.append(arrayOfMetaFlag[b].getLongDescription());
+/* 1320 */           } else if (paramString2.equals("flag")) {
+/* 1321 */             stringBuffer.append(arrayOfMetaFlag[b].getFlagCode());
+/*      */           } else {
+/*      */             
+/* 1324 */             stringBuffer.append(arrayOfMetaFlag[b].toString());
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/* 1328 */       str = stringBuffer.toString();
+/*      */     } 
+/* 1330 */     return str;
+/*      */   }
+/*      */   
+/*      */   private String convertValue(String paramString) {
+/* 1334 */     return (paramString == null) ? "" : paramString;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getVersion() {
+/* 1342 */     return "1.6";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getMQCID() {
+/* 1349 */     return "WWCOMPAT_UPDATE";
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   public String getStatusAttr() {
+/* 1354 */     return "ADSABRSTATUS";
+/*      */   }
+/*      */   
+/*      */   private static class CompatInfo {
+/* 1358 */     String activity_xml = "@@";
+/* 1359 */     String systementitytype_xml = "@@";
+/* 1360 */     String systementityid_xml = "@@";
+/* 1361 */     String systemos_xml = "@@";
+/* 1362 */     String groupentitytype_xml = "@@";
+/* 1363 */     String groupentityid_xml = "@@";
+/* 1364 */     String oktopub_xml = "@@";
+/* 1365 */     String osentitytype_xml = "@@";
+/* 1366 */     String osentityid_xml = "@@";
+/* 1367 */     String os_xml = "@@";
+/* 1368 */     String optionentitytype_xml = "@@";
+/* 1369 */     String optionentityid_xml = "@@";
+/* 1370 */     String compatibilitypublishingflag_xml = "@@";
+/* 1371 */     String relationshiptype_xml = "@@";
+/* 1372 */     String publishfrom_xml = "@@";
+/* 1373 */     String publishto_xml = "@@";
+/* 1374 */     String brandcd_fc_xml = "@@";
+/* 1375 */     String systemmachtype_xml = "@@";
+/* 1376 */     String systemmodel_xml = "@@";
+/* 1377 */     String systemseoid_xml = "@@";
+/* 1378 */     String optionseoid_xml = "@@";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     CompatInfo(String param1String1, String param1String2, int param1Int1, String param1String3, String param1String4, int param1Int2, String param1String5, String param1String6, int param1Int3, String param1String7, String param1String8, int param1Int4, String param1String9, String param1String10, String param1String11, String param1String12, String param1String13, String param1String14, String param1String15, String param1String16, String param1String17) {
+/* 1403 */       if (param1String1.equals("A") || param1String1.equals("C")) {
+/* 1404 */         this.activity_xml = "Update";
+/*      */       } else {
+/* 1406 */         this.activity_xml = "Delete";
+/*      */       } 
+/* 1408 */       if (param1String2 != null) {
+/* 1409 */         this.systementitytype_xml = param1String2.trim();
+/*      */       }
+/*      */       
+/* 1412 */       if (param1Int1 != 0) {
+/* 1413 */         this.systementityid_xml = Integer.toString(param1Int1);
+/*      */       }
+/*      */       
+/* 1416 */       if (param1String3 != null) {
+/* 1417 */         this.systemos_xml = param1String3.trim();
+/*      */       }
+/*      */       
+/* 1420 */       if (param1String4 != null) {
+/* 1421 */         this.groupentitytype_xml = param1String4.trim();
+/*      */       }
+/*      */       
+/* 1424 */       if (param1Int2 != 0) {
+/* 1425 */         this.groupentityid_xml = Integer.toString(param1Int2);
+/*      */       }
+/*      */       
+/* 1428 */       if (param1String5 != null) {
+/* 1429 */         this.oktopub_xml = param1String5.trim();
+/*      */       }
+/* 1431 */       if (param1String6 != null) {
+/* 1432 */         this.osentitytype_xml = param1String6.trim();
+/*      */       }
+/*      */       
+/* 1435 */       if (param1Int3 != 0) {
+/* 1436 */         this.osentityid_xml = Integer.toString(param1Int3);
+/*      */       }
+/*      */       
+/* 1439 */       if (param1String7 != null) {
+/* 1440 */         this.os_xml = param1String7.trim();
+/*      */       }
+/*      */       
+/* 1443 */       if (param1String8 != null) {
+/* 1444 */         this.optionentitytype_xml = param1String8.trim();
+/*      */       }
+/*      */       
+/* 1447 */       if (param1Int4 != 0) {
+/* 1448 */         this.optionentityid_xml = Integer.toString(param1Int4);
+/*      */       }
+/*      */       
+/* 1451 */       if (param1String9 != null) {
+/* 1452 */         this.compatibilitypublishingflag_xml = param1String9.trim();
+/*      */       }
+/*      */       
+/* 1455 */       if (param1String10 != null) {
+/* 1456 */         this.relationshiptype_xml = param1String10.trim();
+/*      */       }
+/*      */       
+/* 1459 */       if (param1String11 != null) {
+/* 1460 */         this.publishfrom_xml = param1String11.trim();
+/*      */       }
+/*      */       
+/* 1463 */       if (param1String12 != null) {
+/* 1464 */         this.publishto_xml = param1String12.trim();
+/*      */       }
+/*      */       
+/* 1467 */       if (param1String13 != null) {
+/* 1468 */         this.brandcd_fc_xml = param1String13.trim();
+/*      */       }
+/*      */       
+/* 1471 */       if (param1String14 != null) {
+/* 1472 */         this.systemmachtype_xml = param1String14.trim();
+/*      */       }
+/*      */       
+/* 1475 */       if (param1String15 != null) {
+/* 1476 */         this.systemmodel_xml = param1String15.trim();
+/*      */       }
+/*      */       
+/* 1479 */       if (param1String16 != null) {
+/* 1480 */         this.systemseoid_xml = param1String16.trim();
+/*      */       }
+/*      */       
+/* 1483 */       if (param1String17 != null) {
+/* 1484 */         this.optionseoid_xml = param1String17.trim();
+/*      */       }
+/*      */     }
+/*      */ 
+/*      */     
+/*      */     void dereference() {
+/* 1490 */       this.activity_xml = null;
+/* 1491 */       this.systementitytype_xml = null;
+/* 1492 */       this.systementityid_xml = null;
+/* 1493 */       this.systemos_xml = null;
+/* 1494 */       this.groupentitytype_xml = null;
+/* 1495 */       this.groupentityid_xml = null;
+/* 1496 */       this.oktopub_xml = null;
+/* 1497 */       this.osentitytype_xml = null;
+/* 1498 */       this.osentityid_xml = null;
+/* 1499 */       this.os_xml = null;
+/* 1500 */       this.optionentitytype_xml = null;
+/* 1501 */       this.optionentityid_xml = null;
+/* 1502 */       this.compatibilitypublishingflag_xml = null;
+/* 1503 */       this.relationshiptype_xml = null;
+/* 1504 */       this.publishfrom_xml = null;
+/* 1505 */       this.publishto_xml = null;
+/* 1506 */       this.brandcd_fc_xml = null;
+/* 1507 */       this.systemmachtype_xml = null;
+/* 1508 */       this.systemmodel_xml = null;
+/* 1509 */       this.systemseoid_xml = null;
+/* 1510 */       this.optionseoid_xml = null;
+/*      */     }
+/*      */   }
+/*      */ }
+
+
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\ln\adsxmlbh1\ADSWWCOMPATXMLABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

@@ -1,115 +1,120 @@
-package COM.ibm.eannounce.abr.util;
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import com.ibm.transform.oim.eacm.diff.DiffEntity;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Hashtable;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ 
+/*     */ public class XMLFCTRANSMODElem
+/*     */   extends XMLElem
+/*     */ {
+/*     */   private String defvalue;
+/*     */   private String attrcode;
+/*     */   
+/*     */   public XMLFCTRANSMODElem(String paramString1, String paramString2, String paramString3) {
+/*  27 */     super(paramString1);
+/*  28 */     this.attrcode = paramString2;
+/*  29 */     this.defvalue = paramString3;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addElements(Database paramDatabase, EntityList paramEntityList, Document paramDocument, Element paramElement, EntityItem paramEntityItem, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  54 */     Element element = paramDocument.createElement(this.nodeName);
+/*  55 */     String str1 = "@@";
+/*  56 */     String str2 = PokUtils.getAttributeValue(paramEntityItem, this.attrcode, ", ", "@@", false);
+/*  57 */     if ("@@".equals(str2)) {
+/*  58 */       str1 = this.defvalue;
+/*     */     } else {
+/*  60 */       str1 = str2;
+/*     */     } 
+/*     */     
+/*  63 */     element.appendChild(paramDocument.createTextNode(str1));
+/*  64 */     paramElement.appendChild(element);
+/*     */     
+/*  66 */     for (byte b = 0; b < this.childVct.size(); b++) {
+/*  67 */       XMLElem xMLElem = this.childVct.elementAt(b);
+/*  68 */       xMLElem.addElements(paramDatabase, paramEntityList, paramDocument, element, paramEntityItem, paramStringBuffer);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addElements(Database paramDatabase, Hashtable paramHashtable, Document paramDocument, Element paramElement, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  93 */     EntityItem entityItem = paramDiffEntity.getCurrentEntityItem();
+/*  94 */     if (paramDiffEntity.isDeleted()) {
+/*  95 */       entityItem = paramDiffEntity.getPriorEntityItem();
+/*     */     }
+/*  97 */     Element element = paramDocument.createElement(this.nodeName);
+/*  98 */     String str1 = "@@";
+/*  99 */     String str2 = PokUtils.getAttributeValue(entityItem, this.attrcode, ", ", "@@", false);
+/* 100 */     if ("@@".equals(str2)) {
+/* 101 */       str1 = this.defvalue;
+/*     */     } else {
+/* 103 */       str1 = str2;
+/*     */     } 
+/*     */     
+/* 106 */     element.appendChild(paramDocument.createTextNode(str1));
+/* 107 */     paramElement.appendChild(element);
+/*     */     
+/* 109 */     for (byte b = 0; b < this.childVct.size(); b++) {
+/* 110 */       XMLElem xMLElem = this.childVct.elementAt(b);
+/* 111 */       xMLElem.addElements(paramDatabase, paramHashtable, paramDocument, element, paramDiffEntity, paramStringBuffer);
+/*     */     } 
+/*     */   }
+/*     */ }
 
-import java.util.Hashtable;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.eannounce.objects.EntityList;
-import COM.ibm.opicmpdh.middleware.Database;
-
-import com.ibm.transform.oim.eacm.diff.DiffEntity;
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-public class XMLFCTRANSMODElem extends XMLElem{
-
-	 private String defvalue;
-	 private String attrcode;
-	    /**********************************************************************************
-	    * Constructor for Fixed value elements
-	    *
-	    *@param nname String with name of node to be created
-	    *@param val String with value
-	    */
-	    public XMLFCTRANSMODElem(String nname, String attcode, String val)
-	    {
-	        super(nname);
-	        attrcode = attcode;
-	        defvalue = val;
-	        
-	    }
-
-	    /**********************************************************************************
-	    * Create a node for this element and add to the parent and any children this node has
-	    *
-	    *@param dbCurrent Database
-	    *@param list EntityList
-	    *@param document Document needed to create nodes
-	    *@param parent Element node to add this node too
-	    *@param debugSb StringBuffer for debug output
-	    */
-	    public void addElements(Database dbCurrent,EntityList list, Document document, Element parent,
-	        EntityItem parentItem,StringBuffer debugSb)
-	    throws
-	        COM.ibm.eannounce.objects.EANBusinessRuleException,
-	        java.sql.SQLException,
-	        COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-	        COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-	        java.rmi.RemoteException,
-	        java.io.IOException,
-	        COM.ibm.opicmpdh.middleware.MiddlewareException,
-	        COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-	    {
-	        Element elem = (Element) document.createElement(nodeName);
-	        String value = CHEAT;
-	        String model = PokUtils.getAttributeValue(parentItem,attrcode, ", ", CHEAT, false);   			
-			if (CHEAT.equals(model)){
-				value = defvalue; 
-			} else{
-				value = model;				
-			}
-	        // use value from constructor
-	        elem.appendChild(document.createTextNode(value));
-	        parent.appendChild(elem);
-	        // add any children
-	        for (int c=0; c<childVct.size(); c++){
-	            XMLElem childElem = (XMLElem)childVct.elementAt(c);
-	            childElem.addElements(dbCurrent,list, document,elem,parentItem,debugSb);
-	        }
-	    }
-	    /**********************************************************************************
-	    * Create a node for this element and add to the parent and any children this node has
-	    *
-	    *@param dbCurrent Database
-	    *@param table Hashtable of Vectors of DiffEntity
-	    *@param document Document needed to create nodes
-	    *@param parent Element node to add this node too
-		*@param parentItem DiffEntity - parent to use if path is specified in XMLGroupElem, item to use otherwise
-	    *@param debugSb StringBuffer for debug output
-	    */
-		public void addElements(Database dbCurrent,Hashtable table, Document document, Element parent,
-			DiffEntity parentItem, StringBuffer debugSb)
-	    throws
-	        COM.ibm.eannounce.objects.EANBusinessRuleException,
-	        java.sql.SQLException,
-	        COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-	        COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-	        java.rmi.RemoteException,
-	        java.io.IOException,
-	        COM.ibm.opicmpdh.middleware.MiddlewareException,
-	        COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-	    {
-	        EntityItem item = parentItem.getCurrentEntityItem();
-	        if (parentItem.isDeleted()){
-	            item = parentItem.getPriorEntityItem();
-	        }
-	        Element elem = (Element) document.createElement(nodeName);
-	        String value = CHEAT;
-	        String model = PokUtils.getAttributeValue(item,attrcode, ", ", CHEAT, false);   			
-			if (CHEAT.equals(model)){
-				value = defvalue; 
-			} else{
-				value = model;				
-			}
-	        // use value from constructor
-	        elem.appendChild(document.createTextNode(value));
-	        parent.appendChild(elem);
-	        // add any children
-	        for (int c=0; c<childVct.size(); c++){
-	            XMLElem childElem = (XMLElem)childVct.elementAt(c);
-	            childElem.addElements(dbCurrent,table, document,elem,parentItem,debugSb);
-	        }
-		}
-	}
-
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\XMLFCTRANSMODElem.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

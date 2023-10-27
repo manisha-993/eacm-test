@@ -1,93 +1,98 @@
-/* Copyright IBM Corp. 2016 */
-package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ 
+/*    */ import com.google.gson.annotations.SerializedName;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class RdhClas_clclasses
+/*    */ {
+/*    */   @SerializedName("CLASS")
+/*    */   private String cLASS;
+/*    */   @SerializedName("CLASS_TYPE")
+/*    */   private String class_type;
+/*    */   @SerializedName("STATUS")
+/*    */   private String status;
+/*    */   @SerializedName("VAL_FROM")
+/*    */   private String val_from;
+/*    */   @SerializedName("VAL_TO")
+/*    */   private String val_to;
+/*    */   @SerializedName("CHECK_NO")
+/*    */   private String check_no;
+/*    */   @SerializedName("ORG_AREA")
+/*    */   private String org_area;
+/*    */   
+/*    */   public String get_class() {
+/* 25 */     return this.cLASS;
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public void set_class(String paramString) {
+/* 30 */     this.cLASS = paramString;
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public String getClass_type() {
+/* 35 */     return this.class_type;
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public void setClass_type(String paramString) {
+/* 40 */     this.class_type = paramString;
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public String getStatus() {
+/* 45 */     return this.status;
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public void setStatus(String paramString) {
+/* 50 */     this.status = paramString;
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public String getVal_from() {
+/* 55 */     return this.val_from;
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public void setVal_from(String paramString) {
+/* 60 */     this.val_from = paramString;
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public String getVal_to() {
+/* 65 */     return this.val_to;
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public void setVal_to(String paramString) {
+/* 70 */     this.val_to = paramString;
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public String getCheck_no() {
+/* 75 */     return this.check_no;
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public void setCheck_no(String paramString) {
+/* 80 */     this.check_no = paramString;
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public String getOrg_area() {
+/* 85 */     return this.org_area;
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public void setOrg_area(String paramString) {
+/* 90 */     this.org_area = paramString;
+/*    */   }
+/*    */ }
 
-import com.google.gson.annotations.SerializedName;
 
-public class RdhClas_clclasses
-{
-    @SerializedName("CLASS")
-    private String cLASS;
-    @SerializedName("CLASS_TYPE")
-    private String class_type;
-    @SerializedName("STATUS")
-    private String status;
-    @SerializedName("VAL_FROM")
-    private String val_from;
-    @SerializedName("VAL_TO")
-    private String val_to;
-    @SerializedName("CHECK_NO")
-    private String check_no;
-    @SerializedName("ORG_AREA")
-    private String org_area;
-
-    public String get_class()
-    {
-        return cLASS;
-    }
-
-    public void set_class(String _class)
-    {
-        this.cLASS = _class;
-    }
-
-    public String getClass_type()
-    {
-        return class_type;
-    }
-
-    public void setClass_type(String class_type)
-    {
-        this.class_type = class_type;
-    }
-
-    public String getStatus()
-    {
-        return status;
-    }
-
-    public void setStatus(String status)
-    {
-        this.status = status;
-    }
-
-    public String getVal_from()
-    {
-        return val_from;
-    }
-
-    public void setVal_from(String val_from)
-    {
-        this.val_from = val_from;
-    }
-
-    public String getVal_to()
-    {
-        return val_to;
-    }
-
-    public void setVal_to(String val_to)
-    {
-        this.val_to = val_to;
-    }
-
-    public String getCheck_no()
-    {
-        return check_no;
-    }
-
-    public void setCheck_no(String check_no)
-    {
-        this.check_no = check_no;
-    }
-
-    public String getOrg_area()
-    {
-        return org_area;
-    }
-
-    public void setOrg_area(String org_area)
-    {
-        this.org_area = org_area;
-    }
-
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\entity\RdhClas_clclasses.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

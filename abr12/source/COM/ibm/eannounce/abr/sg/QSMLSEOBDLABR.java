@@ -1,562 +1,567 @@
-//Licensed Materials -- Property of IBM
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.XLColumn;
+/*     */ import COM.ibm.eannounce.abr.util.XLFixedColumn;
+/*     */ import COM.ibm.eannounce.abr.util.XLIdColumn;
+/*     */ import COM.ibm.eannounce.abr.util.XLRow;
+/*     */ import COM.ibm.eannounce.abr.util.XLSysOrOptColumn;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.eannounce.objects.PDGUtility;
+/*     */ import com.ibm.transform.oim.eacm.diff.DiffEntity;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.util.HashSet;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.Vector;
+/*     */ import org.apache.poi.hssf.usermodel.HSSFCell;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class QSMLSEOBDLABR
+/*     */   implements QSMABRInterface
+/*     */ {
+/* 182 */   private static final Vector COLUMN_VCT = new Vector();
+/*     */   
+/*     */   static {
+/* 185 */     XLColumn xLColumn3 = new XLColumn("RFAnumber", "LSEOBUNDLE", "QSMRFANUMBER");
+/* 186 */     xLColumn3.setAlwaysShow();
+/* 187 */     xLColumn3.setFFColumnLabel("RFANUM");
+/* 188 */     xLColumn3.setColumnWidth(6);
+/* 189 */     xLColumn3.setJustified(false);
+/* 190 */     COLUMN_VCT.addElement(xLColumn3);
+/*     */     
+/* 192 */     xLColumn3 = new XLColumn("AnnDate", "LSEOBUNDLE", "BUNDLPUBDATEMTRGT");
+/* 193 */     xLColumn3.setFFColumnLabel("ANNDATE___");
+/* 194 */     xLColumn3.setColumnWidth(10);
+/* 195 */     COLUMN_VCT.addElement(xLColumn3);
+/*     */     
+/* 197 */     xLColumn3 = new XLColumn("GADate", "LSEOBUNDLE", "BUNDLPUBDATEMTRGT");
+/* 198 */     xLColumn3.setFFColumnLabel("GADATE____");
+/* 199 */     xLColumn3.setColumnWidth(10);
+/* 200 */     COLUMN_VCT.addElement(xLColumn3);
+/*     */     
+/* 202 */     xLColumn3 = new XLColumn("WDDate", "LSEOBUNDLE", "BUNDLUNPUBDATEMTRGT");
+/* 203 */     xLColumn3.setFFColumnLabel("WDDATE____");
+/* 204 */     xLColumn3.setColumnWidth(10);
+/* 205 */     COLUMN_VCT.addElement(xLColumn3);
+/*     */     
+/* 207 */     xLColumn3 = new XLColumn("IBMPartno", "LSEOBUNDLE", "SEOID");
+/* 208 */     xLColumn3.setFFColumnLabel("IBMPART_____");
+/* 209 */     xLColumn3.setColumnWidth(12);
+/* 210 */     xLColumn3.setAlwaysShow();
+/* 211 */     xLColumn3.setJustified(true);
+/* 212 */     COLUMN_VCT.addElement(xLColumn3);
+/*     */     
+/* 214 */     xLColumn3 = new XLColumn("Description", "LSEOBUNDLE", "PRCFILENAM");
+/* 215 */     xLColumn3.setFFColumnLabel("DESCRIPTION___________________");
+/* 216 */     xLColumn3.setColumnWidth(30);
+/* 217 */     COLUMN_VCT.addElement(xLColumn3);
+/*     */     
+/* 219 */     xLColumn3 = new XLColumn("Div", "PROJ", "DIV");
+/* 220 */     xLColumn3.setFFColumnLabel("DV");
+/* 221 */     xLColumn3.setColumnWidth(2);
+/* 222 */     COLUMN_VCT.addElement(xLColumn3);
+/*     */     
+/* 224 */     xLColumn3 = new XLColumn("SegA", "SGMNTACRNYM", "ACRNYM");
+/* 225 */     xLColumn3.setFFColumnLabel("SGA");
+/* 226 */     xLColumn3.setColumnWidth(3);
+/* 227 */     COLUMN_VCT.addElement(xLColumn3);
+/*     */     
+/* 229 */     xLColumn3 = new XLColumn("ProdID", "LSEOBUNDLE", "PRODID");
+/* 230 */     xLColumn3.setFFColumnLabel("P");
+/* 231 */     xLColumn3.setColumnWidth(1);
+/* 232 */     COLUMN_VCT.addElement(xLColumn3);
+/*     */     
+/* 234 */     XLSysOrOptColumn xLSysOrOptColumn = new XLSysOrOptColumn();
+/* 235 */     xLSysOrOptColumn.setFFColumnLabel("I");
+/* 236 */     xLSysOrOptColumn.setColumnWidth(1);
+/* 237 */     COLUMN_VCT.addElement(xLSysOrOptColumn);
+/*     */     
+/* 239 */     XLColumn xLColumn2 = new XLColumn("PlntOfMfg", "GEOMOD", "PLNTOFMFR");
+/* 240 */     xLColumn2.setFFColumnLabel("PLT");
+/* 241 */     xLColumn2.setColumnWidth(3);
+/* 242 */     COLUMN_VCT.addElement(xLColumn2);
+/*     */     
+/* 244 */     xLColumn2 = new XLColumn("IndDefCat", "LSEOBUNDLE", "INDDEFNCATG");
+/* 245 */     xLColumn2.setFFColumnLabel("IDC");
+/* 246 */     xLColumn2.setColumnWidth(3);
+/* 247 */     COLUMN_VCT.addElement(xLColumn2);
+/*     */     
+/* 249 */     xLColumn2 = new XLColumn("FtnClass", "LSEOBUNDLE", "FUNCCLS");
+/* 250 */     xLColumn2.setFFColumnLabel("CLAS");
+/* 251 */     xLColumn2.setColumnWidth(4);
+/* 252 */     COLUMN_VCT.addElement(xLColumn2);
+/*     */     
+/* 254 */     xLColumn2 = new XLColumn("Brand", "GEOMOD", "EMEABRANDCD");
+/* 255 */     xLColumn2.setFFColumnLabel("B");
+/* 256 */     xLColumn2.setColumnWidth(1);
+/* 257 */     COLUMN_VCT.addElement(xLColumn2);
+/*     */     
+/* 259 */     XLFixedColumn xLFixedColumn2 = new XLFixedColumn("USPartNo", "");
+/* 260 */     xLFixedColumn2.setFFColumnLabel("USPN___");
+/* 261 */     xLFixedColumn2.setColumnWidth(7);
+/* 262 */     COLUMN_VCT.addElement(xLFixedColumn2);
+/*     */     
+/* 264 */     XLColumn xLColumn1 = new XLColumn("SPECBID", "LSEOBUNDLE", "SPECBID");
+/* 265 */     xLColumn1.setFFColumnLabel("S");
+/* 266 */     xLColumn1.setColumnWidth(1);
+/* 267 */     COLUMN_VCT.addElement(xLColumn1);
+/*     */     
+/* 269 */     XLFixedColumn xLFixedColumn1 = new XLFixedColumn("SEOType", "LSEOBUNDLE");
+/* 270 */     xLFixedColumn1.setFFColumnLabel("SEOTYPE___");
+/* 271 */     xLFixedColumn1.setColumnWidth(10);
+/* 272 */     xLFixedColumn1.setAlwaysShow();
+/* 273 */     COLUMN_VCT.addElement(xLFixedColumn1);
+/*     */     
+/* 275 */     XLIdColumn xLIdColumn = new XLIdColumn("EntityId", "LSEOBUNDLE");
+/* 276 */     xLIdColumn.setFFColumnLabel("ENTITYID__");
+/* 277 */     xLIdColumn.setAlwaysShow();
+/* 278 */     xLIdColumn.setJustified(false);
+/* 279 */     xLIdColumn.setColumnWidth(10);
+/* 280 */     COLUMN_VCT.addElement(xLIdColumn);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public boolean canGenerateReport(EntityItem paramEntityItem, QSMRPTABRSTATUS paramQSMRPTABRSTATUS) {
+/* 312 */     boolean bool = true;
+/* 313 */     String str1 = PokUtils.getAttributeFlagValue(paramEntityItem, "STATUS");
+/* 314 */     paramQSMRPTABRSTATUS.addDebug("QSMLSEOBDLABR.generateReport: " + paramEntityItem.getKey() + " STATUS: " + 
+/* 315 */         PokUtils.getAttributeValue(paramEntityItem, "STATUS", ", ", "", false) + " [" + str1 + "]");
+/* 316 */     if (!"0020".equals(str1)) {
+/*     */       
+/* 318 */       paramQSMRPTABRSTATUS.addError("NOT_FINAL_ERR", null);
+/* 319 */       bool = false;
+/*     */     } 
+/*     */     
+/* 322 */     HashSet<String> hashSet = new HashSet();
+/* 323 */     for (byte b = 0; b < QSMRPTABRSTATUS.GEOS.length; b++) {
+/* 324 */       hashSet.add(QSMRPTABRSTATUS.GEOS[b]);
+/*     */     }
+/* 326 */     hashSet.add("1999");
+/* 327 */     if (!PokUtils.contains(paramEntityItem, "GENAREASELECTION", hashSet)) {
+/* 328 */       bool = false;
+/* 329 */       paramQSMRPTABRSTATUS.addOutput("LSEOBUNDLE does not have required 'General Area Selection' value.");
+/* 330 */       paramQSMRPTABRSTATUS.addDebug("GENAREASELECTION did not include " + hashSet + ", [" + 
+/* 331 */           PokUtils.getAttributeValue(paramEntityItem, "GENAREASELECTION", ", ", "", false) + "]");
+/* 332 */       paramQSMRPTABRSTATUS.setNoReport();
+/*     */     } 
+/* 334 */     hashSet.clear();
+/*     */     
+/* 336 */     String str2 = PokUtils.getAttributeFlagValue(paramEntityItem, "SPECBID");
+/* 337 */     paramQSMRPTABRSTATUS.addDebug(paramEntityItem.getKey() + " SPECBID: " + str2);
+/* 338 */     if ("11457".equals(str2) || str2 == null) {
+/* 339 */       paramQSMRPTABRSTATUS.addOutput("LSEOBUNDLE is not a special bid.");
+/* 340 */       bool = false;
+/*     */     } 
+/*     */     
+/* 343 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public boolean canGenerateReport(EntityList paramEntityList, QSMRPTABRSTATUS paramQSMRPTABRSTATUS) {
+/* 355 */     return true;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVeName() {
+/* 363 */     return "QSMLSEOBDL";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVersion() {
+/* 372 */     return "1.8";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public int getColumnCount() {
+/* 379 */     return COLUMN_VCT.size();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getColumnLabel(int paramInt) {
+/* 386 */     return ((XLColumn)COLUMN_VCT.elementAt(paramInt)).getColumnLabel();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getFFColumnLabel(int paramInt) {
+/* 394 */     return ((XLColumn)COLUMN_VCT.elementAt(paramInt)).getFFColumnLabel();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public int getColumnWidth(int paramInt) {
+/* 402 */     return ((XLColumn)COLUMN_VCT.elementAt(paramInt)).getColumnWidth();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setColumnValue(HSSFCell paramHSSFCell, String paramString, Hashtable paramHashtable, int paramInt) {
+/* 408 */     ((XLColumn)COLUMN_VCT.elementAt(paramInt)).setColumnValue(paramHSSFCell, paramHashtable);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getColumnValue(String paramString, Hashtable paramHashtable, int paramInt) {
+/* 415 */     return ((XLColumn)COLUMN_VCT.elementAt(paramInt)).getColumnValue(paramHashtable);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public boolean isChanged(String paramString, Hashtable paramHashtable, int paramInt) {
+/* 423 */     return ((XLColumn)COLUMN_VCT.elementAt(paramInt)).isChanged(paramHashtable);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public Vector getRowItems(EntityList paramEntityList, Hashtable paramHashtable, String paramString, QSMRPTABRSTATUS paramQSMRPTABRSTATUS) {
+/* 436 */     Vector<XLRow> vector = new Vector();
+/*     */     
+/* 438 */     EntityItem entityItem = null;
+/* 439 */     if (paramHashtable != null) {
+/* 440 */       Vector<DiffEntity> vector4 = (Vector)paramHashtable.get("ROOT");
+/* 441 */       entityItem = ((DiffEntity)vector4.firstElement()).getCurrentEntityItem();
+/*     */     } else {
+/* 443 */       entityItem = paramEntityList.getParentEntityGroup().getEntityItem(0);
+/*     */     } 
+/*     */     
+/* 446 */     paramQSMRPTABRSTATUS.addDebug("QSMLSEOBDLABR.getRowItems " + entityItem.getKey());
+/*     */     
+/* 448 */     Vector<EntityItem> vector1 = PokUtils.getAllLinkedEntities(entityItem, "LSEOBUNDLEPROJA", "PROJ");
+/*     */     
+/* 450 */     XLRow xLRow = new XLRow((paramHashtable == null) ? entityItem : paramHashtable.get(entityItem.getKey()));
+/* 451 */     vector.addElement(xLRow);
+/*     */     
+/* 453 */     Vector<EntityItem> vector2 = PokUtils.getAllLinkedEntities(entityItem, "LSEOBUNDLEGEOMOD", "GEOMOD");
+/*     */     
+/* 455 */     Vector<EntityItem> vector3 = PokUtils.getEntitiesWithMatchedAttr(vector2, "GENAREASELECTION", "1999");
+/* 456 */     paramQSMRPTABRSTATUS.addDebug("QSMLSEOBDLABR.getRowItems GENAREASELECTION:1999 has wwgeomodVct.size: " + vector3
+/* 457 */         .size());
+/* 458 */     if (vector3.size() == 0) {
+/*     */       
+/* 460 */       vector2 = PokUtils.getEntitiesWithMatchedAttr(vector2, "GENAREASELECTION", paramString);
+/* 461 */       paramQSMRPTABRSTATUS.addDebug("QSMLSEOBDLABR.getRowItems GEOMOD GENAREASELECTION:" + paramString + " has geomodVct.size: " + vector2
+/* 462 */           .size());
+/*     */     } else {
+/* 464 */       vector2 = vector3;
+/*     */     } 
+/* 466 */     if (vector2.size() > 0) {
+/* 467 */       if (vector2.size() > 1) {
+/* 468 */         for (byte b = 0; b < vector2.size(); b++) {
+/* 469 */           paramQSMRPTABRSTATUS.addDebug("QSMLSEOBDLABR.getRowItems WARNING: Found more than one GEOMOD " + ((EntityItem)vector2
+/* 470 */               .elementAt(b)).getKey());
+/*     */         }
+/*     */       }
+/* 473 */       EntityItem entityItem1 = vector2.firstElement();
+/* 474 */       xLRow.addRowItem((paramHashtable == null) ? entityItem1 : paramHashtable
+/* 475 */           .get(entityItem1.getKey()));
+/* 476 */       vector2.clear();
+/*     */     } 
+/*     */     
+/* 479 */     if (vector1.size() > 0) {
+/* 480 */       EntityItem entityItem1 = vector1.firstElement();
+/* 481 */       xLRow.addRowItem((paramHashtable == null) ? entityItem1 : paramHashtable
+/* 482 */           .get(entityItem1.getKey()));
+/*     */       
+/* 484 */       Vector<EntityItem> vector4 = PokUtils.getAllLinkedEntities(entityItem1, "PROJSGMNTACRNYMA", "SGMNTACRNYM");
+/* 485 */       if (vector4.size() > 0) {
+/* 486 */         EntityItem entityItem2 = vector4.firstElement();
+/* 487 */         xLRow.addRowItem((paramHashtable == null) ? entityItem2 : paramHashtable
+/* 488 */             .get(entityItem2.getKey()));
+/* 489 */         vector4.clear();
+/*     */       } 
+/*     */     } 
+/* 492 */     paramQSMRPTABRSTATUS.addDebug("QSMLSEOBDLABR.getRowItems Adding " + xLRow);
+/*     */     
+/* 494 */     return vector;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public boolean withinDateRange(EntityItem paramEntityItem, String paramString, QSMRPTABRSTATUS paramQSMRPTABRSTATUS) {
+/* 503 */     boolean bool = false;
+/* 504 */     Object[] arrayOfObject = new Object[5];
+/* 505 */     String str1 = PokUtils.getAttributeValue(paramEntityItem, "BUNDLPUBDATEMTRGT", "", "1980-01-01", false);
+/* 506 */     String str2 = PokUtils.getAttributeValue(paramEntityItem, "BUNDLUNPUBDATEMTRGT", "", "9999-12-31", false);
+/* 507 */     PDGUtility pDGUtility = new PDGUtility();
+/* 508 */     String str3 = pDGUtility.getDate(paramString, 30);
+/* 509 */     arrayOfObject[0] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "BUNDLPUBDATEMTRGT", "BUNDLPUBDATEMTRGT");
+/* 510 */     arrayOfObject[1] = str1;
+/* 511 */     arrayOfObject[2] = "";
+/* 512 */     arrayOfObject[3] = paramString;
+/* 513 */     arrayOfObject[4] = str3;
+/*     */     
+/* 515 */     paramQSMRPTABRSTATUS.addDebug("QSMLSEOBDLABR.withinDateRange now " + paramString + " pubdate " + str1 + " unpubdate " + str2 + " nowPlus30 " + str3);
+/* 516 */     if (str3.compareTo(str1) >= 0 && str1.compareTo(paramString) >= 0) {
+/* 517 */       bool = true;
+/*     */     } else {
+/* 519 */       arrayOfObject[2] = "not";
+/*     */     } 
+/*     */     
+/* 522 */     paramQSMRPTABRSTATUS.addOutput("DATE_RANGE_MSG", arrayOfObject);
+/* 523 */     arrayOfObject[0] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "BUNDLUNPUBDATEMTRGT", "BUNDLUNPUBDATEMTRGT");
+/* 524 */     arrayOfObject[1] = str2;
+/* 525 */     arrayOfObject[2] = "";
+/* 526 */     if (str3.compareTo(str2) >= 0 && str2.compareTo(paramString) >= 0) {
+/* 527 */       bool = true;
+/*     */     } else {
+/* 529 */       arrayOfObject[2] = "not";
+/*     */     } 
+/*     */     
+/* 532 */     paramQSMRPTABRSTATUS.addOutput("DATE_RANGE_MSG", arrayOfObject);
+/* 533 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getRowOne(EntityItem paramEntityItem) {
+/* 542 */     String str = PokUtils.getAttributeValue(paramEntityItem, "QSMRFANUMBER", "", "", false);
+/* 543 */     return XLColumn.formatToWidth(str, 6, false) + " SBD";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getRowTwoPrefix() {
+/* 558 */     return XLColumn.formatToWidth("Date______", 10) + " " + 
+/* 559 */       XLColumn.formatToWidth("Time___________", 15);
+/*     */   }
+/*     */ }
 
-//(C) Copyright IBM Corp. 2008  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
 
-package COM.ibm.eannounce.abr.sg;
-
-import java.sql.SQLException;
-import java.util.*;
-
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import com.ibm.transform.oim.eacm.diff.DiffEntity;
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-
-import com.ibm.transform.oim.eacm.util.*;
-/**********************************************************************************
-* QSM LSEOBUNDLE ABR
-*
-* QSMRPTABRSTATUS will launch the correct class
-* From "SG FS SysFeed QSM Load  20090220.doc" 
-*
-*D.	Change Report: LSEOBUNDLE
-*
-*If GENAREASELECTION  Not In ('6204'| '1999' | '6197') then (no report now)
-*	Set QSMFEEDRESEND = "No" (No)
-*	Set Return Code = "0030" (Passed)
-*	Exit
-*End if
-*
-*If LSEOBUNDLE.SPECBID = 11457 (N) then
-*	Do not send Spreadsheet; instead send HTML Report
-*	Set QSMFEEDRESEND = "No" (No)
-*	Set Return Code = "0030" (Passed)
-*	Exit
-*End if
-*
-*If RootEntity.STATUS <> "Final" (0020) then
-*	ErrorMessage LD(LSEO) NDN(LSEO) "was queued to send data; however, it is not Final"
-*	Set QSMFEEDRESEND = "No" (No)
-*	Set Return Code = "0040" (Failed)
-*	Exit
-*End if
-*
-*Select Case QSMFEEDRESEND
-*Case "New" (New)
-*	GenerateRFAnumber
-*	GenerateOutputAll
-*Case "Yes" (Yes)
-*	GenerateOutputAll
-*Case "No" (No)
-*	If (Now() + 30 days >= LSEOPUBDATEMTRGT => Now()) OR (Now() + 30 days >= LSEOUNPUBDATEMTRGT => Now()) then
-*		GenerateOutputDelta
-*	Else
-*		Do not send Spreadsheet; instead send HTML Report
-*		Set QSMFEEDRESEND = "No" (No)
-*		Set Return Code = "0030" (Passed)
-*		Exit
-*	End if
-*Case Else
-*	ErrorMessage LD(LSEOBUNDLE) NDN(LSEOBUNDLE) "Invalid data condition; the report was not generated."
-*	Set QSMFEEDRESEND = "No" (No)
-*	Set Return Code = "0040" (Failed)
-*	Exit
-*	End Select Case
-*
-*Set QSMFEEDRESEND = "No" (No)
-*Exit
-*
-*/
-//QSMLSEOBDLABR.java,v
-//Revision 1.8  2013/05/22 14:35:29  wendy
-//Updates for RCQ00132040-WI
-//
-//Revision 1.7  2009/06/24 13:00:47  wendy
-//Make 'IBMPartno' Left justified instead of Right CQ00016165
-//
-//Revision 1.6  2009/03/13 14:32:45  wendy
-//CQ22294-LA CTO (XCC) - Update QSM Reports to Accept WW GenArea (WI CQ22265)
-//
-//Revision 1.5  2009/02/04 21:26:43  wendy
-//CQ00016165 - Automated QSM feed from ePIMS HW to support the late change request from BIDS
-//
-//Revision 1.4  2008/12/10 16:39:39  wendy
-//Spec change to reduce number of error rpts
-//
-//Revision 1.3  2008/11/19 21:18:21  wendy
-//Add check for null specbid
-//
-//Revision 1.2  2008/10/08 12:59:23  wendy
-//Added more debug
-//
-//Revision 1.1  2008/09/30 12:50:12  wendy
-//CQ00006066-WI LA CTO - EACM - Support GFS data Load of QSM (report)
-//
-
-public class QSMLSEOBDLABR implements QSMABRInterface
-{
-	private static final Vector COLUMN_VCT;
-
-	static {
-/*
-5.	LSEOBUNDLEGEOMOD-d
-6.	Include data GEOMOD where GENAREASELECTION  In ('6204'| '1999' | '6197') since GEOMOD may not exist
-7.	Association LSEOBUNDLEPROJA -d
-*/
-/*
-Column Names		Passed	EACM Entity	EACM Attribute
------------------	-------	-----------	--------------
-EntityId			Always	LSEOBUNDLE	Entityid
-RFAnumber			Always	LSEOBUNDLE	QSMRFANUMBER
-GADate						LSEOBUNDLE	BUNDLPUBDATEMTRGT
-Withdrawal					LSEOBUNDLE	BUNDLUNPUBDATEMTRGT
-IBMPartno			Always	LSEOBUNDLE	SEOID
-Description					LSEOBUNDLE	PRCFILENAM
-SEOType				Always				LSEOBUNDLE
-Div							PROJ		DIV
-ProdID						LSEOBUNDLE	PRODID
-SysOrOpt					LSEOBUNDLE	BUNDLETYPE If LSEOBUNDLE.BUNDLETYPE = Hardware then "Initial" else "Both"
-PlntOfMfg					GEOMOD		PLNTOFMFR
-IndDefCat					LSEOBUNDLE	INDDEFNCATG
-FtnClass					LSEOBUNDLE	FUNCCLS
-Brand						GEOMOD		EMEABRANDCD
-USPartNo								""
-
-		COLUMN_VCT = new Vector();
-		XLColumn xlcId = new XLIdColumn("EntityId","LSEOBUNDLE");
-		xlcId.setAlwaysShow();
-		XLColumn xlcAnnNum = new XLColumn("RFAnumber","LSEOBUNDLE","QSMRFANUMBER");
-		xlcAnnNum.setAlwaysShow();
-		XLColumn xlcLseoSeoid = new XLColumn("IBMPartno","LSEOBUNDLE","SEOID");
-		xlcLseoSeoid.setAlwaysShow();
-		XLColumn xlcLseoSeotype = new XLFixedColumn("SEOType","LSEOBUNDLE");
-		xlcLseoSeotype.setAlwaysShow();
-		COLUMN_VCT.addElement(xlcId);
-		COLUMN_VCT.addElement(xlcAnnNum);
-		COLUMN_VCT.addElement(new XLColumn("GADate","LSEOBUNDLE","BUNDLPUBDATEMTRGT"));
-		COLUMN_VCT.addElement(new XLColumn("Withdrawal","LSEOBUNDLE","BUNDLUNPUBDATEMTRGT"));
-		COLUMN_VCT.addElement(xlcLseoSeoid);
-		COLUMN_VCT.addElement(new XLColumn("Description","LSEOBUNDLE","PRCFILENAM"));
-		COLUMN_VCT.addElement(xlcLseoSeotype);
-		COLUMN_VCT.addElement(new XLColumn("Div","PROJ","DIV"));
-		COLUMN_VCT.addElement(new XLColumn("ProdID","LSEOBUNDLE","PRODID"));
-		COLUMN_VCT.addElement(new XLSysOrOptColumn());
-		COLUMN_VCT.addElement(new XLColumn("PlntOfMfg","GEOMOD","PLNTOFMFR"));
-		COLUMN_VCT.addElement(new XLColumn("IndDefCat","LSEOBUNDLE","INDDEFNCATG"));
-		COLUMN_VCT.addElement(new XLColumn("FtnClass","LSEOBUNDLE","FUNCCLS"));
-		COLUMN_VCT.addElement(new XLColumn("Brand","GEOMOD","EMEABRANDCD"));
-		COLUMN_VCT.addElement(new XLFixedColumn("USPartNo",""));
-*/
-
-/*
-	 SS 		SS		Flat File									Special Bids	
-	 Column		Report	Column						Col		Col		LSEOBUNDLE	LSEOBUNDLE
-Col# Heading	Passed	Heading						Width	Justify	EACM Entity	EACM Attribute
-1						"2"							1		Left		"5"
-2						Date______					10		Left		
-3						Time___________				15		Left		
-4	RFAnumber	Always	RFANUM						6		Right	LSEOBUNDLE	QSMRFANUMBER
-5	AnnDate				ANNDATE___					10		Left	LSEOBUNDLE	BUNDLPUBDATEMTRGT
-6	GADate				GADATE____					10		Left	LSEOBUNDLE	BUNDLPUBDATEMTRGT
-7	WDDate				WDDATE____					10				LSEOBUNDLE	BUNDLUNPUBDATEMTRGT
-8	IBMPartno	Always	IBMPART_____				12		Left	LSEOBUNDLE	SEOID
-9	Description			DESCRIPTION___________________	30	Left	LSEOBUNDLE	PRCFILENAM
-10	Div					DV							2		Left	PROJ	DIV
-11	SegA				SGA							3		Left	SGMNTACRNYM	ACRNYM
-12	ProdID				P							1		Left	LSEOBUNDLE	PRODID
-13	SysOrOpt			I							1		Left		If LSEOBUNDLE.BUNDLETYPE = Hardware then "Initial" else "Both"
-14	PlntOfMfg			PLT							3		Left	GEOMOD	PLNTOFMFR
-15	IndDefCat			IDC							3		Left	LSEOBUNDLE	INDDEFNCATG
-16	FtnClass			CLAS						4		Left	LSEOBUNDLE	FUNCCLS
-17	Brand				B							1		Left	GEOMOD	EMEABRANDCD
-18	USPartNo			USPN___						7		Left		Null
-19	SPECBID				S							1		Left	LSEOBUNDLE	SPECBID
-20	SEOType		Always	SEOTYPE___					10		Left		"LSEOBUNDLE"
-21	EntityId	Always	ENTITYID__					10		Right	LSEOBUNDLE	Entityid
-		 
-*/		
-
-		COLUMN_VCT = new Vector();
-
-		//4	RFAnumber	Always	RFANUM						6		Right	LSEOBUNDLE	QSMRFANUMBER
-		XLColumn xlcCol = new XLColumn("RFAnumber","LSEOBUNDLE","QSMRFANUMBER");
-		xlcCol.setAlwaysShow();
-		xlcCol.setFFColumnLabel("RFANUM");
-		xlcCol.setColumnWidth(6);
-		xlcCol.setJustified(XLColumn.RIGHT);
-		COLUMN_VCT.addElement(xlcCol);
-		//5	AnnDate				ANNDATE___					10		Left	LSEOBUNDLE	BUNDLPUBDATEMTRGT
-		xlcCol = new XLColumn("AnnDate","LSEOBUNDLE","BUNDLPUBDATEMTRGT");
-		xlcCol.setFFColumnLabel("ANNDATE___");
-		xlcCol.setColumnWidth(10);
-		COLUMN_VCT.addElement(xlcCol);
-		//6	GADate				GADATE____					10		Left	LSEOBUNDLE	BUNDLPUBDATEMTRGT
-		xlcCol = new XLColumn("GADate","LSEOBUNDLE","BUNDLPUBDATEMTRGT");
-		xlcCol.setFFColumnLabel("GADATE____");
-		xlcCol.setColumnWidth(10);
-		COLUMN_VCT.addElement(xlcCol);
-		//7	WDDate				WDDATE____					10				LSEOBUNDLE	BUNDLUNPUBDATEMTRGT
-		xlcCol = new XLColumn("WDDate","LSEOBUNDLE","BUNDLUNPUBDATEMTRGT");
-		xlcCol.setFFColumnLabel("WDDATE____");
-		xlcCol.setColumnWidth(10);
-		COLUMN_VCT.addElement(xlcCol);
-		//8	IBMPartno	Always	IBMPART_____				12		Left	LSEOBUNDLE	SEOID
-		xlcCol = new XLColumn("IBMPartno","LSEOBUNDLE","SEOID");
-		xlcCol.setFFColumnLabel("IBMPART_____");
-		xlcCol.setColumnWidth(12);
-		xlcCol.setAlwaysShow();
-		xlcCol.setJustified(XLColumn.LEFT);
-		COLUMN_VCT.addElement(xlcCol);
-		//9	Description			DESCRIPTION___________________	30	Left	LSEOBUNDLE	PRCFILENAM
-		xlcCol = new XLColumn("Description","LSEOBUNDLE","PRCFILENAM");
-		xlcCol.setFFColumnLabel("DESCRIPTION___________________");
-		xlcCol.setColumnWidth(30);
-		COLUMN_VCT.addElement(xlcCol);
-		//10	Div					DV							2		Left	PROJ	DIV
-		xlcCol = new XLColumn("Div","PROJ","DIV");
-		xlcCol.setFFColumnLabel("DV");
-		xlcCol.setColumnWidth(2);
-		COLUMN_VCT.addElement(xlcCol);
-		//11	SegA				SGA							3		Left	SGMNTACRNYM	ACRNYM
-		xlcCol = new XLColumn("SegA","SGMNTACRNYM","ACRNYM");
-		xlcCol.setFFColumnLabel("SGA");
-		xlcCol.setColumnWidth(3);
-		COLUMN_VCT.addElement(xlcCol);
-		//12	ProdID				P							1		Left	LSEOBUNDLE	PRODID
-		xlcCol = new XLColumn("ProdID","LSEOBUNDLE","PRODID");
-		xlcCol.setFFColumnLabel("P");
-		xlcCol.setColumnWidth(1);
-		COLUMN_VCT.addElement(xlcCol);
-		//13	SysOrOpt			I							1		Left		If LSEOBUNDLE.BUNDLETYPE = Hardware then "Initial" else "Both"
-		xlcCol = new XLSysOrOptColumn();
-		xlcCol.setFFColumnLabel("I");
-		xlcCol.setColumnWidth(1);
-		COLUMN_VCT.addElement(xlcCol);	
-		//14	PlntOfMfg			PLT							3		Left	GEOMOD	PLNTOFMFR
-		xlcCol = new XLColumn("PlntOfMfg","GEOMOD","PLNTOFMFR");
-		xlcCol.setFFColumnLabel("PLT");
-		xlcCol.setColumnWidth(3);
-		COLUMN_VCT.addElement(xlcCol);	
-		//15	IndDefCat			IDC							3		Left	LSEOBUNDLE	INDDEFNCATG
-		xlcCol = new XLColumn("IndDefCat","LSEOBUNDLE","INDDEFNCATG");
-		xlcCol.setFFColumnLabel("IDC");
-		xlcCol.setColumnWidth(3);
-		COLUMN_VCT.addElement(xlcCol);
-		//16	FtnClass			CLAS						4		Left	LSEOBUNDLE	FUNCCLS
-		xlcCol = new XLColumn("FtnClass","LSEOBUNDLE","FUNCCLS");
-		xlcCol.setFFColumnLabel("CLAS");
-		xlcCol.setColumnWidth(4);
-		COLUMN_VCT.addElement(xlcCol);
-		//17	Brand				B							1		Left	GEOMOD	EMEABRANDCD
-		xlcCol = new XLColumn("Brand","GEOMOD","EMEABRANDCD");
-		xlcCol.setFFColumnLabel("B");
-		xlcCol.setColumnWidth(1);
-		COLUMN_VCT.addElement(xlcCol);	
-		//18	USPartNo			USPN___						7		Left		Null
-		xlcCol = new XLFixedColumn("USPartNo","");
-		xlcCol.setFFColumnLabel("USPN___");
-		xlcCol.setColumnWidth(7);
-		COLUMN_VCT.addElement(xlcCol);	
-		//19	SPECBID				S							1		Left	LSEOBUNDLE	SPECBID
-		xlcCol = new XLColumn("SPECBID","LSEOBUNDLE","SPECBID");
-		xlcCol.setFFColumnLabel("S");
-		xlcCol.setColumnWidth(1);
-		COLUMN_VCT.addElement(xlcCol);	
-		//20	SEOType		Always	SEOTYPE___					10		Left		"LSEOBUNDLE"
-		xlcCol = new XLFixedColumn("SEOType","LSEOBUNDLE");
-		xlcCol.setFFColumnLabel("SEOTYPE___");
-		xlcCol.setColumnWidth(10);
-		xlcCol.setAlwaysShow();
-		COLUMN_VCT.addElement(xlcCol);	
-		//21	EntityId	Always	ENTITYID__					10		Right	LSEOBUNDLE	Entityid
-		xlcCol = new XLIdColumn("EntityId","LSEOBUNDLE");
-		xlcCol.setFFColumnLabel("ENTITYID__");
-		xlcCol.setAlwaysShow();
-		xlcCol.setJustified(XLColumn.RIGHT);
-		xlcCol.setColumnWidth(10);
-		COLUMN_VCT.addElement(xlcCol);			
-	}
-
-	/***********************************************
-	 * Should the report be generated for this root
-	 * Check for specified attributes on root - no structure available at this point in time
-	 *
-	 * If LSEOBUNDLE.SPECBID = 11457 (N) then
-	 * Do not send Spreadsheet; instead send HTML Report
-	 * Set QSMFEEDRESEND = "No" (No)
-	 * Set Return Code = "0030" (Passed)
-	 * Exit
-	 * End if
-	 *
-	 * If RootEntity.STATUS <> "Final" (0020) then
-	 * ErrorMessage LD(LSEOBUNDLE) NDN(LSEOBUNDLE) "was queued to send data; however, it is not Final"
-	 * Set QSMFEEDRESEND = "No" (No)
-	 * Set Return Code = "0040" (Failed)
-	 * Exit
-	 * End if
-	 *
-	 * If GENAREASELECTION  Not In ('6204'| '1999' | '6197') then (no report now)
-	 * Set QSMFEEDRESEND = "No" (No)
-	 * Set Return Code = "0030" (Passed)
-	 * Exit
-	 * End if
-	 *
-	 * @return boolean
-	 * @throws MiddlewareException
-	 * @throws SQLException
-	 */
-	public boolean canGenerateReport(EntityItem rootItem, QSMRPTABRSTATUS abr) {
-		boolean isOk = true;
-		String statusFlag = PokUtils.getAttributeFlagValue(rootItem, "STATUS");
-		abr.addDebug("QSMLSEOBDLABR.generateReport: "+rootItem.getKey()+" STATUS: "+
-			PokUtils.getAttributeValue(rootItem, "STATUS",", ", "", false)+" ["+statusFlag+"]");
-		if (!STATUS_FINAL.equals(statusFlag)){
-			// NOT_FINAL_ERR = was queued to send data; however, it is not Final
-			abr.addError("NOT_FINAL_ERR",null);
-			isOk = false;
-		}
-
-		Set testSet = new HashSet();
-		for (int i=0; i<QSMRPTABRSTATUS.GEOS.length; i++){
-			testSet.add(QSMRPTABRSTATUS.GEOS[i]);
-		}
-		testSet.add(QSMRPTABRSTATUS.GENAREA_WW); // allow WW now CQ22265
-		if (!PokUtils.contains(rootItem, "GENAREASELECTION", testSet)){
-			isOk = false;
-			abr.addOutput("LSEOBUNDLE does not have required 'General Area Selection' value.");
-			abr.addDebug("GENAREASELECTION did not include "+testSet+", ["+
-					PokUtils.getAttributeValue(rootItem, "GENAREASELECTION",", ", "", false)+"]");
-			abr.setNoReport();
-		}
-		testSet.clear();
-
-		String specbid = PokUtils.getAttributeFlagValue(rootItem, "SPECBID");
-		abr.addDebug(rootItem.getKey()+" SPECBID: "+specbid);
-		if ("11457".equals(specbid) || specbid==null){  // is No
-			abr.addOutput("LSEOBUNDLE is not a special bid.");
-			isOk=false;
-		}
-
-		return isOk;
-	}
-	/***********************************************
-	 * Should the report be generated for this extract
-	 * Check for specified structure and attributes
-	 * 5.	LSEOBUNDLEGEOMOD-d
-	 * 6.	Include data GEOMOD where GENAREASELECTION  In ('6204'| '1999' | '6197') since GEOMOD may not exist
-	 * 7.	Association LSEOBUNDLEPROJA -d
-	 * The path used for the ChangeSpecBid is similar to the preceding except the first three items are not applicable.
-	 *@return boolean 
-	 */
-	public boolean canGenerateReport(EntityList list, QSMRPTABRSTATUS abr){
-		return true;
-	}
-
-	/**********************************
-	 * get the name of the VE to use
-	 * @see COM.ibm.eannounce.abr.sg.QSMABRInterface#getVeName()
-	 */
-	public String getVeName() {
-		return "QSMLSEOBDL";
-	}
-
-	/***********************************************
-	 *  Get the version
-	 *
-	 *@return java.lang.String
-	 */
-	public String getVersion(){
-		return "1.8";
-	}
-
-	/*********************************************************************************
-	 * @see COM.ibm.eannounce.abr.sg.QSMABRInterface#getColumnCount()
-	 */
-	public int getColumnCount() {
-		return COLUMN_VCT.size();
-	}
-
-	/*********************************************************************************
-	 * @see COM.ibm.eannounce.abr.sg.QSMABRInterface#getColumnLabel(int)
-	 */
-	public String getColumnLabel(int i) {
-		return ((XLColumn)COLUMN_VCT.elementAt(i)).getColumnLabel();
-	}
-	/***********************************************
-	 *  Get the label for the specified column index for the flatfile
-	 *
-	 *@return String
-	 */
-	public String getFFColumnLabel(int i){
-		return ((XLColumn)COLUMN_VCT.elementAt(i)).getFFColumnLabel();
-	}
-	/***********************************************
-	 *  Get the width for the specified column (used for flat files)  CQ00016165
-	 *
-	 *@return int
-	 */
-	public int getColumnWidth(int i){
-		return ((XLColumn)COLUMN_VCT.elementAt(i)).getColumnWidth();
-	}
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.sg.QSMABRInterface#setColumnValue(org.apache.poi.hssf.usermodel.HSSFCell, java.lang.String, java.util.Hashtable, int)
-	 */
-	public void setColumnValue(HSSFCell cell,String rowtype, Hashtable itemTbl, int i) {
-		((XLColumn)COLUMN_VCT.elementAt(i)).setColumnValue(cell,itemTbl);
-	}
-	/***********************************************
-	 *  get the value for the specified column index - flat file only
-	 *
-	 */
-	public String getColumnValue(String rowtype, Hashtable itemTbl, int i){
-		return ((XLColumn)COLUMN_VCT.elementAt(i)).getColumnValue(itemTbl);
-	}
-	
-	/*********************************************************************************
-	 * @see COM.ibm.eannounce.abr.sg.QSMABRInterface#isChanged(com.ibm.transform.oim.eacm.diff.DiffEntity, int)
-	 */
-	public boolean isChanged(String rowtype, Hashtable itemTbl, int i)
-	{
-		return ((XLColumn)COLUMN_VCT.elementAt(i)).isChanged(itemTbl);
-	}
-
-	/***********************************************
-	 *  Get the entity items to put in the ss for this geo
-	 *  5.	LSEOBUNDLEGEOMOD-d
-	 *  6.	Include data GEOMOD where GENAREASELECTION  In ('6204'| '1999' | '6197') since GEOMOD may not exist
-	 *  7.	Association LSEOBUNDLEPROJA -d
-	 *
-	 * @see COM.ibm.eannounce.abr.sg.QSMABRInterface#getRowItems(COM.ibm.eannounce.objects.EntityList, java.util.Hashtable, java.lang.String, COM.ibm.eannounce.abr.sg.QSMRPTABRSTATUS)
-	 * @return Vector
-	 */
-	public Vector getRowItems(EntityList list,Hashtable diffTbl, String geo, QSMRPTABRSTATUS abr){
-		Vector rowVct = new Vector();
-
-		EntityItem lseobdlitem = null;
-		if (diffTbl!=null){
-			Vector lseoVct = (Vector)diffTbl.get("ROOT");
-			lseobdlitem = ((DiffEntity)lseoVct.firstElement()).getCurrentEntityItem();
-		}else{
-			lseobdlitem = list.getParentEntityGroup().getEntityItem(0);
-		}
-
-		abr.addDebug("QSMLSEOBDLABR.getRowItems "+lseobdlitem.getKey());
-
-		Vector projVct = PokUtils.getAllLinkedEntities(lseobdlitem, "LSEOBUNDLEPROJA", "PROJ");
-
-		XLRow xlrow = new XLRow(diffTbl==null?lseobdlitem:diffTbl.get(lseobdlitem.getKey()));
-		rowVct.addElement(xlrow);
-
-		Vector geomodVct = PokUtils.getAllLinkedEntities(lseobdlitem, "LSEOBUNDLEGEOMOD", "GEOMOD");
-		//CQ22265
-		Vector wwgeomodVct = PokUtils.getEntitiesWithMatchedAttr(geomodVct, "GENAREASELECTION",QSMRPTABRSTATUS.GENAREA_WW);
-		abr.addDebug("QSMLSEOBDLABR.getRowItems GENAREASELECTION:"+QSMRPTABRSTATUS.GENAREA_WW+" has wwgeomodVct.size: "+
-				wwgeomodVct.size());		
-		if (wwgeomodVct.size()==0){
-			// none found for WW look for geo geomod, first one found is used so dont need to combine
-			geomodVct = PokUtils.getEntitiesWithMatchedAttr(geomodVct, "GENAREASELECTION",geo);
-			abr.addDebug("QSMLSEOBDLABR.getRowItems GEOMOD GENAREASELECTION:"+geo+" has geomodVct.size: "+
-					geomodVct.size());
-		}else{
-			geomodVct = wwgeomodVct;
-		}		
-		if (geomodVct.size()>0){
-			if (geomodVct.size()>1){
-				for (int g=0; g<geomodVct.size(); g++){
-					abr.addDebug("QSMLSEOBDLABR.getRowItems WARNING: Found more than one GEOMOD "+
-						((EntityItem)geomodVct.elementAt(g)).getKey());
-				}
-			}
-			EntityItem ei = (EntityItem)geomodVct.firstElement();
-			xlrow.addRowItem(diffTbl==null?ei:
-				diffTbl.get(ei.getKey()));
-			geomodVct.clear();
-		}
-	
-		if (projVct.size()>0){
-			EntityItem ei = (EntityItem)projVct.firstElement();
-			xlrow.addRowItem(diffTbl==null?ei:
-				diffTbl.get(ei.getKey()));
-			// use Association PROJSGMNTACRNYMA to obtain SGMNTACRNYM.ACRNYM 
-			Vector sgVct = PokUtils.getAllLinkedEntities(ei, "PROJSGMNTACRNYMA", "SGMNTACRNYM");
-			if (sgVct.size()>0){
-				EntityItem sgei = (EntityItem)sgVct.firstElement();
-				xlrow.addRowItem(diffTbl==null?sgei:
-					diffTbl.get(sgei.getKey()));
-				sgVct.clear();
-			}
-		}
-		abr.addDebug("QSMLSEOBDLABR.getRowItems Adding "+xlrow);
-
-		return rowVct;
-	}
-	/***************************************************************
-	 * If (Now() + 30 days >= BUNDLPUBDATEMTRGT >= Now()) OR
-	 * (Now() + 30 days >= BUNDLUNPUBDATEMTRGT >= Now())
-	 * then output rpt
-	 * @see COM.ibm.eannounce.abr.sg.QSMABRInterface#withinDateRange(COM.ibm.eannounce.objects.EntityItem, java.lang.String, COM.ibm.eannounce.abr.sg.QSMRPTABRSTATUS)
-	 */
-	public boolean withinDateRange(EntityItem rootitem, String now, QSMRPTABRSTATUS abr) {
-		boolean ok = false;
-		Object args[] = new Object[5];
-		String pubdate = PokUtils.getAttributeValue(rootitem, "BUNDLPUBDATEMTRGT", "",DEFAULT_PUBFROM, false);
-		String unpubdate = PokUtils.getAttributeValue(rootitem, "BUNDLUNPUBDATEMTRGT", "", DEFAULT_PUBTO, false);
-		PDGUtility pdgutil = new PDGUtility();
-		String nowPlus30 = pdgutil.getDate(now, 30);
-		args[0] = PokUtils.getAttributeDescription(rootitem.getEntityGroup(), "BUNDLPUBDATEMTRGT", "BUNDLPUBDATEMTRGT");
-		args[1] = pubdate;
-		args[2] = "";
-		args[3] = now;
-		args[4] = nowPlus30;
-
-		abr.addDebug("QSMLSEOBDLABR.withinDateRange now "+now+" pubdate "+pubdate+" unpubdate "+unpubdate+" nowPlus30 "+nowPlus30);
-		if ((nowPlus30.compareTo(pubdate)>=0) && (pubdate.compareTo(now)>=0)){
-			ok = true;
-		}else{
-			args[2] = "not";
-		}
-		// DATE_RANGE_MSG = &quot;{0}&quot; value of &quot;{1}&quot; was {2} within range of {3} and {4}
-		abr.addOutput("DATE_RANGE_MSG",args);
-		args[0] = PokUtils.getAttributeDescription(rootitem.getEntityGroup(), "BUNDLUNPUBDATEMTRGT", "BUNDLUNPUBDATEMTRGT");
-		args[1] = unpubdate;
-		args[2] = "";
-		if ((nowPlus30.compareTo(unpubdate)>=0) && (unpubdate.compareTo(now)>=0)){
-			ok = true;
-		}else{
-			args[2] = "not";
-		}
-		// DATE_RANGE_MSG = &quot;{0}&quot; value of &quot;{1}&quot; was {2} within range of {3} and {4}
-		abr.addOutput("DATE_RANGE_MSG",args);
-		return ok;
-	}
-	
-	/***********************************************
-	 *  get row 1 - flat file only CQ00016165
-	 *  1 2009-01-13 11:33:42.123456  43635 NEW
-	 *  'SBD' for a special bid
-	 */
-	public String getRowOne(EntityItem rootitem) { 
-		String rfanum = PokUtils.getAttributeValue(rootitem, "QSMRFANUMBER", "", "", false);
-		return XLColumn.formatToWidth(rfanum,6,XLColumn.RIGHT)+" SBD";
-	}
-	/***********************************************
-	 *  get row 1 - flat file only CQ00016165
-	 *  text		start	end width justification
-	 * Date______		3	12	10	Left
-	 * Time___________	14	28	15	Left
-	 * 
-	 * or
-	 * IFCDate___		3	12	10	Left
-	 * IFCTime________	14	28	15	Left
-	 * 
-	 */
-	public String getRowTwoPrefix(){
-		// first two columns are not part of the ss output and not in the 'template'
-		return XLColumn.formatToWidth("Date______", 10)+" "+
-			XLColumn.formatToWidth("Time___________", 15);
-	}
-	
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\QSMLSEOBDLABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

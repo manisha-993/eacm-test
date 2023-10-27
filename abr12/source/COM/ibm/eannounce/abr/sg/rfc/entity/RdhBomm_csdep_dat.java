@@ -1,78 +1,82 @@
-/* Copyright IBM Corp. 2016 */
-package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ 
+/*    */ import com.google.gson.annotations.SerializedName;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class RdhBomm_csdep_dat
+/*    */ {
+/*    */   @SerializedName("OBJECT_ID")
+/*    */   private String object_id;
+/*    */   @SerializedName("IDENTIFIER")
+/*    */   private String identifier;
+/*    */   @SerializedName("DEP_INTERN")
+/*    */   private String dep_intern;
+/*    */   @SerializedName("STATUS")
+/*    */   private String status;
+/*    */   
+/*    */   public String getObject_id() {
+/* 25 */     return this.object_id;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setObject_id(String paramString) {
+/* 32 */     this.object_id = paramString;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getIdentifier() {
+/* 39 */     return this.identifier;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setIdentifier(String paramString) {
+/* 46 */     this.identifier = paramString;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getDep_intern() {
+/* 53 */     return this.dep_intern;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setDep_intern(String paramString) {
+/* 60 */     this.dep_intern = paramString;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getStatus() {
+/* 67 */     return this.status;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setStatus(String paramString) {
+/* 74 */     this.status = paramString;
+/*    */   }
+/*    */ }
 
-import com.google.gson.annotations.SerializedName;
 
-public class RdhBomm_csdep_dat
-{
-    @SerializedName("OBJECT_ID")
-    private String  object_id;
-    
-    @SerializedName("IDENTIFIER")
-    private String  identifier;
-    
-    @SerializedName("DEP_INTERN")
-    private String  dep_intern;
-    
-    @SerializedName("STATUS")
-    private String  status;
-    
-    /**
-     * @return the object_id
-     */
-    public String getObject_id()
-    {
-        return object_id;
-    }
-    /**
-     * @param object_id the object_id to set
-     */
-    public void setObject_id(String object_id)
-    {
-        this.object_id = object_id;
-    }
-    /**
-     * @return the identifier
-     */
-    public String getIdentifier()
-    {
-        return identifier;
-    }
-    /**
-     * @param identifier the identifier to set
-     */
-    public void setIdentifier(String identifier)
-    {
-        this.identifier = identifier;
-    }
-    /**
-     * @return the dep_intern
-     */
-    public String getDep_intern()
-    {
-        return dep_intern;
-    }
-    /**
-     * @param dep_intern the dep_intern to set
-     */
-    public void setDep_intern(String dep_intern)
-    {
-        this.dep_intern = dep_intern;
-    }
-    /**
-     * @return the status
-     */
-    public String getStatus()
-    {
-        return status;
-    }
-    /**
-     * @param status the status to set
-     */
-    public void setStatus(String status)
-    {
-        this.status = status;
-    }
-    
-    
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\entity\RdhBomm_csdep_dat.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

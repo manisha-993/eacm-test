@@ -1,719 +1,724 @@
-//(c) Copyright International Business Machines Corporation, 2001
-//All Rights Reserved.</pre>
+/*     */ package COM.ibm.eannounce.abr.pcd;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.LockPDHEntityException;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.abr.util.UpdatePDHEntityException;
+/*     */ import COM.ibm.eannounce.objects.ALWRCVARABR001PDG;
+/*     */ import COM.ibm.eannounce.objects.EANAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANList;
+/*     */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANObject;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*     */ import COM.ibm.eannounce.objects.SBRException;
+/*     */ import COM.ibm.opicmpdh.transactions.PartNo;
+/*     */ import java.util.StringTokenizer;
+/*     */ import java.util.Vector;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class ALWRCVARABR001
+/*     */   extends PokBaseABR
+/*     */ {
+/* 113 */   public static final String ABR = new String("ALWRCVARABR001");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 118 */   public static final String FINAL = new String("0020");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 123 */   public static final String REVIEW = new String("0040");
+/*     */   
+/* 125 */   private EntityGroup m_egParent = null;
+/* 126 */   private EntityItem m_ei = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/*     */     try {
+/* 148 */       start_ABRBuild();
+/*     */ 
+/*     */       
+/* 151 */       buildReportHeaderII();
+/*     */       
+/* 153 */       this.m_egParent = this.m_elist.getParentEntityGroup();
+/* 154 */       this.m_ei = this.m_egParent.getEntityItem(0);
+/* 155 */       println("<br><b>Country Variant: " + this.m_ei.getKey() + "</b>");
+/*     */       
+/* 157 */       printNavigateAttributes(this.m_ei, this.m_egParent, true);
+/*     */       
+/* 159 */       setReturnCode(0);
+/*     */ 
+/*     */       
+/* 162 */       println("<br/><b>General Area (Region) = </b>" + 
+/*     */           
+/* 164 */           getAttributeValue(this.m_elist, this.m_ei
+/*     */             
+/* 166 */             .getEntityType(), this.m_ei
+/* 167 */             .getEntityID(), "GENAREANAMEREGION"));
+/*     */ 
+/*     */ 
+/*     */       
+/* 171 */       log("ALWRCVARABR001 checking VAR");
+/* 172 */       EntityGroup entityGroup = this.m_elist.getEntityGroup("VAR");
+/*     */       
+/* 174 */       if (entityGroup != null) {
+/*     */         
+/* 176 */         Vector<Integer> vector = getParentEntityIds(this.m_ei
+/* 177 */             .getEntityType(), this.m_ei
+/* 178 */             .getEntityID(), "VAR", "VARCVAR");
+/*     */ 
+/*     */         
+/* 181 */         if (vector.size() <= 0) {
+/* 182 */           println("<br /><font color=red>Failed. There is no VAR</font>");
+/* 183 */           setReturnCode(-1);
+/* 184 */         } else if (vector.size() > 1) {
+/* 185 */           println("<br /><font color=red>Failed. There is not one and only one VAR.</font>");
+/* 186 */           setReturnCode(-1);
+/*     */         } 
+/*     */ 
+/*     */         
+/* 190 */         EANList eANList1 = new EANList();
+/* 191 */         println("<br/></br/><b>Variant(s): </b>"); byte b;
+/* 192 */         for (b = 0; b < vector.size(); b++) {
+/* 193 */           int i = ((Integer)vector.elementAt(b)).intValue();
+/* 194 */           EntityItem entityItem1 = entityGroup.getEntityItem("VAR" + i);
+/* 195 */           println("</br/><LI>" + entityItem1.toString());
+/* 196 */           eANList1.put((EANObject)entityItem1);
+/*     */         } 
+/*     */ 
+/*     */         
+/* 200 */         EANList eANList2 = new EANList();
+/* 201 */         EntityGroup entityGroup1 = this.m_elist.getEntityGroup("PR");
+/* 202 */         println("<br/><br /><b>Project(s):</b>");
+/* 203 */         for (b = 0; b < eANList1.size(); b++) {
+/* 204 */           EntityItem entityItem1 = (EntityItem)eANList1.getAt(b);
+/*     */           
+/* 206 */           Vector<String> vector1 = getParentEntityIds(entityItem1
+/* 207 */               .getEntityType(), entityItem1
+/* 208 */               .getEntityID(), "PR", "PRVAR");
+/*     */ 
+/*     */           
+/* 211 */           for (byte b1 = 0; b1 < vector1.size(); b1++) {
+/*     */             
+/* 213 */             EntityItem entityItem2 = entityGroup1.getEntityItem(entityGroup1
+/* 214 */                 .getEntityType() + vector1.elementAt(b1));
+/* 215 */             if (eANList2.get(entityItem2.getKey()) == null) {
+/* 216 */               println("<br /><LI>" + entityItem2.toString());
+/* 217 */               eANList2.put((EANObject)entityItem2);
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */ 
+/*     */         
+/* 223 */         EANList eANList3 = new EANList();
+/* 224 */         EntityGroup entityGroup2 = this.m_elist.getEntityGroup("BR");
+/* 225 */         println("<br/><br /><b>Brand(s):</b>");
+/* 226 */         for (b = 0; b < eANList2.size(); b++) {
+/* 227 */           EntityItem entityItem1 = (EntityItem)eANList2.getAt(b);
+/*     */           
+/* 229 */           Vector<String> vector1 = getChildrenEntityIds(entityItem1
+/* 230 */               .getEntityType(), entityItem1
+/* 231 */               .getEntityID(), "BR", "PRBRANDCODEA");
+/*     */ 
+/*     */           
+/* 234 */           for (byte b1 = 0; b1 < vector1.size(); b1++) {
+/*     */             
+/* 236 */             EntityItem entityItem2 = entityGroup2.getEntityItem(entityGroup2
+/* 237 */                 .getEntityType() + vector1.elementAt(b1));
+/* 238 */             if (eANList3.get(entityItem2.getKey()) == null) {
+/* 239 */               println("<br /><LI>" + entityItem2.toString());
+/* 240 */               eANList3.put((EANObject)entityItem2);
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */       } else {
+/* 245 */         println("EntityGroup VAR is null\n");
+/* 246 */         setReturnCode(-1);
+/*     */       } 
+/*     */ 
+/*     */       
+/* 250 */       log("ALWRCVARABR001 checking CDG");
+/* 251 */       entityGroup = this.m_elist.getEntityGroup("CDG");
+/* 252 */       EntityItem entityItem = null;
+/* 253 */       if (entityGroup != null) {
+/*     */         
+/* 255 */         Vector<Integer> vector = getChildrenEntityIds(this.m_ei
+/* 256 */             .getEntityType(), this.m_ei
+/* 257 */             .getEntityID(), "CDG", "CVARCDG");
+/*     */ 
+/*     */         
+/* 260 */         if (vector.size() <= 0) {
+/* 261 */           println("<br /><font color=red>Failed. There is no CDG</font>");
+/* 262 */           setReturnCode(-1);
+/* 263 */         } else if (vector.size() > 1) {
+/* 264 */           println("<br /><font color=red>Failed. There is not one and only one CDG.</font>");
+/* 265 */           setReturnCode(-1);
+/*     */         } else {
+/* 267 */           int i = ((Integer)vector.elementAt(0)).intValue();
+/* 268 */           entityItem = entityGroup.getEntityItem("CDG" + i);
+/*     */         } 
+/*     */         
+/* 271 */         println("<br/></br/><b>Country Designator Group(s):</b>");
+/* 272 */         for (byte b = 0; b < vector.size(); b++) {
+/* 273 */           int i = ((Integer)vector.elementAt(b)).intValue();
+/* 274 */           EntityItem entityItem1 = entityGroup.getEntityItem("CDG" + i);
+/* 275 */           println("</br/><LI> " + entityItem1.toString());
+/*     */         } 
+/*     */       } else {
+/* 278 */         println("EntityGroup CDG is null\n");
+/* 279 */         setReturnCode(-1);
+/*     */       } 
+/*     */ 
+/*     */       
+/* 283 */       log("ALWRCVARABR001 checking CD");
+/* 284 */       if (entityItem != null) {
+/* 285 */         EntityGroup entityGroup1 = this.m_elist.getEntityGroup("CD");
+/*     */         
+/* 287 */         Vector<Integer> vector = getChildrenEntityIds(entityItem
+/* 288 */             .getEntityType(), entityItem
+/* 289 */             .getEntityID(), "CD", "CDGCD");
+/*     */ 
+/*     */         
+/* 292 */         if (vector.size() <= 0) {
+/* 293 */           println("</br/><font color=red>Failed. No CD exists in the CDG.</font>");
+/* 294 */           println("</br/>" + entityItem.toString());
+/* 295 */           setReturnCode(-1);
+/*     */         } else {
+/* 297 */           for (byte b = 0; b < vector.size(); b++) {
+/* 298 */             int i = ((Integer)vector.elementAt(b)).intValue();
+/* 299 */             EntityItem entityItem1 = entityGroup1.getEntityItem("CD" + i);
+/*     */             
+/* 301 */             String str = getAttributeValue(this.m_elist, entityItem1
+/*     */                 
+/* 303 */                 .getEntityType(), entityItem1
+/* 304 */                 .getEntityID(), "COUNTRY_DESIG");
+/*     */             
+/* 306 */             if (str == null || str.length() <= 0) {
+/* 307 */               println("</br/><font color=red>Failed. The attribute COUNTRY_DESIG is not populated.</font>");
+/* 308 */               println("</br/>" + entityItem1.toString());
+/* 309 */               setReturnCode(-1);
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 322 */       String str1 = getAttributeFlagEnabledValue(this.m_elist, this.m_ei.getEntityType(), this.m_ei.getEntityID(), "STATUS_CVAR").trim();
+/* 323 */       if (!str1.equals(FINAL) && !str1.equals(REVIEW)) {
+/* 324 */         println("</br/><font color=red>Failed. the CVAR is not in Ready for Review or Final status. </font>");
+/* 325 */         setReturnCode(-1);
+/*     */       } 
+/*     */ 
+/*     */       
+/* 329 */       if (getReturnCode() == 0) {
+/* 330 */         log("ALWRCVARABR001 generating data");
+/* 331 */         ALWRCVARABR001PDG aLWRCVARABR001PDG = new ALWRCVARABR001PDG(null, this.m_db, this.m_prof, "ALWRCVARABR001PDG");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 337 */         aLWRCVARABR001PDG.setEntityItem(this.m_ei);
+/* 338 */         aLWRCVARABR001PDG.setABReList(this.m_elist);
+/* 339 */         aLWRCVARABR001PDG.executeAction(this.m_db, this.m_prof);
+/* 340 */         StringBuffer stringBuffer = aLWRCVARABR001PDG.getActivities();
+/* 341 */         println("</br></br/><b>Generated Data:</b>");
+/* 342 */         println("<br/>" + stringBuffer.toString());
+/* 343 */         log("ALWRCVARABR001 finish generating data");
+/*     */ 
+/*     */ 
+/*     */         
+/* 347 */         println("</br><br/><b>Relators: </b>");
+/* 348 */         EANList eANList = aLWRCVARABR001PDG.getSavedEIList();
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 354 */         ExtractActionItem extractActionItem = new ExtractActionItem(null, this.m_db, this.m_prof, this.m_abri.getVEName()); byte b;
+/* 355 */         for (b = 0; b < eANList.size(); b++) {
+/* 356 */           EntityItem entityItem1 = (EntityItem)eANList.getAt(b);
+/* 357 */           println(pullResultReport(entityItem1, extractActionItem));
+/*     */         } 
+/*     */ 
+/*     */         
+/* 361 */         Vector<String> vector = new Vector();
+/* 362 */         for (b = 0; b < eANList.size(); b++) {
+/* 363 */           EntityItem entityItem1 = (EntityItem)eANList.getAt(b);
+/*     */           
+/* 365 */           for (byte b1 = 0; b1 < entityItem1.getAttributeCount(); b1++) {
+/* 366 */             EANAttribute eANAttribute = entityItem1.getAttribute(b1);
+/* 367 */             EANMetaAttribute eANMetaAttribute = eANAttribute.getMetaAttribute();
+/* 368 */             if (eANAttribute instanceof COM.ibm.eannounce.objects.TextAttribute) {
+/* 369 */               if (eANMetaAttribute.isUnique()) {
+/* 370 */                 if (eANMetaAttribute.getUniqueClass().equals("LEVEL1")) {
+/* 371 */                   vector.addElement(eANAttribute
+/* 372 */                       .toString() + eANMetaAttribute.getKey());
+/* 373 */                 } else if (eANMetaAttribute
+/* 374 */                   .getUniqueClass().equals("LEVEL2")) {
+/* 375 */                   vector.addElement(eANAttribute
+/* 376 */                       .toString() + eANMetaAttribute
+/* 377 */                       .getKey() + entityItem1
+/* 378 */                       .getEntityType());
+/*     */                 } 
+/* 380 */               } else if (eANMetaAttribute.isComboUnique()) {
+/* 381 */                 Vector vector1 = eANMetaAttribute.getComboUniqueAttributeCode();
+/*     */                 
+/* 383 */                 for (byte b2 = 0; b2 < vector1.size(); b2++) {
+/* 384 */                   String str = eANMetaAttribute.getComboUniqueAttributeCode(b2);
+/* 385 */                   EANAttribute eANAttribute1 = entityItem1.getAttribute(str);
+/* 386 */                   if (eANAttribute1 instanceof EANFlagAttribute) {
+/* 387 */                     String str5 = ((EANFlagAttribute)eANAttribute1).getFlagCodes();
+/*     */ 
+/*     */                     
+/* 390 */                     StringTokenizer stringTokenizer = new StringTokenizer(str5, ":");
+/*     */                     
+/* 392 */                     while (stringTokenizer.hasMoreTokens()) {
+/* 393 */                       String str6 = stringTokenizer.nextToken();
+/* 394 */                       vector.addElement(eANAttribute
+/* 395 */                           .toString() + ":" + eANMetaAttribute
+/* 396 */                           .getKey() + ":" + str6 + ":" + str);
+/*     */                     }
+/*     */                   
+/*     */                   }
+/* 400 */                   else if (eANAttribute1 instanceof COM.ibm.eannounce.objects.EANTextAttribute) {
+/* 401 */                     vector.addElement(eANAttribute
+/* 402 */                         .toString() + ":" + eANMetaAttribute
+/* 403 */                         .getKey() + ":" + eANAttribute1
+/* 404 */                         .toString() + ":" + str);
+/*     */                   }
+/*     */                 
+/*     */                 } 
+/*     */               } 
+/* 409 */             } else if (eANAttribute instanceof COM.ibm.eannounce.objects.SingleFlagAttribute) {
+/* 410 */               EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)eANAttribute;
+/* 411 */               if (eANMetaAttribute.isUnique()) {
+/* 412 */                 if (eANMetaAttribute.getUniqueClass().equals("EACHECK")) {
+/* 413 */                   vector.addElement(eANAttribute
+/* 414 */                       .toString() + eANMetaAttribute
+/* 415 */                       .getKey() + entityItem1
+/* 416 */                       .getEntityType());
+/*     */                 }
+/* 418 */               } else if (eANMetaAttribute.isComboUnique()) {
+/* 419 */                 Vector vector1 = eANMetaAttribute.getComboUniqueAttributeCode();
+/* 420 */                 for (byte b2 = 0; b2 < vector1.size(); b2++) {
+/* 421 */                   String str = eANMetaAttribute.getComboUniqueAttributeCode(b2);
+/* 422 */                   EANAttribute eANAttribute1 = entityItem1.getAttribute(str);
+/* 423 */                   if (eANAttribute1 instanceof COM.ibm.eannounce.objects.EANTextAttribute) {
+/* 424 */                     String str5 = eANAttribute1.toString();
+/* 425 */                     vector.addElement(eANFlagAttribute
+/* 426 */                         .getFlagCodes() + ":" + eANMetaAttribute
+/* 427 */                         .getKey() + ":" + str5 + ":" + str);
+/*     */                   
+/*     */                   }
+/* 430 */                   else if (eANAttribute1 instanceof EANFlagAttribute) {
+/* 431 */                     String str5 = ((EANFlagAttribute)eANAttribute1).getFlagCodes();
+/*     */ 
+/*     */                     
+/* 434 */                     StringTokenizer stringTokenizer = new StringTokenizer(str5, ":");
+/*     */                     
+/* 436 */                     while (stringTokenizer.hasMoreTokens()) {
+/* 437 */                       String str6 = stringTokenizer.nextToken();
+/* 438 */                       vector.addElement(eANAttribute
+/* 439 */                           .toString() + ":" + eANMetaAttribute
+/* 440 */                           .getKey() + ":" + str6 + ":" + str);
+/*     */                     }
+/*     */                   
+/*     */                   }
+/*     */                 
+/*     */                 } 
+/*     */               } 
+/* 447 */             } else if (eANAttribute instanceof COM.ibm.eannounce.objects.MultiFlagAttribute) {
+/* 448 */               EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)eANAttribute;
+/* 449 */               if (eANMetaAttribute.isComboUnique()) {
+/* 450 */                 Vector vector1 = eANMetaAttribute.getComboUniqueAttributeCode();
+/* 451 */                 for (byte b2 = 0; b2 < vector1.size(); b2++) {
+/* 452 */                   String str = eANMetaAttribute.getComboUniqueAttributeCode(b2);
+/* 453 */                   EANAttribute eANAttribute1 = entityItem1.getAttribute(str);
+/* 454 */                   if (eANAttribute1 instanceof COM.ibm.eannounce.objects.EANTextAttribute) {
+/* 455 */                     String str5 = eANAttribute1.toString();
+/* 456 */                     vector.addElement(eANFlagAttribute
+/* 457 */                         .getFlagCodes() + ":" + eANMetaAttribute
+/* 458 */                         .getKey() + ":" + str5 + ":" + str);
+/*     */                   
+/*     */                   }
+/* 461 */                   else if (eANAttribute1 instanceof EANFlagAttribute) {
+/* 462 */                     String str5 = ((EANFlagAttribute)eANAttribute1).getFlagCodes();
+/*     */ 
+/*     */                     
+/* 465 */                     StringTokenizer stringTokenizer = new StringTokenizer(str5, ":");
+/*     */                     
+/* 467 */                     while (stringTokenizer.hasMoreTokens()) {
+/* 468 */                       String str6 = stringTokenizer.nextToken();
+/* 469 */                       vector.addElement(eANAttribute
+/* 470 */                           .toString() + ":" + eANMetaAttribute
+/* 471 */                           .getKey() + ":" + str6 + ":" + str);
+/*     */                     } 
+/*     */                   } 
+/*     */                 } 
+/*     */               } 
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */ 
+/*     */ 
+/*     */         
+/* 482 */         for (b = 0; b < vector.size(); b++) {
+/* 483 */           String str = vector.elementAt(b);
+/* 484 */           PartNo.remove(this.m_db, str);
+/*     */         } 
+/*     */       } 
+/*     */ 
+/*     */       
+/* 489 */       println("<br /><br /><b>" + 
+/*     */           
+/* 491 */           buildMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 494 */               getABRDescription(), 
+/* 495 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }) + "</b>");
+/*     */       
+/* 498 */       log(
+/* 499 */           buildLogMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 502 */               getABRDescription(), 
+/* 503 */               (getReturnCode() == 0) ? "Passed" : "Failed" }));
+/* 504 */     } catch (LockPDHEntityException lockPDHEntityException) {
+/* 505 */       setReturnCode(-2);
+/* 506 */       println("<h3><font color=red>IAB1007E: Could not get soft lock.  Rule execution is terminated.<br />" + lockPDHEntityException
+/*     */ 
+/*     */ 
+/*     */           
+/* 510 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 512 */       logError(lockPDHEntityException.getMessage());
+/* 513 */     } catch (UpdatePDHEntityException updatePDHEntityException) {
+/* 514 */       setReturnCode(-2);
+/* 515 */       println("<h3><font color=red>UpdatePDH error: " + updatePDHEntityException
+/*     */           
+/* 517 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 519 */       logError(updatePDHEntityException.getMessage());
+/* 520 */     } catch (SBRException sBRException) {
+/* 521 */       setReturnCode(-2);
+/* 522 */       println("<h3><font color=red>Generate Data error: " + sBRException
+/*     */           
+/* 524 */           .toString() + "</font></h3>");
+/*     */       
+/* 526 */       logError(sBRException.toString());
+/* 527 */     } catch (Exception exception) {
+/*     */       
+/* 529 */       println("Error in " + this.m_abri.getABRCode() + ":" + exception.getMessage());
+/* 530 */       println("" + exception);
+/* 531 */       exception.printStackTrace();
+/*     */       
+/* 533 */       if (getABRReturnCode() != -2) {
+/* 534 */         setReturnCode(-3);
+/*     */       }
+/*     */     } finally {
+/*     */       
+/* 538 */       String str1 = getABREntityDesc(this.m_ei.getEntityType(), this.m_ei.getEntityID());
+/* 539 */       String str2 = getMetaAttributeDescription(this.m_ei, ABR);
+/*     */       
+/* 541 */       String str3 = str2 + " for " + str1;
+/* 542 */       if (str3.length() > 64) {
+/* 543 */         str3 = str3.substring(0, 64);
+/*     */       }
+/*     */       
+/* 546 */       setDGTitle(str3);
+/*     */       
+/* 548 */       printALWRInfo();
+/*     */ 
+/*     */       
+/* 551 */       setDGString(getABRReturnCode());
+/* 552 */       setDGRptName(ABR);
+/* 553 */       setDGRptClass("ALWRCVAR");
+/* 554 */       printDGSubmitString();
+/*     */ 
+/*     */ 
+/*     */       
+/* 558 */       buildReportFooter();
+/*     */       
+/* 560 */       if (!isReadOnly()) {
+/* 561 */         clearSoftLock();
+/*     */       }
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getABREntityDesc(String paramString, int paramInt) {
+/* 574 */     return getAttributeValue(this.m_elist, paramString, paramInt, "PNUMB_CT") + ", " + 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 580 */       getAttributeValue(this.m_elist, paramString, paramInt, "GENAREANAMEREGION") + ", " + 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 586 */       getAttributeValue(this.m_elist, paramString, paramInt, "GENAREANAME") + ", " + 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 592 */       getAttributeValue(this.m_elist, paramString, paramInt, "TARGANNDATE_CVAR") + ", " + 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 598 */       getAttributeValue(this.m_elist, paramString, paramInt, "NAME");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 607 */     return "The purpose of this ABR is to create one or more Country Variant Solutions based on an existing Country Variant Solution (CVAR).  A CVAR is generated for each Country Designator (CD)/Country combination in the related Country Designator Group (CDG) and the part number is determined by the CD.";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getStyle() {
+/* 618 */     return "";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getRevision() {
+/* 628 */     return new String("$Revision: 1.28 $");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String getVersion() {
+/* 638 */     return "$Id: ALWRCVARABR001.java,v 1.28 2010/07/12 21:35:09 wendy Exp $";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 646 */     return "ALWRCVARABR001.java,v 1.2";
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   private void printALWRInfo() {
+/* 651 */     String str1 = getABREntityDesc(this.m_ei.getEntityType(), this.m_ei.getEntityID());
+/* 652 */     String str2 = getMetaAttributeDescription(this.m_ei, ABR);
+/*     */ 
+/*     */     
+/* 655 */     println("<br /><b>NAME = </b>" + str2 + " for " + str1);
+/*     */     
+/* 657 */     println("<br /><b> RPTNAME = </b>" + ABR);
+/*     */     
+/* 659 */     println("<br /><b> TASKSTATUS = </b>" + (
+/*     */         
+/* 661 */         (getReturnCode() == 0) ? "Passed" : "Failed"));
+/*     */     
+/* 663 */     println("<br/><b>PDH Domain = </b>" + 
+/*     */         
+/* 665 */         getAttributeValue(this.m_elist, this.m_ei
+/*     */           
+/* 667 */           .getEntityType(), this.m_ei
+/* 668 */           .getEntityID(), "PDHDOMAIN"));
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String pullResultReport(EntityItem paramEntityItem, ExtractActionItem paramExtractActionItem) {
+/* 676 */     log("ALWRCSOLABR001 pullResultReport");
+/*     */     
+/* 678 */     StringBuffer stringBuffer = new StringBuffer();
+/*     */     try {
+/* 680 */       this.m_prof = refreshProfValOnEffOn(this.m_prof);
+/* 681 */       EntityItem[] arrayOfEntityItem = { paramEntityItem };
+/*     */       
+/* 683 */       EntityList entityList = EntityList.getEntityList(this.m_db, this.m_prof, paramExtractActionItem, arrayOfEntityItem);
+/*     */       
+/* 685 */       EntityGroup entityGroup = entityList.getParentEntityGroup();
+/* 686 */       paramEntityItem = entityGroup.getEntityItem(paramEntityItem.getKey());
+/*     */       byte b;
+/* 688 */       for (b = 0; b < paramEntityItem.getUpLinkCount(); b++) {
+/* 689 */         EntityItem entityItem1 = (EntityItem)paramEntityItem.getUpLink(b);
+/* 690 */         EntityItem entityItem2 = (EntityItem)entityItem1.getUpLink(0);
+/* 691 */         EntityItem entityItem3 = (EntityItem)entityItem1.getDownLink(0);
+/* 692 */         stringBuffer.append("<br />Relator: " + entityItem1
+/*     */             
+/* 694 */             .getKey() + ", Parent: " + entityItem2
+/*     */             
+/* 696 */             .getKey() + ", Child: " + entityItem3
+/*     */             
+/* 698 */             .getKey());
+/*     */       } 
+/*     */       
+/* 701 */       for (b = 0; b < paramEntityItem.getDownLinkCount(); b++) {
+/* 702 */         EntityItem entityItem1 = (EntityItem)paramEntityItem.getDownLink(b);
+/* 703 */         EntityItem entityItem2 = (EntityItem)entityItem1.getUpLink(0);
+/* 704 */         EntityItem entityItem3 = (EntityItem)entityItem1.getDownLink(0);
+/* 705 */         stringBuffer.append("<br />Relator: " + entityItem1
+/*     */             
+/* 707 */             .getKey() + ", Parent: " + entityItem2
+/*     */             
+/* 709 */             .getKey() + ", Child: " + entityItem3
+/*     */             
+/* 711 */             .getKey());
+/*     */       } 
+/* 713 */     } catch (Exception exception) {
+/* 714 */       exception.printStackTrace();
+/*     */     } 
+/* 716 */     return stringBuffer.toString();
+/*     */   }
+/*     */ }
 
-//$Log: ALWRCVARABR001.java,v $
-//Revision 1.28  2010/07/12 21:35:09  wendy
-//BH SR87, SR655 - extended combounique rule
-//
-//Revision 1.27  2008/01/30 19:27:19  wendy
-//Cleanup RSA warnings
 
-//Revision 1.26  2006/03/03 19:24:11  bala
-//remove reference to Constants.CSS
-
-//Revision 1.25  2006/01/25 17:45:03  yang
-//Jtest changes
-
-//Revision 1.24  2005/04/28 21:29:49  joan
-//fixes
-
-//Revision 1.23  2005/01/31 16:30:05  joan
-//make changes for Jtest
-
-//Revision 1.22  2005/01/27 16:39:54  joan
-//changes for Jtest
-
-//Revision 1.21  2004/12/13 21:02:47  joan
-//fix for part number
-
-//Revision 1.20  2004/03/02 18:02:58  joan
-//fix bug
-
-//Revision 1.19  2004/03/02 16:59:09  joan
-//fix pull report
-
-//Revision 1.18  2003/12/16 21:32:49  joan
-//fb fix
-
-//Revision 1.17  2003/11/13 20:53:41  joan
-//work on CR
-
-//Revision 1.16  2003/11/13 17:38:41  joan
-//work on CR
-
-//Revision 1.15  2003/10/29 15:41:00  joan
-//fb fixes
-
-//Revision 1.14  2003/10/23 17:10:06  joan
-//adjust for rptclass
-
-//Revision 1.13  2003/10/21 21:32:04  joan
-//fix name
-
-//Revision 1.12  2003/10/21 17:33:09  joan
-//fix dgentity name
-
-//Revision 1.11  2003/10/20 17:43:11  joan
-//fb fixes
-
-//Revision 1.10  2003/10/17 21:20:53  joan
-//fb fixes
-
-//Revision 1.9  2003/10/07 23:25:37  joan
-//change for subs.
-
-//Revision 1.8  2003/09/23 22:58:19  joan
-//add changes
-
-//Revision 1.7  2003/09/18 16:29:57  joan
-//fix error
-
-//Revision 1.6  2003/09/11 22:24:08  joan
-//fb fixes
-
-//Revision 1.5  2003/09/10 18:10:53  joan
-//fix fb
-
-//Revision 1.4  2003/08/27 15:59:05  joan
-//add log
-
-//Revision 1.3  2003/08/21 21:29:34  joan
-//fix error
-
-//Revision 1.2  2003/08/14 21:48:35  joan
-//fix report
-
-//Revision 1.1  2003/08/13 23:01:38  joan
-//initial load
-
-
-package COM.ibm.eannounce.abr.pcd;
-
-//import COM.ibm.opicmpdh.middleware.*;
-//import COM.ibm.opicmpdh.objects.*;
-import COM.ibm.opicmpdh.transactions.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.eannounce.abr.util.*;
-import java.util.*;
-//import java.io.*;
-
-/**
- * ALWRCVARABR001
- *
- *@author     Administrator
- *@created    August 30, 2002
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\pcd\ALWRCVARABR001.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class ALWRCVARABR001 extends PokBaseABR {
-	/**
-	 *  Execute ABR.
-	 *
-	 */
-
-	// Class constants
-	public final static String ABR = new String("ALWRCVARABR001");
-	/**
-	 * FINAL
-	 *
-	 */
-	public final static String FINAL = new String("0020");
-	/**
-	 * REVIEW
-	 *
-	 */
-	public final static String REVIEW = new String("0040");
-
-	private EntityGroup m_egParent = null;
-	private EntityItem m_ei = null;
-	//private final EntityItem m_eiVAR = null;
-
-	/**
-	 * @see COM.ibm.opicmpdh.middleware.taskmaster.AbstractTask#execute_run()
-	 * @author Administrator
-	 */
-	public void execute_run() {
-		EntityGroup eg;
-		EANList varList;
-		EANList prList;
-		EntityGroup egPR;
-		EANList brList;
-		EntityGroup egBR;
-		EntityItem eiCDG;
-		String strStatus;
-		ALWRCVARABR001PDG pdg;
-		StringBuffer sb;
-		EANList eiList;
-		ExtractActionItem xai;
-		Vector vPartNo;
-		try {
-			start_ABRBuild();
-
-			// Build the report header
-			buildReportHeaderII();
-
-			m_egParent = m_elist.getParentEntityGroup();
-			m_ei = m_egParent.getEntityItem(0);
-			println("<br><b>Country Variant: " + m_ei.getKey() + "</b>");
-
-			printNavigateAttributes(m_ei, m_egParent, true);
-
-			setReturnCode(PASS);
-
-			//print General Area (Region)
-			println(
-					"<br/><b>General Area (Region) = </b>"
-					+ getAttributeValue(
-							m_elist,
-							m_ei.getEntityType(),
-							m_ei.getEntityID(),
-							"GENAREANAMEREGION"));
-
-			//==== check VAR entities =================
-			log("ALWRCVARABR001 checking VAR");
-			eg = m_elist.getEntityGroup("VAR");
-
-			if (eg != null) {
-				Vector vVAR =
-					getParentEntityIds(
-							m_ei.getEntityType(),
-							m_ei.getEntityID(),
-							"VAR",
-							"VARCVAR");
-				if (vVAR.size() <= 0) {
-					println("<br /><font color=red>Failed. There is no VAR</font>");
-					setReturnCode(FAIL);
-				} else if (vVAR.size() > 1) {
-					println("<br /><font color=red>Failed. There is not one and only one VAR.</font>");
-					setReturnCode(FAIL);
-				}
-
-				//print Variant
-				varList = new EANList();
-				println("<br/></br/><b>Variant(s): </b>");
-				for (int i = 0; i < vVAR.size(); i++) {
-					int iID = ((Integer) vVAR.elementAt(i)).intValue();
-					EntityItem eiVAR = eg.getEntityItem("VAR" + iID);
-					println("</br/><LI>" + eiVAR.toString());
-					varList.put(eiVAR);
-				}
-
-				//print Project
-				prList = new EANList();
-				egPR = m_elist.getEntityGroup("PR");
-				println("<br/><br /><b>Project(s):</b>");
-				for (int i = 0; i < varList.size(); i++) {
-					EntityItem eiVAR = (EntityItem) varList.getAt(i);
-					Vector vPR =
-						getParentEntityIds(
-								eiVAR.getEntityType(),
-								eiVAR.getEntityID(),
-								"PR",
-								"PRVAR");
-					for (int j = 0; j < vPR.size(); j++) {
-						EntityItem eiPR =
-							egPR.getEntityItem(
-									egPR.getEntityType() + vPR.elementAt(j));
-						if (prList.get(eiPR.getKey()) == null) {
-							println("<br /><LI>" + eiPR.toString());
-							prList.put(eiPR);
-						}
-					}
-				}
-
-				//print Brand
-				brList = new EANList();
-				egBR = m_elist.getEntityGroup("BR");
-				println("<br/><br /><b>Brand(s):</b>");
-				for (int i = 0; i < prList.size(); i++) {
-					EntityItem eiPR = (EntityItem) prList.getAt(i);
-					Vector vBR =
-						getChildrenEntityIds(
-								eiPR.getEntityType(),
-								eiPR.getEntityID(),
-								"BR",
-								"PRBRANDCODEA");
-					for (int k = 0; k < vBR.size(); k++) {
-						EntityItem eiBR =
-							egBR.getEntityItem(
-									egBR.getEntityType() + vBR.elementAt(k));
-						if (brList.get(eiBR.getKey()) == null) {
-							println("<br /><LI>" + eiBR.toString());
-							brList.put(eiBR);
-						}
-					}
-				}
-			} else {
-				println("EntityGroup VAR is null\n");
-				setReturnCode(FAIL);
-			}
-
-			//==== check CDG entities =================
-			log("ALWRCVARABR001 checking CDG");
-			eg = m_elist.getEntityGroup("CDG");
-			eiCDG = null;
-			if (eg != null) {
-				Vector vCDG =
-					getChildrenEntityIds(
-							m_ei.getEntityType(),
-							m_ei.getEntityID(),
-							"CDG",
-							"CVARCDG");
-				if (vCDG.size() <= 0) {
-					println("<br /><font color=red>Failed. There is no CDG</font>");
-					setReturnCode(FAIL);
-				} else if (vCDG.size() > 1) {
-					println("<br /><font color=red>Failed. There is not one and only one CDG.</font>");
-					setReturnCode(FAIL);
-				} else {
-					int iID = ((Integer) vCDG.elementAt(0)).intValue();
-					eiCDG = eg.getEntityItem("CDG" + iID);
-				}
-
-				println("<br/></br/><b>Country Designator Group(s):</b>");
-				for (int i = 0; i < vCDG.size(); i++) {
-					int iID = ((Integer) vCDG.elementAt(i)).intValue();
-					EntityItem ei = eg.getEntityItem("CDG" + iID);
-					println("</br/><LI> " + ei.toString());
-				}
-			} else {
-				println("EntityGroup CDG is null\n");
-				setReturnCode(FAIL);
-			}
-
-			//=============check CD entities ==========================================
-			log("ALWRCVARABR001 checking CD");
-			if (eiCDG != null) {
-				EntityGroup CDGroup = m_elist.getEntityGroup("CD");
-				Vector vCD =
-					getChildrenEntityIds(
-							eiCDG.getEntityType(),
-							eiCDG.getEntityID(),
-							"CD",
-							"CDGCD");
-				if (vCD.size() <= 0) {
-					println("</br/><font color=red>Failed. No CD exists in the CDG.</font>");
-					println("</br/>" + eiCDG.toString());
-					setReturnCode(FAIL);
-				} else {
-					for (int i = 0; i < vCD.size(); i++) {
-						int iID = ((Integer) vCD.elementAt(i)).intValue();
-						EntityItem ei = CDGroup.getEntityItem("CD" + iID);
-						String strCD =
-							getAttributeValue(
-									m_elist,
-									ei.getEntityType(),
-									ei.getEntityID(),
-									"COUNTRY_DESIG");
-						if (strCD == null || strCD.length() <= 0) {
-							println("</br/><font color=red>Failed. The attribute COUNTRY_DESIG is not populated.</font>");
-							println("</br/>" + ei.toString());
-							setReturnCode(FAIL);
-						}
-					}
-				}
-			}
-
-			//=====For the source CVAR, check that STATUS_CVAR is equal to ‘Ready for Review’ or ‘Final’==
-			strStatus =
-				getAttributeFlagEnabledValue(
-						m_elist,
-						m_ei.getEntityType(),
-						m_ei.getEntityID(),
-						"STATUS_CVAR")
-						.trim();
-			if (!(strStatus.equals(FINAL) || strStatus.equals(REVIEW))) {
-				println("</br/><font color=red>Failed. the CVAR is not in Ready for Review or Final status. </font>");
-				setReturnCode(FAIL);
-			}
-
-			//============= run the PDG to generate data ==========================================
-			if (getReturnCode() == PASS) {
-				log("ALWRCVARABR001 generating data");
-				pdg =
-					new ALWRCVARABR001PDG(
-							null,
-							m_db,
-							m_prof,
-							"ALWRCVARABR001PDG");
-				pdg.setEntityItem(m_ei);
-				pdg.setABReList(m_elist);
-				pdg.executeAction(m_db, m_prof);
-				sb = pdg.getActivities();
-				println("</br></br/><b>Generated Data:</b>");
-				println("<br/>" + sb.toString());
-				log("ALWRCVARABR001 finish generating data");
-
-				// display result
-
-				println("</br><br/><b>Relators: </b>");
-				eiList = pdg.getSavedEIList();
-				xai =
-					new ExtractActionItem(
-							null,
-							m_db,
-							m_prof,
-							m_abri.getVEName());
-				for (int i = 0; i < eiList.size(); i++) {
-					EntityItem ei = (EntityItem) eiList.getAt(i);
-					println(pullResultReport(ei, xai));
-				}
-
-				// clean up PartNo saved temporarily in TRSPARTNO table
-				vPartNo = new Vector();
-				for (int i = 0; i < eiList.size(); i++) {
-					EntityItem ei = (EntityItem) eiList.getAt(i);
-
-					for (int j = 0; j < ei.getAttributeCount(); j++) {
-						EANAttribute att = ei.getAttribute(j);
-						EANMetaAttribute meta = att.getMetaAttribute();
-						if (att instanceof TextAttribute) {
-							if (meta.isUnique()) {
-								if (meta.getUniqueClass().equals("LEVEL1")) {
-									vPartNo.addElement(
-											att.toString() + meta.getKey());
-								} else if (
-										meta.getUniqueClass().equals("LEVEL2")) {
-									vPartNo.addElement(
-											att.toString()
-											+ meta.getKey()
-											+ ei.getEntityType());
-								}
-							} else if (meta.isComboUnique()) {
-								Vector v = meta.getComboUniqueAttributeCode();
-
-								for (int k = 0; k < v.size(); k++) {
-									String strFlagAttributeCode = meta.getComboUniqueAttributeCode(k);
-									EANAttribute att2 = ei.getAttribute(strFlagAttributeCode);
-									if (att2 instanceof EANFlagAttribute) {
-										String strFlagAttributeValue = ((EANFlagAttribute)att2).getFlagCodes();
-
-										// Here .. we have to parse out all the flag codes ...
-										StringTokenizer st = new StringTokenizer(strFlagAttributeValue,":");
-
-										while (st.hasMoreTokens()) {
-											String strFlagCode = st.nextToken();
-											vPartNo.addElement(
-													att.toString()
-													+ ":"+ meta.getKey()
-													+ ":"+ strFlagCode
-													+ ":"+ strFlagAttributeCode);
-										}
-									}else if (att2 instanceof EANTextAttribute){
-										vPartNo.addElement(
-												att.toString()
-												+ ":"+ meta.getKey()
-												+ ":"+ att2.toString()
-												+ ":"+ strFlagAttributeCode);
-									}
-								}
-							}
-						} else if (att instanceof SingleFlagAttribute) {
-							EANFlagAttribute flagAtt = (EANFlagAttribute) att;
-							if (meta.isUnique()) {
-								if (meta.getUniqueClass().equals("EACHECK")) {
-									vPartNo.addElement(
-											att.toString()
-											+ meta.getKey()
-											+ ei.getEntityType());
-								}
-							} else if (meta.isComboUnique()) {
-								Vector v = meta.getComboUniqueAttributeCode();
-								for (int k = 0; k < v.size(); k++) {
-									String strTextAttributeCode =  meta.getComboUniqueAttributeCode(k);
-									EANAttribute att2 = ei.getAttribute(strTextAttributeCode);
-									if (att2 instanceof EANTextAttribute) {
-										String strTextAttributeValue =  att2.toString();
-										vPartNo.addElement(
-												flagAtt.getFlagCodes()
-												+ ":" + meta.getKey()
-												+ ":" + strTextAttributeValue
-												+ ":" + strTextAttributeCode);
-									}else if (att2 instanceof EANFlagAttribute){
-										String strFlagAttributeValue =((EANFlagAttribute)att2).getFlagCodes();
-
-										// Here .. we have to parse out all the flag codes ...
-										StringTokenizer st =new StringTokenizer(strFlagAttributeValue,":");
-
-										while (st.hasMoreTokens()) {
-											String strFlagCode = st.nextToken();
-											vPartNo.addElement(
-													att.toString()
-													+ ":"+ meta.getKey()
-													+ ":"+ strFlagCode
-													+ ":"+ strTextAttributeCode);
-										}
-									}
-								}
-							}
-						} else if (att instanceof MultiFlagAttribute) {
-							EANFlagAttribute flagAtt = (EANFlagAttribute) att;
-							if (meta.isComboUnique()) {
-								Vector v = meta.getComboUniqueAttributeCode();
-								for (int k = 0; k < v.size(); k++) {
-									String strTextAttributeCode = meta.getComboUniqueAttributeCode(k);
-									EANAttribute att2 = ei.getAttribute(strTextAttributeCode);
-									if (att2 instanceof EANTextAttribute) {
-										String strTextAttributeValue = att2.toString();
-										vPartNo.addElement(
-												flagAtt.getFlagCodes()
-												+ ":" + meta.getKey()
-												+ ":" + strTextAttributeValue
-												+ ":" + strTextAttributeCode);
-									}else if (att2 instanceof EANFlagAttribute){
-										String strFlagAttributeValue =((EANFlagAttribute)att2).getFlagCodes();
-
-										// Here .. we have to parse out all the flag codes ...
-										StringTokenizer st =new StringTokenizer(strFlagAttributeValue,":");
-
-										while (st.hasMoreTokens()) {
-											String strFlagCode = st.nextToken();
-											vPartNo.addElement(
-													att.toString()
-													+ ":"+ meta.getKey()
-													+ ":"+ strFlagCode
-													+ ":"+ strTextAttributeCode);
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-
-				for (int i = 0; i < vPartNo.size(); i++) {
-					String strPartNo = (String) vPartNo.elementAt(i);
-					PartNo.remove(m_db, strPartNo);
-				}
-
-			}
-
-			println(
-					"<br /><br /><b>"
-					+ buildMessage(
-							MSG_IAB2016I,
-							new String[] {
-									getABRDescription(),
-									(getReturnCode() == PASS ? "Passed" : "Failed")})
-									+ "</b>");
-
-			log(
-					buildLogMessage(
-							MSG_IAB2016I,
-							new String[] {
-									getABRDescription(),
-									(getReturnCode() == PASS ? "Passed" : "Failed")}));
-		} catch (LockPDHEntityException le) {
-			setReturnCode(UPDATE_ERROR);
-			println(
-					"<h3><font color=red>"
-					+ ERR_IAB1007E
-					+ "<br />"
-					+ le.getMessage()
-					+ "</font></h3>");
-			logError(le.getMessage());
-		} catch (UpdatePDHEntityException le) {
-			setReturnCode(UPDATE_ERROR);
-			println(
-					"<h3><font color=red>UpdatePDH error: "
-					+ le.getMessage()
-					+ "</font></h3>");
-			logError(le.getMessage());
-		} catch (SBRException _sbrex) {
-			setReturnCode(UPDATE_ERROR);
-			println(
-					"<h3><font color=red>Generate Data error: "
-					+ _sbrex.toString()
-					+ "</font></h3>");
-			logError(_sbrex.toString());
-		} catch (Exception exc) {
-			// Report this error to both the datbase log and the PrintWriter
-			println("Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-			println("" + exc);
-			exc.printStackTrace();
-			// don't overwrite an update exception
-			if (getABRReturnCode() != UPDATE_ERROR) {
-				setReturnCode(INTERNAL_ERROR);
-			}
-		} finally {
-			String strNavName =
-				getABREntityDesc(m_ei.getEntityType(), m_ei.getEntityID());
-			String strABRAttrDesc = getMetaAttributeDescription(m_ei, ABR);
-
-			String strDgName = strABRAttrDesc + " for " + strNavName;
-			if (strDgName.length() > 64) {
-				strDgName = strDgName.substring(0, 64);
-			}
-
-			setDGTitle(strDgName);
-
-			printALWRInfo();
-
-			// set DG submit string
-			setDGString(getABRReturnCode());
-			setDGRptName(ABR); //Set the report name
-			setDGRptClass("ALWRCVAR");
-			printDGSubmitString();
-			//Stuff into report for subscription and notification
-
-			// Tack on the DGString
-			buildReportFooter();
-			// make sure the lock is released
-			if (!isReadOnly()) {
-				clearSoftLock();
-			}
-		}
-	}
-
-	/**
-	 *  Get the entity description to use in error messages
-	 *
-	 *@return             String
-	 * @param _iEntityId
-	 * @param _strEntityType
-	 */
-	protected String getABREntityDesc(String _strEntityType, int _iEntityId) {
-		return getAttributeValue(
-				m_elist,
-				_strEntityType,
-				_iEntityId,
-				"PNUMB_CT")
-				+ ", "
-				+ getAttributeValue(
-						m_elist,
-						_strEntityType,
-						_iEntityId,
-				"GENAREANAMEREGION")
-				+ ", "
-				+ getAttributeValue(
-						m_elist,
-						_strEntityType,
-						_iEntityId,
-				"GENAREANAME")
-				+ ", "
-				+ getAttributeValue(
-						m_elist,
-						_strEntityType,
-						_iEntityId,
-				"TARGANNDATE_CVAR")
-				+ ", "
-				+ getAttributeValue(m_elist, _strEntityType, _iEntityId, "NAME");
-	}
-
-	/**
-	 *  Get ABR description
-	 *
-	 *@return    java.lang.String
-	 */
-	public String getDescription() {
-		return "The purpose of this ABR is to create one or more Country Variant Solutions based on an existing Country Variant Solution (CVAR).  A CVAR is generated for each Country Designator (CD)/Country combination in the related Country Designator Group (CDG) and the part number is determined by the CD.";
-	}
-
-	/**
-	 *  Get any style that should be used for this page. Derived classes can
-	 *  override this to set styles They must include the <style>...</style> tags
-	 *
-	 *@return    String
-	 */
-	protected String getStyle() {
-		// Print out the PSG stylesheet
-		return "";
-	}
-
-	/**
-	 * getRevision
-	 *
-	 * @return
-	 * @author Administrator
-	 */
-	public String getRevision() {
-		return new String("$Revision: 1.28 $");
-	}
-
-	/**
-	 * getVersion
-	 *
-	 * @return
-	 * @author Administrator
-	 */
-	public static String getVersion() {
-		return ("$Id: ALWRCVARABR001.java,v 1.28 2010/07/12 21:35:09 wendy Exp $");
-	}
-
-	/**
-	 * @see COM.ibm.eannounce.abr.util.PokBaseABR#getABRVersion()
-	 * @author Administrator
-	 */
-	public String getABRVersion() {
-		return ("ALWRCVARABR001.java,v 1.2");
-	}
-
-	private void printALWRInfo() {
-		String strNavName =
-			getABREntityDesc(m_ei.getEntityType(), m_ei.getEntityID());
-		String strABRAttrDesc = getMetaAttributeDescription(m_ei, ABR);
-
-		//NAME = ALWR for (Entity Description of selected CSOL): Navigation Display Name of Selected CSOL | Return Code | ALWRSTATUS
-		println("<br /><b>NAME = </b>" + strABRAttrDesc + " for " + strNavName);
-		//RPTNAME = ALWRCVARABR001
-		println("<br /><b> RPTNAME = </b>" + ABR);
-		//TASKSTATUS = Return Code
-		println(
-				"<br /><b> TASKSTATUS = </b>"
-				+ (getReturnCode() == PASS ? "Passed" : "Failed"));
-		//PDHDOMAIN = from profile
-		println(
-				"<br/><b>PDH Domain = </b>"
-				+ getAttributeValue(
-						m_elist,
-						m_ei.getEntityType(),
-						m_ei.getEntityID(),
-						"PDHDOMAIN"));
-	}
-
-	private String pullResultReport(EntityItem _ei, ExtractActionItem _xai) {
-		StringBuffer sb;
-		EntityList elist;
-		EntityGroup eg;
-		log("ALWRCSOLABR001 pullResultReport");
-
-		sb = new StringBuffer();
-		try {
-			m_prof = refreshProfValOnEffOn(m_prof);
-			EntityItem[] aei = { _ei };
-			elist =
-				EntityList.getEntityList(m_db, m_prof, _xai, aei);
-
-			eg = elist.getParentEntityGroup();
-			_ei = eg.getEntityItem(_ei.getKey());
-
-			for (int u = 0; u < _ei.getUpLinkCount(); u++) {
-				EntityItem eir = (EntityItem) _ei.getUpLink(u);
-				EntityItem eip = (EntityItem) eir.getUpLink(0);
-				EntityItem eic = (EntityItem) eir.getDownLink(0);
-				sb.append(
-						"<br />Relator: "
-						+ eir.getKey()
-						+ ", Parent: "
-						+ eip.getKey()
-						+ ", Child: "
-						+ eic.getKey());
-			}
-
-			for (int d = 0; d < _ei.getDownLinkCount(); d++) {
-				EntityItem eir = (EntityItem) _ei.getDownLink(d);
-				EntityItem eip = (EntityItem) eir.getUpLink(0);
-				EntityItem eic = (EntityItem) eir.getDownLink(0);
-				sb.append(
-						"<br />Relator: "
-						+ eir.getKey()
-						+ ", Parent: "
-						+ eip.getKey()
-						+ ", Child: "
-						+ eic.getKey());
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		} 
-		return sb.toString();
-	}
-
-}

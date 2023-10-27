@@ -1,384 +1,389 @@
-//  (c) Copyright International Business Machines Corporation, 2001
-//  All Rights Reserved.</pre>
-//
-//COFQRABR01.java,v
-//Revision 1.19  2006/03/03 19:23:27  bala
-//remove reference to Constants.CSS
-//
-//Revision 1.18  2006/01/24 17:02:40  yang
-//Jtest Changes
-//
-//Revision 1.17  2003/11/07 01:20:54  yang
-//Adding setDGRptClass
-//
-//Revision 1.16  2003/09/18 19:51:27  yang
-//adding bala's stuff to finally {
-//
-//Revision 1.15  2003/07/02 18:14:59  yang
-//Updated setFlagValue to include the children
-//
-//Revision 1.14  2003/06/06 17:04:28  dave
-//fixing report triggering
-//
-//Revision 1.13  2003/06/06 16:58:19  minhthy
-//change checkM0004() to checkM0004GrandChild()
-//
-//Revision 1.12  2003/06/05 21:53:47  yang
-//Updated S0002
-//
-//Revision 1.11  2003/06/05 16:34:12  dave
-//more fixes to syntax
-//
-//Revision 1.10  2003/06/05 16:20:00  dave
-//going after COF...
-//
-//Revision 1.9  2003/06/04 15:00:04  yang
-//Added StackTrace
-//
-//Revision 1.8  2003/06/04 03:53:08  dave
-//un Staticing getABRVersion
-//
-//Revision 1.7  2003/06/04 03:44:25  dave
-//minor syntax
-//
-//Revision 1.6  2003/06/04 03:41:44  dave
-//adding getABRVersion
-//
-//Revision 1.5  2003/06/03 23:28:33  dave
-//commonizing setControlBlock
-//
-//Revision 1.4  2003/06/03 19:47:31  yang
-//fixed feedback 51110
-//
-//Revision 1.3  2003/06/03 19:41:52  yang
-//fixed merge
-//
-//Revision 1.2  2003/06/03 19:33:58  dave
-//more consolidation
-//
-//Revision 1.1.1.1  2003/06/03 19:02:24  dave
-//new 1.1.1 abr
-//
-//Revision 1.15  2003/06/03 18:17:37  dave
-//preping for common T1 and T2 processing
-//
-//Revision 1.14  2003/05/30 20:13:42  yang
-//Updated S0002
-//
-//Revision 1.13  2003/05/29 01:33:19  naomi
-//fix output M0007, M0008
-//
-//Revision 1.11  2003/05/27 19:02:59  naomi
-//fixed checkS0001_GC
-//
-//Revision 1.10  2003/05/23 22:30:43  naomi
-//fixed isStatusOK
-//
-//Revision 1.9  2003/05/22 18:30:30  yang
-//*** empty log message ***
-//
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.LockPDHEntityException;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.abr.util.UpdatePDHEntityException;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import java.io.PrintWriter;
+/*     */ import java.io.StringWriter;
+/*     */ import java.util.Hashtable;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class COFQRABR01
+/*     */   extends PokBaseABR
+/*     */ {
+/* 118 */   public static final Hashtable c_hshEntities = new Hashtable<>();
+/*     */   static {
+/* 120 */     c_hshEntities.put("BPEXHIBIT", "HI");
+/* 121 */     c_hshEntities.put("CATINCL", "HI");
+/* 122 */     c_hshEntities.put("CHANNEL", "HI");
+/* 123 */     c_hshEntities.put("COMMERCIALOF", "HI");
+/* 124 */     c_hshEntities.put("CRYPTO", "HI");
+/* 125 */     c_hshEntities.put("ENVIRINFO", "HI");
+/* 126 */     c_hshEntities.put("IVOCAT", "HI");
+/* 127 */     c_hshEntities.put("ORDERINFO", "HI");
+/* 128 */     c_hshEntities.put("ORGANUNIT", "HI");
+/* 129 */     c_hshEntities.put("PACKAGING", "HI");
+/* 130 */     c_hshEntities.put("PRICEFININFO", "HI");
+/* 131 */     c_hshEntities.put("PUBLICATION", "HI");
+/* 132 */     c_hshEntities.put("PUBTABLE", "HI");
+/* 133 */     c_hshEntities.put("RULES", "HI");
+/* 134 */     c_hshEntities.put("SHIPINFO", "HI");
+/* 135 */     c_hshEntities.put("TECHCAPABILITY", "HI");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 142 */   public static final String ABR = new String("COFQRABR01");
+/*     */   
+/* 144 */   private EntityGroup m_egParent = null;
+/* 145 */   private EntityItem m_eiParent = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/* 153 */     EntityGroup entityGroup1 = null;
+/* 154 */     EntityGroup entityGroup2 = null;
+/*     */     
+/* 156 */     String str = null;
+/*     */ 
+/*     */     
+/*     */     try {
+/* 160 */       start_ABRBuild();
+/* 161 */       this.m_egParent = this.m_elist.getParentEntityGroup();
+/* 162 */       this
+/* 163 */         .m_eiParent = (this.m_egParent == null) ? null : this.m_egParent.getEntityItem(0);
+/*     */       
+/* 165 */       if (this.m_egParent == null) {
+/* 166 */         logMessage(ABR + ":" + 
+/*     */ 
+/*     */             
+/* 169 */             getVersion() + ":ERROR:1: m_egParent cannot be established.");
+/*     */         
+/* 171 */         setReturnCode(-1);
+/*     */         return;
+/*     */       } 
+/* 174 */       if (this.m_eiParent == null) {
+/* 175 */         logMessage(ABR + ":" + 
+/*     */ 
+/*     */             
+/* 178 */             getVersion() + ":ERROR:2: m_eiParent cannot be established.");
+/*     */         
+/* 180 */         setReturnCode(-1);
+/*     */         return;
+/*     */       } 
+/* 183 */       logMessage(ABR + ":" + 
+/*     */ 
+/*     */           
+/* 186 */           getVersion() + ":Request to Work on Entity:" + this.m_eiParent
+/*     */           
+/* 188 */           .getEntityType() + ":" + this.m_eiParent
+/*     */           
+/* 190 */           .getEntityID());
+/* 191 */       buildReportHeader();
+/* 192 */       setControlBlock();
+/* 193 */       setDGTitle(setDGName(this.m_eiParent, ABR));
+/*     */       
+/* 195 */       logMessage(ABR + ":" + 
+/*     */ 
+/*     */           
+/* 198 */           getVersion() + ":Setup Complete:" + this.m_eiParent
+/*     */           
+/* 200 */           .getEntityType() + ":" + this.m_eiParent
+/*     */           
+/* 202 */           .getEntityID());
+/*     */ 
+/*     */       
+/* 205 */       displayHeader(this.m_egParent, this.m_eiParent);
+/* 206 */       setReturnCode(0);
+/*     */       
+/* 208 */       if (!checkM0007(this.m_egParent, this.m_eiParent)) {
+/* 209 */         setReturnCode(-1);
+/*     */       }
+/* 211 */       if (!checkM0008(this.m_egParent, this.m_eiParent)) {
+/* 212 */         setReturnCode(-1);
+/*     */       }
+/* 214 */       if (!checkM0001(this.m_eiParent)) {
+/* 215 */         setReturnCode(-1);
+/*     */       }
+/* 217 */       if (!checkM0004GrandChild(this.m_eiParent)) {
+/* 218 */         setReturnCode(-1);
+/*     */       }
+/* 220 */       if (!checkS0001(this.m_eiParent)) {
+/* 221 */         setReturnCode(-1);
+/*     */       }
+/* 223 */       if (!checkS0002(this.m_eiParent, c_hshEntities)) {
+/* 224 */         setReturnCode(-1);
+/*     */       }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 230 */       if (getReturnCode() == 0) {
+/* 231 */         setFlagValue(this.m_eiParent, 
+/*     */             
+/* 233 */             getStatusAttributeCode(this.m_eiParent), 
+/* 234 */             getNextStatusCode(this.m_eiParent));
+/* 235 */         entityGroup1 = this.m_elist.getEntityGroup("COFCOFMGMTGRP"); byte b;
+/* 236 */         for (b = 0; b < entityGroup1.getEntityItemCount(); b++) {
+/* 237 */           EntityItem entityItem = entityGroup1.getEntityItem(b);
+/* 238 */           setFlagValue(entityItem, 
+/*     */               
+/* 240 */               getStatusAttributeCode(entityItem), 
+/* 241 */               getNextStatusCode(entityItem));
+/*     */         } 
+/*     */ 
+/*     */         
+/* 245 */         entityGroup2 = this.m_elist.getEntityGroup("COFOOFMGMTGRP");
+/* 246 */         for (b = 0; b < entityGroup2.getEntityItemCount(); b++) {
+/* 247 */           EntityItem entityItem = entityGroup2.getEntityItem(b);
+/* 248 */           setFlagValue(entityItem, 
+/*     */               
+/* 250 */               getStatusAttributeCode(entityItem), 
+/* 251 */               getNextStatusCode(entityItem));
+/*     */         } 
+/*     */ 
+/*     */         
+/* 255 */         if (isChangeRev(this.m_eiParent) || isChangeFinal(this.m_eiParent)) {
+/* 256 */           setNow();
+/* 257 */           println(processChangeReport(getT1(this.m_eiParent), getNow()));
+/*     */         } 
+/*     */       } 
+/*     */       
+/* 261 */       println("<br /><b>" + 
+/*     */           
+/* 263 */           buildMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 266 */               getABRDescription(), 
+/* 267 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }) + "</b>");
+/* 269 */       log(
+/* 270 */           buildLogMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 273 */               getABRDescription(), 
+/* 274 */               (getReturnCode() == 0) ? "Passed" : "Failed" }));
+/* 275 */     } catch (LockPDHEntityException lockPDHEntityException) {
+/* 276 */       setReturnCode(-2);
+/* 277 */       println("<h3><font color=red>IAB1007E: Could not get soft lock.  Rule execution is terminated.<br />" + lockPDHEntityException
+/*     */ 
+/*     */ 
+/*     */           
+/* 281 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 283 */       logError(lockPDHEntityException.getMessage());
+/* 284 */     } catch (UpdatePDHEntityException updatePDHEntityException) {
+/* 285 */       setReturnCode(-2);
+/* 286 */       println("<h3><font color=red>UpdatePDH error: " + updatePDHEntityException
+/*     */           
+/* 288 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 290 */       logError(updatePDHEntityException.getMessage());
+/* 291 */     } catch (Exception exception) {
+/*     */       
+/* 293 */       println("Error in " + this.m_abri.getABRCode() + ":" + exception.getMessage());
+/* 294 */       println("" + exception);
+/* 295 */       exception.printStackTrace();
+/*     */       
+/* 297 */       StringWriter stringWriter = new StringWriter();
+/* 298 */       exception.printStackTrace(new PrintWriter(stringWriter));
+/* 299 */       str = stringWriter.toString();
+/* 300 */       println(str);
+/* 301 */       logMessage("Error in " + this.m_abri
+/* 302 */           .getABRCode() + ":" + exception.getMessage());
+/* 303 */       logMessage("" + exception);
+/*     */       
+/* 305 */       if (getABRReturnCode() != -2) {
+/* 306 */         setReturnCode(-3);
+/*     */       }
+/*     */     } finally {
+/*     */       
+/* 310 */       setDGString(getABRReturnCode());
+/* 311 */       setDGRptName("COFQRABR01");
+/* 312 */       setDGRptClass("COFQRABR01");
+/* 313 */       printDGSubmitString();
+/*     */       
+/* 315 */       buildReportFooter();
+/* 316 */       if (!isReadOnly()) {
+/* 317 */         clearSoftLock();
+/*     */       }
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getABREntityDesc(String paramString, int paramInt) {
+/* 331 */     return null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 341 */     return "<br /><br />";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getStyle() {
+/* 351 */     return "";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getRevision() {
+/* 361 */     return new String("1.19");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String getVersion() {
+/* 371 */     return "COFQRABR01.java,v 1.19 2006/03/03 19:23:27 bala Exp";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 381 */     return getVersion();
+/*     */   }
+/*     */ }
 
-//Revision 1.16  2003/04/16 22:07:30  yang
 
-//Modify ABR to new spec
-
-//
-
-//
-
-//Revision 1.1  2002/09/11 21:08:36  bala
-
-//check in
-
-//
-
-package COM.ibm.eannounce.abr.sg;
-
-//import COM.ibm.opicmpdh.middleware.*;
-//import COM.ibm.opicmpdh.objects.*;
-//import COM.ibm.opicmpdh.transactions.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.eannounce.abr.util.*;
-import java.util.*;
-import java.io.*;
-//import java.sql.*;
-
-/**
- * COFQRABR01
- *
- * @author Owner
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\COFQRABR01.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class COFQRABR01 extends PokBaseABR {
-
-  // S0002 only check for PUBLICATION , RULES
-  /**
-     * c_hshEntities
-     *
-     */
-    public static final Hashtable c_hshEntities = new Hashtable();
-  static {
-    c_hshEntities.put("BPEXHIBIT", "HI");
-    c_hshEntities.put("CATINCL", "HI");
-    c_hshEntities.put("CHANNEL", "HI");
-    c_hshEntities.put("COMMERCIALOF", "HI");
-    c_hshEntities.put("CRYPTO", "HI");
-    c_hshEntities.put("ENVIRINFO", "HI");
-    c_hshEntities.put("IVOCAT", "HI");
-    c_hshEntities.put("ORDERINFO", "HI");
-    c_hshEntities.put("ORGANUNIT", "HI");
-    c_hshEntities.put("PACKAGING", "HI");
-    c_hshEntities.put("PRICEFININFO", "HI");
-    c_hshEntities.put("PUBLICATION", "HI");
-    c_hshEntities.put("PUBTABLE", "HI");
-    c_hshEntities.put("RULES", "HI");
-    c_hshEntities.put("SHIPINFO", "HI");
-    c_hshEntities.put("TECHCAPABILITY", "HI");
-  }
-
-  /**
-     * ABR
-     *
-     */
-    public final static String ABR = new String("COFQRABR01");
-
-  private EntityGroup m_egParent = null; //root COMMERCIALOF
-  private EntityItem m_eiParent = null; //root COMMERCIALOF
-
-  /**
-     * execute_run
-     *
-     * @author Owner
-     */
-    public void execute_run() {
-    EntityGroup m_egChild = null;
-    EntityGroup m_egChild1 = null;
-    StringWriter writer;
-    String x = null;
-
-    try {
-
-      start_ABRBuild();
-      m_egParent = m_elist.getParentEntityGroup();
-      m_eiParent =
-        (m_egParent == null ? null : m_egParent.getEntityItem(0));
-
-      if (m_egParent == null) {
-        logMessage(
-          ABR
-            + ":"
-            + getVersion()
-            + ":ERROR:1: m_egParent cannot be established.");
-        setReturnCode(FAIL);
-        return;
-      }
-      if (m_eiParent == null) {
-        logMessage(
-          ABR
-            + ":"
-            + getVersion()
-            + ":ERROR:2: m_eiParent cannot be established.");
-        setReturnCode(FAIL);
-        return;
-      }
-      logMessage(
-        ABR
-          + ":"
-          + getVersion()
-          + ":Request to Work on Entity:"
-          + m_eiParent.getEntityType()
-          + ":"
-          + m_eiParent.getEntityID());
-      buildReportHeader();
-      setControlBlock();
-      setDGTitle(setDGName(m_eiParent, ABR));
-
-      logMessage(
-        ABR
-          + ":"
-          + getVersion()
-          + ":Setup Complete:"
-          + m_eiParent.getEntityType()
-          + ":"
-          + m_eiParent.getEntityID());
-
-      // Here is the check
-      displayHeader(m_egParent, m_eiParent);
-      setReturnCode(PASS);
-
-      if (!checkM0007(m_egParent, m_eiParent)) {
-        setReturnCode(FAIL);
-      }
-      if (!checkM0008(m_egParent, m_eiParent)) {
-        setReturnCode(FAIL);
-      }
-      if (!checkM0001(m_eiParent)) {
-        setReturnCode(FAIL);
-      }
-      if (!checkM0004GrandChild(m_eiParent)) {
-        setReturnCode(FAIL);
-      }
-      if (!checkS0001(m_eiParent)) {
-        setReturnCode(FAIL);
-      }
-      if (!checkS0002(m_eiParent, c_hshEntities)) {
-        setReturnCode(FAIL);
-      }
-
-      /* If return code is PASS and the prior status is "Change (Ready for Review)" or "Change (Complete)"
-      * then, produce a Change Report
-      */
-      if (getReturnCode() == PASS) {
-        setFlagValue(
-          m_eiParent,
-          getStatusAttributeCode(m_eiParent),
-          getNextStatusCode(m_eiParent));
-        m_egChild = m_elist.getEntityGroup("COFCOFMGMTGRP");
-        for (int i = 0; i < m_egChild.getEntityItemCount(); i++) {
-          EntityItem m_eiChild = (m_egChild.getEntityItem(i));
-          setFlagValue(
-            m_eiChild,
-            getStatusAttributeCode(m_eiChild),
-            getNextStatusCode(m_eiChild));
-        }
-
-        m_egChild1 =
-          m_elist.getEntityGroup("COFOOFMGMTGRP");
-        for (int i = 0; i < m_egChild1.getEntityItemCount(); i++) {
-          EntityItem m_eiChild1 = (m_egChild1.getEntityItem(i));
-          setFlagValue(
-            m_eiChild1,
-            getStatusAttributeCode(m_eiChild1),
-            getNextStatusCode(m_eiChild1));
-        }
-
-        // Insert the change report here
-        if (isChangeRev(m_eiParent) || isChangeFinal(m_eiParent)) {
-          setNow();
-          println(processChangeReport(getT1(m_eiParent), getNow()));
-        }
-      }
-
-      println(
-        "<br /><b>"
-          + buildMessage(
-            MSG_IAB2016I,
-            new String[] {
-              getABRDescription(),
-              (getReturnCode() == PASS ? "Passed" : "Failed")})
-          + "</b>");
-      log(
-        buildLogMessage(
-          MSG_IAB2016I,
-          new String[] {
-            getABRDescription(),
-            (getReturnCode() == PASS ? "Passed" : "Failed")}));
-    } catch (LockPDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>"
-          + ERR_IAB1007E
-          + "<br />"
-          + le.getMessage()
-          + "</font></h3>");
-      logError(le.getMessage());
-    } catch (UpdatePDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>UpdatePDH error: "
-          + le.getMessage()
-          + "</font></h3>");
-      logError(le.getMessage());
-    } catch (Exception exc) {
-      // Report this error to both the datbase log and the PrintWriter
-      println("Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-      println("" + exc);
-      exc.printStackTrace();
-
-      writer = new StringWriter();
-      exc.printStackTrace(new PrintWriter(writer));
-      x = writer.toString();
-      println(x);
-      logMessage(
-        "Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-      logMessage("" + exc);
-      // don't overwrite an update exception
-      if (getABRReturnCode() != UPDATE_ERROR) {
-        setReturnCode(INTERNAL_ERROR);
-      }
-    } finally {
-      //Everything is fine...so lets pass
-      setDGString(getABRReturnCode());
-      setDGRptName("COFQRABR01"); //Set the report name
-      setDGRptClass("COFQRABR01"); //Set the report class
-      printDGSubmitString();
-      //Stuff into report for subscription and notification
-      buildReportFooter();
-      if (!isReadOnly()) {
-        clearSoftLock();
-      }
-    }
-  }
-
-  /**
-     * getABREntityDesc
-     *
-     * @param entityType
-     * @param entityId
-     * @return
-     * @author Owner
-     */
-    protected String getABREntityDesc(String entityType, int entityId) {
-    return null;
-  }
-
-  /**
-     * getDescription
-     *
-     * @return
-     * @author Owner
-     */
-    public String getDescription() {
-    return "<br /><br />";
-  }
-
-  /**
-     * getStyle
-     *
-     * @return
-     * @author Owner
-     */
-    protected String getStyle() {
-    return "";
-  }
-
-  /**
-     * getRevision
-     *
-     * @return
-     * @author Owner
-     */
-    public String getRevision() {
-    return new String("1.19");
-  }
-
-  /**
-     * getVersion
-     *
-     * @return
-     * @author Owner
-     */
-    public static String getVersion() {
-    return ("COFQRABR01.java,v 1.19 2006/03/03 19:23:27 bala Exp");
-  }
-
-  /**
-     * getABRVersion
-     *
-     * @return
-     * @author Owner
-     */
-    public String getABRVersion() {
-    return getVersion();
-  }
-
-}

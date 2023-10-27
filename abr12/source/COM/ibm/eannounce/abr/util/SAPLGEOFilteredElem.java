@@ -1,136 +1,141 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2007  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Vector;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ import org.w3c.dom.Node;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class SAPLGEOFilteredElem
+/*     */   extends SAPLElem
+/*     */ {
+/*     */   private String filterAttr;
+/*     */   private String filterValue;
+/*     */   
+/*     */   public SAPLGEOFilteredElem(String paramString1, String paramString2, String paramString3, String paramString4, String paramString5, int paramInt) {
+/*  54 */     super(paramString1, paramString2, paramString3, false, paramInt);
+/*  55 */     this.filterAttr = paramString4;
+/*  56 */     this.filterValue = paramString5;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public SAPLGEOFilteredElem(String paramString1, String paramString2, String paramString3, String paramString4, String paramString5) {
+/*  70 */     super(paramString1, paramString2, paramString3, false);
+/*  71 */     this.filterAttr = paramString4;
+/*  72 */     this.filterValue = paramString5;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected Vector getEntities(EntityGroup paramEntityGroup) {
+/*  82 */     return PokUtils.getEntitiesWithMatchedAttr(paramEntityGroup, this.filterAttr, this.filterValue);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void addGEOElements(Vector paramVector, Document paramDocument, Element paramElement, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 102 */     if (paramVector != null && paramVector.size() > 0) {
+/* 103 */       Vector<EntityItem> vector = PokUtils.getEntitiesWithMatchedAttr(paramVector, this.filterAttr, this.filterValue);
+/*     */       
+/* 105 */       if (vector.size() == 0) {
+/* 106 */         paramStringBuffer.append("SAPLGEOFilteredElem: No " + this.etype + " items found for node:" + this.nodeName + " filterattr:" + this.filterAttr + " filterval:" + this.filterValue + NEWLINE);
+/*     */         
+/* 108 */         Element element = paramDocument.createElement(this.nodeName);
+/* 109 */         addXMLAttrs(element);
+/* 110 */         paramElement.appendChild(element);
+/* 111 */         if (this.attrCode != null) {
+/* 112 */           element.appendChild(paramDocument.createTextNode("@@"));
+/*     */         }
+/*     */       } 
+/* 115 */       for (byte b = 0; b < vector.size(); b++) {
+/* 116 */         EntityItem entityItem = vector.elementAt(b);
+/* 117 */         Element element = paramDocument.createElement(this.nodeName);
+/* 118 */         addXMLAttrs(element);
+/* 119 */         paramElement.appendChild(element);
+/* 120 */         Node node = getContentNode(paramDocument, entityItem, paramElement);
+/* 121 */         if (node != null) {
+/* 122 */           element.appendChild(node);
+/*     */         }
+/*     */       } 
+/* 125 */       vector.clear();
+/*     */     } else {
+/* 127 */       paramStringBuffer.append("SAPLGEOFilteredElem: No " + this.etype + " passed in for node:" + this.nodeName + NEWLINE);
+/* 128 */       Element element = paramDocument.createElement(this.nodeName);
+/* 129 */       addXMLAttrs(element);
+/* 130 */       paramElement.appendChild(element);
+/* 131 */       if (this.attrCode != null)
+/* 132 */         element.appendChild(paramDocument.createTextNode("@@")); 
+/*     */     } 
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.util;
 
-import COM.ibm.eannounce.objects.*;
-import com.ibm.transform.oim.eacm.util.*;
-
-import java.util.*;
-import java.io.*;
-
-import org.w3c.dom.*;
-
-/**********************************************************************************
-*  Class used to hold info and structure to be generated for the xml feed
-* for SAPLABRSTATUS abrs
-* This class will find entities based on a filter
-* like AVAIL with AVAILTYPE= 149 (LastOrder)
-*/
-// $Log: SAPLGEOFilteredElem.java,v $
-// Revision 1.4  2008/02/19 17:18:25  wendy
-// Cleanup RSA warnings
-//
-// Revision 1.3  2007/12/12 15:48:27  wendy
-// Add support for outputting a flagcode instead of desc.
-//
-// Revision 1.2  2007/04/20 14:58:33  wendy
-// RQ0417075638 updates
-//
-// Revision 1.1  2007/04/02 17:38:17  wendy
-// Support classes for SAPL xml generation
-//
-
-public class SAPLGEOFilteredElem extends SAPLElem
-{
-    private String filterAttr;
-    private String filterValue;
-
-    /**********************************************************************************
-    * Constructor for filtered entities and output flagcode
-    *
-    *@param nname String with name of node to be created
-    *@param type String with entity type
-    *@param att String with attribute code to filter on
-    *@param val String with attribute value to filter on
-	*@param src int for flag attributes
-    */
-    public SAPLGEOFilteredElem(String nname, String type, String code, String att, String val, int src)
-    {
-        super(nname,type,code,false, src);
-        filterAttr = att;
-        filterValue = val;
-    }
-
-    /**********************************************************************************
-    * Constructor for filtered entities
-    *
-    *@param nname String with name of node to be created
-    *@param type String with entity type
-    *@param code String with attribute code
-    *@param att String with attribute code to filter on
-    *@param val String with attribute value to filter on
-    */
-    public SAPLGEOFilteredElem(String nname, String type, String code, String att, String val)
-    {
-        super(nname,type,code,false);
-        filterAttr = att;
-        filterValue = val;
-    }
-
-    /**********************************************************************************
-    * Get entities to output
-    *
-    *@param egrp EntityGroup
-    */
-    protected Vector getEntities(EntityGroup egrp)
-    {
-        return PokUtils.getEntitiesWithMatchedAttr(egrp, filterAttr, filterValue);
-    }
-    /**********************************************************************************
-    * Create a node for this element add to the parent
-    *
-    *@param itemVct Vector of EntityItem for a country, find the one that matches this filter
-    *@param document Document needed to create nodes
-    *@param parent Element node to add this node too
-    *@param debugSb StringBuffer used for debug output
-    */
-    protected void addGEOElements(Vector itemVct, Document document, Element parent,StringBuffer debugSb)
-    throws COM.ibm.eannounce.objects.EANBusinessRuleException,
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-        java.rmi.RemoteException,
-        IOException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {
-		if (itemVct !=null && itemVct.size()>0){
-			Vector matchVct = PokUtils.getEntitiesWithMatchedAttr(itemVct, filterAttr, filterValue);
-			// there should really only be 1 or 0 item returned
-			if (matchVct.size()==0){
-				debugSb.append("SAPLGEOFilteredElem: No "+etype+" items found for node:"+nodeName+" filterattr:"+
-					filterAttr+" filterval:"+filterValue+NEWLINE);
-				Element elem = (Element) document.createElement(nodeName);
-				addXMLAttrs(elem);
-				parent.appendChild(elem);
-				if (attrCode!=null){ // a value is expected, prevent a normal empty tag, OIDH cant handle it
-					elem.appendChild(document.createTextNode(CHEAT));
-				}
-			}
-			for (int i=0; i<matchVct.size(); i++){
-				EntityItem item = (EntityItem)matchVct.elementAt(i);
-				Element elem = (Element) document.createElement(nodeName);
-				addXMLAttrs(elem);
-				parent.appendChild(elem);
-				Node contentElem = getContentNode(document, item,parent);
-				if (contentElem!=null){
-					elem.appendChild(contentElem);
-				}
-			}
-			matchVct.clear();
-		}else{
-			debugSb.append("SAPLGEOFilteredElem: No "+etype+" passed in for node:"+nodeName+NEWLINE);
-			Element elem = (Element) document.createElement(nodeName);
-			addXMLAttrs(elem);
-			parent.appendChild(elem);
-			if (attrCode!=null){ // a value is expected, prevent a normal empty tag, OIDH cant handle it
-				elem.appendChild(document.createTextNode(CHEAT));
-			}
-		}
-	}
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\SAPLGEOFilteredElem.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

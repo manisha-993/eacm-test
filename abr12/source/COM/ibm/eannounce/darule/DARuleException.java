@@ -1,27 +1,33 @@
-//Licensed Materials -- Property of IBM
-//(C) Copyright IBM Corp. 2011  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.darule;
+/*    */ package COM.ibm.eannounce.darule;
+/*    */ 
+/*    */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class DARuleException
+/*    */   extends MiddlewareRequestException
+/*    */ {
+/*    */   private static final long serialVersionUID = 1L;
+/*    */   
+/*    */   public DARuleException(String paramString) {
+/* 25 */     super(paramString);
+/*    */   }
+/*    */ }
 
-import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
 
-/*********************************
- * Exception used when an error occurs deriving catalog attribute data
- * 
- */ 
-// $Log: DARuleException.java,v $
-// Revision 1.1  2011/03/15 21:12:10  wendy
-// Init for BH FS ABR Catalog Attr Derivation 20110221b.doc
-//
-public class DARuleException extends MiddlewareRequestException {
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * @param s
-     */
-    public DARuleException(String s) {
-        super(s);
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\darule\DARuleException.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

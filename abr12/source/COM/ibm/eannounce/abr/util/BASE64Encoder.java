@@ -1,66 +1,70 @@
-package COM.ibm.eannounce.abr.util;
+/*    */ package COM.ibm.eannounce.abr.util;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class BASE64Encoder
+/*    */ {
+/* 11 */   private static char[] codec_table = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/' };
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String encode(byte[] paramArrayOfbyte) {
+/* 19 */     int i = paramArrayOfbyte.length * 8;
+/* 20 */     int j = i % 6;
+/* 21 */     byte b = 0;
+/* 22 */     StringBuffer stringBuffer = new StringBuffer();
+/* 23 */     while (b < i) {
+/* 24 */       int m, k = b / 8;
+/* 25 */       switch (b % 8) {
+/*    */         case 0:
+/* 27 */           stringBuffer.append(codec_table[(paramArrayOfbyte[k] & 0xFC) >> 2]);
+/*    */           break;
+/*    */         
+/*    */         case 2:
+/* 31 */           stringBuffer.append(codec_table[paramArrayOfbyte[k] & 0x3F]);
+/*    */           break;
+/*    */         case 4:
+/* 34 */           if (k == paramArrayOfbyte.length - 1) {
+/* 35 */             stringBuffer
+/* 36 */               .append(codec_table[(paramArrayOfbyte[k] & 0xF) << 2 & 0x3F]); break;
+/*    */           } 
+/* 38 */           m = ((paramArrayOfbyte[k] & 0xF) << 2 | (paramArrayOfbyte[k + 1] & 0xC0) >> 6) & 0x3F;
+/* 39 */           stringBuffer.append(codec_table[m]);
+/*    */           break;
+/*    */         
+/*    */         case 6:
+/* 43 */           if (k == paramArrayOfbyte.length - 1) {
+/* 44 */             stringBuffer
+/* 45 */               .append(codec_table[(paramArrayOfbyte[k] & 0x3) << 4 & 0x3F]); break;
+/*    */           } 
+/* 47 */           m = ((paramArrayOfbyte[k] & 0x3) << 4 | (paramArrayOfbyte[k + 1] & 0xF0) >> 4) & 0x3F;
+/* 48 */           stringBuffer.append(codec_table[m]);
+/*    */           break;
+/*    */       } 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */       
+/* 55 */       b += 6;
+/*    */     } 
+/* 57 */     if (j == 2) {
+/* 58 */       stringBuffer.append("==");
+/* 59 */     } else if (j == 4) {
+/* 60 */       stringBuffer.append("=");
+/*    */     } 
+/* 62 */     return stringBuffer.toString();
+/*    */   }
+/*    */ }
 
-//$Log: BASE64Encoder.java,v $
-//Revision 1.1  2011/08/22 11:10:40  guobin
-//update for the Image abr
-//
-//Init for
-//rewrite the BASE64Encoder class for ADSIMAGE abr
-public class BASE64Encoder {
 
-	private static char[] codec_table = { 'A', 'B', 'C', 'D', 'E', 'F', 'G',
-			'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-			'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
-			'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-			'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6',
-			'7', '8', '9', '+', '/' };
-
-	public String encode(byte[] a) {
-		int totalBits = a.length * 8;
-		int nn = totalBits % 6;
-		int curPos = 0;// process bits
-		StringBuffer toReturn = new StringBuffer();
-		while (curPos < totalBits) {
-			int bytePos = curPos / 8;
-			switch (curPos % 8) {
-			case 0:
-				toReturn.append(codec_table[(a[bytePos] & 0xfc) >> 2]);
-				break;
-			case 2:
-
-				toReturn.append(codec_table[(a[bytePos] & 0x3f)]);
-				break;
-			case 4:
-				if (bytePos == a.length - 1) {
-					toReturn
-							.append(codec_table[((a[bytePos] & 0x0f) << 2) & 0x3f]);
-				} else {
-					int pos = (((a[bytePos] & 0x0f) << 2) | ((a[bytePos + 1] & 0xc0) >> 6)) & 0x3f;
-					toReturn.append(codec_table[pos]);
-				}
-				break;
-			case 6:
-				if (bytePos == a.length - 1) {
-					toReturn
-							.append(codec_table[((a[bytePos] & 0x03) << 4) & 0x3f]);
-				} else {
-					int pos = (((a[bytePos] & 0x03) << 4) | ((a[bytePos + 1] & 0xf0) >> 4)) & 0x3f;
-					toReturn.append(codec_table[pos]);
-				}
-				break;
-			default:
-				// never hanppen
-				break;
-			}
-			curPos += 6;
-		}
-		if (nn == 2) {
-			toReturn.append("==");
-		} else if (nn == 4) {
-			toReturn.append("=");
-		}
-		return toReturn.toString();
-
-	}
-
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\BASE64Encoder.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

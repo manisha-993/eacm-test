@@ -1,111 +1,117 @@
-//Licensed Materials -- Property of IBM
+/*     */ package COM.ibm.eannounce.abr.sg.psu;
+/*     */ 
+/*     */ import java.util.Vector;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ class PSUDeleteData
+/*     */   extends PSUUpdateData
+/*     */ {
+/*     */   protected String actionName;
+/*     */   protected String deleteType;
+/*  30 */   protected Vector idVct = new Vector();
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   PSUDeleteData(PSUABRSTATUS paramPSUABRSTATUS, String paramString) {
+/*  37 */     super(paramPSUABRSTATUS);
+/*  38 */     this.deleteType = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   String getEntityType() {
+/*  45 */     return this.deleteType;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   int getHighEntityId() {
+/*  51 */     return ((Integer)this.idVct.lastElement()).intValue();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   int getEntityId() {
+/*  58 */     return ((Integer)this.idVct.firstElement()).intValue();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   void setActionName(String paramString) {
+/*  64 */     this.actionName = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   void addDeleteId(int paramInt) {
+/*  71 */     this.idVct.add(new Integer(paramInt));
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   void outputUserInfo() {
+/*  79 */     for (byte b = 0; b < this.idVct.size(); b++) {
+/*  80 */       this.infoTbl.put("Update Class", "Reference");
+/*  81 */       this.infoTbl.put("Entity Type", getEntityType());
+/*  82 */       this.infoTbl.put("Entity ID", this.idVct.elementAt(b).toString());
+/*  83 */       this.infoTbl.put("Attribute Update Action", "D");
+/*  84 */       this.infoTbl.put("Relator Action", this.actionName);
+/*  85 */       this.abr.addUpdateInfo(this.infoTbl);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   void dereference() {
+/*  92 */     super.dereference();
+/*  93 */     this.deleteType = null;
+/*  94 */     this.idVct.clear();
+/*  95 */     this.idVct = null;
+/*  96 */     this.actionName = null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String hashkey() {
+/* 103 */     return this.deleteType + this.idVct.firstElement();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String toString() {
+/* 109 */     return this.deleteType + ":" + this.idVct;
+/*     */   }
+/*     */ }
 
-//(C) Copyright IBM Corp. 2013  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-package COM.ibm.eannounce.abr.sg.psu;
 
-import java.util.Vector; 
-   
-/**
- * hold onto entity type and id that need deactivation
- * 
- * To deactivate a relator the ABR needs the relator type and relator id and a DeleteAction.
- * DeleteAction will enforce pdhdomain, check locks, prevent orphans, check for dependencies and execute the delete
- * by expiring relator references and deactivate all attributes
- * 
- * C.	Creating Relators/ Deactivating Relators
- * This function (ABR) will be running in a minimalist environment and as such does not have easy access to 
- * all the information to create (update) relators. Therefore, an “ACTION” will be defined via meta data 
- * (similar to defining an “ACTION” for the user interface) and identified via a PDHUPDATEACT 
- * where PSUCLASS = “Reference” via “PSURELATORACTION”.
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\psu\PSUDeleteData.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-//$Log: PSUDeleteData.java,v $
-//Revision 1.1  2013/04/19 19:28:44  wendy
-//Add PSUABRSTATUS
-//
-class PSUDeleteData extends PSUUpdateData {
-	protected String actionName;
-	protected String deleteType;
-	protected Vector idVct = new Vector();
-
-	/**
-	 * @param psu
-	 * @param delType
-	 */
-	PSUDeleteData(PSUABRSTATUS psu, String delType){
-		super(psu);
-		deleteType = delType;
-	}
-	
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.sg.psu.PSUUpdateData#getEntityType()
-	 */
-	String getEntityType(){
-		return deleteType;
-	}
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.sg.psu.PSUUpdateData#getHighEntityId()
-	 */
-	int getHighEntityId(){
-		return ((Integer)idVct.lastElement()).intValue();
-	}
-	/* (non-Javadoc)
-	 * part of hashkey so always use first id
-	 * @see COM.ibm.eannounce.abr.sg.psu.PSUUpdateData#getEntityId()
-	 */
-	int getEntityId(){
-		return ((Integer)idVct.firstElement()).intValue();
-	}
-	/**
-	 * @param actnm
-	 */
-	void setActionName(String actnm){
-		actionName = actnm;
-	}
-	/**
-	 * add a entity id to be deactivated
-	 * @param delid
-	 */
-	void addDeleteId(int delid){
-		idVct.add(new Integer(delid));
-	}
-	
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.sg.psu.PSUUpdateData#outputUserInfo()
-	 */
-	void outputUserInfo(){
-		//list deactivated relators
-		for(int x=0;x<idVct.size();x++){
-			infoTbl.put(PSUABRSTATUS.UPDATE_CLASS, "Reference");
-			infoTbl.put(PSUABRSTATUS.UPDATE_ENTITYTYPE, getEntityType());
-			infoTbl.put(PSUABRSTATUS.UPDATE_ENTITYID, idVct.elementAt(x).toString());
-			infoTbl.put(PSUABRSTATUS.UPDATE_ATTRACT,PSUABRSTATUS.PSUATTRACTION_D);
-			infoTbl.put(PSUABRSTATUS.UPDATE_RELACT, actionName);
-			abr.addUpdateInfo(infoTbl);  // one row for each delete made
-		}
-	}
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.sg.bh.PSUABRSTATUS.PSUUpdateData#dereference()
-	 */
-	void dereference(){
-		super.dereference();
-		deleteType = null;
-		idVct.clear();
-		idVct = null;
-		actionName = null;
-	}
-	/**
-	 * OPICMList interface
-	 * @return
-	 */
-	public String hashkey() {
-		return deleteType+idVct.firstElement();
-	}
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.sg.psu.PSUUpdateData#toString()
-	 */
-	public String toString(){
-		return deleteType+":"+idVct;
-	}
-}

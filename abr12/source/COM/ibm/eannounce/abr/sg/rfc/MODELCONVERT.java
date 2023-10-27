@@ -1,244 +1,120 @@
-package COM.ibm.eannounce.abr.sg.rfc;
-
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "MODELCONVERT_UPDATE")
-public class MODELCONVERT {
-	
-	@XmlElement(name = "MODELUPGRADEENTITYTYPE")
-	private String MODELUPGRADEENTITYTYPE;
-	
-	@XmlElement(name = "MODELUPGRADEENTITYID")
-	private String MODELUPGRADEENTITYID;
-	
-	@XmlElement(name = "FROMMACHTYPE")
-	private String FROMMACHTYPE;
-	
-	@XmlElement(name = "FROMMODEL")
-	private String FROMMODEL;
-	
-	@XmlElement(name = "TOMODEL")
-	private String TOMODEL;
-	
-	@XmlElement(name = "TOMODELTYPE")
-	private String TOMODELTYPE;
-	
-	@XmlElement(name = "TOMACHTYPE")
-	private String TOMACHTYPE;
-	
-	@XmlElement(name = "PDHDOMAIN")
-	private String PDHDOMAIN;
-	
-	public String getPDHDOMAIN() {
-		return PDHDOMAIN;
-	}
-
-	public void setPDHDOMAIN(String pDHDOMAIN) {
-		PDHDOMAIN = pDHDOMAIN;
-	}
-
-	@XmlElement(name = "AVAILABILITYLIST")
-	private List<AVAILABILITYLIST> AVAILABILITYLIST;
-
-	public String getMODELUPGRADEENTITYTYPE() {
-		return MODELUPGRADEENTITYTYPE;
-	}
-
-	public void setMODELUPGRADEENTITYTYPE(String mODELUPGRADEENTITYTYPE) {
-		MODELUPGRADEENTITYTYPE = mODELUPGRADEENTITYTYPE;
-	}
-
-	public String getMODELUPGRADEENTITYID() {
-		return MODELUPGRADEENTITYID;
-	}
-
-	public void setMODELUPGRADEENTITYID(String mODELUPGRADEENTITYID) {
-		MODELUPGRADEENTITYID = mODELUPGRADEENTITYID;
-	}
-
-	public String getFROMMACHTYPE() {
-		return FROMMACHTYPE;
-	}
-
-	public void setFROMMACHTYPE(String fROMMACHTYPE) {
-		FROMMACHTYPE = fROMMACHTYPE;
-	}
-
-	public String getTOMACHTYPE() {
-		return TOMACHTYPE;
-	}
-
-	public void setTOMACHTYPE(String tOMACHTYPE) {
-		TOMACHTYPE = tOMACHTYPE;
-	}
-
-	public List<AVAILABILITYLIST> getAVAILABILITYLIST() {
-		return AVAILABILITYLIST;
-	}
-
-	public void setAVAILABILITYLIST(List<AVAILABILITYLIST> aVAILABILITYLIST) {
-		AVAILABILITYLIST = aVAILABILITYLIST;
-	}
-
-	public String getFROMMODEL() {
-		return FROMMODEL;
-	}
-
-	public void setFROMMODEL(String fROMMODEL) {
-		FROMMODEL = fROMMODEL;
-	}
-
-	public String getTOMODEL() {
-		return TOMODEL;
-	}
-
-	public void setTOMODEL(String tOMODEL) {
-		TOMODEL = tOMODEL;
-	}
-
-	public String getTOMODELTYPE() {
-		return TOMODELTYPE;
-	}
-
-	public void setTOMODELTYPE(String tOMODELTYPE) {
-		TOMODELTYPE = tOMODELTYPE;
-	}
-	
-	
-	
-
-}
+/*     */ package COM.ibm.eannounce.abr.sg.rfc;
+/*     */ 
+/*     */ import java.util.List;
+/*     */ import javax.xml.bind.annotation.XmlAccessType;
+/*     */ import javax.xml.bind.annotation.XmlAccessorType;
+/*     */ import javax.xml.bind.annotation.XmlElement;
+/*     */ import javax.xml.bind.annotation.XmlRootElement;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ @XmlAccessorType(XmlAccessType.FIELD)
+/*     */ @XmlRootElement(name = "MODELCONVERT_UPDATE")
+/*     */ public class MODELCONVERT
+/*     */ {
+/*     */   @XmlElement(name = "MODELUPGRADEENTITYTYPE")
+/*     */   private String MODELUPGRADEENTITYTYPE;
+/*     */   @XmlElement(name = "MODELUPGRADEENTITYID")
+/*     */   private String MODELUPGRADEENTITYID;
+/*     */   @XmlElement(name = "FROMMACHTYPE")
+/*     */   private String FROMMACHTYPE;
+/*     */   @XmlElement(name = "FROMMODEL")
+/*     */   private String FROMMODEL;
+/*     */   @XmlElement(name = "TOMODEL")
+/*     */   private String TOMODEL;
+/*     */   @XmlElement(name = "TOMODELTYPE")
+/*     */   private String TOMODELTYPE;
+/*     */   @XmlElement(name = "TOMACHTYPE")
+/*     */   private String TOMACHTYPE;
+/*     */   @XmlElement(name = "PDHDOMAIN")
+/*     */   private String PDHDOMAIN;
+/*     */   @XmlElement(name = "AVAILABILITYLIST")
+/*     */   private List<AVAILABILITYLIST> AVAILABILITYLIST;
+/*     */   
+/*     */   public String getPDHDOMAIN() {
+/*  41 */     return this.PDHDOMAIN;
+/*     */   }
+/*     */   
+/*     */   public void setPDHDOMAIN(String paramString) {
+/*  45 */     this.PDHDOMAIN = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getMODELUPGRADEENTITYTYPE() {
+/*  52 */     return this.MODELUPGRADEENTITYTYPE;
+/*     */   }
+/*     */   
+/*     */   public void setMODELUPGRADEENTITYTYPE(String paramString) {
+/*  56 */     this.MODELUPGRADEENTITYTYPE = paramString;
+/*     */   }
+/*     */   
+/*     */   public String getMODELUPGRADEENTITYID() {
+/*  60 */     return this.MODELUPGRADEENTITYID;
+/*     */   }
+/*     */   
+/*     */   public void setMODELUPGRADEENTITYID(String paramString) {
+/*  64 */     this.MODELUPGRADEENTITYID = paramString;
+/*     */   }
+/*     */   
+/*     */   public String getFROMMACHTYPE() {
+/*  68 */     return this.FROMMACHTYPE;
+/*     */   }
+/*     */   
+/*     */   public void setFROMMACHTYPE(String paramString) {
+/*  72 */     this.FROMMACHTYPE = paramString;
+/*     */   }
+/*     */   
+/*     */   public String getTOMACHTYPE() {
+/*  76 */     return this.TOMACHTYPE;
+/*     */   }
+/*     */   
+/*     */   public void setTOMACHTYPE(String paramString) {
+/*  80 */     this.TOMACHTYPE = paramString;
+/*     */   }
+/*     */   
+/*     */   public List<AVAILABILITYLIST> getAVAILABILITYLIST() {
+/*  84 */     return this.AVAILABILITYLIST;
+/*     */   }
+/*     */   
+/*     */   public void setAVAILABILITYLIST(List<AVAILABILITYLIST> paramList) {
+/*  88 */     this.AVAILABILITYLIST = paramList;
+/*     */   }
+/*     */   
+/*     */   public String getFROMMODEL() {
+/*  92 */     return this.FROMMODEL;
+/*     */   }
+/*     */   
+/*     */   public void setFROMMODEL(String paramString) {
+/*  96 */     this.FROMMODEL = paramString;
+/*     */   }
+/*     */   
+/*     */   public String getTOMODEL() {
+/* 100 */     return this.TOMODEL;
+/*     */   }
+/*     */   
+/*     */   public void setTOMODEL(String paramString) {
+/* 104 */     this.TOMODEL = paramString;
+/*     */   }
+/*     */   
+/*     */   public String getTOMODELTYPE() {
+/* 108 */     return this.TOMODELTYPE;
+/*     */   }
+/*     */   
+/*     */   public void setTOMODELTYPE(String paramString) {
+/* 112 */     this.TOMODELTYPE = paramString;
+/*     */   }
+/*     */ }
 
 
-
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-@XmlAccessorType(XmlAccessType.FIELD)
-class AVAILABILITYLIST {
-	@XmlElement(name = "AVAILABILITYELEMENT")
-	private List<AVAILABILITYELEMENT> AVAILABILITYELEMENT;
-
-	public List<AVAILABILITYELEMENT> getAVAILABILITYELEMENT() {
-		return AVAILABILITYELEMENT;
-	}
-
-	public void setAVAILABILITYELEMENT(List<AVAILABILITYELEMENT> aVAILABILITYELEMENT) {
-		AVAILABILITYELEMENT = aVAILABILITYELEMENT;
-	}
-	
-	
-}
-
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-@XmlAccessorType(XmlAccessType.FIELD)
-class AVAILABILITYELEMENT {
-	@XmlElement(name = "COUNTRY_FC")
-	private String COUNTRY_FC;
-	
-	@XmlElement(name = "AVAILABILITYACTION")
-	private String AVAILABILITYACTION;
-	
-	@XmlElement(name = "ANNDATE")
-	private String ANNDATE;
-	
-	@XmlElement(name = "FIRSTORDER")
-	private String FIRSTORDER;
-	
-	@XmlElement(name = "PLANNEDAVAILABILITY")
-	private String PLANNEDAVAILABILITY;
-	
-	@XmlElement(name = "PUBFROM")
-	private String PUBFROM;
-	
-	@XmlElement(name = "PUBTO")
-	private String PUBTO;
-	
-	@XmlElement(name = "WDANNDATE")
-	private String WDANNDATE;
-	
-	@XmlElement(name = "LASTORDER")
-	private String LASTORDER;
-
-	public String getCOUNTRY_FC() {
-		return COUNTRY_FC;
-	}
-
-	public void setCOUNTRY_FC(String cOUNTRY_FC) {
-		COUNTRY_FC = cOUNTRY_FC;
-	}
-
-	public String getAVAILABILITYACTION() {
-		return AVAILABILITYACTION;
-	}
-
-	public void setAVAILABILITYACTION(String aVAILABILITYACTION) {
-		AVAILABILITYACTION = aVAILABILITYACTION;
-	}
-
-	public String getANNDATE() {
-		return ANNDATE;
-	}
-
-	public void setANNDATE(String aNNDATE) {
-		ANNDATE = aNNDATE;
-	}
-
-	public String getFIRSTORDER() {
-		return FIRSTORDER;
-	}
-
-	public void setFIRSTORDER(String fIRSTORDER) {
-		FIRSTORDER = fIRSTORDER;
-	}
-
-	public String getPLANNEDAVAILABILITY() {
-		return PLANNEDAVAILABILITY;
-	}
-
-	public void setPLANNEDAVAILABILITY(String pLANNEDAVAILABILITY) {
-		PLANNEDAVAILABILITY = pLANNEDAVAILABILITY;
-	}
-
-	public String getPUBFROM() {
-		return PUBFROM;
-	}
-
-	public void setPUBFROM(String pUBFROM) {
-		PUBFROM = pUBFROM;
-	}
-
-	public String getPUBTO() {
-		return PUBTO;
-	}
-
-	public void setPUBTO(String pUBTO) {
-		PUBTO = pUBTO;
-	}
-
-	public String getWDANNDATE() {
-		return WDANNDATE;
-	}
-
-	public void setWDANNDATE(String wDANNDATE) {
-		WDANNDATE = wDANNDATE;
-	}
-
-	public String getLASTORDER() {
-		return LASTORDER;
-	}
-
-	public void setLASTORDER(String lASTORDER) {
-		LASTORDER = lASTORDER;
-	}
-	
-	
-	
-}
-
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\MODELCONVERT.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

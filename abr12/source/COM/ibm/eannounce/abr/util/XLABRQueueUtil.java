@@ -1,54 +1,59 @@
-package COM.ibm.eannounce.abr.util;
+/*    */ package COM.ibm.eannounce.abr.util;
+/*    */ 
+/*    */ import COM.ibm.eannounce.objects.EntityItem;
+/*    */ import COM.ibm.opicmpdh.middleware.Database;
+/*    */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*    */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*    */ import COM.ibm.opicmpdh.middleware.Profile;
+/*    */ import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
+/*    */ import COM.ibm.opicmpdh.objects.ControlBlock;
+/*    */ import COM.ibm.opicmpdh.objects.SingleFlag;
+/*    */ import java.sql.SQLException;
+/*    */ import java.util.Vector;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class XLABRQueueUtil
+/*    */ {
+/*    */   protected static final String ABR_QUEUED = "0020";
+/*    */   protected static final String XL_POST_PROCESS_ATTRIBUTE = "XLPOSTPROCABR";
+/*    */   
+/*    */   public static void queueTranslationPostProcessABR(Database paramDatabase, Profile paramProfile, EntityItem paramEntityItem, ControlBlock paramControlBlock) throws MiddlewareBusinessRuleException, SQLException, MiddlewareException {
+/* 24 */     queueABR(paramDatabase, paramProfile, paramEntityItem, paramControlBlock, "XLPOSTPROCABR");
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public static void queueABR(Database paramDatabase, Profile paramProfile, EntityItem paramEntityItem, ControlBlock paramControlBlock, String paramString) throws MiddlewareBusinessRuleException, SQLException, MiddlewareException {
+/* 30 */     if (paramControlBlock == null) {
+/* 31 */       throw new IllegalArgumentException("Control Block was not initialized by ABR. Call setControlBlock();");
+/*    */     }
+/*    */ 
+/*    */ 
+/*    */     
+/* 36 */     ReturnEntityKey returnEntityKey = new ReturnEntityKey(paramEntityItem.getEntityType(), paramEntityItem.getEntityID(), true);
+/*    */ 
+/*    */     
+/* 39 */     SingleFlag singleFlag = new SingleFlag(paramProfile.getEnterprise(), returnEntityKey.getEntityType(), returnEntityKey.getEntityID(), paramString, "0020", 1, paramControlBlock);
+/*    */ 
+/*    */     
+/* 42 */     Vector<SingleFlag> vector = new Vector();
+/* 43 */     Vector<ReturnEntityKey> vector1 = new Vector();
+/* 44 */     if (singleFlag != null) {
+/* 45 */       vector.addElement(singleFlag);
+/* 46 */       returnEntityKey.m_vctAttributes = vector;
+/* 47 */       vector1.addElement(returnEntityKey);
+/*    */       
+/* 49 */       paramDatabase.update(paramProfile, vector1, false, false);
+/* 50 */       paramDatabase.commit();
+/*    */     } 
+/*    */   }
+/*    */ }
 
-import java.sql.SQLException;
-import java.util.Vector;
 
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.opicmpdh.middleware.Database;
-import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-import COM.ibm.opicmpdh.middleware.Profile;
-import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
-import COM.ibm.opicmpdh.objects.ControlBlock;
-import COM.ibm.opicmpdh.objects.SingleFlag;
-
-public class XLABRQueueUtil {
-
-	protected static final String ABR_QUEUED = "0020";
-
-	protected static final String XL_POST_PROCESS_ATTRIBUTE = "XLPOSTPROCABR";
-
-	public static void queueTranslationPostProcessABR(Database m_db,
-			Profile m_prof, EntityItem ei, ControlBlock m_cbOn) throws MiddlewareBusinessRuleException, SQLException, MiddlewareException {
-		//if (EnterpriseUtil.isLastEnterpriseVersion(m_prof)) {
-			queueABR(m_db, m_prof, ei, m_cbOn, XL_POST_PROCESS_ATTRIBUTE);
-		//}
-	}
-
-	public static void queueABR(Database db, Profile profile, EntityItem ei,
-			ControlBlock controlBlock, String attributeCode) throws MiddlewareBusinessRuleException, SQLException, MiddlewareException {
-		if (controlBlock == null) {
-			throw new IllegalArgumentException(
-					"Control Block was not initialized by ABR. Call setControlBlock();");
-		}
-
-		ReturnEntityKey rek = new ReturnEntityKey(ei.getEntityType(), ei
-				.getEntityID(), true);
-
-		SingleFlag sf = new SingleFlag(profile.getEnterprise(), rek
-				.getEntityType(), rek.getEntityID(), attributeCode, ABR_QUEUED,
-				1, controlBlock);
-
-		Vector vctAtts = new Vector();
-		Vector vctReturnsEntityKeys = new Vector();
-		if (sf != null) {
-			vctAtts.addElement(sf);
-			rek.m_vctAttributes = vctAtts;
-			vctReturnsEntityKeys.addElement(rek);
-
-			db.update(profile, vctReturnsEntityKeys, false, false);
-			db.commit();
-		}
-	}
-
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\XLABRQueueUtil.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

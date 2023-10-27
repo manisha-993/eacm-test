@@ -1,256 +1,262 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.abr.sg.wave2;
+/*     */ package COM.ibm.eannounce.abr.sg.wave2;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.Connection;
+/*     */ import java.sql.PreparedStatement;
+/*     */ import java.sql.ResultSet;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.MissingResourceException;
+/*     */ import java.util.Vector;
+/*     */ import javax.xml.parsers.DocumentBuilder;
+/*     */ import javax.xml.parsers.DocumentBuilderFactory;
+/*     */ import javax.xml.parsers.ParserConfigurationException;
+/*     */ import javax.xml.transform.TransformerException;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class ADSGENAREAABR
+/*     */   extends XMLMQAdapter
+/*     */ {
+/*     */   private static final String GENAREA_SQL = "select genareaname_fc as descriptionclass,genareacode,genareaname, sleorg, isactive from price.generalarea where genareatype='Country' and nlsid=1 and Valfrom BETWEEN ? AND ?";
+/*     */   
+/*     */   public void processThis(ADSABRSTATUS paramADSABRSTATUS, Profile paramProfile1, Profile paramProfile2, EntityItem paramEntityItem) throws SQLException, MiddlewareException, ParserConfigurationException, RemoteException, EANBusinessRuleException, MiddlewareShutdownInProgressException, IOException, TransformerException, MissingResourceException {
+/*  91 */     String str1 = paramProfile1.getValOn();
+/*  92 */     String str2 = paramProfile2.getValOn();
+/*     */     
+/*  94 */     paramADSABRSTATUS.addDebug("ADSGENAREAABR.processThis checking between " + str1 + " and " + str2);
+/*     */     
+/*  96 */     Vector<GenAreaInfo> vector = getGenarea(paramADSABRSTATUS, str1, str2);
+/*  97 */     if (vector.size() == 0) {
+/*     */       
+/*  99 */       paramADSABRSTATUS.addXMLGenMsg("NO_CHANGES_FND", "GENERALAREA");
+/*     */     } else {
+/* 101 */       paramADSABRSTATUS.addDebug("ADSGENAREAABR.processThis found " + vector.size() + " GENERALAREA");
+/*     */       
+/* 103 */       Vector vector1 = getMQPropertiesFN();
+/* 104 */       if (vector1 == null) {
+/* 105 */         paramADSABRSTATUS.addDebug("ADSGENAREAABR: No MQ properties files, nothing will be generated.");
+/*     */         
+/* 107 */         paramADSABRSTATUS.addXMLGenMsg("NOT_REQUIRED", "GENERALAREA");
+/*     */       } else {
+/* 109 */         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+/* 110 */         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+/* 111 */         Document document = documentBuilder.newDocument();
+/* 112 */         String str3 = "GENERALAREA_UPDATE";
+/* 113 */         String str4 = "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/" + str3;
+/*     */ 
+/*     */         
+/* 116 */         Element element = document.createElementNS(str4, str3);
+/*     */         
+/* 118 */         document.appendChild(element);
+/* 119 */         element.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", str4);
+/*     */ 
+/*     */         
+/* 122 */         for (byte b = 0; b < vector.size(); b++) {
+/* 123 */           GenAreaInfo genAreaInfo = vector.elementAt(b);
+/* 124 */           Element element1 = document.createElement("GENAREAELEMENT");
+/* 125 */           element.appendChild(element1);
+/*     */           
+/* 127 */           Element element2 = document.createElement("DTSOFMSG");
+/* 128 */           element2.appendChild(document.createTextNode(paramProfile2.getEndOfDay()));
+/* 129 */           element1.appendChild(element2);
+/*     */           
+/* 131 */           element2 = document.createElement("ACTIVITY");
+/* 132 */           element2.appendChild(document.createTextNode(genAreaInfo.isactive ? "Update" : "Delete"));
+/* 133 */           element1.appendChild(element2);
+/*     */           
+/* 135 */           element2 = document.createElement("DESCRIPTIONCLASS");
+/* 136 */           element2.appendChild(document.createTextNode(genAreaInfo.descriptionclass));
+/* 137 */           element1.appendChild(element2);
+/*     */           
+/* 139 */           element2 = document.createElement("GENAREACODE");
+/* 140 */           element2.appendChild(document.createTextNode(genAreaInfo.genareacode));
+/* 141 */           element1.appendChild(element2);
+/*     */           
+/* 143 */           element2 = document.createElement("GENAREANAME");
+/* 144 */           element2.appendChild(document.createTextNode(genAreaInfo.genareaname));
+/* 145 */           element1.appendChild(element2);
+/*     */           
+/* 147 */           element2 = document.createElement("SLEORG");
+/* 148 */           element2.appendChild(document.createTextNode(genAreaInfo.sleorg));
+/* 149 */           element1.appendChild(element2);
+/*     */           
+/* 151 */           genAreaInfo.dereference();
+/*     */         } 
+/*     */         
+/* 154 */         String str5 = paramADSABRSTATUS.transformXML(this, document);
+/* 155 */         paramADSABRSTATUS.addDebug("ADSGENAREAABR: Generated MQ xml:" + ADSABRSTATUS.NEWLINE + str5 + ADSABRSTATUS.NEWLINE);
+/* 156 */         paramADSABRSTATUS.notify(this, "GENERALAREA", str5);
+/*     */       } 
+/*     */ 
+/*     */       
+/* 160 */       vector.clear();
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private Vector getGenarea(ADSABRSTATUS paramADSABRSTATUS, String paramString1, String paramString2) throws SQLException {
+/* 167 */     Vector<GenAreaInfo> vector = new Vector();
+/* 168 */     ResultSet resultSet = null;
+/* 169 */     Connection connection = null;
+/* 170 */     PreparedStatement preparedStatement = null;
+/*     */     try {
+/* 172 */       connection = setupConnection();
+/* 173 */       preparedStatement = connection.prepareStatement("select genareaname_fc as descriptionclass,genareacode,genareaname, sleorg, isactive from price.generalarea where genareatype='Country' and nlsid=1 and Valfrom BETWEEN ? AND ?");
+/*     */ 
+/*     */       
+/* 176 */       preparedStatement.setString(1, paramString1);
+/* 177 */       preparedStatement.setString(2, paramString2);
+/*     */       
+/* 179 */       resultSet = preparedStatement.executeQuery();
+/* 180 */       while (resultSet.next()) {
+/* 181 */         String str1 = resultSet.getString(1);
+/* 182 */         String str2 = resultSet.getString(2);
+/* 183 */         String str3 = resultSet.getString(3);
+/* 184 */         String str4 = resultSet.getString(4);
+/* 185 */         int i = resultSet.getInt(5);
+/* 186 */         paramADSABRSTATUS.addDebug("getGenarea desc:" + str1 + " code:" + str2 + " name:" + str3 + " org:" + str4 + " active:" + i);
+/* 187 */         vector.add(new GenAreaInfo(str1, str2, str3, str4, i));
+/*     */       } 
+/*     */     } finally {
+/*     */       
+/*     */       try {
+/* 192 */         if (preparedStatement != null) {
+/* 193 */           preparedStatement.close();
+/* 194 */           preparedStatement = null;
+/*     */         } 
+/* 196 */       } catch (Exception exception) {
+/* 197 */         System.err.println("getGenarea(), unable to close statement. " + exception);
+/* 198 */         paramADSABRSTATUS.addDebug("getGenarea unable to close statement. " + exception);
+/*     */       } 
+/* 200 */       if (resultSet != null) {
+/* 201 */         resultSet.close();
+/*     */       }
+/* 203 */       closeConnection(connection);
+/*     */     } 
+/* 205 */     return vector;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVersion() {
+/* 214 */     return "1.6";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getMQCID() {
+/* 221 */     return "GENERALAREA";
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public String getStatusAttr() {
+/* 226 */     return "ADSABRSTATUS";
+/*     */   }
+/*     */   
+/* 229 */   private static class GenAreaInfo { String descriptionclass = "@@";
+/* 230 */     String genareacode = "@@";
+/* 231 */     String genareaname = "@@";
+/* 232 */     String sleorg = "@@"; boolean isactive = false;
+/*     */     
+/*     */     GenAreaInfo(String param1String1, String param1String2, String param1String3, String param1String4, int param1Int) {
+/* 235 */       if (param1String1 != null) {
+/* 236 */         this.descriptionclass = param1String1.trim();
+/*     */       }
+/* 238 */       if (param1String2 != null) {
+/* 239 */         this.genareacode = param1String2.trim();
+/*     */       }
+/* 241 */       if (param1String3 != null) {
+/* 242 */         this.genareaname = param1String3.trim();
+/*     */       }
+/* 244 */       if (param1String4 != null) {
+/* 245 */         this.sleorg = param1String4.trim();
+/*     */       }
+/* 247 */       this.isactive = (param1Int == 1);
+/*     */     }
+/*     */     void dereference() {
+/* 250 */       this.descriptionclass = null;
+/* 251 */       this.genareacode = null;
+/* 252 */       this.genareaname = null;
+/* 253 */       this.sleorg = null;
+/*     */     } }
+/*     */ 
+/*     */ }
 
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
 
-import java.util.*;
-import java.sql.*;
-import java.io.*;
-
-import javax.xml.parsers.*;
-import org.w3c.dom.*;
-
-/**********************************************************************************
-*
-*
-XVII. General Area
-
-select genareaname_fc as descriptionclass,
-genareacode,
-genareaname, sleorg, isactive
-from price.generalarea
-where genareatype='Country' and nlsid=1 and valfrom> '1979-01-01 00:00:00.000000'
-
-Deleted rows are when IsActive<>1
-
-1 <GENERALAREA_UPDATE>		1
-0..N <GENAREAELEMENT>		2
-1 <DTSOFMSG>	</DTSOFMSG>	2				VALFROM for the ABR attribute when Queued
-1 <ACTIVITY>	</ACTIVITY>		2	Activity
-1 <DESCRIPTIONCLASS>	</DESCRIPTIONCLASS>	3	METADESCRIPTION	DESCRIPTIONCLASS		where DESCRIPTIONTYPE='COUNTRYLIST'
-1 <GENAREACODE>	</GENAREACODE>	3	GENERALAREA	GENAREACODE
-1 <GENAREANAME>	</GENAREANAME>	3	GENERALAREA	GENAREANAME
-1 <SLEORG>	</SLEORG>	3	GENERALAREA	SLEORG
-	</GENAREAELEMENT>	2
-	</GENERALAREA_UPDATE>	1	GENERALAREA
-
-
-*/
-// ADSGENAREAABR.java,v
-//ADSGENAREAABR.java,v
-//Revision 1.6  2010/01/07 18:04:21  wendy
-//cvs failure again
-//
-// Revision 1.4  2008/05/28 13:46:09  wendy
-// updates for spec "SG FS ABR ADS System Feed 20080528c.doc"
-//
-// Revision 1.3  2008/05/27 14:28:58  wendy
-// Clean up RSA warnings
-//
-// Revision 1.2  2008/05/03 23:30:27  wendy
-// Changed to support generation of large XML files
-//
-// Revision 1.1  2008/04/29 14:31:38  wendy
-// Init for
-//  -   CQ00003539-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC
-//  -   CQ00005096-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Add Category MM and Images
-//  -   CQ00005046-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Support CRAD in BHC
-//  -   CQ00005045-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Upgrade/Conversion Support
-//  -   CQ00006862-WI  - BHC 3.0 Support - Support for Services Data UI
-//
-//
-public class ADSGENAREAABR extends XMLMQAdapter
-{
-	private static final String GENAREA_SQL ="select genareaname_fc as descriptionclass,genareacode,"+
-		"genareaname, sleorg, isactive from price.generalarea "+
-		"where genareatype='Country' and nlsid=1 and Valfrom BETWEEN ? AND ?";
-
-
-    /**********************************
-    * create xml and write to queue
-    */
-    public void processThis(ADSABRSTATUS abr, Profile profileT1, Profile profileT2, EntityItem rootEntity)
-    throws
-    java.sql.SQLException,
-    COM.ibm.opicmpdh.middleware.MiddlewareException,
-    ParserConfigurationException,
-    java.rmi.RemoteException,
-    COM.ibm.eannounce.objects.EANBusinessRuleException,
-    COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-    IOException,
-    javax.xml.transform.TransformerException,
-	MissingResourceException
-    {
-		String t1DTS = profileT1.getValOn();
-		String t2DTS = profileT2.getValOn();
-
-		abr.addDebug("ADSGENAREAABR.processThis checking between "+t1DTS+" and "+t2DTS);
-		// find GENAREA
-		Vector genVct = getGenarea(abr,	t1DTS, t2DTS);
-		if (genVct.size()==0){
-			//NO_CHANGES_FND=No Changes found for {0}
-			abr.addXMLGenMsg("NO_CHANGES_FND","GENERALAREA");
-		}else{
-			abr.addDebug("ADSGENAREAABR.processThis found "+genVct.size()+" GENERALAREA");
-
-			Vector mqVct = getMQPropertiesFN();
-			if (mqVct==null){
-				abr.addDebug("ADSGENAREAABR: No MQ properties files, nothing will be generated.");
-				//NOT_REQUIRED = Not Required for {0}.
-				abr.addXMLGenMsg("NOT_REQUIRED", "GENERALAREA");
-			}else{
-				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-				DocumentBuilder builder = factory.newDocumentBuilder();
-				Document document = builder.newDocument();  // Create
-				String nodeName = "GENERALAREA_UPDATE";
-				String xmlns = "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/" + nodeName;
-
-				// Element parent = (Element) document.createElement("GENERALAREA_UPDATE");
-				Element parent = (Element) document.createElementNS(xmlns,nodeName);
-				// create the root
-				document.appendChild(parent);
-				parent.setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns",xmlns);
-
-				// create one GENAREAELEMENT for each one found
-				for (int i=0; i<genVct.size(); i++){
-					GenAreaInfo ga = (GenAreaInfo)genVct.elementAt(i);
-					Element genarea = (Element) document.createElement("GENAREAELEMENT");
-					parent.appendChild(genarea);
-
-					Element elem = (Element) document.createElement("DTSOFMSG");
-					elem.appendChild(document.createTextNode(profileT2.getEndOfDay()));
-					genarea.appendChild(elem);
-
-					elem = (Element) document.createElement("ACTIVITY");
-					elem.appendChild(document.createTextNode(ga.isactive?XMLElem.UPDATE_ACTIVITY:XMLElem.DELETE_ACTIVITY));
-					genarea.appendChild(elem);
-
-					elem = (Element) document.createElement("DESCRIPTIONCLASS");
-					elem.appendChild(document.createTextNode(ga.descriptionclass));
-					genarea.appendChild(elem);
-
-					elem = (Element) document.createElement("GENAREACODE");
-					elem.appendChild(document.createTextNode(ga.genareacode));
-					genarea.appendChild(elem);
-
-					elem = (Element) document.createElement("GENAREANAME");
-					elem.appendChild(document.createTextNode(ga.genareaname));
-					genarea.appendChild(elem);
-					
-					elem = (Element) document.createElement("SLEORG");
-					elem.appendChild(document.createTextNode(ga.sleorg));
-					genarea.appendChild(elem);
-					// release memory
-					ga.dereference();
-				}
-
-				String xml = abr.transformXML(this, document);
-				abr.addDebug("ADSGENAREAABR: Generated MQ xml:"+ADSABRSTATUS.NEWLINE+xml+ADSABRSTATUS.NEWLINE);
-				abr.notify(this, "GENERALAREA", xml);
-			}
-
-			// release memory
-			genVct.clear();
-		}
-    }
-
-	private Vector getGenarea(ADSABRSTATUS abr,String t1DTS, String t2DTS)
- 	throws java.sql.SQLException
-	{
-		Vector rootVct = new Vector();
-        ResultSet result=null;
-		Connection connection=null;
-		PreparedStatement statement = null;
-        try {
-            connection = setupConnection();
-			statement = connection.prepareStatement(GENAREA_SQL);
-
-            //statement.clearParameters();
-            statement.setString(1, t1DTS);//"time1"
-            statement.setString(2, t2DTS);//"time2"
-
-            result = statement.executeQuery();
-            while(result.next()) {
-				String desc = result.getString(1);
-				String code = result.getString(2);
-				String name = result.getString(3);
-				String org = result.getString(4);
-				int active = result.getInt(5);
-				abr.addDebug("getGenarea desc:"+desc+" code:"+code+" name:"+name+" org:"+org+" active:"+active);
-				rootVct.add(new GenAreaInfo(desc, code, name, org, active));
-            }
-        }
-        finally{
-			try {
-				if (statement!=null) {
-					statement.close();
-					statement=null;
-				}
-			}catch(Exception e){
-				System.err.println("getGenarea(), unable to close statement. "+ e);
-				abr.addDebug("getGenarea unable to close statement. "+e);
-			}
-            if (result!=null){
-                result.close();
-            }
-            closeConnection(connection);
-        }
-		return rootVct;
-	}
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getVersion() {
-        return "1.6";//"1.4";
-    }
-
-    /**********************************
-    *
-	A.	MQ-Series CID
-    */
-    public String getMQCID() { return "GENERALAREA"; }
-
-    /**********************************
-    * get the status attribute to use for this ABR
-    */
-    public String getStatusAttr() { return "ADSABRSTATUS";}
-
-    private static class GenAreaInfo{
-		String descriptionclass = XMLElem.CHEAT;
-		String genareacode = XMLElem.CHEAT;
-		String genareaname = XMLElem.CHEAT;
-		String sleorg = XMLElem.CHEAT;
-		boolean isactive = false;
-		GenAreaInfo(String desc, String code, String name, String org, int active){
-			if (desc != null){
-				descriptionclass = desc.trim();
-			}
-			if (code != null){
-				genareacode = code.trim();
-			}
-			if (name != null){
-				genareaname = name.trim();
-			}
-			if (org != null){
-				sleorg = org.trim();
-			}
-			isactive = (active==1);
-		}
-		void dereference(){
-			descriptionclass = null;
-			genareacode = null;
-			genareaname = null;
-			sleorg = null;
-		}
-	}
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\wave2\ADSGENAREAABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

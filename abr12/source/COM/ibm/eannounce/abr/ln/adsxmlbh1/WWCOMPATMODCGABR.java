@@ -1,405 +1,411 @@
-package COM.ibm.eannounce.abr.ln.adsxmlbh1;
+/*     */ package COM.ibm.eannounce.abr.ln.adsxmlbh1;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import com.ibm.transform.oim.eacm.diff.DiffEntity;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.Connection;
+/*     */ import java.sql.PreparedStatement;
+/*     */ import java.sql.ResultSet;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.MissingResourceException;
+/*     */ import java.util.Vector;
+/*     */ import javax.xml.parsers.ParserConfigurationException;
+/*     */ import javax.xml.transform.TransformerException;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class WWCOMPATMODCGABR
+/*     */   extends ADSCOMPATGEN
+/*     */ {
+/*     */   public void processThis(ADSABRSTATUS paramADSABRSTATUS, Profile paramProfile1, Profile paramProfile2, EntityItem paramEntityItem) throws SQLException, MiddlewareException, ParserConfigurationException, RemoteException, EANBusinessRuleException, MiddlewareShutdownInProgressException, IOException, TransformerException, MissingResourceException {
+/*  99 */     processThis(paramADSABRSTATUS, paramProfile1, paramProfile2, paramEntityItem, false);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void getModelsByOS(ADSABRSTATUS paramADSABRSTATUS, Hashtable paramHashtable, String paramString1, String paramString2) throws SQLException {
+/* 108 */     Vector vector = new Vector();
+/* 109 */     Vector<DiffEntity> vector1 = (Vector)paramHashtable.get("ROOT");
+/* 110 */     DiffEntity diffEntity = vector1.firstElement();
+/* 111 */     EntityItem entityItem = diffEntity.getCurrentEntityItem();
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 118 */     if (diffEntity.isNew()) {
+/* 119 */       paramADSABRSTATUS.addXMLGenMsg("NEW_ENTITY", diffEntity.getKey());
+/* 120 */       populateCompat(paramADSABRSTATUS, vector, entityItem, paramString1, paramString2);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*     */     }
+/*     */     else {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 143 */       String str1 = getValue(diffEntity, "OKTOPUB");
+/* 144 */       String str2 = getValue(diffEntity, "BRANDCD");
+/* 145 */       if (str1 != null || str2 != null) {
+/* 146 */         if ("Delete".equals(str1)) {
+/* 147 */           paramADSABRSTATUS.addXMLGenMsg("OKTOPUB_CHANGE_FOUND", str1);
+/* 148 */           deActivateCG(paramADSABRSTATUS, entityItem.getEntityType(), entityItem.getEntityID(), paramString1, paramString2);
+/*     */         } else {
+/* 150 */           paramADSABRSTATUS.addXMLGenMsg("INTEREST_CHANGE_FOUND", diffEntity.getKey());
+/* 151 */           String str3 = PokUtils.getAttributeValue(entityItem, "OKTOPUB", ", ", "", false);
+/* 152 */           String str4 = PokUtils.getAttributeFlagValue(entityItem, "BRANDCD");
+/* 153 */           if (str4 == null) {
+/* 154 */             str4 = "";
+/*     */           }
+/* 156 */           updateCGOKTOPUB(paramADSABRSTATUS, entityItem.getEntityType(), entityItem.getEntityID(), str3, str4, paramString1, paramString2);
+/*     */         } 
+/*     */       }
+/* 159 */       Vector<DiffEntity> vector2 = (Vector)paramHashtable.get("MDLCGMDLCGOS");
+/*     */       
+/* 161 */       for (byte b = 0; b < vector2.size(); b++) {
+/* 162 */         DiffEntity diffEntity1 = vector2.elementAt(b);
+/* 163 */         if (diffEntity1.isDeleted()) {
+/* 164 */           paramADSABRSTATUS.addXMLGenMsg("DELETE_ENTITY", diffEntity1.getKey());
+/* 165 */           EntityItem entityItem1 = (EntityItem)diffEntity1.getPriorEntityItem().getDownLink(0);
+/* 166 */           if (entityItem1 != null) {
+/* 167 */             deActivateCGOS(paramADSABRSTATUS, entityItem.getEntityType(), entityItem.getEntityID(), entityItem1.getEntityType(), entityItem1.getEntityID(), paramString1, paramString2);
+/*     */           }
+/* 169 */         } else if (diffEntity1.isNew()) {
+/* 170 */           paramADSABRSTATUS.addXMLGenMsg("NEW_ENTITY", diffEntity1.getKey());
+/* 171 */           EntityItem entityItem1 = (EntityItem)diffEntity1.getCurrentEntityItem().getDownLink(0);
+/* 172 */           if (entityItem1 != null) {
+/* 173 */             populateCompat2(paramADSABRSTATUS, vector, entityItem, entityItem1, paramString1, paramString2);
+/*     */           }
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/* 178 */     vector.clear();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void populateCompat2(ADSABRSTATUS paramADSABRSTATUS, Vector paramVector, EntityItem paramEntityItem1, EntityItem paramEntityItem2, String paramString1, String paramString2) throws SQLException {
+/* 188 */     String str1 = null;
+/* 189 */     String str2 = "    MODELCGOS.entityid = ? and \r\n    MODELCG.entityid   = ? with ur \r\n";
+/*     */     
+/* 191 */     str1 = getCommMODELCGSql(str2);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 203 */     Vector vector1 = new Vector();
+/* 204 */     Vector vector2 = new Vector();
+/* 205 */     Vector vector3 = new Vector();
+/*     */     
+/* 207 */     PreparedStatement preparedStatement = null;
+/* 208 */     ResultSet resultSet = null;
+/*     */ 
+/*     */     
+/*     */     try {
+/* 212 */       Connection connection = getConnection();
+/* 213 */       preparedStatement = connection.prepareStatement(str1);
+/* 214 */       preparedStatement.setInt(1, paramEntityItem2.getEntityID());
+/* 215 */       preparedStatement.setInt(2, paramEntityItem1.getEntityID());
+/* 216 */       resultSet = preparedStatement.executeQuery();
+/*     */       
+/* 218 */       putWWCOMPATVector(paramADSABRSTATUS, paramVector, paramEntityItem1, resultSet, vector1, vector2, vector3, paramString1, paramString2);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*     */     }
+/*     */     finally {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 264 */       vector2.clear();
+/* 265 */       vector3.clear();
+/* 266 */       vector1.clear();
+/* 267 */       if (resultSet != null) {
+/*     */         try {
+/* 269 */           resultSet.close();
+/* 270 */         } catch (Exception exception) {
+/* 271 */           System.err.println("getMatchingDateIds(), unable to close result. " + exception);
+/*     */         } 
+/* 273 */         resultSet = null;
+/*     */       } 
+/*     */       
+/* 276 */       if (preparedStatement != null) {
+/*     */         try {
+/* 278 */           preparedStatement.close();
+/* 279 */         } catch (Exception exception) {
+/* 280 */           System.err.println("getMatchingDateIds(), unable to close ps. " + exception);
+/*     */         } 
+/* 282 */         preparedStatement = null;
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void populateCompat(ADSABRSTATUS paramADSABRSTATUS, Vector paramVector, EntityItem paramEntityItem, String paramString1, String paramString2) throws SQLException {
+/* 294 */     String str1 = null;
+/* 295 */     String str2 = "    MODELCG.entityid                = ? with ur \r\n";
+/* 296 */     str1 = getCommMODELCGSql(str2);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 308 */     Vector vector1 = new Vector();
+/* 309 */     Vector vector2 = new Vector();
+/* 310 */     Vector vector3 = new Vector();
+/*     */     
+/* 312 */     PreparedStatement preparedStatement = null;
+/* 313 */     ResultSet resultSet = null;
+/*     */ 
+/*     */     
+/*     */     try {
+/* 317 */       Connection connection = getConnection();
+/* 318 */       preparedStatement = connection.prepareStatement(str1);
+/* 319 */       preparedStatement.setInt(1, paramEntityItem.getEntityID());
+/* 320 */       resultSet = preparedStatement.executeQuery();
+/*     */       
+/* 322 */       putWWCOMPATVector(paramADSABRSTATUS, paramVector, paramEntityItem, resultSet, vector1, vector2, vector3, paramString1, paramString2);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*     */     }
+/*     */     finally {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 368 */       vector2.clear();
+/* 369 */       vector3.clear();
+/* 370 */       vector1.clear();
+/* 371 */       if (resultSet != null) {
+/*     */         try {
+/* 373 */           resultSet.close();
+/* 374 */         } catch (Exception exception) {
+/* 375 */           System.err.println("getMatchingDateIds(), unable to close result. " + exception);
+/*     */         } 
+/* 377 */         resultSet = null;
+/*     */       } 
+/*     */       
+/* 380 */       if (preparedStatement != null) {
+/*     */         try {
+/* 382 */           preparedStatement.close();
+/* 383 */         } catch (Exception exception) {
+/* 384 */           System.err.println("getMatchingDateIds(), unable to close ps. " + exception);
+/*     */         } 
+/* 386 */         preparedStatement = null;
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVeName() {
+/* 394 */     return "ADSWWCOMPATMODCG";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVersion() {
+/* 403 */     return "$Revision: 1.1 $";
+/*     */   }
+/*     */ }
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Hashtable;
-import java.util.MissingResourceException;
-import java.util.Vector;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import com.ibm.transform.oim.eacm.diff.DiffEntity;
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.opicmpdh.middleware.Profile;
-import COM.ibm.opicmpdh.middleware.Stopwatch;
-/**
- * --VE for MODELCG
-   insert into opicm.metalinkattr values ('SG' ,'Action/Entity'  , 'ADSWWCOMPATMODCG' ,'MDLCGMDLCGOS' ,'D','0'  ,'1980-01-01-00.00.00.000000', '9999-12-31-00.00.00.000000', '1980-01-01-00.00.00.000000', '9999-12-31-00.00.00.000000', -1,-1);
--------------------------------------------
- * Extract the following for T1 to T2 changes:
-•	MODELCG.OKTOPUB
-•	MODELCG.BRANDCD
-•	MDLCGMDLCGOS where Entity1ID = MODELCG.entityid
-
-	For MODELCG.OKTOPUB = Delete (Delete) as a change, then
-	Set
-	Activity = “D”
-	Updated = NOW()
-	TimeOfChange = T2
-	Where
-	Activity <> “D”
-	TimeOfChange < T2
-	GroupEntityType = “MODELCG”
-	GroupEntityID = MODELCG.ENTITYID
-	
-	If MODELCG.OKTOPUB = Delete (Delete) then after the preceding is processed, deactivate MODELCG in the PDH.
-	
-	 
-	
-	If MODELCG.OKTOPUB = {Yes (Yes) | No (No)} was changed, then update records as follows:
-	Set
-	Activity = “C”
-	Updated = NOW()
-	TimeOfChange = T2
-	Where
-	Activity <> “D”
-	TimeOfChange < T2
-	GroupEntityType = “MODELCG”
-	GroupEntityID = MODELCG.ENTITYID
-	
-	If MODELCG is new, then insert records based on the section named “Insert Additions” where:
-	GroupEntityType = “MODELCG”
-	GroupEntityID = MODELCG.ENTITYID
-	
-	
-	If MDLCGMDLCGOS is deactivated, then
-	Set
-	Activity = “D”
-	Updated = NOW()
-	TimeOfChange = T2
-	Where
-	Activity <> “D”
-	TimeOfChange < T2
-	GroupEntityType = “MODELCG”
-	GroupEntityID = MODELCG.ENTITYID
-	OSEntityType = “MODELCGOS”
-	OSEntityId = MDLCGMDLCGOS.Entity2Id
-	
-	If MDLCGMDLCGOS is new, then insert records based on the section named “Insert Additions” where:
-	GroupEntityType = “MODELCG”
-	GroupEntityID = MODELCG.ENTITYID
-
- * 
- * @author guobin
- *
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\ln\adsxmlbh1\WWCOMPATMODCGABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-
-public class WWCOMPATMODCGABR extends ADSCOMPATGEN {
-
-	/**********************************
-	    * create xml and write to queue
-	    */
-	    public void processThis(ADSABRSTATUS abr, Profile profileT1, Profile profileT2, EntityItem rootEntity)
-	    throws
-	    java.sql.SQLException,
-	    COM.ibm.opicmpdh.middleware.MiddlewareException,
-	    ParserConfigurationException,
-	    java.rmi.RemoteException,
-	    COM.ibm.eannounce.objects.EANBusinessRuleException,
-	    COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-	    IOException,
-	    javax.xml.transform.TransformerException,
-		MissingResourceException
-	    {
-            processThis(abr, profileT1, profileT2, rootEntity, false);
-
-		}	
-	     /***********************************************
-	      *  Get the models by os
-	     * @throws SQLException 
-	      */
-	  	protected void getModelsByOS(ADSABRSTATUS abr, Hashtable diffTbl,String update, String timeofchange) throws SQLException
-	  	{
-	  		Vector osTbl = new Vector();
-			Vector vct = (Vector)diffTbl.get("ROOT");
-			DiffEntity parentItem = (DiffEntity)vct.firstElement();
-			EntityItem curritem = parentItem.getCurrentEntityItem();
-			
-
-			//If MODELCG is new, then insert records based on the section named “Insert Additions” where:
-			//GroupEntityType = “MODELCG”
-			//GroupEntityID = MODELCG.ENTITYID
-			
-			if (parentItem.isNew()){
-				abr.addXMLGenMsg("NEW_ENTITY",parentItem.getKey());
-				populateCompat( abr,  osTbl, curritem, update, timeofchange);
-			}else{
-//				For MODELCG.OKTOPUB = Delete (Delete) as a change, then
-//				Set
-//				Activity = “D”
-//				Updated = NOW()
-//				TimeOfChange = T2
-//				Where
-//				Activity <> “D”
-//				TimeOfChange < T2
-//				GroupEntityType = “MODELCG”
-//				GroupEntityID = MODELCG.ENTITYID
-				
-//				For MODELCG.BRANDCD as a change, then
-//				Set
-//				Activity = “C”
-//				Updated = NOW()
-//				TimeOfChange = T2
-//				Where
-//				Activity <> “D”
-//				TimeOfChange < T2
-//				GroupEntityType = “MODELCG”
-//				GroupEntityID = MODELCG.ENTITYID
-				String oktoput = getValue(parentItem,"OKTOPUB");
-				String brandcd = getValue(parentItem,"BRANDCD");
-				if (oktoput != null || brandcd != null){
-					if ("Delete".equals(oktoput)){
-						abr.addXMLGenMsg("OKTOPUB_CHANGE_FOUND", oktoput);
-						deActivateCG(abr, curritem.getEntityType(),curritem.getEntityID(),update, timeofchange);
-					}else{
-						abr.addXMLGenMsg("INTEREST_CHANGE_FOUND", parentItem.getKey());
-						String curr_oktoput = PokUtils.getAttributeValue(curritem, "OKTOPUB",", ", "", false);
-						String curr_brandcd = PokUtils.getAttributeFlagValue(curritem, "BRANDCD");
-						if (curr_brandcd == null){
-							curr_brandcd = "";
-						}
-						updateCGOKTOPUB(abr, curritem.getEntityType(),curritem.getEntityID(),curr_oktoput,curr_brandcd, update, timeofchange);
-					}
-				}
-				Vector MDLCGMDLCGOSVector = (Vector)diffTbl.get("MDLCGMDLCGOS");
-	  			
-	  			for (int i=0; i<MDLCGMDLCGOSVector.size(); i++){
-	  				DiffEntity mdlcgmdlcgos = (DiffEntity)MDLCGMDLCGOSVector.elementAt(i);
-			  			if (mdlcgmdlcgos.isDeleted()){
-			  				abr.addXMLGenMsg("DELETE_ENTITY", mdlcgmdlcgos.getKey());
-			  				EntityItem mdlcgos = (EntityItem)mdlcgmdlcgos.getPriorEntityItem().getDownLink(0);
-			  				if (mdlcgos != null)
-			  				    deActivateCGOS(abr, curritem.getEntityType(),curritem.getEntityID(), mdlcgos.getEntityType(), mdlcgos.getEntityID(), update, timeofchange );
-			  			
-			  			} else if (mdlcgmdlcgos.isNew()){
-			  				abr.addXMLGenMsg("NEW_ENTITY",mdlcgmdlcgos.getKey());
-			  				EntityItem mdlcgos = (EntityItem)mdlcgmdlcgos.getCurrentEntityItem().getDownLink(0);
-			  				if (mdlcgos != null)
-			  				populateCompat2( abr,  osTbl, curritem , mdlcgos, update, timeofchange);
-			  			}
-			  	}
-			}
-
-		osTbl.clear();
-	  	}
-	  	/**
-	  	 * populate compat for new related modlecgos
-	  	 * @param abr
-	  	 * @param osTbl
-	  	 * @param curritem
-	  	 * @throws SQLException
-	  	 */
-	  	private void populateCompat2(ADSABRSTATUS abr, Vector osTbl, EntityItem curritem, EntityItem mdlcgos, String update, String timeofchange) throws SQLException{
-	  		String sql = null; 
-	  		String wherestr =      "    MODELCGOS.entityid = ? and \r\n"+  
-	                               "    MODELCG.entityid   = ? with ur \r\n";  
-            	sql = getCommMODELCGSql(wherestr);
-	  		    
-//	  			String SystemEntityType = "";
-//				int SystemEntityId ;
-//				String GroupEntityType = "";
-//				int GroupEntityId ;
-//				String OSEntityType = "";
-//				int OSEntityId;
-//				String OSOPTIONType ="";
-//				int OSOPTIONId;
-//				String OptionEntityType="";
-//				int OptionEntityId;
-	  			Vector SystemOSVector = new Vector();
-				Vector OptionOSVector = new Vector();
-				Vector WWCOMPATVector = new Vector();
-				//abr.addDebug("getMatchingDateIds executing with " + PokUtils.convertToHTML(sql));
-				PreparedStatement ps = null;
-				ResultSet result2 = null;
-
-				try {
-//					long curtime = System.currentTimeMillis();
-					Connection conODS = getConnection();
-					ps = conODS.prepareStatement(sql);
-					ps.setInt(1, mdlcgos.getEntityID());
-					ps.setInt(2, curritem.getEntityID());
-					result2 = ps.executeQuery();
-//					TODO CALL putWWCOMPATVector(ADSABRSTATUS abr, Vector osTbl,  EntityItem curritem, ResultSet result2,  Vector SystemOSVector, Vector OptionOSVector, Vector WWCOMPATVector, String update, String timeofchange ) throws SQLException{
-					putWWCOMPATVector(abr, osTbl, curritem, result2, SystemOSVector, OptionOSVector, WWCOMPATVector, update, timeofchange);
-//                    int counter =1 ;
-////					one MODELCG, get all MODEL and etc
-//					while(result2.next()){
-//						SystemEntityType	= result2.getString("SystemEntityType");
-//						SystemEntityId 		= result2.getInt("SystemEntityId");						
-//						GroupEntityType 	= result2.getString("GroupEntityType");
-//					    GroupEntityId 		= result2.getInt("GroupEntityId");
-//						OSEntityType    	= result2.getString("OSEntityType");
-//						OSEntityId 			= result2.getInt("OSEntityId");
-//						OSOPTIONType        = result2.getString("OSOPTIONType");
-//						OSOPTIONId   		= result2.getInt("OSOPTIONId");
-//						OptionEntityType   	= result2.getString("OptionEntityType");
-//						OptionEntityId 		= result2.getInt("OptionEntityID");
-//						WWCOMPATVector.clear();
-//						putvalidWWCOMPAT(abr, WWCOMPATVector,SystemOSVector, OptionOSVector,SystemEntityType,
-//							 SystemEntityId 		,					
-//							  GroupEntityType 	,
-//							  GroupEntityId 		,
-//							  OSEntityType    	,
-//							  OSEntityId 			,
-//							  OSOPTIONType       ,
-//							  OSOPTIONId   		,
-//							  OptionEntityType   ,
-//							  OptionEntityId,
-//							  timeofchange);
-//						osTbl.addAll(WWCOMPATVector);
-////						TODO SET chunk size to avoid out of memory
-//						if (osTbl.size()>=WWCOMPAT_ROW_LIMIT){
-//							abr.addDebug("Chunking size is " +  WWCOMPAT_ROW_LIMIT + ". Start to run chunking "  + counter++  + " times.");
-//							updateCompat(abr,osTbl,update,timeofchange);
-////							 release memory
-//							osTbl.clear();
-//						}
-//						
-//					} 
-//					if (osTbl.size()>0){
-//						updateCompat(abr,osTbl,update,timeofchange);
-//					}
-//					abr.addDebug("Time to getMatchingDateIds all WWCOMPATVector size:" + ((counter -1)*WWCOMPAT_ROW_LIMIT + osTbl.size() )  +"|"+ curritem.getKey()
-//						+ ": " + Stopwatch.format(System.currentTimeMillis() - curtime));	
-//	                if (((counter -1)*WWCOMPAT_ROW_LIMIT + osTbl.size() )==0){
-//	                	abr.addOutput("ADSWWCOMPATABR found insert count: 0");
-//	                }
-
-				} finally {
-					OptionOSVector.clear();
-					WWCOMPATVector.clear();
-					SystemOSVector.clear();
-					if (result2 != null) {
-						try {
-							result2.close();
-						} catch (Exception e) {
-							System.err.println("getMatchingDateIds(), unable to close result. " + e);
-						}
-						result2 = null;
-					}
-
-					if (ps != null) {
-						try {
-							ps.close();
-						} catch (Exception e) {
-							System.err.println("getMatchingDateIds(), unable to close ps. " + e);
-						}
-						ps = null;
-					}
-				}	  		
-	  	}
-	  	/**
-	  	 * populate compat for new MODELCG
-	  	 * @param abr
-	  	 * @param osTbl
-	  	 * @param curritem
-	  	 * @throws SQLException
-	  	 */
-	  	private void populateCompat(ADSABRSTATUS abr, Vector osTbl, EntityItem curritem, String update, String timeofchange) throws SQLException{
-	  		String sql = null;  
-	  		String wherestr =  "    MODELCG.entityid                = ? with ur \r\n"; 
-            	sql = getCommMODELCGSql(wherestr);
-	  		    
-//	  			String SystemEntityType = "";
-//				int SystemEntityId ;
-//				String GroupEntityType = "";
-//				int GroupEntityId ;
-//				String OSEntityType = "";
-//				int OSEntityId;
-//				String OSOPTIONType ="";
-//				int OSOPTIONId;
-//				String OptionEntityType="";
-//				int OptionEntityId;
-	  			Vector SystemOSVector = new Vector();
-				Vector OptionOSVector = new Vector();
-				Vector WWCOMPATVector = new Vector();
-				//abr.addDebug("getMatchingDateIds executing with " + PokUtils.convertToHTML(sql));
-				PreparedStatement ps = null;
-				ResultSet result2 = null;
-
-				try {
-//					long curtime = System.currentTimeMillis();
-					Connection conODS = getConnection();
-					ps = conODS.prepareStatement(sql);
-					ps.setInt(1, curritem.getEntityID());
-					result2 = ps.executeQuery();
-//					TODO CALL putWWCOMPATVector(ADSABRSTATUS abr, Vector osTbl,  EntityItem curritem, ResultSet result2,  Vector SystemOSVector, Vector OptionOSVector, Vector WWCOMPATVector, String update, String timeofchange ) throws SQLException{
-					putWWCOMPATVector(abr, osTbl, curritem, result2, SystemOSVector, OptionOSVector, WWCOMPATVector, update, timeofchange);
-//                    int counter = 1;
-////					one MODELCG, get all MODEL and etc
-//					while(result2.next()){
-//						SystemEntityType	= result2.getString("SystemEntityType");
-//						SystemEntityId 		= result2.getInt("SystemEntityId");						
-//						GroupEntityType 	= result2.getString("GroupEntityType");
-//					    GroupEntityId 		= result2.getInt("GroupEntityId");
-//						OSEntityType    	= result2.getString("OSEntityType");
-//						OSEntityId 			= result2.getInt("OSEntityId");
-//						OSOPTIONType        = result2.getString("OSOPTIONType");
-//						OSOPTIONId   		= result2.getInt("OSOPTIONId");
-//						OptionEntityType   	= result2.getString("OptionEntityType");
-//						OptionEntityId 		= result2.getInt("OptionEntityID");
-//						WWCOMPATVector.clear();
-//						putvalidWWCOMPAT(abr, WWCOMPATVector,SystemOSVector, OptionOSVector,SystemEntityType,
-//							 SystemEntityId 		,					
-//							  GroupEntityType 	,
-//							  GroupEntityId 		,
-//							  OSEntityType    	,
-//							  OSEntityId 			,
-//							  OSOPTIONType       ,
-//							  OSOPTIONId   		,
-//							  OptionEntityType   ,
-//							  OptionEntityId,
-//							  timeofchange);
-//						osTbl.addAll(WWCOMPATVector);
-////						TODO SET chunk size to avoid out of memory
-//						if (osTbl.size()>=WWCOMPAT_ROW_LIMIT){
-//							abr.addDebug("Chunking size is " +  WWCOMPAT_ROW_LIMIT + ". Start to run chunking "  + counter++  + " times.");
-//							updateCompat(abr,osTbl,update,timeofchange);
-////							 release memory
-//							osTbl.clear();
-//						}
-//						
-//					} 
-//					if (osTbl.size()>0){
-//						updateCompat(abr,osTbl,update,timeofchange);
-//					}
-//					abr.addDebug("Time to getMatchingDateIds all WWCOMPATVector size:" + ((counter -1)*WWCOMPAT_ROW_LIMIT + osTbl.size() )  +"|"+ curritem.getKey()
-//						+ ": " + Stopwatch.format(System.currentTimeMillis() - curtime));	
-//	                if (((counter -1)*WWCOMPAT_ROW_LIMIT + osTbl.size() )==0){
-//	                	abr.addOutput("ADSWWCOMPATABR found insert count: 0");
-//	                }
-
-				} finally {
-					OptionOSVector.clear();
-					WWCOMPATVector.clear();
-					SystemOSVector.clear();
-					if (result2 != null) {
-						try {
-							result2.close();
-						} catch (Exception e) {
-							System.err.println("getMatchingDateIds(), unable to close result. " + e);
-						}
-						result2 = null;
-					}
-
-					if (ps != null) {
-						try {
-							ps.close();
-						} catch (Exception e) {
-							System.err.println("getMatchingDateIds(), unable to close ps. " + e);
-						}
-						ps = null;
-					}
-				}	  		
-	  		
-	  	}
-    /**********************************
-    * get the name of the VE to use
-    */
-    public String getVeName() { return "ADSWWCOMPATMODCG";}
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getVersion()
-    {
-        return "$Revision: 1.1 $";
-    }
-}

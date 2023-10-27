@@ -1,605 +1,611 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.abr.sg;
-
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.objects.*;
-import com.ibm.transform.oim.eacm.util.*;
-import com.ibm.transform.oim.eacm.diff.*;
-
-import java.io.*;
-import java.util.*;
-import javax.xml.parsers.*;
-import org.w3c.dom.*;
-/**********************************************************************************
-* this must be done here, the map cannot be used because there are multiple
-MODEL2MODEL elements for one root MODELCG based on operating systems
-1	<MODELCG_UPDATE>						1
-1	<DTSOFMSG>	</DTSOFMSG>					2				Date/Time Stamp of Message
-1..N	<MODEL2MODEL>						2
-1	<PDHDOMAIN>	</PDHDOMAIN>				3	MODELCG	PDHDOMAIN
-1	<ACTIVITY>	</ACTIVITY>					3		ACTIVITY	Derived	Update | Delete
-1	<UPDATED>	</UPDATED>					3		valfrom	Derived	MAX of the various DTS
-1	<SYSTEMENTITYTYPE>	</SYSTEMENTITYTYPE>	3	MODEL	ENTITYTYPE	'MODEL'
-1	<SYSTEMENTITYID>	</SYSTEMENTITYID>	3	MODEL	ENTITYID
-1	<SYSTEMOS>	</SYSTEMOS>					3	MODEL	OSLEVEL	Flag Description Class
-				MODEL.COFGRP		COFGRP = "Base" & COFCAT <> "Service"
-1	<GROUPENTITYTYPE>	</GROUPENTITYTYPE>	3	MODELCG	ENTITYTYPE	'MODELCG'
-1	<GROUPENTITYID>	</GROUPENTITYID>		3	MODELCG	ENTITYID
-1	<OKTOPUB>	</OKTOPUB>					3	MODELCG	OKTOPUB		{Y | N}
-1	<GROUPOSENTITYTYPE>	</GROUPOSENTITYTYPE>	3	MODELCGOS	ENTITYTYPE	'MODELCGOS'
-1	<GROUPOSENTITYID>	</GROUPOSENTITYID>	3	MODELCGOS	ENTITYID
-1	<OPTIONOS>	</OPTIONOS>					3	MODELCGOS	OS
-1	<OPTIONENTITYTYPE>	</OPTIONENTITYTYPE>	3	MODEL	ENTITYTYPE	'MODEL'
-1	<OPTIONENTITYID>	</OPTIONENTITYID>	3	MODEL	ENTITYID
-1	<COMPATIBILITYPUBLISHINGFLAG>	</COMPATIBILITYPUBLISHINGFLAG>	3	MDLCGOSMDL	COMPATPUBFLG		{No; Yes}
-1	<RELATIONSHIPTYPE>	</RELATIONSHIPTYPE>	3	MDLCGOSMDL	RELTYPE	Description Class
-1	<PUBLISHFROM>	</PUBLISHFROM>			3	MDLCGOSMDL	PUBFROM
-1	<PUBLISHTO>	</PUBLISHTO>				3	MDLCGOSMDL	PUBTO
-		</MODEL2MODEL>						2
-		</MODELCG_UPDATE>					1
-
-*/
-// ADSWWCOMPATABR.java,v
-// Revision 1.3  2008/05/28 13:46:07  wendy
-// updates for spec "SG FS ABR ADS System Feed 20080528c.doc"
-//
-// Revision 1.2  2008/05/27 14:28:59  wendy
-// Clean up RSA warnings
-//
-// Revision 1.1  2008/05/03 23:32:41  wendy
-//  Init for
-//   -   CQ00003539-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC
-//   -   CQ00005096-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Add Category MM and Images
-//   -   CQ00005046-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Support CRAD in BHC
-//   -   CQ00005045-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Upgrade/Conversion Support
-//   -   CQ00006862-WI  - BHC 3.0 Support - Support for Services Data UI
-//
-//
-public class ADSWWCOMPATABR extends XMLMQChanges
-{
-//from		  rel			to
-//MODELCG	  MDLCGMDL		MODEL
-//MODELCG	  MDLCGMDLCGOS	MODELCGOS
-//MODELCGOS	  MDLCGOSMDL	MODEL
-
-/*
-ADSWWCOMPAT	MDLCGMDL		D	0
-ADSWWCOMPAT	MDLCGMDLCGOS	D	0
-ADSWWCOMPAT	MDLCGOSMDL		D	1
-
-*/
-    /**********************************
-    * create xml and write to queue
-    */
-    public void processThis(ADSABRSTATUS abr, Profile profileT1, Profile profileT2, EntityItem rootEntity)
-    throws
-    java.sql.SQLException,
-    COM.ibm.opicmpdh.middleware.MiddlewareException,
-    ParserConfigurationException,
-    java.rmi.RemoteException,
-    COM.ibm.eannounce.objects.EANBusinessRuleException,
-    COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-    IOException,
-    javax.xml.transform.TransformerException,
-	MissingResourceException
-    {
-		// look at ADSTYPE
-		String etype = "MODELCG";
-
-		// Find all instances of the VE Structure that changed between T1 and T2, and then
-		// create XML for each instance where the structure has changed or an attribute of
-		// interest has changed.
-		Vector rootIds = getAffectedRoots(abr,getVeName(), profileT2, etype,
-			profileT1.getValOn(), profileT2.getValOn());
-
-		if (rootIds.size()==0){
-			//NO_CHANGES_FND=No Changes found for {0}
-			abr.addXMLGenMsg("NO_CHANGES_FND",etype);
-		}else{
-			// get all of this at once to check pdhdomain
-			EntityItem eiArray[] = new EntityItem[rootIds.size()];
-			for (int i=0; i<rootIds.size(); i++){
-				eiArray[i] = new EntityItem(null, profileT2, etype,
-					Integer.parseInt((String)rootIds.elementAt(i)));
-			}
-
-			// pull just roots to check pdhdomain before doing anything else
-			EntityList rootlist = abr.getDB().getEntityList(profileT2,
-					new ExtractActionItem(null, abr.getDB(), profileT2,"dummy"),eiArray);
-
-			EntityGroup eg = rootlist.getParentEntityGroup();
-			for (int i=0; i<eg.getEntityItemCount(); i++){
-				EntityItem item = eg.getEntityItem(i);
-				abr.addDebug("ADSWWCOMPATABR checking root "+item.getKey());
-				if (abr.domainNeedsChecks(item)){
-					// build model2model xml
-					processThis(abr, profileT1, profileT2, item, true);
-				}else{
-					abr.addXMLGenMsg("DOMAIN_NOT_LISTED",item.getKey());
-				}
-			}
-
-			// release memory
-			rootlist.dereference();
-			for (int i=0; i<eiArray.length; i++){
-				eiArray[i] = null;
-			}
-			eiArray = null;
-			rootIds.clear();
-		}
-	}
-
-    /***********************************************
-    *  Get the xml
-    *
-    *@return java.lang.String
-    */
-    protected String generateXML(ADSABRSTATUS abr, Hashtable diffTbl)
-    throws
-    java.sql.SQLException,
-    COM.ibm.opicmpdh.middleware.MiddlewareException,
-    ParserConfigurationException,
-    java.rmi.RemoteException,
-    COM.ibm.eannounce.objects.EANBusinessRuleException,
-    COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-    IOException,
-    javax.xml.transform.TransformerException
-    {
-		String xml = null;
-		Vector vct = (Vector)diffTbl.get("ROOT");
-		DiffEntity parentItem = (DiffEntity)vct.firstElement();
-
-		//use this difftbl and build one xml for each os
-		Vector model2modelVct = getModelsByOS(abr,diffTbl);
-		if (model2modelVct.size()==0){
-			//NO_OS_MATCH_FND=No matches found in OS and OSLEVEL for {0}
-			abr.addXMLGenMsg("NO_OS_MATCH_FND",parentItem.getKey());
-		}else{
-			abr.addDebug("ADSWWCOMPATABR.generateXML found "+model2modelVct.size()+" m2m for "+parentItem.getKey());
-
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document document = builder.newDocument();  // Create
-			Element root = (Element) document.createElement("MODELCG_UPDATE");
-			// create the root
-			document.appendChild(root);
-
-			Element elem = (Element) document.createElement("DTSOFMSG");
-			elem.appendChild(document.createTextNode(parentItem.getCurrentEntityItem().getProfile().getEndOfDay()));
-			root.appendChild(elem);
-
-			// create one MODEL2MODEL for each one found
-			for (int i=0; i<model2modelVct.size(); i++){
-				M2MInfo m2m = (M2MInfo)model2modelVct.elementAt(i);
-
-				if (!m2m.isDisplayable()){
-					abr.addDebug("No changes found in "+m2m);
-					continue;
-				}
-
-				Element parent = (Element) document.createElement("MODEL2MODEL");
-				root.appendChild(parent);
-
-				elem = (Element) document.createElement("PDHDOMAIN");
-				elem.appendChild(document.createTextNode(m2m.getPdhdomain()));
-				parent.appendChild(elem);
-
-				elem = (Element) document.createElement("ACTIVITY");
-				elem.appendChild(document.createTextNode(m2m.getActivity()));
-				parent.appendChild(elem);
-
-				elem = (Element) document.createElement("SYSTEMENTITYTYPE");
-				elem.appendChild(document.createTextNode(m2m.getSysType()));
-				parent.appendChild(elem);
-
-				elem = (Element) document.createElement("SYSTEMENTITYID");
-				elem.appendChild(document.createTextNode(m2m.getSysID()));
-				parent.appendChild(elem);
-
-				elem = (Element) document.createElement("SYSTEMOS");
-				elem.appendChild(document.createTextNode(m2m.getOS()));
-				parent.appendChild(elem);
-
-				elem = (Element) document.createElement("GROUPENTITYTYPE");
-				elem.appendChild(document.createTextNode(m2m.getGrpType()));
-				parent.appendChild(elem);
-
-				elem = (Element) document.createElement("GROUPENTITYID");
-				elem.appendChild(document.createTextNode(m2m.getGrpID()));
-				parent.appendChild(elem);
-
-				elem = (Element) document.createElement("OKTOPUB");
-				elem.appendChild(document.createTextNode(m2m.getOktopub()));
-				parent.appendChild(elem);
-
-				elem = (Element) document.createElement("GROUPOSENTITYTYPE");
-				elem.appendChild(document.createTextNode(m2m.getGrpOsType()));
-				parent.appendChild(elem);
-
-				elem = (Element) document.createElement("GROUPOSENTITYID");
-				elem.appendChild(document.createTextNode(m2m.getGrpOsID()));
-				parent.appendChild(elem);
-
-				elem = (Element) document.createElement("OPTIONOS");
-				elem.appendChild(document.createTextNode(m2m.getOptOS()));
-				parent.appendChild(elem);
-
-				elem = (Element) document.createElement("OPTIONENTITYTYPE");
-				elem.appendChild(document.createTextNode(m2m.getOptType()));
-				parent.appendChild(elem);
-
-				elem = (Element) document.createElement("OPTIONENTITYID");
-				elem.appendChild(document.createTextNode(m2m.getOptID()));
-				parent.appendChild(elem);
-
-				elem = (Element) document.createElement("COMPATIBILITYPUBLISHINGFLAG");
-				elem.appendChild(document.createTextNode(m2m.getCompatPubFlag()));
-				parent.appendChild(elem);
-
-				elem = (Element) document.createElement("RELATIONSHIPTYPE");
-				elem.appendChild(document.createTextNode(m2m.getRelType()));
-				parent.appendChild(elem);
-
-				elem = (Element) document.createElement("PUBLISHFROM");
-				elem.appendChild(document.createTextNode(m2m.getPubFrom()));
-				parent.appendChild(elem);
-
-				elem = (Element) document.createElement("PUBLISHTO");
-				elem.appendChild(document.createTextNode(m2m.getPubTo()));
-				parent.appendChild(elem);
-
-				// release memory
-				m2m.dereference();
-			}
-
-			xml = abr.transformXML(this, document);
-// reduce file size	abr.addDebug("ADSWWCOMPATABR: Generated xml:"+ADSABRSTATUS.NEWLINE+xml+ADSABRSTATUS.NEWLINE);
-
-			// release memory
-			model2modelVct.clear();
-			document = null;
-			factory = null;
-			builder = null;
-			root = null;
-			elem = null;
-			System.gc();
-		}
-
-		return xml;
-    }
-
-    /***********************************************
-    *  Get the models by os
-    */
-	private Vector getModelsByOS(ADSABRSTATUS abr, Hashtable diffTbl)
-	{
-		Vector m2mVct = new Vector(1);
-		Vector vct = (Vector)diffTbl.get("ROOT");
-		DiffEntity parentItem = (DiffEntity)vct.firstElement();
-		EntityItem curritem = parentItem.getCurrentEntityItem();
-		EntityItem previtem = parentItem.getPriorEntityItem();
-
-		// MODELCG-MDLCGMDL-MODEL.OSLEVEL
-		Vector currSysVct = PokUtils.getAllLinkedEntities(curritem, "MDLCGMDL", "MODEL");
-		Vector prevSysVct = PokUtils.getAllLinkedEntities(previtem, "MDLCGMDL", "MODEL");
-
-		// MODELCG-MDLCGMDLCGOS-MODELCGOS.OS
-		Vector currOSVct = PokUtils.getAllLinkedEntities(curritem, "MDLCGMDLCGOS", "MODELCGOS");
-		Vector prevOSVct = PokUtils.getAllLinkedEntities(previtem, "MDLCGMDLCGOS", "MODELCGOS");
-
-		Hashtable osTbl = new Hashtable();
-
-		buildOSTbl(abr, osTbl, diffTbl, parentItem,	currSysVct, currOSVct, true);
-		buildOSTbl(abr, osTbl, diffTbl, parentItem,	prevSysVct, prevOSVct, false);
-
-		prevSysVct.clear();
-		currSysVct.clear();
-		currOSVct.clear();
-		prevOSVct.clear();
-		if (osTbl.size()>0){
-			m2mVct.addAll(osTbl.values());
-			osTbl.clear();
-		}
-		return m2mVct;
-	}
-
-	private void buildOSTbl(ADSABRSTATUS abr, Hashtable osTbl, Hashtable diffTbl, DiffEntity parentItem,
-		Vector sysmdlVct, Vector mdlcgosVct, boolean current)
-	{
-		for (int i=0; i<sysmdlVct.size(); i++){
-			EntityItem mdlitem = (EntityItem)sysmdlVct.elementAt(i);
-			DiffEntity diffmdlitem = (DiffEntity)diffTbl.get(mdlitem.getKey());
-//			MODEL	COFGRP = "Base" & COFCAT <> "Service"
-//150		Base
-//102		Service
-
-			String modelCOFCAT = abr.getAttributeFlagEnabledValue(mdlitem, "COFCAT");
-			String modelCOFGRP = abr.getAttributeFlagEnabledValue(mdlitem, "COFGRP");
-			abr.addDebug((current?"current ":"previous ")+ mdlitem.getKey()+" COFCAT: "+modelCOFCAT+" COFGRP: "+modelCOFGRP);
-
-			if ("150".equals(modelCOFGRP) && !"102".equals(modelCOFCAT)){
-				// get all oslevel values
-				Vector osLvlVct = new Vector(1);
-				EANFlagAttribute fAtt = (EANFlagAttribute)mdlitem.getAttribute("OSLEVEL");
-				if (fAtt!=null && fAtt.toString().length()>0){
-					// Get the selected Flag codes.
-					MetaFlag[] mfArray = (MetaFlag[]) fAtt.get();
-					for (int i2 = 0; i2 < mfArray.length; i2++){
-						// get selection
-						if (mfArray[i2].isSelected()){
-							osLvlVct.add(mfArray[i2].getFlagCode());
-						}
-					}
-				}
-				abr.addDebug((current?"current ":"previous ")+mdlitem.getKey()+" OSLEVEL: "+osLvlVct);
-				if (osLvlVct.size()==0){
-					continue; //if "null" - then no match
-				}
-
-				//MODELCGOS-MDLCGOSMDL-MODEL
-				for (int os = 0; os<mdlcgosVct.size(); os++){
-					// get OS
-					EntityItem ositem = (EntityItem)mdlcgosVct.elementAt(os);
-					DiffEntity mdlcgositem = (DiffEntity)diffTbl.get(ositem.getKey());
-					String osStr = abr.getAttributeFlagEnabledValue(ositem, "OS");
-					abr.addDebug((current?"current ":"previous ")+ositem.getKey()+" OS: "+osStr);
-
-					//find match
-					String[] oslvl = oslvlMatch(osStr, osLvlVct);
-					if (oslvl != null){
-						for (int d=0; d<ositem.getDownLinkCount(); d++){
-							EANEntity relator = ositem.getDownLink(d);
-							DiffEntity mdlcgosmdlitem = (DiffEntity)diffTbl.get(relator.getKey());
-							for (int d2 =0; d2<relator.getDownLinkCount(); d2++){
-								EANEntity optmodel = relator.getDownLink(d2);
-								DiffEntity optmdlitem = (DiffEntity)diffTbl.get(optmodel.getKey());
-								for(int x=0; x<oslvl.length; x++){
-									String key = generateM2MKey(diffmdlitem,
-											parentItem, oslvl[x],mdlcgositem, mdlcgosmdlitem, optmdlitem,osStr);
-									if (!osTbl.containsKey(key)){
-										M2MInfo m2m = new M2MInfo(diffmdlitem,
-											parentItem, oslvl[x],mdlcgositem, mdlcgosmdlitem, optmdlitem,osStr);
-										osTbl.put(key,m2m);
-									}
-								}
-							}
-						}
-					}
-				}
-
-				osLvlVct.clear();
-			}
-		}
-	}
-	/***********************************
-	A.	Handling OSLEVEL and OS
-
-	In the following, children of 'Model Compatibility Group' (MODELCG) are referred to as 'MODEL (System)'
-	and children of 'Compatibility Group By OS" (MODELCGOS) are referred to as 'MODEL (Option)'. Also, OS shows
-	in the User Interface as 'Operating System' and OSLEVEL shows as 'OS Level'.
-
-	There are three conditions that need to be considered. The conditions are considered in order and the first
-	condition that applies is used.
-	1.	MODEL (System).OSLEVEL = "OS Independent" (10589) or "None Specified" (10582), then pass this MODEL (System)
-	with its OSLEVEL and all MODELCGOS children MODEL (Option) its 'OS'.
-	2.	MODELCGOS.OS = "OS Independent" (10589 then pass this MODEL (System) with its OSLEVEL and this MODELCGOS
-	children MODEL (Option) its 'OS'.
-	3.	Neither of the preceding criteria is met, then if MODELCGOS.OS matches (is in) one of the values for MODEL
-	(System).OSLEVEL, then pass this MODEL (System) with its OSLEVEL and this MODELCGOS children MODEL (Option) its 'OS'.
-
-	If none of the above conditions is met, do not pass that MODELCGOS nor its MODEL (Option).
-
-	*/
-	private String[] oslvlMatch(String osStr, Vector osLvlVct){
-		String matchval[] = null;
-		if (osLvlVct.contains("10589")){
-			matchval = new String[] {"10589"};
-		}else if(osLvlVct.contains("10582")){
-			matchval = new String[] {"10582"};
-		}else if ("10589".equals(osStr)){
-			matchval = new String[osLvlVct.size()];
-			osLvlVct.copyInto(matchval);
-		}else if (osStr !=null && osLvlVct.contains(osStr)){
-			matchval = new String[] {osStr};
-		}
-
-		return matchval;
-	}
-
-    /**********************************
-    *
-	A.	MQ-Series CID
-    */
-    public String getMQCID() { return "MODELCG"; }
-
-    /**********************************
-    * get the name of the VE to use
-    */
-    public String getVeName() { return "ADSWWCOMPAT";}
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getVersion()
-    {
-        return "1.3";
-    }
-
-	private static String generateM2MKey(DiffEntity mdlitem, DiffEntity mdlcgitem, String os,
-			DiffEntity mdlcgositem, DiffEntity mdlcgosmdlitem, DiffEntity optmdlitem, String optos){
-		return mdlitem.getKey()+"|"+mdlcgitem.getKey()+"|"+os+
-				mdlcgositem.getKey()+"|"+mdlcgosmdlitem.getKey()+"|"+optmdlitem.getKey()+"|"+optos;
-	}
-    /***********************************************
-    *  class for each os
-	MODELCGOS	OS	U
-	MODEL		OSLEVEL	F
-    */
-    private static class M2MInfo{
-		private DiffEntity sysmdlDiff = null;
-		private DiffEntity mdlcgDiff = null;
-		private DiffEntity mdlcgosDiff = null;
-		private DiffEntity mdlcgosmdlDiff = null;
-		private DiffEntity optmdlDiff = null;
-		private String activity = XMLElem.CHEAT;
-		//private String updated = XMLElem.CHEAT;
-		private String systemos = null;
-		private String optionos = null;
-		private String pdhdomain = null;
-		private String oktopub = null;
-		private String compatpubflag = null;
-		private String pubfrom = null;
-		private String pubto = null;
-		private String reltype= null;
-
-		M2MInfo(DiffEntity mdlitem, DiffEntity mdlcgitem, String os,
-			DiffEntity mdlcgositem, DiffEntity mdlcgosmdlitem, DiffEntity optmdlitem,
-			String optos){
-			sysmdlDiff = mdlitem;
-			mdlcgDiff = mdlcgitem;
-			mdlcgosDiff = mdlcgositem;
-			mdlcgosmdlDiff = mdlcgosmdlitem;
-			optmdlDiff = optmdlitem;
-			systemos = os;
-			optionos = optos;
-
-			if (sysmdlDiff.isNew() || mdlcgDiff.isNew() || mdlcgosDiff.isNew() ||
-				mdlcgosmdlDiff.isNew() || optmdlDiff.isNew()){
-				activity = XMLElem.UPDATE_ACTIVITY;
-			}
-			if (sysmdlDiff.isDeleted() || mdlcgDiff.isDeleted() || mdlcgosDiff.isDeleted() ||
-				mdlcgosmdlDiff.isDeleted() || optmdlDiff.isDeleted()){
-				activity = XMLElem.DELETE_ACTIVITY;
-			}
-			//check to see if this systemos or optionos was newly added or deleted
-			checkOSValue(sysmdlDiff, systemos, "OSLEVEL");
-			checkOSValue(mdlcgosDiff, optionos, "OS");
-
-			pdhdomain = getValue(mdlcgDiff, "PDHDOMAIN");//MODELCG	PDHDOMAIN
-			oktopub = getValue(mdlcgDiff, "OKTOPUB");//MODELCG	OKTOPUB
-			compatpubflag = getValue(mdlcgosmdlDiff, "COMPATPUBFLG");//MDLCGOSMDL	COMPATPUBFLG
-			pubfrom = getValue(mdlcgosmdlDiff, "PUBFROM");//MDLCGOSMDL	PUBFROM
-			pubto = getValue(mdlcgosmdlDiff, "PUBTO");//MDLCGOSMDL	PUBTO
-			reltype= getFlagValue(mdlcgosmdlDiff, "RELTYPE");//MMDLCGOSMDL	RELTYPE	Description Class
-		}
-
-		boolean isDisplayable() {return activity!=null;} // only display those with filled in actions
-
-		//check to see if this systemos or optionos was newly added or deleted
-		private void checkOSValue(DiffEntity diff, String osvalue, String attrcode){
-			if (activity==null){
-				EntityItem item = diff.getCurrentEntityItem();
-				EANFlagAttribute fAtt = (EANFlagAttribute)item.getAttribute(attrcode);
-				if (fAtt== null || !fAtt.isSelected(osvalue)){
-					activity = XMLElem.UPDATE_ACTIVITY;
-				}else{
-					item = diff.getPriorEntityItem();
-					fAtt = (EANFlagAttribute)item.getAttribute(attrcode);
-					if (fAtt== null || !fAtt.isSelected(osvalue)){
-						activity = XMLElem.UPDATE_ACTIVITY;
-					}
-				}
-			}
-		}
-		String getKey() {
-			return generateM2MKey(sysmdlDiff, mdlcgDiff, systemos,mdlcgosDiff,mdlcgosmdlDiff,optmdlDiff,optionos);
-		}
-		String getOS() { return systemos;}
-		String getPdhdomain() { return pdhdomain;}
-		String getOktopub() {  return oktopub;}
-		String getCompatPubFlag() {  return compatpubflag;}
-		String getPubFrom() {  return pubfrom; }
-		String getPubTo() {  return pubto; }
-		String getRelType() { return reltype;}
-		String getSysType() { return sysmdlDiff.getEntityType();}
-		String getSysID() { return ""+sysmdlDiff.getEntityID();}
-		String getGrpType() { return mdlcgDiff.getEntityType();}
-		String getGrpID() { return ""+mdlcgDiff.getEntityID();}
-		String getGrpOsType() { return mdlcgosDiff.getEntityType();}
-		String getGrpOsID() { return ""+mdlcgosDiff.getEntityID();}
-		String getOptType() { return optmdlDiff.getEntityType();}
-		String getOptID() { return ""+optmdlDiff.getEntityID();}
-		String getOptOS() { return optionos;} //MODELCGOS	OS
-		String getActivity() { return activity;}
-
-		void dereference(){
-			sysmdlDiff = null;
-			mdlcgDiff = null;
-			systemos = null;
-			activity = null;
-			pdhdomain = null;
-			oktopub = null;
-			compatpubflag = null;
-			pubfrom = null;
-			pubto = null;
-			reltype= null;
-			optionos = null;
-		}
-
-		private String getValue(DiffEntity diffitem, String attrcode){
-			String curvalue = XMLElem.CHEAT;
-			String prevvalue = XMLElem.CHEAT;
-			EntityItem curritem = diffitem.getCurrentEntityItem();
-			EntityItem previtem = diffitem.getPriorEntityItem();
-			if (diffitem.isDeleted()){
-				prevvalue = PokUtils.getAttributeValue(previtem, attrcode,", ", XMLElem.CHEAT, false);
-			}else if (diffitem.isNew()){
-				curvalue = PokUtils.getAttributeValue(curritem, attrcode,", ", XMLElem.CHEAT, false);
-			}else{
-				prevvalue = PokUtils.getAttributeValue(previtem, attrcode,", ", XMLElem.CHEAT, false);
-				curvalue = PokUtils.getAttributeValue(curritem, attrcode,", ", XMLElem.CHEAT, false);
-			}
-
-			if (!prevvalue.equals(curvalue) && activity==null){
-				activity = XMLElem.UPDATE_ACTIVITY;
-			}
-
-			return curvalue;
-		}
-
-		private String getFlagValue(DiffEntity diffitem, String attrcode){
-			String curvalue = XMLElem.CHEAT;
-			String prevvalue = XMLElem.CHEAT;
-			EntityItem curritem = diffitem.getCurrentEntityItem();
-			EntityItem previtem = diffitem.getPriorEntityItem();
-			if (diffitem.isDeleted()){
-				prevvalue = PokUtils.getAttributeFlagValue(previtem, attrcode);
-				if (prevvalue==null){
-					prevvalue = XMLElem.CHEAT;
-				}
-			}else if (diffitem.isNew()){
-				curvalue = PokUtils.getAttributeFlagValue(curritem, attrcode);
-				if (curvalue==null){
-					curvalue = XMLElem.CHEAT;
-				}
-			}else{
-				prevvalue = PokUtils.getAttributeFlagValue(previtem, attrcode);
-				curvalue = PokUtils.getAttributeFlagValue(curritem, attrcode);
-				if (curvalue==null){
-					curvalue = XMLElem.CHEAT;
-				}
-				if (prevvalue==null){
-					prevvalue = XMLElem.CHEAT;
-				}
-			}
-
-			if (!prevvalue.equals(curvalue) && activity==null){
-				activity = XMLElem.UPDATE_ACTIVITY;
-			}
-
-			return curvalue;
-		}
-
-		public String toString() {
-			return getKey()+" activity:"+activity;
-		}
-	}
-}
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EANEntity;
+/*     */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*     */ import COM.ibm.eannounce.objects.MetaFlag;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import com.ibm.transform.oim.eacm.diff.DiffEntity;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.MissingResourceException;
+/*     */ import java.util.Vector;
+/*     */ import javax.xml.parsers.DocumentBuilder;
+/*     */ import javax.xml.parsers.DocumentBuilderFactory;
+/*     */ import javax.xml.parsers.ParserConfigurationException;
+/*     */ import javax.xml.transform.TransformerException;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class ADSWWCOMPATABR
+/*     */   extends XMLMQChanges
+/*     */ {
+/*     */   public void processThis(ADSABRSTATUS paramADSABRSTATUS, Profile paramProfile1, Profile paramProfile2, EntityItem paramEntityItem) throws SQLException, MiddlewareException, ParserConfigurationException, RemoteException, EANBusinessRuleException, MiddlewareShutdownInProgressException, IOException, TransformerException, MissingResourceException {
+/*  93 */     String str = "MODELCG";
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*  98 */     Vector<String> vector = getAffectedRoots(paramADSABRSTATUS, getVeName(), paramProfile2, str, paramProfile1
+/*  99 */         .getValOn(), paramProfile2.getValOn());
+/*     */     
+/* 101 */     if (vector.size() == 0) {
+/*     */       
+/* 103 */       paramADSABRSTATUS.addXMLGenMsg("NO_CHANGES_FND", str);
+/*     */     } else {
+/*     */       
+/* 106 */       EntityItem[] arrayOfEntityItem = new EntityItem[vector.size()];
+/* 107 */       for (byte b1 = 0; b1 < vector.size(); b1++) {
+/* 108 */         arrayOfEntityItem[b1] = new EntityItem(null, paramProfile2, str, 
+/* 109 */             Integer.parseInt(vector.elementAt(b1)));
+/*     */       }
+/*     */ 
+/*     */       
+/* 113 */       EntityList entityList = paramADSABRSTATUS.getDB().getEntityList(paramProfile2, new ExtractActionItem(null, paramADSABRSTATUS
+/* 114 */             .getDB(), paramProfile2, "dummy"), arrayOfEntityItem);
+/*     */       
+/* 116 */       EntityGroup entityGroup = entityList.getParentEntityGroup(); byte b2;
+/* 117 */       for (b2 = 0; b2 < entityGroup.getEntityItemCount(); b2++) {
+/* 118 */         EntityItem entityItem = entityGroup.getEntityItem(b2);
+/* 119 */         paramADSABRSTATUS.addDebug("ADSWWCOMPATABR checking root " + entityItem.getKey());
+/* 120 */         if (paramADSABRSTATUS.domainNeedsChecks(entityItem)) {
+/*     */           
+/* 122 */           processThis(paramADSABRSTATUS, paramProfile1, paramProfile2, entityItem, true);
+/*     */         } else {
+/* 124 */           paramADSABRSTATUS.addXMLGenMsg("DOMAIN_NOT_LISTED", entityItem.getKey());
+/*     */         } 
+/*     */       } 
+/*     */ 
+/*     */       
+/* 129 */       entityList.dereference();
+/* 130 */       for (b2 = 0; b2 < arrayOfEntityItem.length; b2++) {
+/* 131 */         arrayOfEntityItem[b2] = null;
+/*     */       }
+/* 133 */       arrayOfEntityItem = null;
+/* 134 */       vector.clear();
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String generateXML(ADSABRSTATUS paramADSABRSTATUS, Hashtable paramHashtable) throws SQLException, MiddlewareException, ParserConfigurationException, RemoteException, EANBusinessRuleException, MiddlewareShutdownInProgressException, IOException, TransformerException {
+/* 154 */     String str = null;
+/* 155 */     Vector<DiffEntity> vector = (Vector)paramHashtable.get("ROOT");
+/* 156 */     DiffEntity diffEntity = vector.firstElement();
+/*     */ 
+/*     */     
+/* 159 */     Vector<M2MInfo> vector1 = getModelsByOS(paramADSABRSTATUS, paramHashtable);
+/* 160 */     if (vector1.size() == 0) {
+/*     */       
+/* 162 */       paramADSABRSTATUS.addXMLGenMsg("NO_OS_MATCH_FND", diffEntity.getKey());
+/*     */     } else {
+/* 164 */       paramADSABRSTATUS.addDebug("ADSWWCOMPATABR.generateXML found " + vector1.size() + " m2m for " + diffEntity.getKey());
+/*     */       
+/* 166 */       DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+/* 167 */       DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+/* 168 */       Document document = documentBuilder.newDocument();
+/* 169 */       Element element1 = document.createElement("MODELCG_UPDATE");
+/*     */       
+/* 171 */       document.appendChild(element1);
+/*     */       
+/* 173 */       Element element2 = document.createElement("DTSOFMSG");
+/* 174 */       element2.appendChild(document.createTextNode(diffEntity.getCurrentEntityItem().getProfile().getEndOfDay()));
+/* 175 */       element1.appendChild(element2);
+/*     */ 
+/*     */       
+/* 178 */       for (byte b = 0; b < vector1.size(); b++) {
+/* 179 */         M2MInfo m2MInfo = vector1.elementAt(b);
+/*     */         
+/* 181 */         if (!m2MInfo.isDisplayable()) {
+/* 182 */           paramADSABRSTATUS.addDebug("No changes found in " + m2MInfo);
+/*     */         }
+/*     */         else {
+/*     */           
+/* 186 */           Element element = document.createElement("MODEL2MODEL");
+/* 187 */           element1.appendChild(element);
+/*     */           
+/* 189 */           element2 = document.createElement("PDHDOMAIN");
+/* 190 */           element2.appendChild(document.createTextNode(m2MInfo.getPdhdomain()));
+/* 191 */           element.appendChild(element2);
+/*     */           
+/* 193 */           element2 = document.createElement("ACTIVITY");
+/* 194 */           element2.appendChild(document.createTextNode(m2MInfo.getActivity()));
+/* 195 */           element.appendChild(element2);
+/*     */           
+/* 197 */           element2 = document.createElement("SYSTEMENTITYTYPE");
+/* 198 */           element2.appendChild(document.createTextNode(m2MInfo.getSysType()));
+/* 199 */           element.appendChild(element2);
+/*     */           
+/* 201 */           element2 = document.createElement("SYSTEMENTITYID");
+/* 202 */           element2.appendChild(document.createTextNode(m2MInfo.getSysID()));
+/* 203 */           element.appendChild(element2);
+/*     */           
+/* 205 */           element2 = document.createElement("SYSTEMOS");
+/* 206 */           element2.appendChild(document.createTextNode(m2MInfo.getOS()));
+/* 207 */           element.appendChild(element2);
+/*     */           
+/* 209 */           element2 = document.createElement("GROUPENTITYTYPE");
+/* 210 */           element2.appendChild(document.createTextNode(m2MInfo.getGrpType()));
+/* 211 */           element.appendChild(element2);
+/*     */           
+/* 213 */           element2 = document.createElement("GROUPENTITYID");
+/* 214 */           element2.appendChild(document.createTextNode(m2MInfo.getGrpID()));
+/* 215 */           element.appendChild(element2);
+/*     */           
+/* 217 */           element2 = document.createElement("OKTOPUB");
+/* 218 */           element2.appendChild(document.createTextNode(m2MInfo.getOktopub()));
+/* 219 */           element.appendChild(element2);
+/*     */           
+/* 221 */           element2 = document.createElement("GROUPOSENTITYTYPE");
+/* 222 */           element2.appendChild(document.createTextNode(m2MInfo.getGrpOsType()));
+/* 223 */           element.appendChild(element2);
+/*     */           
+/* 225 */           element2 = document.createElement("GROUPOSENTITYID");
+/* 226 */           element2.appendChild(document.createTextNode(m2MInfo.getGrpOsID()));
+/* 227 */           element.appendChild(element2);
+/*     */           
+/* 229 */           element2 = document.createElement("OPTIONOS");
+/* 230 */           element2.appendChild(document.createTextNode(m2MInfo.getOptOS()));
+/* 231 */           element.appendChild(element2);
+/*     */           
+/* 233 */           element2 = document.createElement("OPTIONENTITYTYPE");
+/* 234 */           element2.appendChild(document.createTextNode(m2MInfo.getOptType()));
+/* 235 */           element.appendChild(element2);
+/*     */           
+/* 237 */           element2 = document.createElement("OPTIONENTITYID");
+/* 238 */           element2.appendChild(document.createTextNode(m2MInfo.getOptID()));
+/* 239 */           element.appendChild(element2);
+/*     */           
+/* 241 */           element2 = document.createElement("COMPATIBILITYPUBLISHINGFLAG");
+/* 242 */           element2.appendChild(document.createTextNode(m2MInfo.getCompatPubFlag()));
+/* 243 */           element.appendChild(element2);
+/*     */           
+/* 245 */           element2 = document.createElement("RELATIONSHIPTYPE");
+/* 246 */           element2.appendChild(document.createTextNode(m2MInfo.getRelType()));
+/* 247 */           element.appendChild(element2);
+/*     */           
+/* 249 */           element2 = document.createElement("PUBLISHFROM");
+/* 250 */           element2.appendChild(document.createTextNode(m2MInfo.getPubFrom()));
+/* 251 */           element.appendChild(element2);
+/*     */           
+/* 253 */           element2 = document.createElement("PUBLISHTO");
+/* 254 */           element2.appendChild(document.createTextNode(m2MInfo.getPubTo()));
+/* 255 */           element.appendChild(element2);
+/*     */ 
+/*     */           
+/* 258 */           m2MInfo.dereference();
+/*     */         } 
+/*     */       } 
+/* 261 */       str = paramADSABRSTATUS.transformXML(this, document);
+/*     */ 
+/*     */ 
+/*     */       
+/* 265 */       vector1.clear();
+/* 266 */       document = null;
+/* 267 */       documentBuilderFactory = null;
+/* 268 */       documentBuilder = null;
+/* 269 */       element1 = null;
+/* 270 */       element2 = null;
+/* 271 */       System.gc();
+/*     */     } 
+/*     */     
+/* 274 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private Vector getModelsByOS(ADSABRSTATUS paramADSABRSTATUS, Hashtable paramHashtable) {
+/* 282 */     Vector vector1 = new Vector(1);
+/* 283 */     Vector<DiffEntity> vector = (Vector)paramHashtable.get("ROOT");
+/* 284 */     DiffEntity diffEntity = vector.firstElement();
+/* 285 */     EntityItem entityItem1 = diffEntity.getCurrentEntityItem();
+/* 286 */     EntityItem entityItem2 = diffEntity.getPriorEntityItem();
+/*     */ 
+/*     */     
+/* 289 */     Vector vector2 = PokUtils.getAllLinkedEntities(entityItem1, "MDLCGMDL", "MODEL");
+/* 290 */     Vector vector3 = PokUtils.getAllLinkedEntities(entityItem2, "MDLCGMDL", "MODEL");
+/*     */ 
+/*     */     
+/* 293 */     Vector vector4 = PokUtils.getAllLinkedEntities(entityItem1, "MDLCGMDLCGOS", "MODELCGOS");
+/* 294 */     Vector vector5 = PokUtils.getAllLinkedEntities(entityItem2, "MDLCGMDLCGOS", "MODELCGOS");
+/*     */     
+/* 296 */     Hashtable<Object, Object> hashtable = new Hashtable<>();
+/*     */     
+/* 298 */     buildOSTbl(paramADSABRSTATUS, hashtable, paramHashtable, diffEntity, vector2, vector4, true);
+/* 299 */     buildOSTbl(paramADSABRSTATUS, hashtable, paramHashtable, diffEntity, vector3, vector5, false);
+/*     */     
+/* 301 */     vector3.clear();
+/* 302 */     vector2.clear();
+/* 303 */     vector4.clear();
+/* 304 */     vector5.clear();
+/* 305 */     if (hashtable.size() > 0) {
+/* 306 */       vector1.addAll(hashtable.values());
+/* 307 */       hashtable.clear();
+/*     */     } 
+/* 309 */     return vector1;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void buildOSTbl(ADSABRSTATUS paramADSABRSTATUS, Hashtable<String, M2MInfo> paramHashtable1, Hashtable paramHashtable2, DiffEntity paramDiffEntity, Vector<EntityItem> paramVector1, Vector<EntityItem> paramVector2, boolean paramBoolean) {
+/* 315 */     for (byte b = 0; b < paramVector1.size(); b++) {
+/* 316 */       EntityItem entityItem = paramVector1.elementAt(b);
+/* 317 */       DiffEntity diffEntity = (DiffEntity)paramHashtable2.get(entityItem.getKey());
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 322 */       String str1 = paramADSABRSTATUS.getAttributeFlagEnabledValue(entityItem, "COFCAT");
+/* 323 */       String str2 = paramADSABRSTATUS.getAttributeFlagEnabledValue(entityItem, "COFGRP");
+/* 324 */       paramADSABRSTATUS.addDebug((paramBoolean ? "current " : "previous ") + entityItem.getKey() + " COFCAT: " + str1 + " COFGRP: " + str2);
+/*     */       
+/* 326 */       if ("150".equals(str2) && !"102".equals(str1)) {
+/*     */         
+/* 328 */         Vector<String> vector = new Vector(1);
+/* 329 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("OSLEVEL");
+/* 330 */         if (eANFlagAttribute != null && eANFlagAttribute.toString().length() > 0) {
+/*     */           
+/* 332 */           MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 333 */           for (byte b1 = 0; b1 < arrayOfMetaFlag.length; b1++) {
+/*     */             
+/* 335 */             if (arrayOfMetaFlag[b1].isSelected()) {
+/* 336 */               vector.add(arrayOfMetaFlag[b1].getFlagCode());
+/*     */             }
+/*     */           } 
+/*     */         } 
+/* 340 */         paramADSABRSTATUS.addDebug((paramBoolean ? "current " : "previous ") + entityItem.getKey() + " OSLEVEL: " + vector);
+/* 341 */         if (vector.size() != 0) {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */           
+/* 346 */           for (byte b1 = 0; b1 < paramVector2.size(); b1++) {
+/*     */             
+/* 348 */             EntityItem entityItem1 = paramVector2.elementAt(b1);
+/* 349 */             DiffEntity diffEntity1 = (DiffEntity)paramHashtable2.get(entityItem1.getKey());
+/* 350 */             String str = paramADSABRSTATUS.getAttributeFlagEnabledValue(entityItem1, "OS");
+/* 351 */             paramADSABRSTATUS.addDebug((paramBoolean ? "current " : "previous ") + entityItem1.getKey() + " OS: " + str);
+/*     */ 
+/*     */             
+/* 354 */             String[] arrayOfString = oslvlMatch(str, vector);
+/* 355 */             if (arrayOfString != null) {
+/* 356 */               for (byte b2 = 0; b2 < entityItem1.getDownLinkCount(); b2++) {
+/* 357 */                 EANEntity eANEntity = entityItem1.getDownLink(b2);
+/* 358 */                 DiffEntity diffEntity2 = (DiffEntity)paramHashtable2.get(eANEntity.getKey());
+/* 359 */                 for (byte b3 = 0; b3 < eANEntity.getDownLinkCount(); b3++) {
+/* 360 */                   EANEntity eANEntity1 = eANEntity.getDownLink(b3);
+/* 361 */                   DiffEntity diffEntity3 = (DiffEntity)paramHashtable2.get(eANEntity1.getKey());
+/* 362 */                   for (byte b4 = 0; b4 < arrayOfString.length; b4++) {
+/* 363 */                     String str3 = generateM2MKey(diffEntity, paramDiffEntity, arrayOfString[b4], diffEntity1, diffEntity2, diffEntity3, str);
+/*     */                     
+/* 365 */                     if (!paramHashtable1.containsKey(str3)) {
+/* 366 */                       M2MInfo m2MInfo = new M2MInfo(diffEntity, paramDiffEntity, arrayOfString[b4], diffEntity1, diffEntity2, diffEntity3, str);
+/*     */                       
+/* 368 */                       paramHashtable1.put(str3, m2MInfo);
+/*     */                     } 
+/*     */                   } 
+/*     */                 } 
+/*     */               } 
+/*     */             }
+/*     */           } 
+/*     */           
+/* 376 */           vector.clear();
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String[] oslvlMatch(String paramString, Vector paramVector) {
+/* 400 */     String[] arrayOfString = null;
+/* 401 */     if (paramVector.contains("10589")) {
+/* 402 */       arrayOfString = new String[] { "10589" };
+/* 403 */     } else if (paramVector.contains("10582")) {
+/* 404 */       arrayOfString = new String[] { "10582" };
+/* 405 */     } else if ("10589".equals(paramString)) {
+/* 406 */       arrayOfString = new String[paramVector.size()];
+/* 407 */       paramVector.copyInto((Object[])arrayOfString);
+/* 408 */     } else if (paramString != null && paramVector.contains(paramString)) {
+/* 409 */       arrayOfString = new String[] { paramString };
+/*     */     } 
+/*     */     
+/* 412 */     return arrayOfString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getMQCID() {
+/* 419 */     return "MODELCG";
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public String getVeName() {
+/* 424 */     return "ADSWWCOMPAT";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVersion() {
+/* 433 */     return "1.3";
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   private static String generateM2MKey(DiffEntity paramDiffEntity1, DiffEntity paramDiffEntity2, String paramString1, DiffEntity paramDiffEntity3, DiffEntity paramDiffEntity4, DiffEntity paramDiffEntity5, String paramString2) {
+/* 438 */     return paramDiffEntity1.getKey() + "|" + paramDiffEntity2.getKey() + "|" + paramString1 + paramDiffEntity3
+/* 439 */       .getKey() + "|" + paramDiffEntity4.getKey() + "|" + paramDiffEntity5.getKey() + "|" + paramString2;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private static class M2MInfo
+/*     */   {
+/* 447 */     private DiffEntity sysmdlDiff = null;
+/* 448 */     private DiffEntity mdlcgDiff = null;
+/* 449 */     private DiffEntity mdlcgosDiff = null;
+/* 450 */     private DiffEntity mdlcgosmdlDiff = null;
+/* 451 */     private DiffEntity optmdlDiff = null;
+/* 452 */     private String activity = "@@";
+/*     */     
+/* 454 */     private String systemos = null;
+/* 455 */     private String optionos = null;
+/* 456 */     private String pdhdomain = null;
+/* 457 */     private String oktopub = null;
+/* 458 */     private String compatpubflag = null;
+/* 459 */     private String pubfrom = null;
+/* 460 */     private String pubto = null;
+/* 461 */     private String reltype = null;
+/*     */ 
+/*     */ 
+/*     */     
+/*     */     M2MInfo(DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, String param1String1, DiffEntity param1DiffEntity3, DiffEntity param1DiffEntity4, DiffEntity param1DiffEntity5, String param1String2) {
+/* 466 */       this.sysmdlDiff = param1DiffEntity1;
+/* 467 */       this.mdlcgDiff = param1DiffEntity2;
+/* 468 */       this.mdlcgosDiff = param1DiffEntity3;
+/* 469 */       this.mdlcgosmdlDiff = param1DiffEntity4;
+/* 470 */       this.optmdlDiff = param1DiffEntity5;
+/* 471 */       this.systemos = param1String1;
+/* 472 */       this.optionos = param1String2;
+/*     */       
+/* 474 */       if (this.sysmdlDiff.isNew() || this.mdlcgDiff.isNew() || this.mdlcgosDiff.isNew() || this.mdlcgosmdlDiff
+/* 475 */         .isNew() || this.optmdlDiff.isNew()) {
+/* 476 */         this.activity = "Update";
+/*     */       }
+/* 478 */       if (this.sysmdlDiff.isDeleted() || this.mdlcgDiff.isDeleted() || this.mdlcgosDiff.isDeleted() || this.mdlcgosmdlDiff
+/* 479 */         .isDeleted() || this.optmdlDiff.isDeleted()) {
+/* 480 */         this.activity = "Delete";
+/*     */       }
+/*     */       
+/* 483 */       checkOSValue(this.sysmdlDiff, this.systemos, "OSLEVEL");
+/* 484 */       checkOSValue(this.mdlcgosDiff, this.optionos, "OS");
+/*     */       
+/* 486 */       this.pdhdomain = getValue(this.mdlcgDiff, "PDHDOMAIN");
+/* 487 */       this.oktopub = getValue(this.mdlcgDiff, "OKTOPUB");
+/* 488 */       this.compatpubflag = getValue(this.mdlcgosmdlDiff, "COMPATPUBFLG");
+/* 489 */       this.pubfrom = getValue(this.mdlcgosmdlDiff, "PUBFROM");
+/* 490 */       this.pubto = getValue(this.mdlcgosmdlDiff, "PUBTO");
+/* 491 */       this.reltype = getFlagValue(this.mdlcgosmdlDiff, "RELTYPE");
+/*     */     }
+/*     */     boolean isDisplayable() {
+/* 494 */       return (this.activity != null);
+/*     */     }
+/*     */     
+/*     */     private void checkOSValue(DiffEntity param1DiffEntity, String param1String1, String param1String2) {
+/* 498 */       if (this.activity == null) {
+/* 499 */         EntityItem entityItem = param1DiffEntity.getCurrentEntityItem();
+/* 500 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute(param1String2);
+/* 501 */         if (eANFlagAttribute == null || !eANFlagAttribute.isSelected(param1String1)) {
+/* 502 */           this.activity = "Update";
+/*     */         } else {
+/* 504 */           entityItem = param1DiffEntity.getPriorEntityItem();
+/* 505 */           eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute(param1String2);
+/* 506 */           if (eANFlagAttribute == null || !eANFlagAttribute.isSelected(param1String1))
+/* 507 */             this.activity = "Update"; 
+/*     */         } 
+/*     */       } 
+/*     */     }
+/*     */     
+/*     */     String getKey() {
+/* 513 */       return ADSWWCOMPATABR.generateM2MKey(this.sysmdlDiff, this.mdlcgDiff, this.systemos, this.mdlcgosDiff, this.mdlcgosmdlDiff, this.optmdlDiff, this.optionos);
+/*     */     }
+/* 515 */     String getOS() { return this.systemos; }
+/* 516 */     String getPdhdomain() { return this.pdhdomain; }
+/* 517 */     String getOktopub() { return this.oktopub; }
+/* 518 */     String getCompatPubFlag() { return this.compatpubflag; }
+/* 519 */     String getPubFrom() { return this.pubfrom; }
+/* 520 */     String getPubTo() { return this.pubto; }
+/* 521 */     String getRelType() { return this.reltype; }
+/* 522 */     String getSysType() { return this.sysmdlDiff.getEntityType(); }
+/* 523 */     String getSysID() { return "" + this.sysmdlDiff.getEntityID(); }
+/* 524 */     String getGrpType() { return this.mdlcgDiff.getEntityType(); }
+/* 525 */     String getGrpID() { return "" + this.mdlcgDiff.getEntityID(); }
+/* 526 */     String getGrpOsType() { return this.mdlcgosDiff.getEntityType(); }
+/* 527 */     String getGrpOsID() { return "" + this.mdlcgosDiff.getEntityID(); }
+/* 528 */     String getOptType() { return this.optmdlDiff.getEntityType(); }
+/* 529 */     String getOptID() { return "" + this.optmdlDiff.getEntityID(); }
+/* 530 */     String getOptOS() { return this.optionos; } String getActivity() {
+/* 531 */       return this.activity;
+/*     */     }
+/*     */     void dereference() {
+/* 534 */       this.sysmdlDiff = null;
+/* 535 */       this.mdlcgDiff = null;
+/* 536 */       this.systemos = null;
+/* 537 */       this.activity = null;
+/* 538 */       this.pdhdomain = null;
+/* 539 */       this.oktopub = null;
+/* 540 */       this.compatpubflag = null;
+/* 541 */       this.pubfrom = null;
+/* 542 */       this.pubto = null;
+/* 543 */       this.reltype = null;
+/* 544 */       this.optionos = null;
+/*     */     }
+/*     */     
+/*     */     private String getValue(DiffEntity param1DiffEntity, String param1String) {
+/* 548 */       String str1 = "@@";
+/* 549 */       String str2 = "@@";
+/* 550 */       EntityItem entityItem1 = param1DiffEntity.getCurrentEntityItem();
+/* 551 */       EntityItem entityItem2 = param1DiffEntity.getPriorEntityItem();
+/* 552 */       if (param1DiffEntity.isDeleted()) {
+/* 553 */         str2 = PokUtils.getAttributeValue(entityItem2, param1String, ", ", "@@", false);
+/* 554 */       } else if (param1DiffEntity.isNew()) {
+/* 555 */         str1 = PokUtils.getAttributeValue(entityItem1, param1String, ", ", "@@", false);
+/*     */       } else {
+/* 557 */         str2 = PokUtils.getAttributeValue(entityItem2, param1String, ", ", "@@", false);
+/* 558 */         str1 = PokUtils.getAttributeValue(entityItem1, param1String, ", ", "@@", false);
+/*     */       } 
+/*     */       
+/* 561 */       if (!str2.equals(str1) && this.activity == null) {
+/* 562 */         this.activity = "Update";
+/*     */       }
+/*     */       
+/* 565 */       return str1;
+/*     */     }
+/*     */     
+/*     */     private String getFlagValue(DiffEntity param1DiffEntity, String param1String) {
+/* 569 */       String str1 = "@@";
+/* 570 */       String str2 = "@@";
+/* 571 */       EntityItem entityItem1 = param1DiffEntity.getCurrentEntityItem();
+/* 572 */       EntityItem entityItem2 = param1DiffEntity.getPriorEntityItem();
+/* 573 */       if (param1DiffEntity.isDeleted()) {
+/* 574 */         str2 = PokUtils.getAttributeFlagValue(entityItem2, param1String);
+/* 575 */         if (str2 == null) {
+/* 576 */           str2 = "@@";
+/*     */         }
+/* 578 */       } else if (param1DiffEntity.isNew()) {
+/* 579 */         str1 = PokUtils.getAttributeFlagValue(entityItem1, param1String);
+/* 580 */         if (str1 == null) {
+/* 581 */           str1 = "@@";
+/*     */         }
+/*     */       } else {
+/* 584 */         str2 = PokUtils.getAttributeFlagValue(entityItem2, param1String);
+/* 585 */         str1 = PokUtils.getAttributeFlagValue(entityItem1, param1String);
+/* 586 */         if (str1 == null) {
+/* 587 */           str1 = "@@";
+/*     */         }
+/* 589 */         if (str2 == null) {
+/* 590 */           str2 = "@@";
+/*     */         }
+/*     */       } 
+/*     */       
+/* 594 */       if (!str2.equals(str1) && this.activity == null) {
+/* 595 */         this.activity = "Update";
+/*     */       }
+/*     */       
+/* 598 */       return str1;
+/*     */     }
+/*     */     
+/*     */     public String toString() {
+/* 602 */       return getKey() + " activity:" + this.activity;
+/*     */     }
+/*     */   }
+/*     */ }
+
+
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\ADSWWCOMPATABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

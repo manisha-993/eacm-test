@@ -1,436 +1,442 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2009  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.abr.ln.adsxmlbh1;
+/*     */ package COM.ibm.eannounce.abr.ln.adsxmlbh1;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.XMLActivityElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLBundleTypeElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLCATAElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLChgSetElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLDistinctGroupElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLGroupElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLLSEOBUNDELAVAILElembh1;
+/*     */ import COM.ibm.eannounce.abr.util.XMLLSEOBUNDLEINSTALLElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLMultiFlagElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLNLSElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLNotificationElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLSLEORGGRPElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLStatusElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLVMElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLZCONFElem;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class ADSLSEOBUNDLEABR
+/*     */   extends XMLMQRoot
+/*     */ {
+/* 101 */   private static final XMLElem XMLMAP = (XMLElem)new XMLGroupElem("LSEOBUNDLE_UPDATE"); static {
+/* 102 */     XMLMAP.addChild((XMLElem)new XMLVMElem("LSEOBUNDLE_UPDATE", "1"));
+/*     */     
+/* 104 */     XMLMAP.addChild(new XMLElem("PDHDOMAIN", "PDHDOMAIN"));
+/* 105 */     XMLMAP.addChild((XMLElem)new XMLNotificationElem("DTSOFMSG"));
+/* 106 */     XMLMAP.addChild((XMLElem)new XMLActivityElem("ACTIVITY"));
+/* 107 */     XMLMAP.addChild(new XMLElem("ENTITYTYPE", "ENTITYTYPE"));
+/* 108 */     XMLMAP.addChild(new XMLElem("ENTITYID", "ENTITYID"));
+/* 109 */     XMLMAP.addChild(new XMLElem("SEOID", "SEOID"));
+/*     */     
+/* 111 */     XMLMAP.addChild((XMLElem)new XMLStatusElem("STATUS", "STATUS", 1));
+/* 112 */     XMLMAP.addChild(new XMLElem("PRFCNTR", "PRFTCTR", 1));
+/*     */     
+/* 114 */     XMLMAP.addChild(new XMLElem("BHPRODHIERCD", "BHPRODHIERCD"));
+/* 115 */     XMLMAP.addChild(new XMLElem("BHACCTASGNGRP", "BHACCTASGNGRP", 2));
+/* 116 */     XMLMAP.addChild(new XMLElem("UPCCD", "UPCCD"));
+/* 117 */     XMLMAP.addChild(new XMLElem("SPECIALBID", "SPECBID"));
+/* 118 */     XMLMAP.addChild(new XMLElem("PROJECT", "PROJCDNAM", 1));
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 129 */     XMLMAP.addChild(new XMLElem("WWOCCODE", "WWOCCODE"));
+/* 130 */     XMLMAP.addChild(new XMLElem("SOMFMLY", "SOMFMLY"));
+/* 131 */     XMLMAP.addChild(new XMLElem("PRCINDC", "PRCINDC"));
+/* 132 */     XMLMAP.addChild(new XMLElem("ZEROPRICE", "ZEROPRICE"));
+/* 133 */     XMLMAP.addChild(new XMLElem("BPSPECBIDCERTREQ", "BPSPECBIDCERTREQ"));
+/* 134 */     XMLMAP.addChild(new XMLElem("SVCPACBNDLTYPE", "SVCPACBNDLTYPE", 1));
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 154 */     XMLMAP.addChild((XMLElem)new XMLLSEOBUNDLEINSTALLElem());
+/*     */ 
+/*     */     
+/* 157 */     XMLMAP.addChild(new XMLElem("UNSPSC", "UNSPSCCD"));
+/* 158 */     XMLMAP.addChild(new XMLElem("UNUOM", "UNSPSCCDUOM"));
+/*     */ 
+/*     */     
+/* 161 */     XMLMAP.addChild((XMLElem)new XMLBundleTypeElem());
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 169 */     XMLDistinctGroupElem xMLDistinctGroupElem = new XMLDistinctGroupElem(null, "PROJ", "D:LSEOBUNDLEPROJA:D", true, true);
+/* 170 */     XMLMAP.addChild((XMLElem)xMLDistinctGroupElem);
+/* 171 */     xMLDistinctGroupElem.addChild(new XMLElem("DIVISION", "DIV", 1));
+/*     */     
+/* 173 */     XMLElem xMLElem1 = new XMLElem("LANGUAGELIST");
+/* 174 */     XMLMAP.addChild(xMLElem1);
+/*     */     
+/* 176 */     XMLNLSElem xMLNLSElem1 = new XMLNLSElem("LANGUAGEELEMENT");
+/* 177 */     xMLElem1.addChild((XMLElem)xMLNLSElem1);
+/*     */     
+/* 179 */     xMLNLSElem1.addChild(new XMLElem("NLSID", "NLSID"));
+/* 180 */     xMLNLSElem1.addChild(new XMLElem("MKTGDESC", "BUNDLMKTGDESC"));
+/* 181 */     xMLNLSElem1.addChild(new XMLElem("INVNAME", "PRCFILENAM"));
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 188 */     XMLElem xMLElem2 = new XMLElem("AVAILABILITYLIST");
+/* 189 */     XMLMAP.addChild(xMLElem2);
+/* 190 */     xMLElem2.addChild((XMLElem)new XMLLSEOBUNDELAVAILElembh1());
+/*     */ 
+/*     */     
+/* 193 */     XMLGroupElem xMLGroupElem6 = new XMLGroupElem("IMAGELIST", "IMG");
+/* 194 */     XMLMAP.addChild((XMLElem)xMLGroupElem6);
+/*     */     
+/* 196 */     XMLElem xMLElem8 = new XMLElem("IMAGEELEMENT");
+/* 197 */     xMLGroupElem6.addChild(xMLElem8);
+/*     */     
+/* 199 */     xMLElem8.addChild((XMLElem)new XMLActivityElem("IMAGEACTION"));
+/* 200 */     xMLElem8.addChild(new XMLElem("IMAGEENTITYTYPE", "ENTITYTYPE"));
+/* 201 */     xMLElem8.addChild(new XMLElem("IMAGEENTITYID", "ENTITYID"));
+/*     */ 
+/*     */     
+/* 204 */     xMLElem8.addChild(new XMLElem("STATUS", "STATUS", 1));
+/* 205 */     xMLElem8.addChild(new XMLElem("PUBFROM", "PUBFROM"));
+/* 206 */     xMLElem8.addChild(new XMLElem("PUBTO", "PUBTO"));
+/* 207 */     xMLElem8.addChild(new XMLElem("IMAGEDESCRIPTION", "IMGDESC"));
+/* 208 */     xMLElem8.addChild(new XMLElem("MARKETINGIMAGEFILENAME", "MKTGIMGFILENAM"));
+/*     */ 
+/*     */     
+/* 211 */     XMLElem xMLElem7 = new XMLElem("COUNTRYLIST");
+/* 212 */     xMLElem8.addChild(xMLElem7);
+/*     */     
+/* 214 */     XMLChgSetElem xMLChgSetElem1 = new XMLChgSetElem("COUNTRYELEMENT");
+/* 215 */     xMLElem7.addChild((XMLElem)xMLChgSetElem1);
+/*     */     
+/* 217 */     xMLChgSetElem1.addChild((XMLElem)new XMLMultiFlagElem("COUNTRY_FC", "COUNTRYLIST", "COUNTRYACTION", 1));
+/*     */ 
+/*     */ 
+/*     */     
+/* 221 */     XMLGroupElem xMLGroupElem5 = new XMLGroupElem("MMLIST", "MM");
+/* 222 */     XMLMAP.addChild((XMLElem)xMLGroupElem5);
+/*     */     
+/* 224 */     XMLElem xMLElem9 = new XMLElem("MMELEMENT");
+/* 225 */     xMLGroupElem5.addChild(xMLElem9);
+/*     */     
+/* 227 */     xMLElem9.addChild((XMLElem)new XMLActivityElem("MMACTION"));
+/* 228 */     xMLElem9.addChild(new XMLElem("MMENTITYTYPE", "ENTITYTYPE"));
+/* 229 */     xMLElem9.addChild(new XMLElem("MMENTITYID", "ENTITYID"));
+/* 230 */     xMLElem9.addChild(new XMLElem("STATUS", "MMSTATUS", 1));
+/* 231 */     xMLElem9.addChild(new XMLElem("PUBFROM", "PUBFROM"));
+/* 232 */     xMLElem9.addChild(new XMLElem("PUBTO", "PUBTO"));
+/*     */     
+/* 234 */     XMLElem xMLElem6 = new XMLElem("MSGLIST");
+/* 235 */     xMLElem9.addChild(xMLElem6);
+/*     */     
+/* 237 */     xMLNLSElem1 = new XMLNLSElem("MSGELEMENT");
+/* 238 */     xMLElem6.addChild((XMLElem)xMLNLSElem1);
+/*     */     
+/* 240 */     xMLNLSElem1.addChild(new XMLElem("NLSID", "NLSID"));
+/* 241 */     xMLNLSElem1.addChild(new XMLElem("SHRTMKTGMSG", "SHRTMKTGMSG"));
+/* 242 */     xMLNLSElem1.addChild(new XMLElem("LONGMKTGMSG", "LONGMKTGMSG"));
+/*     */     
+/* 244 */     xMLElem6 = new XMLElem("AUDIENCELIST");
+/* 245 */     xMLElem9.addChild(xMLElem6);
+/*     */     
+/* 247 */     xMLChgSetElem1 = new XMLChgSetElem("AUDIENCEELEMENT");
+/* 248 */     xMLElem6.addChild((XMLElem)xMLChgSetElem1);
+/*     */ 
+/*     */     
+/* 251 */     xMLChgSetElem1.addChild((XMLElem)new XMLMultiFlagElem("AUDIENCE", "CATAUDIENCE", "ACTIVITY", 0));
+/*     */     
+/* 253 */     xMLElem6 = new XMLElem("COUNTRYLIST");
+/* 254 */     xMLElem9.addChild(xMLElem6);
+/*     */     
+/* 256 */     xMLChgSetElem1 = new XMLChgSetElem("COUNTRYELEMENT");
+/* 257 */     xMLElem6.addChild((XMLElem)xMLChgSetElem1);
+/*     */     
+/* 259 */     xMLChgSetElem1.addChild((XMLElem)new XMLMultiFlagElem("COUNTRY_FC", "COUNTRYLIST", "COUNTRYACTION", 1));
+/*     */ 
+/*     */ 
+/*     */     
+/* 263 */     XMLGroupElem xMLGroupElem4 = new XMLGroupElem("FBLIST", "FB");
+/* 264 */     XMLMAP.addChild((XMLElem)xMLGroupElem4);
+/*     */     
+/* 266 */     XMLElem xMLElem10 = new XMLElem("FBELEMENT");
+/* 267 */     xMLGroupElem4.addChild(xMLElem10);
+/*     */     
+/* 269 */     xMLElem10.addChild((XMLElem)new XMLActivityElem("FBACTION"));
+/* 270 */     xMLElem10.addChild(new XMLElem("FBENTITYTYPE", "ENTITYTYPE"));
+/* 271 */     xMLElem10.addChild(new XMLElem("FBENTITYID", "ENTITYID"));
+/*     */     
+/* 273 */     xMLElem10.addChild(new XMLElem("STATUS", "FBSTATUS", 1));
+/* 274 */     xMLElem10.addChild(new XMLElem("PUBFROM", "PUBFROM"));
+/* 275 */     xMLElem10.addChild(new XMLElem("PUBTO", "PUBTO"));
+/*     */ 
+/*     */     
+/* 278 */     XMLElem xMLElem5 = new XMLElem("FBSTMTLIST");
+/* 279 */     xMLElem10.addChild(xMLElem5);
+/*     */     
+/* 281 */     xMLNLSElem1 = new XMLNLSElem("FBSTMTELEMENT");
+/* 282 */     xMLElem5.addChild((XMLElem)xMLNLSElem1);
+/*     */     
+/* 284 */     xMLNLSElem1.addChild(new XMLElem("NLSID", "NLSID"));
+/* 285 */     xMLNLSElem1.addChild(new XMLElem("FBSTMT", "FBSTMT"));
+/*     */     
+/* 287 */     xMLElem5 = new XMLElem("AUDIENCELIST");
+/* 288 */     xMLElem10.addChild(xMLElem5);
+/*     */     
+/* 290 */     xMLChgSetElem1 = new XMLChgSetElem("AUDIENCEELEMENT");
+/* 291 */     xMLElem5.addChild((XMLElem)xMLChgSetElem1);
+/*     */ 
+/*     */     
+/* 294 */     xMLChgSetElem1.addChild((XMLElem)new XMLMultiFlagElem("AUDIENCE", "CATAUDIENCE", "ACTIVITY", 0));
+/*     */     
+/* 296 */     xMLElem5 = new XMLElem("COUNTRYLIST");
+/* 297 */     xMLElem10.addChild(xMLElem5);
+/*     */     
+/* 299 */     xMLChgSetElem1 = new XMLChgSetElem("COUNTRYELEMENT");
+/* 300 */     xMLElem5.addChild((XMLElem)xMLChgSetElem1);
+/*     */     
+/* 302 */     xMLChgSetElem1.addChild((XMLElem)new XMLMultiFlagElem("COUNTRY_FC", "COUNTRYLIST", "COUNTRYACTION", 1));
+/*     */ 
+/*     */ 
+/*     */     
+/* 306 */     XMLGroupElem xMLGroupElem3 = new XMLGroupElem("TAXCATEGORYLIST", "TAXCATG");
+/* 307 */     XMLMAP.addChild((XMLElem)xMLGroupElem3);
+/*     */     
+/* 309 */     XMLElem xMLElem11 = new XMLElem("TAXCATEGORYELEMENT");
+/* 310 */     xMLGroupElem3.addChild(xMLElem11);
+/*     */     
+/* 312 */     xMLElem11.addChild((XMLElem)new XMLActivityElem("TAXCATEGORYACTION"));
+/* 313 */     XMLElem xMLElem4 = new XMLElem("COUNTRYLIST");
+/* 314 */     xMLElem11.addChild(xMLElem4);
+/*     */     
+/* 316 */     xMLChgSetElem1 = new XMLChgSetElem("COUNTRYELEMENT");
+/* 317 */     xMLElem4.addChild((XMLElem)xMLChgSetElem1);
+/*     */ 
+/*     */     
+/* 320 */     xMLChgSetElem1.addChild((XMLElem)new XMLMultiFlagElem("COUNTRY_FC", "TAXCNTRY", "COUNTRYACTION", 1));
+/*     */     
+/* 322 */     xMLElem11.addChild(new XMLElem("TAXCATEGORYVALUE", "TAXCATGATR", 1));
+/* 323 */     XMLGroupElem xMLGroupElem7 = new XMLGroupElem(null, "SLNTAXRELEVANCE", "U:SLNTAXRELEVANCE");
+/* 324 */     xMLElem11.addChild((XMLElem)xMLGroupElem7);
+/* 325 */     xMLGroupElem7.addChild(new XMLElem("TAXCLASSIFICATION", "TAXCLS", 2));
+/*     */     
+/* 327 */     xMLElem11.addChild((XMLElem)new XMLSLEORGGRPElem("D:TAXCATGSLEORGA:D"));
+/*     */     
+/* 329 */     XMLGroupElem xMLGroupElem2 = new XMLGroupElem("TAXCODELIST", "TAXGRP");
+/* 330 */     XMLMAP.addChild((XMLElem)xMLGroupElem2);
+/* 331 */     XMLElem xMLElem12 = new XMLElem("TAXCODEELEMENT");
+/* 332 */     xMLGroupElem2.addChild(xMLElem12);
+/* 333 */     xMLElem12.addChild((XMLElem)new XMLActivityElem("TAXCODEACTION"));
+/* 334 */     xMLElem12.addChild(new XMLElem("TAXCODEDESCRIPTION", "DESC"));
+/* 335 */     XMLElem xMLElem3 = new XMLElem("COUNTRYLIST");
+/* 336 */     xMLElem12.addChild(xMLElem3);
+/* 337 */     XMLChgSetElem xMLChgSetElem2 = new XMLChgSetElem("COUNTRYELEMENT");
+/* 338 */     xMLElem3.addChild((XMLElem)xMLChgSetElem2);
+/* 339 */     xMLChgSetElem2.addChild((XMLElem)new XMLMultiFlagElem("COUNTRY_FC", "COUNTRYLIST", "COUNTRYACTION", 1));
+/* 340 */     xMLElem12.addChild(new XMLElem("TAXCODE", "TAXCD"));
+/*     */     
+/* 342 */     xMLElem12.addChild((XMLElem)new XMLSLEORGGRPElem("D:TAXGRPSLEORGA:D"));
+/*     */ 
+/*     */     
+/* 345 */     xMLElem3 = new XMLElem("AUDIENCELIST");
+/* 346 */     XMLMAP.addChild(xMLElem3);
+/*     */     
+/* 348 */     xMLChgSetElem1 = new XMLChgSetElem("AUDIENCEELEMENT");
+/* 349 */     xMLElem3.addChild((XMLElem)xMLChgSetElem1);
+/*     */     
+/* 351 */     xMLChgSetElem1.addChild((XMLElem)new XMLMultiFlagElem("AUDIENCE", "AUDIEN", "AUDIENCEACTION", 0));
+/*     */ 
+/*     */ 
+/*     */     
+/* 355 */     XMLMAP.addChild((XMLElem)new XMLZCONFElem());
+/*     */ 
+/*     */     
+/* 358 */     xMLElem3 = new XMLElem("CATALOGOVERRIDELIST");
+/* 359 */     XMLMAP.addChild(xMLElem3);
+/* 360 */     xMLElem3.addChild((XMLElem)new XMLCATAElem());
+/*     */ 
+/*     */ 
+/*     */     
+/* 364 */     XMLGroupElem xMLGroupElem1 = new XMLGroupElem("CATATTRIBUTELIST", "CATDATA");
+/* 365 */     XMLMAP.addChild((XMLElem)xMLGroupElem1);
+/*     */     
+/* 367 */     XMLNLSElem xMLNLSElem2 = new XMLNLSElem("CATATTRIBUTEELEMENT");
+/* 368 */     xMLGroupElem1.addChild((XMLElem)xMLNLSElem2);
+/*     */     
+/* 370 */     xMLNLSElem2.addChild((XMLElem)new XMLActivityElem("CATATTRIBUTEACTION"));
+/* 371 */     xMLNLSElem2.addChild(new XMLElem("CATATTRIBUTE", "DAATTRIBUTECODE"));
+/* 372 */     xMLNLSElem2.addChild(new XMLElem("NLSID", "NLSID"));
+/*     */     
+/* 374 */     xMLNLSElem2.addChild(new XMLElem("CATATTRIBUTEVALUE", "DAATTRIBUTEVALUE"));
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 382 */     xMLGroupElem1 = new XMLGroupElem("COMPONENTLIST", "LSEO");
+/* 383 */     XMLMAP.addChild((XMLElem)xMLGroupElem1);
+/*     */     
+/* 385 */     XMLElem xMLElem13 = new XMLElem("COMPONENTELEMENT");
+/* 386 */     xMLGroupElem1.addChild(xMLElem13);
+/*     */     
+/* 388 */     xMLElem13.addChild((XMLElem)new XMLActivityElem("ACTIVITY"));
+/* 389 */     xMLElem13.addChild(new XMLElem("ENTITYTYPE", "ENTITYTYPE"));
+/* 390 */     xMLElem13.addChild(new XMLElem("ENTITYID", "ENTITYID"));
+/*     */ 
+/*     */     
+/* 393 */     xMLElem13.addChild(new XMLElem("SEOID", "SEOID"));
+/* 394 */     XMLGroupElem xMLGroupElem8 = new XMLGroupElem(null, "LSEOBUNDLELSEO", "U:LSEOBUNDLELSEO");
+/* 395 */     xMLElem13.addChild((XMLElem)xMLGroupElem8);
+/* 396 */     xMLGroupElem8.addChild(new XMLElem("QTY", "LSEOQTY"));
+/* 397 */     xMLGroupElem8.addChild(new XMLElem("SEQ", "LSEOSEQ"));
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public XMLElem getXMLMap() {
+/* 408 */     return XMLMAP;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVeName() {
+/* 414 */     return "ADSLSEOBUNDLE";
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public String getStatusAttr() {
+/* 419 */     return "STATUS";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getMQCID() {
+/* 425 */     return "LSEOBUNDLE_UPDATE";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVersion() {
+/* 434 */     return "$Revision: 1.1 $";
+/*     */   }
+/*     */ }
 
-import COM.ibm.eannounce.abr.util.*;
 
-/**********************************************************************************
-*/
-//$Log: ADSLSEOBUNDLEABR.java,v $
-//Revision 1.1  2015/02/04 14:55:48  wangyul
-//RCQ00337765-RQ change the XML mapping to pull DIV from PROJ for Lenovo
-//
-//Revision 1.25  2013/12/04 01:46:36  guobin
-//delete XML Spec sent to dev - Avails RFR Defect: BH 185136 Fix LSEOBUNDEL <STATUS> flag
-//
-//Revision 1.24  2013/05/14 12:24:58  wangyulo
-//WI 945853 - Change mapping for BUNDLETYPE in LSEOBUNDLE_UPDATE XML
-//
-//Revision 1.23  2013/03/26 14:20:06  wangyulo
-//fix defect 910327 -- BH CQ 175643 - Update mapping for BHPRODHIERCD and BHACCTASGNGRP for LSEOBUNDLE_UPDATE xml
-//
-//Revision 1.22  2012/12/05 14:54:00  wangyulo
-//Fix the defect 848608 to correct the mapping for DIVISION
-//
-//Revision 1.21  2012/06/04 08:26:44  wangyulo
-//Fix the Defect 733108 -- Can not get STATUS value of IMAGELIST in LSEOBUNDLE xml
-//
-//Revision 1.20  2012/01/22 05:32:06  guobin
-//RTM work item number on the change is 643541 / BHCQ 81991 Update to XML System Feed Mapping 20120117.doc - correct design for PUBFROM, FIRSTORDER, PUBTO
-//
-//Revision 1.19  2012/01/18 15:55:29  guobin
-//Fix the issue 635138 -- LSEOBUNDLE:
-//1. Tag name ACTIVTY should be ACTIVITY for AUDIENCEELEMENT of FBELEMENT tag.
-//2. Tag name ACTIVTY should be ACTIVITY for AUDIENCEELEMENT of MMELEMENT tag.
-//3. It should show <DIVISION> tag once in xml report.
-//
-//Revision 1.18  2011/12/14 02:22:45  guobin
-//Update the Version V Mod M for the ADSABR
-//
-//Revision 1.16  2011/07/13 08:20:59  guobin
-// //Defect BHALM00057306 Change Mapping to TAXCNTRY
-//
-//Revision 1.15  2011/03/18 06:13:32  guobin
-//correction	118.00	Correct attr name to FBSTATUS
-//correction	162.00	Correct attr name to OFFCOUNTRY
-//correction	177.00	Correct attr name to DAATTRIBUTEVALUE
-//
-//Revision 1.14  2011/02/16 03:31:00  guobin
-//CQ 31962	15.50. 15.55	Correct mapping for UNSPSC and UNUOM
-//
-//Revision 1.13  2011/02/15 10:59:49  lucasrg
-//Applied mapping updates for DM Cycle 2
-//
-//Revision 1.12  2011/01/17 13:57:35  guobin
-//change ZCONF
-//
-//Revision 1.11  2010/12/29 06:05:42  guobin
-//New added <SLEORGGRPLIST> in <TAXCODE> and  <TAXCATEGORYVALUE>
-//
-//Revision 1.10  2010/12/20 10:53:35  guobin
-//add Catalog Override Defaults
-//
-//Revision 1.9  2010/11/24 08:25:15  guobin
-//Change <TAXCODELIST>  add <COUNTRYLIST>
-//
-//Revision 1.8  2010/11/22 01:41:41  rick
-//changing taxcategorylist to be like it is on MODEL code.
-//
-//Revision 1.7  2010/11/19 16:30:34  rick
-//fix for div
-//
-//Revision 1.6  2010/11/17 00:20:39  rick
-//fixing audience
-//
-//Revision 1.5  2010/11/08 05:52:21  rick
-//Misc changes from last mapping SS.
-//
-//Revision 1.4  2010/10/29 15:18:05  rick
-//changing MQCID again.
-//
-//Revision 1.3  2010/10/27 22:57:45  rick
-//making INSTALL and ORDERCODE empty elements
-//the derivation is designed.
-//
-//Revision 1.2  2010/10/18 23:20:16  rick
-//various fixes
-//
-//Revision 1.1  2010/10/18 18:43:01  rick
-//ADS XML ABR for LSEOBUNDLE
-//
-
-public class ADSLSEOBUNDLEABR extends XMLMQRoot
-{
-    private static final XMLElem XMLMAP;
-
-    static {
-        XMLMAP = new XMLGroupElem("LSEOBUNDLE_UPDATE");
-        XMLMAP.addChild(new XMLVMElem("LSEOBUNDLE_UPDATE","1"));
-        // level2
-        XMLMAP.addChild(new XMLElem("PDHDOMAIN","PDHDOMAIN"));
-        XMLMAP.addChild(new XMLNotificationElem("DTSOFMSG")); // pull from profile.endofday
-        XMLMAP.addChild(new XMLActivityElem("ACTIVITY"));
-        XMLMAP.addChild(new XMLElem("ENTITYTYPE","ENTITYTYPE"));
-        XMLMAP.addChild(new XMLElem("ENTITYID","ENTITYID"));
-        XMLMAP.addChild(new XMLElem("SEOID","SEOID"));
-        //XMLMAP.addChild(new XMLElem("STATUS","STATUS",XMLElem.FLAGVAL)); BH FS ABR XML System Feed Mapping 20131106b.doc
-        XMLMAP.addChild(new XMLStatusElem("STATUS", "STATUS", XMLElem.FLAGVAL));
-        XMLMAP.addChild(new XMLElem("PRFCNTR","PRFTCTR",XMLElem.FLAGVAL));
-        //2013-03-13 defect 910317 -- BH CQ 175643 - Update mapping for BHPRODHIERCD and BHACCTASGNGRP for LSEOBUNDLE_UPDATE xml
-        XMLMAP.addChild(new XMLElem("BHPRODHIERCD","BHPRODHIERCD"));//flag->Long Description
-        XMLMAP.addChild(new XMLElem("BHACCTASGNGRP","BHACCTASGNGRP",XMLElem.SHORTDESC));//flag ->Short Description
-        XMLMAP.addChild(new XMLElem("UPCCD","UPCCD"));
-        XMLMAP.addChild(new XMLElem("SPECIALBID","SPECBID"));
-        XMLMAP.addChild(new XMLElem("PROJECT","PROJCDNAM",XMLElem.FLAGVAL));
-        //8/25/2011	LSEOBUNDLE_UPDATE	CR 63555	15.05	Remove OFERCONFIGTYPE attribute        
-        //XMLMAP.addChild(new XMLElem("OFERCONFIGTYPE","OFERCONFIGTYPE",XMLElem.FLAGVAL));
-        /**
-         * CR 63555	15.10--15.25, 18.00	Update mapping to Long Description
-         * Change	Map to Long Description	15.10		1	1.0	<WWOCCODE>	</WWOCCODE>	2	LSEOBUNDLE_UPDATE  /WWOCCODE			LSEOBUNDLE	WWOCCODE
-         * Change	Map to Long Description	15.15		1	1.0	<SOMFMLY>	</SOMFMLY>	2	LSEOBUNDLE_UPDATE  /SOMFMLY			LSEOBUNDLE	SOMFLMY
-         * Change	Map to Long Description	15.20		1	1.0	<PRCINDC>	</PRCINDC>	2	LSEOBUNDLE_UPDATE  /PRCINDC			LSEOBUNDLE	PRCDINC
-         * Change	Map to Long Description	15.25		1	1.0	<ZEROPRICE>	</ZEROPRICE>	2	LSEOBUNDLE_UPDATE  /ZEROPRICE			LSEOBUNDLE	ZEROPRICE
-         * Change	Solutions CR	15.30		1	1.0	<BPSPECBIDCERTREQ>	</BPSPECBIDCERTREQ>	2	LSEOBUNDLE_UPDATE  /BPSPECBIDCERTREQ			LSEOBUNDLE	BPSPECBIDCERTREQ
-        */
-        XMLMAP.addChild(new XMLElem("WWOCCODE","WWOCCODE"));//Long Description //the long description of the attribute flag or text value
-        XMLMAP.addChild(new XMLElem("SOMFMLY","SOMFMLY"));//Long Description
-        XMLMAP.addChild(new XMLElem("PRCINDC","PRCINDC"));//Long Description
-        XMLMAP.addChild(new XMLElem("ZEROPRICE","ZEROPRICE"));//Long Description        
-        XMLMAP.addChild(new XMLElem("BPSPECBIDCERTREQ","BPSPECBIDCERTREQ"));//Long Description
-        XMLMAP.addChild(new XMLElem("SVCPACBNDLTYPE","SVCPACBNDLTYPE",XMLElem.FLAGVAL));
-        
-        // A derivation is needed for ORDERCODE and INSTALL fields
-        //XMLElem elemMODEL = new XMLGroupElem(null,"MODEL");
-        //XMLMAP.addChild(elemMODEL);
-        //elemMODEL.addChild(new XMLElem("ORDERCODE","MODELORDERCODE",XMLElem.FLAGVAL));
-        //elemMODEL.addChild(new XMLElem("INSTALL","INSTALL",XMLElem.FLAGVAL));        
-        
-        //8/18/2011	LSEOBUNDLE_UPDATE	CR 63555	15.40	Remove ORDERCODE attribute
-        //Delete	Rescope to Fixed Solutions only	15.40		1	1.0	<ORDERCODE>	</ORDERCODE>	2	LSEOBUNDLE_UPDATE  /ORDERCODE
-        //XMLMAP.addChild(new XMLElem("ORDERCODE",""));
-        //XMLMAP.addChild(new XMLElem("INSTALL","")); //changed
-        /**
-         * <INSTALL>
-         *  If BUNDLETYPE=’Hardware’ exists, then derive INSTALL as follows:
-         *  		Navigate each LSEOBUNDLELSEO –d, WWSEOLSEO –u and MODELWWSEO –u to find parent MODEL.
-         *  		If MODEL.COFCAT = “Hardware” (100), set <INSTALL> to MODEL.INSTALL Long Description 
-         *     	for NLSID=1 if it exists (else set to null)
-         *  Else <INSTALL> is null 
-         */
-        XMLMAP.addChild(new XMLLSEOBUNDLEINSTALLElem());
-        //Change	CQ 31962 - correct mapping	15.50		1	1.0	<UNSPSC>	</UNSPSC>	2	LSEOBUNDLE_UPDATE  /UNSPSC			LSEOBUNDLE	UNSPSCCD
-        //Change	CQ 31962 - correct mapping	15.55		1	1.0	<UNUOM>	</UNUOM>	2	LSEOBUNDLE_UPDATE  /UNUOM			LSEOBUNDLE	UNSPSCCDUOM
-        XMLMAP.addChild(new XMLElem("UNSPSC","UNSPSCCD"));
-        XMLMAP.addChild(new XMLElem("UNUOM","UNSPSCCDUOM"));
-        //TODO Defect 945853 Change mapping for BUNDLETYPE in LSEOBUNDLE_UPDATE XML in BH FS ABR XML System Feed Mapping 20130508.doc
-        //XMLMAP.addChild(new XMLElem("BUNDLETYPE","BUNDLETYPE"));//Long Description
-        XMLMAP.addChild(new XMLBundleTypeElem());
-        
-        
-        
-        //Defect 635138 It should show <DIVISION> tag once in xml report
-        //Defect 848608 to correct the mapping for DIVISION
-        //XMLElem elemSGMNTACRNYM = new XMLGroupElem(null,"SGMNTACRNYM","D:LSEOBUNDLEPROJA:D:PROJ:D:PROJSGMNTACRNYMA:D"); 	
-        //TODO RCQ00337765-RQ change the XML mapping to pull DIV from PROJ for Lenovo
-        XMLElem elemPROJ = new XMLDistinctGroupElem(null,"PROJ","D:LSEOBUNDLEPROJA:D",true,true);
-        XMLMAP.addChild(elemPROJ);
-        elemPROJ.addChild(new XMLElem("DIVISION","DIV",XMLElem.FLAGVAL));
-
-        XMLElem langlist = new XMLElem("LANGUAGELIST");
-        XMLMAP.addChild(langlist);
-        // level 3
-        XMLElem langelem = new XMLNLSElem("LANGUAGEELEMENT");
-        langlist.addChild(langelem);
-        // level 4
-        langelem.addChild(new XMLElem("NLSID","NLSID"));
-        langelem.addChild(new XMLElem("MKTGDESC","BUNDLMKTGDESC"));
-        langelem.addChild(new XMLElem("INVNAME","PRCFILENAM"));
-
-        // Availabilitylist goes here
-        //BH FS ABR Data Transformation System Feed 20110916.doc >> new change
-        //1. If LSEOBUNDLE.SPECBID = 11458 (Yes)
-        //The description class of LSEO.COUNTRYLIST 
-        //change to The description class of LSEOBUNDLE.COUNTRYLIST
-        XMLElem availlist = new XMLElem("AVAILABILITYLIST");
-		XMLMAP.addChild(availlist);
-		availlist.addChild(new XMLLSEOBUNDELAVAILElembh1());
-
-        // start of IMAGELIST structure
-        XMLElem list = new XMLGroupElem("IMAGELIST","IMG");
-        XMLMAP.addChild(list);
-        // level 3
-        XMLElem imgelem = new XMLElem("IMAGEELEMENT");//check for chgs is controlled by XMLGroupElem
-        list.addChild(imgelem);
-        // level 4
-        imgelem.addChild(new XMLActivityElem("IMAGEACTION"));
-        imgelem.addChild(new XMLElem("IMAGEENTITYTYPE","ENTITYTYPE"));
-        imgelem.addChild(new XMLElem("IMAGEENTITYID","ENTITYID"));
-        //correction	118.00 Correct attr name from STATUS to FBSTATUS
-        //correct       55.00  Correct attr name from FBSTATUS to STATUS, it is not FBLIST but IMAGELIST
-        imgelem.addChild(new XMLElem("STATUS","STATUS",XMLElem.FLAGVAL));
-        imgelem.addChild(new XMLElem("PUBFROM","PUBFROM"));
-        imgelem.addChild(new XMLElem("PUBTO","PUBTO"));
-        imgelem.addChild(new XMLElem("IMAGEDESCRIPTION","IMGDESC"));
-        imgelem.addChild(new XMLElem("MARKETINGIMAGEFILENAME","MKTGIMGFILENAM"));
-
-        //level 4
-        list = new XMLElem("COUNTRYLIST");
-        imgelem.addChild(list);
-        // level 5
-        XMLElem listelem = new XMLChgSetElem("COUNTRYELEMENT");
-        list.addChild(listelem);
-        //level 6
-        listelem.addChild(new XMLMultiFlagElem("COUNTRY_FC","COUNTRYLIST","COUNTRYACTION",XMLElem.FLAGVAL));
-        // end of IMAGELIST structure
-
-        // start of MMLIST structure
-        list = new XMLGroupElem("MMLIST","MM");
-        XMLMAP.addChild(list);
-        // level 3
-        XMLElem mmelem = new XMLElem("MMELEMENT");//check for chgs is controlled by XMLGroupElem
-        list.addChild(mmelem);
-        // level 4
-        mmelem.addChild(new XMLActivityElem("MMACTION"));
-        mmelem.addChild(new XMLElem("MMENTITYTYPE","ENTITYTYPE"));
-        mmelem.addChild(new XMLElem("MMENTITYID","ENTITYID"));
-        mmelem.addChild(new XMLElem("STATUS","MMSTATUS",XMLElem.FLAGVAL));
-        mmelem.addChild(new XMLElem("PUBFROM","PUBFROM"));
-        mmelem.addChild(new XMLElem("PUBTO","PUBTO"));
-        
-        list = new XMLElem("MSGLIST");
-        mmelem.addChild(list);
-        // level 5
-        langelem = new XMLNLSElem("MSGELEMENT");
-        list.addChild(langelem);
-        //level 6
-        langelem.addChild(new XMLElem("NLSID","NLSID"));
-        langelem.addChild(new XMLElem("SHRTMKTGMSG","SHRTMKTGMSG"));
-        langelem.addChild(new XMLElem("LONGMKTGMSG","LONGMKTGMSG"));
-        //level 4
-        list = new XMLElem("AUDIENCELIST");
-        mmelem.addChild(list);
-        // level 5
-        listelem = new XMLChgSetElem("AUDIENCEELEMENT");
-        list.addChild(listelem);
-        //level 6
-        //Defect 635138 tag name ACTIVTY should be ACTIVITY for AUDIENCEELEMENT of MMELEMENT tag
-        listelem.addChild(new XMLMultiFlagElem("AUDIENCE","CATAUDIENCE","ACTIVITY",XMLElem.ATTRVAL));
-	    //level 4
-        list = new XMLElem("COUNTRYLIST");
-        mmelem.addChild(list);
-        // level 5
-        listelem = new XMLChgSetElem("COUNTRYELEMENT");
-        list.addChild(listelem);
-        //level 6
-        listelem.addChild(new XMLMultiFlagElem("COUNTRY_FC","COUNTRYLIST","COUNTRYACTION",XMLElem.FLAGVAL));
-        // end of MMLIST structure
-
-        // start of FBLIST structure
-        list = new XMLGroupElem("FBLIST","FB");
-        XMLMAP.addChild(list);
-        // level 3
-        XMLElem fbelem = new XMLElem("FBELEMENT");//check for chgs is controlled by XMLGroupElem
-        list.addChild(fbelem);
-        // level 4
-        fbelem.addChild(new XMLActivityElem("FBACTION"));
-        fbelem.addChild(new XMLElem("FBENTITYTYPE","ENTITYTYPE"));
-        fbelem.addChild(new XMLElem("FBENTITYID","ENTITYID"));
-        //      correction	118.00 Correct attr name from STATUS to FBSTATUS
-        fbelem.addChild(new XMLElem("STATUS","FBSTATUS",XMLElem.FLAGVAL));
-        fbelem.addChild(new XMLElem("PUBFROM","PUBFROM"));
-        fbelem.addChild(new XMLElem("PUBTO","PUBTO"));
-        
-
-        list = new XMLElem("FBSTMTLIST");
-        fbelem.addChild(list);
-        // level 5
-        langelem = new XMLNLSElem("FBSTMTELEMENT");
-        list.addChild(langelem);
-        //level 6
-        langelem.addChild(new XMLElem("NLSID","NLSID"));
-        langelem.addChild(new XMLElem("FBSTMT","FBSTMT"));
-        //level 4
-        list = new XMLElem("AUDIENCELIST");
-        fbelem.addChild(list);
-        // level 5
-        listelem = new XMLChgSetElem("AUDIENCEELEMENT");
-        list.addChild(listelem);
-        //level 6
-        //Defect 635138 tag name ACTIVTY should be ACTIVITY for AUDIENCEELEMENT of FBELEMENT tag
-        listelem.addChild(new XMLMultiFlagElem("AUDIENCE","CATAUDIENCE","ACTIVITY",XMLElem.ATTRVAL));
-	    //level 4
-        list = new XMLElem("COUNTRYLIST");
-        fbelem.addChild(list);
-        // level 5
-        listelem = new XMLChgSetElem("COUNTRYELEMENT");
-        list.addChild(listelem);
-        //level 6
-        listelem.addChild(new XMLMultiFlagElem("COUNTRY_FC","COUNTRYLIST","COUNTRYACTION",XMLElem.FLAGVAL));
-        // end of FBLIST structure
-
-        // start of TAXCATEGORYLIST structure
-        list = new XMLGroupElem("TAXCATEGORYLIST","TAXCATG");
-        XMLMAP.addChild(list);
-        // level 3
-        XMLElem taxelem = new XMLElem("TAXCATEGORYELEMENT");//check for chgs is controlled by XMLGroupElem
-        list.addChild(taxelem);
-        // level 4
-        taxelem.addChild(new XMLActivityElem("TAXCATEGORYACTION"));
-        list = new XMLElem("COUNTRYLIST");
-        taxelem.addChild(list);
-        // level 5
-        listelem = new XMLChgSetElem("COUNTRYELEMENT");
-        list.addChild(listelem);
-        //level 6 
-        //Defect BHALM00057306 Change Mapping to TAXCNTRY
-        listelem.addChild(new XMLMultiFlagElem("COUNTRY_FC","TAXCNTRY","COUNTRYACTION",XMLElem.FLAGVAL));
-        //level 4
-        taxelem.addChild(new XMLElem("TAXCATEGORYVALUE","TAXCATGATR",XMLElem.FLAGVAL));
-        XMLElem elemSLNTAXRELEVANCE = new XMLGroupElem(null,"SLNTAXRELEVANCE","U:SLNTAXRELEVANCE");
-        taxelem.addChild(elemSLNTAXRELEVANCE);
-        elemSLNTAXRELEVANCE.addChild(new XMLElem("TAXCLASSIFICATION","TAXCLS",XMLElem.SHORTDESC));
-        //level 4 new added <SLEORGGRPLIST>
-        taxelem.addChild(new XMLSLEORGGRPElem("D:TAXCATGSLEORGA:D"));
-
-        list = new XMLGroupElem("TAXCODELIST","TAXGRP");
-	    XMLMAP.addChild(list);
-	    XMLElem taxcodeelem = new XMLElem("TAXCODEELEMENT");
-        list.addChild(taxcodeelem);
-        taxcodeelem.addChild(new XMLActivityElem("TAXCODEACTION"));
-        taxcodeelem.addChild(new XMLElem("TAXCODEDESCRIPTION","DESC"));
-        list = new XMLElem("COUNTRYLIST");
-        taxcodeelem.addChild(list);
-        XMLElem cntryelem = new XMLChgSetElem("COUNTRYELEMENT");
-        list.addChild(cntryelem);
-        cntryelem.addChild(new XMLMultiFlagElem("COUNTRY_FC","COUNTRYLIST","COUNTRYACTION",XMLElem.FLAGVAL));
-        taxcodeelem.addChild(new XMLElem("TAXCODE","TAXCD"));
-        //level 4 new added <SLEORGGRPLIST>
-        taxcodeelem.addChild(new XMLSLEORGGRPElem("D:TAXGRPSLEORGA:D"));
-        
-        // start of AUDIENCELIST structure
-        list = new XMLElem("AUDIENCELIST");
-        XMLMAP.addChild(list);
-        // level 5
-        listelem = new XMLChgSetElem("AUDIENCEELEMENT");
-        list.addChild(listelem);
-        //level 6
-        listelem.addChild(new XMLMultiFlagElem("AUDIENCE","AUDIEN","AUDIENCEACTION",XMLElem.ATTRVAL));
-        // end of AUDIENCELIST structure
-        
-        //add 20101217 Level 2 Catalog Override Defaults
-        XMLMAP.addChild(new XMLZCONFElem());
-        
-        // start of CATALOGOVERRIDELIST
-        list = new XMLElem("CATALOGOVERRIDELIST");
-		XMLMAP.addChild(list);
-		list.addChild(new XMLCATAElem());
-        // end of   CATALOGOVERRIDELIST
-
-        // start of CATATTRIBUTELIST
-        list = new XMLGroupElem("CATATTRIBUTELIST","CATDATA");
-        XMLMAP.addChild(list);
-        // level 3
-        listelem = new XMLNLSElem("CATATTRIBUTEELEMENT");
-        list.addChild(listelem);
-        // level 4
-        listelem.addChild(new XMLActivityElem("CATATTRIBUTEACTION"));
-        listelem.addChild(new XMLElem("CATATTRIBUTE","DAATTRIBUTECODE"));
-        listelem.addChild(new XMLElem("NLSID","NLSID"));
-        //change from DAATATTRIBUTEVALUE to DAATTRIBUTEVALUE
-        listelem.addChild(new XMLElem("CATATTRIBUTEVALUE","DAATTRIBUTEVALUE"));    
-        // end of   CATATTRIBUTELIST
-
-        // start of LSEOLIST
-        /**
-         * CR 63555	181.00, 183.00, 184.00, 185.02, 185.04	Update mapping details for COMPONENTELEMENT attributes 
-		 * CR 63555	184.10, 184.20	Remove MACHTYPE and MODEL from COMPONENTELEMENT
-         */
-         list = new XMLGroupElem("COMPONENTLIST","LSEO");
-        XMLMAP.addChild(list);
-        // level 3
-        XMLElem lseoelem = new XMLElem("COMPONENTELEMENT");//check for chgs is controlled by XMLGroupElem
-        list.addChild(lseoelem);
-        // level 4
-        lseoelem.addChild(new XMLActivityElem("ACTIVITY"));
-        lseoelem.addChild(new XMLElem("ENTITYTYPE","ENTITYTYPE"));
-        lseoelem.addChild(new XMLElem("ENTITYID","ENTITYID"));
-        //lseoelem.addChild(new XMLElem("MACHTYPE",""));
-        //lseoelem.addChild(new XMLElem("MODEL",""));
-        lseoelem.addChild(new XMLElem("SEOID","SEOID"));
-        XMLElem elemLSEOBUNDLELSEO = new XMLGroupElem(null,"LSEOBUNDLELSEO","U:LSEOBUNDLELSEO");
-        lseoelem.addChild(elemLSEOBUNDLELSEO);
-        elemLSEOBUNDLELSEO.addChild(new XMLElem("QTY","LSEOQTY"));
-        elemLSEOBUNDLELSEO.addChild(new XMLElem("SEQ","LSEOSEQ"));
-        // end of LSEOLIST
-
-
-    }
-        
-
-    /**********************************
-    * get xml object mapping
-    */
-    public XMLElem getXMLMap() {
-        return XMLMAP;
-    }
-
-	/**********************************
-    * get the name of the VE to use
-    */
-    public String getVeName() { return "ADSLSEOBUNDLE"; }
-
-    /**********************************
-    * get the status attribute to use for this ABR
-    */
-    public String getStatusAttr() { return "STATUS";}
-
-    /**********************************
-    *
-	A.	MQ-Series CID
-    */
-    public String getMQCID() { return "LSEOBUNDLE_UPDATE"; }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getVersion()
-    {
-        return "$Revision: 1.1 $";//"1.0";
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\ln\adsxmlbh1\ADSLSEOBUNDLEABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

@@ -1,684 +1,690 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2007, 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.abr.sg;
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.SAPLElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLEnterpriseElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLFixedElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLIdElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLNotificationElem;
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EANEntity;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.IOException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.Vector;
+/*     */ import javax.xml.parsers.ParserConfigurationException;
+/*     */ import javax.xml.transform.TransformerException;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class WWPRTANNABR
+/*     */   extends EPIMSABRBase
+/*     */ {
+/*     */   private static final Vector FIRSTFINAL_XMLMAP_VCT;
+/*     */   private static final Vector CHGFINAL_XMLMAP_VCT;
+/*     */   private static final Hashtable ATTR_OF_INTEREST_TBL;
+/*     */   private static final String PROPERTIES_FNAME = "WWPRTANNABR_AOI.properties";
+/*  70 */   private static final String[] INDEPENDENT_OF_PRICEDFC = new String[] { "MODELAVAIL", "LSEOAVAIL", "LSEOBUNDLEAVAIL", "LSEOBUNDLELSEO", "LSEO", "LSEOBUNDLE", "AVAIL" };
+/*     */   
+/*  72 */   private static final String[] PRICED_FCREL = new String[] { "OOFAVAIL", "LSEOPRODSTRUCT", "WWSEOPRODSTRUCT" };
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   static {
+/*  77 */     ATTR_OF_INTEREST_TBL = new Hashtable<>();
+/*  78 */     loadAttrOfInterest("WWPRTANNABR_AOI.properties", ATTR_OF_INTEREST_TBL);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*  89 */     FIRSTFINAL_XMLMAP_VCT = new Vector();
+/*  90 */     SAPLElem sAPLElem = new SAPLElem("WWPRTNotification");
+/*  91 */     FIRSTFINAL_XMLMAP_VCT.addElement(sAPLElem);
+/*     */     
+/*  93 */     sAPLElem.addChild((SAPLElem)new SAPLFixedElem("EntityType", "ANNOUNCEMENT"));
+/*  94 */     sAPLElem.addChild((SAPLElem)new SAPLIdElem("EntityId"));
+/*  95 */     sAPLElem.addChild(new SAPLElem("Id", "ANNOUNCEMENT", "ANNNUMBER", true));
+/*  96 */     sAPLElem.addChild((SAPLElem)new SAPLFixedElem("Change", "no"));
+/*  97 */     sAPLElem.addChild((SAPLElem)new SAPLNotificationElem("NotificationTime"));
+/*  98 */     sAPLElem.addChild((SAPLElem)new SAPLEnterpriseElem("Enterprise"));
+/*     */     
+/* 100 */     CHGFINAL_XMLMAP_VCT = new Vector();
+/* 101 */     sAPLElem = new SAPLElem("WWPRTNotification");
+/*     */     
+/* 103 */     CHGFINAL_XMLMAP_VCT.addElement(sAPLElem);
+/*     */     
+/* 105 */     sAPLElem.addChild((SAPLElem)new SAPLFixedElem("EntityType", "ANNOUNCEMENT"));
+/* 106 */     sAPLElem.addChild((SAPLElem)new SAPLIdElem("EntityId"));
+/* 107 */     sAPLElem.addChild(new SAPLElem("Id", "ANNOUNCEMENT", "ANNNUMBER", true));
+/* 108 */     sAPLElem.addChild((SAPLElem)new SAPLFixedElem("Change", "yes"));
+/* 109 */     sAPLElem.addChild((SAPLElem)new SAPLNotificationElem("NotificationTime"));
+/* 110 */     sAPLElem.addChild((SAPLElem)new SAPLEnterpriseElem("Enterprise"));
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected Vector getMQPropertiesFN() {
+/* 117 */     Vector<String> vector = new Vector(1);
+/* 118 */     vector.add("WWPRTMQSERIES");
+/* 119 */     return vector;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected Vector getXMLMap(boolean paramBoolean) {
+/* 127 */     if (paramBoolean) {
+/* 128 */       return FIRSTFINAL_XMLMAP_VCT;
+/*     */     }
+/* 130 */     return CHGFINAL_XMLMAP_VCT;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void execute() throws Exception {
+/* 302 */     EntityItem entityItem = this.epimsAbr.getEntityList().getParentEntityGroup().getEntityItem(0);
+/*     */     
+/* 304 */     String str1 = this.epimsAbr.getAttributeFlagEnabledValue(entityItem, "ANNSTATUS");
+/* 305 */     String str2 = this.epimsAbr.getAttributeFlagEnabledValue(entityItem, "SYSFEEDRESEND");
+/*     */     
+/* 307 */     addDebug("execute: " + entityItem.getKey() + " ANNSTATUS: " + 
+/* 308 */         PokUtils.getAttributeValue(entityItem, "ANNSTATUS", ", ", "", false) + " [" + str1 + "] sysfeedFlag: " + str2);
+/*     */ 
+/*     */     
+/* 311 */     if ("Yes".equals(str2)) {
+/* 312 */       resendSystemFeed(entityItem, str1);
+/*     */       
+/*     */       return;
+/*     */     } 
+/* 316 */     if (!"0020".equals(str1)) {
+/*     */       
+/* 318 */       addError("ERROR_NOT_FINAL", null);
+/*     */       
+/*     */       return;
+/*     */     } 
+/* 322 */     if (this.epimsAbr.isFirstFinal()) {
+/* 323 */       addDebug("Only one transition to Final found, must be first.");
+/*     */       
+/* 325 */       if (checkForAvails()) {
+/*     */         
+/* 327 */         notifyAndSetStatus(null);
+/*     */       } else {
+/* 329 */         addDebug("No AVAIL with AVAILTYPE=planned avail found");
+/*     */       } 
+/*     */     } else {
+/* 332 */       addDebug("More than one transition to Final found, check for change of interest.");
+/*     */       
+/* 334 */       if (changeOfInterest()) {
+/*     */ 
+/*     */         
+/* 337 */         notifyAndSetStatus(null);
+/*     */       } else {
+/* 339 */         addDebug("No change of interest found");
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void handleResend(EntityItem paramEntityItem, String paramString) throws SQLException, MiddlewareException, ParserConfigurationException, TransformerException, EANBusinessRuleException, MiddlewareShutdownInProgressException, IOException {
+/* 373 */     String str = this.epimsAbr.getAttributeFlagEnabledValue(paramEntityItem, "ANNTYPE");
+/* 374 */     addDebug("annType: " + str);
+/* 375 */     if (!"19".equals(str)) {
+/*     */ 
+/*     */       
+/* 378 */       addError("ANN_NOT_NEW", null);
+/*     */       
+/*     */       return;
+/*     */     } 
+/* 382 */     if (!"0020".equals(paramString)) {
+/*     */       
+/* 384 */       addError("RESEND_NOT_FINAL", null);
+/*     */ 
+/*     */       
+/*     */       return;
+/*     */     } 
+/*     */     
+/* 390 */     if (!checkForAvails()) {
+/* 391 */       addError("ANN_NO_AVAIL", null);
+/*     */       
+/*     */       return;
+/*     */     } 
+/*     */     
+/* 396 */     notifyAndSetStatus(null);
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   private boolean checkForAvails() throws SQLException, MiddlewareException {
+/* 401 */     String str1 = this.epimsAbr.getLastFinalDTS();
+/*     */     
+/* 403 */     boolean bool = false;
+/*     */     
+/* 405 */     Profile profile = this.epimsAbr.getProfile().getNewInstance(this.epimsAbr.getDB());
+/* 406 */     profile.setValOnEffOn(str1, str1);
+/*     */     
+/* 408 */     String str2 = getVeName();
+/*     */     
+/* 410 */     EntityList entityList = this.epimsAbr.getDB().getEntityList(profile, new ExtractActionItem(null, this.epimsAbr
+/* 411 */           .getDB(), profile, str2), new EntityItem[] { new EntityItem(null, profile, this.epimsAbr
+/* 412 */             .getEntityType(), this.epimsAbr.getEntityID()) });
+/*     */ 
+/*     */     
+/* 415 */     addDebug("checkForAvails dts: " + str1 + " extract: " + str2 + NEWLINE + 
+/* 416 */         PokUtils.outputList(entityList));
+/*     */ 
+/*     */     
+/* 419 */     EntityGroup entityGroup = entityList.getEntityGroup("AVAIL");
+/* 420 */     bool = (entityGroup.getEntityItemCount() > 0) ? true : false;
+/*     */     
+/* 422 */     entityList.dereference();
+/*     */     
+/* 424 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean changeOfInterest() throws SQLException, MiddlewareException {
+/* 435 */     boolean bool = false;
+/* 436 */     String str1 = this.epimsAbr.getLastFinalDTS();
+/* 437 */     String str2 = this.epimsAbr.getPriorFinalDTS();
+/* 438 */     boolean bool1 = false;
+/*     */     
+/* 440 */     if (str1.equals(str2)) {
+/* 441 */       addDebug("changeOfInterest Only one transition to Final found, no changes can exist.");
+/* 442 */       return bool;
+/*     */     } 
+/*     */ 
+/*     */     
+/* 446 */     Profile profile1 = this.epimsAbr.getProfile().getNewInstance(this.epimsAbr.getDB());
+/* 447 */     profile1.setValOnEffOn(str1, str1);
+/*     */ 
+/*     */ 
+/*     */     
+/* 451 */     String str3 = getVeName();
+/*     */     
+/* 453 */     EntityList entityList1 = this.epimsAbr.getDB().getEntityList(profile1, new ExtractActionItem(null, this.epimsAbr
+/* 454 */           .getDB(), profile1, str3), new EntityItem[] { new EntityItem(null, profile1, this.epimsAbr
+/* 455 */             .getEntityType(), this.epimsAbr.getEntityID()) });
+/*     */ 
+/*     */     
+/* 458 */     addDebug("changeOfInterest dts: " + str1 + " extract: " + str3 + NEWLINE + 
+/* 459 */         PokUtils.outputList(entityList1));
+/*     */ 
+/*     */     
+/* 462 */     Profile profile2 = this.epimsAbr.getProfile().getNewInstance(this.epimsAbr.getDB());
+/* 463 */     profile2.setValOnEffOn(str2, str2);
+/*     */ 
+/*     */     
+/* 466 */     EntityList entityList2 = this.epimsAbr.getDB().getEntityList(profile2, new ExtractActionItem(null, this.epimsAbr
+/* 467 */           .getDB(), profile2, str3), new EntityItem[] { new EntityItem(null, profile2, this.epimsAbr
+/* 468 */             .getEntityType(), this.epimsAbr.getEntityID()) });
+/*     */ 
+/*     */     
+/* 471 */     addDebug("changeOfInterest dts: " + str2 + " extract: " + str3 + NEWLINE + 
+/* 472 */         PokUtils.outputList(entityList2));
+/*     */ 
+/*     */     
+/* 475 */     EntityGroup entityGroup = entityList1.getEntityGroup("AVAIL");
+/* 476 */     if (entityGroup.getEntityItemCount() > 0) {
+/* 477 */       bool1 = true;
+/*     */     } else {
+/* 479 */       addDebug("No AVAIL with AVAILTYPE=planned avail found in last final");
+/* 480 */       entityGroup = entityList2.getEntityGroup("AVAIL");
+/* 481 */       if (entityGroup.getEntityItemCount() > 0) {
+/* 482 */         bool1 = true;
+/*     */       } else {
+/* 484 */         addDebug("No AVAIL with AVAILTYPE=planned avail found in prior final");
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 488 */     if (bool1) {
+/*     */       
+/* 490 */       Hashtable hashtable1 = getStringRep(entityList1, getAttrOfInterest());
+/* 491 */       Hashtable hashtable2 = getStringRep(entityList2, getAttrOfInterest());
+/*     */       
+/* 493 */       bool = changeOfInterest(hashtable1, hashtable2);
+/* 494 */       hashtable1.clear();
+/* 495 */       hashtable2.clear();
+/*     */     } 
+/*     */     
+/* 498 */     entityList2.dereference();
+/* 499 */     entityList1.dereference();
+/*     */     
+/* 501 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected Hashtable getAttrOfInterest() {
+/* 507 */     return ATTR_OF_INTEREST_TBL;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected Hashtable getStringRep(EntityList paramEntityList, Hashtable paramHashtable) {
+/* 565 */     addDebug(NEWLINE + "getStringRep: entered for " + paramEntityList.getProfile().getValOn());
+/* 566 */     Hashtable<Object, Object> hashtable = new Hashtable<>();
+/* 567 */     EntityGroup entityGroup = null;
+/* 568 */     String[] arrayOfString = null;
+/*     */ 
+/*     */     
+/* 571 */     for (byte b1 = 0; b1 < INDEPENDENT_OF_PRICEDFC.length; b1++) {
+/* 572 */       entityGroup = paramEntityList.getEntityGroup(INDEPENDENT_OF_PRICEDFC[b1]);
+/* 573 */       arrayOfString = (String[])paramHashtable.get(entityGroup.getEntityType());
+/* 574 */       for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/*     */ 
+/*     */         
+/* 577 */         EntityItem entityItem = entityGroup.getEntityItem(b);
+/* 578 */         String str = this.epimsAbr.generateString(entityItem, arrayOfString);
+/* 579 */         addDebug("getStringRep: put " + entityItem.getKey() + " " + str);
+/* 580 */         hashtable.put(entityItem.getKey(), str);
+/*     */       } 
+/*     */     } 
+/*     */ 
+/*     */     
+/* 585 */     arrayOfString = (String[])paramHashtable.get("MODEL");
+/* 586 */     Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(paramEntityList.getEntityGroup("AVAIL"), "MODELAVAIL", "MODEL");
+/* 587 */     addDebug("getStringRep: Model thru modelavail mdlVct " + vector.size()); byte b2;
+/* 588 */     for (b2 = 0; b2 < vector.size(); b2++) {
+/* 589 */       EntityItem entityItem = vector.elementAt(b2);
+/* 590 */       String str = this.epimsAbr.generateString(entityItem, arrayOfString);
+/* 591 */       addDebug("getStringRep: put " + entityItem.getKey() + " " + str);
+/* 592 */       hashtable.put(entityItem.getKey(), str);
+/*     */     } 
+/*     */ 
+/*     */     
+/* 596 */     entityGroup = paramEntityList.getEntityGroup("FEATURE");
+/* 597 */     for (b2 = 0; b2 < entityGroup.getEntityItemCount(); b2++) {
+/*     */       
+/* 599 */       EntityItem entityItem = entityGroup.getEntityItem(b2);
+/* 600 */       String str1 = null;
+/* 601 */       String str2 = this.epimsAbr.getAttributeFlagEnabledValue(entityItem, "PRICEDFEATURE");
+/* 602 */       addDebug(entityItem.getKey() + " PRICEDFEATURE: " + str2);
+/* 603 */       if ("100".equals(str2)) {
+/* 604 */         for (byte b = 0; b < PRICED_FCREL.length; b++) {
+/*     */           
+/* 606 */           Vector<EntityItem> vector1 = getAllLinkedEntities(entityItem, PRICED_FCREL[b]);
+/* 607 */           if (vector1.size() > 0) {
+/*     */             
+/* 609 */             if (!hashtable.containsKey(entityItem.getKey())) {
+/* 610 */               arrayOfString = (String[])paramHashtable.get(entityGroup.getEntityType());
+/* 611 */               str1 = this.epimsAbr.generateString(entityItem, arrayOfString);
+/* 612 */               addDebug("getStringRep: put " + entityItem.getKey() + " " + str1);
+/* 613 */               hashtable.put(entityItem.getKey(), str1);
+/*     */             } 
+/*     */           } else {
+/*     */             
+/* 617 */             addDebug("getStringRep: " + entityItem.getKey() + " was not found thru " + PRICED_FCREL[b]);
+/*     */           } 
+/* 619 */           for (byte b3 = 0; b3 < vector1.size(); b3++) {
+/* 620 */             EntityItem entityItem1 = vector1.elementAt(b3);
+/* 621 */             arrayOfString = (String[])paramHashtable.get(entityItem1.getEntityType());
+/* 622 */             str1 = this.epimsAbr.generateString(entityItem1, arrayOfString);
+/* 623 */             addDebug("getStringRep: put " + entityItem1.getKey() + " " + str1);
+/* 624 */             hashtable.put(entityItem1.getKey(), str1);
+/*     */           } 
+/* 626 */           vector1.clear();
+/*     */         } 
+/*     */       }
+/*     */     } 
+/*     */     
+/* 631 */     return hashtable;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private Vector getAllLinkedEntities(EntityItem paramEntityItem, String paramString) {
+/* 644 */     Vector<EANEntity> vector = new Vector(1);
+/* 645 */     for (byte b = 0; b < paramEntityItem.getDownLinkCount(); b++) {
+/*     */       
+/* 647 */       EANEntity eANEntity = paramEntityItem.getDownLink(b);
+/* 648 */       if (eANEntity.getEntityType().equals("PRODSTRUCT")) {
+/*     */         byte b1;
+/*     */         
+/* 651 */         for (b1 = 0; b1 < eANEntity.getUpLinkCount(); b1++) {
+/*     */           
+/* 653 */           EANEntity eANEntity1 = eANEntity.getUpLink(b1);
+/* 654 */           if (eANEntity1.getEntityType().equals(paramString) && !vector.contains(eANEntity1)) {
+/* 655 */             vector.addElement(eANEntity1);
+/*     */           }
+/*     */         } 
+/* 658 */         for (b1 = 0; b1 < eANEntity.getDownLinkCount(); b1++) {
+/*     */           
+/* 660 */           EANEntity eANEntity1 = eANEntity.getDownLink(b1);
+/* 661 */           if (eANEntity1.getEntityType().equals(paramString) && !vector.contains(eANEntity1)) {
+/* 662 */             vector.addElement(eANEntity1);
+/*     */           }
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/* 667 */     return vector;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getVeName() {
+/* 673 */     return "WWPRTANNVE1";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVersion() {
+/* 682 */     return "1.5";
+/*     */   }
+/*     */ }
 
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-import com.ibm.transform.oim.eacm.util.*;
 
-import java.util.*;
-
-/**********************************************************************************
-* WWPRTANNABR class generates xml for ANNOUNCEMENT
-*
-* From "SG FS ABR WWPRT Notification 20080326.doc"
-* MN 35084789 - support resend of lost notification messages.
-* This ABR gets triggered by the Data Quality ABR only when the ANNOUNCEMENT has a STATUS = Final.
-*
-* If this is the first time that the ABR is Queued, then a notification is sent to WWPRT.
-* If this is not the first time that the ABR is Queued, then a notification is sent only
-* if an attribute of interest was changed.
-*
-* <?xml version = "1.0" ?>
-* <WWPRTNotification>
-*    <EntityType>LSEO/LSEOBUNDLE/ANNOUNCEMENT/RPQ</Entity Type>
-*    <EntityId>(the entity id value)</EntityId>
-*    <Id>seoid/seo bundle id/annnumber/PRODSTRUCT entityid</Id>
-*    <Change>no/yes</Change>
-*    <NotificationTime>(Timestamp of the notification)</NotificationTime>
-*    <Enterprise>(enterprise value)</Enterprise>
-* </WWPRTNotification>
-*
-* where 'Change' is set as follows:
-* First Time for this notification:  'No'
-* Subsequent notifications:  'Yes'
-*
-* Notes:the notification is for one EntityType and EntityId
-* RPQ = PRODSTRUCT
-*
-*/
-// WWPRTANNABR.java,v
-// Revision 1.5  2009/08/09 01:31:40  wendy
-// Dont need to hang onto properties file after load attr list
-//
-// Revision 1.4  2009/08/07 18:29:12  wendy
-// Move AttributesOfInterest to properties file
-//
-// Revision 1.3  2008/04/08 12:27:44  wendy
-// MN 35084789 - support resend of lost notification messages.
-// and MN 35178533 - ePIMS lost some geography data
-// "SG FS ABR WWPRT Notification 20080407.doc"
-//
-// Revision 1.2  2008/01/30 19:39:14  wendy
-// Cleanup RSA warnings
-//
-// Revision 1.1  2007/12/03 19:28:07  wendy
-// Init for WWPRT ABRs
-//
-public class WWPRTANNABR extends EPIMSABRBase
-{
-    private static final Vector FIRSTFINAL_XMLMAP_VCT;
-    private static final Vector CHGFINAL_XMLMAP_VCT;
-    private static final Hashtable ATTR_OF_INTEREST_TBL;
-    private static final String PROPERTIES_FNAME = "WWPRTANNABR_AOI.properties";
-    
-	private static final String[] INDEPENDENT_OF_PRICEDFC = new String[]{"MODELAVAIL","LSEOAVAIL","LSEOBUNDLEAVAIL",
-		"LSEOBUNDLELSEO", "LSEO","LSEOBUNDLE", "AVAIL"};
-	private static final String[] PRICED_FCREL = new String[]{"OOFAVAIL","LSEOPRODSTRUCT","WWSEOPRODSTRUCT"};
-
-    static {
-   	 
-    	// read list of attributes of interest from a properties file
-		ATTR_OF_INTEREST_TBL = new Hashtable();
-		loadAttrOfInterest(PROPERTIES_FNAME,ATTR_OF_INTEREST_TBL);
-		
-        /*ATTR_OF_INTEREST_TBL.put("MODEL",new String[]{"MACHTYPEATR","MODELATR","INSTALL","PROJCDNAM"});
-        ATTR_OF_INTEREST_TBL.put("FEATURE",new String[]{"FEATURECODE","FCTYPE","ZEROPRICE","PRICEDFEATURE"});
-        ATTR_OF_INTEREST_TBL.put("LSEO",new String[]{"SEOID","COUNTRYLIST","PRCINDC","ZEROPRICE"});
-        ATTR_OF_INTEREST_TBL.put("WWSEOPRODSTRUCT",new String[]{"CONFQTY"});
-        ATTR_OF_INTEREST_TBL.put("LSEOPRODSTRUCT",new String[]{"CONFQTY"});
-        ATTR_OF_INTEREST_TBL.put("LSEOBUNDLE",new String[]{"SEOID","COUNTRYLIST"});
-        ATTR_OF_INTEREST_TBL.put("LSEOBUNDLELSEO",new String[]{"LSEOQTY"});
-        ATTR_OF_INTEREST_TBL.put("AVAIL",new String[]{"AVAILTYPE"});*/
-
-        FIRSTFINAL_XMLMAP_VCT = new Vector();  // set of elements
-        SAPLElem topElem = new SAPLElem("WWPRTNotification");
-        FIRSTFINAL_XMLMAP_VCT.addElement(topElem);
-         // level2
-        topElem.addChild(new SAPLFixedElem("EntityType","ANNOUNCEMENT"));
-        topElem.addChild(new SAPLIdElem("EntityId"));
-        topElem.addChild(new SAPLElem("Id","ANNOUNCEMENT","ANNNUMBER",true));
-        topElem.addChild(new SAPLFixedElem("Change","no"));
-        topElem.addChild(new SAPLNotificationElem("NotificationTime"));
-        topElem.addChild(new SAPLEnterpriseElem("Enterprise"));
-
-        CHGFINAL_XMLMAP_VCT = new Vector();  // set of elements
-        topElem = new SAPLElem("WWPRTNotification");
-
-        CHGFINAL_XMLMAP_VCT.addElement(topElem);
-         // level2
-        topElem.addChild(new SAPLFixedElem("EntityType","ANNOUNCEMENT"));
-        topElem.addChild(new SAPLIdElem("EntityId"));
-        topElem.addChild(new SAPLElem("Id","ANNOUNCEMENT","ANNNUMBER",true));
-        topElem.addChild(new SAPLFixedElem("Change","yes"));
-        topElem.addChild(new SAPLNotificationElem("NotificationTime"));
-        topElem.addChild(new SAPLEnterpriseElem("Enterprise"));
-    }
-
-    /**********************************
-    * get the name(s) of the MQ properties file to use
-    */
-    protected Vector getMQPropertiesFN() {
-        Vector vct = new Vector(1);
-        vct.add(WWPRTMQSERIES);
-        return vct;
-    }
-
-
-    /**********************************
-    * get xml object mapping
-    */
-    protected Vector getXMLMap(boolean isFirst) {
-        if (isFirst) {
-            return FIRSTFINAL_XMLMAP_VCT;
-        }else{
-            return CHGFINAL_XMLMAP_VCT;
-        }
-    }
-
-    /**********************************
-    * execute the derived class
-    * This ABR is queued only when STATUS = Final.
-    *
-    * The logical business data model states that an Announcement (ANNOUNCEMENT) has an
-    * announcement date (ANNDATE) on which the availability (AVAIL) of 'offerings' is announced.
-    * 'Offerings' that can be announced will have an availability (AVAIL) of a given type (AVAILTYPE),
-    * an effective date (EFFECTIVEDATE), and a list of countries (COUNTRYLIST). 'Offerings' include:
-    * MODEL, FEATUREs in a MODEL (PRODSTRUCT), LSEOs, and LSEOBUNDLEs. The types of availability
-    * (AVAILTYPE) are:
-    * Code	LongDescription
-    * 143	First Order
-    * 146	Planned Availability
-    * 149	Last Order
-    * 150	Last Return
-    * 151	End of Service
-    * 152	End of Dev Support
-    * 153	Last Initial Order
-    * 200	End of Marketing
-    *
-    * There are different types of Announcements (ANNTYPE):
-    *
-    * Code	LongDescription
-    * 11	Other - Change to Business Term or Condition
-    * 12	End Of Life - Change to End Of Service Date
-    * 13	End Of Life - Discontinuance of service
-    * 14	End Of Life - Withdrawal from mktg
-    * 15	Other - Statement of Intent
-    * 16	End Of Life - Both
-    * 17	Other - Vision
-    * 18	Change
-    * 19	New
-    *
-    *
-    * A.	Resend
-    *
-    * If SYSFEEDRESEND = 'Yes' (Yes) then
-    * 	If ANNTYPE <> 'New' (19) then
-    * 		Set SYSFEEDRESEND = 'No' (No)
-    * 		ErrorMessage LD(ANNOUNCEMENT) NDN(ANNOUNCEMENT) 'is not New; however it was queued to resend data'.
-    * 		Done
-    * 	End If
-    * 	If the ANNOUNCEMENT does not have an AVAIL where AVAILTYPE = 'Planned Availability' (146) then
-    * 		Set SYSFEEDRESEND = 'No' (No)
-    * 		ErrorMessage LD(ANNOUNCEMENT) NDN(ANNOUNCEMENT) 'was queued to resend data; however, there are no AVAILabilities that are of type Planned Availability'.
-    * 		Done
-    * 	End If
-    * 	If STATUS = 'Final' (0020) then
-    * 		Send notification with <NotificationTime> = DTS (current VALFROM of STATUS)
-    * 		Done
-    * 	Else
-    * 		ErrorMessage LD(ANNOUNCEMENT) NDN(ANNOUNCEMENT) 'was queued to resend data; however, it is not Final'
-    * 	End If
-    * 	Set SYSFEEDRESEND = 'No' (No)
-    * 	Done
-    * Else
-    * 	Continue with the next paragraph in this specification.
-    * End If
-    *
-    * B.	First Time
-    *
-    * This notification occurs whenever the status of a 'New' Announcement is changed to Final the first
-    * time and is announcing the 'Planned Availability' (146) of one or more 'offerings'.
-    * ANNOUNCEMENT.ANNSTATUS = Final (0020)
-    * ANNOUNCEMENT.ANNTYPE = New (19)
-    * AVAIL.AVAILTYPE = Planned Availability (146)
-    *
-    *
-    * C.	Subsequent Times
-    *
-    * This notification occurs when there is a change in information within an announcement structure
-    * that is of interest to WWPRT and the announcement status is Final (not the first time) and the
-    * Announcement meets the criteria in A above.
-    *
-    * Let T1 = DTS of this Final and T2 = DTS of the prior Final. Then a change of interest is a change
-    * in attribute value listed or in structure.
-    *
-    * The VE defining the structure of interest follows:
-    *
-    * Lev	Entity1	RelType	Relator	Entity2	Dir
-    * 0	ANNOUNCEMENT	Assoc	ANNAVAILA	AVAIL	D
-    * 1	MODEL	Relator	MODELAVAIL	AVAIL	U
-    * 1	PRODSTRUCT	Relator	OOFAVAIL	AVAIL	U
-    * 2	FEATURE	Relator	PRODSTRUCT	MODEL	U
-    * 1	LSEO	Relator	LSEOAVAIL	AVAIL	U
-    * 1	LSEOBUNDLE	Relator	LSEOBUNDLEAVAIL	AVAIL	U
-    * 2	LSEO	Relator	LSEOPRODSTRUCT	PRODSTRUCT	D
-    * 3	FEATURE	Relator	PRODSTRUCT	MODEL	U
-    * 2	LSEO	Relator	WWSEOLSEO	WWSEO	U
-    * 3	WWSEO	Relator	WWSEOPRODSTRUCT	PRODSTRUCT	D
-    * 4	FEATURE	Relator	PRODSTRUCT	MODEL	U
-    * 2	LSEOBUNDLE	Relator	LSEOBUNDLELSEO	LSEO	D
-    * 3	LSEO	Relator	LSEOPRODSTRUCT	PRODSTRUCT	D
-    * 4	FEATURE	Relator	PRODSTRUCT	MODEL	U
-    * 3	LSEO	Relator	WWSEOLSEO	WWSEO	U
-    * 4	WWSEO	Relator	WWSEOPRODSTRUCT	PRODSTRUCT	D
-    * 5	FEATURE	Relator	PRODSTRUCT	MODEL	U
-    *
-    * Note:  in the preceding VE, the level 2 FEATURE is found as follows:
-    * Start with ANNOUNCEMENT and find AVAILs
-    * For an AVAIL, find the PRODSTRUCT
-    * For a PRODSTRUCT, find the FEATURE
-    *
-    * Do not consider the FEATUREs found for the MODEL in level 1 via PRODSTRUCT.
-    *
-    * The changes of interest within this structure are filtered by Feature if applicable. Features (FEATURE)
-    * are considered only if they are priced (PRICEDFEATURE = Yes (100). Items that add/remove Features are
-    * indicated via an asterisk.
-    *
-    * All LSEOs in an Announcement are considered independent of the value of the Zero Priced Indicator
-    *(ZEROPRICE) and Priced Indicator (PRCINDC).
-    *
-    * The changes that are watched are:
-    *
-    * 	New (added) or removed (deleted) relators
-    * MODELAVAIL
-    * OOFAVAIL *
-    * LSEOAVAIL
-    * LSEOBUNDLEAVAIL
-    *
-    * 	New (added) or removed (deleted) relators
-    * LSEOPRODSTRUCT *
-    * WWSEOPRODSTRUCT *
-    * LSEOBUNDLELSEO
-    *
-    * 	New entities
-    * AVAIL where AVAILTYPE = Planned Availability (146)
-    *
-    * The changes in data of interest within this structure are:
-    *
-    * MODEL - only for level 1 (from MODELAVAIL)
-    * MACHTYPEATR
-    * MODELATR
-    * INSTALL
-    * PROJCDNAM
-    *
-    * FEATURE
-    * FEATURECODE
-    * FCTYPE
-    * ZEROPRICE
-    * PRICEDFEATURE
-    *
-    * LSEO
-    * SEOID
-    * COUNTRYLIST
-    * PRCINDC
-    * ZEROPRICE
-    *
-    * LSEOBUNDLE
-    * SEOID
-    * COUNTRYLIST
-    *
-    * WWSEOPRODSTRUCT
-    * CONFQTY
-    *
-    * LSEOPRODSTRUCT
-    * CONFQTY
-    *
-    * LSEOBUNDLELSEO
-    * LSEOQTY
-    *
-    * AVAIL
-    * AVAILTYPE only if change to or from Planned Availability (146)
-    * 	Note that this is a FLAG
-    */
-    protected void execute() throws Exception
-    {
-        // make sure the STATUS is Final
-        EntityItem rootEntity = epimsAbr.getEntityList().getParentEntityGroup().getEntityItem(0);
-
-        String statusFlag = epimsAbr.getAttributeFlagEnabledValue(rootEntity, "ANNSTATUS");
-       	String sysfeedFlag = epimsAbr.getAttributeFlagEnabledValue(rootEntity, "SYSFEEDRESEND");
-  
-		addDebug("execute: "+rootEntity.getKey()+" ANNSTATUS: "+
-			PokUtils.getAttributeValue(rootEntity, "ANNSTATUS",", ", "", false)+" ["+statusFlag+"] sysfeedFlag: "+
-			sysfeedFlag);
-
-		if (SYSFEEDRESEND_YES.equals(sysfeedFlag)){
-			resendSystemFeed(rootEntity, statusFlag);
-			return;
-		}
-
-        if (!STATUS_FINAL.equals(statusFlag)){
-			//ERROR_NOT_FINAL = Status was not Final.
-			addError("ERROR_NOT_FINAL", null);
-			return;
-        }
-
-		if (epimsAbr.isFirstFinal()){
-            addDebug("Only one transition to Final found, must be first.");
-
-            if (checkForAvails())
-            {
-				notifyAndSetStatus(null);
-			}else{
-				addDebug("No AVAIL with AVAILTYPE=planned avail found");
-			}
-        }else{
-            addDebug("More than one transition to Final found, check for change of interest.");
-            //If Change of Interest to wwprt then
-            if (changeOfInterest())
-            {
-                //  Notify
-                notifyAndSetStatus(null);
-            }else{
-                addDebug("No change of interest found");
-            }
-        }
-    }
-
-	/**********************************
-	* A.	Resend
-	*
-	* If SYSFEEDRESEND = 'Yes' (Yes) then
-	* 	If ANNTYPE <> 'New' (19) then
-	* 		Set SYSFEEDRESEND = 'No' (No)
-	* 		ErrorMessage LD(ANNOUNCEMENT) NDN(ANNOUNCEMENT) 'is not New; however it was queued to resend data'.
-	* 		Done
-	* 	End If
-	* 	If the ANNOUNCEMENT does not have an AVAIL where AVAILTYPE = 'Planned Availability' (146) then
-	* 		Set SYSFEEDRESEND = 'No' (No)
-	* 		ErrorMessage LD(ANNOUNCEMENT) NDN(ANNOUNCEMENT) 'was queued to resend data; however, there are no AVAILabilities that are of type Planned Availability'.
-	* 		Done
-	* 	End If
-	* 	If STATUS = 'Final' (0020) then
-	* 		Send notification with <NotificationTime> = DTS (current VALFROM of STATUS)
-	* 		Done
-	* 	Else
-	* 		ErrorMessage LD(ANNOUNCEMENT) NDN(ANNOUNCEMENT) 'was queued to resend data; however, it is not Final'
-	* 	End If
-	* 	Set SYSFEEDRESEND = 'No' (No)
-	* 	Done
-    * Else
-    */
-	protected void handleResend(EntityItem rootEntity, String statusFlag) throws
-	java.sql.SQLException, MiddlewareException, javax.xml.parsers.ParserConfigurationException,
-	javax.xml.transform.TransformerException, COM.ibm.eannounce.objects.EANBusinessRuleException,
-	COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException, java.io.IOException
-	{
-		String annType = epimsAbr.getAttributeFlagEnabledValue(rootEntity, "ANNTYPE");
-		addDebug("annType: "+annType);
-		if (!"19".equals(annType)){ //If ANNTYPE <> 'New' (19) then
-			//ErrorMessage LD(ANNOUNCEMENT) NDN(ANNOUNCEMENT) 'is not New; however it was queued to resend data'.
-			//ANN_NOT_NEW = is not New; however it was queued to resend data.
-			addError("ANN_NOT_NEW", null);
-			return;
-		}
-
-		if (!STATUS_FINAL.equals(statusFlag)){ //If STATUS != 'Final' (0020)
-			//RESEND_NOT_FINAL = was queued to resend data; however, it is not Final.
-			addError("RESEND_NOT_FINAL", null);
-			return;
-		}
-
-		//If the ANNOUNCEMENT does not have an AVAIL where AVAILTYPE = 'Planned Availability' (146) then
-		//ANN_NO_AVAIL = was queued to resend data; however, there are no AVAILabilities that are of type Planned Availability.
-        if (!checkForAvails()){
-			addError("ANN_NO_AVAIL", null);
-        	return;
-		}
-
-		//	Notify
-		notifyAndSetStatus(null);
-	}
-
-	private boolean checkForAvails() throws java.sql.SQLException,MiddlewareException
-	{
-		String lastdts = epimsAbr.getLastFinalDTS(); // really queued DTS now
-
-		boolean availFnd = false;
-		// set lastfinal date in profile
-		Profile lastprofile = epimsAbr.getProfile().getNewInstance(epimsAbr.getDB());
-		lastprofile.setValOnEffOn(lastdts, lastdts);
-
-		String VEname = getVeName();
-		// create VE for lastfinal time
-		EntityList lastFinalList = epimsAbr.getDB().getEntityList(lastprofile,
-			new ExtractActionItem(null, epimsAbr.getDB(),lastprofile,VEname),
-			new EntityItem[] { new EntityItem(null, lastprofile, epimsAbr.getEntityType(), epimsAbr.getEntityID()) });
-
-		 // debug display list of groups
-		addDebug("checkForAvails dts: "+lastdts+" extract: "+VEname+NEWLINE +
-			PokUtils.outputList(lastFinalList));
-
-		//  Notify if at least one planned avail exists
-		EntityGroup availGrp = lastFinalList.getEntityGroup("AVAIL");
-		availFnd = availGrp.getEntityItemCount()>0;
-
-		lastFinalList.dereference();
-
-		return availFnd;
-	}
-
-    /**********************************
-    * check for any changes in structure or specified attr between current chg to final and prior chg
-    */
-    protected boolean changeOfInterest()
-    throws
-    java.sql.SQLException,
-    COM.ibm.opicmpdh.middleware.MiddlewareException
-    {
-        boolean hadChgs = false;
-        String lastdts = epimsAbr.getLastFinalDTS();
-        String priordts = epimsAbr.getPriorFinalDTS();
-		boolean availFnd = false;  // must have at least one planned avail
-
-        if (lastdts.equals(priordts)){
-            addDebug("changeOfInterest Only one transition to Final found, no changes can exist.");
-            return hadChgs;
-        }
-
-        // set lastfinal date in profile
-        Profile lastprofile = epimsAbr.getProfile().getNewInstance(epimsAbr.getDB());
-        lastprofile.setValOnEffOn(lastdts, lastdts);
-
-        // pull VE
-        // get VE name
-        String VEname = getVeName();
-        // create VE for lastfinal time
-        EntityList lastFinalList = epimsAbr.getDB().getEntityList(lastprofile,
-            new ExtractActionItem(null, epimsAbr.getDB(),lastprofile,VEname),
-            new EntityItem[] { new EntityItem(null, lastprofile, epimsAbr.getEntityType(), epimsAbr.getEntityID()) });
-
-         // debug display list of groups
-        addDebug("changeOfInterest dts: "+lastdts+" extract: "+VEname+NEWLINE +
-            PokUtils.outputList(lastFinalList));
-
-        // set prior date in profile
-        Profile profile = epimsAbr.getProfile().getNewInstance(epimsAbr.getDB());
-        profile.setValOnEffOn(priordts, priordts);
-
-        // create VE for prior time
-        EntityList list = epimsAbr.getDB().getEntityList(profile,
-            new ExtractActionItem(null, epimsAbr.getDB(),profile,VEname),
-            new EntityItem[] { new EntityItem(null, profile, epimsAbr.getEntityType(), epimsAbr.getEntityID()) });
-
-         // debug display list of groups
-        addDebug("changeOfInterest dts: "+priordts+" extract: "+VEname+NEWLINE +
-            PokUtils.outputList(list));
-
-		//  do checks if at least one planned avail exists in t1 or t2 - VE is filtered
-		EntityGroup availGrp = lastFinalList.getEntityGroup("AVAIL");
-		if (availGrp.getEntityItemCount()>0){
-			availFnd = true;
-		}else{
-			addDebug("No AVAIL with AVAILTYPE=planned avail found in last final");
-			availGrp = list.getEntityGroup("AVAIL");
-			if (availGrp.getEntityItemCount()>0){
-				availFnd = true;
-			}else{
-				addDebug("No AVAIL with AVAILTYPE=planned avail found in prior final");
-			}
-		}
-
-		if (availFnd){
-	        // get the attributes as one string for each entityitem key
-	        Hashtable currlistRep = getStringRep(lastFinalList, getAttrOfInterest());
-	        Hashtable prevlistRep = getStringRep(list, getAttrOfInterest());
-
-	        hadChgs = changeOfInterest(currlistRep, prevlistRep);
-	        currlistRep.clear();
-	        prevlistRep.clear();
-		}
-
-        list.dereference();
-        lastFinalList.dereference();
-
-        return hadChgs;
-    }
-
-    /**********************************
-    * attributes to check for any changes
-    */
-    protected Hashtable getAttrOfInterest() { return ATTR_OF_INTEREST_TBL;}
-
-    /**********************************
-    * get hashtable with entitylist converted to strings.  key is entityitem key
-    * value is the concatenated list of all attributes of interest.
-    * The changes of interest within this structure are filtered by Feature if applicable.
-    * Features (FEATURE) are considered only if they are priced (PRICEDFEATURE = Yes (100). Items
-    * that add/remove Features are indicated via an asterisk. The changes that are watched are:
-    *
-    * 	New (added) or removed (deleted) relators
-    * MODELAVAIL
-    * OOFAVAIL *
-    * LSEOAVAIL
-    * LSEOBUNDLEAVAIL
-    *
-    * 	New (added) or removed (deleted) relators
-    * LSEOPRODSTRUCT *
-    * WWSEOPRODSTRUCT *
-    * LSEOBUNDLELSEO
-    *
-    * The changes in data of interest within this structure are:
-    *
-    * MODEL - only for level 1 (from MODELAVAIL)
-    * MACHTYPEATR
-    * MODELATR
-    * INSTALL
-    * PROJCDNAM
-    *
-    * FEATURE
-    * FEATURECODE
-    * FCTYPE
-    * ZEROPRICE
-    * PRICEDFEATURE
-    *
-    * LSEO
-    * SEOID
-    * COUNTRYLIST
-    * PRCINDC
-    * ZEROPRICE
-    *
-    * LSEOBUNDLE
-    * SEOID
-    * COUNTRYLIST
-    *
-    * WWSEOPRODSTRUCT
-    * CONFQTY
-    *
-    * LSEOPRODSTRUCT
-    * CONFQTY
-    *
-    * LSEOBUNDLELSEO
-    * LSEOQTY
-    *
-    * AVAIL
-    * AVAILTYPE only if change to or from Planned Availability (146)
-    * 	Note that this is a FLAG
-    */
-    protected Hashtable getStringRep(EntityList list, Hashtable attrOfInterest) {
-        addDebug(NEWLINE+"getStringRep: entered for "+list.getProfile().getValOn());
-        Hashtable listTbl = new Hashtable();
-        EntityGroup eg = null;
-        String attrlist[] = null;
-
-        // check structure for relators not restricted to priced features
-        for (int i=0; i<INDEPENDENT_OF_PRICEDFC.length; i++){
-			eg =list.getEntityGroup(INDEPENDENT_OF_PRICEDFC[i]);
-			attrlist = (String[])attrOfInterest.get(eg.getEntityType());
-			for (int e=0; e<eg.getEntityItemCount(); e++)
-			{
-				//StringBuffer sb = new StringBuffer();
-				EntityItem theItem = eg.getEntityItem(e);
-				String str = epimsAbr.generateString(theItem, attrlist);
-				addDebug("getStringRep: put "+theItem.getKey()+" "+str);
-				listTbl.put(theItem.getKey(),str);
-			}
-		}
-
-		// check model thru modelavail
-        attrlist = (String[])attrOfInterest.get("MODEL");
-		Vector mdlVct = PokUtils.getAllLinkedEntities(list.getEntityGroup("AVAIL") , "MODELAVAIL", "MODEL");
-		addDebug("getStringRep: Model thru modelavail mdlVct "+mdlVct.size());
-		for (int entityCount = 0; entityCount < mdlVct.size(); entityCount++) {
-			EntityItem theItem = (EntityItem) mdlVct.elementAt(entityCount);
-			String str = epimsAbr.generateString(theItem, attrlist);
-			addDebug("getStringRep: put "+theItem.getKey()+" "+str);
-			listTbl.put(theItem.getKey(),str);
-        }
-
-        // only look at structure tied to priced features
-        eg =list.getEntityGroup("FEATURE");
-        for (int e=0; e<eg.getEntityItemCount(); e++)
-        {
-            EntityItem featItem = eg.getEntityItem(e);
-            String str = null;
-            String priced = epimsAbr.getAttributeFlagEnabledValue(featItem, "PRICEDFEATURE");
-            addDebug(featItem.getKey()+" PRICEDFEATURE: "+priced);
-            if ("100".equals(priced)){
-				for (int i=0; i<PRICED_FCREL.length; i++){
-					// check the oofavail, lseoprodstruct or wwseoprodstruct to this feature
-					Vector psVct = getAllLinkedEntities(featItem, PRICED_FCREL[i]);
-					if (psVct.size()>0){
-						// only look at FEATUREs thru these relators
-						if (!listTbl.containsKey(featItem.getKey())){
-							attrlist = (String[])attrOfInterest.get(eg.getEntityType());
-							str = epimsAbr.generateString(featItem, attrlist);
-							addDebug("getStringRep: put "+featItem.getKey()+" "+str);
-							listTbl.put(featItem.getKey(),str);
-						}
-					}else{
-						// skip all those features from MODELAVAIL->MODEL->PRODSTRUCT->FEATURE
-						addDebug("getStringRep: "+featItem.getKey()+" was not found thru "+PRICED_FCREL[i]);
-					}
-					for (int p=0; p<psVct.size(); p++){
-						EntityItem psitem = (EntityItem)psVct.elementAt(p);
-						attrlist = (String[])attrOfInterest.get(psitem.getEntityType());
-						str = epimsAbr.generateString(psitem, attrlist);
-						addDebug("getStringRep: put "+psitem.getKey()+" "+str);
-						listTbl.put(psitem.getKey(),str);
-					}
-					psVct.clear();
-				}
-            }
-        }
-
-        return listTbl;
-    }
-
-    /********************************************************************************
-    * Find entities of the destination type linked to the EntityItems in the source
-    *
-    * @param entityItem EntityItem
-    * @param destType   String EntityType to match
-    * @returns Vector of EntityItems
-    */
-    private Vector getAllLinkedEntities(EntityItem entityItem, String destType)
-    {
-        // find entities thru '"PRODSTRUCT"' relators
-        Vector destVct = new Vector(1);
-        for (int ui=0; ui<entityItem.getDownLinkCount(); ui++)
-        {
-            EANEntity entityLink = entityItem.getDownLink(ui);
-            if (entityLink.getEntityType().equals("PRODSTRUCT"))
-            {
-                // check for destination entity as a uplink for wwseops or lseops
-                for (int i=0; i<entityLink.getUpLinkCount(); i++)
-                {
-                    EANEntity entity = entityLink.getUpLink(i);
-                    if (entity.getEntityType().equals(destType) && !destVct.contains(entity)) {
-                        destVct.addElement(entity); }
-                }
-                // check for destination entity as a dnlink for oofavail
-                for (int i=0; i<entityLink.getDownLinkCount(); i++)
-                {
-                    EANEntity entity = entityLink.getDownLink(i);
-                    if (entity.getEntityType().equals(destType) && !destVct.contains(entity)) {
-                        destVct.addElement(entity); }
-                }
-            }
-        }
-
-        return destVct;
-    }
-
-    /**********************************
-    * get the name of the VE to use
-    */
-    protected String getVeName() { return "WWPRTANNVE1";}
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getVersion()
-    {
-        return "1.5";
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\WWPRTANNABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

@@ -1,561 +1,567 @@
-//Licensed Materials -- Property of IBM
+/*     */ package COM.ibm.eannounce.abr.sg.psu;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.WorkflowException;
+/*     */ import COM.ibm.opicmpdh.middleware.LockException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import COM.ibm.opicmpdh.transactions.OPICMList;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Arrays;
+/*     */ import java.util.Comparator;
+/*     */ import java.util.Hashtable;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ class PSUList
+/*     */ {
+/*     */   private static final String ID_PAD = "000000000000";
+/*     */   private PSUABRSTATUS abr;
+/*     */   private EntityItem rootEntity;
+/*  40 */   private Object[] args = (Object[])new String[3];
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   PSUList(PSUABRSTATUS paramPSUABRSTATUS, EntityItem paramEntityItem) {
+/*  47 */     this.abr = paramPSUABRSTATUS;
+/*  48 */     this.rootEntity = paramEntityItem;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   void execute(EntityGroup paramEntityGroup) throws SQLException, MiddlewareException, RemoteException, MiddlewareShutdownInProgressException, EANBusinessRuleException, LockException, WorkflowException {
+/*  68 */     EntityItem[] arrayOfEntityItem = paramEntityGroup.getEntityItemsAsArray();
+/*     */     
+/*  70 */     if (arrayOfEntityItem.length == 0) {
+/*     */       
+/*  72 */       this.args[0] = this.abr.getLD_Value(this.rootEntity, "PSUCRITERIA");
+/*  73 */       this.args[1] = paramEntityGroup.getLongDescription();
+/*  74 */       this.abr.addError("LIST_NO_CHILDREN_ERR", this.args);
+/*     */       
+/*     */       return;
+/*     */     } 
+/*     */     
+/*  79 */     Arrays.sort(arrayOfEntityItem, new Comparator<EntityItem>() {
+/*     */           public int compare(Object param1Object1, Object param1Object2) {
+/*  81 */             EntityItem entityItem1 = (EntityItem)param1Object1;
+/*  82 */             EntityItem entityItem2 = (EntityItem)param1Object2;
+/*  83 */             String str1 = PSUList.this.getSortKey(entityItem1);
+/*  84 */             String str2 = PSUList.this.getSortKey(entityItem2);
+/*  85 */             return str1.compareToIgnoreCase(str2);
+/*     */           }
+/*     */         });
+/*     */     
+/*  89 */     processList(arrayOfEntityItem);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String getSortKey(EntityItem paramEntityItem) {
+/* 100 */     StringBuffer stringBuffer = new StringBuffer(PokUtils.getAttributeValue(paramEntityItem, "PSUENTITYTYPE", "", "", false));
+/*     */     
+/* 102 */     String str = PokUtils.getAttributeValue(paramEntityItem, "PSUENTITYID", "", "", false);
+/* 103 */     if (str.length() < "000000000000".length()) {
+/* 104 */       str = "000000000000".substring(0, "000000000000".length() - str.length()) + str;
+/*     */     }
+/* 106 */     stringBuffer.append(str);
+/* 107 */     stringBuffer.append(PokUtils.getAttributeValue(paramEntityItem, "PSUCLASS", "", "", false));
+/* 108 */     stringBuffer.append(PokUtils.getAttributeValue(paramEntityItem, "PSUATTRACTION", "", "", false));
+/* 109 */     stringBuffer.append(PokUtils.getAttributeValue(paramEntityItem, "PSUATTRIBUTE", "", "", false));
+/*     */     
+/* 111 */     return stringBuffer.toString();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void processList(EntityItem[] paramArrayOfEntityItem) throws SQLException, MiddlewareException, RemoteException, MiddlewareShutdownInProgressException, EANBusinessRuleException, LockException, WorkflowException {
+/* 131 */     int i = 0;
+/* 132 */     byte b1 = 0;
+/* 133 */     String str = null;
+/* 134 */     int j = -1;
+/* 135 */     PSUUpdateData pSUUpdateData = null;
+/* 136 */     boolean bool1 = true;
+/*     */ 
+/*     */     
+/* 139 */     int k = Integer.parseInt(PokUtils.getAttributeValue(this.rootEntity, "PSUMAX", "", "" + paramArrayOfEntityItem.length, false));
+/*     */     
+/* 141 */     this.abr.addDebug(3, "PSUList.processList: psuMax: " + k);
+/*     */ 
+/*     */     
+/* 144 */     OPICMList oPICMList1 = new OPICMList();
+/* 145 */     OPICMList oPICMList2 = new OPICMList();
+/*     */     
+/* 147 */     Hashtable<Object, Object> hashtable = new Hashtable<>();
+/* 148 */     boolean bool2 = true;
+/*     */ 
+/*     */     
+/* 151 */     for (byte b2 = 0; b2 < paramArrayOfEntityItem.length && this.abr.getReturnCode() == 0; b2++) {
+/* 152 */       EntityItem entityItem = paramArrayOfEntityItem[b2];
+/* 153 */       String str1 = PokUtils.getAttributeValue(entityItem, "PSUENTITYTYPE", "", null, false);
+/* 154 */       String str2 = PokUtils.getAttributeValue(entityItem, "PSUENTITYID", "", null, false);
+/* 155 */       this.abr.addDebug(4, "PSUList.processList[" + b2 + "]: " + entityItem.getKey() + " psuEntityType: " + str1 + " psuEntityId: " + str2);
+/* 156 */       if (str1 == null) {
+/*     */         
+/* 158 */         this.args[0] = entityItem.getEntityGroup().getLongDescription() + ": " + this.abr.getNavigationName(entityItem);
+/* 159 */         this.args[1] = PokUtils.getAttributeDescription(entityItem.getEntityGroup(), "PSUENTITYTYPE", "PSUENTITYTYPE");
+/* 160 */         this.abr.addError("REQ_NOTPOPULATED_ERR", this.args);
+/*     */         
+/*     */         break;
+/*     */       } 
+/* 164 */       int m = 0;
+/*     */       
+/* 166 */       if (str2 == null) {
+/*     */         
+/* 168 */         this.args[0] = entityItem.getEntityGroup().getLongDescription() + ": " + this.abr.getNavigationName(entityItem);
+/* 169 */         this.args[1] = PokUtils.getAttributeDescription(entityItem.getEntityGroup(), "PSUENTITYID", "PSUENTITYID");
+/* 170 */         this.abr.addError("REQ_NOTPOPULATED_ERR", this.args);
+/*     */         
+/*     */         break;
+/*     */       } 
+/*     */       try {
+/* 175 */         m = Integer.parseInt(str2);
+/* 176 */       } catch (NumberFormatException numberFormatException) {
+/*     */         
+/* 178 */         this.args[0] = entityItem.getEntityGroup().getLongDescription() + ": " + this.abr.getNavigationName(entityItem);
+/* 179 */         this.args[1] = this.abr.getLD_Value(entityItem, "PSUENTITYID");
+/* 180 */         this.abr.addError("INVALID_FORMAT_ERR", this.args);
+/*     */ 
+/*     */         
+/*     */         break;
+/*     */       } 
+/*     */       
+/* 186 */       if (!this.abr.wasPreviouslyProcessed(str1, m)) {
+/*     */ 
+/*     */ 
+/*     */         
+/* 190 */         bool2 = false;
+/* 191 */         if (str == null) {
+/* 192 */           str = str1;
+/*     */         }
+/*     */ 
+/*     */         
+/* 196 */         if (!str1.equals(str) || j != m) {
+/*     */           
+/* 198 */           if (oPICMList2.size() + i >= k) {
+/* 199 */             this.abr.addDebug(1, "PSUList.processList:  psuMax: " + k + " updates has been reached, stopping processing");
+/*     */             
+/* 201 */             bool1 = false;
+/*     */             break;
+/*     */           } 
+/* 204 */           if (oPICMList2.size() >= PSUABRSTATUS.UPDATE_SIZE) {
+/* 205 */             i += oPICMList2.size() + b1;
+/* 206 */             if (oPICMList1.size() > 0) {
+/* 207 */               this.abr.getCurrentValues(oPICMList1);
+/* 208 */               oPICMList1.removeAll();
+/*     */             } 
+/* 210 */             hashtable.clear();
+/* 211 */             b1 = 0;
+/* 212 */             this.abr.doUpdates(this.rootEntity, oPICMList2, false);
+/*     */           } 
+/*     */         } 
+/*     */         
+/* 216 */         String str3 = PokUtils.getAttributeFlagValue(entityItem, "PSUCLASS");
+/* 217 */         this.abr.addDebug(4, "PSUList.processList: " + entityItem.getKey() + " psuClass: " + str3);
+/* 218 */         if ("PSUC1".equalsIgnoreCase(str3)) {
+/* 219 */           if (!str1.equals(str) || j != m) {
+/*     */             
+/* 221 */             pSUUpdateData = new PSUUpdateData(this.abr, str1, m);
+/* 222 */             oPICMList2.put(pSUUpdateData);
+/*     */           } 
+/*     */ 
+/*     */           
+/* 226 */           if (!buildListUpdate(entityItem, pSUUpdateData, oPICMList1)) {
+/*     */             break;
+/*     */           }
+/* 229 */         } else if ("PSUC2".equalsIgnoreCase(str3)) {
+/* 230 */           String str4 = PokUtils.getAttributeValue(entityItem, "PSUATTRACTION", "", null, false);
+/* 231 */           String str5 = PokUtils.getAttributeValue(entityItem, "PSURELATORACTION", "", null, false);
+/* 232 */           String str6 = PokUtils.getAttributeValue(entityItem, "PSURELATORTYPE", "", null, false);
+/* 233 */           this.abr.addDebug(4, "PSUList.processList: reference " + entityItem.getKey() + " psuAttrAct: " + str4 + " psuRelAction: " + str5 + " psuRelType: " + str6);
+/*     */ 
+/*     */           
+/* 236 */           if (str5 == null) {
+/*     */             
+/* 238 */             this.args[0] = entityItem.getEntityGroup().getLongDescription() + ": " + this.abr.getNavigationName(entityItem);
+/* 239 */             this.args[1] = PokUtils.getAttributeDescription(entityItem.getEntityGroup(), "PSURELATORACTION", "PSURELATORACTION");
+/* 240 */             this.abr.addError("REQ_NOTPOPULATED_ERR", this.args);
+/*     */             
+/*     */             break;
+/*     */           } 
+/*     */           
+/* 245 */           if ("N".equalsIgnoreCase(str4)) {
+/* 246 */             if (str6 == null) {
+/*     */               
+/* 248 */               this.args[0] = entityItem.getEntityGroup().getLongDescription() + ": " + this.abr.getNavigationName(entityItem);
+/* 249 */               this.args[1] = PokUtils.getAttributeDescription(entityItem.getEntityGroup(), "PSURELATORTYPE", "PSURELATORTYPE");
+/* 250 */               this.abr.addError("REQ_NOTPOPULATED_ERR", this.args);
+/*     */               
+/*     */               break;
+/*     */             } 
+/* 254 */             if (!str1.equals(str) || j != m) {
+/*     */               
+/* 256 */               pSUUpdateData = new PSULinkData(this.abr, str1, m);
+/* 257 */               oPICMList2.put(pSUUpdateData);
+/*     */             } 
+/*     */ 
+/*     */             
+/* 261 */             if (!buildListReference(entityItem, (PSULinkData)pSUUpdateData)) {
+/*     */               break;
+/*     */             }
+/* 264 */           } else if ("D".equalsIgnoreCase(str4)) {
+/*     */ 
+/*     */             
+/* 267 */             pSUUpdateData = (PSUDeleteData)hashtable.get(str1);
+/* 268 */             if (pSUUpdateData == null) {
+/* 269 */               pSUUpdateData = new PSUDeleteData(this.abr, str1);
+/* 270 */               ((PSUDeleteData)pSUUpdateData).addDeleteId(m);
+/* 271 */               ((PSUDeleteData)pSUUpdateData).setActionName(str5);
+/* 272 */               hashtable.put(str1, pSUUpdateData);
+/* 273 */               oPICMList2.put(pSUUpdateData);
+/*     */             } else {
+/* 275 */               ((PSUDeleteData)pSUUpdateData).addDeleteId(m);
+/* 276 */               b1++;
+/*     */             }
+/*     */           
+/*     */           } else {
+/*     */             
+/* 281 */             this.args[0] = entityItem.getEntityGroup().getLongDescription() + ": " + this.abr.getNavigationName(entityItem);
+/* 282 */             if (str4 == null) {
+/* 283 */               this.args[1] = PokUtils.getAttributeDescription(entityItem.getEntityGroup(), "PSUATTRACTION", "PSUATTRACTION");
+/* 284 */               this.abr.addError("REQ_NOTPOPULATED_ERR", this.args); break;
+/*     */             } 
+/* 286 */             this.args[1] = this.abr.getLD_Value(entityItem, "PSUATTRACTION");
+/* 287 */             this.args[2] = "D, N";
+/* 288 */             this.abr.addError("NOTSUPPORTEDLIST_ERR", this.args);
+/*     */ 
+/*     */ 
+/*     */             
+/*     */             break;
+/*     */           } 
+/*     */         } else {
+/* 295 */           this.args[0] = entityItem.getEntityGroup().getLongDescription() + ": " + this.abr.getNavigationName(entityItem);
+/* 296 */           if (str3 == null) {
+/* 297 */             this.args[1] = PokUtils.getAttributeDescription(entityItem.getEntityGroup(), "PSUCLASS", "PSUCLASS");
+/* 298 */             this.abr.addError("REQ_NOTPOPULATED_ERR", this.args); break;
+/*     */           } 
+/* 300 */           this.args[1] = this.abr.getLD_Value(entityItem, "PSUCLASS");
+/* 301 */           this.abr.addError("NOTSUPPORTED_ERR", this.args);
+/*     */           
+/*     */           break;
+/*     */         } 
+/*     */         
+/* 306 */         if (!str1.equals(str)) {
+/*     */           
+/* 308 */           if (oPICMList1.size() > 0) {
+/* 309 */             this.abr.getCurrentValues(oPICMList1);
+/* 310 */             oPICMList1.removeAll();
+/*     */           } 
+/*     */ 
+/*     */           
+/* 314 */           str = str1;
+/* 315 */           j = m;
+/* 316 */         } else if (j != m) {
+/* 317 */           j = m;
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/*     */ 
+/*     */     
+/* 323 */     if (this.abr.getReturnCode() != 0) {
+/* 324 */       while (oPICMList2.size() > 0) {
+/* 325 */         PSUUpdateData pSUUpdateData1 = (PSUUpdateData)oPICMList2.remove(0);
+/* 326 */         pSUUpdateData1.dereference();
+/*     */       } 
+/*     */       
+/* 329 */       oPICMList1.removeAll();
+/* 330 */       hashtable.clear();
+/*     */     } else {
+/* 332 */       if (bool2) {
+/*     */ 
+/*     */         
+/* 335 */         this.abr.addMessage("", "ALLSKIPPED", (Object[])null);
+/* 336 */         bool1 = true;
+/*     */       } 
+/*     */       
+/* 339 */       if (oPICMList2.size() > 0) {
+/*     */         
+/* 341 */         if (oPICMList1.size() > 0) {
+/* 342 */           this.abr.getCurrentValues(oPICMList1);
+/* 343 */           oPICMList1.removeAll();
+/*     */         } 
+/* 345 */         hashtable.clear();
+/*     */       } 
+/*     */       
+/* 348 */       this.abr.doUpdates(this.rootEntity, oPICMList2, bool1);
+/*     */     } 
+/*     */     
+/* 351 */     oPICMList1 = null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private boolean buildListUpdate(EntityItem paramEntityItem, PSUUpdateData paramPSUUpdateData, OPICMList paramOPICMList) throws SQLException, MiddlewareException {
+/* 364 */     boolean bool = true;
+/*     */     
+/* 366 */     String str1 = PokUtils.getAttributeValue(paramEntityItem, "PSUATTRIBUTE", "", null, false);
+/* 367 */     String str2 = PokUtils.getAttributeValue(paramEntityItem, "PSUATTRACTION", "", null, false);
+/* 368 */     String str3 = PokUtils.getAttributeValue(paramEntityItem, "PSUATTRTYPE", "", null, false);
+/* 369 */     String str4 = PokUtils.getAttributeValue(paramEntityItem, "PSUATTRVALUE", "", null, false);
+/* 370 */     this.abr.addDebug(4, "PSUList.buildListUpdate: " + paramEntityItem.getKey() + " psuAttrAction: " + str2 + " psuAttr: " + str1 + " psuAttrType: " + str3 + " psuAttrValue: " + str4);
+/*     */ 
+/*     */ 
+/*     */     
+/* 374 */     if (str1 == null) {
+/*     */       
+/* 376 */       this.args[0] = paramEntityItem.getEntityGroup().getLongDescription() + ": " + this.abr.getNavigationName(paramEntityItem);
+/* 377 */       this.args[1] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "PSUATTRIBUTE", "PSUATTRIBUTE");
+/* 378 */       this.abr.addError("REQ_NOTPOPULATED_ERR", this.args);
+/* 379 */       bool = false;
+/*     */     } 
+/* 381 */     if (str3 == null) {
+/*     */       
+/* 383 */       this.args[0] = paramEntityItem.getEntityGroup().getLongDescription() + ": " + this.abr.getNavigationName(paramEntityItem);
+/* 384 */       this.args[1] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "PSUATTRTYPE", "PSUATTRTYPE");
+/* 385 */       this.abr.addError("REQ_NOTPOPULATED_ERR", this.args);
+/* 386 */       bool = false;
+/*     */     }
+/* 388 */     else if (!str3.equalsIgnoreCase("U") && 
+/* 389 */       !str3.equalsIgnoreCase("A") && 
+/* 390 */       !str3.equalsIgnoreCase("S") && 
+/* 391 */       !str3.equalsIgnoreCase("F") && 
+/* 392 */       !str3.equalsIgnoreCase("T")) {
+/*     */ 
+/*     */       
+/* 395 */       this.args[0] = paramEntityItem.getEntityGroup().getLongDescription() + ": " + this.abr.getNavigationName(paramEntityItem);
+/* 396 */       this.args[1] = this.abr.getLD_Value(paramEntityItem, "PSUATTRTYPE");
+/* 397 */       this.args[2] = "U, A, S, F, T";
+/* 398 */       this.abr.addError("NOTSUPPORTEDLIST_ERR", this.args);
+/* 399 */       bool = false;
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */     
+/* 404 */     if ("N".equalsIgnoreCase(str2)) {
+/* 405 */       if (str4 == null) {
+/*     */         
+/* 407 */         this.args[0] = paramEntityItem.getEntityGroup().getLongDescription() + ": " + this.abr.getNavigationName(paramEntityItem);
+/* 408 */         this.args[1] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "PSUATTRVALUE", "PSUATTRVALUE");
+/* 409 */         this.abr.addError("REQ_NOTPOPULATED_ERR", this.args);
+/* 410 */         bool = false;
+/*     */       } 
+/*     */       
+/* 413 */       if (bool)
+/*     */       {
+/* 415 */         this.abr.setAttribute(str3, paramPSUUpdateData, str1, str4);
+/*     */       }
+/* 417 */     } else if ("D".equalsIgnoreCase(str2)) {
+/*     */       
+/* 419 */       if (bool) {
+/* 420 */         if (str4 == null) {
+/* 421 */           str4 = "temp";
+/*     */         }
+/*     */         
+/* 424 */         this.abr.deactivateAttribute(str3, paramPSUUpdateData, str1, str4);
+/* 425 */         paramOPICMList.put(paramPSUUpdateData);
+/*     */       }
+/*     */     
+/*     */     } else {
+/*     */       
+/* 430 */       this.args[0] = paramEntityItem.getEntityGroup().getLongDescription() + ": " + this.abr.getNavigationName(paramEntityItem);
+/* 431 */       if (str2 == null) {
+/* 432 */         this.args[1] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "PSUATTRACTION", "PSUATTRACTION");
+/* 433 */         this.abr.addError("REQ_NOTPOPULATED_ERR", this.args);
+/*     */       } else {
+/* 435 */         this.args[1] = this.abr.getLD_Value(paramEntityItem, "PSUATTRACTION");
+/* 436 */         this.args[2] = "D, N";
+/* 437 */         this.abr.addError("NOTSUPPORTEDLIST_ERR", this.args);
+/*     */       } 
+/*     */       
+/* 440 */       bool = false;
+/*     */     } 
+/*     */     
+/* 443 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private boolean buildListReference(EntityItem paramEntityItem, PSULinkData paramPSULinkData) throws SQLException, MiddlewareException {
+/* 455 */     boolean bool = true;
+/*     */     
+/* 457 */     String str1 = PokUtils.getAttributeValue(paramEntityItem, "PSUENTITYTYPEREF", "", null, false);
+/* 458 */     String str2 = PokUtils.getAttributeValue(paramEntityItem, "PSUENTITYIDREF", "", null, false);
+/* 459 */     String str3 = PokUtils.getAttributeValue(paramEntityItem, "PSURELATORACTION", "", null, false);
+/* 460 */     String str4 = PokUtils.getAttributeValue(paramEntityItem, "PSUATTRACTION", "", null, false);
+/* 461 */     this.abr.addDebug(4, "PSUList.buildListReference: " + paramEntityItem.getKey() + " psuEntityTypeRef: " + str1 + " psuEntityIdRef: " + str2 + " psuRelatorAct: " + str3 + " psuAttrAct: " + str4);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 466 */     if ("N".equalsIgnoreCase(str4)) {
+/*     */       
+/* 468 */       if (str1 == null) {
+/*     */         
+/* 470 */         this.args[0] = paramEntityItem.getEntityGroup().getLongDescription() + ": " + this.abr.getNavigationName(paramEntityItem);
+/* 471 */         this.args[1] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "PSUENTITYTYPEREF", "PSUENTITYTYPEREF");
+/* 472 */         this.abr.addError("REQ_NOTPOPULATED_ERR", this.args);
+/* 473 */         bool = false;
+/*     */       } 
+/* 475 */       int i = 0;
+/* 476 */       if (str2 == null) {
+/*     */         
+/* 478 */         this.args[0] = paramEntityItem.getEntityGroup().getLongDescription() + ": " + this.abr.getNavigationName(paramEntityItem);
+/* 479 */         this.args[1] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "PSUENTITYIDREF", "PSUENTITYIDREF");
+/* 480 */         this.abr.addError("REQ_NOTPOPULATED_ERR", this.args);
+/* 481 */         bool = false;
+/*     */       } else {
+/*     */         
+/*     */         try {
+/* 485 */           i = Integer.parseInt(str2);
+/* 486 */         } catch (NumberFormatException numberFormatException) {
+/*     */           
+/* 488 */           this.args[0] = paramEntityItem.getEntityGroup().getLongDescription() + ": " + this.abr.getNavigationName(paramEntityItem);
+/* 489 */           this.args[1] = this.abr.getLD_Value(paramEntityItem, "PSUENTITYID");
+/* 490 */           this.abr.addError("INVALID_FORMAT_ERR", this.args);
+/* 491 */           bool = false;
+/*     */         } 
+/*     */       } 
+/*     */       
+/* 495 */       if (bool) {
+/* 496 */         PSUUpdateData pSUUpdateData = paramPSULinkData.addChild(this.abr, str1, i, str3);
+/*     */ 
+/*     */         
+/* 499 */         String str5 = PokUtils.getAttributeValue(paramEntityItem, "PSUATTRIBUTE", "", null, false);
+/* 500 */         String str6 = PokUtils.getAttributeValue(paramEntityItem, "PSUATTRTYPE", "", null, false);
+/* 501 */         String str7 = PokUtils.getAttributeValue(paramEntityItem, "PSUATTRVALUE", "", null, false);
+/* 502 */         String str8 = PokUtils.getAttributeValue(paramEntityItem, "PSUATTRACTION", "", null, false);
+/*     */         
+/* 504 */         this.abr.addDebug(4, "PSUList.buildListReference: " + paramEntityItem.getKey() + " psuAttrAction: " + str8 + " psuAttr: " + str5 + " psuAttrType: " + str6 + " psuAttrValue: " + str7);
+/*     */ 
+/*     */ 
+/*     */         
+/* 508 */         if (str5 != null)
+/*     */         {
+/* 510 */           if (str6 == null) {
+/*     */             
+/* 512 */             this.args[0] = paramEntityItem.getEntityGroup().getLongDescription() + ": " + this.abr.getNavigationName(paramEntityItem);
+/* 513 */             this.args[1] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "PSUATTRTYPE", "PSUATTRTYPE");
+/* 514 */             this.abr.addError("REQ_NOTPOPULATED_ERR", this.args);
+/* 515 */             bool = false;
+/*     */           }
+/* 517 */           else if (!str6.equalsIgnoreCase("U") && 
+/* 518 */             !str6.equalsIgnoreCase("A") && 
+/* 519 */             !str6.equalsIgnoreCase("S") && 
+/* 520 */             !str6.equalsIgnoreCase("F") && 
+/* 521 */             !str6.equalsIgnoreCase("T")) {
+/*     */ 
+/*     */             
+/* 524 */             this.args[0] = paramEntityItem.getEntityGroup().getLongDescription() + ": " + this.abr.getNavigationName(paramEntityItem);
+/* 525 */             this.args[1] = this.abr.getLD_Value(paramEntityItem, "PSUATTRTYPE");
+/* 526 */             this.args[2] = "U, A, S, F, T";
+/* 527 */             this.abr.addError("NOTSUPPORTEDLIST_ERR", this.args);
+/* 528 */             bool = false;
+/*     */           } 
+/*     */           
+/* 531 */           if (str7 == null) {
+/*     */             
+/* 533 */             this.args[0] = paramEntityItem.getEntityGroup().getLongDescription() + ": " + this.abr.getNavigationName(paramEntityItem);
+/* 534 */             this.args[1] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "PSUATTRVALUE", "PSUATTRVALUE");
+/* 535 */             this.abr.addError("REQ_NOTPOPULATED_ERR", this.args);
+/* 536 */             bool = false;
+/*     */           } 
+/*     */           
+/* 539 */           if (bool) {
+/* 540 */             this.abr.setAttribute(str6, pSUUpdateData, str5, str7);
+/*     */           }
+/*     */         }
+/*     */       
+/*     */       } 
+/* 545 */     } else if ("D".equalsIgnoreCase(str4)) {
+/*     */     
+/*     */     } 
+/*     */ 
+/*     */     
+/* 550 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   void dereference() {
+/* 557 */     this.abr = null;
+/* 558 */     this.rootEntity = null;
+/* 559 */     this.args = null;
+/*     */   }
+/*     */ }
 
-//(C) Copyright IBM Corp. 2013  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-package COM.ibm.eannounce.abr.sg.psu;
-  
-import java.rmi.RemoteException;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Hashtable;
 
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-import COM.ibm.eannounce.abr.util.PokBaseABR;
-import COM.ibm.eannounce.objects.EANBusinessRuleException;
-import COM.ibm.eannounce.objects.EntityGroup;
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.eannounce.objects.WorkflowException;
-import COM.ibm.opicmpdh.middleware.D;
-import COM.ibm.opicmpdh.middleware.LockException;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
-import COM.ibm.opicmpdh.transactions.OPICMList;
-  
-/**
- * PSUCRITERIA=List, get all PDHUPDATEACT and sort them and process any not previously handled
- * 	LIST – the children specify everything required to define the update. There may be one more children 
- * of entity type “PDH Update Action” (PDHUPDATEACT). 
- * The list will support PSUCLASS IN {Update | Reference}.
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\psu\PSUList.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-//$Log: PSUList.java,v $
-//Revision 1.1  2013/04/19 19:28:43  wendy
-//Add PSUABRSTATUS
-//
-class PSUList {
-	private static final String ID_PAD="000000000000";
-	private PSUABRSTATUS abr;
-	private EntityItem rootEntity;
-	private Object[] args = new String[3];
- 
-	/**
-	 * @param psu
-	 * @param ei
-	 */
-	PSUList(PSUABRSTATUS psu,EntityItem ei){
-		abr = psu;
-		rootEntity = ei;
-	}
-
-	/**
-	 * execute -
-	 * 
-	 * @param psuUpdateActGrp
-	 * @return
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws WorkflowException 
-	 * @throws LockException 
-	 * @throws EANBusinessRuleException 
-	 * @throws MiddlewareShutdownInProgressException 
-	 * @throws RemoteException 
-	 */
-	void execute(EntityGroup psuUpdateActGrp) throws SQLException, MiddlewareException, 
-	RemoteException, MiddlewareShutdownInProgressException, EANBusinessRuleException, 
-	LockException, WorkflowException 
-	{
-		EntityItem[] children = psuUpdateActGrp.getEntityItemsAsArray();
-
-		if(children.length==0){
-			//LIST_NO_CHILDREN_ERR = {0} Does not have any {1}.
-			args[0] = abr.getLD_Value(rootEntity, "PSUCRITERIA");
-			args[1] = psuUpdateActGrp.getLongDescription();
-			abr.addError("LIST_NO_CHILDREN_ERR",args);
-			return;
-		}
-
-		//The LIST will be sorted (ordered by) in ascending order by Entity Type and Entity ID.
-		Arrays.sort(children, new java.util.Comparator(){
-			public int compare(Object o1, Object o2) {
-				EntityItem ei1 = (EntityItem)o1;
-				EntityItem ei2 = (EntityItem)o2;
-				String psu1 = getSortKey(ei1);
-				String psu2 = getSortKey(ei2);
-				return psu1.compareToIgnoreCase(psu2);
-			}
-		});
-
-		processList(children);
-	}
-	
-	/**
-	 * get key for sorting
-	 * @param ei
-	 * @return
-	 */
-	private String getSortKey(EntityItem ei){
-		// root type and id are main sort key because they are used for psuhighentitytype and highentityid
-		// sort key is roottype+rootid+attraction - update or reference will have a value in attraction
-		StringBuffer sb = new StringBuffer(PokUtils.getAttributeValue(ei, "PSUENTITYTYPE", "", "", false));
-		// id 1267883 ends up before 83468 - must pad id
-		String id = PokUtils.getAttributeValue(ei, "PSUENTITYID", "", "", false);
-		if(id.length()<ID_PAD.length()){
-			id=ID_PAD.substring(0, ID_PAD.length()-id.length())+id;
-		}
-		sb.append(id);
-		sb.append(PokUtils.getAttributeValue(ei, "PSUCLASS", "", "", false)); // update or reference
-		sb.append(PokUtils.getAttributeValue(ei, "PSUATTRACTION", "", "", false)); // new or delete
-		sb.append(PokUtils.getAttributeValue(ei, "PSUATTRIBUTE", "", "", false)); // may not have a value
-		
-		return sb.toString();
-	}
-
-	/**
-	 *  build updates - there may be multiple PDHUPDATEACT for one entity
-	 * any previously handled types and ids are dropped
-	 * 
-	 * @param children
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws RemoteException
-	 * @throws MiddlewareShutdownInProgressException
-	 * @throws EANBusinessRuleException
-	 * @throws LockException
-	 * @throws WorkflowException
-	 */
-	private void processList(EntityItem[] children) throws SQLException, MiddlewareException, 
-	RemoteException, MiddlewareShutdownInProgressException, EANBusinessRuleException, 
-	LockException, WorkflowException 
-	{
-		int totalProcessed = 0;
-		int deletedRelCnt = 0;
-		String prevType = null;
-		int prevId = -1;
-		PSUUpdateData currPSUdata=null;
-		boolean allProcessed = true;
-
-		// this is the total number to process in one execution of this abr
-		int psuMax = Integer.parseInt(PokUtils.getAttributeValue(rootEntity, "PSUMAX", "", ""+children.length, false));
-
-		abr.addDebug(D.EBUG_DETAIL,"PSUList.processList: psuMax: "+psuMax);
-
-		// build all list actions - there may be multiple PDHUPDATEACT for one entity
-		OPICMList needValueList = new OPICMList();
-		OPICMList psuUpdateList = new OPICMList();
-		
-		Hashtable delRelTbl = new Hashtable(); // entitytype is key, value is PSUUnLinkData
-		boolean allSkipped = true;
-
-		// children are in sorted order
-		for(int i=0; i<children.length && abr.getReturnCode()==PokBaseABR.PASS; i++){
-			EntityItem item = children[i];
-			String psuEntityType = PokUtils.getAttributeValue(item, "PSUENTITYTYPE", "", null, false);
-			String psuEntityIdStr = PokUtils.getAttributeValue(item, "PSUENTITYID", "", null, false);
-			abr.addDebug(D.EBUG_SPEW,"PSUList.processList["+i+"]: "+item.getKey()+" psuEntityType: "+psuEntityType+" psuEntityId: "+psuEntityIdStr);
-			if(psuEntityType==null){
-				//REQ_NOTPOPULATED_ERR = {0} {1} is required and does not have a value.
-				args[0] = item.getEntityGroup().getLongDescription()+": "+abr.getNavigationName(item);
-				args[1] = PokUtils.getAttributeDescription(item.getEntityGroup(), "PSUENTITYTYPE", "PSUENTITYTYPE");
-				abr.addError("REQ_NOTPOPULATED_ERR",args);
-				break;
-			}
-			
-			int psuEntityId = 0;
-			
-			if(psuEntityIdStr==null){
-				//REQ_NOTPOPULATED_ERR = {0} {1} is required and does not have a value.
-				args[0] = item.getEntityGroup().getLongDescription()+": "+abr.getNavigationName(item);
-				args[1] = PokUtils.getAttributeDescription(item.getEntityGroup(), "PSUENTITYID", "PSUENTITYID");
-				abr.addError("REQ_NOTPOPULATED_ERR",args);
-				break;
-			}else{
-				// make sure it is all digits
-				try{
-					psuEntityId = Integer.parseInt(psuEntityIdStr);
-				}catch(NumberFormatException nfe){
-					//INVALID_FORMAT_ERR = {0} {1} is invalid.
-					args[0] = item.getEntityGroup().getLongDescription()+": "+abr.getNavigationName(item);
-					args[1] = abr.getLD_Value(item, "PSUENTITYID");
-					abr.addError("INVALID_FORMAT_ERR",args);
-					break;
-				}
-			}
-
-			// check to see if these types and ids were already processed in a previous execution of the abr
-			if(abr.wasPreviouslyProcessed(psuEntityType, psuEntityId)){
-				continue;
-			}
-
-			allSkipped=false;
-			if(prevType==null){
-				prevType = psuEntityType; // init this so neededvalues will accumulate more than 1 first time thru
-			}
-			
-			// type or id has changed, check max
-			if(!psuEntityType.equals(prevType) || prevId!=psuEntityId){
-				// have the max items to process been reached
-				if((psuUpdateList.size()+totalProcessed)>=psuMax){
-					abr.addDebug(D.EBUG_WARN,"PSUList.processList:  psuMax: "+psuMax+
-					" updates has been reached, stopping processing");
-					allProcessed = false;
-					break;
-				}
-				if(psuUpdateList.size()>=PSUABRSTATUS.UPDATE_SIZE){
-					totalProcessed += psuUpdateList.size()+deletedRelCnt;
-					if(needValueList.size()>0){
-						abr.getCurrentValues(needValueList);
-						needValueList.removeAll();
-					}
-					delRelTbl.clear();
-					deletedRelCnt = 0;
-					abr.doUpdates(rootEntity,psuUpdateList,false);
-				}
-			}
-			// verify values needed are filled in
-			String psuClass = PokUtils.getAttributeFlagValue(item, "PSUCLASS");
-			abr.addDebug(D.EBUG_SPEW,"PSUList.processList: "+item.getKey()+" psuClass: "+psuClass);
-			if(PSUABRSTATUS.PSUCLASS_Update.equalsIgnoreCase(psuClass)){
-				if(!psuEntityType.equals(prevType) || prevId!=psuEntityId){
-					// create a PSUUpdateData to hold info
-					currPSUdata = new PSUUpdateData(abr,psuEntityType,psuEntityId);
-					psuUpdateList.put(currPSUdata);
-				}
-
-				// this is an update action for an attribute
-				if(!buildListUpdate(item,currPSUdata,needValueList)){
-					break;
-				}
-			}else if(PSUABRSTATUS.PSUCLASS_Reference.equalsIgnoreCase(psuClass)){
-				String psuAttrAct = PokUtils.getAttributeValue(item, "PSUATTRACTION", "", null, false);
-				String psuRelAction = PokUtils.getAttributeValue(item, "PSURELATORACTION", "", null, false);
-				String psuRelType = PokUtils.getAttributeValue(item, "PSURELATORTYPE", "", null, false);
-				abr.addDebug(D.EBUG_SPEW,"PSUList.processList: reference "+item.getKey()+
-						" psuAttrAct: "+psuAttrAct+" psuRelAction: "+psuRelAction+" psuRelType: "+psuRelType);
-				
-				if(psuRelAction==null){
-					//REQ_NOTPOPULATED_ERR = {0} {1} is required and does not have a value.
-					args[0] = item.getEntityGroup().getLongDescription()+": "+abr.getNavigationName(item);
-					args[1] = PokUtils.getAttributeDescription(item.getEntityGroup(), "PSURELATORACTION", "PSURELATORACTION");
-					abr.addError("REQ_NOTPOPULATED_ERR",args);
-					break;
-				}
-
-				// create relator needs type1, id1, type2, id2 and linkaction
-				if(PSUABRSTATUS.PSUATTRACTION_N.equalsIgnoreCase(psuAttrAct)){
-					if(psuRelType==null){ // needed to validate meta on the relatot
-						//REQ_NOTPOPULATED_ERR = {0} {1} is required and does not have a value.
-						args[0] = item.getEntityGroup().getLongDescription()+": "+abr.getNavigationName(item);
-						args[1] = PokUtils.getAttributeDescription(item.getEntityGroup(), "PSURELATORTYPE", "PSURELATORTYPE");
-						abr.addError("REQ_NOTPOPULATED_ERR",args);
-						break;
-					}
-					//if parent changed
-					if(!psuEntityType.equals(prevType) || prevId!=psuEntityId){
-						// create a PSULinkData to hold info - this is the parent or root
-						currPSUdata = new PSULinkData(abr,psuEntityType,psuEntityId);
-						psuUpdateList.put(currPSUdata);
-					}
-
-					// this is a reference action
-					if(!buildListReference(item,(PSULinkData)currPSUdata)){
-						break;
-					}
-				} else if(PSUABRSTATUS.PSUATTRACTION_D.equalsIgnoreCase(psuAttrAct)){
-					//must get deleterelator action, relator type and relator id
-					// group all of the same entitytype
-					currPSUdata = (PSUDeleteData)delRelTbl.get(psuEntityType);
-					if(currPSUdata==null){
-						currPSUdata = new PSUDeleteData(abr,psuEntityType);
-						((PSUDeleteData)currPSUdata).addDeleteId(psuEntityId);
-						((PSUDeleteData)currPSUdata).setActionName(psuRelAction);
-						delRelTbl.put(psuEntityType,currPSUdata);
-						psuUpdateList.put(currPSUdata);
-					}else{
-						((PSUDeleteData)currPSUdata).addDeleteId(psuEntityId);
-						deletedRelCnt++;
-					}
-				}else{
-					//REQ_NOTPOPULATED_ERR = {0} {1} is required and does not have a value.
-					//NOTSUPPORTEDLIST_ERR = {0} {1} is not supported. Only {2} are supported when Criteria is List
-					args[0] = item.getEntityGroup().getLongDescription()+": "+abr.getNavigationName(item);
-					if(psuAttrAct==null){
-						args[1] = PokUtils.getAttributeDescription(item.getEntityGroup(), "PSUATTRACTION", "PSUATTRACTION");
-						abr.addError("REQ_NOTPOPULATED_ERR",args);
-					}else{
-						args[1] = abr.getLD_Value(item, "PSUATTRACTION");
-						args[2] = PSUABRSTATUS.PSUATTRACTION_D+", "+PSUABRSTATUS.PSUATTRACTION_N;
-						abr.addError("NOTSUPPORTEDLIST_ERR",args);
-					}
-					break;
-				}
-			}else{
-				//REQ_NOTPOPULATED_ERR = {0} {1} is required and does not have a value.
-				//NOTSUPPORTED_ERR = {0} {1} is not supported.
-				args[0] = item.getEntityGroup().getLongDescription()+": "+abr.getNavigationName(item);
-				if(psuClass==null){
-					args[1] = PokUtils.getAttributeDescription(item.getEntityGroup(), "PSUCLASS", "PSUCLASS");
-					abr.addError("REQ_NOTPOPULATED_ERR",args);
-				}else{
-					args[1] = abr.getLD_Value(item, "PSUCLASS");
-					abr.addError("NOTSUPPORTED_ERR",args);
-				}
-				break;
-			}
-
-			if(!psuEntityType.equals(prevType)){
-				//get any current attribute values before switching types, pull all at once
-				if(needValueList.size()>0){
-					abr.getCurrentValues(needValueList);
-					needValueList.removeAll();
-				}
-
-				// entity type changed
-				prevType = psuEntityType;
-				prevId=psuEntityId;
-			}else if(prevId!=psuEntityId){
-				prevId=psuEntityId;
-				// entity id changed
-			}
-		}
-
-		// if there were errors, clear the update vct
-		if(abr.getReturnCode()!= PokBaseABR.PASS){
-			while(psuUpdateList.size()>0){
-				PSUUpdateData psu = (PSUUpdateData)psuUpdateList.remove(0);
-				psu.dereference();
-			}
-
-			needValueList.removeAll();
-			delRelTbl.clear();
-		}else{
-			if(allSkipped){
-				// tell user nothing was done
-				//ALLSKIPPED = No data found to process.
-				abr.addMessage("","ALLSKIPPED",null);
-				allProcessed = true;
-			}
-			
-			if(psuUpdateList.size()>0){
-				// last type needs to be handled, pull all at once
-				if(needValueList.size()>0){
-					abr.getCurrentValues(needValueList);
-					needValueList.removeAll();
-				}
-				delRelTbl.clear();
-			}
-			
-			abr.doUpdates(rootEntity,psuUpdateList,allProcessed);
-		}
-
-		needValueList = null;
-	}
-	/**
-	 * this is a list update request, make sure all attributes have a value and fill in the psudata info
-	 * @param item
-	 * @param currPSUdata
-	 * @param needValueList - must get the current attr value for these
-	 * @return true if no errors
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	private boolean buildListUpdate(EntityItem item,PSUUpdateData currPSUdata,
-			OPICMList needValueList) throws SQLException, MiddlewareException{
-		boolean isok = true;
-		
-		String psuAttr = PokUtils.getAttributeValue(item, "PSUATTRIBUTE", "", null, false);
-		String psuAttrAction = PokUtils.getAttributeValue(item, "PSUATTRACTION", "", null, false);
-		String psuAttrType = PokUtils.getAttributeValue(item, "PSUATTRTYPE", "", null, false);
-		String psuAttrValue = PokUtils.getAttributeValue(item, "PSUATTRVALUE", "", null, false);
-		abr.addDebug(D.EBUG_SPEW,"PSUList.buildListUpdate: "+item.getKey()+
-				" psuAttrAction: "+psuAttrAction+" psuAttr: "+psuAttr+" psuAttrType: "+psuAttrType+
-				" psuAttrValue: "+psuAttrValue);
-
-		if(psuAttr==null){
-			//REQ_NOTPOPULATED_ERR = {0} {1} is required and does not have a value.
-			args[0] = item.getEntityGroup().getLongDescription()+": "+abr.getNavigationName(item);
-			args[1] = PokUtils.getAttributeDescription(item.getEntityGroup(), "PSUATTRIBUTE", "PSUATTRIBUTE");
-			abr.addError("REQ_NOTPOPULATED_ERR",args);
-			isok = false;
-		}
-		if(psuAttrType==null){
-			//REQ_NOTPOPULATED_ERR = {0} {1} is required and does not have a value.
-			args[0] = item.getEntityGroup().getLongDescription()+": "+abr.getNavigationName(item);
-			args[1] = PokUtils.getAttributeDescription(item.getEntityGroup(), "PSUATTRTYPE", "PSUATTRTYPE");
-			abr.addError("REQ_NOTPOPULATED_ERR",args);
-			isok = false;
-		}else {
-			if(psuAttrType.equalsIgnoreCase("U") ||
-					psuAttrType.equalsIgnoreCase("A") ||
-					psuAttrType.equalsIgnoreCase("S") ||
-					psuAttrType.equalsIgnoreCase("F") ||
-					psuAttrType.equalsIgnoreCase("T")){}
-			else{
-				//NOTSUPPORTEDLIST_ERR = {0} {1} is not supported. Only {2} are supported when Criteria is List
-				args[0] = item.getEntityGroup().getLongDescription()+": "+abr.getNavigationName(item);
-				args[1] = abr.getLD_Value(item, "PSUATTRTYPE");
-				args[2] = "U, A, S, F, T";
-				abr.addError("NOTSUPPORTEDLIST_ERR",args);
-				isok=false;
-			}
-		}
-
-		// this is set action
-		if(PSUABRSTATUS.PSUATTRACTION_N.equalsIgnoreCase(psuAttrAction)){
-			if(psuAttrValue==null){
-				//REQ_NOTPOPULATED_ERR = {0} {1} is required and does not have a value.
-				args[0] = item.getEntityGroup().getLongDescription()+": "+abr.getNavigationName(item);
-				args[1] = PokUtils.getAttributeDescription(item.getEntityGroup(), "PSUATTRVALUE", "PSUATTRVALUE");
-				abr.addError("REQ_NOTPOPULATED_ERR",args);
-				isok = false;
-			} 
-
-			if (isok){
-				//add this attribute to the PSUUpdateData - must get currentvalue for a deactivate, get all at once later
-				abr.setAttribute(psuAttrType,currPSUdata,psuAttr,psuAttrValue);
-			}
-		}else if(PSUABRSTATUS.PSUATTRACTION_D.equalsIgnoreCase(psuAttrAction)){
-			// this is a deactivate
-			if(isok){
-				if(psuAttrValue==null){
-					psuAttrValue="temp";
-				}
-				//add this attribute to the PSUUpdateData - must get currentvalue for a deactivate, get all at once later
-				abr.deactivateAttribute(psuAttrType,currPSUdata,psuAttr,psuAttrValue);	
-				needValueList.put(currPSUdata);
-			}
-		}else{
-			//REQ_NOTPOPULATED_ERR = {0} {1} is required and does not have a value.
-			//NOTSUPPORTEDLIST_ERR = {0} {1} is not supported. Only {2} are supported when Criteria is List
-			args[0] = item.getEntityGroup().getLongDescription()+": "+abr.getNavigationName(item);
-			if(psuAttrAction==null){
-				args[1] = PokUtils.getAttributeDescription(item.getEntityGroup(), "PSUATTRACTION", "PSUATTRACTION");
-				abr.addError("REQ_NOTPOPULATED_ERR",args);
-			}else{
-				args[1] = abr.getLD_Value(item, "PSUATTRACTION");
-				args[2] = PSUABRSTATUS.PSUATTRACTION_D+", "+PSUABRSTATUS.PSUATTRACTION_N;
-				abr.addError("NOTSUPPORTEDLIST_ERR",args);
-			}
-
-			isok = false;
-		}
-
-		return isok;
-	}
-
-	/**
-	 * this is a list reference request, make sure all attributes have a value
-	 * @param item
-	 * @param psuData
-	 * @return
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	private boolean buildListReference(EntityItem item,PSULinkData psuData) throws SQLException, MiddlewareException{
-		boolean isok = true;
-
-		String psuEntityTypeRef = PokUtils.getAttributeValue(item, "PSUENTITYTYPEREF", "", null, false);
-		String psuEntityIdRef = PokUtils.getAttributeValue(item, "PSUENTITYIDREF", "", null, false);
-		String psuRelatorAct = PokUtils.getAttributeValue(item, "PSURELATORACTION", "", null, false);
-		String psuAttrAct = PokUtils.getAttributeValue(item, "PSUATTRACTION", "", null, false);
-		abr.addDebug(D.EBUG_SPEW,"PSUList.buildListReference: "+item.getKey()+" psuEntityTypeRef: "+psuEntityTypeRef+
-				" psuEntityIdRef: "+psuEntityIdRef+" psuRelatorAct: "+psuRelatorAct+
-				" psuAttrAct: "+psuAttrAct);
-
-		// create relator needs type1, id1, type2, id2 and linkaction
-		if(PSUABRSTATUS.PSUATTRACTION_N.equalsIgnoreCase(psuAttrAct)){
-			// this is a new relator request
-			if(psuEntityTypeRef==null){
-				//REQ_NOTPOPULATED_ERR = {0} {1} is required and does not have a value.
-				args[0] = item.getEntityGroup().getLongDescription()+": "+abr.getNavigationName(item);
-				args[1] = PokUtils.getAttributeDescription(item.getEntityGroup(), "PSUENTITYTYPEREF", "PSUENTITYTYPEREF");
-				abr.addError("REQ_NOTPOPULATED_ERR",args);
-				isok = false;
-			}
-			int psuEntityIdRefint = 0;
-			if(psuEntityIdRef==null){
-				//REQ_NOTPOPULATED_ERR = {0} {1} is required and does not have a value.
-				args[0] = item.getEntityGroup().getLongDescription()+": "+abr.getNavigationName(item);
-				args[1] = PokUtils.getAttributeDescription(item.getEntityGroup(), "PSUENTITYIDREF", "PSUENTITYIDREF");
-				abr.addError("REQ_NOTPOPULATED_ERR",args);
-				isok = false;
-			}else{
-				// make sure it is all digits
-				try{
-					psuEntityIdRefint = Integer.parseInt(psuEntityIdRef);
-				}catch(NumberFormatException nfe){
-					//INVALID_FORMAT_ERR = {0} {1} is invalid.
-					args[0] = item.getEntityGroup().getLongDescription()+": "+abr.getNavigationName(item);
-					args[1] = abr.getLD_Value(item, "PSUENTITYID");
-					abr.addError("INVALID_FORMAT_ERR",args);
-					isok=false;
-				}
-			}
-
-			if(isok){
-				PSUUpdateData childData = psuData.addChild(abr,psuEntityTypeRef, psuEntityIdRefint,psuRelatorAct);
-
-				// are these on the relator only - if so they are optional, but if attribute is specified, rest must be
-				String psuAttr = PokUtils.getAttributeValue(item, "PSUATTRIBUTE", "", null, false);
-				String psuAttrType = PokUtils.getAttributeValue(item, "PSUATTRTYPE", "", null, false);
-				String psuAttrValue = PokUtils.getAttributeValue(item, "PSUATTRVALUE", "", null, false);
-				String psuAttrAction = PokUtils.getAttributeValue(item, "PSUATTRACTION", "", null, false);
-
-				abr.addDebug(D.EBUG_SPEW,"PSUList.buildListReference: "+item.getKey()+
-						" psuAttrAction: "+psuAttrAction+" psuAttr: "+psuAttr+" psuAttrType: "+psuAttrType+
-						" psuAttrValue: "+psuAttrValue);
-
-				if(psuAttr!=null){
-					// then the rest must have a value
-					if(psuAttrType==null){
-						//REQ_NOTPOPULATED_ERR = {0} {1} is required and does not have a value.
-						args[0] = item.getEntityGroup().getLongDescription()+": "+abr.getNavigationName(item);
-						args[1] = PokUtils.getAttributeDescription(item.getEntityGroup(), "PSUATTRTYPE", "PSUATTRTYPE");
-						abr.addError("REQ_NOTPOPULATED_ERR",args);
-						isok = false;
-					}else{
-						if(psuAttrType.equalsIgnoreCase("U") ||
-								psuAttrType.equalsIgnoreCase("A") ||
-								psuAttrType.equalsIgnoreCase("S") ||
-								psuAttrType.equalsIgnoreCase("F") ||
-								psuAttrType.equalsIgnoreCase("T")){}
-						else{
-							//NOTSUPPORTEDLIST_ERR = {0} {1} is not supported. Only {2} are supported when Criteria is List
-							args[0] = item.getEntityGroup().getLongDescription()+": "+abr.getNavigationName(item);
-							args[1] = abr.getLD_Value(item, "PSUATTRTYPE");
-							args[2] = "U, A, S, F, T";
-							abr.addError("NOTSUPPORTEDLIST_ERR",args);
-							isok=false;
-						}
-					}
-					if(psuAttrValue==null){
-						//REQ_NOTPOPULATED_ERR = {0} {1} is required and does not have a value.
-						args[0] = item.getEntityGroup().getLongDescription()+": "+abr.getNavigationName(item);
-						args[1] = PokUtils.getAttributeDescription(item.getEntityGroup(), "PSUATTRVALUE", "PSUATTRVALUE");
-						abr.addError("REQ_NOTPOPULATED_ERR",args);
-						isok = false;
-					} 
-	
-					if(isok){
-						abr.setAttribute(psuAttrType,childData,psuAttr,psuAttrValue);
-					}
-				}
-			}
-		}//end new relator
-		else if(PSUABRSTATUS.PSUATTRACTION_D.equalsIgnoreCase(psuAttrAct)){
-			//get deleterelator action, relator type and relator id
-
-		}
-
-		return isok;
-	}
-
-	/**
-	 * release memory
-	 */
-	void dereference(){
-		abr = null;
-		rootEntity  = null;
-		args = null;
-	}
-}

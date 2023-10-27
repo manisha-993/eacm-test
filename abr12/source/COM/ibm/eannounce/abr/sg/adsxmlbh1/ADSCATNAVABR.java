@@ -1,205 +1,211 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.abr.sg.adsxmlbh1;
+/*     */ package COM.ibm.eannounce.abr.sg.adsxmlbh1;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.XMLActivityElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLChgSetElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLCtryImgElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLGroupElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLMultiFlagElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLNLSElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLNotificationElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLVMElem;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class ADSCATNAVABR
+/*     */   extends XMLMQRoot
+/*     */ {
+/*  58 */   private static final XMLElem XMLMAP = (XMLElem)new XMLGroupElem("CATNAV_UPDATE"); static {
+/*  59 */     XMLMAP.addChild((XMLElem)new XMLVMElem("CATNAV_UPDATE", "1"));
+/*     */     
+/*  61 */     XMLMAP.addChild(new XMLElem("PDHDOMAIN", "PDHDOMAIN"));
+/*  62 */     XMLMAP.addChild((XMLElem)new XMLNotificationElem("DTSOFMSG"));
+/*  63 */     XMLMAP.addChild((XMLElem)new XMLActivityElem("ACTIVITY"));
+/*  64 */     XMLMAP.addChild(new XMLElem("ENTITYTYPE", "ENTITYTYPE"));
+/*  65 */     XMLMAP.addChild(new XMLElem("ENTITYID", "ENTITYID"));
+/*  66 */     XMLMAP.addChild(new XMLElem("TYPE", "CATNAVTYPE"));
+/*  67 */     XMLMAP.addChild(new XMLElem("STATUS", "STATUS", 1));
+/*     */     
+/*  69 */     XMLMAP.addChild(new XMLElem("PUBLISH", "CATPUBLISH"));
+/*  70 */     XMLMAP.addChild(new XMLElem("CATBR", "CATBR"));
+/*  71 */     XMLMAP.addChild(new XMLElem("CATNAME", "CATNAME"));
+/*     */     
+/*  73 */     XMLElem xMLElem4 = new XMLElem("PROJECTLIST");
+/*  74 */     XMLMAP.addChild(xMLElem4);
+/*  75 */     XMLChgSetElem xMLChgSetElem = new XMLChgSetElem("PROJECTELEMENT");
+/*  76 */     xMLElem4.addChild((XMLElem)xMLChgSetElem);
+/*  77 */     xMLChgSetElem.addChild((XMLElem)new XMLMultiFlagElem("PROJECT", "PROJCDNAMF", "PROJECTACTIVITY", 1));
+/*     */ 
+/*     */     
+/*  80 */     xMLElem4 = new XMLElem("COUNTRYLIST");
+/*  81 */     XMLMAP.addChild(xMLElem4);
+/*  82 */     xMLElem4.addChild((XMLElem)new XMLCtryImgElem());
+/*     */     
+/*  84 */     xMLElem4 = new XMLElem("LANGUAGELIST");
+/*  85 */     XMLMAP.addChild(xMLElem4);
+/*     */     
+/*  87 */     XMLNLSElem xMLNLSElem = new XMLNLSElem("LANGUAGEELEMENT");
+/*  88 */     xMLElem4.addChild((XMLElem)xMLNLSElem);
+/*     */     
+/*  90 */     xMLNLSElem.addChild(new XMLElem("NLSID", "NLSID"));
+/*  91 */     xMLNLSElem.addChild(new XMLElem("CATFMLY", "CATFMLY"));
+/*  92 */     xMLNLSElem.addChild(new XMLElem("CATSER", "CATSER"));
+/*  93 */     xMLNLSElem.addChild(new XMLElem("CATOPTGRPNAM", "CATOPTGRPNAM"));
+/*  94 */     xMLNLSElem.addChild(new XMLElem("CATNAME", "CATNAME"));
+/*  95 */     xMLNLSElem.addChild(new XMLElem("CATNAVL1", "CATNAVL1"));
+/*  96 */     xMLNLSElem.addChild(new XMLElem("CATNAVL2", "CATNAVL2"));
+/*  97 */     xMLNLSElem.addChild(new XMLElem("CATNAVL3", "CATNAVL3"));
+/*  98 */     xMLNLSElem.addChild(new XMLElem("CATNAVL4", "CATNAVL4"));
+/*  99 */     xMLNLSElem.addChild(new XMLElem("PRICEDISCLAIMER", "PRICEDISCLAIMER"));
+/* 100 */     xMLNLSElem.addChild(new XMLElem("IMAGEDISCLAIMER", "IMGDISCLAIMER"));
+/* 101 */     xMLNLSElem.addChild(new XMLElem("FEATUREBENEFIT", "FBSTMT"));
+/* 102 */     xMLNLSElem.addChild(new XMLElem("FAMILYDESCOVERRIDE", "CATFMLYDESC"));
+/* 103 */     xMLNLSElem.addChild(new XMLElem("SERIESDESCOVERRIDE", "CATSERDESC"));
+/* 104 */     xMLNLSElem.addChild(new XMLElem("SERIESHEADING", "CATSERHEAD"));
+/* 105 */     xMLNLSElem.addChild(new XMLElem("LONGMKTGMSG", "LONGMKTGMSG"));
+/*     */     
+/* 107 */     xMLElem4 = new XMLElem("CATAUDIENCELIST");
+/* 108 */     XMLMAP.addChild(xMLElem4);
+/* 109 */     xMLChgSetElem = new XMLChgSetElem("CATAUDIENCEELEMENT");
+/* 110 */     xMLElem4.addChild((XMLElem)xMLChgSetElem);
+/* 111 */     xMLChgSetElem.addChild((XMLElem)new XMLMultiFlagElem("CATAUDIENCE", "CATAUDIENCE", "ACTIVITY", 0));
+/*     */     
+/* 113 */     XMLGroupElem xMLGroupElem3 = new XMLGroupElem("CATDETAILSLIST", "CATGROUP");
+/* 114 */     XMLMAP.addChild((XMLElem)xMLGroupElem3);
+/* 115 */     XMLElem xMLElem5 = new XMLElem("CATDETAILSELEMENT");
+/* 116 */     xMLGroupElem3.addChild(xMLElem5);
+/* 117 */     xMLElem5.addChild((XMLElem)new XMLActivityElem("ACTIVITY"));
+/* 118 */     xMLElem5.addChild(new XMLElem("ENTITYID", "ENTITYID"));
+/* 119 */     xMLElem5.addChild(new XMLElem("CATSEQ", "CATSEQ"));
+/* 120 */     XMLElem xMLElem3 = new XMLElem("CATDESCLIST");
+/* 121 */     xMLElem5.addChild(xMLElem3);
+/*     */     
+/* 123 */     xMLNLSElem = new XMLNLSElem("CATDESCELEMENT");
+/* 124 */     xMLElem3.addChild((XMLElem)xMLNLSElem);
+/*     */     
+/* 126 */     xMLNLSElem.addChild((XMLElem)new XMLActivityElem("ACTIVITY"));
+/* 127 */     xMLNLSElem.addChild(new XMLElem("NLSID", "NLSID"));
+/* 128 */     xMLNLSElem.addChild(new XMLElem("GROUPDESCRIPTION", "GROUPDESCRIPTION"));
+/*     */     
+/* 130 */     XMLGroupElem xMLGroupElem2 = new XMLGroupElem("CATATTRLIST", "CATATTR", "D:CATGROUPATTR:D", true);
+/*     */     
+/* 132 */     xMLElem5.addChild((XMLElem)xMLGroupElem2);
+/*     */     
+/* 134 */     XMLElem xMLElem6 = new XMLElem("CATATTRELEMENT");
+/* 135 */     xMLGroupElem2.addChild(xMLElem6);
+/*     */     
+/* 137 */     xMLElem6.addChild((XMLElem)new XMLActivityElem("ACTIVITY"));
+/* 138 */     xMLElem6.addChild(new XMLElem("CATENTITYTYPE", "DAENTITYTYPE"));
+/* 139 */     xMLElem6.addChild(new XMLElem("CATATTRIBUTECODE", "DAATTRIBUTECODE"));
+/* 140 */     xMLElem6.addChild(new XMLElem("CATSEQ", "CATSEQ"));
+/* 141 */     XMLElem xMLElem2 = new XMLElem("CATDESCLIST");
+/* 142 */     xMLElem6.addChild(xMLElem2);
+/*     */     
+/* 144 */     xMLNLSElem = new XMLNLSElem("CATDESCELEMENT");
+/* 145 */     xMLElem2.addChild((XMLElem)xMLNLSElem);
+/*     */     
+/* 147 */     xMLNLSElem.addChild((XMLElem)new XMLActivityElem("ACTIVITY"));
+/* 148 */     xMLNLSElem.addChild(new XMLElem("NLSID", "NLSID"));
+/* 149 */     xMLNLSElem.addChild(new XMLElem("ATTRIBUTEDESCRIPTION", "ATTRDESCRIPTION"));
+/*     */     
+/* 151 */     XMLGroupElem xMLGroupElem1 = new XMLGroupElem("CATVAMLIST", "CATVAMATTR");
+/* 152 */     XMLMAP.addChild((XMLElem)xMLGroupElem1);
+/* 153 */     XMLElem xMLElem7 = new XMLElem("CATVAMATTRELEMENT");
+/* 154 */     xMLGroupElem1.addChild(xMLElem7);
+/* 155 */     xMLElem7.addChild((XMLElem)new XMLActivityElem("ACTIVITY"));
+/* 156 */     xMLElem7.addChild(new XMLElem("CATENTITYTYPE", "DAENTITYTYPE"));
+/* 157 */     xMLElem7.addChild(new XMLElem("CATATTRIBUTECODE", "DAATTRIBUTECODE"));
+/* 158 */     xMLElem7.addChild(new XMLElem("CATCOLUMN", "CATCOLUMN"));
+/* 159 */     xMLElem7.addChild(new XMLElem("CATSEQ", "CATSEQ"));
+/*     */     
+/* 161 */     XMLElem xMLElem1 = new XMLElem("CATDESCLIST");
+/* 162 */     xMLElem7.addChild(xMLElem1);
+/*     */     
+/* 164 */     xMLNLSElem = new XMLNLSElem("CATDESCELEMENT");
+/* 165 */     xMLElem1.addChild((XMLElem)xMLNLSElem);
+/*     */     
+/* 167 */     xMLNLSElem.addChild((XMLElem)new XMLActivityElem("ACTIVITY"));
+/* 168 */     xMLNLSElem.addChild(new XMLElem("NLSID", "NLSID"));
+/* 169 */     xMLNLSElem.addChild(new XMLElem("ATTRIBUTEDESCRIPTION", "ATTRDESCRIPTION"));
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public XMLElem getXMLMap() {
+/* 177 */     return XMLMAP;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVeName() {
+/* 183 */     return "ADSCATNAV";
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public String getStatusAttr() {
+/* 188 */     return "STATUS";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getMQCID() {
+/* 194 */     return "CATNAV_UPDATE";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVersion() {
+/* 203 */     return "1.3";
+/*     */   }
+/*     */ }
 
-import COM.ibm.eannounce.abr.util.*;
 
-/**********************************************************************************
-*/
-//$Log: ADSCATNAVABR.java,v $
-//Revision 1.13  2011/12/14 02:20:44  guobin
-//Update the Version V Mod M for the ADSABR
-//
-//Revision 1.12  2010/12/10 09:22:51  guobin
-//Change  CATATTRLIST tag use multiUse structure of XMLGroupElem
-//
-//Revision 1.11  2010/12/08 07:52:04  guobin
-//change tag CATATTRLIST
-//
-//Revision 1.10  2010/12/08 07:22:42  guobin
-//change the list  of <CATATTRLIST>
-//
-//Revision 1.9  2010/12/07 06:36:00  guobin
-//Remove the path of CATATTR
-//
-//Revision 1.8  2010/11/30 02:21:15  guobin
-//change <AUDIENCE> to <CATAUDIENCE>
-//
-//Revision 1.7  2010/11/24 08:29:32  guobin
-//add ENTITYID in <CATDETAILSLIST>
-//
-//Revision 1.6  2010/11/17 00:20:55  rick
-//fixing audience
-//
-//Revision 1.5  2010/11/16 13:55:47  rick
-//add path to CATATTR.
-//
-//Revision 1.4  2010/11/02 19:23:35  rick
-//various changes /fixes for the CATNAV XML
-//
-//Revision 1.3  2010/10/29 15:18:04  rick
-//changing MQCID again.
-//
-//Revision 1.2  2010/10/26 17:00:54  rick
-//taking out CATENTITYID
-//
-//Revision 1.1  2010/10/18 23:21:55  rick
-//Initial version of CATNAV XML ABR
-//
-public class ADSCATNAVABR extends XMLMQRoot
-{
-    private static final XMLElem XMLMAP;
-
-    static {
-        XMLMAP = new XMLGroupElem("CATNAV_UPDATE");
-        XMLMAP.addChild(new XMLVMElem("CATNAV_UPDATE","1"));
-         // level2
-        XMLMAP.addChild(new XMLElem("PDHDOMAIN","PDHDOMAIN"));
-        XMLMAP.addChild(new XMLNotificationElem("DTSOFMSG")); // pull from profile.endofday
-        XMLMAP.addChild(new XMLActivityElem("ACTIVITY"));
-        XMLMAP.addChild(new XMLElem("ENTITYTYPE","ENTITYTYPE"));
-        XMLMAP.addChild(new XMLElem("ENTITYID","ENTITYID"));
-        XMLMAP.addChild(new XMLElem("TYPE","CATNAVTYPE"));
-        XMLMAP.addChild(new XMLElem("STATUS","STATUS",XMLElem.FLAGVAL));
-
-        XMLMAP.addChild(new XMLElem("PUBLISH","CATPUBLISH"));
-        XMLMAP.addChild(new XMLElem("CATBR","CATBR"));
-        XMLMAP.addChild(new XMLElem("CATNAME","CATNAME"));
-        
-        XMLElem list = new XMLElem("PROJECTLIST");
-        XMLMAP.addChild(list);
-        XMLElem listelem = new XMLChgSetElem("PROJECTELEMENT");
-        list.addChild(listelem);
-        listelem.addChild(new XMLMultiFlagElem("PROJECT","PROJCDNAMF","PROJECTACTIVITY",XMLElem.FLAGVAL));
-             
-
-        list = new XMLElem("COUNTRYLIST");
-        XMLMAP.addChild(list);
-        list.addChild(new XMLCtryImgElem());
-
-        list = new XMLElem("LANGUAGELIST");
-        XMLMAP.addChild(list);
-        // level 3
-        XMLElem langelem = new XMLNLSElem("LANGUAGEELEMENT");
-        list.addChild(langelem);
-        //level 4
-        langelem.addChild(new XMLElem("NLSID","NLSID"));
-        langelem.addChild(new XMLElem("CATFMLY","CATFMLY"));
-        langelem.addChild(new XMLElem("CATSER","CATSER"));
-        langelem.addChild(new XMLElem("CATOPTGRPNAM","CATOPTGRPNAM"));
-        langelem.addChild(new XMLElem("CATNAME","CATNAME"));
-        langelem.addChild(new XMLElem("CATNAVL1","CATNAVL1"));
-        langelem.addChild(new XMLElem("CATNAVL2","CATNAVL2"));
-        langelem.addChild(new XMLElem("CATNAVL3","CATNAVL3"));
-        langelem.addChild(new XMLElem("CATNAVL4","CATNAVL4"));
-        langelem.addChild(new XMLElem("PRICEDISCLAIMER","PRICEDISCLAIMER"));
-        langelem.addChild(new XMLElem("IMAGEDISCLAIMER","IMGDISCLAIMER"));
-        langelem.addChild(new XMLElem("FEATUREBENEFIT","FBSTMT"));
-        langelem.addChild(new XMLElem("FAMILYDESCOVERRIDE","CATFMLYDESC"));
-        langelem.addChild(new XMLElem("SERIESDESCOVERRIDE","CATSERDESC"));
-        langelem.addChild(new XMLElem("SERIESHEADING","CATSERHEAD"));
-        langelem.addChild(new XMLElem("LONGMKTGMSG","LONGMKTGMSG"));
-
-        list = new XMLElem("CATAUDIENCELIST");
-        XMLMAP.addChild(list);
-        listelem = new XMLChgSetElem("CATAUDIENCEELEMENT");
-        list.addChild(listelem);
-        listelem.addChild(new XMLMultiFlagElem("CATAUDIENCE","CATAUDIENCE","ACTIVITY",XMLElem.ATTRVAL));
-        // level 2
-        list = new XMLGroupElem("CATDETAILSLIST","CATGROUP");
-	    XMLMAP.addChild(list);
-	    XMLElem catdetelem = new XMLElem("CATDETAILSELEMENT");
-        list.addChild(catdetelem);
-        catdetelem.addChild(new XMLActivityElem("ACTIVITY"));
-        catdetelem.addChild(new XMLElem("ENTITYID","ENTITYID"));
-        catdetelem.addChild(new XMLElem("CATSEQ","CATSEQ"));
-        list = new XMLElem("CATDESCLIST");
-        catdetelem.addChild(list);
-        // level 5
-        langelem = new XMLNLSElem("CATDESCELEMENT");
-        list.addChild(langelem);
-        //level 6
-        langelem.addChild(new XMLActivityElem("ACTIVITY"));
-        langelem.addChild(new XMLElem("NLSID","NLSID"));
-        langelem.addChild(new XMLElem("GROUPDESCRIPTION","GROUPDESCRIPTION"));
-        // level 4
-        list = new XMLGroupElem("CATATTRLIST","CATATTR","D:CATGROUPATTR:D",true);
-        //list = new XMLGroupElem("CATATTRLIST","CATATTR");
-        catdetelem.addChild(list);
-        // level 5
-        XMLElem catattrelem = new XMLElem("CATATTRELEMENT");
-        list.addChild(catattrelem);
-        //level 6
-        catattrelem.addChild(new XMLActivityElem("ACTIVITY"));
-        catattrelem.addChild(new XMLElem("CATENTITYTYPE","DAENTITYTYPE"));
-        catattrelem.addChild(new XMLElem("CATATTRIBUTECODE","DAATTRIBUTECODE"));
-        catattrelem.addChild(new XMLElem("CATSEQ","CATSEQ"));
-        list = new XMLElem("CATDESCLIST");
-        catattrelem.addChild(list);
-        // level 5
-        langelem = new XMLNLSElem("CATDESCELEMENT");
-        list.addChild(langelem);
-        //level 6
-        langelem.addChild(new XMLActivityElem("ACTIVITY"));
-        langelem.addChild(new XMLElem("NLSID","NLSID"));
-        langelem.addChild(new XMLElem("ATTRIBUTEDESCRIPTION","ATTRDESCRIPTION"));
-        // level 2
-        list = new XMLGroupElem("CATVAMLIST","CATVAMATTR");
-	XMLMAP.addChild(list);
-	XMLElem catvamelem = new XMLElem("CATVAMATTRELEMENT");
-        list.addChild(catvamelem);
-        catvamelem.addChild(new XMLActivityElem("ACTIVITY"));
-        catvamelem.addChild(new XMLElem("CATENTITYTYPE","DAENTITYTYPE"));
-        catvamelem.addChild(new XMLElem("CATATTRIBUTECODE","DAATTRIBUTECODE"));
-        catvamelem.addChild(new XMLElem("CATCOLUMN","CATCOLUMN"));
-        catvamelem.addChild(new XMLElem("CATSEQ","CATSEQ"));
-        
-        list = new XMLElem("CATDESCLIST");
-        catvamelem.addChild(list);
-        // level 5
-        langelem = new XMLNLSElem("CATDESCELEMENT");
-        list.addChild(langelem);
-        //level 6
-        langelem.addChild(new XMLActivityElem("ACTIVITY"));
-        langelem.addChild(new XMLElem("NLSID","NLSID"));
-        langelem.addChild(new XMLElem("ATTRIBUTEDESCRIPTION","ATTRDESCRIPTION"));
-        
-    }
-
-    /**********************************
-    * get xml object mapping
-    */
-    public XMLElem getXMLMap() {
-        return XMLMAP;
-    }
-
-    /**********************************
-    * get the name of the VE to use
-    */
-    public String getVeName() { return "ADSCATNAV";}
-
-     /**********************************
-    * get the status attribute to use for this ABR
-    */
-    public String getStatusAttr() { return "STATUS";}
-
-    /**********************************
-    *
-	A.	MQ-Series CID
-    */
-    public String getMQCID() { return "CATNAV_UPDATE"; }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getVersion()
-    {
-        return "1.3";
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\adsxmlbh1\ADSCATNAVABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

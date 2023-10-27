@@ -1,624 +1,629 @@
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.DatePackage;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.BufferedInputStream;
+/*     */ import java.io.BufferedReader;
+/*     */ import java.io.FileInputStream;
+/*     */ import java.io.FileOutputStream;
+/*     */ import java.io.IOException;
+/*     */ import java.io.InputStreamReader;
+/*     */ import java.io.OutputStreamWriter;
+/*     */ import java.nio.channels.FileChannel;
+/*     */ import java.sql.SQLException;
+/*     */ import java.text.MessageFormat;
+/*     */ import java.text.ParseException;
+/*     */ import java.util.ArrayList;
+/*     */ import java.util.Collections;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.List;
+/*     */ import java.util.ResourceBundle;
+/*     */ import java.util.Vector;
+/*     */ 
+/*     */ public class QSMRPQWITHDRAWALFULLABR extends PokBaseABR {
+/*  33 */   private StringBuffer rptSb = new StringBuffer();
+/*  34 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/*  35 */   static final String NEWLINE = new String(FOOL_JTEST);
+/*     */   
+/*  37 */   private ResourceBundle rsBundle = null;
+/*  38 */   private Hashtable metaTbl = new Hashtable<>();
+/*  39 */   private String navName = "";
+/*     */   
+/*  41 */   private String ffFileName = null;
+/*  42 */   private String ffPathName = null;
+/*  43 */   private String ffFTPPathName = null;
+/*  44 */   private String dir = null;
+/*  45 */   private String dirDest = null;
+/*  46 */   private final String QSMRPTPATH = "_rptpath";
+/*  47 */   private final String QSMGENPATH = "_genpath";
+/*  48 */   private final String QSMFTPPATH = "_ftppath";
+/*  49 */   private int abr_debuglvl = 0;
+/*  50 */   private String abrcode = "";
+/*     */   
+/*     */   private static final String CREFINIPATH = "_inipath";
+/*     */   private static final String FTPSCRPATH = "_script";
+/*     */   private static final String TARGETFILENAME = "_wdtargetfilename";
+/*     */   private static final String LOGPATH = "_logpath";
+/*     */   private static final String BACKUPPATH = "_backuppath";
+/*     */   private static final String FILEPREFIX = "_wdfilePrefix";
+/*  58 */   private String lineStr = "";
+/*     */   
+/*     */   private EntityItem rootEntity;
+/*     */   private static final String FAILD = "FAILD";
+/*     */   private static final String IFTYPE = "IFTYPE";
+/*     */   private static final String IOPUCTY = "IOPUCTY";
+/*     */   private static final String ISLMPAL = "ISLMPAL";
+/*     */   private static final String ISLMRFA = "ISLMRFA";
+/*     */   private static final String ISLMPRN = "ISLMPRN";
+/*     */   private static final String DSLMWDN = "DSLMWDN";
+/*     */   private static final String ISLMTYP = "ISLMTYP";
+/*     */   private static final String ISLMMOD = "ISLMMOD";
+/*     */   private static final String ISLMFTR = "ISLMFTR";
+/*     */   private static final Hashtable COLUMN_LENGTH;
+/*  72 */   private static final List geoWWList = Collections.unmodifiableList(new ArrayList()
+/*     */       {
+/*     */       
+/*     */       });
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   static {
+/*  87 */     COLUMN_LENGTH = new Hashtable<>();
+/*  88 */     COLUMN_LENGTH.put("IFTYPE", "20");
+/*  89 */     COLUMN_LENGTH.put("IOPUCTY", "3");
+/*  90 */     COLUMN_LENGTH.put("ISLMPAL", "8");
+/*  91 */     COLUMN_LENGTH.put("ISLMRFA", "6");
+/*  92 */     COLUMN_LENGTH.put("ISLMPRN", "14");
+/*  93 */     COLUMN_LENGTH.put("DSLMWDN", "10");
+/*  94 */     COLUMN_LENGTH.put("ISLMTYP", "4");
+/*  95 */     COLUMN_LENGTH.put("ISLMMOD", "3");
+/*  96 */     COLUMN_LENGTH.put("ISLMFTR", "6");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected ResourceBundle getBundle() {
+/* 103 */     return this.rsBundle;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void processThis(QSMRPQFULLABRSTATUS paramQSMRPQFULLABRSTATUS, Profile paramProfile, Database paramDatabase, String paramString, StringBuffer paramStringBuffer, EntityItem paramEntityItem) throws Exception {
+/*     */     try {
+/* 122 */       this.m_prof = paramProfile;
+/* 123 */       this.m_db = paramDatabase;
+/* 124 */       this.rootEntity = paramEntityItem;
+/* 125 */       this.abrcode = paramString;
+/* 126 */       this.rptSb = paramStringBuffer;
+/*     */       
+/* 128 */       this.m_elist = getEntityList(getFeatureVEName());
+/*     */       
+/* 130 */       if (this.m_elist.getEntityGroupCount() > 0)
+/*     */       {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 136 */         generateFlatFile(paramEntityItem);
+/* 137 */         exeFtpShell(this.ffPathName);
+/*     */       }
+/*     */     
+/* 140 */     } catch (IOException iOException) {
+/*     */       
+/* 142 */       iOException.printStackTrace();
+/* 143 */     } catch (ParseException parseException) {
+/*     */       
+/* 145 */       parseException.printStackTrace();
+/*     */     } 
+/*     */   }
+/*     */   
+/*     */   private void setFileName(EntityItem paramEntityItem) {
+/* 150 */     String str = ABRServerProperties.getValue(this.abrcode, "_wdfilePrefix", null);
+/* 151 */     StringBuffer stringBuffer = new StringBuffer(str.trim());
+/*     */     
+/*     */     try {
+/* 154 */       DatePackage datePackage = this.m_db.getDates();
+/* 155 */       String str1 = datePackage.getNow();
+/*     */       
+/* 157 */       str1 = str1.replace(' ', '_');
+/* 158 */       stringBuffer.append(paramEntityItem.getEntityType() + paramEntityItem.getEntityID() + "_");
+/* 159 */       stringBuffer.append(str1 + ".txt");
+/* 160 */       this.dir = ABRServerProperties.getValue(this.abrcode, "_genpath", "/Dgq");
+/* 161 */       if (!this.dir.endsWith("/")) {
+/* 162 */         this.dir += "/";
+/*     */       }
+/* 164 */       this.ffFileName = stringBuffer.toString();
+/* 165 */       this.ffPathName = this.dir + this.ffFileName;
+/* 166 */     } catch (MiddlewareException middlewareException) {
+/*     */       
+/* 168 */       middlewareException.printStackTrace();
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void generateFlatFile(EntityItem paramEntityItem) throws IOException, SQLException, MiddlewareException, ParseException {
+/* 184 */     FileChannel fileChannel1 = null;
+/* 185 */     FileChannel fileChannel2 = null;
+/*     */ 
+/*     */     
+/* 188 */     setFileName(paramEntityItem);
+/*     */     
+/* 190 */     FileOutputStream fileOutputStream = new FileOutputStream(this.ffPathName);
+/* 191 */     OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, "UTF-8");
+/*     */     
+/* 193 */     createT006Feature(paramEntityItem, outputStreamWriter);
+/* 194 */     createT632TypeModelFeatureRelation(paramEntityItem, outputStreamWriter);
+/*     */     
+/* 196 */     outputStreamWriter.close();
+/*     */     
+/* 198 */     this.dirDest = ABRServerProperties.getValue(this.abrcode, "_ftppath", "/Dgq");
+/* 199 */     if (!this.dirDest.endsWith("/")) {
+/* 200 */       this.dirDest += "/";
+/*     */     }
+/*     */     
+/* 203 */     this.ffFTPPathName = this.dirDest + this.ffFileName;
+/*     */     
+/*     */     try {
+/* 206 */       fileChannel1 = (new FileInputStream(this.ffPathName)).getChannel();
+/* 207 */       fileChannel2 = (new FileOutputStream(this.ffFTPPathName)).getChannel();
+/* 208 */       fileChannel2.transferFrom(fileChannel1, 0L, fileChannel1.size());
+/*     */     } finally {
+/* 210 */       fileChannel1.close();
+/* 211 */       fileChannel2.close();
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void createT006Feature(EntityItem paramEntityItem, OutputStreamWriter paramOutputStreamWriter) throws IOException, SQLException, MiddlewareException {
+/* 230 */     EANFlagAttribute eANFlagAttribute = null;
+/*     */     
+/* 232 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("PRODSTRUCT");
+/*     */     
+/* 234 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/*     */       
+/* 236 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/*     */       
+/* 238 */       eANFlagAttribute = (EANFlagAttribute)paramEntityItem.getAttribute("GENAREASELECTION");
+/* 239 */       if (eANFlagAttribute != null) {
+/* 240 */         if (eANFlagAttribute.isSelected("1999")) {
+/* 241 */           for (byte b1 = 0; b1 < geoWWList.size(); b1++) {
+/* 242 */             createT006FeatureRecords(paramEntityItem, paramOutputStreamWriter, entityItem, geoWWList.get(b1));
+/*     */           }
+/*     */         } else {
+/* 245 */           if (eANFlagAttribute.isSelected("6199")) {
+/* 246 */             createT006FeatureRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Asia Pacific");
+/*     */           }
+/* 248 */           if (eANFlagAttribute.isSelected("6200")) {
+/* 249 */             createT006FeatureRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Canada and Caribbean North");
+/*     */           }
+/* 251 */           if (eANFlagAttribute.isSelected("6198")) {
+/* 252 */             createT006FeatureRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Europe/Middle East/Africa");
+/*     */           }
+/* 254 */           if (eANFlagAttribute.isSelected("6204")) {
+/* 255 */             createT006FeatureRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "Latin America");
+/*     */           }
+/* 257 */           if (eANFlagAttribute.isSelected("6221")) {
+/* 258 */             createT006FeatureRecords(paramEntityItem, paramOutputStreamWriter, entityItem, "US Only");
+/*     */           }
+/*     */         } 
+/*     */       }
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void createT006FeatureRecords(EntityItem paramEntityItem1, OutputStreamWriter paramOutputStreamWriter, EntityItem paramEntityItem2, String paramString) throws IOException, SQLException, MiddlewareException {
+/* 282 */     Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(paramEntityItem1, "PRODSTRUCT", "MODEL");
+/*     */     
+/* 284 */     for (byte b = 0; b < vector.size(); b++) {
+/* 285 */       StringBuffer stringBuffer = new StringBuffer();
+/* 286 */       EntityItem entityItem = vector.elementAt(b);
+/* 287 */       stringBuffer = new StringBuffer();
+/* 288 */       String str1 = "";
+/* 289 */       String str2 = "";
+/* 290 */       String str3 = "";
+/* 291 */       str2 = "";
+/*     */       
+/* 293 */       stringBuffer.append(getValue("IFTYPE", "F=CHKT631&UPGT005"));
+/*     */       
+/* 295 */       if (paramString.equals("Latin America")) {
+/* 296 */         str1 = "601";
+/* 297 */         str3 = PokUtils.getAttributeValue(paramEntityItem1, "FEATURECODE", "", "");
+/* 298 */       } else if (paramString.equals("Europe/Middle East/Africa")) {
+/* 299 */         str1 = "999";
+/* 300 */         str3 = PokUtils.getAttributeValue(paramEntityItem1, "FEATURECODE", "", "");
+/* 301 */       } else if (paramString.equals("Asia Pacific")) {
+/* 302 */         str1 = "872";
+/* 303 */         str3 = PokUtils.getAttributeValue(paramEntityItem1, "FEATURECODE", "", "");
+/* 304 */       } else if (paramString.equals("US Only")) {
+/* 305 */         str1 = "897";
+/* 306 */         str3 = PokUtils.getAttributeValue(paramEntityItem1, "FEATURECODE", "", "");
+/* 307 */       } else if (paramString.equals("Canada and Caribbean North")) {
+/* 308 */         str1 = "649";
+/* 309 */         str3 = PokUtils.getAttributeValue(paramEntityItem1, "FEATURECODE", "", "");
+/*     */       } 
+/*     */       
+/* 312 */       stringBuffer.append(getValue("IOPUCTY", str1));
+/* 313 */       stringBuffer.append(getValue("ISLMPAL", str3));
+/* 314 */       stringBuffer.append(getValue("ISLMRFA", PokUtils.getAttributeValue(paramEntityItem1, "FEATURECODE", "", "")));
+/* 315 */       String str4 = PokUtils.getAttributeValue(entityItem, "MACHTYPEATR", ",", "", false);
+/* 316 */       str4 = str4 + PokUtils.getAttributeValue(paramEntityItem1, "FEATURECODE", ",", "", false);
+/* 317 */       stringBuffer.append(getValue("ISLMPRN", str4));
+/*     */       
+/* 319 */       str2 = PokUtils.getAttributeValue(paramEntityItem1, "WITHDRAWDATEEFF_T", ",", "", false);
+/* 320 */       if (str2.equals("")) {
+/* 321 */         str2 = "2050-12-31";
+/*     */       }
+/* 323 */       stringBuffer.append(getValue("DSLMWDN", str2));
+/*     */       
+/* 325 */       stringBuffer.append(NEWLINE);
+/* 326 */       paramOutputStreamWriter.write(stringBuffer.toString());
+/* 327 */       paramOutputStreamWriter.flush();
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void createT632TypeModelFeatureRelation(EntityItem paramEntityItem, OutputStreamWriter paramOutputStreamWriter) throws IOException, SQLException, MiddlewareException {
+/* 347 */     this.m_elist = getEntityList(getFeatureVEName());
+/*     */ 
+/*     */     
+/* 350 */     EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)paramEntityItem.getAttribute("GENAREASELECTION");
+/* 351 */     if (eANFlagAttribute != null && (
+/* 352 */       eANFlagAttribute.isSelected("6221") || eANFlagAttribute.isSelected("1999"))) {
+/*     */       
+/* 354 */       EntityGroup entityGroup = this.m_elist.getEntityGroup("PRODSTRUCT");
+/*     */       
+/* 356 */       for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/* 357 */         StringBuffer stringBuffer = new StringBuffer();
+/*     */         
+/* 359 */         EntityItem entityItem = entityGroup.getEntityItem(b);
+/*     */         
+/* 361 */         Vector<EntityItem> vector = entityItem.getDownLink();
+/*     */         
+/* 363 */         for (byte b1 = 0; b1 < vector.size(); b1++) {
+/*     */           
+/* 365 */           EntityItem entityItem1 = vector.elementAt(b1);
+/*     */           
+/* 367 */           stringBuffer = new StringBuffer();
+/* 368 */           String str = "";
+/*     */           
+/* 370 */           stringBuffer.append(getValue("IFTYPE", "T=(CHK&UPG)T631"));
+/* 371 */           stringBuffer.append(getValue("IOPUCTY", "897"));
+/* 372 */           stringBuffer.append(getValue("ISLMPAL", PokUtils.getAttributeValue(paramEntityItem, "FEATURECODE", "", "")));
+/* 373 */           stringBuffer.append(getValue("ISLMRFA", PokUtils.getAttributeValue(paramEntityItem, "FEATURECODE", "", "")));
+/* 374 */           stringBuffer.append(getValue("ISLMTYP", PokUtils.getAttributeValue(entityItem1, "MACHTYPEATR", "", "")));
+/* 375 */           stringBuffer.append(getValue("ISLMMOD", PokUtils.getAttributeValue(entityItem1, "MODELATR", "", "")));
+/* 376 */           stringBuffer.append(getValue("ISLMFTR", PokUtils.getAttributeValue(paramEntityItem, "FEATURECODE", "", "")));
+/* 377 */           str = PokUtils.getAttributeValue(entityItem, "WTHDRWEFFCTVDATE", "", "");
+/* 378 */           if (str.equals("")) {
+/* 379 */             str = "2050-12-31";
+/*     */           }
+/*     */           
+/* 382 */           stringBuffer.append(getValue("DSLMWDN", str));
+/*     */           
+/* 384 */           stringBuffer.append(NEWLINE);
+/* 385 */           paramOutputStreamWriter.write(stringBuffer.toString());
+/* 386 */           paramOutputStreamWriter.flush();
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getValue(String paramString1, String paramString2) {
+/* 395 */     if (paramString2 == null)
+/* 396 */       paramString2 = ""; 
+/* 397 */     int i = (paramString2 == null) ? 0 : paramString2.length();
+/* 398 */     int j = Integer.parseInt(COLUMN_LENGTH.get(paramString1).toString());
+/* 399 */     if (i == j)
+/* 400 */       return paramString2; 
+/* 401 */     if (i > j) {
+/* 402 */       return paramString2.substring(0, j);
+/*     */     }
+/* 404 */     return paramString2 + getBlank(j - i);
+/*     */   }
+/*     */   
+/*     */   protected String getBlank(int paramInt) {
+/* 408 */     StringBuffer stringBuffer = new StringBuffer();
+/* 409 */     while (paramInt > 0) {
+/* 410 */       stringBuffer.append(" ");
+/* 411 */       paramInt--;
+/*     */     } 
+/* 413 */     return stringBuffer.toString();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private EntityList getEntityList(String paramString) throws SQLException, MiddlewareException {
+/* 421 */     ExtractActionItem extractActionItem = new ExtractActionItem(null, this.m_db, this.m_prof, paramString);
+/*     */     
+/* 423 */     EntityList entityList = this.m_db.getEntityList(this.m_prof, extractActionItem, new EntityItem[] { new EntityItem(null, this.m_prof, this.rootEntity
+/* 424 */             .getEntityType(), this.rootEntity.getEntityID()) });
+/*     */ 
+/*     */     
+/* 427 */     addDebug("EntityList for " + this.m_prof.getValOn() + " extract " + paramString + " contains the following entities: \n" + 
+/* 428 */         PokUtils.outputList(entityList));
+/*     */     
+/* 430 */     return entityList;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getFeatureVEName() {
+/* 439 */     return "QSMRPQFULLVE1";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public boolean exeFtpShell(String paramString) {
+/* 447 */     String str1 = ABRServerProperties.getValue(this.abrcode, "_script", null) + " -f " + paramString;
+/* 448 */     String str2 = ABRServerProperties.getValue(this.abrcode, "_inipath", null);
+/* 449 */     if (str2 != null)
+/* 450 */       str1 = str1 + " -i " + str2; 
+/* 451 */     if (this.dir != null)
+/* 452 */       str1 = str1 + " -d " + this.dir; 
+/* 453 */     String str3 = ABRServerProperties.getValue(this.abrcode, "_wdfilePrefix", null);
+/* 454 */     if (str3 != null)
+/* 455 */       str1 = str1 + " -p " + str3; 
+/* 456 */     String str4 = ABRServerProperties.getValue(this.abrcode, "_wdtargetfilename", null);
+/* 457 */     if (str4 != null)
+/* 458 */       str1 = str1 + " -t " + str4; 
+/* 459 */     String str5 = ABRServerProperties.getValue(this.abrcode, "_logpath", null);
+/* 460 */     if (str5 != null)
+/* 461 */       str1 = str1 + " -l " + str5; 
+/* 462 */     String str6 = ABRServerProperties.getValue(this.abrcode, "_backuppath", null);
+/* 463 */     if (str6 != null)
+/* 464 */       str1 = str1 + " -b " + str6; 
+/* 465 */     Runtime runtime = Runtime.getRuntime();
+/* 466 */     String str7 = "";
+/* 467 */     BufferedReader bufferedReader = null;
+/* 468 */     BufferedInputStream bufferedInputStream = null;
+/* 469 */     addDebug("cmd:" + str1);
+/*     */     try {
+/* 471 */       Process process = runtime.exec(str1);
+/* 472 */       if (process.waitFor() != 0) {
+/* 473 */         return false;
+/*     */       }
+/* 475 */       bufferedInputStream = new BufferedInputStream(process.getInputStream());
+/* 476 */       bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream));
+/* 477 */       while ((this.lineStr = bufferedReader.readLine()) != null) {
+/* 478 */         str7 = str7 + this.lineStr;
+/* 479 */         if (this.lineStr.indexOf("FAILD") > -1) {
+/* 480 */           return false;
+/*     */         }
+/*     */       } 
+/* 483 */     } catch (Exception exception) {
+/* 484 */       exception.printStackTrace();
+/* 485 */       return false;
+/*     */     } finally {
+/* 487 */       if (bufferedReader != null) {
+/*     */         try {
+/* 489 */           bufferedReader.close();
+/* 490 */           bufferedInputStream.close();
+/* 491 */         } catch (IOException iOException) {
+/* 492 */           iOException.printStackTrace();
+/*     */         } 
+/*     */       }
+/*     */     } 
+/* 496 */     return !(str7 == null);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void addOutput(String paramString) {
+/* 503 */     this.rptSb.append("<p>" + paramString + "</p>" + NEWLINE);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void addOutput(String paramString, Object[] paramArrayOfObject) {
+/* 511 */     String str = getBundle().getString(paramString);
+/* 512 */     if (paramArrayOfObject != null) {
+/* 513 */       MessageFormat messageFormat = new MessageFormat(str);
+/* 514 */       str = messageFormat.format(paramArrayOfObject);
+/*     */     } 
+/*     */     
+/* 517 */     addOutput(str);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void addDebug(String paramString) {
+/* 524 */     this.rptSb.append("<!-- " + paramString + " -->" + NEWLINE);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void addError(String paramString) {
+/* 531 */     addOutput(paramString);
+/* 532 */     setReturnCode(-1);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void addError(String paramString, Object[] paramArrayOfObject) {
+/* 543 */     EntityGroup entityGroup = this.m_elist.getParentEntityGroup();
+/* 544 */     setReturnCode(-1);
+/*     */ 
+/*     */     
+/* 547 */     MessageFormat messageFormat = new MessageFormat(getBundle().getString("ERROR_PREFIX"));
+/* 548 */     Object[] arrayOfObject = new Object[2];
+/* 549 */     arrayOfObject[0] = entityGroup.getLongDescription();
+/* 550 */     arrayOfObject[1] = this.navName;
+/*     */     
+/* 552 */     addMessage(messageFormat.format(arrayOfObject), paramString, paramArrayOfObject);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void addMessage(String paramString1, String paramString2, Object[] paramArrayOfObject) {
+/* 560 */     String str = getBundle().getString(paramString2);
+/*     */     
+/* 562 */     if (paramArrayOfObject != null) {
+/* 563 */       MessageFormat messageFormat = new MessageFormat(str);
+/* 564 */       str = messageFormat.format(paramArrayOfObject);
+/*     */     } 
+/*     */     
+/* 567 */     addOutput(paramString1 + " " + str);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 612 */     return "1.0";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 621 */     return "QSMRPQWITHDRAWALFULLABR";
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.sg;
 
-import java.io.*;
-import java.nio.channels.FileChannel;
-import java.sql.SQLException;
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.util.*;
-
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.opicmpdh.middleware.*;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
-import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
-
-/**
- * @author whwyue QSM RPQ withdrawal ABR
- *
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\QSMRPQWITHDRAWALFULLABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-//$Log: QSMRPQWITHDRAWALFULLABR.java,v $
-//Revision 1.5  2018/09/19 12:50:14  whwyue
-//Update the IFTYPE
-//
-//Revision 1.4  2018/09/18 10:03:44  whwyue
-//Update feature logic
-//
-//Revision 1.3  2018/09/18 09:51:08  whwyue
-//RPQ abr for withdrawal full file
-//
-public class QSMRPQWITHDRAWALFULLABR extends PokBaseABR {
-	private StringBuffer rptSb = new StringBuffer();
-	private static final char[] FOOL_JTEST = { '\n' };
-	static final String NEWLINE = new String(FOOL_JTEST);
-
-	private ResourceBundle rsBundle = null;
-	private Hashtable metaTbl = new Hashtable();
-	private String navName = "";
-
-	private String ffFileName = null;
-	private String ffPathName = null;
-	private String ffFTPPathName = null;
-	private String dir = null;
-	private String dirDest = null;
-	private final String QSMRPTPATH = "_rptpath";
-	private final String QSMGENPATH = "_genpath";
-	private final String QSMFTPPATH = "_ftppath";
-	private int abr_debuglvl = D.EBUG_ERR;
-	private String abrcode = "";
-
-	private static final String CREFINIPATH = "_inipath";
-	private static final String FTPSCRPATH = "_script";
-	private static final String TARGETFILENAME = "_wdtargetfilename";
-	private static final String LOGPATH = "_logpath";
-	private static final String BACKUPPATH = "_backuppath";
-	private static final String FILEPREFIX = "_wdfilePrefix";
-	private String lineStr = "";
-	private EntityItem rootEntity;
-	private static final String FAILD = "FAILD";
-	private static final String IFTYPE = "IFTYPE";
-	private static final String IOPUCTY = "IOPUCTY";
-	private static final String ISLMPAL = "ISLMPAL";
-	private static final String ISLMRFA = "ISLMRFA";
-	private static final String ISLMPRN = "ISLMPRN";
-	private static final String DSLMWDN = "DSLMWDN";
-	private static final String ISLMTYP = "ISLMTYP";
-	private static final String ISLMMOD = "ISLMMOD";
-	private static final String ISLMFTR = "ISLMFTR";
-	private static final Hashtable COLUMN_LENGTH;
-
-	private static final List geoWWList = Collections.unmodifiableList(new ArrayList() {
-		{
-			add("Asia Pacific");
-			add("Canada and Caribbean North");
-			add("Europe/Middle East/Africa");
-			add("Latin America");
-			add("US Only");
-		}
-	});
-
-	/**
-	 * Record format defintion Form (record name), (record length), <starting
-	 * postion>, <type>
-	 */
-	static {
-		COLUMN_LENGTH = new Hashtable();
-		COLUMN_LENGTH.put(IFTYPE, "20");
-		COLUMN_LENGTH.put(IOPUCTY, "3");
-		COLUMN_LENGTH.put(ISLMPAL, "8");
-		COLUMN_LENGTH.put(ISLMRFA, "6");
-		COLUMN_LENGTH.put(ISLMPRN, "14");
-		COLUMN_LENGTH.put(DSLMWDN, "10");
-		COLUMN_LENGTH.put(ISLMTYP, "4");
-		COLUMN_LENGTH.put(ISLMMOD, "3");
-		COLUMN_LENGTH.put(ISLMFTR, "6");
-	}
-
-	/**********************************
-	 * get the resource bundle
-	 */
-	protected ResourceBundle getBundle() {
-		return rsBundle;
-	}
-
-	/**********************************
-	 * Execute ABR.
-	 *
-	 */
-	public void processThis(QSMRPQFULLABRSTATUS abr, Profile m_prof, Database m_db, String abri, StringBuffer rpt,
-			EntityItem rootEntity) throws Exception {
-		// String header1 = "";
-		// boolean creatFile = true;
-		// boolean sentFile = true;
-
-		// MessageFormat msgf;
-		// String abrversion="";
-
-		// Object[] args = new String[10];
-
-		try {
-			this.m_prof = m_prof;
-			this.m_db = m_db;
-			this.rootEntity = rootEntity;
-			abrcode = abri;
-			rptSb = rpt;
-
-			m_elist = getEntityList(getFeatureVEName());
-
-			if (m_elist.getEntityGroupCount() > 0) {
-//				setDGTitle("QSMRPQWITHDRWALFULLABR report");
-//				setDGString(getABRReturnCode());
-//				setDGRptName("QSMRPQWITHDRWALFULLABR"); // Set the report name
-//				setDGRptClass("QSMRPQWITHDRWALFULLABR"); // Set the report class
-//				navName = getNavigationName();
-				generateFlatFile(rootEntity);
-				exeFtpShell(ffPathName);
-			}
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	private void setFileName(EntityItem rootEntity) {
-		String filePrefix = ABRServerProperties.getValue(abrcode, FILEPREFIX, null);
-		StringBuffer sb = new StringBuffer(filePrefix.trim());
-		DatePackage dbNow;
-		try {
-			dbNow = m_db.getDates();
-			String dts = dbNow.getNow();
-			// replace special characters
-			dts = dts.replace(' ', '_');
-			sb.append(rootEntity.getEntityType() + rootEntity.getEntityID() + "_");
-			sb.append(dts + ".txt");
-			dir = ABRServerProperties.getValue(abrcode, QSMGENPATH, "/Dgq");
-			if (!dir.endsWith("/")) {
-				dir = dir + "/";
-			}
-			ffFileName = sb.toString();
-			ffPathName = dir + ffFileName;
-		} catch (MiddlewareException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-	/********************************************
-	 * Build a text file using all The records are data based on the type of
-	 * data described above.
-	 * 
-	 * @throws IOException
-	 * @throws MiddlewareException
-	 * @throws SQLException
-	 * @throws ParseException
-	 */
-	private void generateFlatFile(EntityItem rootEntity)
-			throws IOException, SQLException, MiddlewareException, ParseException {
-
-		FileChannel sourceChannel = null;
-		FileChannel destChannel = null;
-
-		// generate file name
-		setFileName(rootEntity);
-
-		FileOutputStream fos = new FileOutputStream(ffPathName);
-		OutputStreamWriter wOut = new OutputStreamWriter(fos, "UTF-8");
-
-		createT006Feature(rootEntity, wOut);
-		createT632TypeModelFeatureRelation(rootEntity, wOut);
-
-		wOut.close();
-
-		dirDest = ABRServerProperties.getValue(abrcode, QSMFTPPATH, "/Dgq");
-		if (!dirDest.endsWith("/")) {
-			dirDest = dirDest + "/";
-		}
-
-		ffFTPPathName = dirDest + ffFileName;
-
-		try {
-			sourceChannel = new FileInputStream(ffPathName).getChannel();
-			destChannel = new FileOutputStream(ffFTPPathName).getChannel();
-			destChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
-		} finally {
-			sourceChannel.close();
-			destChannel.close();
-		}
-
-	}
-
-	/*
-	 * Create records for T006 FEATURE
-	 * 
-	 * @throws IOException
-	 * 
-	 * @throws SQLException
-	 * 
-	 * @throws MiddlewareException
-	 */
-	private void createT006Feature(EntityItem rootEntity, OutputStreamWriter wOut)
-			throws IOException, SQLException, MiddlewareException {
-
-		EANFlagAttribute featGeoList;
-
-		featGeoList = null;
-
-		EntityGroup prodstructGrp = m_elist.getEntityGroup("PRODSTRUCT");
-
-		for (int pI = 0; pI < prodstructGrp.getEntityItemCount(); pI++) {
-
-			EntityItem eiProdstruct = prodstructGrp.getEntityItem(pI);
-
-			featGeoList = (EANFlagAttribute) rootEntity.getAttribute("GENAREASELECTION");
-			if (featGeoList != null) {
-				if (featGeoList.isSelected("1999")) {
-					for (int i = 0; i < geoWWList.size(); i++) {
-						createT006FeatureRecords(rootEntity, wOut, eiProdstruct, (String) geoWWList.get(i));
-					}
-				} else {
-					if (featGeoList.isSelected("6199")) {
-						createT006FeatureRecords(rootEntity, wOut, eiProdstruct, "Asia Pacific");
-					}
-					if (featGeoList.isSelected("6200")) {
-						createT006FeatureRecords(rootEntity, wOut, eiProdstruct, "Canada and Caribbean North");
-					}
-					if (featGeoList.isSelected("6198")) {
-						createT006FeatureRecords(rootEntity, wOut, eiProdstruct, "Europe/Middle East/Africa");
-					}
-					if (featGeoList.isSelected("6204")) {
-						createT006FeatureRecords(rootEntity, wOut, eiProdstruct, "Latin America");
-					}
-					if (featGeoList.isSelected("6221")) {
-						createT006FeatureRecords(rootEntity, wOut, eiProdstruct, "US Only");
-					}
-				}
-			}
-		}
-	}
-
-	/*
-	 * Create records for T006 FEATURE
-	 * 
-	 * @throws IOException
-	 * 
-	 * @throws SQLException
-	 * 
-	 * @throws MiddlewareException
-	 */
-	private void createT006FeatureRecords(EntityItem rootEntity, OutputStreamWriter wOut, EntityItem eiProdstruct,
-			String strRootGenAreaSel) throws IOException, SQLException, MiddlewareException {
-
-		StringBuffer sb;
-		String strIOPUCTY;
-		String strDSLMWDN;
-		String strISLMPAL;
-
-		Vector modelVect = PokUtils.getAllLinkedEntities(rootEntity, "PRODSTRUCT", "MODEL");
-
-		for (int i = 0; i < modelVect.size(); i++) {
-			sb = new StringBuffer();
-			EntityItem eiModel = (EntityItem) modelVect.elementAt(i);
-			sb = new StringBuffer();
-			strIOPUCTY = "";
-			strDSLMWDN = "";
-			strISLMPAL = "";
-			strDSLMWDN = "";
-
-			sb.append(getValue(IFTYPE, "F=CHKT631&UPGT005"));
-
-			if (strRootGenAreaSel.equals("Latin America")) {
-				strIOPUCTY = "601";
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "FEATURECODE", "", "");
-			} else if (strRootGenAreaSel.equals("Europe/Middle East/Africa")) {
-				strIOPUCTY = "999";
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "FEATURECODE", "", "");
-			} else if (strRootGenAreaSel.equals("Asia Pacific")) {
-				strIOPUCTY = "872";
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "FEATURECODE", "", "");
-			} else if (strRootGenAreaSel.equals("US Only")) {
-				strIOPUCTY = "897";
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "FEATURECODE", "", "");
-			} else if (strRootGenAreaSel.equals("Canada and Caribbean North")) {
-				strIOPUCTY = "649";
-				strISLMPAL = PokUtils.getAttributeValue(rootEntity, "FEATURECODE", "", "");
-			}
-
-			sb.append(getValue(IOPUCTY, strIOPUCTY));
-			sb.append(getValue(ISLMPAL, strISLMPAL));
-			sb.append(getValue(ISLMRFA, PokUtils.getAttributeValue(rootEntity, "FEATURECODE", "", "")));
-			String strISLMPRN = PokUtils.getAttributeValue(eiModel, "MACHTYPEATR", ",", "", false);
-			strISLMPRN += PokUtils.getAttributeValue(rootEntity, "FEATURECODE", ",", "", false);
-			sb.append(getValue(ISLMPRN, strISLMPRN));
-
-			strDSLMWDN = PokUtils.getAttributeValue(rootEntity, "WITHDRAWDATEEFF_T", ",", "", false);
-			if (strDSLMWDN.equals("")) {
-				strDSLMWDN = "2050-12-31";
-			}
-			sb.append(getValue(DSLMWDN, strDSLMWDN));
-
-			sb.append(NEWLINE);
-			wOut.write(sb.toString());
-			wOut.flush();
-
-		}
-	}
-
-	/******
-	 * Create T632 records
-	 * 
-	 * @param rootEntity
-	 * @param wOut
-	 * @throws IOException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	private void createT632TypeModelFeatureRelation(EntityItem rootEntity, OutputStreamWriter wOut)
-			throws IOException, SQLException, MiddlewareException {
-
-		StringBuffer sb;
-		String strDSLMWDN;
-
-		m_elist = getEntityList(getFeatureVEName());
-
-		// Create T632 records only for US ONLY and WorldWide GEOs
-		EANFlagAttribute featGenAreaList = (EANFlagAttribute) rootEntity.getAttribute("GENAREASELECTION");
-		if (featGenAreaList != null) {
-			if (featGenAreaList.isSelected("6221") || featGenAreaList.isSelected("1999")) {
-
-				EntityGroup prodstructGrp = m_elist.getEntityGroup("PRODSTRUCT");
-
-				for (int i = 0; i < prodstructGrp.getEntityItemCount(); i++) {
-					sb = new StringBuffer();
-
-					EntityItem eiProdstruct = prodstructGrp.getEntityItem(i);
-
-					Vector modelVect = eiProdstruct.getDownLink();
-
-					for (int im = 0; im < modelVect.size(); im++) {
-
-						EntityItem eiModel = (EntityItem) modelVect.elementAt(im);
-
-						sb = new StringBuffer();
-						strDSLMWDN = "";
-
-						sb.append(getValue(IFTYPE, "T=(CHK&UPG)T631"));
-						sb.append(getValue(IOPUCTY, "897"));
-						sb.append(getValue(ISLMPAL, PokUtils.getAttributeValue(rootEntity, "FEATURECODE", "", "")));
-						sb.append(getValue(ISLMRFA, PokUtils.getAttributeValue(rootEntity, "FEATURECODE", "", "")));
-						sb.append(getValue(ISLMTYP, PokUtils.getAttributeValue(eiModel, "MACHTYPEATR", "", "")));
-						sb.append(getValue(ISLMMOD, PokUtils.getAttributeValue(eiModel, "MODELATR", "", "")));
-						sb.append(getValue(ISLMFTR, PokUtils.getAttributeValue(rootEntity, "FEATURECODE", "", "")));
-						strDSLMWDN = PokUtils.getAttributeValue(eiProdstruct, "WTHDRWEFFCTVDATE", "", "");
-						if (strDSLMWDN.equals("")) {
-							strDSLMWDN = "2050-12-31";
-						}
-
-						sb.append(getValue(DSLMWDN, strDSLMWDN));
-	
-						sb.append(NEWLINE);
-						wOut.write(sb.toString());
-						wOut.flush();
-
-					}
-				}
-			}
-		}
-	}
-
-	protected String getValue(String column, String columnValue) {
-		if (columnValue == null)
-			columnValue = "";
-		int columnValueLength = columnValue == null ? 0 : columnValue.length();
-		int columnLength = Integer.parseInt(COLUMN_LENGTH.get(column).toString());
-		if (columnValueLength == columnLength)
-			return columnValue;
-		if (columnValueLength > columnLength)
-			return columnValue.substring(0, columnLength);
-
-		return columnValue + getBlank(columnLength - columnValueLength);
-	}
-
-	protected String getBlank(int count) {
-		StringBuffer sb = new StringBuffer();
-		while (count > 0) {
-			sb.append(" ");
-			count--;
-		}
-		return sb.toString();
-	}
-
-	/******************************************
-	 * get entitylist used for compares
-	 */
-	private EntityList getEntityList(String veName)
-			throws java.sql.SQLException, COM.ibm.opicmpdh.middleware.MiddlewareException {
-		ExtractActionItem eaItem = new ExtractActionItem(null, m_db, m_prof, veName);
-
-		EntityList list = m_db.getEntityList(m_prof, eaItem, new EntityItem[] {
-				new EntityItem(null, m_prof, rootEntity.getEntityType(), rootEntity.getEntityID()) });
-
-		// debug display list of groups
-		addDebug("EntityList for " + m_prof.getValOn() + " extract " + veName + " contains the following entities: \n"
-				+ PokUtils.outputList(list));
-
-		return list;
-	}
-
-	/**********************************
-	 * get the name of the VE that returns all data
-	 * 
-	 * @return java.lang.String
-	 */
-	public String getFeatureVEName() {
-		return "QSMRPQFULLVE1";
-	}
-
-	public boolean exeFtpShell(String fileName) {
-		// String cmd =
-		// "/usr/bin/rsync -av /var/log/www.solive.kv/access_log
-		// testuser@10.0.1.219::store --password-file=/etc/client/rsync.pwd";
-
-		String cmd = ABRServerProperties.getValue(abrcode, FTPSCRPATH, null) + " -f " + fileName;
-		String ibiinipath = ABRServerProperties.getValue(abrcode, CREFINIPATH, null);
-		if (ibiinipath != null)
-			cmd += " -i " + ibiinipath;
-		if (dir != null)
-			cmd += " -d " + dir;
-		String filePrefix = ABRServerProperties.getValue(abrcode, FILEPREFIX, null);
-		if (filePrefix != null)
-			cmd += " -p " + filePrefix;
-		String targetFilePath = ABRServerProperties.getValue(abrcode, TARGETFILENAME, null);
-		if (targetFilePath != null)
-			cmd += " -t " + targetFilePath;
-		String logPath = ABRServerProperties.getValue(abrcode, LOGPATH, null);
-		if (logPath != null)
-			cmd += " -l " + logPath;
-		String backupPath = ABRServerProperties.getValue(abrcode, BACKUPPATH, null);
-		if (backupPath != null)
-			cmd += " -b " + backupPath;
-		Runtime run = Runtime.getRuntime();
-		String result = "";
-		BufferedReader br = null;
-		BufferedInputStream in = null;
-		addDebug("cmd:" + cmd);
-		try {
-			Process p = run.exec(cmd);
-			if (p.waitFor() != 0) {
-				return false;
-			}
-			in = new BufferedInputStream(p.getInputStream());
-			br = new BufferedReader(new InputStreamReader(in));
-			while ((lineStr = br.readLine()) != null) {
-				result += lineStr;
-				if (lineStr.indexOf(FAILD) > -1) {
-					return false;
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-					in.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return result == null ? false : true;
-	}
-
-	/**********************************
-	 * add msg to report output
-	 */
-	protected void addOutput(String msg) {
-		rptSb.append("<p>" + msg + "</p>" + NEWLINE);
-	}
-
-	/**********************************
-	 * used for output
-	 *
-	 */
-	protected void addOutput(String resrcCode, Object args[]) {
-		String msg = getBundle().getString(resrcCode);
-		if (args != null) {
-			MessageFormat msgf = new MessageFormat(msg);
-			msg = msgf.format(args);
-		}
-
-		addOutput(msg);
-	}
-
-	/**********************************
-	 * add debug info as html comment
-	 */
-	protected void addDebug(String msg) {
-		rptSb.append("<!-- " + msg + " -->" + NEWLINE);
-	}
-
-	/**********************************
-	 * add error info and fail abr
-	 */
-	protected void addError(String msg) {
-		addOutput(msg);
-		setReturnCode(FAIL);
-	}
-
-	/**********************************
-	 * used for error output Prefix with LD(EntityType) NDN(EntityType) of the
-	 * EntityType that the ABR is checking (root EntityType)
-	 *
-	 * The entire message should be prefixed with 'Error: '
-	 *
-	 */
-	protected void addError(String errCode, Object args[]) {
-		EntityGroup eGrp = m_elist.getParentEntityGroup();
-		setReturnCode(FAIL);
-
-		// ERROR_PREFIX = Error: &quot;{0} {1}&quot;
-		MessageFormat msgf = new MessageFormat(getBundle().getString("ERROR_PREFIX"));
-		Object args2[] = new Object[2];
-		args2[0] = eGrp.getLongDescription();
-		args2[1] = navName;
-
-		addMessage(msgf.format(args2), errCode, args);
-	}
-
-	/**********************************
-	 * used for warning or error output
-	 *
-	 */
-	private void addMessage(String msgPrefix, String errCode, Object args[]) {
-		String msg = getBundle().getString(errCode);
-		// get message to output
-		if (args != null) {
-			MessageFormat msgf = new MessageFormat(msg);
-			msg = msgf.format(args);
-		}
-
-		addOutput(msgPrefix + " " + msg);
-	}
-
-	/**********************************************************************************
-	 * Get Name based on navigation attributes for root entity
-	 *
-	 * @return java.lang.String
-	 */
-//	private String getNavigationName() throws java.sql.SQLException, MiddlewareException {
-//		return getNavigationName(m_elist.getParentEntityGroup().getEntityItem(0));
-//	}
-
-	/**********************************************************************************
-	 * Get Name based on navigation attributes for specified entity
-	 *
-	 * @return java.lang.String
-	 */
-//	private String getNavigationName(EntityItem theItem) throws java.sql.SQLException, MiddlewareException {
-//		StringBuffer navName = new StringBuffer();
-		// NAME is navigate attributes
-		// check hashtable to see if we already got this meta
-//		EANList metaList = (EANList) metaTbl.get(theItem.getEntityType());
-//		if (metaList == null) {
-//			EntityGroup eg = new EntityGroup(null, m_db, m_prof, theItem.getEntityType(), "Navigate");
-//			metaList = eg.getMetaAttribute(); // iterator does not maintain
-//												// navigate order
-//			metaTbl.put(theItem.getEntityType(), metaList);
-//		}
-//		for (int ii = 0; ii < metaList.size(); ii++) {
-//			EANMetaAttribute ma = (EANMetaAttribute) metaList.getAt(ii);
-//			navName.append(PokUtils.getAttributeValue(theItem, ma.getAttributeCode(), ", ", "", false));
-//			if (ii + 1 < metaList.size()) {
-//				navName.append(" ");
-//			}
-//		}
-
-//		return navName.toString();
-//	}
-
-	/***********************************************
-	 * Get the version
-	 *
-	 * @return java.lang.String
-	 */
-	public String getABRVersion() {
-		return "1.0";
-	}
-
-	/***********************************************
-	 * Get ABR description
-	 *
-	 * @return java.lang.String
-	 */
-	public String getDescription() {
-		return "QSMRPQWITHDRAWALFULLABR";
-	}
-
-}

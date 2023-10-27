@@ -1,438 +1,444 @@
-//Licensed Materials -- Property of IBM
-//XMLINVNameElem.java
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANTextAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import COM.ibm.opicmpdh.transactions.NLSItem;
+/*     */ import com.ibm.transform.oim.eacm.diff.DiffEntity;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.IOException;
+/*     */ import java.util.StringTokenizer;
+/*     */ import java.util.Vector;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ import org.w3c.dom.Node;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class XMLMktgInvElem
+/*     */   extends XMLElem
+/*     */ {
+/*     */   private String destinationPath;
+/*     */   private String att2code;
+/*     */   
+/*     */   public XMLMktgInvElem(String paramString1, String paramString2, String paramString3, String paramString4) {
+/*  50 */     super(paramString1, paramString2);
+/*  51 */     this.destinationPath = paramString4;
+/*  52 */     this.att2code = paramString3;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected Node getContentNode(Document paramDocument, EntityItem paramEntityItem, Element paramElement, StringBuffer paramStringBuffer) throws IOException {
+/*  67 */     if (this.attrCode == null || paramEntityItem == null) {
+/*  68 */       return null;
+/*     */     }
+/*  70 */     EntityGroup entityGroup = paramEntityItem.getEntityGroup();
+/*  71 */     EntityList entityList = entityGroup.getEntityList();
+/*     */ 
+/*     */     
+/*  74 */     String[] arrayOfString = PokUtils.convertToArray(this.attrCode);
+/*  75 */     for (byte b = 0; b < arrayOfString.length; b++) {
+/*  76 */       String str1 = "@@";
+/*  77 */       String str2 = arrayOfString[b];
+/*  78 */       boolean bool = false;
+/*  79 */       EANMetaAttribute eANMetaAttribute = entityGroup.getMetaAttribute(str2);
+/*     */ 
+/*     */ 
+/*     */       
+/*  83 */       if (eANMetaAttribute == null) {
+/*  84 */         if (this.isReq) {
+/*  85 */           throw new IOException(this.nodeName + " is required but " + str2 + " is not in " + paramEntityItem.getEntityType() + " META data");
+/*     */         }
+/*     */ 
+/*     */         
+/*  89 */         str1 = "Error: Attribute " + str2 + " not found in " + paramEntityItem.getEntityType() + " META data.";
+/*     */       } else {
+/*  91 */         Profile profile = entityList.getProfile();
+/*  92 */         NLSItem nLSItem = profile.getReadLanguage();
+/*  93 */         int i = nLSItem.getNLSID();
+/*     */ 
+/*     */         
+/*  96 */         EANAttribute eANAttribute1 = paramEntityItem.getAttribute(str2);
+/*  97 */         EANAttribute eANAttribute2 = paramEntityItem.getAttribute(str2);
+/*  98 */         if (eANAttribute1 instanceof EANTextAttribute && eANAttribute2 instanceof EANTextAttribute && (
+/*  99 */           (EANTextAttribute)eANAttribute1).containsNLS(1) && 
+/* 100 */           eANAttribute1 != null && eANAttribute1.toString().length() > 0) {
+/* 101 */           bool = true;
+/* 102 */           ABRUtil.append(paramStringBuffer, "use the TMF's" + NEWLINE);
+/* 103 */           if (((EANTextAttribute)eANAttribute2).containsNLS(i)) {
+/* 104 */             str1 = eANAttribute2.toString();
+/* 105 */             if (eANMetaAttribute.getAttributeType().equals("T") && 
+/* 106 */               str1.length() > getTextLimit()) {
+/* 107 */               str1 = str1.substring(0, getTextLimit());
+/* 108 */               ABRUtil.append(paramStringBuffer, "XMLElem.getContentNode node:" + this.nodeName + " " + paramEntityItem.getKey() + " value was truncated for attr " + str2 + NEWLINE);
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 116 */         if (!bool) {
+/* 117 */           Vector<EntityItem> vector = new Vector();
+/*     */           
+/* 119 */           if (this.destinationPath != null && paramEntityItem != null) {
+/* 120 */             ABRUtil.append(paramStringBuffer, "use the feature's" + NEWLINE);
+/* 121 */             EntityItem entityItem = paramEntityItem;
+/* 122 */             Vector<EntityItem> vector1 = new Vector(1);
+/* 123 */             Vector<EntityItem> vector2 = new Vector(1);
+/* 124 */             vector2.add(entityItem);
+/* 125 */             StringTokenizer stringTokenizer = new StringTokenizer(this.destinationPath, ":");
+/* 126 */             while (stringTokenizer.hasMoreTokens()) {
+/* 127 */               String str3 = stringTokenizer.nextToken();
+/* 128 */               String str4 = null;
+/* 129 */               if (stringTokenizer.hasMoreTokens()) {
+/* 130 */                 str4 = stringTokenizer.nextToken();
+/*     */               }
+/* 132 */               ABRUtil.append(paramStringBuffer, "XMLMktgInvElem: node:" + this.nodeName + " attrbutecode:" + str2 + " path:" + this.destinationPath + " dir:" + str3 + " destination " + str4 + NEWLINE);
+/*     */ 
+/*     */               
+/* 135 */               Vector<EntityItem> vector3 = new Vector();
+/* 136 */               for (byte b2 = 0; b2 < vector2.size(); b2++) {
+/* 137 */                 EntityItem entityItem1 = vector2.elementAt(b2);
+/* 138 */                 ABRUtil.append(paramStringBuffer, "XMLMktgInvElem: loop pitem " + entityItem1.getKey() + NEWLINE);
+/* 139 */                 Vector<EntityItem> vector4 = null;
+/* 140 */                 if (str3.equals("D")) {
+/* 141 */                   vector4 = entityItem1.getDownLink();
+/*     */                 } else {
+/* 143 */                   vector4 = entityItem1.getUpLink();
+/*     */                 } 
+/* 145 */                 for (byte b3 = 0; b3 < vector4.size(); b3++) {
+/* 146 */                   EntityItem entityItem2 = vector4.elementAt(b3);
+/* 147 */                   ABRUtil.append(paramStringBuffer, "XMLMktgInvElem: linkloop entity " + entityItem2.getKey() + NEWLINE);
+/* 148 */                   if (entityItem2.getEntityType().equals(str4)) {
+/* 149 */                     if (stringTokenizer.hasMoreTokens()) {
+/*     */                       
+/* 151 */                       vector3.add(entityItem2);
+/*     */                     } else {
+/* 153 */                       vector1.add(entityItem2);
+/*     */                     } 
+/*     */                   }
+/*     */                 } 
+/*     */               } 
+/* 158 */               vector2 = vector3;
+/*     */             } 
+/*     */             
+/* 161 */             vector = vector1;
+/*     */           } 
+/* 163 */           if (vector.size() == 0) {
+/* 164 */             paramStringBuffer
+/* 165 */               .append("XMLMktgInvElem: node:" + this.nodeName + " No entities found for " + this.destinationPath + NEWLINE);
+/*     */ 
+/*     */             
+/* 168 */             return null;
+/*     */           } 
+/* 170 */           for (byte b1 = 0; b1 < vector.size(); b1++) {
+/* 171 */             EntityItem entityItem = vector.elementAt(b1);
+/* 172 */             EntityGroup entityGroup1 = entityItem.getEntityGroup();
+/* 173 */             EANMetaAttribute eANMetaAttribute1 = entityGroup1.getMetaAttribute(str2);
+/* 174 */             if (eANMetaAttribute1 != null) {
+/* 175 */               EANAttribute eANAttribute = entityItem.getAttribute(str2);
+/* 176 */               if (eANAttribute instanceof EANTextAttribute)
+/*     */               {
+/*     */                 
+/* 179 */                 if (((EANTextAttribute)eANAttribute).containsNLS(i)) {
+/* 180 */                   str1 = eANAttribute.toString();
+/* 181 */                   if (eANMetaAttribute1.getAttributeType().equals("T") && 
+/* 182 */                     str1.length() > getTextLimit()) {
+/* 183 */                     str1 = str1.substring(0, getTextLimit());
+/* 184 */                     ABRUtil.append(paramStringBuffer, "XMLElem.getContentNode node:" + this.nodeName + " " + entityItem.getKey() + " value was truncated for attr " + str2 + NEWLINE);
+/*     */                   }
+/*     */                 
+/*     */                 }
+/*     */               
+/*     */               }
+/*     */             } else {
+/*     */               
+/* 192 */               str1 = "Error: Attribute " + str2 + " not found in " + entityItem.getEntityType() + " META data.";
+/*     */             } 
+/*     */           } 
+/* 195 */           vector.clear();
+/*     */         } 
+/*     */         
+/* 198 */         return paramDocument.createTextNode(str1);
+/*     */       } 
+/*     */     } 
+/* 201 */     return null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean hasNodeValueChgForNLS(DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) {
+/* 214 */     boolean bool1 = false;
+/*     */     
+/* 216 */     EntityItem entityItem1 = paramDiffEntity.getCurrentEntityItem();
+/* 217 */     EntityItem entityItem2 = paramDiffEntity.getPriorEntityItem();
+/* 218 */     NLSItem nLSItem = null;
+/* 219 */     if (!paramDiffEntity.isDeleted()) {
+/* 220 */       nLSItem = entityItem1.getProfile().getReadLanguage();
+/*     */     } else {
+/* 222 */       nLSItem = entityItem2.getProfile().getReadLanguage();
+/*     */     } 
+/* 224 */     int i = nLSItem.getNLSID();
+/* 225 */     String str1 = "@@";
+/* 226 */     String str2 = "@@";
+/* 227 */     boolean bool2 = false;
+/* 228 */     boolean bool3 = false;
+/*     */     
+/* 230 */     String[] arrayOfString = PokUtils.convertToArray(this.attrCode);
+/* 231 */     for (byte b = 0; b < arrayOfString.length; b++) {
+/* 232 */       String str = arrayOfString[b];
+/* 233 */       if (!str.equals("ENTITYTYPE") && !str.equals("ENTITYID") && !str.equals("NLSID") && 
+/* 234 */         !str.equals("ENTITY1ID") && !str.equals("ENTITY2ID")) {
+/*     */ 
+/*     */ 
+/*     */         
+/* 238 */         if (entityItem1 != null) {
+/* 239 */           EntityGroup entityGroup = entityItem1.getEntityGroup();
+/* 240 */           EANMetaAttribute eANMetaAttribute = entityGroup.getMetaAttribute(str);
+/* 241 */           if (eANMetaAttribute != null) {
+/* 242 */             EANAttribute eANAttribute1 = entityItem1.getAttribute(str);
+/* 243 */             EANAttribute eANAttribute2 = entityItem1.getAttribute(str);
+/* 244 */             if (eANAttribute1 instanceof EANTextAttribute && eANAttribute2 instanceof EANTextAttribute && (
+/* 245 */               (EANTextAttribute)eANAttribute1).containsNLS(1) && 
+/* 246 */               eANAttribute1 != null && eANAttribute1.toString().length() > 0) {
+/* 247 */               bool2 = true;
+/* 248 */               ABRUtil.append(paramStringBuffer, "check the TMF's " + NEWLINE);
+/* 249 */               if (((EANTextAttribute)eANAttribute2).containsNLS(i)) {
+/* 250 */                 str1 = eANAttribute2.toString();
+/*     */               }
+/*     */             } 
+/*     */           } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */           
+/* 258 */           if (!bool2) {
+/* 259 */             ABRUtil.append(paramStringBuffer, "hasNodeValueChgForNLS: geting current 2nd priority attrCode:" + this.att2code + NEWLINE);
+/* 260 */             Vector<EntityItem> vector = new Vector();
+/*     */             
+/* 262 */             if (this.destinationPath != null && entityItem1 != null) {
+/* 263 */               ABRUtil.append(paramStringBuffer, "check the feature's" + NEWLINE);
+/* 264 */               EntityItem entityItem = entityItem1;
+/* 265 */               Vector<EntityItem> vector1 = new Vector(1);
+/* 266 */               Vector<EntityItem> vector2 = new Vector(1);
+/* 267 */               vector2.add(entityItem);
+/* 268 */               StringTokenizer stringTokenizer = new StringTokenizer(this.destinationPath, ":");
+/* 269 */               while (stringTokenizer.hasMoreTokens()) {
+/* 270 */                 String str3 = stringTokenizer.nextToken();
+/* 271 */                 String str4 = null;
+/* 272 */                 if (stringTokenizer.hasMoreTokens()) {
+/* 273 */                   str4 = stringTokenizer.nextToken();
+/*     */                 }
+/* 275 */                 ABRUtil.append(paramStringBuffer, "hasNodeValueChgForNLS: node:" + this.nodeName + "attrCode:" + str + " path:" + this.destinationPath + " dir:" + str3 + " destination " + str4 + NEWLINE);
+/*     */ 
+/*     */                 
+/* 278 */                 Vector<EntityItem> vector3 = new Vector();
+/* 279 */                 for (byte b1 = 0; b1 < vector2.size(); b1++) {
+/* 280 */                   EntityItem entityItem3 = vector2.elementAt(b1);
+/* 281 */                   ABRUtil.append(paramStringBuffer, "hasNodeValueChgForNLS: loop pitem " + entityItem3.getKey() + NEWLINE);
+/* 282 */                   Vector<EntityItem> vector4 = null;
+/* 283 */                   if (str3.equals("D")) {
+/* 284 */                     vector4 = entityItem3.getDownLink();
+/*     */                   } else {
+/* 286 */                     vector4 = entityItem3.getUpLink();
+/*     */                   } 
+/* 288 */                   for (byte b2 = 0; b2 < vector4.size(); b2++) {
+/* 289 */                     EntityItem entityItem4 = vector4.elementAt(b2);
+/* 290 */                     ABRUtil.append(paramStringBuffer, "hasNodeValueChgForNLS: linkloop entity " + entityItem4.getKey() + NEWLINE);
+/* 291 */                     if (entityItem4.getEntityType().equals(str4)) {
+/* 292 */                       if (stringTokenizer.hasMoreTokens()) {
+/*     */                         
+/* 294 */                         vector3.add(entityItem4);
+/*     */                       } else {
+/* 296 */                         vector1.add(entityItem4);
+/*     */                       } 
+/*     */                     }
+/*     */                   } 
+/*     */                 } 
+/* 301 */                 vector2 = vector3;
+/*     */               } 
+/*     */               
+/* 304 */               vector = vector1;
+/*     */             } 
+/* 306 */             if (vector.size() > 0) {
+/* 307 */               for (byte b1 = 0; b1 < vector.size(); b1++) {
+/* 308 */                 EntityItem entityItem = vector.elementAt(b1);
+/* 309 */                 EntityGroup entityGroup1 = entityItem.getEntityGroup();
+/* 310 */                 EANMetaAttribute eANMetaAttribute1 = entityGroup1.getMetaAttribute(str);
+/* 311 */                 if (eANMetaAttribute1 != null) {
+/* 312 */                   EANAttribute eANAttribute = entityItem.getAttribute(str);
+/* 313 */                   if (eANAttribute instanceof EANTextAttribute)
+/*     */                   {
+/*     */                     
+/* 316 */                     if (((EANTextAttribute)eANAttribute).containsNLS(i))
+/*     */                     {
+/* 318 */                       str1 = eANAttribute.toString();
+/*     */                     }
+/*     */                   }
+/*     */                 }
+/*     */               
+/*     */               } 
+/*     */             } else {
+/*     */               
+/* 326 */               ABRUtil.append(paramStringBuffer, "hasNodeValueChgForNLS: node:" + this.nodeName + " No entities found for " + this.destinationPath + NEWLINE);
+/*     */             } 
+/*     */ 
+/*     */             
+/* 330 */             vector.clear();
+/*     */           } 
+/*     */         } 
+/* 333 */         if (entityItem2 != null) {
+/* 334 */           EntityGroup entityGroup = entityItem2.getEntityGroup();
+/* 335 */           EANMetaAttribute eANMetaAttribute = entityGroup.getMetaAttribute(str);
+/* 336 */           if (eANMetaAttribute != null) {
+/* 337 */             EANAttribute eANAttribute1 = entityItem2.getAttribute(str);
+/* 338 */             EANAttribute eANAttribute2 = entityItem2.getAttribute(str);
+/* 339 */             if (eANAttribute1 instanceof EANTextAttribute && eANAttribute2 instanceof EANTextAttribute)
+/*     */             {
+/*     */               
+/* 342 */               if (((EANTextAttribute)eANAttribute1).containsNLS(1) && 
+/* 343 */                 eANAttribute1 != null && eANAttribute1.toString().length() > 0) {
+/* 344 */                 bool3 = true;
+/* 345 */                 ABRUtil.append(paramStringBuffer, "check the TMF's " + NEWLINE);
+/* 346 */                 if (((EANTextAttribute)eANAttribute2).containsNLS(i)) {
+/* 347 */                   str2 = eANAttribute2.toString();
+/*     */                 }
+/*     */               } 
+/*     */             }
+/*     */           } 
+/*     */ 
+/*     */           
+/* 354 */           if (!bool3) {
+/* 355 */             ABRUtil.append(paramStringBuffer, "hasNodeValueChgForNLS: geting preview 2nd priority attrCode:" + str + NEWLINE);
+/* 356 */             Vector<EntityItem> vector = new Vector();
+/*     */             
+/* 358 */             if (this.destinationPath != null && entityItem2 != null) {
+/* 359 */               ABRUtil.append(paramStringBuffer, "check the feature's" + NEWLINE);
+/* 360 */               EntityItem entityItem = entityItem2;
+/* 361 */               Vector<EntityItem> vector1 = new Vector(1);
+/* 362 */               Vector<EntityItem> vector2 = new Vector(1);
+/* 363 */               vector2.add(entityItem);
+/* 364 */               StringTokenizer stringTokenizer = new StringTokenizer(this.destinationPath, ":");
+/* 365 */               while (stringTokenizer.hasMoreTokens()) {
+/* 366 */                 String str3 = stringTokenizer.nextToken();
+/* 367 */                 String str4 = null;
+/* 368 */                 if (stringTokenizer.hasMoreTokens()) {
+/* 369 */                   str4 = stringTokenizer.nextToken();
+/*     */                 }
+/* 371 */                 ABRUtil.append(paramStringBuffer, "hasNodeValueChgForNLS: node:" + this.nodeName + " path:" + this.destinationPath + " dir:" + str3 + " destination " + str4 + NEWLINE);
+/*     */ 
+/*     */                 
+/* 374 */                 Vector<EntityItem> vector3 = new Vector();
+/* 375 */                 for (byte b1 = 0; b1 < vector2.size(); b1++) {
+/* 376 */                   EntityItem entityItem3 = vector2.elementAt(b1);
+/* 377 */                   ABRUtil.append(paramStringBuffer, "hasNodeValueChgForNLS: loop pitem " + entityItem3.getKey() + NEWLINE);
+/* 378 */                   Vector<EntityItem> vector4 = null;
+/* 379 */                   if (str3.equals("D")) {
+/* 380 */                     vector4 = entityItem3.getDownLink();
+/*     */                   } else {
+/* 382 */                     vector4 = entityItem3.getUpLink();
+/*     */                   } 
+/* 384 */                   for (byte b2 = 0; b2 < vector4.size(); b2++) {
+/* 385 */                     EntityItem entityItem4 = vector4.elementAt(b2);
+/* 386 */                     ABRUtil.append(paramStringBuffer, "hasNodeValueChgForNLS: linkloop entity " + entityItem4.getKey() + NEWLINE);
+/* 387 */                     if (entityItem4.getEntityType().equals(str4)) {
+/* 388 */                       if (stringTokenizer.hasMoreTokens()) {
+/*     */                         
+/* 390 */                         vector3.add(entityItem4);
+/*     */                       } else {
+/* 392 */                         vector1.add(entityItem4);
+/*     */                       } 
+/*     */                     }
+/*     */                   } 
+/*     */                 } 
+/* 397 */                 vector2 = vector3;
+/*     */               } 
+/*     */               
+/* 400 */               vector = vector1;
+/*     */             } 
+/* 402 */             if (vector.size() > 0) {
+/* 403 */               for (byte b1 = 0; b1 < vector.size(); b1++) {
+/* 404 */                 EntityItem entityItem = vector.elementAt(b1);
+/* 405 */                 EntityGroup entityGroup1 = entityItem.getEntityGroup();
+/* 406 */                 EANMetaAttribute eANMetaAttribute1 = entityGroup1.getMetaAttribute(str);
+/* 407 */                 if (eANMetaAttribute1 != null) {
+/* 408 */                   EANAttribute eANAttribute = entityItem.getAttribute(str);
+/* 409 */                   if (eANAttribute instanceof EANTextAttribute)
+/*     */                   {
+/*     */                     
+/* 412 */                     if (((EANTextAttribute)eANAttribute).containsNLS(i))
+/*     */                     {
+/* 414 */                       str2 = eANAttribute.toString();
+/*     */                     }
+/*     */                   }
+/*     */                 }
+/*     */               
+/*     */               } 
+/*     */             } else {
+/*     */               
+/* 422 */               ABRUtil.append(paramStringBuffer, "hasNodeValueChgForNLS: node:" + this.nodeName + " No entities found for " + this.destinationPath + NEWLINE);
+/*     */             } 
+/*     */ 
+/*     */             
+/* 426 */             vector.clear();
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/* 430 */     }  ABRUtil.append(paramStringBuffer, "hasNodeValueChgForNLS.hasNodeValueChgForNLS node:" + this.nodeName + " " + paramDiffEntity.getKey() + " ReadLanguage " + nLSItem + " attr " + this.attrCode + "\n currVal: " + str1 + "\n prevVal: " + str2 + NEWLINE);
+/*     */ 
+/*     */     
+/* 433 */     if (!str1.equals(str2)) {
+/* 434 */       bool1 = true;
+/*     */     }
+/* 436 */     return bool1;
+/*     */   }
+/*     */ }
 
 
-//$Log: XMLMktgInvElem.java,v $
-//Revision 1.2  2015/01/26 15:53:39  wangyul
-//fix the issue PR24222 -- SPF ADS abr string buffer
-//
-//Revision 1.1  2014/01/07 13:09:56  guobin
-//Fix CR BH FS ABR XML System Feed Mapping 20131106b.doc , LANGUAGE Element NLSID MarketName and Invoice Name extract from FEATURE if no NLSID 1 .
-//
-
-package COM.ibm.eannounce.abr.util;
-
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.opicmpdh.middleware.Profile;
-import COM.ibm.opicmpdh.transactions.NLSItem;
-
-import java.io.*;
-import java.util.StringTokenizer;
-import java.util.Vector;
-
-import org.w3c.dom.*;
-
-import com.ibm.transform.oim.eacm.diff.DiffEntity;
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-/*******************************************************************************
- * Base Class used to hold info and structure to be generated for the xml feed
- * for abrs. This acts on a particular entity.Tag INVNAME is derived from
- * SWPRODSTRUCT.INVNAME OR SWFEATURE.INVNAME
- * 
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\XMLMktgInvElem.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-
-public class XMLMktgInvElem extends XMLElem {
-	private String destinationPath;
-
-	private String att2code;
-
-	/***************************************************************************
-	 * Constructor - used when element does not have text nodes and is not root
-	 * 
-	 * @param nname
-	 *            String with name of node to be created
-	 */
-	public XMLMktgInvElem(String nname, String attcode, String attcode2, String path) {
-		super(nname, attcode);
-		destinationPath = path;
-		att2code = attcode2;
-	}
-
-	/***************************************************************************
-	 * Get the content node for this attribute(s), if this is a F (multiflag)
-	 * then create one parent and node for each value
-	 * 
-	 * @param document
-	 *            Document
-	 * @param item
-	 *            EntityItem
-	 * @param parent
-	 *            Element
-	 */
-	protected Node getContentNode(Document document, EntityItem item, Element parent, StringBuffer debugSb) throws IOException {
-		if (attrCode == null || item == null) {
-			return null;
-		}
-		EntityGroup egrp = item.getEntityGroup();
-		EntityList list1 = egrp.getEntityList();
-		// use value from entity1 id
-		// new added
-		String attrCodes[] = PokUtils.convertToArray(attrCode);
-		for (int a = 0; a < attrCodes.length; a++) {
-			String value = CHEAT;
-			String code = attrCodes[a];
-			boolean ifTmf = false;
-			EANMetaAttribute metaAttr = egrp.getMetaAttribute(code);
-			// new end
-			// String value = CHEAT;
-			// EANMetaAttribute metaAttr = egrp.getMetaAttribute(attrCode);
-			if (metaAttr == null) {
-				if (isReq) {
-					throw new IOException(nodeName + " is required but " + code + " is not in " + item.getEntityType()
-						+ " META data");
-				}
-
-				value = "Error: Attribute " + code + " not found in " + item.getEntityType() + " META data.";
-			} else { // meta exists for this attribute
-				Profile profile = list1.getProfile();
-				NLSItem nlsitem = profile.getReadLanguage();
-				int nlsid = nlsitem.getNLSID();
-				// avoid using fallback to nlsid==1 for text attributes
-				// this node may only want a value for a specific nlsid
-				EANAttribute att = item.getAttribute(code);// attrCode
-				EANAttribute atta = item.getAttribute(code);
-				if (att instanceof EANTextAttribute && atta instanceof EANTextAttribute) {
-					if (((EANTextAttribute) att).containsNLS(1)) {
-						if (att != null && att.toString().length() > 0) {
-							ifTmf = true;
-							ABRUtil.append(debugSb,"use the TMF's" + NEWLINE);
-							if (((EANTextAttribute) atta).containsNLS(nlsid)) {
-								value = atta.toString();
-								if (metaAttr.getAttributeType().equals("T")) { // TextAttribute
-									if (value.length() > getTextLimit()) {
-										value = value.substring(0, getTextLimit());
-										ABRUtil.append(debugSb,"XMLElem.getContentNode node:" + nodeName + " " + item.getKey()
-											+ " value was truncated for attr " + code + NEWLINE);
-									}
-								}
-							}
-						}
-					}
-				}
-				if (!ifTmf) {
-					Vector entityVct = new Vector();
-					// if the INVNAME is CHEAT, then get the SWFEATURE.INVNAME
-					if (destinationPath != null && item != null) {
-						ABRUtil.append(debugSb,"use the feature's" + NEWLINE);
-						EntityItem theitem = item;
-						Vector overrideVct = new Vector(1);
-						Vector parentitemsVct = new Vector(1);
-						parentitemsVct.add(theitem);
-						StringTokenizer st1 = new StringTokenizer(destinationPath, ":");
-						while (st1.hasMoreTokens()) {
-							String dir = st1.nextToken();
-							String destination = null;
-							if (st1.hasMoreTokens()) {
-								destination = st1.nextToken();
-							}
-							ABRUtil.append(debugSb,"XMLMktgInvElem: node:" + nodeName + " attrbutecode:" + code + " path:"
-								+ destinationPath + " dir:" + dir + " destination " + destination + NEWLINE);
-							// know we know dir and type needed
-							Vector tmp = new Vector();
-							for (int p = 0; p < parentitemsVct.size(); p++) {
-								EntityItem pitem = (EntityItem) parentitemsVct.elementAt(p);
-								ABRUtil.append(debugSb,"XMLMktgInvElem: loop pitem " + pitem.getKey() + NEWLINE);
-								Vector linkVct = null;
-								if (dir.equals("D")) {
-									linkVct = pitem.getDownLink();
-								} else {
-									linkVct = pitem.getUpLink();
-								}
-								for (int i = 0; i < linkVct.size(); i++) {
-									EntityItem entity = (EntityItem) linkVct.elementAt(i);
-									ABRUtil.append(debugSb,"XMLMktgInvElem: linkloop entity " + entity.getKey() + NEWLINE);
-									if (entity.getEntityType().equals(destination)) {
-										if (st1.hasMoreTokens()) {
-											// keep looking
-											tmp.add(entity);
-										} else {
-											overrideVct.add(entity);
-										}
-									}
-								}
-							}// end parentloop
-							parentitemsVct = tmp;
-						}
-
-						entityVct = overrideVct;
-					}
-					if (entityVct.size() == 0) {
-						debugSb
-							.append("XMLMktgInvElem: node:" + nodeName + " No entities found for " + destinationPath + NEWLINE);
-						// add any children to the parent, not this node
-
-						return null;
-					}
-					for (int i = 0; i < entityVct.size(); i++) {
-						EntityItem item2 = (EntityItem) entityVct.elementAt(i);
-						EntityGroup egrp2 = item2.getEntityGroup();
-						EANMetaAttribute metaAttr2 = egrp2.getMetaAttribute(code);// att2code
-						if (metaAttr2 != null) {
-							EANAttribute att2 = item2.getAttribute(code);
-							if (att2 instanceof EANTextAttribute) {
-								// true if information for the given NLSID is
-								// contained in the Text data
-								if (((EANTextAttribute) att2).containsNLS(nlsid)) {
-									value = att2.toString();
-									if (metaAttr2.getAttributeType().equals("T")) { // TextAttribute
-										if (value.length() > getTextLimit()) {
-											value = value.substring(0, getTextLimit());
-											ABRUtil.append(debugSb,"XMLElem.getContentNode node:" + nodeName + " " + item2.getKey()
-												+ " value was truncated for attr " + code + NEWLINE);
-										}
-									}
-								} // end attr has this language
-							}
-
-						} else {
-							value = "Error: Attribute " + code + " not found in " + item2.getEntityType() + " META data.";
-						}
-					}
-					entityVct.clear();
-				}
-
-				return document.createTextNode(value);
-			}
-		}
-		return null;
-	}
-
-	/**********************************************************************************
-	 * Check to see if this node has a changed value for this NLS, must be a Text attribute
-	 *
-	 *@param diffitem DiffEntity
-	 *@param debugSb StringBuffer
-	 *
-	 *hasNodeValueChgForNLS(diffitem, debugSb))
-	 */
-
-	protected boolean hasNodeValueChgForNLS(DiffEntity diffitem, StringBuffer debugSb) {
-		boolean hasValue = false;
-		// check at both times if one existed or not
-		EntityItem curritem = diffitem.getCurrentEntityItem();
-		EntityItem previtem = diffitem.getPriorEntityItem();
-		NLSItem nlsitem = null;
-		if (!diffitem.isDeleted()) {
-			nlsitem = curritem.getProfile().getReadLanguage();
-		} else {
-			nlsitem = previtem.getProfile().getReadLanguage();
-		}
-		int nlsid = nlsitem.getNLSID(); 
-		String currVal = CHEAT;
-		String prevVal = CHEAT;
-		boolean ifcTmf = false;
-		boolean ifpTmf = false;
-		//new added 
-		String attrCodes[] = PokUtils.convertToArray(attrCode);
-		for(int a=0; a<attrCodes.length; a++){
-			String code = attrCodes[a];
-			if (code.equals("ENTITYTYPE") || code.equals("ENTITYID") || code.equals("NLSID") ||
-				code.equals("ENTITY1ID") || code.equals("ENTITY2ID")){
-				continue;
-			}
-			//new added end
-		if (curritem != null) {
-			EntityGroup egrp = curritem.getEntityGroup();
-			EANMetaAttribute metaAttr = egrp.getMetaAttribute(code);
-			if (metaAttr != null) {
-				EANAttribute att = curritem.getAttribute(code);
-				EANAttribute atta = curritem.getAttribute(code);
-				if (att instanceof EANTextAttribute && atta instanceof EANTextAttribute) {
-				 if (((EANTextAttribute) att).containsNLS(1)) {
-						if (att != null && att.toString().length() > 0) {
-							ifcTmf = true;
-							ABRUtil.append(debugSb,"check the TMF's " + NEWLINE);
-							if(((EANTextAttribute) atta).containsNLS(nlsid)){								
-								currVal = atta.toString();								
-							} 
-						}
-
-					}
-				}
-			}
-		//	if (CHEAT.equals(currVal)) {
-			if(!ifcTmf) {
-				ABRUtil.append(debugSb,"hasNodeValueChgForNLS: geting current 2nd priority attrCode:" + att2code + NEWLINE);
-				Vector entityVct = new Vector();
-				// if the INVNAME is CHEAT, then get the SWFEATURE.INVNAME
-				if (destinationPath != null && curritem != null) {
-					ABRUtil.append(debugSb,"check the feature's" + NEWLINE);
-					EntityItem theitem = curritem;
-					Vector overrideVct = new Vector(1);
-					Vector parentitemsVct = new Vector(1);
-					parentitemsVct.add(theitem);
-					StringTokenizer st1 = new StringTokenizer(destinationPath, ":");
-					while (st1.hasMoreTokens()) {
-						String dir = st1.nextToken();
-						String destination = null;
-						if (st1.hasMoreTokens()) {
-							destination = st1.nextToken();
-						}
-						ABRUtil.append(debugSb,"hasNodeValueChgForNLS: node:" + nodeName + "attrCode:" + code + " path:"
-							+ destinationPath + " dir:" + dir + " destination " + destination + NEWLINE);
-						// know we know dir and type needed
-						Vector tmp = new Vector();
-						for (int p = 0; p < parentitemsVct.size(); p++) {
-							EntityItem pitem = (EntityItem) parentitemsVct.elementAt(p);
-							ABRUtil.append(debugSb,"hasNodeValueChgForNLS: loop pitem " + pitem.getKey() + NEWLINE);
-							Vector linkVct = null;
-							if (dir.equals("D")) {
-								linkVct = pitem.getDownLink();
-							} else {
-								linkVct = pitem.getUpLink();
-							}
-							for (int i = 0; i < linkVct.size(); i++) {
-								EntityItem entity = (EntityItem) linkVct.elementAt(i);
-								ABRUtil.append(debugSb,"hasNodeValueChgForNLS: linkloop entity " + entity.getKey() + NEWLINE);
-								if (entity.getEntityType().equals(destination)) {
-									if (st1.hasMoreTokens()) {
-										// keep looking
-										tmp.add(entity);
-									} else {
-										overrideVct.add(entity);
-									}
-								}
-							}
-						}// end parentloop
-						parentitemsVct = tmp;
-					}
-
-					entityVct = overrideVct;
-				}
-				if (entityVct.size() > 0) {
-					for (int i = 0; i < entityVct.size(); i++) {
-						EntityItem item2 = (EntityItem) entityVct.elementAt(i);
-						EntityGroup egrp2 = item2.getEntityGroup();
-						EANMetaAttribute metaAttr2 = egrp2.getMetaAttribute(code);//att2code
-						if (metaAttr2 != null) {
-							EANAttribute att2 = item2.getAttribute(code);//att2code
-							if (att2 instanceof EANTextAttribute) {
-								// true if information for the given NLSID is
-								// contained in the Text data
-								if (((EANTextAttribute) att2).containsNLS(nlsid)) {
-							//		if (att2 != null && att2.toString().length() > 0) {
-										currVal = att2.toString();
-							//		}
-								}
-							}
-						}
-					}
-
-				} else {
-					ABRUtil.append(debugSb,"hasNodeValueChgForNLS: node:" + nodeName + " No entities found for " + destinationPath
-						+ NEWLINE);
-					// add any children to the parent, not this node
-				}
-				entityVct.clear();
-			}
-		}
-		if (previtem != null) {
-			EntityGroup egrp = previtem.getEntityGroup();
-			EANMetaAttribute metaAttr = egrp.getMetaAttribute(code);
-			if (metaAttr != null) {
-				EANAttribute att = previtem.getAttribute(code);
-				EANAttribute atta = previtem.getAttribute(code);
-				if (att instanceof EANTextAttribute && atta instanceof EANTextAttribute) {
-					// true if information for the given NLSID is contained in the
-					// Text data
-				 if (((EANTextAttribute) att).containsNLS(1)) {
-						if (att != null && att.toString().length() > 0) {
-							ifpTmf = true;
-							ABRUtil.append(debugSb,"check the TMF's " + NEWLINE);
-							if(((EANTextAttribute) atta).containsNLS(nlsid)){								
-								prevVal = atta.toString();								
-							} 
-						}
-
-					}
-				}
-			}
-			if (!ifpTmf) {
-				ABRUtil.append(debugSb,"hasNodeValueChgForNLS: geting preview 2nd priority attrCode:" + code + NEWLINE);
-				Vector entityVct = new Vector();
-				// if the INVNAME is CHEAT, then get the SWFEATURE.INVNAME
-				if (destinationPath != null && previtem != null) {
-					ABRUtil.append(debugSb,"check the feature's" + NEWLINE);
-					EntityItem theitem = previtem;
-					Vector overrideVct = new Vector(1);
-					Vector parentitemsVct = new Vector(1);
-					parentitemsVct.add(theitem);
-					StringTokenizer st1 = new StringTokenizer(destinationPath, ":");
-					while (st1.hasMoreTokens()) {
-						String dir = st1.nextToken();
-						String destination = null;
-						if (st1.hasMoreTokens()) {
-							destination = st1.nextToken();
-						}
-						ABRUtil.append(debugSb,"hasNodeValueChgForNLS: node:" + nodeName + " path:" + destinationPath + " dir:" + dir
-							+ " destination " + destination + NEWLINE);
-						// know we know dir and type needed
-						Vector tmp = new Vector();
-						for (int p = 0; p < parentitemsVct.size(); p++) {
-							EntityItem pitem = (EntityItem) parentitemsVct.elementAt(p);
-							ABRUtil.append(debugSb,"hasNodeValueChgForNLS: loop pitem " + pitem.getKey() + NEWLINE);
-							Vector linkVct = null;
-							if (dir.equals("D")) {
-								linkVct = pitem.getDownLink();
-							} else {
-								linkVct = pitem.getUpLink();
-							}
-							for (int i = 0; i < linkVct.size(); i++) {
-								EntityItem entity = (EntityItem) linkVct.elementAt(i);
-								ABRUtil.append(debugSb,"hasNodeValueChgForNLS: linkloop entity " + entity.getKey() + NEWLINE);
-								if (entity.getEntityType().equals(destination)) {
-									if (st1.hasMoreTokens()) {
-										// keep looking
-										tmp.add(entity);
-									} else {
-										overrideVct.add(entity);
-									}
-								}
-							}
-						}// end parentloop
-						parentitemsVct = tmp;
-					}
-
-					entityVct = overrideVct;
-				}
-				if (entityVct.size() > 0) {
-					for (int i = 0; i < entityVct.size(); i++) {
-						EntityItem item2 = (EntityItem) entityVct.elementAt(i);
-						EntityGroup egrp2 = item2.getEntityGroup();
-						EANMetaAttribute metaAttr2 = egrp2.getMetaAttribute(code);//att2code
-						if (metaAttr2 != null) {
-							EANAttribute att2 = item2.getAttribute(code);
-							if (att2 instanceof EANTextAttribute) {
-								// true if information for the given NLSID is
-								// contained in the Text data
-								if (((EANTextAttribute) att2).containsNLS(nlsid)) {
-								//	if (att2 != null && att2.toString().length() > 0) {
-										prevVal = att2.toString();
-								//	}
-								}
-							}
-						}
-					}
-
-				} else {
-					ABRUtil.append(debugSb,"hasNodeValueChgForNLS: node:" + nodeName + " No entities found for " + destinationPath
-						+ NEWLINE);
-					// add any children to the parent, not this node
-				}
-				entityVct.clear();
-			}
-		}
-		}
-		ABRUtil.append(debugSb,"hasNodeValueChgForNLS.hasNodeValueChgForNLS node:" + nodeName + " " + diffitem.getKey()
-			+ " ReadLanguage " + nlsitem + " attr " + attrCode + "\n currVal: " + currVal + "\n prevVal: " + prevVal + NEWLINE);
-
-		if (!currVal.equals(prevVal)) { // we only care if there was a change
-			hasValue = true;
-		}
-		return hasValue;
-	}
-}

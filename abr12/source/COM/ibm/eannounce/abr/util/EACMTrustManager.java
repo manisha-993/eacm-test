@@ -1,54 +1,60 @@
-/* Copyright IBM Corp. 2016 */
-package COM.ibm.eannounce.abr.util;
+/*    */ package COM.ibm.eannounce.abr.util;
+/*    */ 
+/*    */ import java.security.KeyStore;
+/*    */ import javax.net.ssl.TrustManager;
+/*    */ import javax.net.ssl.TrustManagerFactory;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class EACMTrustManager
+/*    */ {
+/*    */   private KeyStore ks;
+/*    */   
+/*    */   public EACMTrustManager(String paramString1, String paramString2) throws Exception {
+/* 27 */     this("JKS", paramString1, paramString2);
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public EACMTrustManager(String paramString1, String paramString2, String paramString3) throws Exception {
+/* 39 */     this.ks = KeyStoreLoader.loadKeyStore(paramString1, paramString2, paramString3);
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public TrustManager[] getTrustManagers() throws Exception {
+/* 50 */     TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+/* 51 */     trustManagerFactory.init(this.ks);
+/* 52 */     return trustManagerFactory.getTrustManagers();
+/*    */   }
+/*    */ }
 
-import java.security.KeyStore;
 
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-
-/**
- * A class to load KeyStore and then generated KeyManagers
- * 
- * @author Li Chao Ji (jilichao@cn.ibm.com)
- * @since 08/11/2016
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\EACMTrustManager.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class EACMTrustManager
-{
-    private KeyStore ks;
-
-    /**
-     * 
-     * @param keyStore The keystore file location
-     * @param password The keystore file password
-     * @throws Exception
-     */
-    public EACMTrustManager(String keyStore, String password) throws Exception
-    {
-        this("JKS", keyStore, password);
-    }
-
-    /**
-     * 
-     * @param keyStoreType The KeyStore type
-     * @param keyStore The keystore file location
-     * @param password The keystore file password
-     * @throws Exception
-     */
-    public EACMTrustManager(String keyStoreType, String keyStore, String password) throws Exception
-    {
-        this.ks = KeyStoreLoader.loadKeyStore(keyStoreType, keyStore, password);
-    }
-
-    /**
-     * Initial TrustManagerFactory and then return TrustManagers
-     * 
-     * @return KeyManagers
-     * @throws Exception
-     */
-    public TrustManager[] getTrustManagers() throws Exception
-    {
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(ks);
-        return tmf.getTrustManagers();
-    }
-}

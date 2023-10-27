@@ -1,133 +1,139 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import java.io.IOException;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ import org.w3c.dom.Node;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class XMLRelatorElem
+/*     */   extends XMLElem
+/*     */ {
+/*     */   private String destinationType;
+/*     */   
+/*     */   public XMLRelatorElem(String paramString1, String paramString2, String paramString3) {
+/*  50 */     super(paramString1, paramString2);
+/*  51 */     this.destinationType = paramString3;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected Node getContentNode(Document paramDocument, EntityItem paramEntityItem, Element paramElement, StringBuffer paramStringBuffer) throws IOException {
+/*  66 */     if (this.attrCode == null || paramEntityItem == null) {
+/*  67 */       return null;
+/*     */     }
+/*     */     
+/*  70 */     if (this.attrCode.equals("ENTITY1ID")) {
+/*     */       
+/*  72 */       String str = "@@";
+/*  73 */       if (paramEntityItem.hasUpLinks()) {
+/*  74 */         for (byte b = 0; b < paramEntityItem.getUpLinkCount(); b++) {
+/*  75 */           EntityItem entityItem = (EntityItem)paramEntityItem.getUpLink(b);
+/*  76 */           if (entityItem.getEntityType().equals(this.destinationType)) {
+/*  77 */             str = "" + entityItem.getEntityID();
+/*  78 */             ABRUtil.append(paramStringBuffer, "XMLRelatorElem getting " + this.attrCode + " from " + entityItem.getKey() + NEWLINE);
+/*     */             break;
+/*     */           } 
+/*     */         } 
+/*     */       }
+/*  83 */       return paramDocument.createTextNode(str);
+/*     */     } 
+/*  85 */     if (this.attrCode.equals("ENTITY1TYPE")) {
+/*     */       
+/*  87 */       String str = "@@";
+/*  88 */       if (paramEntityItem.hasUpLinks()) {
+/*  89 */         for (byte b = 0; b < paramEntityItem.getUpLinkCount(); b++) {
+/*  90 */           EntityItem entityItem = (EntityItem)paramEntityItem.getUpLink(b);
+/*  91 */           if (entityItem.getEntityType().equals(this.destinationType)) {
+/*  92 */             str = "" + entityItem.getEntityType();
+/*  93 */             ABRUtil.append(paramStringBuffer, "XMLRelatorElem getting " + this.attrCode + " from " + entityItem.getKey() + NEWLINE);
+/*     */             break;
+/*     */           } 
+/*     */         } 
+/*     */       }
+/*  98 */       return paramDocument.createTextNode(str);
+/*     */     } 
+/* 100 */     if (this.attrCode.equals("ENTITY2ID")) {
+/*     */       
+/* 102 */       String str = "@@";
+/* 103 */       if (paramEntityItem.hasDownLinks()) {
+/* 104 */         for (byte b = 0; b < paramEntityItem.getDownLinkCount(); b++) {
+/* 105 */           EntityItem entityItem = (EntityItem)paramEntityItem.getDownLink(b);
+/* 106 */           if (entityItem.getEntityType().equals(this.destinationType)) {
+/* 107 */             str = "" + entityItem.getEntityID();
+/* 108 */             ABRUtil.append(paramStringBuffer, "XMLRelatorElem getting " + this.attrCode + " from " + entityItem.getKey() + NEWLINE);
+/*     */             break;
+/*     */           } 
+/*     */         } 
+/*     */       }
+/* 113 */       return paramDocument.createTextNode(str);
+/*     */     } 
+/* 115 */     if (this.attrCode.equals("ENTITY2TYPE")) {
+/*     */       
+/* 117 */       String str = "@@";
+/* 118 */       if (paramEntityItem.hasDownLinks()) {
+/* 119 */         for (byte b = 0; b < paramEntityItem.getDownLinkCount(); b++) {
+/* 120 */           EntityItem entityItem = (EntityItem)paramEntityItem.getDownLink(b);
+/* 121 */           if (entityItem.getEntityType().equals(this.destinationType)) {
+/* 122 */             str = "" + entityItem.getEntityType();
+/* 123 */             ABRUtil.append(paramStringBuffer, "XMLRelatorElem getting " + this.attrCode + " from " + entityItem.getKey() + NEWLINE);
+/*     */             break;
+/*     */           } 
+/*     */         } 
+/*     */       }
+/* 128 */       return paramDocument.createTextNode(str);
+/*     */     } 
+/*     */     
+/* 131 */     return null;
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.util;
 
-import COM.ibm.eannounce.objects.*;
-import java.io.*;
-
-import org.w3c.dom.*;
-
-/**********************************************************************************
-* Base Class used to hold info and structure to be generated for the xml feed
-* for abrs.  This acts on a particular entity.
-*
-*/
-// $Log: XMLRelatorElem.java,v $
-// Revision 1.4  2015/01/26 15:53:39  wangyul
-// fix the issue PR24222 -- SPF ADS abr string buffer
-//
-// Revision 1.3  2010/08/10 09:59:27  yang
-// get Feature and Model through the Path.
-//
-// Revision 1.2  2008/05/27 14:11:45  wendy
-// Clean up RSA warnings
-//
-// Revision 1.1  2008/05/07 19:26:48  wendy
-// Init for
-//  -   CQ00003539-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC
-//  -   CQ00005096-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Add Category MM and Images
-//  -   CQ00005046-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Support CRAD in BHC
-//  -   CQ00005045-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Upgrade/Conversion Support
-//  -   CQ00006862-WI  - BHC 3.0 Support - Support for Services Data UI
-//
-//
-public class XMLRelatorElem extends XMLElem
-{
-    private String destinationType;
-
-    /**********************************************************************************
-    * Constructor - used when element does not have text nodes and is not root
-    *
-    *@param nname String with name of node to be created
-    */
-    public XMLRelatorElem(String nname, String attcode, String dest)
-    {
-        super(nname, attcode);
-        destinationType = dest;
-    }
-
-    /**********************************************************************************
-    * Get the content node for this attribute(s), if this is a F (multiflag) then
-    * create one parent and node for each value
-    *
-    *@param document Document
-    *@param item EntityItem
-    *@param parent Element
-    */
-    protected Node getContentNode(Document document, EntityItem item, Element parent,
-        StringBuffer debugSb)
-    throws IOException
-    {
-        if (attrCode==null || item==null){
-            return null;
-        }
-
-        if (attrCode.equals("ENTITY1ID")){
-            // use value from entity1 id
-            String value = CHEAT;
-            if (item.hasUpLinks()){
-				for (int i=0; i<item.getUpLinkCount(); i++){
-					EntityItem entity = (EntityItem)item.getUpLink(i);
-					if (entity.getEntityType().equals(destinationType)){
-						value = ""+entity.getEntityID();
-						ABRUtil.append(debugSb,"XMLRelatorElem getting "+attrCode+" from "+entity.getKey()+NEWLINE);
-						break;
-					}
-				}
-            }
-            return document.createTextNode(value);
-        }
-        if (attrCode.equals("ENTITY1TYPE")){
-            // use value from entity1 id
-            String value = CHEAT;
-            if (item.hasUpLinks()){
-				for (int i=0; i<item.getUpLinkCount(); i++){
-					EntityItem entity = (EntityItem)item.getUpLink(i);
-					if (entity.getEntityType().equals(destinationType)){
-						value = ""+entity.getEntityType();
-						ABRUtil.append(debugSb,"XMLRelatorElem getting "+attrCode+" from "+entity.getKey()+NEWLINE);
-						break;
-					}
-				}
-            }
-            return document.createTextNode(value);
-        }
-        if (attrCode.equals("ENTITY2ID")){
-            // use value from entity2 id
-            String value = CHEAT;
-            if (item.hasDownLinks()){
-				for (int i=0; i<item.getDownLinkCount(); i++){
-					EntityItem entity = (EntityItem)item.getDownLink(i);
-					if (entity.getEntityType().equals(destinationType)){
-						value = ""+entity.getEntityID();
-						ABRUtil.append(debugSb,"XMLRelatorElem getting "+attrCode+" from "+entity.getKey()+NEWLINE);
-						break;
-					}
-				}
-            }
-            return document.createTextNode(value);
-        }
-        if (attrCode.equals("ENTITY2TYPE")){
-            // use value from entity2 id
-            String value = CHEAT;
-            if (item.hasDownLinks()){
-				for (int i=0; i<item.getDownLinkCount(); i++){
-					EntityItem entity = (EntityItem)item.getDownLink(i);
-					if (entity.getEntityType().equals(destinationType)){
-						value = ""+entity.getEntityType();
-						ABRUtil.append(debugSb,"XMLRelatorElem getting "+attrCode+" from "+entity.getKey()+NEWLINE);
-						break;
-					}
-				}
-            }
-            return document.createTextNode(value);
-        }
-
-        return null;
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\XMLRelatorElem.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

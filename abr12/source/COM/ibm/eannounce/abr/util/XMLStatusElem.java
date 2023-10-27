@@ -1,614 +1,557 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.AttributeChangeHistoryGroup;
+/*     */ import COM.ibm.eannounce.objects.AttributeChangeHistoryItem;
+/*     */ import COM.ibm.eannounce.objects.EANAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANTextAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*     */ import COM.ibm.opicmpdh.middleware.D;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import COM.ibm.opicmpdh.transactions.NLSItem;
+/*     */ import com.ibm.transform.oim.eacm.diff.DiffEntity;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.Vector;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ import org.w3c.dom.Node;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class XMLStatusElem
+/*     */   extends XMLElem
+/*     */ {
+/*     */   private static final String STATUS_RFR = "0040";
+/*     */   private static final String m_strEpoch = "1980-01-01-00.00.00.000000";
+/*     */   private static final String STATUS_PASSED = "0030";
+/*     */   private static final String STATUS_QUEUE = "0020";
+/*     */   private static final String STATUS_INPROCESS = "0050";
+/*  73 */   private static Vector tarEntity = new Vector(); static {
+/*  74 */     tarEntity.add("MODEL");
+/*  75 */     tarEntity.add("PRODSTRUCT");
+/*  76 */     tarEntity.add("LSEO");
+/*  77 */     tarEntity.add("SWPRODSTRUCT");
+/*  78 */     tarEntity.add("LSEOBUNDLE");
+/*  79 */     tarEntity.add("SVCMOD");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*  84 */   private static Hashtable RootEntity_Dates = new Hashtable<>(); static {
+/*  85 */     RootEntity_Dates.put("MODEL", new String[] { "ANNDATE", "WTHDRWEFFCTVDATE", "WITHDRAWDATE" });
+/*  86 */     RootEntity_Dates.put("LSEO1", new String[] { "LSEOPUBDATEMTRGT" });
+/*     */     
+/*  88 */     RootEntity_Dates.put("LSEO2", new String[] { "LSEOPUBDATEMTRGT", "LSEOUNPUBDATEMTRGT" });
+/*  89 */     RootEntity_Dates.put("PRODSTRUCT", new String[] { "ANNDATE", "GENAVAILDATE", "WTHDRWEFFCTVDATE", "WITHDRAWDATE" });
+/*  90 */     RootEntity_Dates.put("SWPRODSTRUCT", new String[] { "GENAVAILDATE" });
+/*  91 */     RootEntity_Dates.put("LSEOBUNDLE", new String[] { "BUNDLPUBDATEMTRGT", "BUNDLUNPUBDATEMTRGT" });
+/*  92 */     RootEntity_Dates.put("SVCMOD", new String[] { "ANNDATE", "WTHDRWEFFCTVDATE", "WITHDRAWDATE" });
+/*     */   }
+/*     */   
+/*     */   public XMLStatusElem(String paramString1, String paramString2, int paramInt) {
+/*  96 */     super(paramString1, paramString2, paramInt);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addElements(Database paramDatabase, EntityList paramEntityList, Document paramDocument, Element paramElement, EntityItem paramEntityItem, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 120 */     D.ebug(0, "Working on the item:" + this.nodeName);
+/* 121 */     Element element = paramDocument.createElement(this.nodeName);
+/* 122 */     addXMLAttrs(element);
+/*     */     
+/* 124 */     if (paramElement == null) {
+/* 125 */       paramDocument.appendChild(element);
+/*     */     } else {
+/* 127 */       paramElement.appendChild(element);
+/*     */     } 
+/* 129 */     Profile profile = paramEntityItem.getProfile();
+/* 130 */     AttributeChangeHistoryGroup attributeChangeHistoryGroup = null;
+/* 131 */     attributeChangeHistoryGroup = getADSABRSTATUSHistory(profile, paramDatabase, paramEntityItem, this.nodeName, paramStringBuffer);
+/* 132 */     Node node = null;
+/* 133 */     if (isExistFinal(attributeChangeHistoryGroup, paramDocument, paramEntityItem, paramElement, paramStringBuffer)) {
+/* 134 */       node = paramDocument.createTextNode("0020");
+/*     */     } else {
+/* 136 */       node = getContentNode(paramDocument, paramEntityItem, paramElement, paramStringBuffer);
+/*     */     } 
+/*     */     
+/* 139 */     if (node != null) {
+/* 140 */       element.appendChild(node);
+/*     */     }
+/*     */     
+/* 143 */     for (byte b = 0; b < this.childVct.size(); b++) {
+/* 144 */       XMLElem xMLElem = this.childVct.elementAt(b);
+/* 145 */       xMLElem.addElements(paramDatabase, paramEntityList, paramDocument, element, paramEntityItem, paramStringBuffer);
+/*     */     } 
+/*     */     
+/* 148 */     if (!element.hasChildNodes())
+/*     */     {
+/*     */       
+/* 151 */       element.appendChild(paramDocument.createTextNode("@@"));
+/*     */     }
+/* 153 */     attributeChangeHistoryGroup = null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public boolean isExistFinal(AttributeChangeHistoryGroup paramAttributeChangeHistoryGroup, Document paramDocument, EntityItem paramEntityItem, Element paramElement, StringBuffer paramStringBuffer) throws MiddlewareRequestException {
+/* 159 */     boolean bool = false;
+/* 160 */     if (this.attrCode == null || paramEntityItem == null) {
+/* 161 */       return false;
+/*     */     }
+/* 163 */     if (paramAttributeChangeHistoryGroup != null && paramAttributeChangeHistoryGroup.getChangeHistoryItemCount() > 0) {
+/* 164 */       for (int i = paramAttributeChangeHistoryGroup.getChangeHistoryItemCount() - 1; i >= 0; i--) {
+/* 165 */         AttributeChangeHistoryItem attributeChangeHistoryItem = (AttributeChangeHistoryItem)paramAttributeChangeHistoryGroup.getChangeHistoryItem(i);
+/* 166 */         if (attributeChangeHistoryItem != null) {
+/* 167 */           String str = attributeChangeHistoryItem.getFlagCode();
+/* 168 */           if (str != null && str.equals("0020")) {
+/* 169 */             bool = true;
+/*     */             break;
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */     } else {
+/* 175 */       ABRUtil.append(paramStringBuffer, "XMLStatusElem.isExistFinal STATUS has no changed history!" + NEWLINE);
+/* 176 */       bool = false;
+/*     */     } 
+/* 178 */     paramAttributeChangeHistoryGroup = null;
+/* 179 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addElements(Database paramDatabase, Hashtable<String, String> paramHashtable, Document paramDocument, Element paramElement, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 187 */     D.ebug(0, "Working on the item:" + this.nodeName);
+/* 188 */     Node node = null;
+/* 189 */     Element element = paramDocument.createElement(this.nodeName);
+/* 190 */     addXMLAttrs(element);
+/* 191 */     if (paramElement == null) {
+/* 192 */       paramDocument.appendChild(element);
+/*     */     } else {
+/* 194 */       paramElement.appendChild(element);
+/*     */     } 
+/* 196 */     EntityItem entityItem1 = paramDiffEntity.getCurrentEntityItem();
+/* 197 */     EntityItem entityItem2 = paramDiffEntity.getPriorEntityItem();
+/* 198 */     EntityItem entityItem3 = entityItem1;
+/* 199 */     if (paramDiffEntity.isDeleted()) {
+/* 200 */       entityItem3 = entityItem2;
+/*     */     }
+/* 202 */     Profile profile = entityItem3.getProfile();
+/* 203 */     AttributeChangeHistoryGroup attributeChangeHistoryGroup1 = null;
+/* 204 */     AttributeChangeHistoryGroup attributeChangeHistoryGroup2 = null;
+/* 205 */     attributeChangeHistoryGroup1 = getADSABRSTATUSHistory(profile, paramDatabase, entityItem3, "ADSABRSTATUS", paramStringBuffer);
+/* 206 */     attributeChangeHistoryGroup2 = getADSABRSTATUSHistory(profile, paramDatabase, entityItem3, this.nodeName, paramStringBuffer);
+/* 207 */     boolean bool = "0020".equals(PokUtils.getAttributeFlagValue(entityItem3, "STATUS"));
+/*     */     
+/* 209 */     if (tarEntity.contains(paramDiffEntity.getEntityType())) {
+/* 210 */       ABRUtil.append(paramStringBuffer, "XMLStatusElem running" + paramDiffEntity.getEntityType() + NEWLINE);
+/* 211 */       if (isDelta(entityItem2)) {
+/* 212 */         if (bool) {
+/* 213 */           node = paramDocument.createTextNode("0020");
+/* 214 */           paramHashtable.put("_chSTATUS", "0020");
+/* 215 */         } else if (isExistFinal(attributeChangeHistoryGroup2, paramDocument, entityItem3, paramElement, paramStringBuffer)) {
+/*     */           
+/* 217 */           ABRUtil.append(paramStringBuffer, "XMLStatusElem.addElements it's delta and existfinal. " + NEWLINE);
+/* 218 */           Vector vector1 = setMeta(entityItem3);
+/* 219 */           Vector vector2 = checkChgdAttr(entityItem3, entityItem2, vector1, paramStringBuffer);
+/* 220 */           ABRUtil.append(paramStringBuffer, "XMLStatusElem.addElements checkChgdAttr: " + vector2.toString() + NEWLINE);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */           
+/* 225 */           if (vector2 != null) {
+/* 226 */             if (isDatechange(entityItem3, paramDiffEntity, vector2, paramStringBuffer)) {
+/* 227 */               ABRUtil.append(paramStringBuffer, "XMLStatusElem.addElements only avail date related attricodes changed." + NEWLINE);
+/* 228 */               node = paramDocument.createTextNode("0020");
+/* 229 */               paramHashtable.put("_chSTATUS", "0020");
+/*     */             } else {
+/* 231 */               ABRUtil.append(paramStringBuffer, "XMLStatusElem.addElements not only avail date attricodes changed. " + NEWLINE);
+/* 232 */               node = paramDocument.createTextNode("0040");
+/* 233 */               paramHashtable.put("_chSTATUS", "0040");
+/*     */             } 
+/*     */           }
+/*     */         } else {
+/* 237 */           node = paramDocument.createTextNode("0040");
+/* 238 */           paramHashtable.put("_chSTATUS", "0040");
+/*     */         }
+/*     */       
+/* 241 */       } else if (bool) {
+/* 242 */         node = paramDocument.createTextNode("0020");
+/* 243 */         paramHashtable.put("_chSTATUS", "0020");
+/* 244 */       } else if (isExistFinal(attributeChangeHistoryGroup2, paramDocument, entityItem3, paramElement, paramStringBuffer)) {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 254 */         ABRUtil.append(paramStringBuffer, "XMLStatusElem.addElements it's full xml and existfinal. " + NEWLINE);
+/* 255 */         String str = getT1(attributeChangeHistoryGroup1, attributeChangeHistoryGroup2, paramStringBuffer);
+/* 256 */         if (!"1980-01-01-00.00.00.000000".equals(str)) {
+/*     */           
+/* 258 */           Profile profile1 = profile.getNewInstance(paramDatabase);
+/* 259 */           profile1.setValOnEffOn(str, str);
+/* 260 */           EntityList entityList = paramDatabase.getEntityList(profile1, new ExtractActionItem(null, paramDatabase, profile1, "dummy"), new EntityItem[] { new EntityItem(null, profile1, entityItem3
+/* 261 */                   .getEntityType(), entityItem3.getEntityID()) });
+/* 262 */           entityItem2 = entityList.getParentEntityGroup().getEntityItem(0);
+/*     */           
+/* 264 */           Vector vector1 = setMeta(entityItem3);
+/* 265 */           Vector vector2 = checkChgdAttr(entityItem3, entityItem2, vector1, paramStringBuffer);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */           
+/* 270 */           if (vector2 != null) {
+/* 271 */             if (isDatechange(entityItem3, paramDiffEntity, vector2, paramStringBuffer)) {
+/* 272 */               ABRUtil.append(paramStringBuffer, "XMLStatusElem.addElements only avail date related attricodes changed. " + NEWLINE);
+/* 273 */               node = paramDocument.createTextNode("0020");
+/* 274 */               paramHashtable.put("_chSTATUS", "0020");
+/*     */             } else {
+/* 276 */               ABRUtil.append(paramStringBuffer, "XMLStatusElem.addElements not only avail date related attricodes changed. " + NEWLINE);
+/* 277 */               node = paramDocument.createTextNode("0040");
+/* 278 */               paramHashtable.put("_chSTATUS", "0040");
+/*     */             } 
+/*     */           }
+/* 281 */           entityList = null;
+/*     */         } else {
+/* 283 */           ABRUtil.append(paramStringBuffer, "XMLStatusElem.addElements send the whole data, T1 is 1980. " + NEWLINE);
+/* 284 */           node = paramDocument.createTextNode("0040");
+/* 285 */           paramHashtable.put("_chSTATUS", "0040");
+/*     */         } 
+/*     */       } else {
+/* 288 */         node = paramDocument.createTextNode("0040");
+/* 289 */         paramHashtable.put("_chSTATUS", "0040");
+/*     */       } 
+/*     */     } else {
+/*     */       
+/* 293 */       ABRUtil.append(paramStringBuffer, "XMLStatusElem.addElements " + paramDiffEntity.getEntityType() + " is not in the tarEntity list. " + NEWLINE);
+/* 294 */       if (isExistFinal(attributeChangeHistoryGroup2, paramDocument, entityItem3, paramElement, paramStringBuffer)) {
+/* 295 */         node = paramDocument.createTextNode("0020");
+/* 296 */         paramHashtable.put("_chSTATUS", "0020");
+/*     */       } else {
+/* 298 */         node = getContentNode(paramDocument, entityItem3, paramElement, paramStringBuffer);
+/* 299 */         paramHashtable.put("_chSTATUS", "0040");
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 303 */     if (node != null) {
+/* 304 */       element.appendChild(node);
+/*     */     }
+/*     */     
+/* 307 */     for (byte b = 0; b < this.childVct.size(); b++) {
+/* 308 */       XMLElem xMLElem = this.childVct.elementAt(b);
+/* 309 */       xMLElem.addElements(paramDatabase, paramHashtable, paramDocument, element, paramDiffEntity, paramStringBuffer);
+/*     */     } 
+/*     */     
+/* 312 */     if (!element.hasChildNodes())
+/*     */     {
+/*     */       
+/* 315 */       element.appendChild(paramDocument.createTextNode("@@"));
+/*     */     }
+/* 317 */     attributeChangeHistoryGroup1 = null;
+/* 318 */     attributeChangeHistoryGroup2 = null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private AttributeChangeHistoryGroup getADSABRSTATUSHistory(Profile paramProfile, Database paramDatabase, EntityItem paramEntityItem, String paramString, StringBuffer paramStringBuffer) throws MiddlewareException {
+/* 324 */     EANAttribute eANAttribute = paramEntityItem.getAttribute(paramString);
+/* 325 */     if (eANAttribute != null) {
+/* 326 */       return new AttributeChangeHistoryGroup(paramDatabase, paramProfile, eANAttribute);
+/*     */     }
+/* 328 */     ABRUtil.append(paramStringBuffer, paramString + " of " + paramEntityItem.getKey() + "  was null");
+/* 329 */     return null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String getT1(AttributeChangeHistoryGroup paramAttributeChangeHistoryGroup1, AttributeChangeHistoryGroup paramAttributeChangeHistoryGroup2, StringBuffer paramStringBuffer) throws MiddlewareRequestException {
+/* 343 */     String str = "1980-01-01-00.00.00.000000";
+/* 344 */     boolean bool = false;
+/*     */     
+/* 346 */     if (paramAttributeChangeHistoryGroup1 != null && paramAttributeChangeHistoryGroup1.getChangeHistoryItemCount() > 0) {
+/* 347 */       for (int i = paramAttributeChangeHistoryGroup1.getChangeHistoryItemCount() - 3; i >= 0; i--) {
+/* 348 */         AttributeChangeHistoryItem attributeChangeHistoryItem = (AttributeChangeHistoryItem)paramAttributeChangeHistoryGroup1.getChangeHistoryItem(i);
+/* 349 */         if (attributeChangeHistoryItem != null) {
+/* 350 */           if (attributeChangeHistoryItem.getFlagCode().equals("0030")) {
+/* 351 */             bool = true;
+/*     */           }
+/* 353 */           if (bool && attributeChangeHistoryItem.getFlagCode().equals("0020")) {
+/* 354 */             String str1 = getTQStatus(paramAttributeChangeHistoryGroup2, attributeChangeHistoryItem.getChangeDate(), paramStringBuffer);
+/* 355 */             if (str1.equals("0020")) {
+/* 356 */               AttributeChangeHistoryItem attributeChangeHistoryItem1 = (AttributeChangeHistoryItem)paramAttributeChangeHistoryGroup1.getChangeHistoryItem(i + 1);
+/* 357 */               if (attributeChangeHistoryItem1.getFlagCode().equals("0050")) {
+/* 358 */                 str = attributeChangeHistoryItem1.getChangeDate();
+/* 359 */                 return str;
+/*     */               } 
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */     } else {
+/* 366 */       ABRUtil.append(paramStringBuffer, "getT1 for STATUS has no changed history!");
+/*     */     } 
+/* 368 */     return str;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   private String getTQStatus(AttributeChangeHistoryGroup paramAttributeChangeHistoryGroup, String paramString, StringBuffer paramStringBuffer) throws MiddlewareRequestException {
+/* 373 */     if (paramAttributeChangeHistoryGroup != null && paramAttributeChangeHistoryGroup.getChangeHistoryItemCount() > 0) {
+/*     */       
+/* 375 */       for (int i = paramAttributeChangeHistoryGroup.getChangeHistoryItemCount() - 1; i >= 0; i--) {
+/* 376 */         AttributeChangeHistoryItem attributeChangeHistoryItem = (AttributeChangeHistoryItem)paramAttributeChangeHistoryGroup.getChangeHistoryItem(i);
+/* 377 */         if (attributeChangeHistoryItem != null && 
+/* 378 */           paramString.compareTo(attributeChangeHistoryItem.getChangeDate()) > 0) {
+/* 379 */           return attributeChangeHistoryItem.getFlagCode();
+/*     */         }
+/*     */       } 
+/*     */     } else {
+/*     */       
+/* 384 */       ABRUtil.append(paramStringBuffer, "getTQStatus for STATUS has no changed history!");
+/*     */     } 
+/* 386 */     return "@@";
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   private boolean isDelta(EntityItem paramEntityItem) {
+/* 391 */     if (paramEntityItem != null && "1980-01-01-00.00.00.000000".equals(paramEntityItem.getProfile().getValOn())) {
+/* 392 */       return false;
+/*     */     }
+/* 394 */     return true;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   private boolean isDatechange(EntityItem paramEntityItem, DiffEntity paramDiffEntity, Vector<String> paramVector, StringBuffer paramStringBuffer) {
+/* 399 */     Vector<String> vector = new Vector();
+/* 400 */     if (!"LSEO".equals(paramDiffEntity.getEntityType())) {
+/* 401 */       String[] arrayOfString = (String[])RootEntity_Dates.get(paramDiffEntity.getEntityType());
+/* 402 */       if (arrayOfString != null && arrayOfString.length > 0) {
+/* 403 */         for (byte b1 = 0; b1 < arrayOfString.length; b1++) {
+/* 404 */           vector.add(arrayOfString[b1]);
+/*     */         }
+/*     */       }
+/*     */     } else {
+/* 408 */       Vector<EntityItem> vector1 = PokUtils.getAllLinkedEntities(paramEntityItem, "WWSEOLSEO", "WWSEO");
+/* 409 */       for (byte b1 = 0; b1 < vector1.size(); b1++) {
+/* 410 */         EntityItem entityItem = vector1.elementAt(b1);
+/* 411 */         String str = PokUtils.getAttributeFlagValue(entityItem, "SPECBID");
+/* 412 */         if ("11457".equals(str)) {
+/* 413 */           String[] arrayOfString = (String[])RootEntity_Dates.get("LSEO1");
+/* 414 */           if (arrayOfString != null && arrayOfString.length > 0) {
+/* 415 */             for (byte b2 = 0; b2 < arrayOfString.length; b2++) {
+/* 416 */               vector.add(arrayOfString[b2]);
+/*     */             }
+/*     */           }
+/*     */         } else {
+/* 420 */           String[] arrayOfString = (String[])RootEntity_Dates.get("LSEO2");
+/* 421 */           if (arrayOfString != null && arrayOfString.length > 0) {
+/* 422 */             for (byte b2 = 0; b2 < arrayOfString.length; b2++) {
+/* 423 */               vector.add(arrayOfString[b2]);
+/*     */             }
+/*     */           }
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/* 429 */     for (byte b = 0; b < paramVector.size(); b++) {
+/* 430 */       String str = paramVector.elementAt(b);
+/* 431 */       if (!vector.contains(str)) {
+/* 432 */         ABRUtil.append(paramStringBuffer, "chgdattr " + str + " is not in availdate.");
+/* 433 */         return false;
+/*     */       } 
+/*     */     } 
+/* 436 */     return true;
+/*     */   }
+/*     */   
+/*     */   private Vector setMeta(EntityItem paramEntityItem) {
+/* 440 */     Vector<EANMetaAttribute> vector = new Vector();
+/* 441 */     EntityGroup entityGroup = paramEntityItem.getEntityGroup();
+/* 442 */     for (byte b = 0; b < entityGroup.getMetaAttributeCount(); b++) {
+/* 443 */       EANMetaAttribute eANMetaAttribute = entityGroup.getMetaAttribute(b);
+/* 444 */       String str = eANMetaAttribute.getAttributeCode();
+/* 445 */       if (!eANMetaAttribute.getAttributeType().equals("A") && !str.equals("STATUS") && !str.equals("SYSFEEDRESEND")) {
+/* 446 */         vector.add(eANMetaAttribute);
+/*     */       }
+/*     */     } 
+/* 449 */     return vector;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private Vector checkChgdAttr(EntityItem paramEntityItem1, EntityItem paramEntityItem2, Vector<EANMetaAttribute> paramVector, StringBuffer paramStringBuffer) {
+/* 457 */     Vector<String> vector = new Vector();
+/* 458 */     Profile profile1 = null;
+/* 459 */     Profile profile2 = null;
+/* 460 */     if (paramEntityItem1 != null) {
+/* 461 */       profile1 = paramEntityItem1.getProfile();
+/*     */     }
+/* 463 */     if (paramEntityItem2 != null) {
+/* 464 */       profile2 = paramEntityItem2.getProfile();
+/*     */     }
+/*     */     
+/* 467 */     Profile profile3 = (profile1 == null) ? profile2 : profile1;
+/* 468 */     NLSItem nLSItem = profile3.getReadLanguage();
+/*     */ 
+/*     */     
+/* 471 */     for (byte b = 0; b < paramVector.size(); b++) {
+/* 472 */       EANMetaAttribute eANMetaAttribute = paramVector.elementAt(b);
+/* 473 */       String str1 = eANMetaAttribute.getAttributeCode();
+/* 474 */       EANAttribute eANAttribute = null;
+/* 475 */       String str2 = "";
+/* 476 */       String str3 = "";
+/* 477 */       String str4 = "";
+/*     */       
+/* 479 */       if (paramEntityItem2 != null) {
+/* 480 */         str4 = paramEntityItem2.getKey();
+/* 481 */         eANAttribute = paramEntityItem2.getAttribute(str1);
+/* 482 */         if (eANAttribute != null) {
+/* 483 */           str2 = eANAttribute.toString();
+/*     */         }
+/*     */       } 
+/* 486 */       if (paramEntityItem1 != null) {
+/* 487 */         str4 = paramEntityItem1.getKey();
+/* 488 */         eANAttribute = paramEntityItem1.getAttribute(str1);
+/* 489 */         if (eANAttribute != null) {
+/* 490 */           str3 = eANAttribute.toString();
+/*     */         }
+/*     */       } 
+/* 493 */       if (!str3.equals(str2)) {
+/* 494 */         vector.add(str1);
+/* 495 */         ABRUtil.append(paramStringBuffer, "XMLStatusElem " + str4 + " has chgd " + str1 + NEWLINE);
+/*     */       }
+/* 497 */       else if (eANMetaAttribute instanceof COM.ibm.eannounce.objects.EANMetaTextAttribute) {
+/*     */         
+/* 499 */         for (byte b1 = 0; b1 < profile3.getReadLanguages().size(); b1++) {
+/* 500 */           NLSItem nLSItem1 = profile3.getReadLanguage(b1);
+/* 501 */           if (nLSItem1 != nLSItem) {
+/*     */ 
+/*     */             
+/* 504 */             if (profile1 != null) {
+/* 505 */               profile1.setReadLanguage(b1);
+/*     */             }
+/* 507 */             if (profile2 != null) {
+/* 508 */               profile2.setReadLanguage(b1);
+/*     */             }
+/*     */             
+/* 511 */             str2 = "";
+/* 512 */             str3 = "";
+/* 513 */             if (paramEntityItem2 != null) {
+/* 514 */               eANAttribute = paramEntityItem2.getAttribute(str1);
+/* 515 */               if (eANAttribute instanceof EANTextAttribute) {
+/* 516 */                 int i = nLSItem1.getNLSID();
+/*     */ 
+/*     */                 
+/* 519 */                 if (((EANTextAttribute)eANAttribute).containsNLS(i)) {
+/* 520 */                   str2 = eANAttribute.toString();
+/*     */                 }
+/*     */               } 
+/*     */             } 
+/* 524 */             if (paramEntityItem1 != null) {
+/* 525 */               eANAttribute = paramEntityItem1.getAttribute(str1);
+/* 526 */               if (eANAttribute instanceof EANTextAttribute) {
+/* 527 */                 int i = nLSItem1.getNLSID();
+/*     */ 
+/*     */                 
+/* 530 */                 if (((EANTextAttribute)eANAttribute).containsNLS(i)) {
+/* 531 */                   str3 = eANAttribute.toString();
+/*     */                 }
+/*     */               } 
+/*     */             } 
+/* 535 */             if (!str3.equals(str2)) {
+/* 536 */               vector.add(str1);
+/* 537 */               ABRUtil.append(paramStringBuffer, "XMLStatusElem " + str4 + " has chgd " + str1 + NEWLINE);
+/*     */             } 
+/*     */           } 
+/* 540 */         }  if (profile1 != null) {
+/* 541 */           profile1.setReadLanguage(nLSItem);
+/*     */         }
+/* 543 */         if (profile2 != null) {
+/* 544 */           profile2.setReadLanguage(nLSItem);
+/*     */         }
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 549 */     return vector;
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.util;
 
-
-import java.util.Hashtable;
-import java.util.Vector;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import COM.ibm.eannounce.objects.AttributeChangeHistoryGroup;
-import COM.ibm.eannounce.objects.AttributeChangeHistoryItem;
-import COM.ibm.eannounce.objects.EANAttribute;
-import COM.ibm.eannounce.objects.EANMetaAttribute;
-import COM.ibm.eannounce.objects.EANMetaTextAttribute;
-import COM.ibm.eannounce.objects.EANTextAttribute;
-import COM.ibm.eannounce.objects.EntityGroup;
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.eannounce.objects.EntityList;
-import COM.ibm.opicmpdh.middleware.D;
-import COM.ibm.opicmpdh.middleware.Database;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
-import COM.ibm.opicmpdh.middleware.Profile;
-import COM.ibm.opicmpdh.transactions.NLSItem;
-
-import com.ibm.transform.oim.eacm.diff.DiffEntity;
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-import COM.ibm.eannounce.objects.*;
-
-//$Log: XMLStatusElem.java,v $
-//Revision 1.4  2020/02/05 13:29:08  xujianbo
-//Add debug info to investigate   performance issue
-//
-//Revision 1.3  2015/01/26 15:53:39  wangyul
-//fix the issue PR24222 -- SPF ADS abr string buffer
-//
-//Revision 1.2  2014/03/25 14:55:17  guobin
-//flows to BH prof srv - multi status change - more broadly then we needed. data not in final sent as final
-//
-/**********************************************************************************
- * Class used to get the entity status, when the status is ever final in the
- * history group, then the status show 0020, else show the status of the entity.
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\XMLStatusElem.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-
-public class XMLStatusElem extends XMLElem {
-	/**********************************************************************************
-	 * Constructor for DTS value elements - uses getEndOfDay() in profile
-	 * 
-	 * 2 <NotificationTime>(Timestamp of the notification)</NotificationTime>
-	 * 
-	 * @param nname
-	 *            String with name of node to be created
-	 */
-	private static final String STATUS_RFR = "0040";
-
-	private static final String m_strEpoch = "1980-01-01-00.00.00.000000";
-
-	private static final String STATUS_PASSED = "0030";
-
-	private static final String STATUS_QUEUE = "0020";
-
-	private static final String STATUS_INPROCESS = "0050";
-
-	private static Vector tarEntity;
-	static {
-		tarEntity = new Vector();
-		tarEntity.add("MODEL");
-		tarEntity.add("PRODSTRUCT");
-		tarEntity.add("LSEO");
-		tarEntity.add("SWPRODSTRUCT");
-		tarEntity.add("LSEOBUNDLE");
-		tarEntity.add("SVCMOD");
-	}
-
-	private static Hashtable RootEntity_Dates;
-	static {
-		RootEntity_Dates = new Hashtable();
-		RootEntity_Dates.put("MODEL", new String[] { "ANNDATE", "WTHDRWEFFCTVDATE", "WITHDRAWDATE" });
-		RootEntity_Dates.put("LSEO1", new String[] { "LSEOPUBDATEMTRGT" }); // SPECBID
-																			// NO
-		RootEntity_Dates.put("LSEO2", new String[] { "LSEOPUBDATEMTRGT", "LSEOUNPUBDATEMTRGT" });
-		RootEntity_Dates.put("PRODSTRUCT", new String[] { "ANNDATE", "GENAVAILDATE", "WTHDRWEFFCTVDATE", "WITHDRAWDATE" });
-		RootEntity_Dates.put("SWPRODSTRUCT", new String[] { "GENAVAILDATE" });
-		RootEntity_Dates.put("LSEOBUNDLE", new String[] { "BUNDLPUBDATEMTRGT", "BUNDLUNPUBDATEMTRGT" });
-		RootEntity_Dates.put("SVCMOD", new String[] { "ANNDATE", "WTHDRWEFFCTVDATE", "WITHDRAWDATE" });
-	}
-
-	public XMLStatusElem(String nname, String code, int src) {
-		super(nname, code, src);
-
-	}
-
-	/**********************************************************************************
-	 * Create a node for this element and add to the parent and any children
-	 * this node has
-	 * 
-	 * @param dbCurrent
-	 *            Database
-	 * @param list
-	 *            EntityList
-	 * @param document
-	 *            Document needed to create nodes
-	 * @param parent
-	 *            Element node to add this node too
-	 * @param debugSb
-	 *            StringBuffer for debug output
-	 */
-	public void addElements(Database dbCurrent, EntityList list, Document document, Element parent, EntityItem parentItem,
-		StringBuffer debugSb) throws COM.ibm.eannounce.objects.EANBusinessRuleException, java.sql.SQLException,
-		COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException, COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-		java.rmi.RemoteException, java.io.IOException, COM.ibm.opicmpdh.middleware.MiddlewareException,
-		COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException {
-		D.ebug(D.EBUG_ERR,"Working on the item:"+nodeName);
-		Element elem = (Element) document.createElement(nodeName);
-		addXMLAttrs(elem);
-
-		if (parent == null) { // create the root
-			document.appendChild(elem);
-		} else { // create a node
-			parent.appendChild(elem);
-		}
-		Profile m_prof = parentItem.getProfile();
-		AttributeChangeHistoryGroup statusHistory = null;
-		statusHistory = getADSABRSTATUSHistory(m_prof, dbCurrent, parentItem, nodeName, debugSb);
-		Node contentElem = null;
-		if (isExistFinal(statusHistory, document, parentItem, parent, debugSb)) {
-			contentElem = document.createTextNode(STATUS_FINAL);
-		} else {
-			contentElem = getContentNode(document, parentItem, parent, debugSb);
-		}
-
-		if (contentElem != null) {
-			elem.appendChild(contentElem);
-		}
-		// add any children
-		for (int c = 0; c < childVct.size(); c++) {
-			XMLElem childElem = (XMLElem) childVct.elementAt(c);
-			childElem.addElements(dbCurrent, list, document, elem, parentItem, debugSb);
-		}
-
-		if (!elem.hasChildNodes()) {
-			// a value is expected, prevent a normal empty tag, OIDH cant handle
-			// it
-			elem.appendChild(document.createTextNode(CHEAT));
-		}
-		statusHistory = null;
-	}
-
-
-	public boolean isExistFinal(AttributeChangeHistoryGroup statusHistory, Document document, EntityItem item, Element parent,
-		StringBuffer debugSb) throws MiddlewareRequestException {
-		boolean existFinal = false;
-		if (attrCode == null || item == null) {
-			return false;
-		}
-		if (statusHistory != null && statusHistory.getChangeHistoryItemCount() > 0) {
-			for (int i = statusHistory.getChangeHistoryItemCount() - 1; i >= 0; i--) {
-				AttributeChangeHistoryItem achi = (AttributeChangeHistoryItem) statusHistory.getChangeHistoryItem(i);
-				if (achi != null) {
-					String status = achi.getFlagCode();
-					if (status != null && status.equals(STATUS_FINAL)) {
-						existFinal = true;
-						break;
-					}
-				}
-			}
-		} else {
-			ABRUtil.append(debugSb,"XMLStatusElem.isExistFinal STATUS has no changed history!" + NEWLINE);
-			existFinal = false;
-		}
-		statusHistory = null;
-		return existFinal;
-	}
-
-	public void addElements(Database dbCurrent, Hashtable table, Document document, Element parent, DiffEntity parentEntity,
-		StringBuffer debugSb) throws COM.ibm.eannounce.objects.EANBusinessRuleException, java.sql.SQLException,
-		COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException, COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-		java.rmi.RemoteException, java.io.IOException, COM.ibm.opicmpdh.middleware.MiddlewareException,
-		COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException {
-		D.ebug(D.EBUG_ERR,"Working on the item:"+nodeName);
-		Node contentElem = null;
-		Element elem = (Element) document.createElement(nodeName);
-		addXMLAttrs(elem);
-		if (parent == null) { // create the root
-			document.appendChild(elem);
-		} else { // create a node
-			parent.appendChild(elem);
-		}
-		EntityItem curritem = parentEntity.getCurrentEntityItem();
-		EntityItem prioritem = parentEntity.getPriorEntityItem();
-		EntityItem item = curritem;
-		if (parentEntity.isDeleted()) {
-			item = prioritem;
-		}
-		Profile m_prof = item.getProfile();
-		AttributeChangeHistoryGroup adsStatusHistory = null;
-		AttributeChangeHistoryGroup statusHistory = null;
-		adsStatusHistory = getADSABRSTATUSHistory(m_prof, dbCurrent, item, "ADSABRSTATUS", debugSb);
-		statusHistory = getADSABRSTATUSHistory(m_prof, dbCurrent, item, nodeName, debugSb);
-		boolean isFinal = STATUS_FINAL.equals(PokUtils.getAttributeFlagValue(item, "STATUS"));
-
-		if (tarEntity.contains(parentEntity.getEntityType())) {
-			ABRUtil.append(debugSb,"XMLStatusElem running" +  parentEntity.getEntityType() + NEWLINE);
-			if (isDelta(prioritem)) {
-				if (isFinal) {
-					contentElem = document.createTextNode(STATUS_FINAL);
-					table.put("_chSTATUS", STATUS_FINAL);
-				} else if (isExistFinal(statusHistory, document, item, parent, debugSb)) {
-
-					ABRUtil.append(debugSb,"XMLStatusElem.addElements it's delta and existfinal. "+ NEWLINE);
-					Vector metaAttrVct = setMeta(item);
-					Vector chgdAttrVct = checkChgdAttr(item, prioritem, metaAttrVct, debugSb);
-					ABRUtil.append(debugSb,"XMLStatusElem.addElements checkChgdAttr: " + chgdAttrVct.toString() + NEWLINE);
-					// isDatechange() check the chagAttrVct whether only have
-					// Date attributes list below,
-					// if true, then createTextNode(STATUS_FINAL) else
-					// createTextNode(STATUS_RFR).
-					if (chgdAttrVct != null) {
-						if (isDatechange(item, parentEntity, chgdAttrVct, debugSb)) {
-							ABRUtil.append(debugSb,"XMLStatusElem.addElements only avail date related attricodes changed." + NEWLINE);
-							contentElem = document.createTextNode(STATUS_FINAL);
-							table.put("_chSTATUS", STATUS_FINAL);
-						} else {
-							ABRUtil.append(debugSb,"XMLStatusElem.addElements not only avail date attricodes changed. " + NEWLINE);
-							contentElem = document.createTextNode(STATUS_RFR);
-							table.put("_chSTATUS", STATUS_RFR);
-						}
-					}
-				} else {
-					contentElem = document.createTextNode(STATUS_RFR);
-					table.put("_chSTATUS", STATUS_RFR);
-				}
-			} else {
-				if (isFinal) {
-					contentElem = document.createTextNode(STATUS_FINAL);
-					table.put("_chSTATUS", STATUS_FINAL);
-				} else if (isExistFinal(statusHistory, document, item, parent, debugSb)) {
-					/*
-					 * for resend, if the status is RFR, it was final before. I
-					 * need to check last Status is Final queued ADSABRSTATUS,
-					 * if it is Pass, then set T1 = timestamp of ADSABRSTATUS ='
-					 * in process'. compare attributes of Root between the T1
-					 * and T2. if the any changes on Root expect date
-					 * attributes, then set <STATUS> - RFR. else set <STATUS> -
-					 * Final
-					 */
-					ABRUtil.append(debugSb,"XMLStatusElem.addElements it's full xml and existfinal. " + NEWLINE);
-					String T1 = getT1(adsStatusHistory, statusHistory, debugSb);
-					if (!m_strEpoch.equals(T1)) {
-
-						Profile profile = m_prof.getNewInstance(dbCurrent);
-						profile.setValOnEffOn(T1, T1);
-						EntityList mm_elist = dbCurrent.getEntityList(profile, new ExtractActionItem(null, dbCurrent, profile,"dummy"),
-							new EntityItem[] { new EntityItem(null, profile, item.getEntityType(), item.getEntityID()) });
-						prioritem = mm_elist.getParentEntityGroup().getEntityItem(0);
-
-						Vector metaAttrVct = setMeta(item);
-						Vector chgdAttrVct = checkChgdAttr(item, prioritem, metaAttrVct, debugSb);
-						// isDatechange() check the chagAttrVct whether only
-						// have Date attributes list below,
-						// if true, then createTextNode(STATUS_FINAL) else
-						// createTextNode(STATUS_RFR).
-						if (chgdAttrVct != null) {
-							if (isDatechange(item, parentEntity, chgdAttrVct, debugSb)) {
-								ABRUtil.append(debugSb,"XMLStatusElem.addElements only avail date related attricodes changed. " + NEWLINE);
-								contentElem = document.createTextNode(STATUS_FINAL);
-								table.put("_chSTATUS", STATUS_FINAL);
-							} else {
-								ABRUtil.append(debugSb,"XMLStatusElem.addElements not only avail date related attricodes changed. " + NEWLINE);
-								contentElem = document.createTextNode(STATUS_RFR);
-								table.put("_chSTATUS", STATUS_RFR);
-							}
-						}
-						mm_elist = null;
-					} else {
-						ABRUtil.append(debugSb,"XMLStatusElem.addElements send the whole data, T1 is 1980. " + NEWLINE);
-						contentElem = document.createTextNode(STATUS_RFR);
-						table.put("_chSTATUS", STATUS_RFR);
-					}
-				} else {
-					contentElem = document.createTextNode(STATUS_RFR);
-					table.put("_chSTATUS", STATUS_RFR);
-				}
-			}
-		} else {
-			ABRUtil.append(debugSb,"XMLStatusElem.addElements " + parentEntity.getEntityType() + " is not in the tarEntity list. " + NEWLINE);
-			if (isExistFinal(statusHistory, document, item, parent, debugSb)) {
-				contentElem = document.createTextNode(STATUS_FINAL);
-				table.put("_chSTATUS", STATUS_FINAL);
-			} else {
-				contentElem = getContentNode(document, item, parent, debugSb);
-				table.put("_chSTATUS", STATUS_RFR);
-			}
-		}
-
-		if (contentElem != null) {
-			elem.appendChild(contentElem);
-		}
-		// add any children
-		for (int c = 0; c < childVct.size(); c++) {
-			XMLElem childElem = (XMLElem) childVct.elementAt(c);
-			childElem.addElements(dbCurrent, table, document, elem, parentEntity, debugSb);
-		}
-
-		if (!elem.hasChildNodes()) {
-			// a value is expected, prevent a normal empty tag, OIDH cant handle
-			// it
-			elem.appendChild(document.createTextNode(CHEAT));
-		}
-		adsStatusHistory = null;
-		statusHistory = null;
-	}
-
-	private AttributeChangeHistoryGroup getADSABRSTATUSHistory(Profile m_prof, Database dbCurrent, EntityItem item, String attr,
-		StringBuffer debugSb) throws MiddlewareException {
-
-		EANAttribute att = item.getAttribute(attr);
-		if (att != null) {
-			return new AttributeChangeHistoryGroup(dbCurrent, m_prof, att);
-		} else {
-			ABRUtil.append(debugSb,attr + " of " + item.getKey() + "  was null");
-			return null;
-		}
-	}
-
-	/*
-	 * for resend, if the status is RFR, it was final before. I need to check
-	 * last Status is Final queued ADSABRSTATUS, if it is Pass, then set T1 =
-	 * timestamp of ADSABRSTATUS =' in process'. compare attributes of Root
-	 * between the T1 and T2. if the any changes on Root expect date attributes,
-	 * then set <STATUS> - RFR. else set <STATUS> - Final
-	 */
-	private String getT1(AttributeChangeHistoryGroup adsStatusHistory, AttributeChangeHistoryGroup statusHistory,
-		StringBuffer debugSb) throws MiddlewareRequestException {
-
-		String T1 = m_strEpoch;
-		boolean nextQueued = false;
-		AttributeChangeHistoryItem achi, nextachi;
-		if (adsStatusHistory != null && adsStatusHistory.getChangeHistoryItemCount() > 0) {
-			for (int i = adsStatusHistory.getChangeHistoryItemCount() - 3; i >= 0; i--) {
-				achi = (AttributeChangeHistoryItem) adsStatusHistory.getChangeHistoryItem(i);
-				if (achi != null) {
-					if (achi.getFlagCode().equals(STATUS_PASSED)) { // Passed
-						nextQueued = true;
-					}
-					if (nextQueued && achi.getFlagCode().equals(STATUS_QUEUE)) { 
-						String status = getTQStatus(statusHistory, achi.getChangeDate(), debugSb);
-						if (status.equals(STATUS_FINAL)) {
-							nextachi = (AttributeChangeHistoryItem) adsStatusHistory.getChangeHistoryItem(i + 1);
-							if (nextachi.getFlagCode().equals(STATUS_INPROCESS)) {
-								T1 = nextachi.getChangeDate();
-								return T1;
-							}
-						}
-					}
-				}
-			}
-		} else {
-			ABRUtil.append(debugSb,"getT1 for STATUS has no changed history!");
-		}
-		return T1;
-	}
-
-	private String getTQStatus(AttributeChangeHistoryGroup statusHistory, String tqtime, StringBuffer debugSb)
-		throws COM.ibm.opicmpdh.middleware.MiddlewareRequestException {
-		if (statusHistory != null && statusHistory.getChangeHistoryItemCount() > 0) {
-			// last chghistory is the current one
-			for (int i = statusHistory.getChangeHistoryItemCount() - 1; i >= 0; i--) {
-				AttributeChangeHistoryItem achi = (AttributeChangeHistoryItem) statusHistory.getChangeHistoryItem(i);
-				if (achi != null) {
-					if (tqtime.compareTo(achi.getChangeDate()) > 0) {
-						return achi.getFlagCode();
-					}
-				}
-			}
-		} else {
-			ABRUtil.append(debugSb,"getTQStatus for STATUS has no changed history!");
-		}
-		return CHEAT;
-	}
-
-	private boolean isDelta(EntityItem prioritem) {
-
-		if (prioritem != null && m_strEpoch.equals(prioritem.getProfile().getValOn())) {
-			return false;
-		}
-		return true;
-	}
-
-	private boolean isDatechange(EntityItem item, DiffEntity parentEntity, Vector chgdAttrVct, StringBuffer debugSb) {
-
-		Vector tarAttrVct = new Vector();
-		if (!"LSEO".equals(parentEntity.getEntityType())) {
-			String[] attrs = (String[]) RootEntity_Dates.get(parentEntity.getEntityType());
-			if (attrs != null && attrs.length > 0) {
-				for (int i = 0; i < attrs.length; i++) {
-					tarAttrVct.add(attrs[i]);
-				}
-			}
-		} else {
-			Vector wwseoVct = PokUtils.getAllLinkedEntities(item, "WWSEOLSEO", "WWSEO");
-			for (int w = 0; w < wwseoVct.size(); w++) {
-				EntityItem wwseoitem = (EntityItem) wwseoVct.elementAt(w);
-				String specbid = PokUtils.getAttributeFlagValue(wwseoitem, "SPECBID");
-				if ("11457".equals(specbid)) { // IS NO
-					String[] attrs = (String[]) RootEntity_Dates.get("LSEO1");
-					if (attrs != null && attrs.length > 0) {
-						for (int i = 0; i < attrs.length; i++) {
-							tarAttrVct.add(attrs[i]);
-						}
-					}
-				} else {
-					String[] attrs = (String[]) RootEntity_Dates.get("LSEO2");
-					if (attrs != null && attrs.length > 0) {
-						for (int i = 0; i < attrs.length; i++) {
-							tarAttrVct.add(attrs[i]);
-						}
-					}
-				}
-			}
-		}
-		for (int i = 0; i < chgdAttrVct.size(); i++) {
-			String chgdattr = (String) chgdAttrVct.elementAt(i);
-			if (!tarAttrVct.contains(chgdattr)) {
-				ABRUtil.append(debugSb,"chgdattr " + chgdattr + " is not in availdate.");
-				return false;
-			}
-		}
-		return true;
-	}
-
-	private Vector setMeta(EntityItem item) {
-		Vector metaAttrVct = new Vector();
-		EntityGroup eg = item.getEntityGroup();
-		for (int i = 0; i < eg.getMetaAttributeCount(); i++) {
-			EANMetaAttribute ma = eg.getMetaAttribute(i);
-			String code = ma.getAttributeCode();
-			if (!ma.getAttributeType().equals("A") && !code.equals("STATUS") && !code.equals("SYSFEEDRESEND")) { // Filter out 'A' attrType																									 
-				metaAttrVct.add(ma);
-			}
-		}
-		return metaAttrVct;
-	}
-
-	/********************************************************************************
-	 * count attribute changes so dont have to look over and over again
-	 */
-
-	private Vector checkChgdAttr(EntityItem currentItem, EntityItem priorItem, Vector metaAttrVct, StringBuffer debugSb) {
-		Vector chgdAttr = new Vector();
-		Profile currprofile = null;
-		Profile prevprofile = null;
-		if (currentItem != null) {
-			currprofile = currentItem.getProfile();
-		}
-		if (priorItem != null) {
-			prevprofile = priorItem.getProfile();
-		}
-
-		Profile profile = (currprofile == null ? prevprofile : currprofile); // both
-		NLSItem origNls = profile.getReadLanguage();
-
-		// check if attr changed or not
-		for (int i = 0; i < metaAttrVct.size(); i++) {
-			EANMetaAttribute ma = (EANMetaAttribute) metaAttrVct.elementAt(i);
-			String attrcode = ma.getAttributeCode();
-			EANAttribute attr = null;
-			String priorval = "";
-			String curval = "";
-			String eikey = "";
-
-			if (priorItem != null) {
-				eikey = priorItem.getKey();
-				attr = priorItem.getAttribute(attrcode);
-				if (attr != null) {
-					priorval = attr.toString();
-				}
-			}
-			if (currentItem != null) {
-				eikey = currentItem.getKey();
-				attr = currentItem.getAttribute(attrcode);
-				if (attr != null) {
-					curval = attr.toString();
-				}
-			}
-			if (!curval.equals(priorval)) {
-				chgdAttr.add(attrcode);
-				ABRUtil.append(debugSb,"XMLStatusElem " + eikey + " has chgd " + attrcode + NEWLINE);
-			} else { // make sure it wasnt changed in a different nls, if needed
-				if (ma instanceof EANMetaTextAttribute) {
-					// this is NLS sensitive, do each one
-					for (int ix = 0; ix < profile.getReadLanguages().size(); ix++) {
-						NLSItem nlsitem = profile.getReadLanguage(ix);
-						if (nlsitem == origNls) {
-							continue; // already checked this one
-						}
-						if (currprofile != null) {
-							currprofile.setReadLanguage(ix);
-						}
-						if (prevprofile != null) {
-							prevprofile.setReadLanguage(ix);
-						}
-
-						priorval = "";
-						curval = "";
-						if (priorItem != null) {
-							attr = priorItem.getAttribute(attrcode);
-							if (attr instanceof EANTextAttribute) {
-								int nlsid = nlsitem.getNLSID();
-								// true if information for the given NLSID is
-								// contained in the Text data
-								if (((EANTextAttribute) attr).containsNLS(nlsid)) {
-									priorval = attr.toString();
-								} // end attr has this language
-							}
-						}
-						if (currentItem != null) {
-							attr = currentItem.getAttribute(attrcode);
-							if (attr instanceof EANTextAttribute) {
-								int nlsid = nlsitem.getNLSID();
-								// true if information for the given NLSID is
-								// contained in the Text data
-								if (((EANTextAttribute) attr).containsNLS(nlsid)) {
-									curval = attr.toString();
-								} // end attr has this language
-							}
-						}
-						if (!curval.equals(priorval)) {
-							chgdAttr.add(attrcode);
-							ABRUtil.append(debugSb,"XMLStatusElem " + eikey + " has chgd " + attrcode + NEWLINE);
-						}
-					} // end each nls
-					if (currprofile != null) {
-						currprofile.setReadLanguage(origNls);
-					}
-					if (prevprofile != null) {
-						prevprofile.setReadLanguage(origNls);
-					}
-				} // end is meta text attr
-			} // end need to check all nls
-		}
-		return chgdAttr;
-	}
-	/*
-	 * XML <STATUS> 1.First time the Root Entity (e.g. MODEL) moved to RFR -
-	 * full XML was created with the XML <STATUS> = RFR and the
-	 * <AVAILABILITYELEMENT> <STATUS> = RFR. 2. 2nd thru Nth time the Root
-	 * Entity moved to RFR but was never Final.- Delta XML was created with the
-	 * XML <STATUS>=RFR and the <AVAILABILITYELEMENT> <STATUS> = RFR/Final. 3.
-	 * First time to Final - full XML was created with the XML <STATUS> = Final
-	 * and the <AVAILABILITYELEMENT> <STATUS> = Final/RFR 4. Root Entity moved
-	 * from Final - CR - RFR, anything change on the Root Entity except date
-	 * attributes(list in following RootEntity_Dates) - Delta XML was created
-	 * with the XML<STATUS> = RFR and the <AVAILABILITYELEMENT> <STATUS> =
-	 * Final/RFR. If only Date attributes change (list in following
-	 * RootEntity_Dates) - Delta XML was created with the XML<STATUS> = FINAL
-	 * and <AVAILABILITYELEMENT> <STATUS> = Final/RFR.
-	 * 
-	 * 5. 2nd thru Nth time the Root Entity moved from RFR –CR- RFR but was
-	 * Final, anything change on the last RFR except date attributes - Delta XML
-	 * The XML <STATUS> = RFR, if only Date attributes change - Delta XML the
-	 * XML <STATUS> = FINAL. 6 3rd thru Nth time the Root Entity moved to Final
-	 * – Delta XML was created with the XML<STATUS> = Final and the
-	 * AVAILABILITYELEMENT> <STATUS> = Final/RFR
-	 * 
-	 * 
-	 * 
-	 * list of RootEntity_Dates:
-	 * 
-	 * MODEL <ANNDATE> MODEL.ANNDATE <FIRSTORDER> MODEL.ANNDATE
-	 * <PLANNEDAVAILABILITY> MODEL.ANNDATE <PUBFROM> MODEL.ANNDATE <PUBTO>
-	 * MODEL. WTHDRWEFFCTVDATE <WDANNDATE> MODEL.WITHDRAWDATE <LASTORDER>
-	 * MODEL.WTHDRWEFFCTVDATE
-	 * 
-	 * LSEO SPECBID = yes <ANNDATE> LSEO.LSEOPUBDATEMTRGT <ANNNUMBER>
-	 * LSEO.LSEOPUBDATEMTRGT <PLANNEDAVAILABILITY> LSEO. LSEOPUBDATEMTRGT
-	 * <PUBFROM> LSEO. LSEOPUBDATEMTRGT <PUBTO> LSEO. LSEOUNPUBDATEMTRGT
-	 * <WDANNDATE> LSEO.LSEOUNPUBDATEMTRGT <LASTORDER> LSEO.LSEOUNPUBDATEMTRGT
-	 * 
-	 * SPECBID = no <FIRSTORDER> LSEO. LSEOPUBDATEMTRGT <PUBFROM> LSEO.
-	 * LSEOPUBDATEMTRGT
-	 * 
-	 * TMF <ANNDATE> PRODSTRUCT.ANNDATE <FIRSTORDER> PRODSTRUCT.ANNDATE
-	 * <PLANNEDAVAILABILITY> RODSTRUCT.GENAVAILDATE <PUBFROM> PRODSTRUCT.ANNDATE
-	 * <PUBTO> PRODSTRUCT. WTHDRWEFFCTVDATE <WDANNDATE> PRODSTRUCT. WITHDRAWDATE
-	 * <LASTORDER> PRODSTRUCT. WTHDRWEFFCTVDATE
-	 * 
-	 * SWPRODSTRUCT <PLANNEDAVAILABILITY> RODSTRUCT.GENAVAILDATE
-	 * 
-	 * LSEOBUNDLE SPECBID = yes <ANNDATE> LSEOBUNDLE.BUNDLPUBDATEMTRGT
-	 * <FIRSTORDER> LSEOBUNDLE.BUNDLPUBDATEMTRGT <PLANNEDAVAILABILITY>
-	 * LSEOBUNDLE.BUNDLPUBDATEMTRGT <PUBFROM> LSEOBUNDLE.BUNDLPUBDATEMTRGT
-	 * <PUBTO> LSEOBUNDLE.BUNDLUNPUBDATEMTRGT <WDANNDATE>
-	 * LSEOBUNDLE.BUNDLUNPUBDATEMTRGT <LASTORDER> LSEOBUNDLE.BUNDLUNPUBDATEMTRGT
-	 * 
-	 * SPECBID = no <FIRSTORDER> LSEOBUNDLE.BUNDLPUBDATEMTRGT <PUBFROM>
-	 * LSEOBUNDLE.BUNDLPUBDATEMTRGT <PUBTO> LSEOBUNDLE.BUNDLUNPUBDATEMTRGT
-	 * <LASTORDER> LSEOBUNDLE.BUNDLUNPUBDATEMTRGT
-	 * 
-	 * 
-	 * SVCMOD <ANNDATE> SVCMOD.ANNDATE <FIRSTORDER> SVCMOD.ANNDATE
-	 * <PLANNEDAVAILABILITY> SVCMOD.ANNDATE <PUBFROM> SVCMOD.ANNDATE <PUBTO>
-	 * SVCMOD.WTHDRWEFFCTVDATE <WDANNDATE> SVCMOD.WITHDRAWDATE <LASTORDER>
-	 * SVCMOD.WTHDRWEFFCTVDATE
-	 */
-
-}

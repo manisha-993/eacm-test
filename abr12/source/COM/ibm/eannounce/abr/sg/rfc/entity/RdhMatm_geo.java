@@ -1,109 +1,114 @@
-/* Copyright IBM Corp. 2016 */
-package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*     */ package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*     */ 
+/*     */ import com.google.gson.annotations.SerializedName;
+/*     */ import java.util.List;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class RdhMatm_geo
+/*     */ {
+/*     */   @SerializedName("NAME")
+/*     */   private String name;
+/*     */   @SerializedName("VMSTA")
+/*     */   private String vmsta;
+/*     */   @SerializedName("VMSTD")
+/*     */   private String vmstd;
+/*     */   @SerializedName("SALES_ORG")
+/*     */   private List<RdhMatm_sales_org> sales_orgs;
+/*     */   @SerializedName("TAX_COUNTRY")
+/*     */   private List<RdhMatm_tax_country> tax_countries;
+/*     */   @SerializedName("PLANT")
+/*     */   private List<RdhMatm_plant> plants;
+/*     */   
+/*     */   public List<RdhMatm_tax_country> getTax_countries() {
+/*  28 */     return this.tax_countries;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setTax_countries(List<RdhMatm_tax_country> paramList) {
+/*  35 */     this.tax_countries = paramList;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getName() {
+/*  43 */     return this.name;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setName(String paramString) {
+/*  50 */     this.name = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVmsta() {
+/*  57 */     return this.vmsta;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setVmsta(String paramString) {
+/*  64 */     this.vmsta = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVmstd() {
+/*  71 */     return this.vmstd;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setVmstd(String paramString) {
+/*  78 */     this.vmstd = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public List<RdhMatm_sales_org> getSales_orgs() {
+/*  85 */     return this.sales_orgs;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setSales_orgs(List<RdhMatm_sales_org> paramList) {
+/*  92 */     this.sales_orgs = paramList;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public List<RdhMatm_plant> getPlants() {
+/*  99 */     return this.plants;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setPlants(List<RdhMatm_plant> paramList) {
+/* 106 */     this.plants = paramList;
+/*     */   }
+/*     */ }
 
-import java.util.List;
 
-import com.google.gson.annotations.SerializedName;
-
-public class RdhMatm_geo
-{
-    @SerializedName("NAME")
-    private String name;
-    @SerializedName("VMSTA")
-    private String vmsta;
-    @SerializedName("VMSTD")
-    private String vmstd;
-    @SerializedName("SALES_ORG")
-    private List<RdhMatm_sales_org> sales_orgs;
-    @SerializedName("TAX_COUNTRY")
-    private List<RdhMatm_tax_country> tax_countries;
-    @SerializedName("PLANT")
-    private List<RdhMatm_plant > plants;
-    
-    /**
-     * @return the tax_country list
-     */
-    public List<RdhMatm_tax_country> getTax_countries()
-    {
-        return tax_countries;
-    }
-    /**
-     * @param tax_country the tax_country list to set
-     */
-    public void setTax_countries(List<RdhMatm_tax_country> tax_countries)
-    {
-        this.tax_countries = tax_countries;
-    }
-    
-    /**
-     * @return the name
-     */
-    public String getName()
-    {
-        return name;
-    }
-    /**
-     * @param name the name to set
-     */
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-    /**
-     * @return the vmsta
-     */
-    public String getVmsta()
-    {
-        return vmsta;
-    }
-    /**
-     * @param vmsta the vmsta to set
-     */
-    public void setVmsta(String vmsta)
-    {
-        this.vmsta = vmsta;
-    }
-    /**
-     * @return the vmstd
-     */
-    public String getVmstd()
-    {
-        return vmstd;
-    }
-    /**
-     * @param vmstd the vmstd to set
-     */
-    public void setVmstd(String vmstd)
-    {
-        this.vmstd = vmstd;
-    }
-    /**
-     * @return the sales_org list
-     */
-    public List<RdhMatm_sales_org> getSales_orgs()
-    {
-        return sales_orgs;
-    }
-    /**
-     * @param sales_org the sales_org list to set
-     */
-    public void setSales_orgs(List<RdhMatm_sales_org> sales_orgs)
-    {
-        this.sales_orgs = sales_orgs;
-    }
-    /**
-     * @return the plants
-     */
-    public List<RdhMatm_plant> getPlants()
-    {
-        return plants;
-    }
-    /**
-     * @param plants the plants to set
-     */
-    public void setPlants(List<RdhMatm_plant> plants)
-    {
-        this.plants = plants;
-    }
-    
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\entity\RdhMatm_geo.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

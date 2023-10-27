@@ -1,772 +1,778 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.MetaFlag;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import com.ibm.transform.oim.eacm.diff.DiffEntity;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Collection;
+/*     */ import java.util.HashSet;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.Iterator;
+/*     */ import java.util.TreeMap;
+/*     */ import java.util.Vector;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class XMLCtryTMFElem
+/*     */   extends XMLElem
+/*     */ {
+/*     */   public XMLCtryTMFElem() {
+/*  66 */     super("COUNTRYELEMENT");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addElements(Database paramDatabase, Hashtable paramHashtable, Document paramDocument, Element paramElement, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  92 */     Vector<DiffEntity> vector = getPlannedAvails(paramHashtable, paramStringBuffer);
+/*     */     
+/*  94 */     if (vector.size() > 0) {
+/*     */ 
+/*     */       
+/*  97 */       TreeMap<Object, Object> treeMap = new TreeMap<>();
+/*  98 */       for (byte b = 0; b < vector.size(); b++) {
+/*  99 */         DiffEntity diffEntity = vector.elementAt(b);
+/*     */ 
+/*     */         
+/* 102 */         buildCtryRecs(treeMap, diffEntity, paramStringBuffer);
+/*     */       } 
+/*     */ 
+/*     */       
+/* 106 */       Collection collection = treeMap.values();
+/* 107 */       Iterator<CtryRecord> iterator = collection.iterator();
+/* 108 */       while (iterator.hasNext()) {
+/* 109 */         CtryRecord ctryRecord = iterator.next();
+/*     */         
+/* 111 */         if (!ctryRecord.isDeleted()) {
+/*     */           
+/* 113 */           DiffEntity diffEntity1 = getEntityForAttrs(paramHashtable, "AVAIL", "AVAILTYPE", "143", "COUNTRYLIST", ctryRecord
+/* 114 */               .getCountry(), paramStringBuffer);
+/*     */           
+/* 116 */           DiffEntity diffEntity2 = getEntityForAttrs(paramHashtable, "AVAIL", "AVAILTYPE", "149", "COUNTRYLIST", ctryRecord
+/* 117 */               .getCountry(), paramStringBuffer);
+/*     */           
+/* 119 */           DiffEntity diffEntity3 = getEntityForAttrs(paramHashtable, "CATLGOR", "OFFCOUNTRY", ctryRecord
+/* 120 */               .getCountry(), (String)null, (String)null, paramStringBuffer);
+/*     */ 
+/*     */           
+/* 123 */           ctryRecord.setAllFields(diffEntity1, diffEntity2, diffEntity3, paramStringBuffer);
+/*     */         } 
+/* 125 */         if (ctryRecord.isDisplayable()) {
+/* 126 */           createNodeSet(paramDocument, paramElement, ctryRecord, paramStringBuffer);
+/*     */         } else {
+/* 128 */           paramStringBuffer.append("XMLCtryTMFElem.addElements no changes found for " + ctryRecord + NEWLINE);
+/*     */         } 
+/* 130 */         ctryRecord.dereference();
+/*     */       } 
+/*     */ 
+/*     */       
+/* 134 */       treeMap.clear();
+/*     */     } else {
+/* 136 */       paramStringBuffer.append("XMLCtryTMFElem.addElements no planned AVAILs found" + NEWLINE);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void createNodeSet(Document paramDocument, Element paramElement, CtryRecord paramCtryRecord, StringBuffer paramStringBuffer) {
+/* 145 */     Element element1 = paramDocument.createElement(this.nodeName);
+/* 146 */     addXMLAttrs(element1);
+/* 147 */     paramElement.appendChild(element1);
+/*     */ 
+/*     */     
+/* 150 */     Element element2 = paramDocument.createElement("COUNTRYACTION");
+/* 151 */     element2.appendChild(paramDocument.createTextNode(paramCtryRecord.getAction()));
+/* 152 */     element1.appendChild(element2);
+/* 153 */     element2 = paramDocument.createElement("COUNTRY");
+/* 154 */     element2.appendChild(paramDocument.createTextNode(paramCtryRecord.getCountry()));
+/* 155 */     element1.appendChild(element2);
+/* 156 */     element2 = paramDocument.createElement("STATUS");
+/* 157 */     element2.appendChild(paramDocument.createTextNode(paramCtryRecord.getAvailStatus()));
+/* 158 */     element1.appendChild(element2);
+/* 159 */     element2 = paramDocument.createElement("EARLIESTSHIPDATE");
+/* 160 */     element2.appendChild(paramDocument.createTextNode(paramCtryRecord.getShipDate()));
+/* 161 */     element1.appendChild(element2);
+/* 162 */     element2 = paramDocument.createElement("PUBFROM");
+/* 163 */     element2.appendChild(paramDocument.createTextNode(paramCtryRecord.getPubFrom()));
+/* 164 */     element1.appendChild(element2);
+/* 165 */     element2 = paramDocument.createElement("PUBTO");
+/* 166 */     element2.appendChild(paramDocument.createTextNode(paramCtryRecord.getPubTo()));
+/* 167 */     element1.appendChild(element2);
+/* 168 */     element2 = paramDocument.createElement("HIDE");
+/* 169 */     element2.appendChild(paramDocument.createTextNode(paramCtryRecord.getHide()));
+/* 170 */     element1.appendChild(element2);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void buildCtryRecs(TreeMap<String, CtryRecord> paramTreeMap, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) {
+/* 177 */     paramStringBuffer.append("XMLCtryTMFElem.buildCtryRecs " + paramDiffEntity.getKey() + NEWLINE);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 183 */     EntityItem entityItem1 = paramDiffEntity.getCurrentEntityItem();
+/* 184 */     EntityItem entityItem2 = paramDiffEntity.getPriorEntityItem();
+/* 185 */     if (paramDiffEntity.isDeleted()) {
+/*     */       
+/* 187 */       EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute("COUNTRYLIST");
+/* 188 */       paramStringBuffer.append("XMLCtryTMFElem.buildCtryRecs for deleted avail: ctryAtt " + 
+/* 189 */           PokUtils.getAttributeFlagValue(entityItem2, "COUNTRYLIST") + NEWLINE);
+/* 190 */       if (eANFlagAttribute != null) {
+/* 191 */         MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 192 */         for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/*     */           
+/* 194 */           if (arrayOfMetaFlag[b].isSelected()) {
+/* 195 */             String str = arrayOfMetaFlag[b].getFlagCode();
+/* 196 */             if (paramTreeMap.containsKey(str)) {
+/*     */               
+/* 198 */               CtryRecord ctryRecord = (CtryRecord)paramTreeMap.get(str);
+/* 199 */               paramStringBuffer.append("WARNING buildCtryRecs for deleted " + paramDiffEntity.getKey() + " " + str + " already exists, keeping orig " + ctryRecord + NEWLINE);
+/*     */             } else {
+/*     */               
+/* 202 */               CtryRecord ctryRecord = new CtryRecord(paramDiffEntity, str);
+/* 203 */               ctryRecord.setAction("Delete");
+/* 204 */               paramTreeMap.put(ctryRecord.getKey(), ctryRecord);
+/* 205 */               paramStringBuffer.append("XMLCtryTMFElem.buildCtryRecs for deleted:" + paramDiffEntity.getKey() + " rec: " + ctryRecord
+/* 206 */                   .getKey() + NEWLINE);
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/* 211 */     } else if (paramDiffEntity.isNew()) {
+/*     */       
+/* 213 */       EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute("COUNTRYLIST");
+/* 214 */       paramStringBuffer.append("XMLCtryTMFElem.buildCtryRecs for new avail: ctryAtt " + 
+/* 215 */           PokUtils.getAttributeFlagValue(entityItem1, "COUNTRYLIST") + NEWLINE);
+/* 216 */       if (eANFlagAttribute != null) {
+/* 217 */         MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 218 */         for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/*     */           
+/* 220 */           if (arrayOfMetaFlag[b].isSelected()) {
+/* 221 */             String str = arrayOfMetaFlag[b].getFlagCode();
+/* 222 */             if (paramTreeMap.containsKey(str)) {
+/* 223 */               CtryRecord ctryRecord = paramTreeMap.get(str);
+/* 224 */               paramStringBuffer.append("WARNING buildCtryRecs for new " + paramDiffEntity.getKey() + " " + str + " already exists, replacing orig " + ctryRecord + NEWLINE);
+/*     */               
+/* 226 */               ctryRecord.setUpdateAvail(paramDiffEntity);
+/*     */             } else {
+/* 228 */               CtryRecord ctryRecord = new CtryRecord(paramDiffEntity, str);
+/* 229 */               ctryRecord.setAction("Update");
+/* 230 */               paramTreeMap.put(ctryRecord.getKey(), ctryRecord);
+/* 231 */               paramStringBuffer.append("XMLCtryTMFElem.buildCtryRecs for new:" + paramDiffEntity.getKey() + " rec: " + ctryRecord
+/* 232 */                   .getKey() + NEWLINE);
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */     } else {
+/* 238 */       HashSet<String> hashSet1 = new HashSet();
+/* 239 */       HashSet<String> hashSet2 = new HashSet();
+/*     */       
+/* 241 */       EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute("COUNTRYLIST");
+/* 242 */       paramStringBuffer.append("XMLCtryTMFElem.buildCtryRecs for curr avail: fAtt " + 
+/* 243 */           PokUtils.getAttributeFlagValue(entityItem1, "COUNTRYLIST") + NEWLINE);
+/* 244 */       if (eANFlagAttribute != null && eANFlagAttribute.toString().length() > 0) {
+/*     */         
+/* 246 */         MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 247 */         for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/*     */           
+/* 249 */           if (arrayOfMetaFlag[b].isSelected()) {
+/* 250 */             hashSet2.add(arrayOfMetaFlag[b].getFlagCode());
+/*     */           }
+/*     */         } 
+/*     */       } 
+/*     */ 
+/*     */       
+/* 256 */       eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute("COUNTRYLIST");
+/* 257 */       paramStringBuffer.append("XMLCtryTMFElem.buildCtryRecs for prev avail: fAtt " + 
+/* 258 */           PokUtils.getAttributeFlagValue(entityItem2, "COUNTRYLIST") + NEWLINE);
+/* 259 */       if (eANFlagAttribute != null && eANFlagAttribute.toString().length() > 0) {
+/*     */         
+/* 261 */         MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 262 */         for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/*     */           
+/* 264 */           if (arrayOfMetaFlag[b].isSelected()) {
+/* 265 */             hashSet1.add(arrayOfMetaFlag[b].getFlagCode());
+/*     */           }
+/*     */         } 
+/*     */       } 
+/*     */ 
+/*     */       
+/* 271 */       Iterator<String> iterator = hashSet2.iterator();
+/* 272 */       while (iterator.hasNext()) {
+/* 273 */         String str = iterator.next();
+/* 274 */         if (!hashSet1.contains(str)) {
+/* 275 */           if (paramTreeMap.containsKey(str)) {
+/* 276 */             CtryRecord ctryRecord2 = paramTreeMap.get(str);
+/* 277 */             paramStringBuffer.append("WARNING buildCtryRecs for added ctry on " + paramDiffEntity.getKey() + " " + str + " already exists, replacing orig " + ctryRecord2 + NEWLINE);
+/*     */             
+/* 279 */             ctryRecord2.setUpdateAvail(paramDiffEntity); continue;
+/*     */           } 
+/* 281 */           CtryRecord ctryRecord1 = new CtryRecord(paramDiffEntity, str);
+/* 282 */           ctryRecord1.setAction("Update");
+/* 283 */           paramTreeMap.put(ctryRecord1.getKey(), ctryRecord1);
+/* 284 */           paramStringBuffer.append("XMLCtryTMFElem.buildCtryRecs for added ctry:" + paramDiffEntity.getKey() + " rec: " + ctryRecord1
+/* 285 */               .getKey() + NEWLINE);
+/*     */           
+/*     */           continue;
+/*     */         } 
+/* 289 */         if (paramTreeMap.containsKey(str)) {
+/* 290 */           CtryRecord ctryRecord1 = paramTreeMap.get(str);
+/* 291 */           paramStringBuffer.append("WARNING buildCtryRecs for existing ctry " + paramDiffEntity.getKey() + " " + str + " already exists, keeping orig " + ctryRecord1 + NEWLINE);
+/*     */           continue;
+/*     */         } 
+/* 294 */         CtryRecord ctryRecord = new CtryRecord(paramDiffEntity, str);
+/* 295 */         paramTreeMap.put(ctryRecord.getKey(), ctryRecord);
+/* 296 */         paramStringBuffer.append("XMLCtryTMFElem.buildCtryRecs for existing ctry:" + paramDiffEntity.getKey() + " rec: " + ctryRecord
+/* 297 */             .getKey() + NEWLINE);
+/*     */       } 
+/*     */ 
+/*     */       
+/* 301 */       iterator = hashSet1.iterator();
+/* 302 */       while (iterator.hasNext()) {
+/* 303 */         String str = iterator.next();
+/* 304 */         if (!hashSet2.contains(str)) {
+/* 305 */           if (paramTreeMap.containsKey(str)) {
+/* 306 */             CtryRecord ctryRecord1 = paramTreeMap.get(str);
+/* 307 */             paramStringBuffer.append("WARNING buildCtryRecs for delete ctry on " + paramDiffEntity.getKey() + " " + str + " already exists, keeping orig " + ctryRecord1 + NEWLINE);
+/*     */             continue;
+/*     */           } 
+/* 310 */           CtryRecord ctryRecord = new CtryRecord(paramDiffEntity, str);
+/* 311 */           ctryRecord.setAction("Delete");
+/* 312 */           paramTreeMap.put(ctryRecord.getKey(), ctryRecord);
+/* 313 */           paramStringBuffer.append("XMLCtryTMFElem.buildCtryRecs for delete ctry:" + paramDiffEntity.getKey() + " rec: " + ctryRecord
+/* 314 */               .getKey() + NEWLINE);
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private Vector getPlannedAvails(Hashtable paramHashtable, StringBuffer paramStringBuffer) {
+/* 327 */     Vector<DiffEntity> vector1 = new Vector(1);
+/* 328 */     Vector<DiffEntity> vector2 = (Vector)paramHashtable.get("AVAIL");
+/*     */     
+/* 330 */     paramStringBuffer.append("XMLCtryTMFElem.getPlannedAvails looking for AVAILTYPE:146 in AVAIL allVct.size:" + ((vector2 == null) ? "null" : ("" + vector2
+/* 331 */         .size())) + NEWLINE);
+/* 332 */     if (vector2 == null) {
+/* 333 */       return vector1;
+/*     */     }
+/*     */ 
+/*     */     
+/* 337 */     for (byte b = 0; b < vector2.size(); b++) {
+/* 338 */       DiffEntity diffEntity = vector2.elementAt(b);
+/* 339 */       EntityItem entityItem1 = diffEntity.getCurrentEntityItem();
+/* 340 */       EntityItem entityItem2 = diffEntity.getPriorEntityItem();
+/* 341 */       if (diffEntity.isDeleted()) {
+/* 342 */         paramStringBuffer.append("XMLCtryTMFElem.getPlannedAvails checking[" + b + "]: deleted " + diffEntity.getKey() + " AVAILTYPE: " + 
+/* 343 */             PokUtils.getAttributeFlagValue(entityItem2, "AVAILTYPE") + NEWLINE);
+/* 344 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute("AVAILTYPE");
+/* 345 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected("146")) {
+/* 346 */           vector1.add(diffEntity);
+/*     */         }
+/*     */       } else {
+/* 349 */         paramStringBuffer.append("XMLCtryTMFElem.getPlannedAvails checking[" + b + "]:" + diffEntity.getKey() + " AVAILTYPE: " + 
+/* 350 */             PokUtils.getAttributeFlagValue(entityItem1, "AVAILTYPE") + NEWLINE);
+/* 351 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute("AVAILTYPE");
+/* 352 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected("146")) {
+/* 353 */           vector1.add(diffEntity);
+/*     */         }
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 358 */     return vector1;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private DiffEntity getEntityForAttrs(Hashtable paramHashtable, String paramString1, String paramString2, String paramString3, String paramString4, String paramString5, StringBuffer paramStringBuffer) {
+/* 367 */     DiffEntity diffEntity = null;
+/* 368 */     Vector<DiffEntity> vector = (Vector)paramHashtable.get(paramString1);
+/*     */     
+/* 370 */     paramStringBuffer.append("XMLCtryTMFElem.getEntityForAttrs looking for " + paramString2 + ":" + paramString3 + " and " + paramString4 + ":" + paramString5 + " in " + paramString1 + " allVct.size:" + ((vector == null) ? "null" : ("" + vector
+/* 371 */         .size())) + NEWLINE);
+/* 372 */     if (vector == null) {
+/* 373 */       return diffEntity;
+/*     */     }
+/*     */ 
+/*     */     
+/* 377 */     for (byte b = 0; b < vector.size(); b++) {
+/* 378 */       DiffEntity diffEntity1 = vector.elementAt(b);
+/* 379 */       EntityItem entityItem1 = diffEntity1.getCurrentEntityItem();
+/* 380 */       EntityItem entityItem2 = diffEntity1.getPriorEntityItem();
+/* 381 */       if (diffEntity1.isDeleted()) {
+/* 382 */         paramStringBuffer.append("XMLCtryTMFElem.getEntityForAttrs checking[" + b + "]: deleted " + diffEntity1.getKey() + " " + paramString2 + ":" + 
+/* 383 */             PokUtils.getAttributeFlagValue(entityItem2, paramString2) + ((paramString4 == null) ? "" : (" " + paramString4 + ":" + 
+/* 384 */             PokUtils.getAttributeFlagValue(entityItem2, paramString4))) + NEWLINE);
+/* 385 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute(paramString2);
+/* 386 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString3)) {
+/* 387 */           if (paramString4 != null) {
+/* 388 */             eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute(paramString4);
+/* 389 */             if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString5)) {
+/* 390 */               diffEntity = diffEntity1;
+/*     */             }
+/*     */           } else {
+/* 393 */             diffEntity = diffEntity1;
+/*     */           }
+/*     */         
+/*     */         }
+/* 397 */       } else if (diffEntity1.isNew()) {
+/* 398 */         paramStringBuffer.append("XMLCtryTMFElem.getEntityForAttrs checking[" + b + "]: new " + diffEntity1.getKey() + " " + paramString2 + ":" + 
+/* 399 */             PokUtils.getAttributeFlagValue(entityItem1, paramString2) + ((paramString4 == null) ? "" : (" " + paramString4 + ":" + 
+/* 400 */             PokUtils.getAttributeFlagValue(entityItem1, paramString4))) + NEWLINE);
+/* 401 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute(paramString2);
+/* 402 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString3)) {
+/* 403 */           if (paramString4 != null) {
+/* 404 */             eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute(paramString4);
+/* 405 */             if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString5)) {
+/* 406 */               diffEntity = diffEntity1;
+/*     */               break;
+/*     */             } 
+/*     */           } else {
+/* 410 */             diffEntity = diffEntity1;
+/*     */             
+/*     */             break;
+/*     */           } 
+/*     */         }
+/*     */       } else {
+/* 416 */         paramStringBuffer.append("XMLCtryTMFElem.getEntityForAttrs checking[" + b + "]: current " + diffEntity1.getKey() + " " + paramString2 + ":" + 
+/* 417 */             PokUtils.getAttributeFlagValue(entityItem1, paramString2) + ((paramString4 == null) ? "" : (" " + paramString4 + ":" + 
+/* 418 */             PokUtils.getAttributeFlagValue(entityItem1, paramString4))) + NEWLINE);
+/* 419 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute(paramString2);
+/* 420 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString3)) {
+/* 421 */           if (paramString4 != null) {
+/* 422 */             eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute(paramString4);
+/* 423 */             if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString5)) {
+/* 424 */               diffEntity = diffEntity1;
+/*     */               break;
+/*     */             } 
+/*     */           } else {
+/* 428 */             diffEntity = diffEntity1;
+/*     */             break;
+/*     */           } 
+/*     */         }
+/* 432 */         paramStringBuffer.append("XMLCtryTMFElem.getEntityForAttrs checking[" + b + "]: prior " + diffEntity1.getKey() + " " + paramString2 + ":" + 
+/* 433 */             PokUtils.getAttributeFlagValue(entityItem2, paramString2) + ((paramString4 == null) ? "" : (" " + paramString4 + ":" + 
+/* 434 */             PokUtils.getAttributeFlagValue(entityItem2, paramString4))) + NEWLINE);
+/* 435 */         eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute(paramString2);
+/* 436 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString3)) {
+/* 437 */           if (paramString4 != null) {
+/* 438 */             eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute(paramString4);
+/* 439 */             if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString5)) {
+/* 440 */               diffEntity = diffEntity1;
+/*     */             }
+/*     */           } else {
+/*     */             
+/* 444 */             diffEntity = diffEntity1;
+/*     */           } 
+/*     */         }
+/*     */       } 
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */     
+/* 452 */     return diffEntity;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private static class CtryRecord
+/*     */   {
+/* 459 */     private String action = null;
+/*     */     private String country;
+/* 461 */     private String earliestshipdate = "@@";
+/* 462 */     private String availStatus = "@@";
+/* 463 */     private String pubfrom = "@@";
+/* 464 */     private String pubto = "@@";
+/* 465 */     private String hide = "@@"; private DiffEntity availDiff;
+/*     */     
+/*     */     boolean isDisplayable() {
+/* 468 */       return (this.action != null);
+/*     */     }
+/*     */     CtryRecord(DiffEntity param1DiffEntity, String param1String) {
+/* 471 */       this.country = param1String;
+/* 472 */       this.availDiff = param1DiffEntity;
+/*     */     } void setAction(String param1String) {
+/* 474 */       this.action = param1String;
+/*     */     } void setUpdateAvail(DiffEntity param1DiffEntity) {
+/* 476 */       this.availDiff = param1DiffEntity;
+/* 477 */       setAction("Update");
+/*     */     }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*     */     void setAllFields(DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, DiffEntity param1DiffEntity3, StringBuffer param1StringBuffer) {
+/* 498 */       param1StringBuffer.append("CtryRecord.setAllFields entered for: " + this.availDiff.getKey() + " " + getKey() + XMLElem.NEWLINE);
+/*     */       
+/* 500 */       EntityItem entityItem1 = this.availDiff.getCurrentEntityItem();
+/* 501 */       EntityItem entityItem2 = this.availDiff.getPriorEntityItem();
+/*     */ 
+/*     */ 
+/*     */       
+/* 505 */       this.earliestshipdate = PokUtils.getAttributeValue(entityItem1, "EFFECTIVEDATE", ", ", "@@", false);
+/*     */       
+/* 507 */       String str1 = "@@";
+/* 508 */       if (entityItem2 != null) {
+/* 509 */         str1 = PokUtils.getAttributeValue(entityItem2, "EFFECTIVEDATE", ", ", "@@", false);
+/*     */       }
+/* 511 */       param1StringBuffer.append("CtryRecord.setAllFields curshipdate: " + this.earliestshipdate + " prevdate: " + str1 + XMLElem.NEWLINE);
+/*     */ 
+/*     */       
+/* 514 */       if (!str1.equals(this.earliestshipdate)) {
+/* 515 */         setAction("Update");
+/*     */       }
+/*     */       
+/* 518 */       this.availStatus = PokUtils.getAttributeFlagValue(entityItem1, "STATUS");
+/* 519 */       if (this.availStatus == null) {
+/* 520 */         this.availStatus = "@@";
+/*     */       }
+/*     */       
+/* 523 */       String str2 = "@@";
+/* 524 */       if (entityItem2 != null) {
+/* 525 */         str2 = PokUtils.getAttributeFlagValue(entityItem2, "STATUS");
+/* 526 */         if (str2 == null) {
+/* 527 */           str2 = "@@";
+/*     */         }
+/*     */       } 
+/* 530 */       param1StringBuffer.append("CtryRecord.setAllFields curstatus: " + this.availStatus + " prevstatus: " + str2 + XMLElem.NEWLINE);
+/*     */       
+/* 532 */       if (!str2.equals(this.availStatus)) {
+/* 533 */         setAction("Update");
+/*     */       }
+/*     */ 
+/*     */ 
+/*     */       
+/* 538 */       this.pubfrom = derivePubFrom(param1DiffEntity1, param1DiffEntity3, false, param1StringBuffer);
+/* 539 */       String str3 = derivePubFrom(param1DiffEntity1, param1DiffEntity3, true, param1StringBuffer);
+/* 540 */       param1StringBuffer.append("CtryRecord.setAllFields pubfromT2: " + this.pubfrom + " pubfromT1: " + str3 + XMLElem.NEWLINE);
+/*     */       
+/* 542 */       if (!this.pubfrom.equals(str3)) {
+/* 543 */         setAction("Update");
+/*     */       }
+/*     */ 
+/*     */       
+/* 547 */       this.pubto = derivePubTo(param1DiffEntity2, param1DiffEntity3, false, param1StringBuffer);
+/* 548 */       String str4 = derivePubTo(param1DiffEntity2, param1DiffEntity3, true, param1StringBuffer);
+/* 549 */       if (!this.pubto.equals(str4)) {
+/* 550 */         setAction("Update");
+/*     */       }
+/* 552 */       param1StringBuffer.append("CtryRecord.setAllFields action:" + this.action + " pubtoT2: " + this.pubto + " pubtoT1: " + str4 + XMLElem.NEWLINE);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 561 */       if (param1DiffEntity3 != null) {
+/* 562 */         if (!param1DiffEntity3.isDeleted()) {
+/* 563 */           boolean bool = true;
+/*     */           
+/* 565 */           if (param1DiffEntity3.isNew()) {
+/* 566 */             setAction("Update");
+/*     */           } else {
+/* 568 */             entityItem1 = param1DiffEntity3.getCurrentEntityItem();
+/* 569 */             EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute("OFFCOUNTRY");
+/* 570 */             bool = (eANFlagAttribute != null && eANFlagAttribute.isSelected(this.country)) ? true : false;
+/* 571 */             if (!bool) {
+/* 572 */               setAction("Update");
+/*     */             }
+/*     */           } 
+/*     */           
+/* 576 */           if (bool) {
+/* 577 */             entityItem1 = param1DiffEntity3.getCurrentEntityItem();
+/* 578 */             this.hide = PokUtils.getAttributeValue(entityItem1, "CATHIDE", ", ", "@@", false);
+/*     */           } 
+/*     */         } else {
+/* 581 */           setAction("Update");
+/*     */         } 
+/*     */         
+/* 584 */         param1StringBuffer.append("CtryRecord.setAllFields after catlgor action:" + this.action + XMLElem.NEWLINE);
+/*     */       } 
+/*     */     }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*     */     private String derivePubTo(DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, boolean param1Boolean, StringBuffer param1StringBuffer) {
+/* 597 */       param1StringBuffer.append("CtryRecord.derivePubTo  loAvailDiff: " + ((param1DiffEntity1 == null) ? "null" : param1DiffEntity1
+/* 598 */           .getKey()) + " catlgorDiff: " + ((param1DiffEntity2 == null) ? "null" : param1DiffEntity2
+/* 599 */           .getKey()) + " findT1:" + param1Boolean + XMLElem.NEWLINE);
+/*     */       
+/* 601 */       String str = "@@";
+/* 602 */       if (param1Boolean) {
+/* 603 */         if (param1DiffEntity2 != null && !param1DiffEntity2.isNew()) {
+/* 604 */           EntityItem entityItem = param1DiffEntity2.getPriorEntityItem();
+/*     */           
+/* 606 */           EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("OFFCOUNTRY");
+/* 607 */           if (eANFlagAttribute != null && eANFlagAttribute.isSelected(this.country)) {
+/* 608 */             str = PokUtils.getAttributeValue(entityItem, "PUBTO", "", "@@", false);
+/*     */           }
+/* 610 */           param1StringBuffer.append("CtryRecord.derivePubTo catlgor thedate: " + str + " OFFCOUNTRY: " + 
+/* 611 */               PokUtils.getAttributeFlagValue(entityItem, "OFFCOUNTRY") + XMLElem.NEWLINE);
+/*     */         } 
+/* 613 */         if ("@@".equals(str))
+/*     */         {
+/* 615 */           if (param1DiffEntity1 != null && !param1DiffEntity1.isNew()) {
+/* 616 */             EntityItem entityItem = param1DiffEntity1.getPriorEntityItem();
+/* 617 */             EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("COUNTRYLIST");
+/* 618 */             if (eANFlagAttribute != null && eANFlagAttribute.isSelected(this.country)) {
+/* 619 */               str = PokUtils.getAttributeValue(entityItem, "EFFECTIVEDATE", ", ", "@@", false);
+/*     */             }
+/* 621 */             param1StringBuffer.append("CtryRecord.derivePubTo loavail thedate: " + str + " COUNTRYLIST: " + 
+/* 622 */                 PokUtils.getAttributeFlagValue(entityItem, "COUNTRYLIST") + XMLElem.NEWLINE);
+/*     */           } 
+/*     */         }
+/*     */       } else {
+/* 626 */         if (param1DiffEntity2 != null && !param1DiffEntity2.isDeleted()) {
+/* 627 */           EntityItem entityItem = param1DiffEntity2.getCurrentEntityItem();
+/*     */           
+/* 629 */           EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("OFFCOUNTRY");
+/* 630 */           if (eANFlagAttribute != null && eANFlagAttribute.isSelected(this.country)) {
+/* 631 */             str = PokUtils.getAttributeValue(entityItem, "PUBTO", "", "@@", false);
+/*     */           }
+/* 633 */           param1StringBuffer.append("CtryRecord.derivePubTo catlgor thedate: " + str + " OFFCOUNTRY: " + 
+/* 634 */               PokUtils.getAttributeFlagValue(entityItem, "OFFCOUNTRY") + XMLElem.NEWLINE);
+/*     */         } 
+/* 636 */         if ("@@".equals(str))
+/*     */         {
+/* 638 */           if (param1DiffEntity1 != null && !param1DiffEntity1.isDeleted()) {
+/* 639 */             EntityItem entityItem = param1DiffEntity1.getCurrentEntityItem();
+/* 640 */             EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("COUNTRYLIST");
+/* 641 */             if (eANFlagAttribute != null && eANFlagAttribute.isSelected(this.country)) {
+/* 642 */               str = PokUtils.getAttributeValue(entityItem, "EFFECTIVEDATE", ", ", "@@", false);
+/*     */             }
+/* 644 */             param1StringBuffer.append("CtryRecord.derivePubTo loavail thedate: " + str + " COUNTRYLIST: " + 
+/* 645 */                 PokUtils.getAttributeFlagValue(entityItem, "COUNTRYLIST") + XMLElem.NEWLINE);
+/*     */           } 
+/*     */         }
+/*     */       } 
+/*     */       
+/* 650 */       return str;
+/*     */     }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*     */     private String derivePubFrom(DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, boolean param1Boolean, StringBuffer param1StringBuffer) {
+/* 661 */       String str = "@@";
+/* 662 */       param1StringBuffer.append("CtryRecord.derivePubFrom availDiff: " + this.availDiff.getKey() + " foAvailDiff: " + ((param1DiffEntity1 == null) ? "null" : param1DiffEntity1
+/* 663 */           .getKey()) + " catlgorDiff: " + ((param1DiffEntity2 == null) ? "null" : param1DiffEntity2
+/* 664 */           .getKey()) + " findT1:" + param1Boolean + XMLElem.NEWLINE);
+/*     */       
+/* 666 */       if (param1Boolean) {
+/* 667 */         if (param1DiffEntity2 != null && !param1DiffEntity2.isNew()) {
+/* 668 */           EntityItem entityItem = param1DiffEntity2.getPriorEntityItem();
+/*     */           
+/* 670 */           EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("OFFCOUNTRY");
+/* 671 */           if (eANFlagAttribute != null && eANFlagAttribute.isSelected(this.country)) {
+/* 672 */             str = PokUtils.getAttributeValue(entityItem, "PUBFROM", "", "@@", false);
+/*     */           }
+/* 674 */           param1StringBuffer.append("CtryRecord.derivePubFrom catlgor thedate: " + str + " OFFCOUNTRY: " + 
+/*     */               
+/* 676 */               PokUtils.getAttributeFlagValue(entityItem, "OFFCOUNTRY") + XMLElem.NEWLINE);
+/*     */         } 
+/* 678 */         if ("@@".equals(str))
+/*     */         {
+/* 680 */           if (param1DiffEntity1 != null && !param1DiffEntity1.isNew()) {
+/* 681 */             EntityItem entityItem = param1DiffEntity1.getPriorEntityItem();
+/* 682 */             EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("COUNTRYLIST");
+/* 683 */             if (eANFlagAttribute != null && eANFlagAttribute.isSelected(this.country)) {
+/* 684 */               str = PokUtils.getAttributeValue(entityItem, "EFFECTIVEDATE", ", ", "@@", false);
+/*     */             }
+/* 686 */             param1StringBuffer.append("CtryRecord.derivePubFrom foavail thedate: " + str + " COUNTRYLIST: " + 
+/*     */                 
+/* 688 */                 PokUtils.getAttributeFlagValue(entityItem, "COUNTRYLIST") + XMLElem.NEWLINE);
+/*     */           } 
+/*     */         }
+/* 691 */         if ("@@".equals(str))
+/*     */         {
+/* 693 */           if (!this.availDiff.isNew()) {
+/* 694 */             EntityItem entityItem = this.availDiff.getPriorEntityItem();
+/* 695 */             EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("COUNTRYLIST");
+/* 696 */             if (eANFlagAttribute != null && eANFlagAttribute.isSelected(this.country)) {
+/* 697 */               str = PokUtils.getAttributeValue(entityItem, "EFFECTIVEDATE", ", ", "@@", false);
+/*     */             }
+/* 699 */             param1StringBuffer.append("CtryRecord.derivePubFrom plannedavail thedate: " + str + " COUNTRYLIST: " + 
+/*     */                 
+/* 701 */                 PokUtils.getAttributeFlagValue(entityItem, "COUNTRYLIST") + XMLElem.NEWLINE);
+/*     */           } 
+/*     */         }
+/*     */       } else {
+/* 705 */         if (param1DiffEntity2 != null && !param1DiffEntity2.isDeleted()) {
+/* 706 */           EntityItem entityItem = param1DiffEntity2.getCurrentEntityItem();
+/*     */           
+/* 708 */           EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("OFFCOUNTRY");
+/* 709 */           if (eANFlagAttribute != null && eANFlagAttribute.isSelected(this.country)) {
+/* 710 */             str = PokUtils.getAttributeValue(entityItem, "PUBFROM", "", "@@", false);
+/* 711 */             param1StringBuffer.append("CtryRecord.derivePubFrom catlgor thedate: " + str + " OFFCOUNTRY: " + 
+/*     */                 
+/* 713 */                 PokUtils.getAttributeFlagValue(entityItem, "OFFCOUNTRY") + XMLElem.NEWLINE);
+/*     */           } 
+/*     */         } 
+/* 716 */         if ("@@".equals(str))
+/*     */         {
+/* 718 */           if (param1DiffEntity1 != null && !param1DiffEntity1.isDeleted()) {
+/* 719 */             EntityItem entityItem = param1DiffEntity1.getCurrentEntityItem();
+/* 720 */             EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("COUNTRYLIST");
+/* 721 */             if (eANFlagAttribute != null && eANFlagAttribute.isSelected(this.country)) {
+/* 722 */               str = PokUtils.getAttributeValue(entityItem, "EFFECTIVEDATE", ", ", "@@", false);
+/*     */             }
+/* 724 */             param1StringBuffer.append("CtryRecord.derivePubFrom foavail thedate: " + str + " COUNTRYLIST: " + 
+/*     */                 
+/* 726 */                 PokUtils.getAttributeFlagValue(entityItem, "COUNTRYLIST") + XMLElem.NEWLINE);
+/*     */           } 
+/*     */         }
+/* 729 */         if ("@@".equals(str))
+/*     */         {
+/* 731 */           if (!this.availDiff.isDeleted()) {
+/* 732 */             EntityItem entityItem = this.availDiff.getCurrentEntityItem();
+/* 733 */             EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("COUNTRYLIST");
+/* 734 */             if (eANFlagAttribute != null && eANFlagAttribute.isSelected(this.country)) {
+/* 735 */               str = PokUtils.getAttributeValue(entityItem, "EFFECTIVEDATE", ", ", "@@", false);
+/*     */             }
+/* 737 */             param1StringBuffer.append("CtryRecord.derivePubFrom plannedavail thedate: " + str + " COUNTRYLIST: " + 
+/*     */                 
+/* 739 */                 PokUtils.getAttributeFlagValue(entityItem, "COUNTRYLIST") + XMLElem.NEWLINE);
+/*     */           } 
+/*     */         }
+/*     */       } 
+/*     */       
+/* 744 */       return str;
+/*     */     }
+/*     */     
+/* 747 */     String getAction() { return this.action; }
+/* 748 */     String getCountry() { return this.country; }
+/* 749 */     String getShipDate() { return this.earliestshipdate; }
+/* 750 */     String getPubFrom() { return this.pubfrom; }
+/* 751 */     String getPubTo() { return this.pubto; }
+/* 752 */     String getHide() { return this.hide; } String getAvailStatus() {
+/* 753 */       return this.availStatus;
+/*     */     }
+/* 755 */     boolean isDeleted() { return "Delete".equals(this.action); } String getKey() {
+/* 756 */       return this.country;
+/*     */     } void dereference() {
+/* 758 */       this.availDiff = null;
+/* 759 */       this.action = null;
+/* 760 */       this.availStatus = null;
+/* 761 */       this.country = null;
+/* 762 */       this.earliestshipdate = null;
+/* 763 */       this.pubfrom = null;
+/* 764 */       this.pubto = null;
+/* 765 */       this.hide = null;
+/*     */     }
+/*     */     
+/*     */     public String toString() {
+/* 769 */       return this.availDiff.getKey() + " " + getKey() + " action:" + this.action;
+/*     */     }
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.util;
 
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.objects.*;
-
-import org.w3c.dom.*;
-import java.util.*;
-import com.ibm.transform.oim.eacm.diff.*;
-import com.ibm.transform.oim.eacm.util.*;
-
-/**********************************************************************************
-*  Class used to hold info and structure to be generated for the xml feed
-* for abrs.
-D.	< COUNTRYELEMENT>
-
-There is an instance of this for every country in AVAIL.COUNTRYLIST where AVAILTYPE="Planned Availability" (146).
-If an instance is deleted, then a "delete" is passed. Countries deleted from the COUNTRYLIST are passed as a
-"delete". All other changes are Updates.
-
-Instances of AVAIL where AVAILTYPE = "First Order" (143) or "Last Order" (149) apply when there is a matching
-instance as follows:
-<COUNTRY> = a country in AVAIL.COUNTRYLIST
-
-1	<COUNTRYLIST>					2	PRODSTRUCT
-0..N	<COUNTRYELEMENT>			3
-1	<COUNTRYACTION>	</COUNTRYACTION>	4	AVAIL/CATLGOR	CountryAction
-1	<COUNTRY>	</COUNTRY>			4	AVAIL	COUNTRYLIST
-1	<EARLIESTSHIPDATE>	</EARLIESTSHIPDATE>	4		Shipdate
-1	<PUBFROM>	</PUBFROM>			4		PubFrom
-1	<PUBTO>	</PUBTO>				4		PubTo
-1	<HIDE>	</HIDE>					4	CATLGOR	CATHIDE
-*
-*/
-// $Log: XMLCtryTMFElem.java,v $
-// Revision 1.3  2008/05/28 18:51:17  wendy
-// Added STATUS to output
-//
-// Revision 1.2  2008/05/05 12:17:18  wendy
-// fix nullptr in debug msg
-//
-// Revision 1.1  2008/04/17 19:37:53  wendy
-// Init for
-// -   CQ00003539-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC
-// -   CQ00005096-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Add Category MM and Images
-// -   CQ00005046-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Support CRAD in BHC
-// -   CQ00005045-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Upgrade/Conversion Support
-// -   CQ00006862-WI  - BHC 3.0 Support - Support for Services Data UI
-//
-//
-
-public class XMLCtryTMFElem extends XMLElem
-{
-    /**********************************************************************************
-    * Constructor for TMF COUNTRYLIST elements
-    *
-    */
-    public XMLCtryTMFElem()
-    {
-        super("COUNTRYELEMENT");
-    }
-
-    /**********************************************************************************
-    * Create a node for this element and add to the parent and any children this node has
-    *
-    *@param dbCurrent Database
-    *@param table Hashtable of Vectors of DiffEntity
-    *@param document Document needed to create nodes
-    *@param parent Element node to add this node too
-    *@param parentItem DiffEntity - parent to use if path is specified in XMLGroupElem, item to use otherwise
-    *@param debugSb StringBuffer for debug output
-    */
-    public void addElements(Database dbCurrent,Hashtable table, Document document, Element parent,
-        DiffEntity parentItem, StringBuffer debugSb)
-    throws
-        COM.ibm.eannounce.objects.EANBusinessRuleException,
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-        java.rmi.RemoteException,
-        java.io.IOException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {
-        // get all AVAILs where AVAILTYPE="Planned Availability" (146) - some may be deleted
-        Vector plnAvlVct = getPlannedAvails(table, debugSb);
-
-        if (plnAvlVct.size()>0){ // must have planned avail for any of this, wayne said there will always be at least 1
-            // must account for AVAILa to have had US, CANADA at T1, and just CANADA at T2 and a new
-            // AVAILb to have US at T2
-            TreeMap ctryElemMap = new TreeMap();
-            for (int i=0; i<plnAvlVct.size(); i++){
-                DiffEntity availDiff = (DiffEntity)plnAvlVct.elementAt(i);
-
-                // get all AVAIL.COUNTRYLIST
-                buildCtryRecs(ctryElemMap, availDiff, debugSb);
-            }// end each planned avail
-
-            // output the elements
-            Collection ctryrecs = ctryElemMap.values();
-            Iterator itr = ctryrecs.iterator();
-            while(itr.hasNext()) {
-                CtryRecord ctryRec = (CtryRecord) itr.next();
-                //Rows marked as Delete do not need further updating and the Action should not be changed by further updating.
-                if (!ctryRec.isDeleted()){
-                    // find firstorder avail for this country
-                    DiffEntity foAvailDiff = getEntityForAttrs(table, "AVAIL", "AVAILTYPE", "143",
-                        "COUNTRYLIST", ctryRec.getCountry(), debugSb);
-                    // find lastorder avail for this country
-                    DiffEntity loAvailDiff = getEntityForAttrs(table, "AVAIL", "AVAILTYPE", "149",
-                        "COUNTRYLIST", ctryRec.getCountry(), debugSb);
-                    //find catlgor for this country
-                    DiffEntity catlgorDiff = getEntityForAttrs(table, "CATLGOR",
-                        "OFFCOUNTRY", ctryRec.getCountry(), null,null,debugSb);
-
-                    // add other info now
-                    ctryRec.setAllFields(foAvailDiff, loAvailDiff, catlgorDiff, debugSb);
-                }
-                if (ctryRec.isDisplayable()){
-                    createNodeSet(document, parent, ctryRec, debugSb);
-                }else{
-                    debugSb.append("XMLCtryTMFElem.addElements no changes found for "+ctryRec+NEWLINE);
-                }
-                ctryRec.dereference();
-            }
-
-            // release memory
-            ctryElemMap.clear();
-        }else{
-            debugSb.append("XMLCtryTMFElem.addElements no planned AVAILs found"+NEWLINE);
-        }
-    }
-    /********************
-    * create the nodes for this ctry record
-    */
-    private void createNodeSet(Document document, Element parent,
-        CtryRecord ctryRec,StringBuffer debugSb)
-    {
-        Element elem = (Element) document.createElement(nodeName); // create COUNTRYELEMENT
-        addXMLAttrs(elem);
-        parent.appendChild(elem);
-
-        // add child nodes
-        Element child = (Element) document.createElement("COUNTRYACTION");
-        child.appendChild(document.createTextNode(ctryRec.getAction()));
-        elem.appendChild(child);
-        child = (Element) document.createElement("COUNTRY");
-        child.appendChild(document.createTextNode(ctryRec.getCountry()));
-        elem.appendChild(child);
-		child = (Element) document.createElement("STATUS");
-		child.appendChild(document.createTextNode(ctryRec.getAvailStatus()));
-		elem.appendChild(child);
-        child = (Element) document.createElement("EARLIESTSHIPDATE");
-        child.appendChild(document.createTextNode(ctryRec.getShipDate()));
-        elem.appendChild(child);
-        child = (Element) document.createElement("PUBFROM");
-        child.appendChild(document.createTextNode(ctryRec.getPubFrom()));
-        elem.appendChild(child);
-        child = (Element) document.createElement("PUBTO");
-        child.appendChild(document.createTextNode(ctryRec.getPubTo()));
-        elem.appendChild(child);
-        child = (Element) document.createElement("HIDE");
-        child.appendChild(document.createTextNode(ctryRec.getHide()));
-        elem.appendChild(child);
-    }
-
-    /********************
-    *
-    */
-    private void buildCtryRecs(TreeMap ctryElemMap, DiffEntity availDiff, StringBuffer debugSb){
-        debugSb.append("XMLCtryTMFElem.buildCtryRecs "+availDiff.getKey()+NEWLINE);
-
-		// must account for AVAILa to have had US, CANADA at T1, and just CANADA at T2 and a new
-		// AVAILb to have US at T2
-		// only delete action if ctry or aud was removed at t2!!! allow update to override it
-
-        EntityItem curritem = availDiff.getCurrentEntityItem();
-        EntityItem prioritem = availDiff.getPriorEntityItem();
-        if (availDiff.isDeleted()){ // If the AVAIL was deleted, set Action = Delete
-            // mark all records as delete
-            EANFlagAttribute ctryAtt = (EANFlagAttribute)prioritem.getAttribute("COUNTRYLIST");
-            debugSb.append("XMLCtryTMFElem.buildCtryRecs for deleted avail: ctryAtt "+
-                        PokUtils.getAttributeFlagValue(prioritem, "COUNTRYLIST")+NEWLINE);
-            if (ctryAtt!=null){
-                MetaFlag[] mfArray = (MetaFlag[]) ctryAtt.get();
-                for (int im = 0; im < mfArray.length; im++){
-                    // get selection
-                    if (mfArray[im].isSelected()) {
-                        String ctryVal = mfArray[im].getFlagCode();
-						if (ctryElemMap.containsKey(ctryVal)){
-							// dont overwrite
-							CtryRecord rec = (CtryRecord)ctryElemMap.get(ctryVal);
-							debugSb.append("WARNING buildCtryRecs for deleted "+availDiff.getKey()+
-								" "+ctryVal+" already exists, keeping orig "+rec+NEWLINE);
-						}else{
-							CtryRecord ctryRec = new CtryRecord(availDiff, ctryVal);
-							ctryRec.setAction(DELETE_ACTIVITY);
-							ctryElemMap.put(ctryRec.getKey(),ctryRec);
-							debugSb.append("XMLCtryTMFElem.buildCtryRecs for deleted:"+availDiff.getKey()+" rec: "+
-								ctryRec.getKey()+NEWLINE);
-						}
-                    }
-                }
-            }
-        }else if (availDiff.isNew()){ //If the AVAIL was added or updated, set Action = Update
-            // mark all records as update
-            EANFlagAttribute ctryAtt = (EANFlagAttribute)curritem.getAttribute("COUNTRYLIST");
-            debugSb.append("XMLCtryTMFElem.buildCtryRecs for new avail: ctryAtt "+
-                    PokUtils.getAttributeFlagValue(curritem, "COUNTRYLIST")+NEWLINE);
-            if (ctryAtt!=null){
-                MetaFlag[] mfArray = (MetaFlag[]) ctryAtt.get();
-                for (int im = 0; im < mfArray.length; im++){
-                    // get selection
-                    if (mfArray[im].isSelected()) {
-                        String ctryVal = mfArray[im].getFlagCode();
-						if (ctryElemMap.containsKey(ctryVal)){
-							CtryRecord rec = (CtryRecord)ctryElemMap.get(ctryVal);
-							debugSb.append("WARNING buildCtryRecs for new "+availDiff.getKey()+
-								" "+ctryVal+" already exists, replacing orig "+rec+NEWLINE);
-							rec.setUpdateAvail(availDiff);
-						}else{
-							CtryRecord ctryRec = new CtryRecord(availDiff, ctryVal);
-							ctryRec.setAction(UPDATE_ACTIVITY);
-							ctryElemMap.put(ctryRec.getKey(),ctryRec);
-							debugSb.append("XMLCtryTMFElem.buildCtryRecs for new:"+availDiff.getKey()+" rec: "+
-								ctryRec.getKey()+NEWLINE);
-						}
-                    }
-                }
-            }
-        }else{
-            HashSet prevSet = new HashSet();
-            HashSet currSet = new HashSet();
-            // get current set of countries
-            EANFlagAttribute fAtt = (EANFlagAttribute)curritem.getAttribute("COUNTRYLIST");
-            debugSb.append("XMLCtryTMFElem.buildCtryRecs for curr avail: fAtt "+
-                PokUtils.getAttributeFlagValue(curritem, "COUNTRYLIST")+NEWLINE);
-            if (fAtt!=null && fAtt.toString().length()>0){
-                // Get the selected Flag codes.
-                MetaFlag[] mfArray = (MetaFlag[]) fAtt.get();
-                for (int i = 0; i < mfArray.length; i++){
-                    // get selection
-                    if (mfArray[i].isSelected()){
-                        currSet.add(mfArray[i].getFlagCode());
-                    }  // metaflag is selected
-                }// end of flagcodes
-            }
-
-            // get prev set of countries
-            fAtt = (EANFlagAttribute)prioritem.getAttribute("COUNTRYLIST");
-            debugSb.append("XMLCtryTMFElem.buildCtryRecs for prev avail: fAtt "+
-                    PokUtils.getAttributeFlagValue(prioritem, "COUNTRYLIST")+NEWLINE);
-            if (fAtt!=null && fAtt.toString().length()>0){
-                // Get the selected Flag codes.
-                MetaFlag[] mfArray = (MetaFlag[]) fAtt.get();
-                for (int i = 0; i < mfArray.length; i++){
-                    // get selection
-                    if (mfArray[i].isSelected()){
-                        prevSet.add(mfArray[i].getFlagCode());
-                    }  // metaflag is selected
-                }// end of flagcodes
-            }
-
-            // look for changes in country
-            Iterator itr = currSet.iterator();
-            while(itr.hasNext()) {
-                String ctryVal = (String) itr.next();
-                if(!prevSet.contains(ctryVal))  { // If AVAIL.COUNTRYLIST has a country added, set that row's Action = Update
-					if (ctryElemMap.containsKey(ctryVal)){
-						CtryRecord rec = (CtryRecord)ctryElemMap.get(ctryVal);
-						debugSb.append("WARNING buildCtryRecs for added ctry on "+availDiff.getKey()+
-							" "+ctryVal+" already exists, replacing orig "+rec+NEWLINE);
-						rec.setUpdateAvail(availDiff);
-					}else{
-						CtryRecord ctryRec = new CtryRecord(availDiff, ctryVal);
-						ctryRec.setAction(UPDATE_ACTIVITY);
-						ctryElemMap.put(ctryRec.getKey(),ctryRec);
-						debugSb.append("XMLCtryTMFElem.buildCtryRecs for added ctry:"+availDiff.getKey()+" rec: "+
-							ctryRec.getKey()+NEWLINE);
-					}
-                }else{
-                    // ctry already existed but something else may have changed
-					if (ctryElemMap.containsKey(ctryVal)){
-						CtryRecord rec = (CtryRecord)ctryElemMap.get(ctryVal);
-						debugSb.append("WARNING buildCtryRecs for existing ctry "+availDiff.getKey()+
-							" "+ctryVal+" already exists, keeping orig "+rec+NEWLINE);
-					}else{
-						CtryRecord ctryRec = new CtryRecord(availDiff, ctryVal);
-						ctryElemMap.put(ctryRec.getKey(),ctryRec);
-						debugSb.append("XMLCtryTMFElem.buildCtryRecs for existing ctry:"+availDiff.getKey()+" rec: "+
-							ctryRec.getKey()+NEWLINE);
-					}
-                }
-            }//end of currset while(itr.hasNext())
-            itr = prevSet.iterator();
-            while(itr.hasNext()) {
-                String ctryVal = (String) itr.next();
-                if(!currSet.contains(ctryVal))  { //If AVAIL.COUNTRYLIST has a country deleted, set that row's Action = Delete
-					if (ctryElemMap.containsKey(ctryVal)){
-						CtryRecord rec = (CtryRecord)ctryElemMap.get(ctryVal);
-						debugSb.append("WARNING buildCtryRecs for delete ctry on "+availDiff.getKey()+
-							" "+ctryVal+" already exists, keeping orig "+rec+NEWLINE);
-					}else{
-						CtryRecord ctryRec = new CtryRecord(availDiff, ctryVal);
-						ctryRec.setAction(DELETE_ACTIVITY);
-						ctryElemMap.put(ctryRec.getKey(),ctryRec);
-						debugSb.append("XMLCtryTMFElem.buildCtryRecs for delete ctry:"+availDiff.getKey()+" rec: "+
-							ctryRec.getKey()+NEWLINE);
-					}
-                }
-            }
-        } // end avail existed at both t1 and t2
-    }
-
-
-    /********************
-    * get planned avails - availtype cant be changed
-    */
-    private Vector getPlannedAvails(Hashtable table, StringBuffer debugSb)
-    {
-        Vector avlVct = new Vector(1);
-        Vector allVct = (Vector)table.get("AVAIL");
-
-        debugSb.append("XMLCtryTMFElem.getPlannedAvails looking for AVAILTYPE:146 in AVAIL"+
-            " allVct.size:"+(allVct==null?"null":""+allVct.size())+NEWLINE);
-        if (allVct==null){
-            return avlVct;
-        }
-
-        // find those of specified type
-        for (int i=0; i< allVct.size(); i++){
-            DiffEntity diffitem = (DiffEntity)allVct.elementAt(i);
-            EntityItem curritem = diffitem.getCurrentEntityItem();
-            EntityItem prioritem = diffitem.getPriorEntityItem();
-            if (diffitem.isDeleted()){
-                debugSb.append("XMLCtryTMFElem.getPlannedAvails checking["+i+"]: deleted "+diffitem.getKey()+" AVAILTYPE: "+
-                    PokUtils.getAttributeFlagValue(prioritem, "AVAILTYPE")+NEWLINE);
-                EANFlagAttribute fAtt = (EANFlagAttribute)prioritem.getAttribute("AVAILTYPE");
-                if (fAtt!= null && fAtt.isSelected("146")){
-                    avlVct.add(diffitem);
-                }
-            }else{
-                debugSb.append("XMLCtryTMFElem.getPlannedAvails checking["+i+"]:"+diffitem.getKey()+" AVAILTYPE: "+
-                    PokUtils.getAttributeFlagValue(curritem, "AVAILTYPE")+NEWLINE);
-                EANFlagAttribute fAtt = (EANFlagAttribute)curritem.getAttribute("AVAILTYPE");
-                if (fAtt!= null && fAtt.isSelected("146")){
-                    avlVct.add(diffitem);
-                }
-            }
-        }
-
-        return avlVct;
-    }
-    /********************
-    * get entity with specified values - should only be one
-    * could be two if one was deleted and one was added, but the added one will override and be an 'update'
-    */
-    private DiffEntity getEntityForAttrs(Hashtable table, String etype, String attrCode, String attrVal,
-        String attrCode2, String attrVal2,StringBuffer debugSb)
-    {
-        DiffEntity diffEntity = null;
-        Vector allVct = (Vector)table.get(etype);
-
-        debugSb.append("XMLCtryTMFElem.getEntityForAttrs looking for "+attrCode+":"+attrVal+" and "+
-            attrCode2+":"+attrVal2+" in "+etype+" allVct.size:"+(allVct==null?"null":""+allVct.size())+NEWLINE);
-        if (allVct==null){
-            return diffEntity;
-        }
-
-        // find those of specified type
-        for (int i=0; i< allVct.size(); i++){
-            DiffEntity diffitem = (DiffEntity)allVct.elementAt(i);
-            EntityItem curritem = diffitem.getCurrentEntityItem();
-            EntityItem prioritem = diffitem.getPriorEntityItem();
-            if (diffitem.isDeleted()){
-                debugSb.append("XMLCtryTMFElem.getEntityForAttrs checking["+i+"]: deleted "+diffitem.getKey()+
-                    " "+attrCode+":"+PokUtils.getAttributeFlagValue(prioritem, attrCode)+
-                   (attrCode2==null?"":(" "+attrCode2+":"+PokUtils.getAttributeFlagValue(prioritem, attrCode2)))+NEWLINE);
-                EANFlagAttribute fAtt = (EANFlagAttribute)prioritem.getAttribute(attrCode);
-                if (fAtt!= null && fAtt.isSelected(attrVal)){
-					if (attrCode2!=null){
-						fAtt = (EANFlagAttribute)prioritem.getAttribute(attrCode2);
-						if (fAtt!= null && fAtt.isSelected(attrVal2)){
-							diffEntity = diffitem; // keep looking for one that is not deleted
-						}
-					}else{
-						diffEntity = diffitem; // keep looking for one that is not deleted
-					}
-                }
-            }else{
-                if (diffitem.isNew()){
-                    debugSb.append("XMLCtryTMFElem.getEntityForAttrs checking["+i+"]: new "+diffitem.getKey()+
-                        " "+attrCode+":"+PokUtils.getAttributeFlagValue(curritem, attrCode)+
-                   		(attrCode2==null?"":(" "+attrCode2+":"+PokUtils.getAttributeFlagValue(curritem, attrCode2)))+NEWLINE);
-                    EANFlagAttribute fAtt = (EANFlagAttribute)curritem.getAttribute(attrCode);
-                    if (fAtt!= null && fAtt.isSelected(attrVal)){
-						if (attrCode2!=null){
-							fAtt = (EANFlagAttribute)curritem.getAttribute(attrCode2);
-							if (fAtt!= null && fAtt.isSelected(attrVal2)){
-								diffEntity = diffitem;
-								break;
-							}
-						}else{
-                    	    diffEntity = diffitem;
-                    	    break;
-						}
-					}
-                }else{
-                    // must check to see if the prior item had a match too
-                    debugSb.append("XMLCtryTMFElem.getEntityForAttrs checking["+i+"]: current "+diffitem.getKey()+
-                        " "+attrCode+":"+PokUtils.getAttributeFlagValue(curritem, attrCode)+
-                   		(attrCode2==null?"":(" "+attrCode2+":"+PokUtils.getAttributeFlagValue(curritem, attrCode2)))+NEWLINE);
-                    EANFlagAttribute fAtt = (EANFlagAttribute)curritem.getAttribute(attrCode);
-                    if (fAtt!= null && fAtt.isSelected(attrVal)){
-						if (attrCode2!=null){
-							fAtt = (EANFlagAttribute)curritem.getAttribute(attrCode2);
-							if (fAtt!= null && fAtt.isSelected(attrVal2)){
-								diffEntity = diffitem;
-								break;
-							}
-						}else{
-							diffEntity = diffitem;
-							break;
-						}
-                    }
-                    debugSb.append("XMLCtryTMFElem.getEntityForAttrs checking["+i+"]: prior "+diffitem.getKey()+
-                        " "+attrCode+":"+PokUtils.getAttributeFlagValue(prioritem, attrCode)+
-                   		(attrCode2==null?"":(" "+attrCode2+":"+PokUtils.getAttributeFlagValue(prioritem, attrCode2)))+NEWLINE);
-                    fAtt = (EANFlagAttribute)prioritem.getAttribute(attrCode);
-                    if (fAtt!= null && fAtt.isSelected(attrVal)){
-						if (attrCode2!=null){
-							fAtt = (EANFlagAttribute)prioritem.getAttribute(attrCode2);
-							if (fAtt!= null && fAtt.isSelected(attrVal2)){
-								diffEntity = diffitem;
-								//break; see if there is another that is current
-							}
-						}else{
-							diffEntity = diffitem;
-							//break; see if there is another that is current
-						}
-                    }
-                }
-            }
-        }
-
-        return diffEntity;
-    }
-
-    /*******************************
-    * one for every AVAIL.COUNTRYLIST
-    */
-    private static class CtryRecord {
-        private String action= null;
-        private String country;
-        private String earliestshipdate = CHEAT;// AVAIL
-		private String availStatus = CHEAT; //AVAIL
-        private String pubfrom = CHEAT;         //AVAIL/CATLGOR PubFrom
-        private String pubto = CHEAT;           //AVAIL/CATLGOR PubTo
-        private String hide= CHEAT;             //CATLGOR   CATHIDE
-        private DiffEntity availDiff;
-
-        boolean isDisplayable() {return action!=null;} // only display those with filled in actions
-
-        CtryRecord(DiffEntity diffitem,String ctry){
-            country = ctry;
-            availDiff = diffitem;
-        }
-        void setAction(String s) {  action = s; }
-        void setUpdateAvail(DiffEntity avl) {
-            availDiff = avl;// allow replacement
-            setAction(UPDATE_ACTIVITY);
-        }
-
-        /*********************
-        * 3.    <EARLIESTSHIPDATE>
-        *   AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = "Planned Availability" (146)
-        *   this avail cannot be deleted at this point
-        * 4.    <PUBFROM>
-        *   The first applicable / available date is used.
-        *   1.  CATLGOR.PUBFROM
-        *   2.  AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = "First Order" (143)
-        *   3.  AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = "Planned Availability" (146)
-        * 5.    <PUBTO>
-        *   The first applicable / available date is used.
-        *   1.  CATLGOR.PUBTO
-        *   2.  AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = "Last Order" (149)
-        *   3.  Null
-        */
-        void setAllFields(DiffEntity foAvailDiff, DiffEntity loAvailDiff,
-            DiffEntity catlgorDiff, StringBuffer debugSb)
-        {
-            debugSb.append("CtryRecord.setAllFields entered for: "+availDiff.getKey()+" "+getKey()+NEWLINE);
-
-            EntityItem curritem = availDiff.getCurrentEntityItem();
-            EntityItem previtem = availDiff.getPriorEntityItem();
-
-            // set EARLIESTSHIPDATE
-            // get current value
-            earliestshipdate = PokUtils.getAttributeValue(curritem, "EFFECTIVEDATE",", ", CHEAT, false);
-            // get priorvalue if it exists
-            String prevdate = CHEAT;
-            if (previtem != null){
-                prevdate = PokUtils.getAttributeValue(previtem, "EFFECTIVEDATE",", ", CHEAT, false);
-            }
-            debugSb.append("CtryRecord.setAllFields curshipdate: "+earliestshipdate+" prevdate: "+prevdate+NEWLINE);
-
-            // if diff, set action
-            if (!prevdate.equals(earliestshipdate)){
-                setAction(UPDATE_ACTIVITY);
-            }
-			// get STATUS
-			availStatus = PokUtils.getAttributeFlagValue(curritem, "STATUS");
-			if (availStatus==null){
-				availStatus = CHEAT;
-			}
-			// get priorvalue if it exists
-			String prevStatus = CHEAT;
-			if (previtem != null){
-				prevStatus = PokUtils.getAttributeFlagValue(previtem, "STATUS");
-				if (prevStatus==null){
-					prevStatus = CHEAT;
-				}
-			}
-			debugSb.append("CtryRecord.setAllFields curstatus: "+availStatus+" prevstatus: "+prevStatus+NEWLINE);
-			// if diff, set action
-			if (!prevStatus.equals(availStatus)){
-				setAction(UPDATE_ACTIVITY);
-			}
-
-            // set PUBFROM
-            // get val from t2 entities
-            pubfrom = derivePubFrom(foAvailDiff, catlgorDiff, false, debugSb);
-            String pubfromT1 = derivePubFrom(foAvailDiff, catlgorDiff, true, debugSb);
-            debugSb.append("CtryRecord.setAllFields pubfromT2: "+pubfrom+" pubfromT1: "+pubfromT1+NEWLINE);
-
-            if (!pubfrom.equals(pubfromT1)){
-                setAction(UPDATE_ACTIVITY);
-            }
-            // set PUBTO
-            // get val from t2 entities
-            pubto = derivePubTo(loAvailDiff, catlgorDiff, false,debugSb);
-            String pubtoT1 = derivePubTo(loAvailDiff, catlgorDiff, true,debugSb);
-            if (!pubto.equals(pubtoT1)){
-                setAction(UPDATE_ACTIVITY);
-            }
-            debugSb.append("CtryRecord.setAllFields action:"+action+" pubtoT2: "+pubto+" pubtoT1: "+pubtoT1+NEWLINE);
-
-            // set CATLGOR fields
-            /*
-            Update rows in the table for each instance of CATLGOR, and Country matches a CATLGOR.OFFCOUNTRY.
-            -   If the CALGOR was deleted, do not update the table with any attributes from CATLGOR; however, set the Action = Update
-            -   If the CALGOR was added, update the table with CATLGOR attributes and set the Action = Update
-            -   If the country in CALGOR.OFFCOUNTRY was changed (an add and a delete in the FLAG table), then for both Countries set the Action = Update. For the country deleted, do not update any other attributes. For the country added, update the table with CATLGOR attributes.
-            */
-            if (catlgorDiff != null){
-                if(!catlgorDiff.isDeleted()){
-                    boolean currCtry = true;
-
-                    if(catlgorDiff.isNew()){
-                        setAction(UPDATE_ACTIVITY);
-                    }else{ // check if country is new or removed
-                        curritem = catlgorDiff.getCurrentEntityItem();
-                        EANFlagAttribute fAtt = (EANFlagAttribute)curritem.getAttribute("OFFCOUNTRY");
-                        currCtry = fAtt!= null && fAtt.isSelected(country);
-                        if (!currCtry){ // must have been a match at t1
-                            setAction(UPDATE_ACTIVITY);
-                        }
-                    }
-
-                    if (currCtry){
-                        curritem = catlgorDiff.getCurrentEntityItem();
-                        hide = PokUtils.getAttributeValue(curritem, "CATHIDE",", ", CHEAT, false);
-                    }
-                }else{
-                    setAction(UPDATE_ACTIVITY);
-                    // catlgor values will not be displayed so this is an update
-                }
-                debugSb.append("CtryRecord.setAllFields after catlgor action:"+action+NEWLINE);
-            }
-        }
-
-        /****************************
-        *5. <PUBTO>
-        The first applicable / available date is used.
-        1.  CATLGOR.PUBTO
-        2.  AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = "Last Order" (149)
-        */
-        private String derivePubTo(DiffEntity loAvailDiff, DiffEntity catlgorDiff,
-            boolean findT1, StringBuffer debugSb)
-        {
-            debugSb.append("CtryRecord.derivePubTo "+
-                " loAvailDiff: "+(loAvailDiff==null?"null":loAvailDiff.getKey())+
-                " catlgorDiff: "+(catlgorDiff==null?"null":catlgorDiff.getKey())+" findT1:"+findT1+NEWLINE);
-
-            String thedate = CHEAT;
-            if (findT1){ // find previous derivation
-                if (catlgorDiff != null && !catlgorDiff.isNew()){
-                    EntityItem item = catlgorDiff.getPriorEntityItem();
-                    // make sure it was this country at prior time
-                    EANFlagAttribute fAtt = (EANFlagAttribute)item.getAttribute("OFFCOUNTRY");
-                    if (fAtt != null && fAtt.isSelected(country)){
-                        thedate = PokUtils.getAttributeValue(item, "PUBTO","", CHEAT, false);
-                    }
-                    debugSb.append("CtryRecord.derivePubTo catlgor thedate: "+thedate+
-                        " OFFCOUNTRY: "+PokUtils.getAttributeFlagValue(item, "OFFCOUNTRY")+NEWLINE);
-                }
-                if (CHEAT.equals(thedate)){
-                    // try to get it from the lastorder avail
-                    if (loAvailDiff != null && !loAvailDiff.isNew()){
-                        EntityItem item = loAvailDiff.getPriorEntityItem();
-                        EANFlagAttribute fAtt = (EANFlagAttribute)item.getAttribute("COUNTRYLIST");
-                        if (fAtt!= null && fAtt.isSelected(country)){
-                            thedate = PokUtils.getAttributeValue(item, "EFFECTIVEDATE",", ", CHEAT, false);
-                        }
-                        debugSb.append("CtryRecord.derivePubTo loavail thedate: "+thedate+
-                            " COUNTRYLIST: "+PokUtils.getAttributeFlagValue(item, "COUNTRYLIST")+NEWLINE);
-                    }
-                }
-            }else{ //find current derivation
-                if (catlgorDiff != null && !catlgorDiff.isDeleted()){
-                    EntityItem item = catlgorDiff.getCurrentEntityItem();
-                    // make sure it was this country at prior time
-                    EANFlagAttribute fAtt = (EANFlagAttribute)item.getAttribute("OFFCOUNTRY");
-                    if (fAtt != null && fAtt.isSelected(country)){
-                        thedate = PokUtils.getAttributeValue(item, "PUBTO","", CHEAT, false);
-                    }
-                    debugSb.append("CtryRecord.derivePubTo catlgor thedate: "+thedate+
-                        " OFFCOUNTRY: "+PokUtils.getAttributeFlagValue(item, "OFFCOUNTRY")+NEWLINE);
-                }
-                if (CHEAT.equals(thedate)){
-                    // try to get it from the lastorder avail
-                    if (loAvailDiff != null && !loAvailDiff.isDeleted()){
-                        EntityItem item = loAvailDiff.getCurrentEntityItem();
-                        EANFlagAttribute fAtt = (EANFlagAttribute)item.getAttribute("COUNTRYLIST");
-                        if (fAtt!= null && fAtt.isSelected(country)){
-                            thedate = PokUtils.getAttributeValue(item, "EFFECTIVEDATE",", ", CHEAT, false);
-                        }
-                        debugSb.append("CtryRecord.derivePubTo loavail thedate: "+thedate+
-                            " COUNTRYLIST: "+PokUtils.getAttributeFlagValue(item, "COUNTRYLIST")+NEWLINE);
-                    }
-                }
-            }
-
-            return thedate;
-        }
-        /****************************
-        *4. <PUBFROM>
-        The first applicable / available date is used.
-        1.  CATLGOR.PUBFROM
-        2.  AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = "First Order" (143)
-        3.  AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = "Planned Availability" (146)
-        */
-        private String derivePubFrom(DiffEntity foAvailDiff, DiffEntity catlgorDiff,
-            boolean findT1, StringBuffer debugSb)   {
-            String thedate = CHEAT;
-            debugSb.append("CtryRecord.derivePubFrom availDiff: "+availDiff.getKey()+
-                " foAvailDiff: "+(foAvailDiff==null?"null":foAvailDiff.getKey())+
-                " catlgorDiff: "+(catlgorDiff==null?"null":catlgorDiff.getKey())+" findT1:"+findT1+NEWLINE);
-
-            if (findT1){ // find previous derivation
-                if (catlgorDiff != null && !catlgorDiff.isNew()){
-                    EntityItem item = catlgorDiff.getPriorEntityItem();
-                    // make sure it was this country at prior time
-                    EANFlagAttribute fAtt = (EANFlagAttribute)item.getAttribute("OFFCOUNTRY");
-                    if (fAtt != null && fAtt.isSelected(country)){
-                        thedate = PokUtils.getAttributeValue(item, "PUBFROM","", CHEAT, false);
-                    }
-                    debugSb.append("CtryRecord.derivePubFrom catlgor thedate: "+thedate+
-                        " OFFCOUNTRY: "+
-                        PokUtils.getAttributeFlagValue(item, "OFFCOUNTRY")+NEWLINE);
-                }
-                if (CHEAT.equals(thedate)){
-                    // try to get it from the lastorder avail
-                    if (foAvailDiff != null && !foAvailDiff.isNew()){
-                        EntityItem item = foAvailDiff.getPriorEntityItem();
-                        EANFlagAttribute fAtt = (EANFlagAttribute)item.getAttribute("COUNTRYLIST");
-                        if (fAtt!= null && fAtt.isSelected(country)){
-                            thedate = PokUtils.getAttributeValue(item, "EFFECTIVEDATE",", ", CHEAT, false);
-                        }
-                        debugSb.append("CtryRecord.derivePubFrom foavail thedate: "+thedate+
-                            " COUNTRYLIST: "+
-                            PokUtils.getAttributeFlagValue(item, "COUNTRYLIST")+NEWLINE);
-                    }
-                }
-                if (CHEAT.equals(thedate)){
-                    // try to get it from the plannedavail avail
-                    if (!availDiff.isNew()){
-                        EntityItem item = availDiff.getPriorEntityItem();
-                        EANFlagAttribute fAtt = (EANFlagAttribute)item.getAttribute("COUNTRYLIST");
-                        if (fAtt!= null && fAtt.isSelected(country)){
-                            thedate = PokUtils.getAttributeValue(item, "EFFECTIVEDATE",", ", CHEAT, false);
-                        }
-                        debugSb.append("CtryRecord.derivePubFrom plannedavail thedate: "+thedate+
-                            " COUNTRYLIST: "+
-                            PokUtils.getAttributeFlagValue(item, "COUNTRYLIST")+NEWLINE);
-                    }
-                }
-            }else{ //find current derivation
-                if (catlgorDiff != null && !catlgorDiff.isDeleted()){
-                    EntityItem item = catlgorDiff.getCurrentEntityItem();
-                    // make sure it was this country at prior time
-                    EANFlagAttribute fAtt = (EANFlagAttribute)item.getAttribute("OFFCOUNTRY");
-                    if (fAtt != null && fAtt.isSelected(country)){
-                        thedate = PokUtils.getAttributeValue(item, "PUBFROM","", CHEAT, false);
-                        debugSb.append("CtryRecord.derivePubFrom catlgor thedate: "+thedate+
-                            " OFFCOUNTRY: "+
-                            PokUtils.getAttributeFlagValue(item, "OFFCOUNTRY")+NEWLINE);
-                    }
-                }
-                if (CHEAT.equals(thedate)){
-                    // try to get it from the lastorder avail
-                    if (foAvailDiff != null && !foAvailDiff.isDeleted()){
-                        EntityItem item = foAvailDiff.getCurrentEntityItem();
-                        EANFlagAttribute fAtt = (EANFlagAttribute)item.getAttribute("COUNTRYLIST");
-                        if (fAtt!= null && fAtt.isSelected(country)){
-                            thedate = PokUtils.getAttributeValue(item, "EFFECTIVEDATE",", ", CHEAT, false);
-                        }
-                        debugSb.append("CtryRecord.derivePubFrom foavail thedate: "+thedate+
-                            " COUNTRYLIST: "+
-                            PokUtils.getAttributeFlagValue(item, "COUNTRYLIST")+NEWLINE);
-                    }
-                }
-                if (CHEAT.equals(thedate)){
-                    // try to get it from the plannedavail avail
-                    if (!availDiff.isDeleted()){
-                        EntityItem item = availDiff.getCurrentEntityItem();
-                        EANFlagAttribute fAtt = (EANFlagAttribute)item.getAttribute("COUNTRYLIST");
-                        if (fAtt!= null && fAtt.isSelected(country)){
-                            thedate = PokUtils.getAttributeValue(item, "EFFECTIVEDATE",", ", CHEAT, false);
-                        }
-                        debugSb.append("CtryRecord.derivePubFrom plannedavail thedate: "+thedate+
-                            " COUNTRYLIST: "+
-                            PokUtils.getAttributeFlagValue(item, "COUNTRYLIST")+NEWLINE);
-                    }
-                }
-            }
-
-            return thedate;
-        }
-
-        String getAction() { return action;}
-        String getCountry() { return country;}
-        String getShipDate() { return earliestshipdate;}
-        String getPubFrom() { return pubfrom;}
-        String getPubTo() { return pubto;}
-        String getHide() { return hide;}
-		String getAvailStatus() {return availStatus;}
-
-        boolean isDeleted() { return DELETE_ACTIVITY.equals(action);}
-        String getKey() { return country;}
-        void dereference(){
-            availDiff = null;
-            action= null;
-			availStatus = null;
-            country= null;
-            earliestshipdate = null;
-            pubfrom = null;
-            pubto = null;
-            hide= null;
-        }
-
-        public String toString() {
-            return availDiff.getKey()+" "+getKey()+" action:"+action;
-        }
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\XMLCtryTMFElem.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

@@ -1,272 +1,278 @@
-//  (c) Copyright International Business Machines Corporation, 2001
-//  All Rights Reserved.</pre>
-//
-//FEATUREINTCHECKABR01.java,v
-//Revision 1.4  2006/03/03 19:23:28  bala
-//remove reference to Constants.CSS
-//
-//Revision 1.3  2006/01/24 16:53:00  yang
-//Jtest Changes
-//
-//Revision 1.2  2004/11/04 23:35:30  joan
-//adjust messages
-//
-//Revision 1.1  2004/09/21 00:31:25  joan
-//add abr
-//
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.LockPDHEntityException;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.abr.util.UpdatePDHEntityException;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.PDGUtility;
+/*     */ import COM.ibm.eannounce.objects.SBRException;
+/*     */ import COM.ibm.opicmpdh.transactions.OPICMList;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class FEATUREINTCHECKABR01
+/*     */   extends PokBaseABR
+/*     */ {
+/*  41 */   public static final String ABR = new String("FEATUREINTCHECKABR01");
+/*     */   
+/*  43 */   private EntityGroup m_egParent = null;
+/*  44 */   private EntityItem m_ei = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/*  53 */     String str1 = null;
+/*  54 */     String str2 = null;
+/*  55 */     String str3 = null;
+/*  56 */     String str4 = System.getProperty("line.separator");
+/*     */     
+/*     */     try {
+/*  59 */       StringBuffer stringBuffer = new StringBuffer();
+/*  60 */       PDGUtility pDGUtility = new PDGUtility();
+/*  61 */       start_ABRBuild();
+/*     */       
+/*  63 */       buildReportHeaderII();
+/*     */       
+/*  65 */       this.m_egParent = this.m_elist.getParentEntityGroup();
+/*  66 */       this.m_ei = this.m_egParent.getEntityItem(0);
+/*  67 */       println("<br><b>Feature: " + this.m_ei.getKey() + "</b>");
+/*     */       
+/*  69 */       printNavigateAttributes(this.m_ei, this.m_egParent, true);
+/*  70 */       setReturnCode(0);
+/*     */       
+/*  72 */       str1 = getAttributeValue(this.m_elist, this.m_ei
+/*     */           
+/*  74 */           .getEntityType(), this.m_ei
+/*  75 */           .getEntityID(), "FEATURECODEDUP");
+/*     */ 
+/*     */       
+/*  78 */       str2 = getAttributeValue(this.m_elist, this.m_ei
+/*     */           
+/*  80 */           .getEntityType(), this.m_ei
+/*  81 */           .getEntityID(), "INVENTORYGROUP");
+/*     */ 
+/*     */       
+/*  84 */       if (str1 != null) {
+/*     */         
+/*  86 */         StringBuffer stringBuffer1 = new StringBuffer();
+/*  87 */         stringBuffer1.append("map_FEATURECODE=" + str1 + ";");
+/*  88 */         stringBuffer1.append("map_INVENTORYGROUP=" + str2);
+/*     */         
+/*  90 */         EntityItem[] arrayOfEntityItem = pDGUtility.dynaSearch(this.m_db, this.m_prof, this.m_ei, "SRDFEATURE3", "FEATURE", stringBuffer1
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */             
+/*  96 */             .toString());
+/*     */         
+/*  98 */         if (arrayOfEntityItem == null || arrayOfEntityItem.length <= 0) {
+/*  99 */           setReturnCode(-1);
+/* 100 */           stringBuffer.append("Error:There's no FEATURE with feature code " + str1 + " and inventory group " + str2 + str4);
+/*     */         } 
+/*     */       } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 109 */       if (getReturnCode() == -1 && stringBuffer.toString().length() > 0) {
+/* 110 */         println("<h3><font color=red>" + stringBuffer.toString() + "</h3>");
+/* 111 */         OPICMList oPICMList = new OPICMList();
+/* 112 */         oPICMList.put("ABRRESULTS", "ABRRESULTS=" + stringBuffer.toString());
+/* 113 */         pDGUtility.updateAttribute(this.m_db, this.m_prof, this.m_ei, oPICMList);
+/* 114 */       } else if (getReturnCode() == 0) {
+/* 115 */         println("<h3><font color=red>" + stringBuffer.toString() + "</h3>");
+/* 116 */         OPICMList oPICMList = new OPICMList();
+/* 117 */         oPICMList.put("ABRRESULTS", "ABRRESULTS=Passed:OK");
+/* 118 */         pDGUtility.updateAttribute(this.m_db, this.m_prof, this.m_ei, oPICMList);
+/*     */       }
+/*     */     
+/* 121 */     } catch (LockPDHEntityException lockPDHEntityException) {
+/* 122 */       setReturnCode(-2);
+/* 123 */       println("<h3><font color=red>IAB1007E: Could not get soft lock.  Rule execution is terminated.<br />" + lockPDHEntityException
+/*     */ 
+/*     */ 
+/*     */           
+/* 127 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 129 */       logError(lockPDHEntityException.getMessage());
+/* 130 */     } catch (UpdatePDHEntityException updatePDHEntityException) {
+/* 131 */       setReturnCode(-2);
+/* 132 */       println("<h3><font color=red>UpdatePDH error: " + updatePDHEntityException
+/*     */           
+/* 134 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 136 */       logError(updatePDHEntityException.getMessage());
+/* 137 */     } catch (SBRException sBRException) {
+/* 138 */       String str = sBRException.toString();
+/* 139 */       int i = str.indexOf("(ok)");
+/* 140 */       if (i < 0) {
+/* 141 */         setReturnCode(-2);
+/* 142 */         println("<h3><font color=red>Generate Data error: " + 
+/*     */             
+/* 144 */             replace(str, str4, "<br>") + "</font></h3>");
+/*     */         
+/* 146 */         logError(sBRException.toString());
+/*     */       } else {
+/* 148 */         str = str.substring(0, i);
+/* 149 */         println(replace(str, str4, "<br>"));
+/*     */       } 
+/* 151 */     } catch (Exception exception) {
+/*     */       
+/* 153 */       println("Error in " + this.m_abri.getABRCode() + ":" + exception.getMessage());
+/* 154 */       println("" + exception);
+/* 155 */       exception.printStackTrace();
+/*     */       
+/* 157 */       if (getABRReturnCode() != -2) {
+/* 158 */         setReturnCode(-3);
+/*     */       }
+/*     */     } finally {
+/* 161 */       println("<br /><b>" + 
+/*     */           
+/* 163 */           buildMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 166 */               getABRDescription(), 
+/* 167 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }) + "</b>");
+/*     */       
+/* 170 */       log(
+/* 171 */           buildLogMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 174 */               getABRDescription(), 
+/* 175 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }));
+/*     */       
+/* 178 */       str3 = this.m_ei.toString();
+/* 179 */       if (str3.length() > 64) {
+/* 180 */         str3 = str3.substring(0, 64);
+/*     */       }
+/* 182 */       setDGTitle(str3);
+/* 183 */       setDGRptName(ABR);
+/*     */ 
+/*     */       
+/* 186 */       setDGString(getABRReturnCode());
+/* 187 */       printDGSubmitString();
+/*     */ 
+/*     */ 
+/*     */       
+/* 191 */       buildReportFooter();
+/*     */       
+/* 193 */       if (!isReadOnly()) {
+/* 194 */         clearSoftLock();
+/*     */       }
+/*     */     } 
+/*     */   }
+/*     */   
+/*     */   private String replace(String paramString1, String paramString2, String paramString3) {
+/* 200 */     String str = "";
+/* 201 */     int i = paramString1.indexOf(paramString2);
+/*     */     
+/* 203 */     while (paramString1.length() > 0 && i >= 0) {
+/* 204 */       str = str + paramString1.substring(0, i) + paramString3;
+/* 205 */       paramString1 = paramString1.substring(i + paramString2.length());
+/* 206 */       i = paramString1.indexOf(paramString2);
+/*     */     } 
+/* 208 */     str = str + paramString1;
+/* 209 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getABREntityDesc(String paramString, int paramInt) {
+/* 220 */     return null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 229 */     return "Feature Integrity Check ABR.";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getStyle() {
+/* 240 */     return "";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getRevision() {
+/* 250 */     return new String("1.4");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String getVersion() {
+/* 260 */     return "FEATUREINTCHECKABR01.java,v 1.4 2006/03/03 19:23:28 bala Exp";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 270 */     return "FEATUREINTCHECKABR01.java";
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.sg;
 
-//import COM.ibm.opicmpdh.middleware.*;
-//import COM.ibm.opicmpdh.objects.*;
-import COM.ibm.opicmpdh.transactions.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.eannounce.abr.util.*;
-//import java.util.*;
-//import java.io.*;
-
-/**
- * FEATUREINTCHECKABR01
- *
- *@author     Administrator
- *@created    August 30, 2002
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\FEATUREINTCHECKABR01.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class FEATUREINTCHECKABR01 extends PokBaseABR {
-  /**
-  *  Execute ABR.
-  *
-  */
-
-  // Class constants
-  public final static String ABR = new String("FEATUREINTCHECKABR01");
-
-  private EntityGroup m_egParent = null;
-  private EntityItem m_ei = null;
-
-  /**
-     * execute_run
-     *
-     * @author Owner
-     */
-    public void execute_run() {
-    EntityItem[] aei;
-    String strFCDupe = null;
-    String strInventory = null;
-    String strDgName = null;
-    String RETURN = System.getProperty("line.separator");
-    try {
-      // if it's the first time, build the report header
-      StringBuffer sbError = new StringBuffer();
-      PDGUtility utility = new PDGUtility();
-      start_ABRBuild();
-      // Build the report header
-      buildReportHeaderII();
-
-      m_egParent = m_elist.getParentEntityGroup();
-      m_ei = m_egParent.getEntityItem(0);
-      println("<br><b>Feature: " + m_ei.getKey() + "</b>");
-
-      printNavigateAttributes(m_ei, m_egParent, true);
-      setReturnCode(PASS);
-      strFCDupe =
-        getAttributeValue(
-          m_elist,
-          m_ei.getEntityType(),
-          m_ei.getEntityID(),
-          "FEATURECODEDUP");
-      strInventory =
-        getAttributeValue(
-          m_elist,
-          m_ei.getEntityType(),
-          m_ei.getEntityID(),
-          "INVENTORYGROUP");
-
-      if (strFCDupe != null) {
-        //There must exist a MACHTYPE with machine type
-        StringBuffer sb = new StringBuffer();
-        sb.append("map_FEATURECODE=" + strFCDupe + ";");
-        sb.append("map_INVENTORYGROUP=" + strInventory);
-        aei =
-          utility.dynaSearch(
-            m_db,
-            m_prof,
-            m_ei,
-            "SRDFEATURE3",
-            "FEATURE",
-            sb.toString());
-
-        if (aei == null || aei.length <= 0) {
-          setReturnCode(FAIL);
-          sbError.append(
-            "Error:There's no FEATURE with feature code "
-              + strFCDupe
-              + " and inventory group "
-              + strInventory
-              + RETURN);
-        }
-      }
-
-      if (getReturnCode() == FAIL && sbError.toString().length() > 0) {
-        println("<h3><font color=red>" + sbError.toString() + "</h3>");
-        OPICMList list = new OPICMList();
-        list.put("ABRRESULTS", "ABRRESULTS=" + sbError.toString());
-        utility.updateAttribute(m_db, m_prof, m_ei, list);
-      } else if (getReturnCode() == PASS) {
-        println("<h3><font color=red>" + sbError.toString() + "</h3>");
-        OPICMList list = new OPICMList();
-        list.put("ABRRESULTS", "ABRRESULTS=Passed:OK");
-        utility.updateAttribute(m_db, m_prof, m_ei, list);
-      }
-
-    } catch (LockPDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>"
-          + ERR_IAB1007E
-          + "<br />"
-          + le.getMessage()
-          + "</font></h3>");
-      logError(le.getMessage());
-    } catch (UpdatePDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>UpdatePDH error: "
-          + le.getMessage()
-          + "</font></h3>");
-      logError(le.getMessage());
-    } catch (SBRException _sbrex) {
-      String strError = _sbrex.toString();
-      int i = strError.indexOf("(ok)");
-      if (i < 0) {
-        setReturnCode(UPDATE_ERROR);
-        println(
-          "<h3><font color=red>Generate Data error: "
-            + replace(strError, RETURN, "<br>")
-            + "</font></h3>");
-        logError(_sbrex.toString());
-      } else {
-        strError = strError.substring(0, i);
-        println(replace(strError, RETURN, "<br>"));
-      }
-    } catch (Exception exc) {
-      // Report this error to both the datbase log and the PrintWriter
-      println("Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-      println("" + exc);
-      exc.printStackTrace();
-      // don't overwrite an update exception
-      if (getABRReturnCode() != UPDATE_ERROR) {
-        setReturnCode(INTERNAL_ERROR);
-      }
-    } finally {
-      println(
-        "<br /><b>"
-          + buildMessage(
-            MSG_IAB2016I,
-            new String[] {
-              getABRDescription(),
-              (getReturnCode() == PASS ? "Passed" : "Failed")})
-          + "</b>");
-
-      log(
-        buildLogMessage(
-          MSG_IAB2016I,
-          new String[] {
-            getABRDescription(),
-            (getReturnCode() == PASS ? "Passed" : "Failed")}));
-
-      // set DG title
-      strDgName = m_ei.toString();
-      if (strDgName.length() > 64) {
-        strDgName = strDgName.substring(0, 64);
-      }
-      setDGTitle(strDgName);
-      setDGRptName(ABR);
-
-      // set DG submit string
-      setDGString(getABRReturnCode());
-      printDGSubmitString();
-      //Stuff into report for subscription and notification
-
-      // Tack on the DGString
-      buildReportFooter();
-      // make sure the lock is released
-      if (!isReadOnly()) {
-        clearSoftLock();
-      }
-    }
-  }
-
-  private String replace(String _s, String _s1, String _s2) {
-    String sResult = "";
-    int iTab = _s.indexOf(_s1);
-
-    while (_s.length() > 0 && iTab >= 0) {
-      sResult = sResult + _s.substring(0, iTab) + _s2;
-      _s = _s.substring(iTab + _s1.length());
-      iTab = _s.indexOf(_s1);
-    }
-    sResult = sResult + _s;
-    return sResult;
-  }
-
-  /**
-  *  Get the entity description to use in error messages
-  *
-  *@param  entityType  Description of the Parameter
-  *@param  entityId    Description of the Parameter
-  *@return             String
-  */
-  protected String getABREntityDesc(String entityType, int entityId) {
-    return null;
-  }
-
-  /**
-   *  Get ABR description
-   *
-   *@return    java.lang.String
-   */
-  public String getDescription() {
-    return "Feature Integrity Check ABR.";
-  }
-
-  /**
-   *  Get any style that should be used for this page. Derived classes can
-   *  override this to set styles They must include the <style>...</style> tags
-   *
-   *@return    String
-   */
-  protected String getStyle() {
-    // Print out the PSG stylesheet
-    return "";
-  }
-
-  /**
-     * getRevision
-     *
-     * @return
-     * @author Owner
-     */
-    public String getRevision() {
-    return new String("1.4");
-  }
-
-  /**
-     * getVersion
-     *
-     * @return
-     * @author Owner
-     */
-    public static String getVersion() {
-    return ("FEATUREINTCHECKABR01.java,v 1.4 2006/03/03 19:23:28 bala Exp");
-  }
-
-  /**
-     * getABRVersion
-     *
-     * @return
-     * @author Owner
-     */
-    public String getABRVersion() {
-    return "FEATUREINTCHECKABR01.java";
-  }
-}

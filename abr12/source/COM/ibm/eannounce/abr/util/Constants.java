@@ -1,16 +1,17 @@
 package COM.ibm.eannounce.abr.util;
-//$Log: Constants.java,v $
-//Revision 1.5  2015/02/04 14:51:44  wangyul
-//RCQ00337765-RQ change the XML mapping to pull DIV from PROJ for Lenovo
-//
+
 public interface Constants {
-
-	/**
-	 * Version and Modification are hard coded in the XML Generator which puts the values in the XML
-	 */
-	public static final String XMLVERSION10 = "1";
-	public static final String XMLMOD10 = "0";
-	public static final String XMLVERSION05 = "0";
-	public static final String XMLMOD05 = "5";
-
+  public static final String XMLVERSION10 = "1";
+  
+  public static final String XMLMOD10 = "0";
+  
+  public static final String XMLVERSION05 = "0";
+  
+  public static final String XMLMOD05 = "5";
 }
+
+
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\Constants.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

@@ -1,840 +1,847 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2007, 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-
-package COM.ibm.eannounce.abr.sg;
-
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.opicmpdh.objects.*;
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-import com.ibm.transform.oim.eacm.util.*;
-
-import java.util.*;
-import java.text.*;
-
-
-/**********************************************************************************
-* EPIMSWWPRTBASE class used to handle xml generation for EPIMS or WWPRT by specific entitytype
-* from "SG FS ABR ePIMS Notification 20080407.doc"
-*
-*/
-// EPIMSWWPRTBASE.java,v
-// Revision 1.9  2010/07/30 11:19:33  wendy
-// updated debug msg
-//
-// Revision 1.8  2008/06/24 19:52:56  wendy
-// CQ00006088-WI - LA CTO Support - The requirement is to not feed LA products to ePIMS.
-//
-// Revision 1.7  2008/04/14 17:58:21  wendy
-// Made a few methods public for EPWQGenerator access
-//
-// Revision 1.6  2008/04/08 12:26:45  wendy
-// MN 35084789 - support resend of lost notification messages.
-// and MN 35178533 - ePIMS lost some geography data
-// "SG FS ABR WWPRT Notification 20080407.doc"
-// "SG FS ABR ePIMS Notification 20080407.doc"
-//
-// Revision 1.5  2008/01/30 19:39:14  wendy
-// Cleanup RSA warnings
-//
-// Revision 1.4  2008/01/20 23:19:40  wendy
-// Added check for domains
-//
-// Revision 1.3  2007/12/03 19:26:18  wendy
-// Save key with attribute values
-//
-// Revision 1.2  2007/11/30 22:30:43  wendy
-// Added support for announcement
-//
-// Revision 1.1  2007/11/28 22:56:27  wendy
-// Init for WWPRT ABRs
-//
-//
-public abstract class EPIMSWWPRTBASE extends PokBaseABR
-{
-    private StringBuffer rptSb = new StringBuffer();
-    private static final char[] FOOL_JTEST = {'\n'};
-    static final String NEWLINE = new String(FOOL_JTEST);
-    protected static final String STATUS_FINAL = "0020";
-
-    private Vector finalDtsVct;
-    private boolean bdomainInList = false;
-
-    private ResourceBundle rsBundle = null;
-    private Hashtable metaTbl = new Hashtable();
-    private String navName = "";
-
-    private String xmlgen = "Not required";  // set to Success or Failed or Not required
-
-    private static final Hashtable NDN_TBL;
-    private static final Hashtable STATUSATTR_TBL;
-    static{
-        NDN_TBL = new Hashtable();
-        STATUSATTR_TBL = new Hashtable();
-        STATUSATTR_TBL.put("ANNOUNCEMENT","ANNSTATUS");
-
-    /*
-The NDN of PRODSTRUCT is:
-MODEL.MACHTYPEATR
-MODEL.MODELATR
-MODEL.COFCAT
-MODEL.COFSUBCAT
-MODEL.COFGRP
-MODEL.COFSUBGRP
-FEATURE.FEATURECODE
-    */
-        NDN ndnMdl = new NDN("MODEL", "(TM)");
-        ndnMdl.addAttr("MACHTYPEATR");
-        ndnMdl.addAttr("MODELATR");
-        ndnMdl.addAttr("COFCAT");
-        ndnMdl.addAttr("COFSUBCAT");
-        ndnMdl.addAttr("COFGRP");
-        ndnMdl.addAttr("COFSUBGRP");
-        NDN ndnFc = new NDN("FEATURE", "(FC)");
-        ndnFc.addAttr("FEATURECODE");
-        ndnMdl.setNext(ndnFc);
-        NDN_TBL.put("PRODSTRUCT",ndnMdl);
-    /*
-The NDN of SWPRODSTRUCT is:
-MODEL.MACHTYPEATR
-MODEL.MODELATR
-MODEL.COFCAT
-MODEL.COFSUBCAT
-MODEL.COFGRP
-MODEL.COFSUBGRP
-SWFEATURE.FEATURECODE
-
-    */
-        ndnMdl = new NDN("MODEL", "(TM)");
-        ndnMdl.addAttr("MACHTYPEATR");
-        ndnMdl.addAttr("MODELATR");
-        ndnMdl.addAttr("COFCAT");
-        ndnMdl.addAttr("COFSUBCAT");
-        ndnMdl.addAttr("COFGRP");
-        ndnMdl.addAttr("COFSUBGRP");
-        ndnFc = new NDN("SWFEATURE", "(FC)");
-        ndnFc.addAttr("FEATURECODE");
-        ndnMdl.setNext(ndnFc);
-        NDN_TBL.put("SWPRODSTRUCT",ndnMdl);
-    }
-
-    /**********************************
-    * get the resource bundle
-    */
-    protected ResourceBundle getBundle() {
-        return rsBundle;
-    }
-
-    /**********************************
-     *  Execute ABR.
-     *
-     */
-    public void execute_run()
-    {
-        /*
-        The Report should identify:
-            USERID (USERTOKEN)
-            Role
-            Workgroup
-            Date/Time
-            EntityType LongDescription
-            ABRSTATUS that was set
-            Data Quality Errors (if any) as described in other sections
-            An indication if XML generation/feed was applicable
-            If XML was applicable, an indication of whether it was successfully sent
-        */
-        // must split because too many arguments for messageformat, max of 10.. this was 11
-        String HEADER = "<head>"+
-             EACustom.getMetaTags(getDescription()) + NEWLINE +
-             EACustom.getCSS() + NEWLINE +
-             EACustom.getTitle("{0} {1}") + NEWLINE +
-            "</head>" + NEWLINE + "<body id=\"ibm-com\">" +
-             EACustom.getMastheadDiv() + NEWLINE +
-            "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
-        String HEADER2 = "<table>"+NEWLINE +
-             "<tr><th>Userid: </th><td>{0}</td></tr>"+NEWLINE +
-             "<tr><th>Role: </th><td>{1}</td></tr>"+NEWLINE +
-             "<tr><th>Workgroup: </th><td>{2}</td></tr>"+NEWLINE +
-             "<tr><th>Date: </th><td>{3}</td></tr>"+NEWLINE +
-             "<tr><th>Description: </th><td>{4}</td></tr>"+NEWLINE +
-             "<tr><th>XML generation: </th><td>{5}</td></tr>"+NEWLINE+
-             "</table>"+NEWLINE+
-            "<!-- {6} -->" + NEWLINE;
-
-        MessageFormat msgf;
-        String rootDesc="";
-        String abrversion="";
-        EPIMSABRBase epimsAbr=null;
-        Object[] args = new String[10];
-        println(EACustom.getDocTypeHtml()); //Output the doctype and html
-        try
-        {
-            long startTime = System.currentTimeMillis();
-
-            start_ABRBuild(false); // dont pull VE yet, have to get name from EPIMSABR class
-
-            // get VE name from it
-            String VEname = "dummy";//just need root for timestamps now but prodstruct and swprodstruct
-            // need fc and mdl for nav name
-            if (getEntityType().equals("PRODSTRUCT")){
-				VEname = "EXRPT3FM"; //get VE with just ps
-			}else if (getEntityType().equals("SWPRODSTRUCT")){
-				VEname = "DQVESWPRODSTRUCT2";// get VE with just swps
-			}
-
-            // create VE
-            m_elist = m_db.getEntityList(m_prof,
-                new ExtractActionItem(null, m_db,m_prof,VEname),
-                new EntityItem[] { new EntityItem(null, m_prof, getEntityType(), getEntityID()) });
-
-            addDebug("Time to get VE: "+(System.currentTimeMillis()-startTime)+" (mseconds)");
-
-			String statusattr = (String)STATUSATTR_TBL.get(getEntityType());
-			if (statusattr==null){
-				statusattr = "STATUS";
-			}
-
-            finalDtsVct = getChangeTimes(statusattr, STATUS_FINAL);
-
-            setControlBlock(); // needed for attribute updates
-
-            //get properties file for the base class
-            rsBundle = ResourceBundle.getBundle(EPIMSWWPRTBASE.class.getName(), getLocale(m_prof.getReadLanguage().getNLSID()));
-
-            // debug display list of groups
-            addDebug("DEBUG: "+getShortClassName(getClass())+" entered for " + getEntityType() + getEntityID()+
-                " extract: "+VEname+" using DTS: "+m_prof.getValOn()+NEWLINE + PokUtils.outputList(m_elist));
-
-            //Default set to pass
-            setReturnCode(PASS);
-
-            //NAME is navigate attributes
-            navName = getNavigationName();
-
-            // get root from VE
-            rootDesc = m_elist.getParentEntityGroup().getLongDescription();
-
-// fixme remove this.. avoid msgs to userid for testing
-//setCreateDGEntity(false);
-        	EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-
-            // check if pdhdomain is in domain list for this ABR
-            domainNeedsChecks(rootEntity);
-
-			if (bdomainInList){
-				// find class to instantiate based on entitytype
-				// Load the specified ABR class in preparation for execution
-				String clsname = getSimpleABRName();
-				if (clsname!=null){
-					epimsAbr = (EPIMSABRBase) Class.forName(clsname).newInstance();
-
-					// call execute passing ve and rptsb
-					epimsAbr.execute_run(this);
-					xmlgen = epimsAbr.getXMLGenMsg();
-					abrversion = getShortClassName(epimsAbr.getClass())+" "+epimsAbr.getVersion();
-				}else{
-					addError(getShortClassName(getClass())+" does not support "+getEntityType());
-				}
-
-				// no report needed if all is ok
-				if (getReturnCode()==PASS){
-					setCreateDGEntity(false);
-				}
-			}else{
-				xmlgen = getBundle().getString("DOMAIN_NOT_LISTED"); //  = Domain was not in the list of supported Domains. Execution bypassed.
-			}
-
-            finalDtsVct.clear();
-        }
-        catch(Throwable exc)
-        {
-            java.io.StringWriter exBuf = new java.io.StringWriter();
-            String Error_EXCEPTION="<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
-            String Error_STACKTRACE="<pre>{0}</pre>";
-            msgf = new MessageFormat(Error_EXCEPTION);
-            setReturnCode(INTERNAL_ERROR);
-            exc.printStackTrace(new java.io.PrintWriter(exBuf));
-            // Put exception into document
-            args[0] = exc.getMessage();
-            rptSb.append(msgf.format(args) + NEWLINE);
-            msgf = new MessageFormat(Error_STACKTRACE);
-            args[0] = exBuf.getBuffer().toString();
-            rptSb.append(msgf.format(args) + NEWLINE);
-            logError("Exception: "+exc.getMessage());
-            logError(exBuf.getBuffer().toString());
-        }
-        finally
-        {
-            setDGTitle(navName);
-            setDGRptName(getShortClassName(getClass()));
-            setDGRptClass(getABRCode());
-            // make sure the lock is released
-            if(!isReadOnly())
-            {
-                clearSoftLock();
-            }
-        }
-
-        //Print everything up to </html>
-        //Insert Header into beginning of report
-        msgf = new MessageFormat(HEADER);
-        if (epimsAbr!=null){
-            args[0] = getShortClassName(epimsAbr.getClass());
-        }else{
-            args[0] = getShortClassName(getClass());
-        }
-        args[1] = navName;
-        String header1 = msgf.format(args);
-        msgf = new MessageFormat(HEADER2);
-        args[0] = m_prof.getOPName();
-        args[1] = m_prof.getRoleDescription();
-        args[2] = m_prof.getWGName();
-        args[3] = getNow();
-        args[4] = rootDesc;
-        args[5] = xmlgen;
-        args[6] = abrversion+" "+getABRVersion();
-
-        rptSb.insert(0, header1+msgf.format(args) + NEWLINE);
-
-        println(rptSb.toString()); // Output the Report
-        printDGSubmitString();
-        println(EACustom.getTOUDiv());
-        buildReportFooter(); // Print </html>
-
-        metaTbl.clear();
-    }
-
-	/**********************************************************************************
-	 * get timestamp for queueing this ABR
-	 * from "SG FS ABR ePIMS Notification 20080407.doc" and "SG FS ABR WWPRT Notification 20080407.doc"
-	 * MN 35178533 - ePIMS lost some geography data. A change to the AVAILability to cause it
-	 * to reflow did not work. Although a new notification was sent, the DTS uses was the last DTS to
-	 * Final which was missing the data. This fixes the problem with DTS. A work around of editing the
-	 * LSEO got past the SEV=1 and this is the functional specification fix which requires a code update.
-	 */
-	private String getABRQueuedTime()
-	throws COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-	{
-		String attCode = m_abri.getABRCode();
-		EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-
-		addDebug("getABRQueuedTime entered for "+rootEntity.getKey()+" "+attCode);
-		EANAttribute att = rootEntity.getAttribute(attCode);
-		if (att != null) {
-			AttributeChangeHistoryGroup achg = new AttributeChangeHistoryGroup(m_db, m_prof, att);
-			if (achg.getChangeHistoryItemCount()>1){
-				// last chghistory is the current one(in process), -2 is queued
-				int i=achg.getChangeHistoryItemCount()-2;
-				AttributeChangeHistoryItem achi = (AttributeChangeHistoryItem)achg.getChangeHistoryItem(i);
-				addDebug("getABRQueuedTime ["+i+"] isActive: "+
-						achi.isActive()+" isValid: "+achi.isValid()+" chgdate: "+
-						achi.getChangeDate()+" flagcode: "+achi.getFlagCode());
-
-				return achi.getChangeDate();
-			} // has history items
-			else {
-				addDebug("getABRQueuedTime for "+rootEntity.getKey()+" "+attCode+" has no history");
-			}
-		} else {
-			addDebug("getABRQueuedTime for "+rootEntity.getKey()+" "+attCode+" was null");
-		}
-
-		return getNow();
-	}
-
-    /**********************************
-    * derived classes implement this to supply the name of the abr to instantiate
-    */
-	protected abstract String getSimpleABRName();
-
-    /**********************************
-    * generate string representation of attributes in the list for this entity
-    */
-	protected String generateString(EntityItem theItem, String[] attrlist){
-		StringBuffer sb = new StringBuffer(theItem.getKey());
-		if (attrlist !=null){
-			for (int a=0; a<attrlist.length; a++){
-				sb.append(":"+PokUtils.getAttributeValue(theItem, attrlist[a],", ", "", false));
-			}
-		}else{
-           // addDebug("generateString: No list of 'attr of interest' found for "+theItem.getEntityType());
-		}
-		return sb.toString();
-	}
-
-	protected boolean isFirstFinal() { return firstFinal;}
-	private boolean firstFinal = true;
-    /**********************************************************************************
-    * get timestamp(s) for attribute when attribute went to specified value
-    * (only works for flag attributes)
-    */
-    protected Vector getChangeTimes(String attCode, String flagcode)
-    throws COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-    {
-        Vector dtsVct = new Vector(1);
-        Vector chiVct = new Vector(1);
-
-        EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-        addDebug("getChangeTimes entered for "+rootEntity.getKey()+" "+attCode+" flag: "+flagcode);
-        EANAttribute att = rootEntity.getAttribute(attCode);
-        if (att != null) {
-            AttributeChangeHistoryGroup achg = new AttributeChangeHistoryGroup(m_db,
-                m_elist.getProfile(), att);
-            if (achg.getChangeHistoryItemCount()>0){
-                for (int i=achg.getChangeHistoryItemCount()-1; i>=0; i--)
-                {
-                    chiVct.add(achg.getChangeHistoryItem(i));
-                }
-
-                Collections.sort(chiVct, new ChiComparator()); // Multiflag attr require sort
-                for (int i=0; i<chiVct.size(); i++){
-                    AttributeChangeHistoryItem achi = (AttributeChangeHistoryItem)chiVct.elementAt(i);
-                    addDebug("getChangeTimes "+attCode+"["+i+"] isActive: "+
-                        achi.isActive()+" isValid: "+achi.isValid()+" chgdate: "+
-                        achi.getChangeDate()+" flagcode: "+achi.getFlagCode());
-                    if (flagcode == null){ // just return last change dts
-                        dtsVct.add(achi.getChangeDate());
-                        break;
-                    }
-                    if (flagcode.equals(achi.getFlagCode())){
-                        dtsVct.add(achi.getChangeDate());
-                        if (dtsVct.size()==2){ // only need the last time and the one before that
-                        	firstFinal = false; // second final here
-                            break;
-                        }
-                    }
-                }
-
-                chiVct.clear();
-            } // has history items
-            addDebug("getChangeTimes Before using queued dts "+rootEntity.getKey()+" "+dtsVct);
-            if (dtsVct.size()>0){
-            	dtsVct.remove(0); //remove last final or only final MN 35178533
-	            dtsVct.insertElementAt(getABRQueuedTime(), 0);//replace with queued dts MN 35178533
-			}else{
-				dtsVct.add(getABRQueuedTime());
-			}
-            addDebug("getChangeTimes using queued dts "+rootEntity.getKey()+" "+dtsVct);
-        } else {// status attr !=null
-            addDebug("ERROR: getChangeTimes for "+rootEntity.getKey()+" "+attCode+"  was null use queued time");
-            dtsVct.add(getABRQueuedTime());
-        }
-
-        return dtsVct;
-    }
-
-    /**********************************
-    * get entitylist
-    */
-    protected EntityList getEntityList() { return m_elist; }
-
-    /**********************************
-    * get last final timestamp - now it is the queued timestmp
-    */
-    public String getLastFinalDTS() { return (String)finalDtsVct.firstElement(); }
-
-    /**********************************
-    * get prior final timestamp
-    */
-    public String getPriorFinalDTS() {
-        String prior = getLastFinalDTS();
-        if (finalDtsVct.size()>1){
-            prior = (String)finalDtsVct.lastElement();
-        }
-        return prior;
-    }
-
-    /**********************************
-    * get database
-    */
-    public Database getDB() { return m_db; }
-
-    /**********************************
-    * add msg to report output
-    */
-    protected void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
-
-    /**********************************
-    * add debug info as html comment
-    */
-    public void addDebug(String msg) { rptSb.append("<!-- "+msg+" -->"+NEWLINE);}
-
-    /**********************************
-    * add error info and fail abr
-    */
-    public void addError(String msg) {
-        addOutput(msg);
-        setReturnCode(FAIL);
-    }
-
-    /**********************************
-    * used for error output
-    * Prefix with LD(EntityType) NDN(EntityType) of the EntityType that the ABR is checking
-    * (root EntityType)
-    *
-    * The entire message should be prefixed with 'Error: '
-    *
-    */
-    protected void addError(String errCode, Object args[])
-    {
-		EntityGroup eGrp = m_elist.getParentEntityGroup();
-		setReturnCode(FAIL);
-
-		//ERROR_PREFIX = Error: &quot;{0} {1}&quot;
-		MessageFormat msgf = new MessageFormat(getBundle().getString("ERROR_PREFIX"));
-		Object args2[] = new Object[2];
-		args2[0] = eGrp.getLongDescription();
-		args2[1] = navName;
-
-		addMessage(msgf.format(args2), errCode, args);
-
-	}
-
-    /**********************************
-    * used for warning output
-    * Prefix with LD(EntityType) NDN(EntityType) of the EntityType that the ABR is checking
-    * (root EntityType)
-    *
-    * The entire message should be prefixed with 'Warning: '
-    *
-    */
-    protected void addWarning(String errCode, Object args[])
-    {
-		EntityGroup eGrp = m_elist.getParentEntityGroup();
-
-		//WARNING_PREFIX = Warning: &quot;{0} {1}&quot;
-		MessageFormat msgf = new MessageFormat(getBundle().getString("WARNING_PREFIX"));
-		Object args2[] = new Object[2];
-		args2[0] = eGrp.getLongDescription();
-		args2[1] = navName;
-
-		addMessage(msgf.format(args2), errCode, args);
-	}
-
-    /**********************************
-    * used for warning or error output
-    *
-    */
-    private void addMessage(String msgPrefix, String errCode, Object args[])
-    {
-		String msg = getBundle().getString(errCode);
-		// get message to output
-		if (args!=null){
-			MessageFormat msgf = new MessageFormat(msg);
-			msg = msgf.format(args);
-		}
-
-		addOutput(msgPrefix+" "+msg);
-	}
-
-    /**********************************************************************************
-    *  Get Name based on navigation attributes for root entity
-    *
-    *@return java.lang.String
-    */
-    private String getNavigationName() throws java.sql.SQLException, MiddlewareException
-    {
-        return getNavigationName(m_elist.getParentEntityGroup().getEntityItem(0));
-    }
-
-    /**********************************************************************************
-    *  Get Name based on navigation attributes for specified entity
-    *
-    *@return java.lang.String
-    */
-    protected String getNavigationName(EntityItem theItem) throws java.sql.SQLException, MiddlewareException
-    {
-        StringBuffer navName = new StringBuffer();
-        NDN ndn = (NDN)NDN_TBL.get(theItem.getEntityType());
-        // NAME is navigate attributes
-        // check hashtable to see if we already got this meta
-        EANList metaList = (EANList)metaTbl.get(theItem.getEntityType());
-        if (metaList==null)
-        {
-            EntityGroup eg = new EntityGroup(null, m_db, m_prof, theItem.getEntityType(), "Navigate");
-            metaList = eg.getMetaAttribute();  // iterator does not maintain navigate order
-            metaTbl.put(theItem.getEntityType(), metaList);
-        }
-        for (int ii=0; ii<metaList.size(); ii++)
-        {
-            EANMetaAttribute ma = (EANMetaAttribute)metaList.getAt(ii);
-            navName.append(PokUtils.getAttributeValue(theItem, ma.getAttributeCode(),", ", "", false));
-            if (ii+1<metaList.size()){
-                navName.append(" ");
-            }
-        }
-        if (ndn!=null){ // must get other attr from parent and child entities
-            StringBuffer sb = new StringBuffer();
-            EntityItem ei = getNDNitem(theItem,ndn.getEntityType());
-            if (ei!=null){
-                sb.append("("+ndn.getTag());
-                for (int y=0; y<ndn.getAttr().size(); y++){
-                    String attrcode = ndn.getAttr().elementAt(y).toString();
-                    sb.append(PokUtils.getAttributeValue(ei, attrcode,", ", "", false));
-                    if (y+1<ndn.getAttr().size()){
-                        sb.append(" ");
-                    }
-                }
-                sb.append(") ");
-            }else{
-                addDebug("NO entity found for ndn.getEntityType(): "+ndn.getEntityType());
-            }
-            ndn = ndn.getNext();
-            if (ndn !=null){
-                ei = getNDNitem(theItem,ndn.getEntityType());
-                if (ei!=null){
-                    sb.append("("+ndn.getTag());
-                    for (int y=0; y<ndn.getAttr().size(); y++){
-                        String attrcode = ndn.getAttr().elementAt(y).toString();
-                        sb.append(PokUtils.getAttributeValue(ei, attrcode,", ", "", false));
-                        if (y+1<ndn.getAttr().size()){
-                            sb.append(" ");
-                        }
-                    }
-                    sb.append(") ");
-                }else{
-                    addDebug("NO entity found for next ndn.getEntityType(): "+ndn.getEntityType());
-                }
-            }
-            navName.insert(0,sb.toString());
-        } // end getting other entity info
-
-        return navName.toString();
-    }
-
-    /**********************************************************************************
-    * Find entity item to use for building the navigation display name when more then
-    * one entity is needed, like for PRODSTRUCT
-    *
-    *@return EntityItem
-    */
-    private EntityItem getNDNitem(EntityItem theItem,String etype){
-        for (int i=0; i<theItem.getDownLinkCount(); i++){
-            EntityItem ent = (EntityItem)theItem.getDownLink(i);
-            if (ent.getEntityType().equals(etype)){
-                return ent;
-            }
-        }
-        for (int i=0; i<theItem.getUpLinkCount(); i++){
-            EntityItem ent = (EntityItem)theItem.getUpLink(i);
-            if (ent.getEntityType().equals(etype)){
-                return ent;
-            }
-        }
-        return null;
-    }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getABRVersion()
-    {
-        return "1.9";
-    }
-    /***********************************************
-    *  Get ABR description
-    *
-    *@return java.lang.String
-    */
-    public String getDescription()
-    {
-        return "EPIMSWWPRTBASE";
-    }
-
-    /***********************************************
-    *  Sets the specified Flag Attribute on the Root Entity
-    *
-    *@param    profile Profile
-    *@param    strAttributeCode The Flag Attribute Code
-    *@param    strAttributeValue The Flag Attribute Value
-    */
-    protected void setFlagValue(String strAttributeCode, String strAttributeValue)
-    throws java.sql.SQLException,
-    COM.ibm.opicmpdh.middleware.MiddlewareException
-    {
-        logMessage(getDescription()+" ***** "+strAttributeCode+" set to: " + strAttributeValue);
-        addDebug("setFlagValue entered for "+strAttributeCode+" set to: " + strAttributeValue);
-        EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-
-		// if meta does not have this attribute, there is nothing to do
-        EANMetaAttribute metaAttr = rootEntity.getEntityGroup().getMetaAttribute(strAttributeCode);
-        if (metaAttr==null) {
-			addDebug("setFlagValue: "+strAttributeCode+" was not in meta for "+rootEntity.getEntityType()+", nothing to do");
-        	logMessage(getDescription()+" ***** "+strAttributeCode+" was not in meta for "+
-        		rootEntity.getEntityType()+", nothing to do");
-			return;
-		}
-        if(strAttributeValue != null)
-        {
-            if(strAttributeValue.equals(getAttributeFlagEnabledValue(rootEntity,strAttributeCode))){
-                addDebug("setFlagValue "+rootEntity.getKey()+" "+strAttributeCode+
-                    " already matches: " + strAttributeValue);
-            }else{
-                try
-                {
-                    if (m_cbOn==null){
-                        setControlBlock(); // needed for attribute updates
-                    }
-                    ReturnEntityKey rek = new ReturnEntityKey(getEntityType(), getEntityID(), true);
-
-                    SingleFlag sf = new SingleFlag (m_prof.getEnterprise(), rek.getEntityType(), rek.getEntityID(),
-                        strAttributeCode, strAttributeValue, 1, m_cbOn);
-                    Vector vctAtts = new Vector();
-                    Vector vctReturnsEntityKeys = new Vector();
-                    vctAtts.addElement(sf);
-                    rek.m_vctAttributes = vctAtts;
-                    vctReturnsEntityKeys.addElement(rek);
-
-                    m_db.update(m_prof, vctReturnsEntityKeys, false, false);
-                    addDebug(rootEntity.getKey()+" had "+strAttributeCode+" set to: " + strAttributeValue);
-                }
-                finally {
-                    m_db.commit();
-                    m_db.freeStatement();
-                    m_db.isPending("finally after update in setflag value");
-                }
-            }
-        }
-    }
-
-    /**********************************************************************************
-    *  Get Locale based on NLSID
-    *
-    *@return java.util.Locale
-    */
-    public static Locale getLocale(int nlsID)
-    {
-        Locale locale = null;
-        switch (nlsID)
-        {
-        case 1:
-            locale = Locale.US;
-            break;
-        case 2:
-            locale = Locale.GERMAN;
-            break;
-        case 3:
-            locale = Locale.ITALIAN;
-            break;
-        case 4:
-            locale = Locale.JAPANESE;
-            break;
-        case 5:
-            locale = Locale.FRENCH;
-            break;
-        case 6:
-            locale = new Locale("es", "ES");
-            break;
-        case 7:
-            locale = Locale.UK;
-            break;
-        default:
-            locale = Locale.US;
-            break;
-        }
-        return locale;
-    }
-
-    /*************************************************************************************
-    * Check the PDHDOMAIN
-    * xseries and converged prod need DQ checks in the ABRs but the other domains like iseries don't
-    * because those Brands do not want any checking, they do not use STATUS, they want no process
-    * criteria apply if PDHDOMAIN = (0050) 'xSeries' or (0390) 'Converged Products'
-    *@param item    EntityItem
-    * domainInList set to true if matches one of these domains
-    */
-    private void domainNeedsChecks(EntityItem item)
-    {
-    	String domains = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getDomains(m_abri.getABRCode());
-    	addDebug("domainNeedsChecks pdhdomains needing checks: "+domains);
-		if (domains.equals("all")){
-			bdomainInList = true;
-		}else{
-	        Set testSet = new HashSet();
-			StringTokenizer st1 = new StringTokenizer(domains,",");
-			while (st1.hasMoreTokens()) {
-		        testSet.add(st1.nextToken());
-			}
-	        bdomainInList = PokUtils.contains(item, "PDHDOMAIN", testSet);
-	        testSet.clear();
-		}
-
-        if (!bdomainInList){
-            addDebug("PDHDOMAIN did not include "+domains+", execution is bypassed ["+
-                PokUtils.getAttributeFlagValue(item, "PDHDOMAIN"));
-        }
-    }
-
-    /**********************************
-     * check for specified country in the abr's countrylist
-     * CQ00006088-WI
- 	 * 	LA CTO Support - The requirement is to not feed LA products to ePIMS.
- 	 * This enhancement is to recognize a list of Countries for which ePIMS should be notified
- 	 * and hence eAnnounce will not notify ePIMS about offerings that are only available in LA.
- 	 * Since it is possible to have 'offerings' that are available in Countries that ePIMS needs
- 	 * data and Countries that ePIMS does not handle, ePIMS will need to handle this case.
- 	 *
-     *@param item    EntityItem
-     * @return boolean true if matches one of these countries
-     */
-    protected boolean checkABRCountryList(EntityItem item)
-    {
-    	boolean inlist = false;
-     	String ctrylist = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getCountryList(m_abri.getABRCode());
-     	addDebug("checkABRCountryList countrylist: "+ctrylist);
- 		if (ctrylist.equals("all")){
- 			inlist = true;
- 		}else{
- 	        Set testSet = new HashSet();
- 			StringTokenizer st1 = new StringTokenizer(ctrylist,",");
- 			while (st1.hasMoreTokens()) {
- 		        testSet.add(st1.nextToken());
- 			}
- 			inlist = PokUtils.contains(item, "COUNTRYLIST", testSet);
- 	        testSet.clear();
- 		}
-
-         if (!inlist){
-             addDebug(item.getKey()+".COUNTRYLIST ["+
-                 PokUtils.getAttributeValue(item, "COUNTRYLIST",", ", "", false)+
-                 "] did not include "+ctrylist+", notification will not be sent ");
-         }
-         return inlist;
-     }
-    /**********************************************************************************
-     * This class is used to sort ChangeHistoryItem based on timestamp
-     */
-    private class ChiComparator implements java.util.Comparator
-    {
-        public int compare(Object o1, Object o2) {
-            ChangeHistoryItem chi1 = (ChangeHistoryItem)o1;
-            ChangeHistoryItem chi2 = (ChangeHistoryItem)o2;
-            return chi2.getChangeDate().compareTo(chi1.getChangeDate()); // in descending order
-        }
-    }
-
-    // used to support getting navigation display name when other entities are needed
-    private static class NDN {
-        private String etype, tag;
-        private NDN next;
-        private Vector attrVct = new Vector();
-        NDN(String t,String s){
-            etype = t;
-            tag = s;
-        }
-        String getTag() { return tag;}
-        String getEntityType() { return etype;}
-        Vector getAttr(){ return attrVct;}
-        void addAttr(String a){
-            attrVct.addElement(a);
-        }
-        void setNext(NDN n) { next = n;}
-        NDN getNext() { return next;}
-    }
-}
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.EACustom;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.objects.AttributeChangeHistoryGroup;
+/*     */ import COM.ibm.eannounce.objects.AttributeChangeHistoryItem;
+/*     */ import COM.ibm.eannounce.objects.ChangeHistoryItem;
+/*     */ import COM.ibm.eannounce.objects.EANAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANList;
+/*     */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
+/*     */ import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+/*     */ import COM.ibm.opicmpdh.objects.SingleFlag;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.PrintWriter;
+/*     */ import java.io.StringWriter;
+/*     */ import java.sql.SQLException;
+/*     */ import java.text.MessageFormat;
+/*     */ import java.util.Collections;
+/*     */ import java.util.Comparator;
+/*     */ import java.util.HashSet;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.Locale;
+/*     */ import java.util.ResourceBundle;
+/*     */ import java.util.StringTokenizer;
+/*     */ import java.util.Vector;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public abstract class EPIMSWWPRTBASE
+/*     */   extends PokBaseABR
+/*     */ {
+/*  59 */   private StringBuffer rptSb = new StringBuffer();
+/*  60 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/*  61 */   static final String NEWLINE = new String(FOOL_JTEST);
+/*     */   
+/*     */   protected static final String STATUS_FINAL = "0020";
+/*     */   
+/*     */   private Vector finalDtsVct;
+/*     */   private boolean bdomainInList = false;
+/*  67 */   private ResourceBundle rsBundle = null;
+/*  68 */   private Hashtable metaTbl = new Hashtable<>();
+/*  69 */   private String navName = "";
+/*     */   
+/*  71 */   private String xmlgen = "Not required";
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*  76 */   private static final Hashtable NDN_TBL = new Hashtable<>();
+/*  77 */   private static final Hashtable STATUSATTR_TBL = new Hashtable<>(); static {
+/*  78 */     STATUSATTR_TBL.put("ANNOUNCEMENT", "ANNSTATUS");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*  90 */     NDN nDN1 = new NDN("MODEL", "(TM)");
+/*  91 */     nDN1.addAttr("MACHTYPEATR");
+/*  92 */     nDN1.addAttr("MODELATR");
+/*  93 */     nDN1.addAttr("COFCAT");
+/*  94 */     nDN1.addAttr("COFSUBCAT");
+/*  95 */     nDN1.addAttr("COFGRP");
+/*  96 */     nDN1.addAttr("COFSUBGRP");
+/*  97 */     NDN nDN2 = new NDN("FEATURE", "(FC)");
+/*  98 */     nDN2.addAttr("FEATURECODE");
+/*  99 */     nDN1.setNext(nDN2);
+/* 100 */     NDN_TBL.put("PRODSTRUCT", nDN1);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 112 */     nDN1 = new NDN("MODEL", "(TM)");
+/* 113 */     nDN1.addAttr("MACHTYPEATR");
+/* 114 */     nDN1.addAttr("MODELATR");
+/* 115 */     nDN1.addAttr("COFCAT");
+/* 116 */     nDN1.addAttr("COFSUBCAT");
+/* 117 */     nDN1.addAttr("COFGRP");
+/* 118 */     nDN1.addAttr("COFSUBGRP");
+/* 119 */     nDN2 = new NDN("SWFEATURE", "(FC)");
+/* 120 */     nDN2.addAttr("FEATURECODE");
+/* 121 */     nDN1.setNext(nDN2);
+/* 122 */     NDN_TBL.put("SWPRODSTRUCT", nDN1);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected ResourceBundle getBundle() {
+/* 129 */     return this.rsBundle;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/* 156 */     String str1 = "<head>" + EACustom.getMetaTags(getDescription()) + NEWLINE + EACustom.getCSS() + NEWLINE + EACustom.getTitle("{0} {1}") + NEWLINE + "</head>" + NEWLINE + "<body id=\"ibm-com\">" + EACustom.getMastheadDiv() + NEWLINE + "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
+/*     */     
+/* 158 */     String str2 = "<table>" + NEWLINE + "<tr><th>Userid: </th><td>{0}</td></tr>" + NEWLINE + "<tr><th>Role: </th><td>{1}</td></tr>" + NEWLINE + "<tr><th>Workgroup: </th><td>{2}</td></tr>" + NEWLINE + "<tr><th>Date: </th><td>{3}</td></tr>" + NEWLINE + "<tr><th>Description: </th><td>{4}</td></tr>" + NEWLINE + "<tr><th>XML generation: </th><td>{5}</td></tr>" + NEWLINE + "</table>" + NEWLINE + "<!-- {6} -->" + NEWLINE;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 169 */     String str3 = "";
+/* 170 */     String str4 = "";
+/* 171 */     EPIMSABRBase ePIMSABRBase = null;
+/* 172 */     String[] arrayOfString = new String[10];
+/* 173 */     println(EACustom.getDocTypeHtml());
+/*     */     
+/*     */     try {
+/* 176 */       long l = System.currentTimeMillis();
+/*     */       
+/* 178 */       start_ABRBuild(false);
+/*     */ 
+/*     */       
+/* 181 */       String str6 = "dummy";
+/*     */       
+/* 183 */       if (getEntityType().equals("PRODSTRUCT")) {
+/* 184 */         str6 = "EXRPT3FM";
+/* 185 */       } else if (getEntityType().equals("SWPRODSTRUCT")) {
+/* 186 */         str6 = "DQVESWPRODSTRUCT2";
+/*     */       } 
+/*     */ 
+/*     */       
+/* 190 */       this.m_elist = this.m_db.getEntityList(this.m_prof, new ExtractActionItem(null, this.m_db, this.m_prof, str6), new EntityItem[] { new EntityItem(null, this.m_prof, 
+/*     */               
+/* 192 */               getEntityType(), getEntityID()) });
+/*     */       
+/* 194 */       addDebug("Time to get VE: " + (System.currentTimeMillis() - l) + " (mseconds)");
+/*     */       
+/* 196 */       String str7 = (String)STATUSATTR_TBL.get(getEntityType());
+/* 197 */       if (str7 == null) {
+/* 198 */         str7 = "STATUS";
+/*     */       }
+/*     */       
+/* 201 */       this.finalDtsVct = getChangeTimes(str7, "0020");
+/*     */       
+/* 203 */       setControlBlock();
+/*     */ 
+/*     */       
+/* 206 */       this.rsBundle = ResourceBundle.getBundle(EPIMSWWPRTBASE.class.getName(), getLocale(this.m_prof.getReadLanguage().getNLSID()));
+/*     */ 
+/*     */       
+/* 209 */       addDebug("DEBUG: " + getShortClassName(getClass()) + " entered for " + getEntityType() + getEntityID() + " extract: " + str6 + " using DTS: " + this.m_prof
+/* 210 */           .getValOn() + NEWLINE + PokUtils.outputList(this.m_elist));
+/*     */ 
+/*     */       
+/* 213 */       setReturnCode(0);
+/*     */ 
+/*     */       
+/* 216 */       this.navName = getNavigationName();
+/*     */ 
+/*     */       
+/* 219 */       str3 = this.m_elist.getParentEntityGroup().getLongDescription();
+/*     */ 
+/*     */ 
+/*     */       
+/* 223 */       EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*     */ 
+/*     */       
+/* 226 */       domainNeedsChecks(entityItem);
+/*     */       
+/* 228 */       if (this.bdomainInList) {
+/*     */ 
+/*     */         
+/* 231 */         String str = getSimpleABRName();
+/* 232 */         if (str != null) {
+/* 233 */           ePIMSABRBase = (EPIMSABRBase)Class.forName(str).newInstance();
+/*     */ 
+/*     */           
+/* 236 */           ePIMSABRBase.execute_run(this);
+/* 237 */           this.xmlgen = ePIMSABRBase.getXMLGenMsg();
+/* 238 */           str4 = getShortClassName(ePIMSABRBase.getClass()) + " " + ePIMSABRBase.getVersion();
+/*     */         } else {
+/* 240 */           addError(getShortClassName(getClass()) + " does not support " + getEntityType());
+/*     */         } 
+/*     */ 
+/*     */         
+/* 244 */         if (getReturnCode() == 0) {
+/* 245 */           setCreateDGEntity(false);
+/*     */         }
+/*     */       } else {
+/* 248 */         this.xmlgen = getBundle().getString("DOMAIN_NOT_LISTED");
+/*     */       } 
+/*     */       
+/* 251 */       this.finalDtsVct.clear();
+/*     */     }
+/* 253 */     catch (Throwable throwable) {
+/*     */       
+/* 255 */       StringWriter stringWriter = new StringWriter();
+/* 256 */       String str6 = "<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
+/* 257 */       String str7 = "<pre>{0}</pre>";
+/* 258 */       MessageFormat messageFormat1 = new MessageFormat(str6);
+/* 259 */       setReturnCode(-3);
+/* 260 */       throwable.printStackTrace(new PrintWriter(stringWriter));
+/*     */       
+/* 262 */       arrayOfString[0] = throwable.getMessage();
+/* 263 */       this.rptSb.append(messageFormat1.format(arrayOfString) + NEWLINE);
+/* 264 */       messageFormat1 = new MessageFormat(str7);
+/* 265 */       arrayOfString[0] = stringWriter.getBuffer().toString();
+/* 266 */       this.rptSb.append(messageFormat1.format(arrayOfString) + NEWLINE);
+/* 267 */       logError("Exception: " + throwable.getMessage());
+/* 268 */       logError(stringWriter.getBuffer().toString());
+/*     */     }
+/*     */     finally {
+/*     */       
+/* 272 */       setDGTitle(this.navName);
+/* 273 */       setDGRptName(getShortClassName(getClass()));
+/* 274 */       setDGRptClass(getABRCode());
+/*     */       
+/* 276 */       if (!isReadOnly())
+/*     */       {
+/* 278 */         clearSoftLock();
+/*     */       }
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */     
+/* 284 */     MessageFormat messageFormat = new MessageFormat(str1);
+/* 285 */     if (ePIMSABRBase != null) {
+/* 286 */       arrayOfString[0] = getShortClassName(ePIMSABRBase.getClass());
+/*     */     } else {
+/* 288 */       arrayOfString[0] = getShortClassName(getClass());
+/*     */     } 
+/* 290 */     arrayOfString[1] = this.navName;
+/* 291 */     String str5 = messageFormat.format(arrayOfString);
+/* 292 */     messageFormat = new MessageFormat(str2);
+/* 293 */     arrayOfString[0] = this.m_prof.getOPName();
+/* 294 */     arrayOfString[1] = this.m_prof.getRoleDescription();
+/* 295 */     arrayOfString[2] = this.m_prof.getWGName();
+/* 296 */     arrayOfString[3] = getNow();
+/* 297 */     arrayOfString[4] = str3;
+/* 298 */     arrayOfString[5] = this.xmlgen;
+/* 299 */     arrayOfString[6] = str4 + " " + getABRVersion();
+/*     */     
+/* 301 */     this.rptSb.insert(0, str5 + messageFormat.format(arrayOfString) + NEWLINE);
+/*     */     
+/* 303 */     println(this.rptSb.toString());
+/* 304 */     printDGSubmitString();
+/* 305 */     println(EACustom.getTOUDiv());
+/* 306 */     buildReportFooter();
+/*     */     
+/* 308 */     this.metaTbl.clear();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String getABRQueuedTime() throws MiddlewareRequestException {
+/* 322 */     String str = this.m_abri.getABRCode();
+/* 323 */     EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*     */     
+/* 325 */     addDebug("getABRQueuedTime entered for " + entityItem.getKey() + " " + str);
+/* 326 */     EANAttribute eANAttribute = entityItem.getAttribute(str);
+/* 327 */     if (eANAttribute != null) {
+/* 328 */       AttributeChangeHistoryGroup attributeChangeHistoryGroup = new AttributeChangeHistoryGroup(this.m_db, this.m_prof, eANAttribute);
+/* 329 */       if (attributeChangeHistoryGroup.getChangeHistoryItemCount() > 1) {
+/*     */         
+/* 331 */         int i = attributeChangeHistoryGroup.getChangeHistoryItemCount() - 2;
+/* 332 */         AttributeChangeHistoryItem attributeChangeHistoryItem = (AttributeChangeHistoryItem)attributeChangeHistoryGroup.getChangeHistoryItem(i);
+/* 333 */         addDebug("getABRQueuedTime [" + i + "] isActive: " + attributeChangeHistoryItem
+/* 334 */             .isActive() + " isValid: " + attributeChangeHistoryItem.isValid() + " chgdate: " + attributeChangeHistoryItem
+/* 335 */             .getChangeDate() + " flagcode: " + attributeChangeHistoryItem.getFlagCode());
+/*     */         
+/* 337 */         return attributeChangeHistoryItem.getChangeDate();
+/*     */       } 
+/*     */       
+/* 340 */       addDebug("getABRQueuedTime for " + entityItem.getKey() + " " + str + " has no history");
+/*     */     } else {
+/*     */       
+/* 343 */       addDebug("getABRQueuedTime for " + entityItem.getKey() + " " + str + " was null");
+/*     */     } 
+/*     */     
+/* 346 */     return getNow();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String generateString(EntityItem paramEntityItem, String[] paramArrayOfString) {
+/* 358 */     StringBuffer stringBuffer = new StringBuffer(paramEntityItem.getKey());
+/* 359 */     if (paramArrayOfString != null) {
+/* 360 */       for (byte b = 0; b < paramArrayOfString.length; b++) {
+/* 361 */         stringBuffer.append(":" + PokUtils.getAttributeValue(paramEntityItem, paramArrayOfString[b], ", ", "", false));
+/*     */       }
+/*     */     }
+/*     */ 
+/*     */     
+/* 366 */     return stringBuffer.toString();
+/*     */   }
+/*     */   protected boolean isFirstFinal() {
+/* 369 */     return this.firstFinal;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private boolean firstFinal = true;
+/*     */ 
+/*     */   
+/*     */   protected Vector getChangeTimes(String paramString1, String paramString2) throws MiddlewareRequestException {
+/* 378 */     Vector<String> vector = new Vector(1);
+/* 379 */     Vector<ChangeHistoryItem> vector1 = new Vector(1);
+/*     */     
+/* 381 */     EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/* 382 */     addDebug("getChangeTimes entered for " + entityItem.getKey() + " " + paramString1 + " flag: " + paramString2);
+/* 383 */     EANAttribute eANAttribute = entityItem.getAttribute(paramString1);
+/* 384 */     if (eANAttribute != null) {
+/*     */       
+/* 386 */       AttributeChangeHistoryGroup attributeChangeHistoryGroup = new AttributeChangeHistoryGroup(this.m_db, this.m_elist.getProfile(), eANAttribute);
+/* 387 */       if (attributeChangeHistoryGroup.getChangeHistoryItemCount() > 0) {
+/* 388 */         int i; for (i = attributeChangeHistoryGroup.getChangeHistoryItemCount() - 1; i >= 0; i--)
+/*     */         {
+/* 390 */           vector1.add(attributeChangeHistoryGroup.getChangeHistoryItem(i));
+/*     */         }
+/*     */         
+/* 393 */         Collections.sort(vector1, new ChiComparator());
+/* 394 */         for (i = 0; i < vector1.size(); i++) {
+/* 395 */           AttributeChangeHistoryItem attributeChangeHistoryItem = (AttributeChangeHistoryItem)vector1.elementAt(i);
+/* 396 */           addDebug("getChangeTimes " + paramString1 + "[" + i + "] isActive: " + attributeChangeHistoryItem
+/* 397 */               .isActive() + " isValid: " + attributeChangeHistoryItem.isValid() + " chgdate: " + attributeChangeHistoryItem
+/* 398 */               .getChangeDate() + " flagcode: " + attributeChangeHistoryItem.getFlagCode());
+/* 399 */           if (paramString2 == null) {
+/* 400 */             vector.add(attributeChangeHistoryItem.getChangeDate());
+/*     */             break;
+/*     */           } 
+/* 403 */           if (paramString2.equals(attributeChangeHistoryItem.getFlagCode())) {
+/* 404 */             vector.add(attributeChangeHistoryItem.getChangeDate());
+/* 405 */             if (vector.size() == 2) {
+/* 406 */               this.firstFinal = false;
+/*     */               
+/*     */               break;
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/* 412 */         vector1.clear();
+/*     */       } 
+/* 414 */       addDebug("getChangeTimes Before using queued dts " + entityItem.getKey() + " " + vector);
+/* 415 */       if (vector.size() > 0) {
+/* 416 */         vector.remove(0);
+/* 417 */         vector.insertElementAt(getABRQueuedTime(), 0);
+/*     */       } else {
+/* 419 */         vector.add(getABRQueuedTime());
+/*     */       } 
+/* 421 */       addDebug("getChangeTimes using queued dts " + entityItem.getKey() + " " + vector);
+/*     */     } else {
+/* 423 */       addDebug("ERROR: getChangeTimes for " + entityItem.getKey() + " " + paramString1 + "  was null use queued time");
+/* 424 */       vector.add(getABRQueuedTime());
+/*     */     } 
+/*     */     
+/* 427 */     return vector;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected EntityList getEntityList() {
+/* 433 */     return this.m_elist;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public String getLastFinalDTS() {
+/* 438 */     return this.finalDtsVct.firstElement();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getPriorFinalDTS() {
+/* 444 */     String str = getLastFinalDTS();
+/* 445 */     if (this.finalDtsVct.size() > 1) {
+/* 446 */       str = this.finalDtsVct.lastElement();
+/*     */     }
+/* 448 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public Database getDB() {
+/* 454 */     return this.m_db;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   protected void addOutput(String paramString) {
+/* 459 */     this.rptSb.append("<p>" + paramString + "</p>" + NEWLINE);
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public void addDebug(String paramString) {
+/* 464 */     this.rptSb.append("<!-- " + paramString + " -->" + NEWLINE);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addError(String paramString) {
+/* 470 */     addOutput(paramString);
+/* 471 */     setReturnCode(-1);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void addError(String paramString, Object[] paramArrayOfObject) {
+/* 484 */     EntityGroup entityGroup = this.m_elist.getParentEntityGroup();
+/* 485 */     setReturnCode(-1);
+/*     */ 
+/*     */     
+/* 488 */     MessageFormat messageFormat = new MessageFormat(getBundle().getString("ERROR_PREFIX"));
+/* 489 */     Object[] arrayOfObject = new Object[2];
+/* 490 */     arrayOfObject[0] = entityGroup.getLongDescription();
+/* 491 */     arrayOfObject[1] = this.navName;
+/*     */     
+/* 493 */     addMessage(messageFormat.format(arrayOfObject), paramString, paramArrayOfObject);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void addWarning(String paramString, Object[] paramArrayOfObject) {
+/* 507 */     EntityGroup entityGroup = this.m_elist.getParentEntityGroup();
+/*     */ 
+/*     */     
+/* 510 */     MessageFormat messageFormat = new MessageFormat(getBundle().getString("WARNING_PREFIX"));
+/* 511 */     Object[] arrayOfObject = new Object[2];
+/* 512 */     arrayOfObject[0] = entityGroup.getLongDescription();
+/* 513 */     arrayOfObject[1] = this.navName;
+/*     */     
+/* 515 */     addMessage(messageFormat.format(arrayOfObject), paramString, paramArrayOfObject);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void addMessage(String paramString1, String paramString2, Object[] paramArrayOfObject) {
+/* 524 */     String str = getBundle().getString(paramString2);
+/*     */     
+/* 526 */     if (paramArrayOfObject != null) {
+/* 527 */       MessageFormat messageFormat = new MessageFormat(str);
+/* 528 */       str = messageFormat.format(paramArrayOfObject);
+/*     */     } 
+/*     */     
+/* 531 */     addOutput(paramString1 + " " + str);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String getNavigationName() throws SQLException, MiddlewareException {
+/* 541 */     return getNavigationName(this.m_elist.getParentEntityGroup().getEntityItem(0));
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getNavigationName(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 551 */     StringBuffer stringBuffer = new StringBuffer();
+/* 552 */     NDN nDN = (NDN)NDN_TBL.get(paramEntityItem.getEntityType());
+/*     */ 
+/*     */     
+/* 555 */     EANList eANList = (EANList)this.metaTbl.get(paramEntityItem.getEntityType());
+/* 556 */     if (eANList == null) {
+/*     */       
+/* 558 */       EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, paramEntityItem.getEntityType(), "Navigate");
+/* 559 */       eANList = entityGroup.getMetaAttribute();
+/* 560 */       this.metaTbl.put(paramEntityItem.getEntityType(), eANList);
+/*     */     } 
+/* 562 */     for (byte b = 0; b < eANList.size(); b++) {
+/*     */       
+/* 564 */       EANMetaAttribute eANMetaAttribute = (EANMetaAttribute)eANList.getAt(b);
+/* 565 */       stringBuffer.append(PokUtils.getAttributeValue(paramEntityItem, eANMetaAttribute.getAttributeCode(), ", ", "", false));
+/* 566 */       if (b + 1 < eANList.size()) {
+/* 567 */         stringBuffer.append(" ");
+/*     */       }
+/*     */     } 
+/* 570 */     if (nDN != null) {
+/* 571 */       StringBuffer stringBuffer1 = new StringBuffer();
+/* 572 */       EntityItem entityItem = getNDNitem(paramEntityItem, nDN.getEntityType());
+/* 573 */       if (entityItem != null) {
+/* 574 */         stringBuffer1.append("(" + nDN.getTag());
+/* 575 */         for (byte b1 = 0; b1 < nDN.getAttr().size(); b1++) {
+/* 576 */           String str = nDN.getAttr().elementAt(b1).toString();
+/* 577 */           stringBuffer1.append(PokUtils.getAttributeValue(entityItem, str, ", ", "", false));
+/* 578 */           if (b1 + 1 < nDN.getAttr().size()) {
+/* 579 */             stringBuffer1.append(" ");
+/*     */           }
+/*     */         } 
+/* 582 */         stringBuffer1.append(") ");
+/*     */       } else {
+/* 584 */         addDebug("NO entity found for ndn.getEntityType(): " + nDN.getEntityType());
+/*     */       } 
+/* 586 */       nDN = nDN.getNext();
+/* 587 */       if (nDN != null) {
+/* 588 */         entityItem = getNDNitem(paramEntityItem, nDN.getEntityType());
+/* 589 */         if (entityItem != null) {
+/* 590 */           stringBuffer1.append("(" + nDN.getTag());
+/* 591 */           for (byte b1 = 0; b1 < nDN.getAttr().size(); b1++) {
+/* 592 */             String str = nDN.getAttr().elementAt(b1).toString();
+/* 593 */             stringBuffer1.append(PokUtils.getAttributeValue(entityItem, str, ", ", "", false));
+/* 594 */             if (b1 + 1 < nDN.getAttr().size()) {
+/* 595 */               stringBuffer1.append(" ");
+/*     */             }
+/*     */           } 
+/* 598 */           stringBuffer1.append(") ");
+/*     */         } else {
+/* 600 */           addDebug("NO entity found for next ndn.getEntityType(): " + nDN.getEntityType());
+/*     */         } 
+/*     */       } 
+/* 603 */       stringBuffer.insert(0, stringBuffer1.toString());
+/*     */     } 
+/*     */     
+/* 606 */     return stringBuffer.toString();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private EntityItem getNDNitem(EntityItem paramEntityItem, String paramString) {
+/*     */     byte b;
+/* 616 */     for (b = 0; b < paramEntityItem.getDownLinkCount(); b++) {
+/* 617 */       EntityItem entityItem = (EntityItem)paramEntityItem.getDownLink(b);
+/* 618 */       if (entityItem.getEntityType().equals(paramString)) {
+/* 619 */         return entityItem;
+/*     */       }
+/*     */     } 
+/* 622 */     for (b = 0; b < paramEntityItem.getUpLinkCount(); b++) {
+/* 623 */       EntityItem entityItem = (EntityItem)paramEntityItem.getUpLink(b);
+/* 624 */       if (entityItem.getEntityType().equals(paramString)) {
+/* 625 */         return entityItem;
+/*     */       }
+/*     */     } 
+/* 628 */     return null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 638 */     return "1.9";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 647 */     return "EPIMSWWPRTBASE";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void setFlagValue(String paramString1, String paramString2) throws SQLException, MiddlewareException {
+/* 661 */     logMessage(getDescription() + " ***** " + paramString1 + " set to: " + paramString2);
+/* 662 */     addDebug("setFlagValue entered for " + paramString1 + " set to: " + paramString2);
+/* 663 */     EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*     */ 
+/*     */     
+/* 666 */     EANMetaAttribute eANMetaAttribute = entityItem.getEntityGroup().getMetaAttribute(paramString1);
+/* 667 */     if (eANMetaAttribute == null) {
+/* 668 */       addDebug("setFlagValue: " + paramString1 + " was not in meta for " + entityItem.getEntityType() + ", nothing to do");
+/* 669 */       logMessage(getDescription() + " ***** " + paramString1 + " was not in meta for " + entityItem
+/* 670 */           .getEntityType() + ", nothing to do");
+/*     */       return;
+/*     */     } 
+/* 673 */     if (paramString2 != null)
+/*     */     {
+/* 675 */       if (paramString2.equals(getAttributeFlagEnabledValue(entityItem, paramString1))) {
+/* 676 */         addDebug("setFlagValue " + entityItem.getKey() + " " + paramString1 + " already matches: " + paramString2);
+/*     */       } else {
+/*     */ 
+/*     */         
+/*     */         try {
+/* 681 */           if (this.m_cbOn == null) {
+/* 682 */             setControlBlock();
+/*     */           }
+/* 684 */           ReturnEntityKey returnEntityKey = new ReturnEntityKey(getEntityType(), getEntityID(), true);
+/*     */           
+/* 686 */           SingleFlag singleFlag = new SingleFlag(this.m_prof.getEnterprise(), returnEntityKey.getEntityType(), returnEntityKey.getEntityID(), paramString1, paramString2, 1, this.m_cbOn);
+/*     */           
+/* 688 */           Vector<SingleFlag> vector = new Vector();
+/* 689 */           Vector<ReturnEntityKey> vector1 = new Vector();
+/* 690 */           vector.addElement(singleFlag);
+/* 691 */           returnEntityKey.m_vctAttributes = vector;
+/* 692 */           vector1.addElement(returnEntityKey);
+/*     */           
+/* 694 */           this.m_db.update(this.m_prof, vector1, false, false);
+/* 695 */           addDebug(entityItem.getKey() + " had " + paramString1 + " set to: " + paramString2);
+/*     */         } finally {
+/*     */           
+/* 698 */           this.m_db.commit();
+/* 699 */           this.m_db.freeStatement();
+/* 700 */           this.m_db.isPending("finally after update in setflag value");
+/*     */         } 
+/*     */       } 
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static Locale getLocale(int paramInt) {
+/* 713 */     Locale locale = null;
+/* 714 */     switch (paramInt)
+/*     */     
+/*     */     { case 1:
+/* 717 */         locale = Locale.US;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 741 */         return locale;case 2: locale = Locale.GERMAN; return locale;case 3: locale = Locale.ITALIAN; return locale;case 4: locale = Locale.JAPANESE; return locale;case 5: locale = Locale.FRENCH; return locale;case 6: locale = new Locale("es", "ES"); return locale;case 7: locale = Locale.UK; return locale; }  locale = Locale.US; return locale;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void domainNeedsChecks(EntityItem paramEntityItem) {
+/* 754 */     String str = ABRServerProperties.getDomains(this.m_abri.getABRCode());
+/* 755 */     addDebug("domainNeedsChecks pdhdomains needing checks: " + str);
+/* 756 */     if (str.equals("all")) {
+/* 757 */       this.bdomainInList = true;
+/*     */     } else {
+/* 759 */       HashSet<String> hashSet = new HashSet();
+/* 760 */       StringTokenizer stringTokenizer = new StringTokenizer(str, ",");
+/* 761 */       while (stringTokenizer.hasMoreTokens()) {
+/* 762 */         hashSet.add(stringTokenizer.nextToken());
+/*     */       }
+/* 764 */       this.bdomainInList = PokUtils.contains(paramEntityItem, "PDHDOMAIN", hashSet);
+/* 765 */       hashSet.clear();
+/*     */     } 
+/*     */     
+/* 768 */     if (!this.bdomainInList) {
+/* 769 */       addDebug("PDHDOMAIN did not include " + str + ", execution is bypassed [" + 
+/* 770 */           PokUtils.getAttributeFlagValue(paramEntityItem, "PDHDOMAIN"));
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean checkABRCountryList(EntityItem paramEntityItem) {
+/* 788 */     boolean bool = false;
+/* 789 */     String str = ABRServerProperties.getCountryList(this.m_abri.getABRCode());
+/* 790 */     addDebug("checkABRCountryList countrylist: " + str);
+/* 791 */     if (str.equals("all")) {
+/* 792 */       bool = true;
+/*     */     } else {
+/* 794 */       HashSet<String> hashSet = new HashSet();
+/* 795 */       StringTokenizer stringTokenizer = new StringTokenizer(str, ",");
+/* 796 */       while (stringTokenizer.hasMoreTokens()) {
+/* 797 */         hashSet.add(stringTokenizer.nextToken());
+/*     */       }
+/* 799 */       bool = PokUtils.contains(paramEntityItem, "COUNTRYLIST", hashSet);
+/* 800 */       hashSet.clear();
+/*     */     } 
+/*     */     
+/* 803 */     if (!bool) {
+/* 804 */       addDebug(paramEntityItem.getKey() + ".COUNTRYLIST [" + 
+/* 805 */           PokUtils.getAttributeValue(paramEntityItem, "COUNTRYLIST", ", ", "", false) + "] did not include " + str + ", notification will not be sent ");
+/*     */     }
+/*     */     
+/* 808 */     return bool;
+/*     */   }
+/*     */   
+/*     */   protected abstract String getSimpleABRName();
+/*     */   
+/*     */   private class ChiComparator implements Comparator { private ChiComparator() {}
+/*     */     
+/*     */     public int compare(Object param1Object1, Object param1Object2) {
+/* 816 */       ChangeHistoryItem changeHistoryItem1 = (ChangeHistoryItem)param1Object1;
+/* 817 */       ChangeHistoryItem changeHistoryItem2 = (ChangeHistoryItem)param1Object2;
+/* 818 */       return changeHistoryItem2.getChangeDate().compareTo(changeHistoryItem1.getChangeDate());
+/*     */     } }
+/*     */ 
+/*     */   
+/*     */   private static class NDN {
+/*     */     private String etype;
+/*     */     private String tag;
+/*     */     private NDN next;
+/* 826 */     private Vector attrVct = new Vector();
+/*     */     NDN(String param1String1, String param1String2) {
+/* 828 */       this.etype = param1String1;
+/* 829 */       this.tag = param1String2;
+/*     */     }
+/* 831 */     String getTag() { return this.tag; }
+/* 832 */     String getEntityType() { return this.etype; } Vector getAttr() {
+/* 833 */       return this.attrVct;
+/*     */     } void addAttr(String param1String) {
+/* 835 */       this.attrVct.addElement(param1String);
+/*     */     }
+/* 837 */     void setNext(NDN param1NDN) { this.next = param1NDN; } NDN getNext() {
+/* 838 */       return this.next;
+/*     */     }
+/*     */   }
+/*     */ }
+
+
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\EPIMSWWPRTBASE.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

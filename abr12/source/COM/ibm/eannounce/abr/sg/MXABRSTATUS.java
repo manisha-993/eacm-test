@@ -1,1002 +1,1006 @@
-package COM.ibm.eannounce.abr.sg;
-
-//Licensed Materials -- Property of IBM
-//(C) Copyright IBM Corp. 2011  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-
-
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Vector;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXParseException;
-
-import COM.ibm.eannounce.abr.util.ABRUtil;
-import COM.ibm.eannounce.abr.util.EACustom;
-import COM.ibm.eannounce.abr.util.PokBaseABR;
-import COM.ibm.eannounce.objects.EntityGroup;
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.eannounce.objects.EntityList;
-import COM.ibm.eannounce.objects.ExtractActionItem;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
-import COM.ibm.opicmpdh.middleware.ReturnID;
-import COM.ibm.opicmpdh.middleware.ReturnStatus;
-import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
-import COM.ibm.opicmpdh.middleware.taskmaster.AbstractTask;
-import COM.ibm.opicmpdh.objects.SingleFlag;
-import COM.ibm.opicmpdh.objects.Text;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-//$Log: MXABRSTATUS.java,v $
-//Revision 1.13  2014/01/13 13:52:40  wendy
-//migration to V17
-//
-//Revision 1.12  2012/07/09 12:05:15  wangyulo
-//Fix defect 742829-- correct Date/timestamp format for STRTOSVC and ENDOFSVC
-//
-//Revision 1.11  2012/07/03 07:50:01  wangyulo
-//Fix defect 742829-- correct Date/timestamp format for STRTOSVC and ENDOFSVC
-//
-//Revision 1.10  2012/06/26 00:59:59  wangyulo
-//defect 742829-- Error found during prod IDL of ABR  incorrect Date/ timestamp format
-//
-//Revision 1.9  2012/04/25 15:39:01  lucasrg
-//Allow empty values when validating the PRODUCTACTIVITY tag
-//
-//Revision 1.8  2012/04/24 14:58:43  lucasrg
-//<PRODUCTACTIVITY> for REFOFER FEAT is now mapped as '' (Empty) for Updates and 'Remove' for Deletes
-//
-//Revision 1.7  2012/03/16 20:59:01  lucasrg
-//Storing entity attributes in the correct order
-//
-//Revision 1.6  2012/03/13 20:27:31  lucasrg
-//REFOFER and REFOFER_FEAT mapping changes
-//Using 'Update' as default for <PRODUCTACTIVITY>
-//
-//Revision 1.5  2011/11/04 12:08:53  lucasrg
-//Added MFRPRODID mapping to REFOFER
-//
-//Revision 1.4  2011/10/31 17:22:09  lucasrg
-//Minor change to output error details in the report when deleting a REFOFERFEAT with no relator.
-//
-//Revision 1.3  2011/10/19 20:47:13  lucasrg
-//Keep the timestamp from MIW (don't convert to PDH's timezone)
-//Allow REFOFERFEAT with same FEATID but different PRODUCTID
-//Use only the Date part when deleting "REFOFER" in ENDOFSVC attribute
-//Output the message about deleting the REFOFER in the report
-//Fail the ABR when Creating an REFOFER "Skeleton"
-//Fail the ABR when REFOFERREFOFERFEAT relator is not found and PRODUCTIDACTIVITY = "Delete"
-//Added mappings: PRODSUPRTCD MFRLNGPRODDESC
-//Add PDHDOMAIN attribute in REFOFERFEAT
-//Add DTSMIWCREATE attribute in REFOFER and REFOFERFEAT
-//Change MAINTANNBILLELIGINDC to Flag attribute (MAINN / MAINY)
-//Variable SUBSCRVE depending if MXTYPE is REFOFER or REFOFERFEAT
-//
-//
-public class MXABRSTATUS extends PokBaseABR {
-
-	private static final String DQ_FINAL = "FINAL";
-	private static final String DQ_DRAFT = "DRAFT";
-	private static final String STATUS_DRAFT = "0010";
-	private static final String STATUS_FINAL = "0020";
-	private static final String STATUS_CHANGE_REQUEST = "0050";
-	private static final String ABR_QUEUE = "0020";
-	static final String RPT_EXCEPTION = "<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
-	static final String RPT_STACKTRACE = "<pre>{0}</pre>";
-	private static final String MIW_PDHDOMAIN = "MIW";
-	private static final char[] FOOL_JTEST = { '\n' };
-	static final String NEWLINE = new String(FOOL_JTEST);
-
-	private StringBuffer rptSb = new StringBuffer();
-	private String SUBSCRVE;
-
-	public void execute_run() {
-		setDGTitle("MXABRSTATUS");
-		setDGRptName(getShortClassName(getClass()));
-		setDGRptClass(getABRCode());
-		String title = getShortClassName(getClass()) + " - MIW Inbound";
-		String HEADER = "<head>" + EACustom.getMetaTags(getDescription()) + NEWLINE + EACustom.getCSS() + NEWLINE
-			+ EACustom.getTitle(title) + NEWLINE 
-			+ "</head>" + NEWLINE 
-			+ "<body id=\"ibm-com\">"
-			+ EACustom.getMastheadDiv() + NEWLINE + 
-			"<p class=\"ibm-intro ibm-alternate-three\"><em>"+title+"</em></p>" + NEWLINE;
-		
-		println(EACustom.getDocTypeHtml()); // Output the doctype and html
-		println(HEADER);
-		SUBSCRVE = "UNDEFINED";
-		try {
-			start_ABRBuild(false);
-			setNow();
-			setControlBlock();
-
-			EntityList list = m_db.getEntityList(m_prof, new ExtractActionItem(null, m_db, m_prof,
-					"dummy"), new EntityItem[] { new EntityItem(null, m_prof, getEntityType(),
-					getEntityID()) });
-			EntityItem MIWXMLEntity = list.getParentEntityGroup().getEntityItem(0);
-
-			String MXTYPE = PokUtils.getAttributeValue(MIWXMLEntity, "MXTYPE", null, null);
-
-			String xml = PokUtils.getAttributeValue(MIWXMLEntity, "MXMSG", null, null, false);
-			addDebug(xml);
-			Document document = parseXML(xml);
-			Element root = document.getDocumentElement();
-
-			if ("REFOFER".equals(MXTYPE)) {
-				SUBSCRVE = "REFOFERVE"; 
-				handleRefofer(MIWXMLEntity, root);
-			} else if ("REFOFERFEAT".equals(MXTYPE)) {
-				SUBSCRVE = "REFOFERFEATVE";
-				handleRefoferFeat(MIWXMLEntity, root);
-			}
-		} catch (Throwable exception) {
-			StringWriter stackBuffer = new StringWriter();
-			MessageFormat msgf = new MessageFormat(RPT_EXCEPTION);
-			setReturnCode(INTERNAL_ERROR);
-			exception.printStackTrace(new PrintWriter(stackBuffer));
-
-			// Put exception into document
-			String[] args = { exception.getMessage() };
-			rptSb.append(msgf.format(args));
-			rptSb.append("\n");
-
-			msgf = new MessageFormat(RPT_STACKTRACE);
-			String[] stackArgs = { stackBuffer.getBuffer().toString() };
-			rptSb.append(msgf.format(stackArgs));
-			rptSb.append("\n");
-			logError("Exception: " + exception.getMessage());
-			logError(stackBuffer.getBuffer().toString());
-		}
-
-		println(rptSb.toString()); // Output the Report
-		printDGSubmitString();
-		println(EACustom.getTOUDiv());
-		buildReportFooter(); // Print </html>
-	}
-
-	private void handleRefofer(EntityItem entity, Element root) throws Throwable {
-		/* 1. Search for Reference Offering (REFOFER) using: PRODUCTID = <PRODUCTID>
-		 * 
-		 * 2. If REFOFER
-		 *	Found � then update any attributes changed on REFOFER 
-		 *	Not Found � then create a new instance of REFOFER
-		 *
-		 * 3. REFOFER - Set attributes
-		 *	DataQuality (DATAQUALITY) = "Final" (Final)
-		 *	Status (STATUS) = "Final" (0020)
-		 *	"ADS XML Feed ABR" (ADSABRSTATUS) = "Queued" (0020)
-		*/
-
-		String PRODUCTID = PokUtils.getAttributeValue(entity, "MXPRODUCTID", null, null);
-
-		addDebug("MIW MESSAGE TYPE: REFOFER, PRODUCTID = " + PRODUCTID);
-
-		//Search all REFOFER entity ids for ProductID and PDHDOMAIN = 'MIW'
-
-		EntityItem refofer = findRefofer(PRODUCTID);
-		EntityWrapper refoferWrapper = null;
-
-		if (refofer != null) {
-			addDebug("REFOFER found: " + refofer.getKey());
-		} else {
-			addDebug("REFOFER not found!");
-		}
-
-		RefoferModel refoferModel = new RefoferModel(root);
-		try {
-			refoferModel.validate();
-			if ("Delete".equalsIgnoreCase(refoferModel.ACTIVITY)) {
-				if (refofer == null) {
-					//If Activity = Delete, throw error
-					addError(refoferModel.toString());
-					fail("Reference Offering was marked for Delete; however, the Reference Offering does not exist in the PDH");
-				} else {
-					//Set <ENDOFSVC> = <DTSOFMSG>
-					refoferWrapper = new EntityWrapper(refofer);
-					//Get the DATE part only
-					String endOfSvc = refoferModel.DTSOFMSG.substring(0, 10);
-					refoferWrapper.text("ENDOFSVC", endOfSvc);
-					refoferWrapper.flag("DATAQUALITY", DQ_FINAL);
-					refoferWrapper.flag("STATUS", STATUS_FINAL);
-					refoferWrapper.flag("ADSABRSTATUS", ABR_QUEUE);
-					refoferWrapper.end();
-					addOutput(refoferModel.toString());
-					addOutput("Reference Offering was marked for Delete; however, the Reference Offering was not deleted. The End of Service was updated to match this change ("+endOfSvc+"). This change was feed to downstream systems.");
-				}
-			} else if ("Update".equalsIgnoreCase(refoferModel.ACTIVITY)) {
-				if (refofer == null) {
-					//REFOFER not found, create a new one
-					EntityGroup eg = m_db.getEntityGroup(m_prof, "REFOFER", "Edit");
-					refofer = new EntityItem(eg, m_prof, "REFOFER", 0);
-					addOutput("New REFOFER created");
-				}
-				//Update attributes
-				refoferWrapper = new EntityWrapper(refofer);
-				refoferWrapper.text("PRODUCTID", refoferModel.PRODUCTID);
-				refoferWrapper.text("DTSMIWCREATE", refoferModel.DTSMIWCREATE);
-				refoferWrapper.flag("PDHDOMAIN", MIW_PDHDOMAIN);
-				refoferWrapper.text("MFRPRODTYPE", refoferModel.MFRPRODTYPE, 30);
-				refoferWrapper.text("MFRPRODDESC", refoferModel.MFRPRODDESC, 32);
-				refoferWrapper.text("MKTGDIV", refoferModel.MKTGDIV, 2);
-				refoferWrapper.flag("PRFTCTR", refoferModel.PRFTCTR);
-				refoferWrapper.text("CATGSHRTDESC", refoferModel.CATGSHRTDESC, 30);
-				refoferWrapper.text("STRTOFSVC", refoferModel.STRTOSVC);
-				refoferWrapper.text("ENDOFSVC", refoferModel.ENDOFSVC);
-				refoferWrapper.text("VENDNAM", refoferModel.VENDNAM, 30);
-				refoferWrapper.text("MACHRATECATG", refoferModel.MACHRATECATG, 1);
-				refoferWrapper.text("CECSPRODKEY", refoferModel.CECSPRODKEY, 1);
-				// FLAG N = MAINN / Y = MAINY
-				refoferWrapper.flag("MAINTANNBILLELIGINDC", "Y".equals(refoferModel.MAINTANNBILLELIGINDC) ? "MAINY"	: "MAINN");
-				// REFOFER_DATA/FSLMCPU -> SYSIDUNIT  
-				// If input='Y', value is "SIU-CPU" (S00010); if input='N', value is "SIU-Non CPU" (S00020)
-				refoferWrapper.flag("SYSIDUNIT", "Y".equals(refoferModel.FSLMCPU) ? "S00010" : "S00020");
-				refoferWrapper.text("PRODSUPRTCD", refoferModel.PRODSUPRTCD, 3);
-				if(refoferModel.DOMAIN !=null || !"".equals(refoferModel.DOMAIN)) {
-					refoferWrapper.text("DOMAIN", refoferModel.DOMAIN);
-				}
-				refoferWrapper.flag("DATAQUALITY", DQ_FINAL);
-				refoferWrapper.flag("STATUS", STATUS_FINAL);
-				refoferWrapper.flag("ADSABRSTATUS", ABR_QUEUE);
-				refoferWrapper.end();
-				setReturnCode(RETURNCODE_SUCCESS);
-				addOutput("REFOFER attributes updated");
-			}
-
-		} catch (Exception e) {
-			fail("Invalid REFOFER message: " + e.getMessage());
-		}
-
-	}
-
-	private void handleRefoferFeat(EntityItem entity, Element root) throws Throwable {
-		/* 1. Search without PDHDOMAIN for Reference Offering Feature (REFOFERFEAT) using: FEATID = <FEATID>
-		 * 
-		 * 2. <Activity> = Update
-		 * 2.1. Found - update any attributes changed on the REFOFERFEAT
-		 * 2.2. Not Found - create a new instance of REFOFERFEAT and Set attributes from the XML
-		 * 
-		 * 3. <Activity> = Delete
-		 * 3.1. Found - set STATUS = �Change Request� and indicate an error (Do not proceed)
-		 * 3.2. Not Found - indicate an error (Do not proceed)
-		 * 
-		 * 4. If UPDATED:
-		 * 	REFOFERFEAT.DATAQUALITY=Final
-		 * 	REFOFERFEAT.STATUS=0020 (Final)
-		 * 	REFOFERFEAT.ADSABRSTATUS=0020 (Queued)
-		 * 	MIWXML.MXABRSTATUS = 0030 (Passed)
-		 * 
-		 * 5. Search with PDHDOMAIN = �MIW� (MIW) for REFOFER using <PRODUCTID>
-		 * 
-		 * 6. If <PRODUCTIDACTIVITY> = Update
-		 * 6.1 Found - Search for REFOFERREFOFERFEAT using REFOFER (PRODUCTID) and REFOFERFEAT (FEATID)
-		 * 6.1.1 Found - Nothing to do
-		 * 6.1.2 Not Found - Create the relator (REFOFERREFOFERFEAT) from the REFOFER to REFOFERFEAT
-		 * 
-		 * 6.2 Not Found - this is an error
-		 * 	Create a REFOFER with
-		 * 		PRODUCTID = <PRODUCTID>
-		 * 		MKTGNAME = �Error � not received from MIW�
-		 * 		STATUS = �Draft� (0010)
-		 * 		DATAQUALITY = �Draft� (DRAFT)
-		 * 	Create a REFOFERREFOFERFEAT from the REFOFER to the REFOFERFEAT
-		 * 	Then create the error message
-		 * 
-		 * 7. <PRODUCTIDACTIVITY> = Delete
-		 * 7.1 Found - delete REFOFERREFOFERFEAT
-		 * 7.2 Not Found - create error message (Do not proceed)
-		 * 
-		 * 8. If REFOFERREFOFERFEAT was updated - Set the following attributes for the REFOFERFEAT:
-		 * 		DataQuality (DATAQUALITY) = �Final� (Final)
-		 * 		Status (STATUS) = �Final� (0020)
-		 * 		�ADS XML Feed ABR� (ADSABRSTATUS) = �Queued� (0020)
-		 * 		�MIW ABR Status� (MXABRSTATS) = �Passed� (0030)
-		 * 
-		 */
-
-		addDebug("MIW MESSAGE TYPE: REFOFERFEAT");
-
-		RefoferFeatModel model = new RefoferFeatModel(root);
-		try {
-			model.validate();
-
-			//1
-			String featID = PokUtils.getAttributeValue(entity, "MXFEATID", null, null);
-
-			EntityItem refoferFeat = findRefoferFeat(featID);
-			if (refoferFeat != null) {
-				addDebug("Found REFOFERFEAT for FEATID = " + featID + ": " + refoferFeat.getKey());
-			} else {
-				addDebug("REFOFERFEAT *not found* for FEATID = " + featID);
-			}
-
-			EntityWrapper featWrapper = null;
-			int featEntityID = 0;
-
-			if ("Update".equalsIgnoreCase(model.ACTIVITY)) {
-				//2
-				if (refoferFeat != null) {
-					//2.1 (update attributes only)
-					featEntityID = refoferFeat.getEntityID();
-				} else {
-					//2.2 - Create new ReofferFeat
-					featEntityID = m_db.getNextEntityID(m_prof, "REFOFERFEAT");
-					EntityGroup eg = m_db.getEntityGroup(m_prof, "REFOFERFEAT", "Edit");
-					refoferFeat = new EntityItem(eg, m_prof, "REFOFERFEAT", featEntityID);
-					addOutput("New REFOFERFEAT created " + refoferFeat.getKey());
-				}
-				//Update attributes
-				featWrapper = new EntityWrapper(refoferFeat);
-				featWrapper.text("FEATID", model.FEATID, 40);
-				featWrapper.text("DTSMIWCREATE", model.DTSMIWCREATE);
-				featWrapper.text("MFRFEATID", model.MFRFEATID, 30);
-				featWrapper.text("MFRFEATDESC", model.MFRFEATDESC, 128);
-				featWrapper.text("MFRFEATLNGDESC", model.MFRFEATLNGDESC, 128);
-				featWrapper.text("MKTGDIV", model.MKTGDIV, 2);
-				featWrapper.flag("PRFTCTR", model.PRFTCTR);
-				featWrapper.flag("PDHDOMAIN", MIW_PDHDOMAIN);
-				addOutput("REFOFERFEAT atributes updated");
-			} else if ("Delete".equalsIgnoreCase(model.ACTIVITY)) {
-				//3
-				if (refoferFeat != null) {
-					//3.1
-					setFlagValue(refoferFeat, "STATUS", STATUS_CHANGE_REQUEST);
-					addError(model.toString());
-					fail("Reference Offering Feature was marked for Delete. The STATUS was set to 'Change Request'. Please review and decide how to proceed.");
-				} else {
-					///3.2
-					addError(model.toString());
-					fail("Reference Offering Feature was marked for Delete; however, the Reference Offering Feature does not exist in the PDH");
-				}
-				//Do not proceed with any further processing of this XML message.
-				return;
-			}
-
-			//5
-
-			EntityItem refofer = findRefofer(model.PRODUCTID);
-			if (refofer != null) {
-				addDebug("Found REFOFER for PRODUCTID = " + model.PRODUCTID + ": "
-						+ refofer.getKey());
-			} else {
-				addDebug("REFOFER *not found* for PRODUCTID = " + model.PRODUCTID);
-			}
-			if ("".equals(model.PRODUCTACTIVITY) 
-					|| "Update".equalsIgnoreCase(model.PRODUCTACTIVITY)) {
-				//6
-				if (refofer != null) {
-					//6.1
-					EntityItem relator = findReofferFeatRelator(model.PRODUCTID, refoferFeat);
-					if (relator == null) {
-						addDebug("Creating new relator REFOFERREFOFERFEAT");
-						//6.1.2
-						createRelator("REFOFERREFOFERFEAT", "REFOFER", refofer.getEntityID(),
-								"REFOFERFEAT", refoferFeat.getEntityID());
-						if (featWrapper == null) {
-							featWrapper = new EntityWrapper(refoferFeat);
-						}
-						featWrapper.flag("DATAQUALITY", DQ_FINAL);
-						featWrapper.flag("STATUS", STATUS_FINAL);
-						featWrapper.flag("ADSABRSTATUS", ABR_QUEUE);
-					}
-					addOutput("REFOFERFEAT was updated succesfully");
-				} else {
-					//6.2 Create REFOFER as STATUS_DRAFT
-					int refoferID = m_db.getNextEntityID(m_prof, "REFOFER");
-					EntityGroup egReoffer = m_db.getEntityGroup(m_prof, "REFOFER", "Edit");
-					refofer = new EntityItem(egReoffer, m_prof, "REFOFER", refoferID);
-					EntityWrapper refoferWrapper = new EntityWrapper(refofer);
-					refoferWrapper.text("PRODUCTID", model.PRODUCTID);
-					refoferWrapper.text("MKTGNAME", "Error � not received from MIW");
-					refoferWrapper.flag("PDHDOMAIN", MIW_PDHDOMAIN);
-					refoferWrapper.flag("STATUS", STATUS_DRAFT);
-					refoferWrapper.flag("DATAQUALITY", DQ_DRAFT);
-					refoferWrapper.end();
-					createRelator("REFOFERREFOFERFEAT", "REFOFER", refoferID, "REFOFERFEAT",
-							featEntityID);
-					addDebug("Created skeleton for REFOFER: " + refoferID
-							+ " and relator REFOFERREFOFERFEAT for REFOFERFEAT " + featEntityID);
-					addError(model.toString());
-					if (featWrapper != null) {
-						featWrapper.end();
-					}
-					fail("Referenced Reference Offering does not exist but skeleton REFOFER was created");
-					return;
-				}
-			} else if ("Remove".equalsIgnoreCase(model.PRODUCTACTIVITY)
-					|| "Delete".equalsIgnoreCase(model.PRODUCTACTIVITY)) {
-				//7
-				if (refofer != null) {
-					//7.1 delete REFOFERREFOFERFEAT
-					EntityItem relator = findReofferFeatRelator(model.PRODUCTID, refoferFeat);
-					if (relator == null) {
-						addError(model.toString());
-						fail("the relator \"Reference Offering to Reference Feature\" (REFOFERREFOFERFEAT) does not exist and hence there is nothing to delete.");
-						return;
-					} else {
-						addDebug("Deleting relator REFOFERREFOFERFEAT " + relator.getKey());
-						ReturnStatus returnStatus = new ReturnStatus();
-						m_db.callGBL2099(returnStatus, m_cbOn.m_iOPWGID, m_prof.getEnterprise(),
-								"REFOFERREFOFERFEAT", relator.getEntityID(), m_cbOn.m_iTRANID);
-						m_db.commit();
-						m_db.freeStatement();
-						m_db.isPending();
-						addOutput("REFOFERFEAT's relator was deactivated succesfully");
-					}
-
-					if (featWrapper == null) {
-						featWrapper = new EntityWrapper(refoferFeat);
-					}
-				} else {
-					//7.2
-					addError(model.toString());
-					fail("Reference Offering does not exist and hence there isn't a 'Reference Offering to Reference Feature' to delete.");
-					return;
-				}
-			}
-
-			if (featWrapper != null) {
-				//At this point, the REFOFERFEAT is ok
-				featWrapper.flag("DATAQUALITY", DQ_FINAL);
-				featWrapper.flag("STATUS", STATUS_FINAL);
-				featWrapper.flag("ADSABRSTATUS", ABR_QUEUE);
-				featWrapper.end();
-			}
-			setReturnCode(RETURNCODE_SUCCESS);
-
-		} catch (Exception e) {
-			fail("Invalid REFOFERFEAT message: " + e.getMessage());
-		}
-
-	}
-
-	private EntityItem findRefofer(String productID) throws Exception {
-		//Search all REFOFER entity ids for ProductID and PDHDOMAIN = 'MIW'
-		Vector attrs = new Vector();
-		attrs.addElement("PRODUCTID");
-		Vector vals = new Vector();
-		vals.addElement(productID);
-		StringBuffer debugSb = new StringBuffer();
-		try {
-			EntityItem[] list = ABRUtil.doSearch(m_db, m_prof, "SRDREFOFER1", "REFOFER", false,
-					attrs, vals, debugSb);
-			for (int i = 0; i < list.length; i++) {
-				EntityItem ei = list[i];
-				String id = PokUtils.getAttributeValue(ei, "PRODUCTID", null, null);
-				String domain = PokUtils.getAttributeFlagValue(ei, "PDHDOMAIN");
-				addDebug("Looking at " + ei.getKey() + " [" + id + "," + domain + "]");
-				if (productID.equalsIgnoreCase(id) && MIW_PDHDOMAIN.equals(domain)) {
-					//Found REFOFERFEAT
-					return ei;
-				}
-			}
-		} catch (Exception e) {
-			addError(debugSb.toString());
-			throw e;
-		}
-		return null;
-	}
-
-	private EntityItem findRefoferFeat(String featID) throws Exception {
-		//Search all REFOFERFEAT entity ids for FeatID
-		Vector attrs = new Vector();
-		attrs.addElement("FEATID");
-		Vector vals = new Vector();
-		vals.addElement(featID);
-		StringBuffer debugSb = new StringBuffer();
-		try {
-			EntityItem[] list = ABRUtil.doSearch(m_db, m_prof, "SRDREFOFERFEAT", "REFOFERFEAT",
-					false, attrs, vals, debugSb);
-			for (int i = 0; i < list.length; i++) {
-				EntityItem ei = list[i];
-				String id = PokUtils.getAttributeValue(ei, "FEATID", null, null);
-				if (featID.equalsIgnoreCase(id)) {
-					//Found REFOFERFEAT
-					return ei;
-				}
-			}
-		} catch (Exception e) {
-			addError(debugSb.toString());
-			throw e;
-		}
-		return null;
-	}
-
-	private EntityItem findReofferFeatRelator(String productID, EntityItem refoferFeat)
-			throws SQLException, MiddlewareException {
-		if (refoferFeat.getEntityID() <= 0) {
-			return null;
-		}
-		EntityList el = m_db.getEntityList(m_prof, new ExtractActionItem(null, m_db, m_prof, "BHREFOFERFEATEXT"),
-				new EntityItem[] { new EntityItem(refoferFeat) });
-		EntityGroup relators = el.getEntityGroup("REFOFERREFOFERFEAT");
-		for (int i = 0; i < relators.getEntityItemCount(); i++) {
-			EntityItem ei = relators.getEntityItem(i);
-			if (ei.getUpLinkCount() > 0 && ei.getDownLinkCount() > 0) {
-				EntityItem refofer = (EntityItem) ei.getUpLink(0);
-				String pid = PokUtils.getAttributeValue(refofer, "PRODUCTID", null, null);
-				addDebug("Looking for relator with "+refofer.getKey()+" PRODUCTID "+pid+"="+productID);
-				if (productID.equals(pid)) {
-					addDebug("Relator found for "+refoferFeat.getKey()+" + "+productID);
-					return ei;
-				}
-			}
-		}
-		return null;
-	}
-
-	public String getABRVersion() {
-		return "1.0";
-	}
-
-	public String getDescription() {
-		return "MXABRSTATUS";
-	}
-
-	private Document parseXML(String xml) throws Exception {
-		try {
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			StringReader sr = new StringReader(xml);
-			InputSource is = new InputSource(sr);
-			return builder.parse(is);
-		} catch (SAXParseException exception) {
-			addError(xml);
-			throw exception;
-		}
-	}
-
-	/******************************************************************************
-	 * Get tag value, if doesnt exist use default
-	 * @param element
-	 * @param tagName
-	 */
-	public String getNodeValue(Element element, String tagName) {
-		String value = null;
-		NodeList nlist = element.getElementsByTagName(tagName);
-		if (nlist == null) {
-			addDebug("getNodeValue: " + tagName + " element returned null");
-		} else if (nlist.getLength() == 0) {
-			addDebug("getNodeValue: " + tagName + " was not found in the XML");
-		} else if (nlist.getLength() > 1) {
-			addDebug("getNodeValue: " + tagName + " has more then 1 element");
-		} else {
-			Element node = (Element) nlist.item(0);
-			Element el = (Element) nlist.item(0);
-			if (node.hasChildNodes()) {
-				value = el.getFirstChild().getNodeValue();
-			} else {
-				value = el.getNodeValue();
-			}
-			//addDebug("getNodeValue: " + tagName + " = " + value);
-		}
-		return value;
-	}
-
-	public ReturnStatus createRelator(String relatorType, String entityFromType, int entityFromID,
-			String entityToType, int entityToID) throws MiddlewareException {
-		ReturnStatus returnStatus = new ReturnStatus(-1);
-		String enterprise = m_prof.getEnterprise();
-		int openID = m_cbOn.getOPENID();
-		int tranID = m_cbOn.getTranID();
-		String effFrom = m_cbOn.getEffFrom();
-		String effTo = m_cbOn.getEffTo();
-		int sessionID = m_prof.getSessionID();
-		m_db.callGBL2098(returnStatus, openID, sessionID, enterprise, relatorType, new ReturnID(),
-				entityFromType, entityFromID, entityToType, entityToID, tranID, effFrom, effTo, 1);
-		m_db.freeStatement();
-		m_db.isPending();
-		return returnStatus;
-	}
-
-	public void addDebug(String msg) {
-		rptSb.append("<!-- " + msg + " -->\n");
-	}
-
-	public void addOutput(String msg) {
-		rptSb.append("<p>" + msg + "</p>\n");
-	}
-
-	/**********************************
-	 * add error info and fail abr
-	 * @param msg
-	 */
-	public void addError(String msg) {
-		addOutput(msg);
-	}
-
-	public void fail(String msg) {
-		addError(msg);
-		setReturnCode(FAIL);
-	}
-
-	class Model {
-
-		public String ACTIVITY;
-
-		public String DTSOFMSG;
-
-		public String DTSMIWCREATE;
-
-		public void rejectIfNullOrEmpty(String name, String value) throws Exception {
-			if (value == null || value.length() == 0) {
-				throw new Exception("Element '" + name + "' cannot be empty.");
-			}
-		}
-
-		public String parseTimestampAndRejectIfInvalid(String name, String value) throws Exception {
-			try {
-				return timestamp(value);
-			} catch (ParseException e) {
-				throw new Exception("Element '" + name + "' timestamp '" + value + "' is invalid: "
-						+ e.getMessage());
-			}
-		}
-
-		public String parseDateAndRejectIfInvalid(String name, String value) throws Exception {
-			try {
-				return date(value);
-			} catch (ParseException e) {
-				throw new Exception("Element '" + name + "' date '" + value + "' is invalid: "
-						+ e.getMessage());
-			}
-		}
-	}
-
-	class RefoferModel extends Model {
-
-		public String PRODUCTID;
-		public String MFRPRODTYPE;
-		public String MFRPRODDESC;
-		public String MKTGDIV;
-		public String PRFTCTR;
-		public String CATGSHRTDESC;
-		public String STRTOSVC;
-		public String ENDOFSVC;
-		public String VENDNAM;
-		public String MACHRATECATG;
-		public String CECSPRODKEY;
-		public String MAINTANNBILLELIGINDC;
-		public String FSLMCPU;
-		public String PRODSUPRTCD;
-		public String DOMAIN;
-
-		public RefoferModel(Element element) {
-			ACTIVITY = getNodeValue(element, "ACTIVITY");
-			DTSOFMSG = getNodeValue(element, "DTSOFMSG");
-			DTSMIWCREATE = getNodeValue(element, "DTSMIWCREATE");
-			PRODUCTID = getNodeValue(element, "PRODUCTID");
-			MFRPRODTYPE = getNodeValue(element, "MFRPRODTYPE");
-			MFRPRODDESC = getNodeValue(element, "MFRPRODDESC");
-			MKTGDIV = getNodeValue(element, "MKTGDIV");
-			PRFTCTR = getNodeValue(element, "PRFTCTR");
-			CATGSHRTDESC = getNodeValue(element, "CATGSHRTDESC");
-			STRTOSVC = getNodeValue(element, "STRTOSVC");
-			ENDOFSVC = getNodeValue(element, "ENDOFSVC");
-			VENDNAM = getNodeValue(element, "VENDNAM");
-			MACHRATECATG = getNodeValue(element, "MACHRATECATG");
-			CECSPRODKEY = getNodeValue(element, "CECSPRODKEY");
-			MAINTANNBILLELIGINDC = getNodeValue(element, "MAINTANNBILLELIGINDC");
-			FSLMCPU = getNodeValue(element, "FSLMCPU");
-			PRODSUPRTCD = getNodeValue(element, "PRODSUPRTCD");
-			DOMAIN = getNodeValue(element, "DOMAIN");
-
-		}
-
-		public void validate() throws Exception {
-			rejectIfNullOrEmpty("ACTIVITY", ACTIVITY);
-			rejectIfNullOrEmpty("DTSOFMSG", DTSOFMSG);
-			rejectIfNullOrEmpty("DTSMIWCREATE", DTSMIWCREATE);
-			rejectIfNullOrEmpty("PRODUCTID", PRODUCTID);
-			rejectIfNullOrEmpty("MFRPRODTYPE", MFRPRODTYPE);
-			rejectIfNullOrEmpty("MFRPRODDESC", MFRPRODDESC);
-			rejectIfNullOrEmpty("MKTGDIV", MKTGDIV);
-			rejectIfNullOrEmpty("PRFTCTR", PRFTCTR);
-			rejectIfNullOrEmpty("CATGSHRTDESC", CATGSHRTDESC);
-			rejectIfNullOrEmpty("STRTOSVC", STRTOSVC);
-			rejectIfNullOrEmpty("ENDOFSVC", ENDOFSVC);
-			rejectIfNullOrEmpty("VENDNAM", VENDNAM);
-			rejectIfNullOrEmpty("MACHRATECATG", MACHRATECATG);
-			rejectIfNullOrEmpty("CECSPRODKEY", CECSPRODKEY);
-			rejectIfNullOrEmpty("MAINTANNBILLELIGINDC", MAINTANNBILLELIGINDC);
-			rejectIfNullOrEmpty("FSLMCPU", FSLMCPU);
-			rejectIfNullOrEmpty("PRODSUPRTCD", PRODSUPRTCD);
-
-			DTSOFMSG = parseTimestampAndRejectIfInvalid("DTSOFMSG", DTSOFMSG);
-			DTSMIWCREATE = parseTimestampAndRejectIfInvalid("DTSMIWCREATE", DTSMIWCREATE);
-			STRTOSVC = parseDateAndRejectIfInvalid("STRTOSVC", STRTOSVC);
-			ENDOFSVC = parseDateAndRejectIfInvalid("ENDOFSVC", ENDOFSVC);
-		}
-
-		public String toString() {
-			StringBuffer sb = new StringBuffer();
-			sb.append("Date/Time=" + DTSOFMSG);
-			sb.append(" \nMIW Create=" + DTSMIWCREATE);
-			sb.append(" \nMessage Type=REFOFER");
-			sb.append(" \nProduct ID=" + PRODUCTID);
-			sb.append("\n");
-			return sb.toString();
-		}
-	}
-
-	class RefoferFeatModel extends Model {
-
-		public String PRODUCTID;
-		public String PRODUCTACTIVITY;
-		public String FEATID;
-		public String MFRFEATID;
-		public String MFRFEATDESC;
-		public String MFRFEATLNGDESC;
-		public String MKTGDIV;
-		public String PRFTCTR;
-
-		public RefoferFeatModel(Element element) {
-			ACTIVITY = getNodeValue(element, "ACTIVITY");
-			String pa = getNodeValue(element, "PRODUCTACTIVITY");
-			if (pa == null || pa.length() == 0) {
-				PRODUCTACTIVITY = "";
-			} else {
-				PRODUCTACTIVITY = pa;
-			}
-			DTSOFMSG = getNodeValue(element, "DTSOFMSG");
-			DTSMIWCREATE = getNodeValue(element, "DTSMIWCREATE");
-			FEATID = getNodeValue(element, "FEATID");
-			PRODUCTID = getNodeValue(element, "PRODUCTID");
-			MFRFEATID = getNodeValue(element, "MFRFEATID");
-			MFRFEATDESC = getNodeValue(element, "MFRFEATDESC");
-			MFRFEATLNGDESC = getNodeValue(element, "MFRFEATLNGDESC");
-			MKTGDIV = getNodeValue(element, "MKTGDIV");
-			PRFTCTR = getNodeValue(element, "PRFTCTR");
-		}
-
-		public void validate() throws Exception {
-			rejectIfNullOrEmpty("ACTIVITY", ACTIVITY);
-			rejectIfNullOrEmpty("DTSOFMSG", DTSOFMSG);
-			rejectIfNullOrEmpty("DTSMIWCREATE", DTSMIWCREATE);
-			rejectIfNullOrEmpty("PRODUCTID", PRODUCTID);
-			rejectIfNullOrEmpty("FEATID", FEATID);
-			rejectIfNullOrEmpty("MFRFEATID", MFRFEATID);
-			rejectIfNullOrEmpty("MFRFEATDESC", MFRFEATDESC);
-			rejectIfNullOrEmpty("MFRFEATLNGDESC", MFRFEATLNGDESC);
-			rejectIfNullOrEmpty("MKTGDIV", MKTGDIV);
-			rejectIfNullOrEmpty("PRFTCTR", PRFTCTR);
-			DTSOFMSG = parseTimestampAndRejectIfInvalid("DTSOFMSG", DTSOFMSG);
-			DTSMIWCREATE = parseTimestampAndRejectIfInvalid("DTSMIWCREATE", DTSMIWCREATE);
-		}
-
-		public String toString() {
-			StringBuffer sb = new StringBuffer();
-			sb.append("Message Type=REFOFERFEAT");
-			sb.append(" \nDate/Time=" + DTSOFMSG);
-			sb.append(" \nMIW Create=" + DTSMIWCREATE);
-			sb.append(" \nFeature Id=" + FEATID);
-			sb.append(" \nProduct Id=" + PRODUCTID);
-			sb.append("\n");
-			return sb.toString();
-		}
-	}
-
-	class EntityWrapper {
-
-		EntityItem ei;
-
-		ReturnEntityKey rek;
-
-		Vector attrs;
-		Map map;
-
-		public EntityWrapper(EntityItem ei) {
-			this.ei = ei;
-			rek = new ReturnEntityKey(ei.getEntityType(), ei.getEntityID(), true);
-			map = new HashMap();
-			attrs = new Vector();
-		}
-		
-		private void put(String key, Object value) {
-			Object oldValue = map.get(key);
-			if (oldValue != null) {
-				//Replace old value
-				int index = attrs.indexOf(oldValue);
-				if (index >= 0) {
-					attrs.remove(index);
-					attrs.insertElementAt(value, index);
-				}
-			} else {
-				attrs.add(value);
-			}
-			map.put(key, value);
-		}
-
-		public void flag(String attributeCode, String attributeValue) throws Exception {
-			SingleFlag sf = new SingleFlag(m_prof.getEnterprise(), rek.getEntityType(), rek
-					.getEntityID(), attributeCode, attributeValue, 1, m_cbOn);
-			put(attributeCode, sf);
-		}
-
-		public void text(String attributeCode, String attributeValue) {
-			Text sf = new Text(m_prof.getEnterprise(), rek.getEntityType(), rek.getEntityID(),
-					attributeCode, attributeValue, 1, m_cbOn);
-			put(attributeCode, sf);
-		}
-
-		public void text(String attributeCode, String value, int length) throws Exception {
-			if (value.length() > length) {
-				value = value.substring(0, length);
-			}
-			text(attributeCode, value);
-		}
-
-		public void end() throws Exception {
-			Vector vctReturnsEntityKeys = new Vector();
-			rek.m_vctAttributes = attrs;
-			vctReturnsEntityKeys.addElement(rek);
-			try {
-				m_db.update(m_prof, vctReturnsEntityKeys, false, false);
-				m_db.commit();
-			} catch (Exception e) {
-				throw new Exception("Unable to set text attributes for " + ei.getKey() + ": "
-						+ e.getClass().getName() + " " + e.getMessage());
-
-			}
-		}
-
-	}
-	
-	static String sDateFormat ="yyyy-MM-dd";
-	static DateFormat inDateFormat = new SimpleDateFormat(sDateFormat);
-	static DateFormat outFormat = new SimpleDateFormat(sDateFormat);//
-	static int shortDateLength = sDateFormat.length();
-	
-	static String sDateTimeFormat = "yyyy-MM-dd hh:mm:ss.SSSSSS";
-	static DateFormat inDateTimeFormat = new SimpleDateFormat(sDateTimeFormat);
-	static int shortTimestampLength = sDateTimeFormat.length();
-
-	public static String date(String inputDate) throws ParseException {
-		Date date;
-		if (inputDate.length() == shortDateLength) {
-			date = inDateFormat.parse(inputDate);
-		} else {
-			if(inputDate.length()>shortDateLength){
-				inputDate = inputDate.substring(0,inputDate.length());
-			}
-			date = inDateFormat.parse(inputDate);
-		}
-		return outFormat.format(date);
-	}
-
-	/**
-	 * Fix Defect 742829 : Error found during prod IDL of MIW data - 
-	 * Incorrect Date/timestamp forma
-	 * The dateformat is 2012-12-31 12:03:15.000000 (yyyy-MM-dd hh:mm:ss.SSSSSS)
-	 * @param inputDate
-	 * @return
-	 * @throws ParseException
-	 */
-	public static String timestamp(String inputDate) throws ParseException {
-		int dateLength= inputDate.length();
-		if (dateLength == shortTimestampLength) {
-			inDateTimeFormat.parse(inputDate);
-		} else {
-			if(dateLength>shortTimestampLength){
-				inputDate = inputDate.substring(0,shortTimestampLength);
-			}
-			inDateTimeFormat.parse(inputDate);
-		}
-		return inputDate;
-	}
-
-	/**
-	 * Overridden to support multiple SUBSCRVE as described in spec:
-	 * The subscription information for the Reports will be:
-	 * CAT1= MIW
-	 * CAT2=
-	 * CAT3= TASKSTATUS
-	 * SUBSCRVE=REFOFERVE if report is for a Reference Offering
-	 * or
-	 * SUBSCRVE=REFOFERFEATVE if the report is for a Reference Offering Feature
-	 * 
-	 * It may break if the parent method is changed.
-	 */
-	public void printDGSubmitString() {
-		String strPrintString = null;
-		String strReport = m_abri.getABRCode();
-		println("<!--DGSUBMITBEGIN");
-		StringBuffer sb = new StringBuffer("<!--DGSUBMITBEGIN\n");
-		print("TASKSTATUS=");
-		sb.append("TASKSTATUS=");
-
-		if (getReturnCode() == AbstractTask.RETURNCODE_SUCCESS) {
-			println("TSPA");
-			sb.append("TSPA\n");
-		} else {
-			println("TSFAIL");
-			sb.append("TSFAIL\n");
-		}
-
-		
-		println("SUBSCRVE=" + SUBSCRVE);
-		sb.append("SUBSCRVE=" + SUBSCRVE + "\n");
-
-		strPrintString = ABRServerProperties.getCategory(strReport, "CAT1");
-		if (strPrintString != null) {
-			println("CAT1=" + strPrintString);
-			sb.append("CAT1=" + strPrintString + "\n");
-		}
-		strPrintString = ABRServerProperties.getCategory(strReport, "CAT2");
-		if (strPrintString != null) {
-			println("CAT2=" + strPrintString);
-			sb.append("CAT2=" + strPrintString + "\n");
-		}
-
-		strPrintString = ABRServerProperties.getCategory(strReport, "CAT3");
-		if (strPrintString != null) {
-			println("CAT3=" + strPrintString);
-			sb.append("CAT3=" + strPrintString + "\n");
-		}
-
-		strPrintString = ABRServerProperties.getCategory(strReport, "CAT4");
-		if (strPrintString != null) {
-			println("CAT4=" + strPrintString);
-			sb.append("CAT4=" + strPrintString + "\n");
-		}
-
-		strPrintString = ABRServerProperties.getCategory(strReport, "CAT5");
-		if (strPrintString != null) {
-			println("CAT5=" + strPrintString);
-			sb.append("CAT5=" + strPrintString + "\n");
-		}
-
-		strPrintString = ABRServerProperties.getCategory(strReport, "CAT6");
-		if (strPrintString != null) {
-			println("CAT6=" + strPrintString);
-			sb.append("CAT6=" + strPrintString + "\n");
-		}
-
-		strPrintString = ABRServerProperties.getExtMail(strReport);
-		if (strPrintString != null) {
-			println("EXTMAIL=" + strPrintString);
-			sb.append("EXTMAIL=" + strPrintString + "\n");
-		}
-
-		strPrintString = ABRServerProperties.getIntMail(strReport);
-		if (strPrintString != null) {
-			println("INTMAIL=" + strPrintString);
-			sb.append("INTMAIL=" + strPrintString + "\n");
-		}
-
-		strPrintString = ABRServerProperties.getSubscrEnabled(strReport);
-		if (strPrintString != null) {
-			println("SUBSCR_ENABLED=" + strPrintString);
-			sb.append("SUBSCR_ENABLED=" + strPrintString + "\n");
-		}
-
-		strPrintString = ABRServerProperties.getSubscrNotifyOnError(strReport);
-		if (strPrintString != null) {
-			println("SUBSCR_NOTIFY_ON_ERROR=" + strPrintString);
-			sb.append("SUBSCR_NOTIFY_ON_ERROR=" + strPrintString + "\n");
-		}
-
-		println("DGSUBMITEND-->");
-		sb.append("DGSUBMITEND-->\n");
-		//dgtemplate = sb.toString(); //needed when body is not html
-	}
-
-}
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.ABRUtil;
+/*     */ import COM.ibm.eannounce.abr.util.EACustom;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.objects.EANFoundation;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
+/*     */ import COM.ibm.opicmpdh.middleware.ReturnID;
+/*     */ import COM.ibm.opicmpdh.middleware.ReturnStatus;
+/*     */ import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+/*     */ import COM.ibm.opicmpdh.objects.ControlBlock;
+/*     */ import COM.ibm.opicmpdh.objects.SingleFlag;
+/*     */ import COM.ibm.opicmpdh.objects.Text;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.PrintWriter;
+/*     */ import java.io.StringReader;
+/*     */ import java.io.StringWriter;
+/*     */ import java.sql.SQLException;
+/*     */ import java.text.DateFormat;
+/*     */ import java.text.MessageFormat;
+/*     */ import java.text.ParseException;
+/*     */ import java.text.SimpleDateFormat;
+/*     */ import java.util.Date;
+/*     */ import java.util.HashMap;
+/*     */ import java.util.Map;
+/*     */ import java.util.Vector;
+/*     */ import javax.xml.parsers.DocumentBuilder;
+/*     */ import javax.xml.parsers.DocumentBuilderFactory;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ import org.w3c.dom.NodeList;
+/*     */ import org.xml.sax.InputSource;
+/*     */ import org.xml.sax.SAXParseException;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class MXABRSTATUS
+/*     */   extends PokBaseABR
+/*     */ {
+/*     */   private static final String DQ_FINAL = "FINAL";
+/*     */   private static final String DQ_DRAFT = "DRAFT";
+/*     */   private static final String STATUS_DRAFT = "0010";
+/*     */   private static final String STATUS_FINAL = "0020";
+/*     */   private static final String STATUS_CHANGE_REQUEST = "0050";
+/*     */   private static final String ABR_QUEUE = "0020";
+/*     */   static final String RPT_EXCEPTION = "<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
+/*     */   static final String RPT_STACKTRACE = "<pre>{0}</pre>";
+/*     */   private static final String MIW_PDHDOMAIN = "MIW";
+/* 106 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/* 107 */   static final String NEWLINE = new String(FOOL_JTEST);
+/*     */   
+/* 109 */   private StringBuffer rptSb = new StringBuffer();
+/*     */   private String SUBSCRVE;
+/*     */   
+/*     */   public void execute_run() {
+/* 113 */     setDGTitle("MXABRSTATUS");
+/* 114 */     setDGRptName(getShortClassName(getClass()));
+/* 115 */     setDGRptClass(getABRCode());
+/* 116 */     String str1 = getShortClassName(getClass()) + " - MIW Inbound";
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 121 */     String str2 = "<head>" + EACustom.getMetaTags(getDescription()) + NEWLINE + EACustom.getCSS() + NEWLINE + EACustom.getTitle(str1) + NEWLINE + "</head>" + NEWLINE + "<body id=\"ibm-com\">" + EACustom.getMastheadDiv() + NEWLINE + "<p class=\"ibm-intro ibm-alternate-three\"><em>" + str1 + "</em></p>" + NEWLINE;
+/*     */ 
+/*     */     
+/* 124 */     println(EACustom.getDocTypeHtml());
+/* 125 */     println(str2);
+/* 126 */     this.SUBSCRVE = "UNDEFINED";
+/*     */     try {
+/* 128 */       start_ABRBuild(false);
+/* 129 */       setNow();
+/* 130 */       setControlBlock();
+/*     */       
+/* 132 */       EntityList entityList = this.m_db.getEntityList(this.m_prof, new ExtractActionItem(null, this.m_db, this.m_prof, "dummy"), new EntityItem[] { new EntityItem(null, this.m_prof, 
+/* 133 */               getEntityType(), 
+/* 134 */               getEntityID()) });
+/* 135 */       EntityItem entityItem = entityList.getParentEntityGroup().getEntityItem(0);
+/*     */       
+/* 137 */       String str3 = PokUtils.getAttributeValue(entityItem, "MXTYPE", null, null);
+/*     */       
+/* 139 */       String str4 = PokUtils.getAttributeValue(entityItem, "MXMSG", null, null, false);
+/* 140 */       addDebug(str4);
+/* 141 */       Document document = parseXML(str4);
+/* 142 */       Element element = document.getDocumentElement();
+/*     */       
+/* 144 */       if ("REFOFER".equals(str3)) {
+/* 145 */         this.SUBSCRVE = "REFOFERVE";
+/* 146 */         handleRefofer(entityItem, element);
+/* 147 */       } else if ("REFOFERFEAT".equals(str3)) {
+/* 148 */         this.SUBSCRVE = "REFOFERFEATVE";
+/* 149 */         handleRefoferFeat(entityItem, element);
+/*     */       } 
+/* 151 */     } catch (Throwable throwable) {
+/* 152 */       StringWriter stringWriter = new StringWriter();
+/* 153 */       MessageFormat messageFormat = new MessageFormat("<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>");
+/* 154 */       setReturnCode(-3);
+/* 155 */       throwable.printStackTrace(new PrintWriter(stringWriter));
+/*     */ 
+/*     */       
+/* 158 */       String[] arrayOfString1 = { throwable.getMessage() };
+/* 159 */       this.rptSb.append(messageFormat.format(arrayOfString1));
+/* 160 */       this.rptSb.append("\n");
+/*     */       
+/* 162 */       messageFormat = new MessageFormat("<pre>{0}</pre>");
+/* 163 */       String[] arrayOfString2 = { stringWriter.getBuffer().toString() };
+/* 164 */       this.rptSb.append(messageFormat.format(arrayOfString2));
+/* 165 */       this.rptSb.append("\n");
+/* 166 */       logError("Exception: " + throwable.getMessage());
+/* 167 */       logError(stringWriter.getBuffer().toString());
+/*     */     } 
+/*     */     
+/* 170 */     println(this.rptSb.toString());
+/* 171 */     printDGSubmitString();
+/* 172 */     println(EACustom.getTOUDiv());
+/* 173 */     buildReportFooter();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void handleRefofer(EntityItem paramEntityItem, Element paramElement) throws Throwable {
+/* 189 */     String str = PokUtils.getAttributeValue(paramEntityItem, "MXPRODUCTID", null, null);
+/*     */     
+/* 191 */     addDebug("MIW MESSAGE TYPE: REFOFER, PRODUCTID = " + str);
+/*     */ 
+/*     */ 
+/*     */     
+/* 195 */     EntityItem entityItem = findRefofer(str);
+/* 196 */     EntityWrapper entityWrapper = null;
+/*     */     
+/* 198 */     if (entityItem != null) {
+/* 199 */       addDebug("REFOFER found: " + entityItem.getKey());
+/*     */     } else {
+/* 201 */       addDebug("REFOFER not found!");
+/*     */     } 
+/*     */     
+/* 204 */     RefoferModel refoferModel = new RefoferModel(paramElement);
+/*     */     try {
+/* 206 */       refoferModel.validate();
+/* 207 */       if ("Delete".equalsIgnoreCase(refoferModel.ACTIVITY)) {
+/* 208 */         if (entityItem == null) {
+/*     */           
+/* 210 */           addError(refoferModel.toString());
+/* 211 */           fail("Reference Offering was marked for Delete; however, the Reference Offering does not exist in the PDH");
+/*     */         } else {
+/*     */           
+/* 214 */           entityWrapper = new EntityWrapper(entityItem);
+/*     */           
+/* 216 */           String str1 = refoferModel.DTSOFMSG.substring(0, 10);
+/* 217 */           entityWrapper.text("ENDOFSVC", str1);
+/* 218 */           entityWrapper.flag("DATAQUALITY", "FINAL");
+/* 219 */           entityWrapper.flag("STATUS", "0020");
+/* 220 */           entityWrapper.flag("ADSABRSTATUS", "0020");
+/* 221 */           entityWrapper.end();
+/* 222 */           addOutput(refoferModel.toString());
+/* 223 */           addOutput("Reference Offering was marked for Delete; however, the Reference Offering was not deleted. The End of Service was updated to match this change (" + str1 + "). This change was feed to downstream systems.");
+/*     */         } 
+/* 225 */       } else if ("Update".equalsIgnoreCase(refoferModel.ACTIVITY)) {
+/* 226 */         if (entityItem == null) {
+/*     */           
+/* 228 */           EntityGroup entityGroup = this.m_db.getEntityGroup(this.m_prof, "REFOFER", "Edit");
+/* 229 */           entityItem = new EntityItem((EANFoundation)entityGroup, this.m_prof, "REFOFER", 0);
+/* 230 */           addOutput("New REFOFER created");
+/*     */         } 
+/*     */         
+/* 233 */         entityWrapper = new EntityWrapper(entityItem);
+/* 234 */         entityWrapper.text("PRODUCTID", refoferModel.PRODUCTID);
+/* 235 */         entityWrapper.text("DTSMIWCREATE", refoferModel.DTSMIWCREATE);
+/* 236 */         entityWrapper.flag("PDHDOMAIN", "MIW");
+/* 237 */         entityWrapper.text("MFRPRODTYPE", refoferModel.MFRPRODTYPE, 30);
+/* 238 */         entityWrapper.text("MFRPRODDESC", refoferModel.MFRPRODDESC, 32);
+/* 239 */         entityWrapper.text("MKTGDIV", refoferModel.MKTGDIV, 2);
+/* 240 */         entityWrapper.flag("PRFTCTR", refoferModel.PRFTCTR);
+/* 241 */         entityWrapper.text("CATGSHRTDESC", refoferModel.CATGSHRTDESC, 30);
+/* 242 */         entityWrapper.text("STRTOFSVC", refoferModel.STRTOSVC);
+/* 243 */         entityWrapper.text("ENDOFSVC", refoferModel.ENDOFSVC);
+/* 244 */         entityWrapper.text("VENDNAM", refoferModel.VENDNAM, 30);
+/* 245 */         entityWrapper.text("MACHRATECATG", refoferModel.MACHRATECATG, 1);
+/* 246 */         entityWrapper.text("CECSPRODKEY", refoferModel.CECSPRODKEY, 1);
+/*     */         
+/* 248 */         entityWrapper.flag("MAINTANNBILLELIGINDC", "Y".equals(refoferModel.MAINTANNBILLELIGINDC) ? "MAINY" : "MAINN");
+/*     */ 
+/*     */         
+/* 251 */         entityWrapper.flag("SYSIDUNIT", "Y".equals(refoferModel.FSLMCPU) ? "S00010" : "S00020");
+/* 252 */         entityWrapper.text("PRODSUPRTCD", refoferModel.PRODSUPRTCD, 3);
+/* 253 */         if (refoferModel.DOMAIN != null || !"".equals(refoferModel.DOMAIN)) {
+/* 254 */           entityWrapper.text("DOMAIN", refoferModel.DOMAIN);
+/*     */         }
+/* 256 */         entityWrapper.flag("DATAQUALITY", "FINAL");
+/* 257 */         entityWrapper.flag("STATUS", "0020");
+/* 258 */         entityWrapper.flag("ADSABRSTATUS", "0020");
+/* 259 */         entityWrapper.end();
+/* 260 */         setReturnCode(0);
+/* 261 */         addOutput("REFOFER attributes updated");
+/*     */       }
+/*     */     
+/* 264 */     } catch (Exception exception) {
+/* 265 */       fail("Invalid REFOFER message: " + exception.getMessage());
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void handleRefoferFeat(EntityItem paramEntityItem, Element paramElement) throws Throwable {
+/* 315 */     addDebug("MIW MESSAGE TYPE: REFOFERFEAT");
+/*     */     
+/* 317 */     RefoferFeatModel refoferFeatModel = new RefoferFeatModel(paramElement);
+/*     */     try {
+/* 319 */       refoferFeatModel.validate();
+/*     */ 
+/*     */       
+/* 322 */       String str = PokUtils.getAttributeValue(paramEntityItem, "MXFEATID", null, null);
+/*     */       
+/* 324 */       EntityItem entityItem1 = findRefoferFeat(str);
+/* 325 */       if (entityItem1 != null) {
+/* 326 */         addDebug("Found REFOFERFEAT for FEATID = " + str + ": " + entityItem1.getKey());
+/*     */       } else {
+/* 328 */         addDebug("REFOFERFEAT *not found* for FEATID = " + str);
+/*     */       } 
+/*     */       
+/* 331 */       EntityWrapper entityWrapper = null;
+/* 332 */       int i = 0;
+/*     */       
+/* 334 */       if ("Update".equalsIgnoreCase(refoferFeatModel.ACTIVITY)) {
+/*     */         
+/* 336 */         if (entityItem1 != null) {
+/*     */           
+/* 338 */           i = entityItem1.getEntityID();
+/*     */         } else {
+/*     */           
+/* 341 */           i = this.m_db.getNextEntityID(this.m_prof, "REFOFERFEAT");
+/* 342 */           EntityGroup entityGroup = this.m_db.getEntityGroup(this.m_prof, "REFOFERFEAT", "Edit");
+/* 343 */           entityItem1 = new EntityItem((EANFoundation)entityGroup, this.m_prof, "REFOFERFEAT", i);
+/* 344 */           addOutput("New REFOFERFEAT created " + entityItem1.getKey());
+/*     */         } 
+/*     */         
+/* 347 */         entityWrapper = new EntityWrapper(entityItem1);
+/* 348 */         entityWrapper.text("FEATID", refoferFeatModel.FEATID, 40);
+/* 349 */         entityWrapper.text("DTSMIWCREATE", refoferFeatModel.DTSMIWCREATE);
+/* 350 */         entityWrapper.text("MFRFEATID", refoferFeatModel.MFRFEATID, 30);
+/* 351 */         entityWrapper.text("MFRFEATDESC", refoferFeatModel.MFRFEATDESC, 128);
+/* 352 */         entityWrapper.text("MFRFEATLNGDESC", refoferFeatModel.MFRFEATLNGDESC, 128);
+/* 353 */         entityWrapper.text("MKTGDIV", refoferFeatModel.MKTGDIV, 2);
+/* 354 */         entityWrapper.flag("PRFTCTR", refoferFeatModel.PRFTCTR);
+/* 355 */         entityWrapper.flag("PDHDOMAIN", "MIW");
+/* 356 */         addOutput("REFOFERFEAT atributes updated");
+/* 357 */       } else if ("Delete".equalsIgnoreCase(refoferFeatModel.ACTIVITY)) {
+/*     */         
+/* 359 */         if (entityItem1 != null) {
+/*     */           
+/* 361 */           setFlagValue(entityItem1, "STATUS", "0050");
+/* 362 */           addError(refoferFeatModel.toString());
+/* 363 */           fail("Reference Offering Feature was marked for Delete. The STATUS was set to 'Change Request'. Please review and decide how to proceed.");
+/*     */         } else {
+/*     */           
+/* 366 */           addError(refoferFeatModel.toString());
+/* 367 */           fail("Reference Offering Feature was marked for Delete; however, the Reference Offering Feature does not exist in the PDH");
+/*     */         } 
+/*     */ 
+/*     */         
+/*     */         return;
+/*     */       } 
+/*     */ 
+/*     */       
+/* 375 */       EntityItem entityItem2 = findRefofer(refoferFeatModel.PRODUCTID);
+/* 376 */       if (entityItem2 != null) {
+/* 377 */         addDebug("Found REFOFER for PRODUCTID = " + refoferFeatModel.PRODUCTID + ": " + entityItem2
+/* 378 */             .getKey());
+/*     */       } else {
+/* 380 */         addDebug("REFOFER *not found* for PRODUCTID = " + refoferFeatModel.PRODUCTID);
+/*     */       } 
+/* 382 */       if ("".equals(refoferFeatModel.PRODUCTACTIVITY) || "Update"
+/* 383 */         .equalsIgnoreCase(refoferFeatModel.PRODUCTACTIVITY)) {
+/*     */         
+/* 385 */         if (entityItem2 != null) {
+/*     */           
+/* 387 */           EntityItem entityItem = findReofferFeatRelator(refoferFeatModel.PRODUCTID, entityItem1);
+/* 388 */           if (entityItem == null) {
+/* 389 */             addDebug("Creating new relator REFOFERREFOFERFEAT");
+/*     */             
+/* 391 */             createRelator("REFOFERREFOFERFEAT", "REFOFER", entityItem2.getEntityID(), "REFOFERFEAT", entityItem1
+/* 392 */                 .getEntityID());
+/* 393 */             if (entityWrapper == null) {
+/* 394 */               entityWrapper = new EntityWrapper(entityItem1);
+/*     */             }
+/* 396 */             entityWrapper.flag("DATAQUALITY", "FINAL");
+/* 397 */             entityWrapper.flag("STATUS", "0020");
+/* 398 */             entityWrapper.flag("ADSABRSTATUS", "0020");
+/*     */           } 
+/* 400 */           addOutput("REFOFERFEAT was updated succesfully");
+/*     */         } else {
+/*     */           
+/* 403 */           int j = this.m_db.getNextEntityID(this.m_prof, "REFOFER");
+/* 404 */           EntityGroup entityGroup = this.m_db.getEntityGroup(this.m_prof, "REFOFER", "Edit");
+/* 405 */           entityItem2 = new EntityItem((EANFoundation)entityGroup, this.m_prof, "REFOFER", j);
+/* 406 */           EntityWrapper entityWrapper1 = new EntityWrapper(entityItem2);
+/* 407 */           entityWrapper1.text("PRODUCTID", refoferFeatModel.PRODUCTID);
+/* 408 */           entityWrapper1.text("MKTGNAME", "Error ï¿½ not received from MIW");
+/* 409 */           entityWrapper1.flag("PDHDOMAIN", "MIW");
+/* 410 */           entityWrapper1.flag("STATUS", "0010");
+/* 411 */           entityWrapper1.flag("DATAQUALITY", "DRAFT");
+/* 412 */           entityWrapper1.end();
+/* 413 */           createRelator("REFOFERREFOFERFEAT", "REFOFER", j, "REFOFERFEAT", i);
+/*     */           
+/* 415 */           addDebug("Created skeleton for REFOFER: " + j + " and relator REFOFERREFOFERFEAT for REFOFERFEAT " + i);
+/*     */           
+/* 417 */           addError(refoferFeatModel.toString());
+/* 418 */           if (entityWrapper != null) {
+/* 419 */             entityWrapper.end();
+/*     */           }
+/* 421 */           fail("Referenced Reference Offering does not exist but skeleton REFOFER was created");
+/*     */           return;
+/*     */         } 
+/* 424 */       } else if ("Remove".equalsIgnoreCase(refoferFeatModel.PRODUCTACTIVITY) || "Delete"
+/* 425 */         .equalsIgnoreCase(refoferFeatModel.PRODUCTACTIVITY)) {
+/*     */         
+/* 427 */         if (entityItem2 != null) {
+/*     */           
+/* 429 */           EntityItem entityItem = findReofferFeatRelator(refoferFeatModel.PRODUCTID, entityItem1);
+/* 430 */           if (entityItem == null) {
+/* 431 */             addError(refoferFeatModel.toString());
+/* 432 */             fail("the relator \"Reference Offering to Reference Feature\" (REFOFERREFOFERFEAT) does not exist and hence there is nothing to delete.");
+/*     */             return;
+/*     */           } 
+/* 435 */           addDebug("Deleting relator REFOFERREFOFERFEAT " + entityItem.getKey());
+/* 436 */           ReturnStatus returnStatus = new ReturnStatus();
+/* 437 */           this.m_db.callGBL2099(returnStatus, this.m_cbOn.m_iOPWGID, this.m_prof.getEnterprise(), "REFOFERREFOFERFEAT", entityItem
+/* 438 */               .getEntityID(), this.m_cbOn.m_iTRANID);
+/* 439 */           this.m_db.commit();
+/* 440 */           this.m_db.freeStatement();
+/* 441 */           this.m_db.isPending();
+/* 442 */           addOutput("REFOFERFEAT's relator was deactivated succesfully");
+/*     */ 
+/*     */           
+/* 445 */           if (entityWrapper == null) {
+/* 446 */             entityWrapper = new EntityWrapper(entityItem1);
+/*     */           }
+/*     */         } else {
+/*     */           
+/* 450 */           addError(refoferFeatModel.toString());
+/* 451 */           fail("Reference Offering does not exist and hence there isn't a 'Reference Offering to Reference Feature' to delete.");
+/*     */           
+/*     */           return;
+/*     */         } 
+/*     */       } 
+/* 456 */       if (entityWrapper != null) {
+/*     */         
+/* 458 */         entityWrapper.flag("DATAQUALITY", "FINAL");
+/* 459 */         entityWrapper.flag("STATUS", "0020");
+/* 460 */         entityWrapper.flag("ADSABRSTATUS", "0020");
+/* 461 */         entityWrapper.end();
+/*     */       } 
+/* 463 */       setReturnCode(0);
+/*     */     }
+/* 465 */     catch (Exception exception) {
+/* 466 */       fail("Invalid REFOFERFEAT message: " + exception.getMessage());
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private EntityItem findRefofer(String paramString) throws Exception {
+/* 473 */     Vector<String> vector1 = new Vector();
+/* 474 */     vector1.addElement("PRODUCTID");
+/* 475 */     Vector<String> vector2 = new Vector();
+/* 476 */     vector2.addElement(paramString);
+/* 477 */     StringBuffer stringBuffer = new StringBuffer();
+/*     */     try {
+/* 479 */       EntityItem[] arrayOfEntityItem = ABRUtil.doSearch(this.m_db, this.m_prof, "SRDREFOFER1", "REFOFER", false, vector1, vector2, stringBuffer);
+/*     */       
+/* 481 */       for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/* 482 */         EntityItem entityItem = arrayOfEntityItem[b];
+/* 483 */         String str1 = PokUtils.getAttributeValue(entityItem, "PRODUCTID", null, null);
+/* 484 */         String str2 = PokUtils.getAttributeFlagValue(entityItem, "PDHDOMAIN");
+/* 485 */         addDebug("Looking at " + entityItem.getKey() + " [" + str1 + "," + str2 + "]");
+/* 486 */         if (paramString.equalsIgnoreCase(str1) && "MIW".equals(str2))
+/*     */         {
+/* 488 */           return entityItem;
+/*     */         }
+/*     */       } 
+/* 491 */     } catch (Exception exception) {
+/* 492 */       addError(stringBuffer.toString());
+/* 493 */       throw exception;
+/*     */     } 
+/* 495 */     return null;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   private EntityItem findRefoferFeat(String paramString) throws Exception {
+/* 500 */     Vector<String> vector1 = new Vector();
+/* 501 */     vector1.addElement("FEATID");
+/* 502 */     Vector<String> vector2 = new Vector();
+/* 503 */     vector2.addElement(paramString);
+/* 504 */     StringBuffer stringBuffer = new StringBuffer();
+/*     */     try {
+/* 506 */       EntityItem[] arrayOfEntityItem = ABRUtil.doSearch(this.m_db, this.m_prof, "SRDREFOFERFEAT", "REFOFERFEAT", false, vector1, vector2, stringBuffer);
+/*     */       
+/* 508 */       for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/* 509 */         EntityItem entityItem = arrayOfEntityItem[b];
+/* 510 */         String str = PokUtils.getAttributeValue(entityItem, "FEATID", null, null);
+/* 511 */         if (paramString.equalsIgnoreCase(str))
+/*     */         {
+/* 513 */           return entityItem;
+/*     */         }
+/*     */       } 
+/* 516 */     } catch (Exception exception) {
+/* 517 */       addError(stringBuffer.toString());
+/* 518 */       throw exception;
+/*     */     } 
+/* 520 */     return null;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   private EntityItem findReofferFeatRelator(String paramString, EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 525 */     if (paramEntityItem.getEntityID() <= 0) {
+/* 526 */       return null;
+/*     */     }
+/* 528 */     EntityList entityList = this.m_db.getEntityList(this.m_prof, new ExtractActionItem(null, this.m_db, this.m_prof, "BHREFOFERFEATEXT"), new EntityItem[] { new EntityItem(paramEntityItem) });
+/*     */     
+/* 530 */     EntityGroup entityGroup = entityList.getEntityGroup("REFOFERREFOFERFEAT");
+/* 531 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/* 532 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/* 533 */       if (entityItem.getUpLinkCount() > 0 && entityItem.getDownLinkCount() > 0) {
+/* 534 */         EntityItem entityItem1 = (EntityItem)entityItem.getUpLink(0);
+/* 535 */         String str = PokUtils.getAttributeValue(entityItem1, "PRODUCTID", null, null);
+/* 536 */         addDebug("Looking for relator with " + entityItem1.getKey() + " PRODUCTID " + str + "=" + paramString);
+/* 537 */         if (paramString.equals(str)) {
+/* 538 */           addDebug("Relator found for " + paramEntityItem.getKey() + " + " + paramString);
+/* 539 */           return entityItem;
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/* 543 */     return null;
+/*     */   }
+/*     */   
+/*     */   public String getABRVersion() {
+/* 547 */     return "1.0";
+/*     */   }
+/*     */   
+/*     */   public String getDescription() {
+/* 551 */     return "MXABRSTATUS";
+/*     */   }
+/*     */   
+/*     */   private Document parseXML(String paramString) throws Exception {
+/*     */     try {
+/* 556 */       DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+/* 557 */       DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+/* 558 */       StringReader stringReader = new StringReader(paramString);
+/* 559 */       InputSource inputSource = new InputSource(stringReader);
+/* 560 */       return documentBuilder.parse(inputSource);
+/* 561 */     } catch (SAXParseException sAXParseException) {
+/* 562 */       addError(paramString);
+/* 563 */       throw sAXParseException;
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getNodeValue(Element paramElement, String paramString) {
+/* 573 */     String str = null;
+/* 574 */     NodeList nodeList = paramElement.getElementsByTagName(paramString);
+/* 575 */     if (nodeList == null) {
+/* 576 */       addDebug("getNodeValue: " + paramString + " element returned null");
+/* 577 */     } else if (nodeList.getLength() == 0) {
+/* 578 */       addDebug("getNodeValue: " + paramString + " was not found in the XML");
+/* 579 */     } else if (nodeList.getLength() > 1) {
+/* 580 */       addDebug("getNodeValue: " + paramString + " has more then 1 element");
+/*     */     } else {
+/* 582 */       Element element1 = (Element)nodeList.item(0);
+/* 583 */       Element element2 = (Element)nodeList.item(0);
+/* 584 */       if (element1.hasChildNodes()) {
+/* 585 */         str = element2.getFirstChild().getNodeValue();
+/*     */       } else {
+/* 587 */         str = element2.getNodeValue();
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 591 */     return str;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public ReturnStatus createRelator(String paramString1, String paramString2, int paramInt1, String paramString3, int paramInt2) throws MiddlewareException {
+/* 596 */     ReturnStatus returnStatus = new ReturnStatus(-1);
+/* 597 */     String str1 = this.m_prof.getEnterprise();
+/* 598 */     int i = this.m_cbOn.getOPENID();
+/* 599 */     int j = this.m_cbOn.getTranID();
+/* 600 */     String str2 = this.m_cbOn.getEffFrom();
+/* 601 */     String str3 = this.m_cbOn.getEffTo();
+/* 602 */     int k = this.m_prof.getSessionID();
+/* 603 */     this.m_db.callGBL2098(returnStatus, i, k, str1, paramString1, new ReturnID(), paramString2, paramInt1, paramString3, paramInt2, j, str2, str3, 1);
+/*     */     
+/* 605 */     this.m_db.freeStatement();
+/* 606 */     this.m_db.isPending();
+/* 607 */     return returnStatus;
+/*     */   }
+/*     */   
+/*     */   public void addDebug(String paramString) {
+/* 611 */     this.rptSb.append("<!-- " + paramString + " -->\n");
+/*     */   }
+/*     */   
+/*     */   public void addOutput(String paramString) {
+/* 615 */     this.rptSb.append("<p>" + paramString + "</p>\n");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addError(String paramString) {
+/* 623 */     addOutput(paramString);
+/*     */   }
+/*     */   
+/*     */   public void fail(String paramString) {
+/* 627 */     addError(paramString);
+/* 628 */     setReturnCode(-1);
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   class Model
+/*     */   {
+/*     */     public String ACTIVITY;
+/*     */     
+/*     */     public String DTSOFMSG;
+/*     */     public String DTSMIWCREATE;
+/*     */     
+/*     */     public void rejectIfNullOrEmpty(String param1String1, String param1String2) throws Exception {
+/* 640 */       if (param1String2 == null || param1String2.length() == 0) {
+/* 641 */         throw new Exception("Element '" + param1String1 + "' cannot be empty.");
+/*     */       }
+/*     */     }
+/*     */     
+/*     */     public String parseTimestampAndRejectIfInvalid(String param1String1, String param1String2) throws Exception {
+/*     */       try {
+/* 647 */         return MXABRSTATUS.timestamp(param1String2);
+/* 648 */       } catch (ParseException parseException) {
+/* 649 */         throw new Exception("Element '" + param1String1 + "' timestamp '" + param1String2 + "' is invalid: " + parseException
+/* 650 */             .getMessage());
+/*     */       } 
+/*     */     }
+/*     */     
+/*     */     public String parseDateAndRejectIfInvalid(String param1String1, String param1String2) throws Exception {
+/*     */       try {
+/* 656 */         return MXABRSTATUS.date(param1String2);
+/* 657 */       } catch (ParseException parseException) {
+/* 658 */         throw new Exception("Element '" + param1String1 + "' date '" + param1String2 + "' is invalid: " + parseException
+/* 659 */             .getMessage());
+/*     */       } 
+/*     */     }
+/*     */   }
+/*     */   
+/*     */   class RefoferModel
+/*     */     extends Model {
+/*     */     public String PRODUCTID;
+/*     */     public String MFRPRODTYPE;
+/*     */     public String MFRPRODDESC;
+/*     */     public String MKTGDIV;
+/*     */     public String PRFTCTR;
+/*     */     public String CATGSHRTDESC;
+/*     */     public String STRTOSVC;
+/*     */     public String ENDOFSVC;
+/*     */     public String VENDNAM;
+/*     */     public String MACHRATECATG;
+/*     */     public String CECSPRODKEY;
+/*     */     public String MAINTANNBILLELIGINDC;
+/*     */     public String FSLMCPU;
+/*     */     public String PRODSUPRTCD;
+/*     */     public String DOMAIN;
+/*     */     
+/*     */     public RefoferModel(Element param1Element) {
+/* 683 */       this.ACTIVITY = MXABRSTATUS.this.getNodeValue(param1Element, "ACTIVITY");
+/* 684 */       this.DTSOFMSG = MXABRSTATUS.this.getNodeValue(param1Element, "DTSOFMSG");
+/* 685 */       this.DTSMIWCREATE = MXABRSTATUS.this.getNodeValue(param1Element, "DTSMIWCREATE");
+/* 686 */       this.PRODUCTID = MXABRSTATUS.this.getNodeValue(param1Element, "PRODUCTID");
+/* 687 */       this.MFRPRODTYPE = MXABRSTATUS.this.getNodeValue(param1Element, "MFRPRODTYPE");
+/* 688 */       this.MFRPRODDESC = MXABRSTATUS.this.getNodeValue(param1Element, "MFRPRODDESC");
+/* 689 */       this.MKTGDIV = MXABRSTATUS.this.getNodeValue(param1Element, "MKTGDIV");
+/* 690 */       this.PRFTCTR = MXABRSTATUS.this.getNodeValue(param1Element, "PRFTCTR");
+/* 691 */       this.CATGSHRTDESC = MXABRSTATUS.this.getNodeValue(param1Element, "CATGSHRTDESC");
+/* 692 */       this.STRTOSVC = MXABRSTATUS.this.getNodeValue(param1Element, "STRTOSVC");
+/* 693 */       this.ENDOFSVC = MXABRSTATUS.this.getNodeValue(param1Element, "ENDOFSVC");
+/* 694 */       this.VENDNAM = MXABRSTATUS.this.getNodeValue(param1Element, "VENDNAM");
+/* 695 */       this.MACHRATECATG = MXABRSTATUS.this.getNodeValue(param1Element, "MACHRATECATG");
+/* 696 */       this.CECSPRODKEY = MXABRSTATUS.this.getNodeValue(param1Element, "CECSPRODKEY");
+/* 697 */       this.MAINTANNBILLELIGINDC = MXABRSTATUS.this.getNodeValue(param1Element, "MAINTANNBILLELIGINDC");
+/* 698 */       this.FSLMCPU = MXABRSTATUS.this.getNodeValue(param1Element, "FSLMCPU");
+/* 699 */       this.PRODSUPRTCD = MXABRSTATUS.this.getNodeValue(param1Element, "PRODSUPRTCD");
+/* 700 */       this.DOMAIN = MXABRSTATUS.this.getNodeValue(param1Element, "DOMAIN");
+/*     */     }
+/*     */ 
+/*     */     
+/*     */     public void validate() throws Exception {
+/* 705 */       rejectIfNullOrEmpty("ACTIVITY", this.ACTIVITY);
+/* 706 */       rejectIfNullOrEmpty("DTSOFMSG", this.DTSOFMSG);
+/* 707 */       rejectIfNullOrEmpty("DTSMIWCREATE", this.DTSMIWCREATE);
+/* 708 */       rejectIfNullOrEmpty("PRODUCTID", this.PRODUCTID);
+/* 709 */       rejectIfNullOrEmpty("MFRPRODTYPE", this.MFRPRODTYPE);
+/* 710 */       rejectIfNullOrEmpty("MFRPRODDESC", this.MFRPRODDESC);
+/* 711 */       rejectIfNullOrEmpty("MKTGDIV", this.MKTGDIV);
+/* 712 */       rejectIfNullOrEmpty("PRFTCTR", this.PRFTCTR);
+/* 713 */       rejectIfNullOrEmpty("CATGSHRTDESC", this.CATGSHRTDESC);
+/* 714 */       rejectIfNullOrEmpty("STRTOSVC", this.STRTOSVC);
+/* 715 */       rejectIfNullOrEmpty("ENDOFSVC", this.ENDOFSVC);
+/* 716 */       rejectIfNullOrEmpty("VENDNAM", this.VENDNAM);
+/* 717 */       rejectIfNullOrEmpty("MACHRATECATG", this.MACHRATECATG);
+/* 718 */       rejectIfNullOrEmpty("CECSPRODKEY", this.CECSPRODKEY);
+/* 719 */       rejectIfNullOrEmpty("MAINTANNBILLELIGINDC", this.MAINTANNBILLELIGINDC);
+/* 720 */       rejectIfNullOrEmpty("FSLMCPU", this.FSLMCPU);
+/* 721 */       rejectIfNullOrEmpty("PRODSUPRTCD", this.PRODSUPRTCD);
+/*     */       
+/* 723 */       this.DTSOFMSG = parseTimestampAndRejectIfInvalid("DTSOFMSG", this.DTSOFMSG);
+/* 724 */       this.DTSMIWCREATE = parseTimestampAndRejectIfInvalid("DTSMIWCREATE", this.DTSMIWCREATE);
+/* 725 */       this.STRTOSVC = parseDateAndRejectIfInvalid("STRTOSVC", this.STRTOSVC);
+/* 726 */       this.ENDOFSVC = parseDateAndRejectIfInvalid("ENDOFSVC", this.ENDOFSVC);
+/*     */     }
+/*     */     
+/*     */     public String toString() {
+/* 730 */       StringBuffer stringBuffer = new StringBuffer();
+/* 731 */       stringBuffer.append("Date/Time=" + this.DTSOFMSG);
+/* 732 */       stringBuffer.append(" \nMIW Create=" + this.DTSMIWCREATE);
+/* 733 */       stringBuffer.append(" \nMessage Type=REFOFER");
+/* 734 */       stringBuffer.append(" \nProduct ID=" + this.PRODUCTID);
+/* 735 */       stringBuffer.append("\n");
+/* 736 */       return stringBuffer.toString();
+/*     */     }
+/*     */   }
+/*     */   
+/*     */   class RefoferFeatModel
+/*     */     extends Model {
+/*     */     public String PRODUCTID;
+/*     */     public String PRODUCTACTIVITY;
+/*     */     public String FEATID;
+/*     */     public String MFRFEATID;
+/*     */     public String MFRFEATDESC;
+/*     */     public String MFRFEATLNGDESC;
+/*     */     public String MKTGDIV;
+/*     */     public String PRFTCTR;
+/*     */     
+/*     */     public RefoferFeatModel(Element param1Element) {
+/* 752 */       this.ACTIVITY = MXABRSTATUS.this.getNodeValue(param1Element, "ACTIVITY");
+/* 753 */       String str = MXABRSTATUS.this.getNodeValue(param1Element, "PRODUCTACTIVITY");
+/* 754 */       if (str == null || str.length() == 0) {
+/* 755 */         this.PRODUCTACTIVITY = "";
+/*     */       } else {
+/* 757 */         this.PRODUCTACTIVITY = str;
+/*     */       } 
+/* 759 */       this.DTSOFMSG = MXABRSTATUS.this.getNodeValue(param1Element, "DTSOFMSG");
+/* 760 */       this.DTSMIWCREATE = MXABRSTATUS.this.getNodeValue(param1Element, "DTSMIWCREATE");
+/* 761 */       this.FEATID = MXABRSTATUS.this.getNodeValue(param1Element, "FEATID");
+/* 762 */       this.PRODUCTID = MXABRSTATUS.this.getNodeValue(param1Element, "PRODUCTID");
+/* 763 */       this.MFRFEATID = MXABRSTATUS.this.getNodeValue(param1Element, "MFRFEATID");
+/* 764 */       this.MFRFEATDESC = MXABRSTATUS.this.getNodeValue(param1Element, "MFRFEATDESC");
+/* 765 */       this.MFRFEATLNGDESC = MXABRSTATUS.this.getNodeValue(param1Element, "MFRFEATLNGDESC");
+/* 766 */       this.MKTGDIV = MXABRSTATUS.this.getNodeValue(param1Element, "MKTGDIV");
+/* 767 */       this.PRFTCTR = MXABRSTATUS.this.getNodeValue(param1Element, "PRFTCTR");
+/*     */     }
+/*     */     
+/*     */     public void validate() throws Exception {
+/* 771 */       rejectIfNullOrEmpty("ACTIVITY", this.ACTIVITY);
+/* 772 */       rejectIfNullOrEmpty("DTSOFMSG", this.DTSOFMSG);
+/* 773 */       rejectIfNullOrEmpty("DTSMIWCREATE", this.DTSMIWCREATE);
+/* 774 */       rejectIfNullOrEmpty("PRODUCTID", this.PRODUCTID);
+/* 775 */       rejectIfNullOrEmpty("FEATID", this.FEATID);
+/* 776 */       rejectIfNullOrEmpty("MFRFEATID", this.MFRFEATID);
+/* 777 */       rejectIfNullOrEmpty("MFRFEATDESC", this.MFRFEATDESC);
+/* 778 */       rejectIfNullOrEmpty("MFRFEATLNGDESC", this.MFRFEATLNGDESC);
+/* 779 */       rejectIfNullOrEmpty("MKTGDIV", this.MKTGDIV);
+/* 780 */       rejectIfNullOrEmpty("PRFTCTR", this.PRFTCTR);
+/* 781 */       this.DTSOFMSG = parseTimestampAndRejectIfInvalid("DTSOFMSG", this.DTSOFMSG);
+/* 782 */       this.DTSMIWCREATE = parseTimestampAndRejectIfInvalid("DTSMIWCREATE", this.DTSMIWCREATE);
+/*     */     }
+/*     */     
+/*     */     public String toString() {
+/* 786 */       StringBuffer stringBuffer = new StringBuffer();
+/* 787 */       stringBuffer.append("Message Type=REFOFERFEAT");
+/* 788 */       stringBuffer.append(" \nDate/Time=" + this.DTSOFMSG);
+/* 789 */       stringBuffer.append(" \nMIW Create=" + this.DTSMIWCREATE);
+/* 790 */       stringBuffer.append(" \nFeature Id=" + this.FEATID);
+/* 791 */       stringBuffer.append(" \nProduct Id=" + this.PRODUCTID);
+/* 792 */       stringBuffer.append("\n");
+/* 793 */       return stringBuffer.toString();
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   class EntityWrapper
+/*     */   {
+/*     */     EntityItem ei;
+/*     */     
+/*     */     ReturnEntityKey rek;
+/*     */     Vector attrs;
+/*     */     Map map;
+/*     */     
+/*     */     public EntityWrapper(EntityItem param1EntityItem) {
+/* 807 */       this.ei = param1EntityItem;
+/* 808 */       this.rek = new ReturnEntityKey(param1EntityItem.getEntityType(), param1EntityItem.getEntityID(), true);
+/* 809 */       this.map = new HashMap<>();
+/* 810 */       this.attrs = new Vector();
+/*     */     }
+/*     */     
+/*     */     private void put(String param1String, Object param1Object) {
+/* 814 */       Object object = this.map.get(param1String);
+/* 815 */       if (object != null) {
+/*     */         
+/* 817 */         int i = this.attrs.indexOf(object);
+/* 818 */         if (i >= 0) {
+/* 819 */           this.attrs.remove(i);
+/* 820 */           this.attrs.insertElementAt(param1Object, i);
+/*     */         } 
+/*     */       } else {
+/* 823 */         this.attrs.add(param1Object);
+/*     */       } 
+/* 825 */       this.map.put(param1String, param1Object);
+/*     */     }
+/*     */ 
+/*     */     
+/*     */     public void flag(String param1String1, String param1String2) throws Exception {
+/* 830 */       SingleFlag singleFlag = new SingleFlag(MXABRSTATUS.this.m_prof.getEnterprise(), this.rek.getEntityType(), this.rek.getEntityID(), param1String1, param1String2, 1, MXABRSTATUS.this.m_cbOn);
+/* 831 */       put(param1String1, singleFlag);
+/*     */     }
+/*     */ 
+/*     */     
+/*     */     public void text(String param1String1, String param1String2) {
+/* 836 */       Text text = new Text(MXABRSTATUS.this.m_prof.getEnterprise(), this.rek.getEntityType(), this.rek.getEntityID(), param1String1, param1String2, 1, MXABRSTATUS.this.m_cbOn);
+/* 837 */       put(param1String1, text);
+/*     */     }
+/*     */     
+/*     */     public void text(String param1String1, String param1String2, int param1Int) throws Exception {
+/* 841 */       if (param1String2.length() > param1Int) {
+/* 842 */         param1String2 = param1String2.substring(0, param1Int);
+/*     */       }
+/* 844 */       text(param1String1, param1String2);
+/*     */     }
+/*     */     
+/*     */     public void end() throws Exception {
+/* 848 */       Vector<ReturnEntityKey> vector = new Vector();
+/* 849 */       this.rek.m_vctAttributes = this.attrs;
+/* 850 */       vector.addElement(this.rek);
+/*     */       try {
+/* 852 */         MXABRSTATUS.this.m_db.update(MXABRSTATUS.this.m_prof, vector, false, false);
+/* 853 */         MXABRSTATUS.this.m_db.commit();
+/* 854 */       } catch (Exception exception) {
+/* 855 */         throw new Exception("Unable to set text attributes for " + this.ei.getKey() + ": " + exception
+/* 856 */             .getClass().getName() + " " + exception.getMessage());
+/*     */       } 
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/* 863 */   static String sDateFormat = "yyyy-MM-dd";
+/* 864 */   static DateFormat inDateFormat = new SimpleDateFormat(sDateFormat);
+/* 865 */   static DateFormat outFormat = new SimpleDateFormat(sDateFormat);
+/* 866 */   static int shortDateLength = sDateFormat.length();
+/*     */   
+/* 868 */   static String sDateTimeFormat = "yyyy-MM-dd hh:mm:ss.SSSSSS";
+/* 869 */   static DateFormat inDateTimeFormat = new SimpleDateFormat(sDateTimeFormat);
+/* 870 */   static int shortTimestampLength = sDateTimeFormat.length();
+/*     */   
+/*     */   public static String date(String paramString) throws ParseException {
+/*     */     Date date;
+/* 874 */     if (paramString.length() == shortDateLength) {
+/* 875 */       date = inDateFormat.parse(paramString);
+/*     */     } else {
+/* 877 */       if (paramString.length() > shortDateLength) {
+/* 878 */         paramString = paramString.substring(0, paramString.length());
+/*     */       }
+/* 880 */       date = inDateFormat.parse(paramString);
+/*     */     } 
+/* 882 */     return outFormat.format(date);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String timestamp(String paramString) throws ParseException {
+/* 894 */     int i = paramString.length();
+/* 895 */     if (i == shortTimestampLength) {
+/* 896 */       inDateTimeFormat.parse(paramString);
+/*     */     } else {
+/* 898 */       if (i > shortTimestampLength) {
+/* 899 */         paramString = paramString.substring(0, shortTimestampLength);
+/*     */       }
+/* 901 */       inDateTimeFormat.parse(paramString);
+/*     */     } 
+/* 903 */     return paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void printDGSubmitString() {
+/* 919 */     String str1 = null;
+/* 920 */     String str2 = this.m_abri.getABRCode();
+/* 921 */     println("<!--DGSUBMITBEGIN");
+/* 922 */     StringBuffer stringBuffer = new StringBuffer("<!--DGSUBMITBEGIN\n");
+/* 923 */     print("TASKSTATUS=");
+/* 924 */     stringBuffer.append("TASKSTATUS=");
+/*     */     
+/* 926 */     if (getReturnCode() == 0) {
+/* 927 */       println("TSPA");
+/* 928 */       stringBuffer.append("TSPA\n");
+/*     */     } else {
+/* 930 */       println("TSFAIL");
+/* 931 */       stringBuffer.append("TSFAIL\n");
+/*     */     } 
+/*     */ 
+/*     */     
+/* 935 */     println("SUBSCRVE=" + this.SUBSCRVE);
+/* 936 */     stringBuffer.append("SUBSCRVE=" + this.SUBSCRVE + "\n");
+/*     */     
+/* 938 */     str1 = ABRServerProperties.getCategory(str2, "CAT1");
+/* 939 */     if (str1 != null) {
+/* 940 */       println("CAT1=" + str1);
+/* 941 */       stringBuffer.append("CAT1=" + str1 + "\n");
+/*     */     } 
+/* 943 */     str1 = ABRServerProperties.getCategory(str2, "CAT2");
+/* 944 */     if (str1 != null) {
+/* 945 */       println("CAT2=" + str1);
+/* 946 */       stringBuffer.append("CAT2=" + str1 + "\n");
+/*     */     } 
+/*     */     
+/* 949 */     str1 = ABRServerProperties.getCategory(str2, "CAT3");
+/* 950 */     if (str1 != null) {
+/* 951 */       println("CAT3=" + str1);
+/* 952 */       stringBuffer.append("CAT3=" + str1 + "\n");
+/*     */     } 
+/*     */     
+/* 955 */     str1 = ABRServerProperties.getCategory(str2, "CAT4");
+/* 956 */     if (str1 != null) {
+/* 957 */       println("CAT4=" + str1);
+/* 958 */       stringBuffer.append("CAT4=" + str1 + "\n");
+/*     */     } 
+/*     */     
+/* 961 */     str1 = ABRServerProperties.getCategory(str2, "CAT5");
+/* 962 */     if (str1 != null) {
+/* 963 */       println("CAT5=" + str1);
+/* 964 */       stringBuffer.append("CAT5=" + str1 + "\n");
+/*     */     } 
+/*     */     
+/* 967 */     str1 = ABRServerProperties.getCategory(str2, "CAT6");
+/* 968 */     if (str1 != null) {
+/* 969 */       println("CAT6=" + str1);
+/* 970 */       stringBuffer.append("CAT6=" + str1 + "\n");
+/*     */     } 
+/*     */     
+/* 973 */     str1 = ABRServerProperties.getExtMail(str2);
+/* 974 */     if (str1 != null) {
+/* 975 */       println("EXTMAIL=" + str1);
+/* 976 */       stringBuffer.append("EXTMAIL=" + str1 + "\n");
+/*     */     } 
+/*     */     
+/* 979 */     str1 = ABRServerProperties.getIntMail(str2);
+/* 980 */     if (str1 != null) {
+/* 981 */       println("INTMAIL=" + str1);
+/* 982 */       stringBuffer.append("INTMAIL=" + str1 + "\n");
+/*     */     } 
+/*     */     
+/* 985 */     str1 = ABRServerProperties.getSubscrEnabled(str2);
+/* 986 */     if (str1 != null) {
+/* 987 */       println("SUBSCR_ENABLED=" + str1);
+/* 988 */       stringBuffer.append("SUBSCR_ENABLED=" + str1 + "\n");
+/*     */     } 
+/*     */     
+/* 991 */     str1 = ABRServerProperties.getSubscrNotifyOnError(str2);
+/* 992 */     if (str1 != null) {
+/* 993 */       println("SUBSCR_NOTIFY_ON_ERROR=" + str1);
+/* 994 */       stringBuffer.append("SUBSCR_NOTIFY_ON_ERROR=" + str1 + "\n");
+/*     */     } 
+/*     */     
+/* 997 */     println("DGSUBMITEND-->");
+/* 998 */     stringBuffer.append("DGSUBMITEND-->\n");
+/*     */   }
+/*     */ }
+
+
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\MXABRSTATUS.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

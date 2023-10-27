@@ -1,311 +1,316 @@
-//  (c) Copyright International Business Machines Corporation, 2001
-//  All Rights Reserved.</pre>
-//
-//FUPFUPQRABR01.java,v
-//Revision 1.22  2008/01/30 19:39:17  wendy
-//Cleanup RSA warnings
-//
-//Revision 1.21  2006/03/03 19:23:28  bala
-//remove reference to Constants.CSS
-//
-//Revision 1.20  2006/01/24 16:53:26  yang
-//Jtest Changes
-//
-//Revision 1.19  2003/11/07 01:21:43  yang
-//Adding setDGRptClass
-//
-//Revision 1.18  2003/09/18 19:52:01  yang
-//adding bala's stuff to finally {
-//
-//Revision 1.17  2003/06/18 15:25:43  dave
-//M005 mod
-//
-//Revision 1.16  2003/06/06 17:04:29  dave
-//fixing report triggering
-//
-//Revision 1.15  2003/06/05 02:50:09  dave
-//cleanup on )
-//
-//Revision 1.14  2003/06/05 02:46:58  dave
-//more hashtable control
-//
-//Revision 1.13  2003/06/05 02:37:18  dave
-//cleanup
-//
-//Revision 1.12  2003/06/05 02:17:09  dave
-//more status simplification
-//
-//Revision 1.11  2003/06/04 23:11:21  yang
-//Updated S0002
-//
-//Revision 1.10  2003/06/04 23:09:32  dave
-//checking more changes in
-//
-//Revision 1.9  2003/06/04 22:31:31  yang
-//Updated to new version
-//
-//Revision 1.8  2003/06/04 03:53:09  dave
-//un Staticing getABRVersion
-//
-//Revision 1.7  2003/06/04 03:44:26  dave
-//minor syntax
-//
-//Revision 1.6  2003/06/04 03:41:44  dave
-//adding getABRVersion
-//
-//Revision 1.5  2003/06/03 23:28:33  dave
-//commonizing setControlBlock
-//
-//Revision 1.4  2003/06/03 21:56:19  yang
-//test
-//
-//Revision 1.1.1.1  2003/06/03 19:02:25  dave
-//new 1.1.1 abr
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.LockPDHEntityException;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.abr.util.UpdatePDHEntityException;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class FUPFUPQRABR01
+/*     */   extends PokBaseABR
+/*     */ {
+/*  88 */   public static final String ABR = new String("FUPFUPQRABR01");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*  94 */   public static final String FUPFUPMGMTGRP = new String("FUPFUPMGMTGRP");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*  99 */   public static final String FUPFUPSTATUS = new String("FUPFUPSTATUS");
+/*     */   
+/* 101 */   private EntityGroup m_egParent = null;
+/* 102 */   private EntityItem m_eiParent = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/*     */     try {
+/* 111 */       start_ABRBuild();
+/*     */       
+/* 113 */       this.m_egParent = this.m_elist.getParentEntityGroup();
+/* 114 */       this.m_eiParent = this.m_egParent.getEntityItem(0);
+/*     */       
+/* 116 */       if (this.m_egParent == null) {
+/* 117 */         logMessage(ABR + ":" + 
+/*     */ 
+/*     */             
+/* 120 */             getVersion() + ":ERROR:1: m_egParent cannot be established.");
+/*     */         
+/* 122 */         setReturnCode(-1);
+/*     */         return;
+/*     */       } 
+/* 125 */       if (this.m_eiParent == null) {
+/* 126 */         logMessage(ABR + ":" + 
+/*     */ 
+/*     */             
+/* 129 */             getVersion() + ":ERROR:2: m_eiParent cannot be established.");
+/*     */         
+/* 131 */         setReturnCode(-1);
+/*     */         
+/*     */         return;
+/*     */       } 
+/* 135 */       logMessage(ABR + ":" + 
+/*     */ 
+/*     */           
+/* 138 */           getVersion() + ":Request to Work on Entity:" + this.m_eiParent
+/*     */           
+/* 140 */           .getEntityType() + ":" + this.m_eiParent
+/*     */           
+/* 142 */           .getEntityID());
+/* 143 */       buildReportHeader();
+/* 144 */       setControlBlock();
+/* 145 */       setDGTitle(setDGName(this.m_eiParent, ABR));
+/*     */       
+/* 147 */       logMessage(ABR + ":" + 
+/*     */ 
+/*     */           
+/* 150 */           getVersion() + ":Setup Complete:" + this.m_eiParent
+/*     */           
+/* 152 */           .getEntityType() + ":" + this.m_eiParent
+/*     */           
+/* 154 */           .getEntityID());
+/*     */ 
+/*     */       
+/* 157 */       setReturnCode(0);
+/*     */       
+/* 159 */       displayHeader(this.m_egParent, this.m_eiParent);
+/*     */       
+/* 161 */       if (!checkS0002(this.m_eiParent)) {
+/* 162 */         setReturnCode(-1);
+/*     */       }
+/* 164 */       if (!checkM0007(this.m_egParent, this.m_eiParent)) {
+/* 165 */         setReturnCode(-1);
+/*     */       }
+/* 167 */       if (!checkM0008(this.m_egParent, this.m_eiParent)) {
+/* 168 */         setReturnCode(-1);
+/*     */       }
+/* 170 */       if (!checkM0005(this.m_eiParent, "POFMEMBERFUPOMG")) {
+/* 171 */         setReturnCode(-1);
+/*     */       }
+/*     */       
+/* 174 */       if (getReturnCode() == 0) {
+/*     */         
+/* 176 */         setFlagValue(this.m_eiParent, FUPFUPSTATUS, 
+/*     */ 
+/*     */             
+/* 179 */             getNextStatusCode(this.m_eiParent));
+/*     */         
+/* 181 */         if (isChangeRev(this.m_eiParent) || isChangeFinal(this.m_eiParent)) {
+/* 182 */           setNow();
+/* 183 */           println(processChangeReport(getT1(this.m_eiParent), getNow()));
+/*     */         } 
+/*     */       } 
+/*     */       
+/* 187 */       println("<br /><b>" + 
+/*     */           
+/* 189 */           buildMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 192 */               getABRDescription(), 
+/* 193 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }) + "</b>");
+/*     */       
+/* 196 */       log(
+/* 197 */           buildLogMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 200 */               getABRDescription(), 
+/* 201 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }));
+/* 203 */     } catch (LockPDHEntityException lockPDHEntityException) {
+/* 204 */       setReturnCode(-2);
+/* 205 */       println("<h3><font color=red>IAB1007E: Could not get soft lock.  Rule execution is terminated.<br />" + lockPDHEntityException
+/*     */ 
+/*     */ 
+/*     */           
+/* 209 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 211 */       logError(lockPDHEntityException.getMessage());
+/* 212 */     } catch (UpdatePDHEntityException updatePDHEntityException) {
+/* 213 */       setReturnCode(-2);
+/* 214 */       println("<h3><font color=red>UpdatePDH error: " + updatePDHEntityException
+/*     */           
+/* 216 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 218 */       logError(updatePDHEntityException.getMessage());
+/* 219 */     } catch (Exception exception) {
+/*     */       
+/* 221 */       println("Error in " + this.m_abri.getABRCode() + ":" + exception.getMessage());
+/* 222 */       println("" + exception);
+/*     */ 
+/*     */       
+/* 225 */       if (getABRReturnCode() != -2) {
+/* 226 */         setReturnCode(-3);
+/*     */       }
+/*     */     } finally {
+/*     */       
+/* 230 */       if (getReturnCode() == 0) {
+/* 231 */         setReturnCode(0);
+/*     */         
+/* 233 */         setDGString(getABRReturnCode());
+/* 234 */         setDGRptName("FUPFUPQRABR01");
+/* 235 */         setDGRptClass("FUPFUPQRABR01");
+/* 236 */         printDGSubmitString();
+/*     */ 
+/*     */         
+/* 239 */         buildReportFooter();
+/*     */         
+/* 241 */         if (!isReadOnly()) {
+/* 242 */           clearSoftLock();
+/*     */         }
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getABREntityDesc(String paramString, int paramInt) {
+/* 257 */     return null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 268 */     return "<br />This needs to be defined <br />";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getStyle() {
+/* 279 */     return "";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getRevision() {
+/* 288 */     return new String("1.22");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String getVersion() {
+/* 298 */     return "FUPFUPQRABR01.java,v 1.22 2008/01/30 19:39:17 wendy Exp";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 308 */     return getVersion();
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.sg;
 
-//import COM.ibm.opicmpdh.middleware.*;
-//import COM.ibm.opicmpdh.objects.*;
-//import COM.ibm.opicmpdh.transactions.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.eannounce.abr.util.*;
-//import java.util.*;
-//import java.io.*;
-//import java.sql.*;
-
-/**
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- *
- * @author Owner
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\FUPFUPQRABR01.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class FUPFUPQRABR01 extends PokBaseABR {
-  /**
-  *  Execute ABR.
-  */
-
-  //ABR
-  public final static String ABR = new String("FUPFUPQRABR01");
-
-  /**
-   * FUPFUPMGMTGRP
-   *
-   */
-  public final static String FUPFUPMGMTGRP = new String("FUPFUPMGMTGRP");
-  /**
-   * FUPFUPSTATUS
-   *
-   */
-  public final static String FUPFUPSTATUS = new String("FUPFUPSTATUS");
-
-  private EntityGroup m_egParent = null; //root FUPFUPMGMTGRP
-  private EntityItem m_eiParent = null; //root FUPFUPMGMTGRP
-  /**
-   * execute_run
-   *
-   * @author Owner
-   */
-  public void execute_run() {
-    try {
-
-      start_ABRBuild();
-      //Get the root FUPFUPMGMTGRP
-      m_egParent = m_elist.getParentEntityGroup();
-      m_eiParent = m_egParent.getEntityItem(0);
-
-      if (m_egParent == null) {
-        logMessage(
-          ABR
-            + ":"
-            + getVersion()
-            + ":ERROR:1: m_egParent cannot be established.");
-        setReturnCode(FAIL);
-        return;
-      }
-      if (m_eiParent == null) {
-        logMessage(
-          ABR
-            + ":"
-            + getVersion()
-            + ":ERROR:2: m_eiParent cannot be established.");
-        setReturnCode(FAIL);
-        return;
-      }
-
-      logMessage(
-        ABR
-          + ":"
-          + getVersion()
-          + ":Request to Work on Entity:"
-          + m_eiParent.getEntityType()
-          + ":"
-          + m_eiParent.getEntityID());
-      buildReportHeader();
-      setControlBlock();
-      setDGTitle(setDGName(m_eiParent, ABR));
-
-      logMessage(
-        ABR
-          + ":"
-          + getVersion()
-          + ":Setup Complete:"
-          + m_eiParent.getEntityType()
-          + ":"
-          + m_eiParent.getEntityID());
-
-      // Default the thing to pass...
-      setReturnCode(PASS);
-
-      displayHeader(m_egParent, m_eiParent);
-
-      if (!checkS0002(m_eiParent)) {
-        setReturnCode(FAIL);
-      }
-      if (!checkM0007(m_egParent, m_eiParent)) {
-        setReturnCode(FAIL);
-      }
-      if (!checkM0008(m_egParent, m_eiParent)) {
-        setReturnCode(FAIL);
-      }
-      if (!checkM0005(m_eiParent, "POFMEMBERFUPOMG")) {
-        setReturnCode(FAIL);
-      }
-
-      if (getReturnCode() == PASS) {
-        // Change the status...
-        setFlagValue(
-          m_eiParent,
-          FUPFUPSTATUS,
-          getNextStatusCode(m_eiParent));
-        // Insert the change report here
-        if (isChangeRev(m_eiParent) || isChangeFinal(m_eiParent)) {
-          setNow();
-          println(processChangeReport(getT1(m_eiParent), getNow()));
-        }
-      }
-
-      println(
-        "<br /><b>"
-          + buildMessage(
-            MSG_IAB2016I,
-            new String[] {
-              getABRDescription(),
-              (getReturnCode() == PASS ? "Passed" : "Failed")})
-          + "</b>");
-
-      log(
-        buildLogMessage(
-          MSG_IAB2016I,
-          new String[] {
-            getABRDescription(),
-            (getReturnCode() == PASS ? "Passed" : "Failed")}));
-
-    } catch (LockPDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>"
-          + ERR_IAB1007E
-          + "<br />"
-          + le.getMessage()
-          + "</font></h3>");
-      logError(le.getMessage());
-    } catch (UpdatePDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>UpdatePDH error: "
-          + le.getMessage()
-          + "</font></h3>");
-      logError(le.getMessage());
-    } catch (Exception exc) {
-      // Report this error to both the datbase log and the PrintWriter
-      println("Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-      println("" + exc);
-
-      // don't overwrite an update exception
-      if (getABRReturnCode() != UPDATE_ERROR) {
-        setReturnCode(INTERNAL_ERROR);
-      }
-    } finally {
-      //Everything is fine...so lets pass
-      if (getReturnCode() == PASS) {
-        setReturnCode(PASS);
-        // set DG submit string
-        setDGString(getABRReturnCode());
-        setDGRptName("FUPFUPQRABR01"); //Set the report name
-        setDGRptClass("FUPFUPQRABR01"); //Set the report class
-        printDGSubmitString();
-        //Stuff into report for subscription and notification
-        // Tack on the DGString
-        buildReportFooter();
-        // make sure the lock is released
-        if (!isReadOnly()) {
-          clearSoftLock();
-        }
-      }
-    }
-  }
-
-  /**
-   * getABREntityDesc
-   *
-   * @param entityType
-   * @param entityId
-   * @return
-   * @author Owner
-   */
-  protected String getABREntityDesc(String entityType, int entityId) {
-    return null;
-  }
-
-  /**
-   * getDescription
-   *
-   * @return
-   * @author Owner
-   */
-  public String getDescription() {
-    //return Constants.IAB3053I + "<br /><br />" + Constants.IAB3050I;
-    return "<br />This needs to be defined <br />";
-  }
-
-  /**
-   * getStyle
-   *
-   * @return
-   * @author Owner
-   */
-  protected String getStyle() {
-    // Print out the PSG stylesheet
-    return "";
-  }
-
-  /**
-   *  Get the getRevision
-   *
-   *@return    java.lang.String
-   */
-  public String getRevision() {
-    return new String("1.22");
-  }
-
-  /**
-   * getVersion
-   *
-   * @return
-   * @author Owner
-   */
-  public static String getVersion() {
-    return ("FUPFUPQRABR01.java,v 1.22 2008/01/30 19:39:17 wendy Exp");
-  }
-
-  /**
-   * getABRVersion
-   *
-   * @return
-   * @author Owner
-   */
-  public String getABRVersion() {
-    return getVersion();
-  }
-
-}

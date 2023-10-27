@@ -1,196 +1,202 @@
-//  (c) Copyright International Business Machines Corporation, 2001
-//  All Rights Reserved.</pre>
-//
-//WWSEOALWRABR02.java,v
-//Revision 1.5  2008/01/30 19:39:17  wendy
-//Cleanup RSA warnings
-//
-//Revision 1.4  2006/03/03 19:23:30  bala
-//remove reference to Constants.CSS
-//
-//Revision 1.3  2006/02/09 20:42:52  joan
-//fixes
-//
-//Revision 1.2  2005/07/28 21:11:15  joan
-//fixes
-//
-//Revision 1.1  2005/07/27 22:30:01  joan
-//add new abr
-//
-//
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.LockPDHEntityException;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.abr.util.UpdatePDHEntityException;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.SBRException;
+/*     */ import COM.ibm.eannounce.objects.WWSEOALWRPDG;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class WWSEOALWRABR02
+/*     */   extends PokBaseABR
+/*     */ {
+/*  39 */   public static final String ABR = new String("WWSEOALWRABR02");
+/*     */   
+/*  41 */   EntityGroup m_egParent = null;
+/*  42 */   EntityItem m_ei = null;
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/*     */     try {
+/*  47 */       StringBuffer stringBuffer = new StringBuffer();
+/*  48 */       start_ABRBuild();
+/*     */       
+/*  50 */       buildReportHeaderII();
+/*     */       
+/*  52 */       this.m_egParent = this.m_elist.getParentEntityGroup();
+/*  53 */       this.m_ei = this.m_egParent.getEntityItem(0);
+/*  54 */       println("<br><b>WWSEO ALWR: " + this.m_ei.getKey() + "</b>");
+/*     */       
+/*  56 */       printNavigateAttributes(this.m_ei, this.m_egParent, true);
+/*  57 */       setReturnCode(0);
+/*     */       
+/*  59 */       WWSEOALWRPDG wWSEOALWRPDG = new WWSEOALWRPDG(null, this.m_db, this.m_prof, "WWSEOALWRPDG");
+/*     */       
+/*  61 */       wWSEOALWRPDG.setEntityItem(this.m_ei);
+/*  62 */       wWSEOALWRPDG.setABReList(this.m_elist);
+/*  63 */       wWSEOALWRPDG.executeAction(this.m_db, this.m_prof);
+/*  64 */       stringBuffer = wWSEOALWRPDG.getActivities();
+/*  65 */       println("</br></br/><b>Generated Data:</b>");
+/*  66 */       println("<br/>" + stringBuffer.toString());
+/*  67 */     } catch (LockPDHEntityException lockPDHEntityException) {
+/*  68 */       setReturnCode(-2);
+/*  69 */       println("<h3><font color=red>IAB1007E: Could not get soft lock.  Rule execution is terminated.<br />" + lockPDHEntityException
+/*     */ 
+/*     */ 
+/*     */           
+/*  73 */           .getMessage() + "</font></h3>");
+/*     */       
+/*  75 */       logError(lockPDHEntityException.getMessage());
+/*  76 */     } catch (UpdatePDHEntityException updatePDHEntityException) {
+/*  77 */       setReturnCode(-2);
+/*  78 */       println("<h3><font color=red>UpdatePDH error: " + updatePDHEntityException
+/*     */           
+/*  80 */           .getMessage() + "</font></h3>");
+/*     */       
+/*  82 */       logError(updatePDHEntityException.getMessage());
+/*  83 */     } catch (SBRException sBRException) {
+/*  84 */       String str2 = sBRException.toString();
+/*  85 */       int i = str2.indexOf("(ok)");
+/*  86 */       if (i < 0) {
+/*  87 */         setReturnCode(-2);
+/*  88 */         println("<h3><font color=red>Generate Data error: " + replace(str2, "\n", "<br>") + "</font></h3>");
+/*  89 */         logError(sBRException.toString());
+/*     */       } else {
+/*  91 */         str2 = str2.substring(0, i);
+/*  92 */         println(replace(str2, "\n", "<br>"));
+/*     */       } 
+/*  94 */     } catch (Exception exception) {
+/*     */       
+/*  96 */       println("Error in " + this.m_abri.getABRCode() + ":" + exception.getMessage());
+/*  97 */       println("" + exception);
+/*  98 */       exception.printStackTrace();
+/*     */       
+/* 100 */       if (getABRReturnCode() != -2) {
+/* 101 */         setReturnCode(-3);
+/*     */       }
+/*     */     } finally {
+/* 104 */       println("<br /><b>" + 
+/*     */           
+/* 106 */           buildMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 109 */               getABRDescription(), 
+/* 110 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }) + "</b>");
+/*     */       
+/* 113 */       log(
+/* 114 */           buildLogMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 117 */               getABRDescription(), 
+/* 118 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }));
+/*     */       
+/* 121 */       String str = this.m_ei.toString();
+/* 122 */       if (str.length() > 64) {
+/* 123 */         str = str.substring(0, 64);
+/*     */       }
+/* 125 */       setDGTitle(str);
+/* 126 */       setDGRptName(ABR);
+/*     */ 
+/*     */       
+/* 129 */       setDGString(getABRReturnCode());
+/* 130 */       printDGSubmitString();
+/*     */ 
+/*     */       
+/* 133 */       buildReportFooter();
+/*     */       
+/* 135 */       if (!isReadOnly()) {
+/* 136 */         clearSoftLock();
+/*     */       }
+/*     */     } 
+/*     */   }
+/*     */   
+/*     */   private String replace(String paramString1, String paramString2, String paramString3) {
+/* 142 */     String str = "";
+/* 143 */     int i = paramString1.indexOf(paramString2);
+/*     */     
+/* 145 */     while (paramString1.length() > 0 && i >= 0) {
+/* 146 */       str = str + paramString1.substring(0, i) + paramString3;
+/* 147 */       paramString1 = paramString1.substring(i + paramString2.length());
+/* 148 */       i = paramString1.indexOf(paramString2);
+/*     */     } 
+/* 150 */     str = str + paramString1;
+/* 151 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getABREntityDesc(String paramString, int paramInt) {
+/* 162 */     return null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 171 */     return "WWSEO ALWR No CD ABR.";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getStyle() {
+/* 182 */     return "";
+/*     */   }
+/*     */   
+/*     */   public String getRevision() {
+/* 186 */     return new String("1.5");
+/*     */   }
+/*     */   
+/*     */   public static String getVersion() {
+/* 190 */     return "WWSEOALWRABR02.java,v 1.5 2008/01/30 19:39:17 wendy Exp";
+/*     */   }
+/*     */   
+/*     */   public String getABRVersion() {
+/* 194 */     return "WWSEOALWRABR02.java";
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.sg;
 
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.eannounce.abr.util.*;
-
-/**
- *
- *@author     Administrator
- *@created    August 30, 2002
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\WWSEOALWRABR02.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class WWSEOALWRABR02 extends PokBaseABR {
-  /**
-  *  Execute ABR.
-  *
-  */
-
-  // Class constants
-  public final static String ABR = new String("WWSEOALWRABR02");
-
-  EntityGroup m_egParent = null;
-  EntityItem m_ei = null;
-
-  public void execute_run() {
-      try {
-      // if it's the first time, build the report header
-      StringBuffer sb = new StringBuffer();    
-      start_ABRBuild();
-      // Build the report header
-      buildReportHeaderII();
-
-      m_egParent = m_elist.getParentEntityGroup();
-      m_ei = m_egParent.getEntityItem(0);
-      println("<br><b>WWSEO ALWR: " + m_ei.getKey() + "</b>");
-
-      printNavigateAttributes(m_ei, m_egParent, true);
-      setReturnCode(PASS);
-
-      WWSEOALWRPDG pdg = new WWSEOALWRPDG(null, m_db, m_prof, "WWSEOALWRPDG");
-
-      pdg.setEntityItem(m_ei);
-      pdg.setABReList(m_elist);
-      pdg.executeAction(m_db, m_prof);
-      sb = pdg.getActivities();
-      println("</br></br/><b>Generated Data:</b>");
-      println("<br/>" + sb.toString());
-      } catch (LockPDHEntityException le) {
-        setReturnCode(UPDATE_ERROR);
-        println(
-          "<h3><font color=red>" +
-            ERR_IAB1007E +
-            "<br />" +
-            le.getMessage() +
-            "</font></h3>");
-          logError(le.getMessage());
-      } catch (UpdatePDHEntityException le) {
-        setReturnCode(UPDATE_ERROR);
-          println(
-            "<h3><font color=red>UpdatePDH error: " +
-            le.getMessage() +
-            "</font></h3>");
-          logError(le.getMessage());
-      } catch (SBRException _sbrex) {
-      String strError = _sbrex.toString();
-      int i = strError.indexOf("(ok)");
-      if (i < 0) {
-        setReturnCode(UPDATE_ERROR);
-        println("<h3><font color=red>Generate Data error: " + replace(strError, "\n", "<br>") + "</font></h3>");
-            logError(_sbrex.toString());
-      } else {
-        strError = strError.substring(0,i);
-        println(replace(strError, "\n", "<br>"));
-      }
-      } catch (Exception exc) {
-        // Report this error to both the datbase log and the PrintWriter
-        println("Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-        println("" + exc);
-        exc.printStackTrace();
-        // don't overwrite an update exception
-        if (getABRReturnCode() != UPDATE_ERROR) {
-            setReturnCode(INTERNAL_ERROR);
-        }
-      } finally {
-        println(
-            "<br /><b>" +
-            buildMessage(
-            MSG_IAB2016I,
-            new String[]{
-            getABRDescription(),
-            (getReturnCode() == PASS ? "Passed" : "Failed")}) +
-            "</b>");
-
-      log(
-              buildLogMessage(
-              MSG_IAB2016I,
-              new String[]{
-              getABRDescription(),
-              (getReturnCode() == PASS ? "Passed" : "Failed")}));
-
-          // set DG title
-          String strDgName = m_ei.toString();
-          if (strDgName.length() > 64) {
-        strDgName = strDgName.substring(0,64);
-      }
-          setDGTitle(strDgName);
-          setDGRptName(ABR);
-
-        // set DG submit string
-        setDGString(getABRReturnCode());
-        printDGSubmitString();      //Stuff into report for subscription and notification
-
-          // Tack on the DGString
-          buildReportFooter();
-          // make sure the lock is released
-          if (!isReadOnly()) {
-            clearSoftLock();
-          }
-      }
-    }
-
-  private String replace(String _s, String _s1, String _s2) {
-    String sResult = "";
-    int iTab = _s.indexOf(_s1);
-
-    while (_s.length() > 0 && iTab >=0) {
-      sResult = sResult + _s.substring(0, iTab) + _s2;
-      _s = _s.substring(iTab+_s1.length());
-      iTab = _s.indexOf(_s1);
-    }
-    sResult = sResult + _s;
-    return sResult;
-  }
-
-  /**
-  *  Get the entity description to use in error messages
-  *
-  *@param  entityType  Description of the Parameter
-  *@param  entityId    Description of the Parameter
-  *@return             String
-  */
-  protected String getABREntityDesc(String entityType, int entityId) {
-      return null;
-  }
-
-  /**
-   *  Get ABR description
-   *
-   *@return    java.lang.String
-   */
-  public String getDescription() {
-      return "WWSEO ALWR No CD ABR.";
-  }
-
-  /**
-   *  Get any style that should be used for this page. Derived classes can
-   *  override this to set styles They must include the <style>...</style> tags
-   *
-   *@return    String
-   */
-  protected String getStyle() {
-      // Print out the PSG stylesheet
-      return "";
-  }
-
-  public String getRevision() {
-      return new String("1.5");
-  }
-
-  public static String getVersion() {
-      return ("WWSEOALWRABR02.java,v 1.5 2008/01/30 19:39:17 wendy Exp");
-  }
-
-  public String getABRVersion() {
-      return "WWSEOALWRABR02.java";
-  }
-}

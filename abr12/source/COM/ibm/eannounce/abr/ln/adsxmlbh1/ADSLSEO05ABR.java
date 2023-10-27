@@ -1,176 +1,181 @@
-package COM.ibm.eannounce.abr.ln.adsxmlbh1;
+/*     */ package COM.ibm.eannounce.abr.ln.adsxmlbh1;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.XMLANNElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLActivityElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLGroupElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLLSEOAVAILElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLNLSElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLNotificationElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLVMElem;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class ADSLSEO05ABR
+/*     */   extends XMLMQRoot
+/*     */ {
+/*  89 */   private static final XMLElem XMLMAP = (XMLElem)new XMLGroupElem("SEO_UPDATE"); static {
+/*  90 */     XMLMAP.addChild((XMLElem)new XMLVMElem("SEO_UPDATE", "0"));
+/*     */     
+/*  92 */     XMLMAP.addChild(new XMLElem("PDHDOMAIN", "PDHDOMAIN"));
+/*  93 */     XMLMAP.addChild((XMLElem)new XMLNotificationElem("DTSOFMSG"));
+/*  94 */     XMLMAP.addChild((XMLElem)new XMLActivityElem("ACTIVITY"));
+/*  95 */     XMLMAP.addChild(new XMLElem("SEOENTITYTYPE", "ENTITYTYPE"));
+/*  96 */     XMLMAP.addChild(new XMLElem("SEOENTITYID", "ENTITYID"));
+/*     */     
+/*  98 */     XMLGroupElem xMLGroupElem1 = new XMLGroupElem(null, "MODEL", "U:WWSEOLSEO:U:WWSEO:U:MODELWWSEO:U");
+/*  99 */     XMLMAP.addChild((XMLElem)xMLGroupElem1);
+/* 100 */     xMLGroupElem1.addChild(new XMLElem("PARENTENTITYTYPE", "ENTITYTYPE"));
+/* 101 */     xMLGroupElem1.addChild(new XMLElem("PARENTENTITYID", "ENTITYID"));
+/* 102 */     xMLGroupElem1.addChild(new XMLElem("PARENTMODEL", "MODELATR"));
+/* 103 */     xMLGroupElem1.addChild(new XMLElem("PARENTMACHTPE", "MACHTYPEATR"));
+/*     */     
+/* 105 */     XMLMAP.addChild(new XMLElem("SEOID", "SEOID"));
+/* 106 */     XMLMAP.addChild(new XMLElem("STATUS", "STATUS", 1));
+/*     */     
+/* 108 */     xMLGroupElem1.addChild(new XMLElem("CATEGORY", "COFCAT"));
+/* 109 */     xMLGroupElem1.addChild(new XMLElem("SUBCATEGORY", "COFSUBCAT"));
+/* 110 */     xMLGroupElem1.addChild(new XMLElem("GROUP", "COFGRP"));
+/* 111 */     xMLGroupElem1.addChild(new XMLElem("SUBGROUP", "COFSUBGRP"));
+/*     */     
+/* 113 */     XMLMAP.addChild(new XMLElem("PRFCNTR", "PRFTCTR", 1));
+/*     */     
+/* 115 */     XMLANNElem xMLANNElem = new XMLANNElem();
+/* 116 */     XMLMAP.addChild((XMLElem)xMLANNElem);
+/*     */     
+/* 118 */     XMLMAP.addChild(new XMLElem("PRDHIERCD", "BHPRODHIERCD"));
+/* 119 */     XMLMAP.addChild(new XMLElem("ACCTASGNGRP", "BHACCTASGNGRP", 2));
+/*     */     
+/* 121 */     XMLGroupElem xMLGroupElem2 = new XMLGroupElem(null, "WWSEO");
+/* 122 */     XMLMAP.addChild((XMLElem)xMLGroupElem2);
+/* 123 */     xMLGroupElem2.addChild(new XMLElem("SPECIALBID", "SPECBID"));
+/*     */ 
+/*     */     
+/* 126 */     XMLElem xMLElem1 = new XMLElem("LANGUAGELIST");
+/* 127 */     xMLGroupElem2.addChild(xMLElem1);
+/*     */ 
+/*     */     
+/* 130 */     XMLNLSElem xMLNLSElem = new XMLNLSElem("LANGUAGEELEMENT");
+/* 131 */     xMLElem1.addChild((XMLElem)xMLNLSElem);
+/*     */     
+/* 133 */     xMLNLSElem.addChild(new XMLElem("NLSID", "NLSID"));
+/* 134 */     xMLNLSElem.addChild(new XMLElem("INVNAME", "PRCFILENAM"));
+/*     */ 
+/*     */     
+/* 137 */     XMLElem xMLElem2 = new XMLElem("AVAILABILITYLIST");
+/* 138 */     XMLMAP.addChild(xMLElem2);
+/* 139 */     xMLElem2.addChild((XMLElem)new XMLLSEOAVAILElem());
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public XMLElem getXMLMap() {
+/* 147 */     return XMLMAP;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVeName() {
+/* 153 */     return "ADRLSEO";
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public String getStatusAttr() {
+/* 158 */     return "STATUS";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getMQCID() {
+/* 164 */     return "LSEO";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVersion() {
+/* 173 */     return "$Revision: 1.1 $";
+/*     */   }
+/*     */ }
 
-//Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2009  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
 
-import COM.ibm.eannounce.abr.util.*;
-
-
-/**********************************************************************************
-*
-*
-<SEO_UPDATE>		1	LSEO
-<PDHDOMAIN>	</PDHDOMAIN>	2	LSEO	PDHDOMAIN
-<DTSOFMSG>	</DTSOFMSG>	2	LSEO	ABR Queued
-<ACTIVITY>	</ACTIVITY>	2	LSEO	Activity	"Update"
-<SEOENTITYTYPE>	</SEOENTITYTYPE>	2	LSEO	ENTITYTYPE
-<SEOENTITYID>	</SEOENTITYID>	2	LSEO	ENTITYID
-<PARENTENTITYTYPE>	<PARENTENTITYTYPE>	2	MODEL	ENTITYTYPE
-<PARENTENTITYID>	<PARENTENTITYID>	2	MODEL	ENTITYID
-<PARENTMODEL>	<PARENTMODEL>	2	MODEL	MODELATR
-<PARENTMACHTPE>	<PARENTMACHTPE>	2	MODEL	MACHTYPEATR
-<SEOID>	</SEOID>	2	LSEO	SEOID
-<STATUS>	</STATUS>	2	LSEO	STATUS
-<CATEGORY>	</CATEGORY>	2	MODEL	COFCAT
-<SUBCATEGORY>	</SUBCATEGORY>	2	MODEL	COFSUBCAT
-<GROIUP>	</GROUP>	2	MODEL	COFGRP
-<SUBGROUP>	</SUBGROUP>	2	MODEL	COFSUBGRP
-<PRFCNTR>	</PRFCNTR>	2	LSEO	PRFTCTR
-<ANNOUNCEDATE>	</ANNOUNCEDATE>	2	ANNOUNCEMENT	ANNDATE
-<ANNOUNCENUMBER>	</ANNOUNCENUMBER> 	2	ANNOUNCEMENT	ANNNUMBER
-<WITHDRAWANNOUNCEDATE>	</WITHDRAWANNOUNCEDATE>	2	ANNOUNCEMENT	ANNDATE
-<WITHDRAWANNOUNCENUMBER>	</WITHDRAWANNOUNCENUMBER> 	2	ANNOUNCEMENT	ANNNUMBER
-<PRDHIERCD>	</PRDHIERCD>	2	LSEO	BHPRODHIERCD
-<ACCTASGNGRP>	</ACCTASGNGRP>	2	LSEO	BHACCTASGNGRP
-<SPECIALBID>	</SPECIALBID>	2	WWSEO	SPECBID
-<LANGUAGELIST>
-<LANGUAGEELEMENT>		3
-<NLSID>	</NLSID>	4	MODEL	NLSID
-<INVNAME	</INVNAME>	4	WWSEO	PRCFILENAM
-</LANGUAGEELEMENT>	3
-</LANGUAGELIST>	2
-</SEO_UPDATE	1
-
-*/
-//$Log: ADSLSEO05ABR.java,v $
-//Revision 1.1  2015/02/04 14:55:49  wangyul
-//RCQ00337765-RQ change the XML mapping to pull DIV from PROJ for Lenovo
-//
-//Revision 1.4  2012/03/09 05:36:24  liuweimi
-//Critical issue - reopening defct 634524: Some of the SEO_UPDATE XML generated by Cache load have the incorrrect structure.
-//
-//Revision 1.3  2012/02/28 08:37:20  guobin
-//[Work Item 655030] PCR-1 separate new VE's for Version 0.5 from V1.0
-//
-//Revision 1.2  2011/12/14 02:22:15  guobin
-//Update the Version V Mod M for the ADSABR
-//
-//Revision 1.1  2011/10/17 13:41:02  guobin
-//Support both 0.5 and 1.0 XML together
-//
-//Revision 1.4  2010/12/07 02:39:05  guobin
-//Made change  PRDHIERCD longdescription
-//
-//Revision 1.3  2010/06/03 07:55:26  yang
-//build AVAILABILITLIST structure
-//
-//Revision 1.2  2010/03/15 15:47:07  rick
-//changing BHACCTASGNGRP and TAXCLS to shortdesc.
-//
-//Revision 1.1  2010/03/02 02:17:56  rick
-//changes for new wave2 package
-//
-//Revision 1.5  2010/01/28 00:29:47  rick
-//change to use BHACCTASGNGRP instead of
-// ACCTASGNGRP and LSEO for MQCID.
-//
-//Revision 1.4  2010/01/07 18:03:03  wendy
-//cvs failure again
-//
-public class ADSLSEO05ABR extends XMLMQRoot
-{
-    private static final XMLElem XMLMAP;
-
-    static {
-        XMLMAP = new XMLGroupElem("SEO_UPDATE");
-        XMLMAP.addChild(new XMLVMElem("SEO_UPDATE","0"));
-        // level2
-        XMLMAP.addChild(new XMLElem("PDHDOMAIN","PDHDOMAIN"));
-        XMLMAP.addChild(new XMLNotificationElem("DTSOFMSG")); // pull from profile.endofday
-        XMLMAP.addChild(new XMLActivityElem("ACTIVITY"));
-        XMLMAP.addChild(new XMLElem("SEOENTITYTYPE","ENTITYTYPE"));
-        XMLMAP.addChild(new XMLElem("SEOENTITYID","ENTITYID"));
-
-        XMLElem elem = new XMLGroupElem(null,"MODEL","U:WWSEOLSEO:U:WWSEO:U:MODELWWSEO:U");
-        XMLMAP.addChild(elem);
-        elem.addChild(new XMLElem("PARENTENTITYTYPE","ENTITYTYPE"));
-        elem.addChild(new XMLElem("PARENTENTITYID","ENTITYID"));
-        elem.addChild(new XMLElem("PARENTMODEL","MODELATR"));
-        elem.addChild(new XMLElem("PARENTMACHTPE","MACHTYPEATR"));
-
-        XMLMAP.addChild(new XMLElem("SEOID","SEOID"));
-        XMLMAP.addChild(new XMLElem("STATUS","STATUS",XMLElem.FLAGVAL));
-
-        elem.addChild(new XMLElem("CATEGORY","COFCAT"));
-        elem.addChild(new XMLElem("SUBCATEGORY","COFSUBCAT"));
-        elem.addChild(new XMLElem("GROUP","COFGRP"));
-        elem.addChild(new XMLElem("SUBGROUP","COFSUBGRP"));
-       
-        XMLMAP.addChild(new XMLElem("PRFCNTR","PRFTCTR",XMLElem.FLAGVAL));
-
-        XMLElem annceelem = new XMLANNElem();
-        XMLMAP.addChild(annceelem);        
-
-        XMLMAP.addChild(new XMLElem("PRDHIERCD","BHPRODHIERCD"));
-        XMLMAP.addChild(new XMLElem("ACCTASGNGRP","BHACCTASGNGRP",XMLElem.SHORTDESC));
-
-        XMLElem elemwwseo = new XMLGroupElem(null,"WWSEO");
-        XMLMAP.addChild(elemwwseo);
-        elemwwseo.addChild(new XMLElem("SPECIALBID","SPECBID"));
-        
-        
-        XMLElem langlist = new XMLElem("LANGUAGELIST");
-        elemwwseo.addChild(langlist);
-
-        // level 3
-        XMLElem langelem = new XMLNLSElem("LANGUAGEELEMENT");
-        langlist.addChild(langelem);
-        // level 4
-        langelem.addChild(new XMLElem("NLSID","NLSID"));
-        langelem.addChild(new XMLElem("INVNAME","PRCFILENAM"));
-        
-        // BH AVAILABILITYLIST Structure       
-        XMLElem availlist = new XMLElem("AVAILABILITYLIST");
-		XMLMAP.addChild(availlist);
-		availlist.addChild(new XMLLSEOAVAILElem());
-    }
-        
-
-    /**********************************
-    * get xml object mapping
-    */
-    public XMLElem getXMLMap() {
-        return XMLMAP;
-    }
-
-	/**********************************
-    * get the name of the VE to use
-    */
-    public String getVeName() { return "ADRLSEO"; }
-
-    /**********************************
-    * get the status attribute to use for this ABR
-    */
-    public String getStatusAttr() { return "STATUS";}
-
-    /**********************************
-    *
-	A.	MQ-Series CID
-    */
-    public String getMQCID() { return "LSEO"; }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getVersion()
-    {
-        return "$Revision: 1.1 $";//"1.0";
-    }
-}
-
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\ln\adsxmlbh1\ADSLSEO05ABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

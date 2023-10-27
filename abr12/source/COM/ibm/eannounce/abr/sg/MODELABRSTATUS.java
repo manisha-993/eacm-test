@@ -1,767 +1,773 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2005, 2007  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.abr.sg;
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANEntity;
+/*     */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.MetaFlag;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.HashSet;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.Iterator;
+/*     */ import java.util.Vector;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class MODELABRSTATUS
+/*     */   extends DQABRSTATUS
+/*     */ {
+/* 119 */   private Object[] args = (Object[])new String[10];
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean isVEneeded(String paramString) {
+/* 125 */     return !"0020".equals(paramString);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void doAlreadyFinalProcessing() {
+/* 140 */     setFlagValue(this.m_elist.getProfile(), "SAPLABRSTATUS", "0020");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void completeNowR4RProcessing() throws SQLException, MiddlewareException, MiddlewareRequestException {
+/* 156 */     setFlagValue(this.m_elist.getProfile(), "COMPATGENABR", "0020");
+/* 157 */     propagateOStoWWSEO(this.m_elist.getParentEntityGroup().getEntityItem(0), this.m_elist.getEntityGroup("WWSEO"));
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void completeNowFinalProcessing() throws SQLException, MiddlewareException, MiddlewareRequestException {
+/* 182 */     checkAssortModule();
+/* 183 */     propagateOStoWWSEO(this.m_elist.getParentEntityGroup().getEntityItem(0), this.m_elist.getEntityGroup("WWSEO"));
+/* 184 */     queueSapl();
+/* 185 */     setFlagValue(this.m_elist.getProfile(), "COMPATGENABR", "0020");
+/* 186 */     setFlagValue(this.m_elist.getProfile(), "WWPRTABRSTATUS", "0020");
+/* 187 */     setFlagValue(this.m_elist.getProfile(), "EPIMSABRSTATUS", "0020");
+/*     */ 
+/*     */     
+/* 190 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("ANNOUNCEMENT");
+/* 191 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/* 192 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/* 193 */       String str1 = getAttributeFlagEnabledValue(entityItem, "ANNSTATUS");
+/* 194 */       String str2 = getAttributeFlagEnabledValue(entityItem, "ANNTYPE");
+/* 195 */       addDebug(entityItem.getKey() + " status " + str1 + " type " + str2);
+/* 196 */       if (str1 == null || str1.length() == 0) {
+/* 197 */         str1 = "0020";
+/*     */       }
+/* 199 */       if ("0020".equals(str1) && "19".equals(str2)) {
+/* 200 */         addDebug(entityItem.getKey() + " is Final and New");
+/* 201 */         setFlagValue(this.m_elist.getProfile(), "WWPRTABRSTATUS", "0020", entityItem);
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void completeNowFinalProcessingForOtherDomains() throws SQLException, MiddlewareException, MiddlewareRequestException {
+/* 215 */     queueSapl();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void doDQChecking(EntityItem paramEntityItem, String paramString) throws Exception {
+/* 286 */     int i = 0;
+/* 287 */     String str = getAttributeFlagEnabledValue(paramEntityItem, "COFCAT");
+/* 288 */     if (str == null) {
+/* 289 */       str = "";
+/*     */     }
+/* 291 */     addDebug(paramEntityItem.getKey() + " COFCAT: " + str);
+/*     */ 
+/*     */     
+/* 294 */     if ("100".equals(str)) {
+/* 295 */       checkHardware(paramEntityItem, paramString);
+/*     */     }
+/*     */     
+/* 298 */     if ("102".equals(str)) {
+/*     */ 
+/*     */ 
+/*     */       
+/* 302 */       i = getCount("MDLCGMDL");
+/* 303 */       if (i > 0) {
+/* 304 */         EntityGroup entityGroup = this.m_elist.getEntityGroup("MODELCG");
+/*     */         
+/* 306 */         this.args[0] = entityGroup.getLongDescription();
+/* 307 */         addError("SVC_SEOCG_ERR", this.args);
+/*     */       } 
+/*     */ 
+/*     */       
+/* 311 */       i = getCount("SEOCGSEO");
+/* 312 */       if (i > 0) {
+/* 313 */         EntityGroup entityGroup = this.m_elist.getEntityGroup("SEOCG");
+/*     */         
+/* 315 */         this.args[0] = entityGroup.getLongDescription();
+/* 316 */         addError("SVC_SEOCG_ERR", this.args);
+/*     */       } 
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 325 */     checkModelAvails(paramEntityItem, paramString);
+/*     */     
+/* 327 */     if ("0040".equals(paramString))
+/*     */     {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 335 */       checkAvailDates();
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void checkAnn(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 348 */     Vector vector1 = PokUtils.getAllLinkedEntities(paramEntityItem, "MODELAVAIL", "AVAIL");
+/* 349 */     Vector<EntityItem> vector2 = PokUtils.getEntitiesWithMatchedAttr(vector1, "AVAILTYPE", "146");
+/* 350 */     addDebug("checkAnn " + paramEntityItem.getKey() + " availVct " + vector1.size() + " plannedavailVector " + vector2.size());
+/*     */     
+/* 352 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("PRODSTRUCT");
+/*     */     
+/* 354 */     Vector vector3 = PokUtils.getAllLinkedEntities(entityGroup, "OOFAVAIL", "AVAIL");
+/* 355 */     Vector<EntityItem> vector4 = PokUtils.getEntitiesWithMatchedAttr(vector3, "AVAILTYPE", "146");
+/* 356 */     addDebug("checkAnn psavailVct: " + vector3.size() + " plannedPsAvailVector: " + vector4.size());
+/*     */     
+/* 358 */     Hashtable<Object, Object> hashtable = new Hashtable<>();
+/* 359 */     HashSet<String> hashSet = new HashSet(); byte b;
+/* 360 */     for (b = 0; b < vector2.size(); b++) {
+/* 361 */       EntityItem entityItem = vector2.elementAt(b);
+/* 362 */       EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("ANNCODENAME");
+/* 363 */       addDebug("modelavail " + entityItem.getKey() + " ANNCODENAME " + 
+/* 364 */           PokUtils.getAttributeFlagValue(entityItem, "ANNCODENAME") + NEWLINE);
+/* 365 */       if (eANFlagAttribute != null && eANFlagAttribute.toString().length() > 0) {
+/*     */         
+/* 367 */         MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 368 */         for (byte b1 = 0; b1 < arrayOfMetaFlag.length; b1++) {
+/*     */           
+/* 370 */           if (arrayOfMetaFlag[b1].isSelected()) {
+/* 371 */             hashtable.put(arrayOfMetaFlag[b1].getFlagCode(), entityItem);
+/*     */           }
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/* 376 */     for (b = 0; b < vector4.size(); b++) {
+/* 377 */       EntityItem entityItem = vector4.elementAt(b);
+/* 378 */       EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("ANNCODENAME");
+/* 379 */       addDebug("psavail " + entityItem.getKey() + " ANNCODENAME " + 
+/* 380 */           PokUtils.getAttributeFlagValue(entityItem, "ANNCODENAME") + NEWLINE);
+/* 381 */       if (eANFlagAttribute != null && eANFlagAttribute.toString().length() > 0) {
+/*     */         
+/* 383 */         MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 384 */         for (byte b1 = 0; b1 < arrayOfMetaFlag.length; b1++) {
+/*     */           
+/* 386 */           if (arrayOfMetaFlag[b1].isSelected()) {
+/* 387 */             hashSet.add(arrayOfMetaFlag[b1].getFlagCode());
+/*     */           }
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/*     */ 
+/*     */     
+/* 394 */     Iterator<String> iterator = hashtable.keySet().iterator();
+/* 395 */     while (iterator.hasNext()) {
+/* 396 */       String str = iterator.next();
+/* 397 */       if (!hashSet.contains(str)) {
+/* 398 */         EntityItem entityItem = (EntityItem)hashtable.get(str);
+/*     */ 
+/*     */ 
+/*     */         
+/* 402 */         this.args[0] = entityItem.getEntityGroup().getLongDescription();
+/* 403 */         this.args[1] = getNavigationName(entityItem);
+/* 404 */         this.args[2] = PokUtils.getAttributeDescription(entityItem.getEntityGroup(), "ANNCODENAME", "ANNCODENAME");
+/* 405 */         this.args[3] = this.m_elist.getEntityGroup("FEATURE").getLongDescription();
+/* 406 */         addError("NO_ANNOUNCE_FEATURE", this.args);
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 410 */     hashtable.clear();
+/* 411 */     hashSet.clear();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void checkAvailDates() throws SQLException, MiddlewareException {
+/* 425 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("PRODSTRUCT");
+/* 426 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/* 427 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/*     */       
+/* 429 */       Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(entityItem, "OOFAVAIL", "AVAIL");
+/* 430 */       addDebug("checkAvailDates " + entityItem.getKey() + " availVct: " + vector.size());
+/*     */       
+/* 432 */       for (byte b1 = 0; b1 < vector.size(); b1++) {
+/* 433 */         EntityItem entityItem1 = vector.elementAt(b1);
+/* 434 */         String str1 = PokUtils.getAttributeValue(entityItem1, "EFFECTIVEDATE", ", ", "", false);
+/* 435 */         String str2 = getAttributeFlagEnabledValue(entityItem1, "AVAILTYPE");
+/* 436 */         addDebug("checkAvailDates " + entityItem1.getKey() + " EFFECTIVEDATE: " + str1 + " AVAILTYPE: " + str2);
+/* 437 */         if (("146".equals(str2) || "143".equals(str2)) && str1
+/* 438 */           .length() > 0) {
+/*     */ 
+/*     */           
+/* 441 */           Vector<EntityItem> vector1 = PokUtils.getAllLinkedEntities(entityItem1, "AVAILANNA", "ANNOUNCEMENT");
+/* 442 */           addDebug("checkAvailDates " + entityItem1.getKey() + " annVct: " + vector1.size());
+/* 443 */           for (byte b2 = 0; b2 < vector1.size(); b2++) {
+/* 444 */             EntityItem entityItem2 = vector1.elementAt(b2);
+/* 445 */             String str = PokUtils.getAttributeValue(entityItem2, "ANNDATE", ", ", "", false);
+/* 446 */             addDebug("checkAvailDates " + entityItem2.getKey() + " annDate: " + str);
+/* 447 */             if (str.length() > 0 && str1.compareTo(str) < 0) {
+/*     */ 
+/*     */               
+/* 450 */               this.args[0] = entityItem1.getEntityGroup().getLongDescription() + " " + getNavigationName(entityItem1);
+/* 451 */               this.args[1] = entityItem2.getEntityGroup().getLongDescription();
+/* 452 */               this.args[2] = getNavigationName(entityItem2);
+/* 453 */               this.args[3] = PokUtils.getAttributeDescription(entityItem2.getEntityGroup(), "ANNDATE", "ANNDATE");
+/* 454 */               addError("EARLY_DATE_ERR", this.args);
+/*     */             } 
+/*     */           } 
+/* 457 */           vector1.clear();
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 470 */     return "MODEL ABR";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 481 */     return "1.43";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void checkHardware(EntityItem paramEntityItem, String paramString) throws MiddlewareException, SQLException {
+/* 517 */     String str = getAttributeFlagEnabledValue(paramEntityItem, "COFSUBCAT");
+/*     */     
+/* 519 */     if (str == null) {
+/* 520 */       str = "";
+/*     */     }
+/* 522 */     addDebug("checkHardware " + paramEntityItem.getKey() + " COFSUBCAT: " + str);
+/* 523 */     if ("126".equals(str)) {
+/* 524 */       int i = 0;
+/* 525 */       if ("0040".equals(paramString)) {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 530 */         i = getCount("MODELIMG");
+/* 531 */         if (i == 0) {
+/* 532 */           EntityGroup entityGroup = this.m_elist.getEntityGroup("IMG");
+/*     */           
+/* 534 */           this.args[0] = entityGroup.getLongDescription();
+/* 535 */           addError("MINIMUM_ERR", this.args);
+/*     */         } 
+/*     */ 
+/*     */         
+/* 539 */         i = getCount("MODELWARR");
+/* 540 */         if (i == 0) {
+/* 541 */           EntityGroup entityGroup = this.m_elist.getEntityGroup("WARR");
+/*     */           
+/* 543 */           this.args[0] = entityGroup.getLongDescription();
+/* 544 */           addError("MINIMUM_ERR", this.args);
+/*     */         } 
+/*     */       } 
+/*     */ 
+/*     */ 
+/*     */       
+/* 550 */       i = getCount("MDLCGMDL");
+/* 551 */       if (i == 0) {
+/* 552 */         EntityGroup entityGroup = this.m_elist.getEntityGroup("MODELCG");
+/*     */         
+/* 554 */         this.args[0] = entityGroup.getLongDescription();
+/* 555 */         addError("MUST_BE_IN_ATLEAST_ONE_ERR", this.args);
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 559 */     if ("0040".equals(paramString)) {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 564 */       int i = getCount("MODELMONITOR");
+/* 565 */       if (i > 1) {
+/* 566 */         EntityGroup entityGroup = this.m_elist.getEntityGroup("MONITOR");
+/*     */         
+/* 568 */         this.args[0] = entityGroup.getLongDescription();
+/* 569 */         addError("MORE_THAN_ONE_ERR", this.args);
+/*     */       } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 575 */       checkAnn(paramEntityItem);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 587 */       checkAnnDate(paramEntityItem);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void checkAnnDate(EntityItem paramEntityItem) throws MiddlewareException, SQLException {
+/* 608 */     String str = getAttributeValue(paramEntityItem, "ANNDATE", "");
+/* 609 */     addDebug("checkAnnDate " + paramEntityItem.getKey() + " ANNDATE: " + str);
+/* 610 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("PRODSTRUCT");
+/* 611 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/*     */       
+/* 613 */       EntityItem entityItem1 = entityGroup.getEntityItem(b);
+/*     */       
+/* 615 */       Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(entityItem1, "OOFAVAIL", "AVAIL");
+/* 616 */       String str1 = getAttributeValue(entityItem1, "ANNDATE", "");
+/* 617 */       addDebug("checkAnnDate " + entityItem1.getKey() + " ANNDATE: " + str1 + " availVct: " + vector.size());
+/* 618 */       EntityItem entityItem2 = (EntityItem)getUpLinkEntityItem(entityItem1, "FEATURE");
+/* 619 */       String str2 = getAttributeValue(entityItem2, "FIRSTANNDATE", "");
+/* 620 */       addDebug("checkAnnDate " + entityItem2.getKey() + " FIRSTANNDATE: " + str2);
+/*     */ 
+/*     */       
+/* 623 */       if (str1.length() > 0) {
+/*     */ 
+/*     */ 
+/*     */         
+/* 627 */         if (str2.length() > 0 && str1.compareTo(str2) < 0) {
+/*     */ 
+/*     */           
+/* 630 */           this.args[0] = entityGroup.getLongDescription() + " " + 
+/* 631 */             PokUtils.getAttributeDescription(entityGroup, "ANNDATE", "ANNDATE");
+/* 632 */           this.args[1] = entityItem2.getEntityGroup().getLongDescription();
+/* 633 */           this.args[2] = PokUtils.getAttributeDescription(entityItem2.getEntityGroup(), "FIRSTANNDATE", "FIRSTANNDATE");
+/* 634 */           this.args[3] = "";
+/* 635 */           addError("EARLY_DATE_ERR", this.args);
+/*     */         } 
+/*     */ 
+/*     */ 
+/*     */         
+/* 640 */         if (str.length() > 0 && str1.compareTo(str) < 0) {
+/*     */ 
+/*     */           
+/* 643 */           this.args[0] = entityGroup.getLongDescription() + " " + 
+/* 644 */             PokUtils.getAttributeDescription(entityGroup, "ANNDATE", "ANNDATE");
+/* 645 */           this.args[1] = paramEntityItem.getEntityGroup().getLongDescription();
+/* 646 */           this.args[2] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "ANNDATE", "ANNDATE");
+/* 647 */           this.args[3] = "";
+/* 648 */           addError("EARLY_DATE_ERR", this.args);
+/*     */         } 
+/*     */ 
+/*     */ 
+/*     */         
+/* 653 */         for (byte b1 = 0; b1 < vector.size(); b1++) {
+/* 654 */           EntityItem entityItem = vector.elementAt(b1);
+/* 655 */           String str3 = PokUtils.getAttributeValue(entityItem, "EFFECTIVEDATE", ", ", "", false);
+/* 656 */           String str4 = getAttributeFlagEnabledValue(entityItem, "AVAILTYPE");
+/* 657 */           addDebug("checkAnnDate " + entityItem.getKey() + " EFFECTIVEDATE: " + str3 + " AVAILTYPE: " + str4);
+/*     */           
+/* 659 */           if ("146".equals(str4) && str3
+/* 660 */             .length() > 0 && str3.compareTo(str1) < 0) {
+/*     */ 
+/*     */             
+/* 663 */             this.args[0] = entityItem1.getEntityGroup().getLongDescription();
+/* 664 */             this.args[1] = getNavigationName(entityItem1);
+/* 665 */             this.args[2] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "ANNDATE", "ANNDATE");
+/* 666 */             this.args[3] = entityItem.getEntityGroup().getLongDescription();
+/* 667 */             this.args[4] = getNavigationName(entityItem);
+/* 668 */             addError("LATER_DATE_ERR", this.args);
+/*     */           } 
+/*     */         } 
+/*     */       } else {
+/* 672 */         addDebug("No ANNDATE found for " + entityItem1.getKey());
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 677 */         if (str2.length() > 0) {
+/* 678 */           for (byte b1 = 0; b1 < vector.size(); b1++) {
+/* 679 */             EntityItem entityItem = vector.elementAt(b1);
+/* 680 */             addDebug("checkAnnDate no PRODSTRUCT.ANNDATE checking " + entityItem.getKey());
+/* 681 */             if (PokUtils.isSelected(entityItem, "AVAILTYPE", "146")) {
+/* 682 */               String str3 = PokUtils.getAttributeValue(entityItem, "EFFECTIVEDATE", ", ", "", false);
+/* 683 */               addDebug("checkAnnDate plannedavail " + entityItem.getKey() + " EFFECTIVEDATE: " + str3);
+/* 684 */               if (str3.length() > 0 && str3.compareTo(str2) < 0) {
+/*     */ 
+/*     */                 
+/* 687 */                 this.args[0] = entityItem2.getEntityGroup().getLongDescription();
+/* 688 */                 this.args[1] = getNavigationName(entityItem1);
+/* 689 */                 this.args[2] = PokUtils.getAttributeDescription(entityItem2.getEntityGroup(), "FIRSTANNDATE", "FIRSTANNDATE");
+/* 690 */                 this.args[3] = entityItem.getEntityGroup().getLongDescription();
+/* 691 */                 this.args[4] = getNavigationName(entityItem);
+/* 692 */                 addError("LATER_DATE_ERR", this.args);
+/*     */               } 
+/*     */             } 
+/*     */           } 
+/*     */         }
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void checkModelAvails(EntityItem paramEntityItem, String paramString) throws MiddlewareException, SQLException {
+/* 711 */     Vector vector = PokUtils.getAllLinkedEntities(paramEntityItem, "MODELAVAIL", "AVAIL");
+/* 712 */     Vector<EntityItem> vector1 = PokUtils.getEntitiesWithMatchedAttr(vector, "AVAILTYPE", "146");
+/* 713 */     addDebug("checkModelAvails " + paramEntityItem.getKey() + " availVct " + vector.size() + " plannedavailVector " + vector1.size());
+/* 714 */     vector.clear();
+/* 715 */     if (vector1.size() == 0) {
+/*     */ 
+/*     */       
+/* 718 */       this.args[0] = "Planned Availability";
+/* 719 */       addError("MINIMUM_ERR", this.args);
+/* 720 */     } else if ("0040".equals(paramString)) {
+/*     */ 
+/*     */       
+/* 723 */       String str = getAttributeValue(paramEntityItem, "ANNDATE", "");
+/* 724 */       addDebug("checkModelAvails " + paramEntityItem.getKey() + " ANNDATE: " + str);
+/* 725 */       if (str.length() > 0) {
+/* 726 */         for (byte b = 0; b < vector1.size(); b++) {
+/* 727 */           EntityItem entityItem = vector1.elementAt(b);
+/* 728 */           String str1 = PokUtils.getAttributeValue(entityItem, "EFFECTIVEDATE", ", ", "", false);
+/* 729 */           addDebug("checkModelAvails " + entityItem.getKey() + " EFFECTIVEDATE: " + str1);
+/*     */           
+/* 731 */           if (str1.length() > 0 && str1.compareTo(str) < 0) {
+/*     */ 
+/*     */             
+/* 734 */             this.args[0] = "";
+/* 735 */             this.args[1] = "";
+/* 736 */             this.args[2] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "ANNDATE", "ANNDATE");
+/* 737 */             this.args[3] = entityItem.getEntityGroup().getLongDescription();
+/* 738 */             this.args[4] = getNavigationName(entityItem);
+/* 739 */             addError("LATER_DATE_ERR", this.args);
+/*     */           } 
+/*     */         } 
+/*     */       }
+/* 743 */       vector1.clear();
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private EANEntity getUpLinkEntityItem(EntityItem paramEntityItem, String paramString) {
+/* 756 */     EANEntity eANEntity = null;
+/* 757 */     for (byte b = 0; b < paramEntityItem.getUpLinkCount(); b++) {
+/* 758 */       EANEntity eANEntity1 = paramEntityItem.getUpLink(b);
+/* 759 */       if (eANEntity1.getEntityType().equals(paramString)) {
+/* 760 */         eANEntity = eANEntity1;
+/*     */         
+/*     */         break;
+/*     */       } 
+/*     */     } 
+/* 765 */     return eANEntity;
+/*     */   }
+/*     */ }
 
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.objects.*;
-import com.ibm.transform.oim.eacm.util.*;
 
-import java.util.*;
-
-
-/**********************************************************************************
-* MODELABRSTATUS class
-*
-* From "SG FS ABR Data Quality 20080722.doc"
-*
-* The Model (MODEL) is part of a complex data structure and hence a Virtual Entity (VE)
-* is used to describe the applicable structure for the Data Quality checks and another
-* VE for the SAPL feed.
-*
-* Process
-* 	There may be a SAPL XML Feed to OIDH (LEDGER) of this data which is determined after
-* the data quality checks (if any) are complete.
-*
-* The ABR produces a Report
-*
-* The ABR sets its unique attribute (MODELABRSTATUS)
-MODELABRSTATUS_class=COM.ibm.eannounce.abr.sg.MODELABRSTATUS
-MODELABRSTATUS_enabled=true
-MODELABRSTATUS_idler_class=A
-MODELABRSTATUS_keepfile=true
-MODELABRSTATUS_report_type=DGTYPE01
-MODELABRSTATUS_vename=EXRPT3MODEL1
-MODELABRSTATUS_CAT1=RPTCLASS.MODELABRSTATUS
-MODELABRSTATUS_CAT2=
-MODELABRSTATUS_CAT3=RPTSTATUS
-MODELABRSTATUS_domains=0050,0090,0150,0190,0210,0230,0240,0310,0330,0340,0360,0390
-*/
-// MODELABRSTATUS.java,v
-// Revision 1.43  2009/10/12 12:33:02  wendy
-// restore correct code level
-//
-// Revision 1.40  2008/07/23 13:26:10  wendy
-// MN36320529 - Incorrectly checks MODELs that are not Hardware and requires a hardware feature.
-//
-// Revision 1.39  2008/05/29 15:53:49  wendy
-// Backout queueing ADSABRSTATUS
-//
-// Revision 1.38  2008/05/06 21:23:47  wendy
-// changes for SG FS ABR Data Quality 20080506.doc
-//
-// Revision 1.37  2008/05/01 12:02:45  wendy
-// updates for SG FS ABR Data Quality 20080430.doc
-//
-// Revision 1.36  2008/04/24 20:54:32  wendy
-// "SG FS ABR Data Quality 20080422.doc" spec updates
-//
-// Revision 1.35  2008/04/11 19:13:10  wendy
-// changes for spec SG FS ABR Data Quality 200803xx.doc
-//
-// Revision 1.34  2008/02/13 19:58:49  wendy
-// Make ABRWAITODSx into constants, allow easier change in future
-//
-// Revision 1.33  2008/01/21 17:26:55  wendy
-// Default null status to final
-//
-// Revision 1.32  2007/12/19 17:18:37  wendy
-// VE not needed if already FINAL
-//
-// Revision 1.31  2007/12/12 17:00:24  wendy
-// spec chg "Changed the value used to queue WWPRT since it uses VIEWs in the "legacy" ODS (i.e. not the "approved data ods")"
-//
-// Revision 1.30  2007/11/27 22:07:31  wendy
-// SG FS ABR Data Quality 20071127.doc chgs and TIR79CNTQ
-//
-// Revision 1.29  2007/11/16 22:17:21  nancy
-// Chgs for spec "SG FS ABR Data Quality 20071115.doc"
-//
-// Revision 1.28  2007/10/25 20:06:32  wendy
-// Spec changes
-//
-// Revision 1.27  2007/10/23 17:47:12  wendy
-// Spec changes
-//
-// Revision 1.26  2007/10/15 20:22:35  wendy
-// QueueSAPL when PDHDOMAIN is not in list of domains
-//
-// Revision 1.25  2007/09/14 17:43:55  wendy
-// Updated for GX
-//
-// Revision 1.24  2007/08/17 16:02:10  wendy
-// RQ0713072645 - support for converged products. Another PDHDOMAIN was added.
-// from 'SG FS xSeries ABRs 20070803.doc'
-//
-// Revision 1.23  2007/06/18 18:31:44  wendy
-// TIR 747QEJ- XML Mapping SS updated
-//
-// Revision 1.22  2007/06/13 21:18:21  wendy
-// TIR73RS77 -XML Mapping updated
-//
-// Revision 1.21  2007/05/16 17:19:15  wendy
-// TIR 7STP5L - Routing of XML correction required, spec chg
-//
-// Revision 1.20  2007/05/04 13:40:05  wendy
-// RQ022507238 chgs
-//
-// Revision 1.19  2007/04/20 21:48:59  wendy
-// RQ0417075638 updates
-//
-// Revision 1.18  2007/04/02 17:38:50  wendy
-// Modified for SAPL
-//
-public class MODELABRSTATUS extends DQABRSTATUS
-{
-    private Object[] args = new String[10];
-
-  	/**********************************
-	* needs VE for all except already final
-	*/
-	protected boolean isVEneeded(String statusFlag) {
-		return !(STATUS_FINAL.equals(statusFlag));
-	}
-
-	/**********************************
-	* complete abr processing when status is already final; (dq was final too)
-	* E.	Status = Final
-	*
-	* Data Quality checking is not required; however, the data may need to be sent via XML to SAPL.
-	* This occurs when data is sent to SAPL but there is a downstream failure which requires the XML
-	* to be sent again. The UI allows the setting of SAPL to Send which will queue this ABR.
-	*
-	* 1.	Set SAPLABRSTATUS = 0020 (Queued)
-	2.	Set ADSABRSTATUS = 0020 (Queued)
-	*/
-	protected void doAlreadyFinalProcessing() {
-        setFlagValue(m_elist.getProfile(),"SAPLABRSTATUS", SAPLABR_QUEUED);
-//        setFlagValue(m_elist.getProfile(),"ADSABRSTATUS", ABR_QUEUED);
-	}
-
-    /**********************************
-    * complete abr processing after status moved to readyForReview; (status was chgreq)
-	* D.	STATUS changed to Ready for Review
-	* 1.	Set COMPATGENABR = 0020 (Queued)
-	* 2.	PropagateOStoWWSEO
-	3.	Set ADSABRSTATUS = 0020 (Queued)
-    */
-    protected void completeNowR4RProcessing() throws
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-    {
-         setFlagValue(m_elist.getProfile(),"COMPATGENABR", ABR_QUEUED);
-         propagateOStoWWSEO(m_elist.getParentEntityGroup().getEntityItem(0),m_elist.getEntityGroup("WWSEO"));
-//         setFlagValue(m_elist.getProfile(),"ADSABRSTATUS", ABR_QUEUED);
-    }
-
-	/**********************************
-	* complete abr processing after status moved to final; (status was r4r)
-	*	C.	STATUS changed to Final
-	*1.	IF FirstTime(LSEOBUNDLE.STATUS = 0020 (Final)) THEN  ELSE obtain the value for SAPASSORTMODULE
-	*	that was in effect at the 'last DTS that STATUS was Final' and set SAPASSORTMODULEPRIOR equal to
-	*	that value.
-	*2.	PropagateOStoWWSEO
-	*3.	QueueSAPL
-	*4.	Set COMPATGENABR = 0020 (Queued)
-	*5.	Set WWPRTABRSTATUS = ABRWAITODS2 (Wait for ODS Data)
-	*6.	Set EPIMSABRSTATUS =  ABRWAITODS (Wait for ODS Data)
-	7.	Set ADSABRSTATUS = 0020 (Queued)
-	*8.	IF (MODEL: MODELAVAIL-d: AVAILANNA: ANNOUNCEMENT.STATUS = 0020 (Final) and
-	* (MODEL: MODELAVAIL: AVAILANNA: ANNOUNCEMENT.ANNTYPE) = 19 (New) then
-	* Set (MODEL: MODELAVAIL: AVAILANNA: ANNOUNCEMENT.WWPRTABRSTATUS) = ABRWAITODS2 (Wait for ODS Data)
-	*/
-	protected void completeNowFinalProcessing() throws
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-	{
-        checkAssortModule();
-        propagateOStoWWSEO(m_elist.getParentEntityGroup().getEntityItem(0),m_elist.getEntityGroup("WWSEO"));
-		queueSapl();
-        setFlagValue(m_elist.getProfile(),"COMPATGENABR", ABR_QUEUED);
-        setFlagValue(m_elist.getProfile(),"WWPRTABRSTATUS", ABRWAITODS2);
-        setFlagValue(m_elist.getProfile(),"EPIMSABRSTATUS", ABRWAITODS);
-//        setFlagValue(m_elist.getProfile(),"ADSABRSTATUS", ABR_QUEUED);
-
-		EntityGroup	eg = m_elist.getEntityGroup("ANNOUNCEMENT");
-		for (int i=0; i<eg.getEntityItemCount(); i++){
-			EntityItem annItem = eg.getEntityItem(i);
-			String annstatus = getAttributeFlagEnabledValue(annItem, "ANNSTATUS");
-			String anntype = getAttributeFlagEnabledValue(annItem, "ANNTYPE");
-			addDebug(annItem.getKey()+" status "+annstatus+" type "+anntype);
-            if(annstatus == null || annstatus.length()==0) {
-                annstatus = STATUS_FINAL;
-            }
-			if (STATUS_FINAL.equals(annstatus) && "19".equals(anntype)){
-				addDebug(annItem.getKey()+" is Final and New");
-				setFlagValue(m_elist.getProfile(),"WWPRTABRSTATUS", ABRWAITODS2,annItem);
-			}
-		}
-	}
-
-	/**********************************
-	* complete abr processing after status moved to final; (status was r4r) for
-	* those ABRs that have domains that are not in the list of domains
-	*/
-	protected void completeNowFinalProcessingForOtherDomains() throws
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-    {
-		queueSapl();
-	}
-
-	/**********************************
-	* From "SG FS ABR Data Quality 20071024.doc"
-	* A.	STATUS = Draft | Change Request
-	*
-1.	IF ValueOf(MODEL.COFCAT) = 100 (Hardware) & ValueOf(MODEL.COFSUBCAT) = 126 (System) THEN
-	a.	CountOf(MDLCGMDL-u: MODELCG) => 1
-	ErrorMessage 'must be in at least one' LD(MODELCG)
-2. IF ValueOf(MODEL.COFCAT) = 102 (Service) THEN
-	a.	CountOf(MDLCGMDL-u: MODELCG) = 0
-	ErrorMessage 'is a Service and must not be in a' LD(MODELCG)
-	b.	CountOf(SEOCGSEO-u: SEOCG) = 0
-	ErrorMessage 'is a Service and must not be in a' LD(SEOCG)
-3.	CountOf( MODEL.AVAIL-d: AVAIL)  => 1 WHERE ValueOf(AVAILTYPE = 146 (Planned Availability)
-	ErrorMessage 'must have at least one Planned Availability'
-	*
-	*B.	STATUS = Ready for Review
-	*
-1.	Draft | Change Request Criteria
-2.	IF ValueOf(MODEL.COFCAT) = 100 (Hardware) & ValueOf(MODEL.COFSUBCAT) = 126 (System) THEN
-	a.	CountOf(MODELIMG-d: IMG) => 1
-		ErrorMessage 'must have at least one' LD(IMG)
-	b.	CountOf(MODELWARR-d. WARR) => 1
-		ErrorMessage 'must have at least one' LD(WARR)
-3.	IF ValueOf(MODEL.COFCAT) = 100 (Hardware) THEN
-	a.	 MODELMONITOR.QTY * CountOf(MODELMONITOR-d: MONITOR) <= 1
-		ErrorMessage 'has more than one' LD(MONITOR)
-	b.	AllValuesOf(MODELAVAIL-d: AVAIL.ANNCODENAME) IN (PRODSTRUCT-u: OOFAVAIL-d: AVAIL.ANNCODENAME) WHERE AVAIL.AVAILTYPE = 146 (Planned Availability)
-		ErrorMessage LD(MODEL) NDN(MODEL) LD(AVAIL) NDN(AVAIL) LD(ANNCODENAME) "does not announce any" LD(FEATURE)
-	c.	IF NotNull(PRODSTRUCT.ANNDATE) THEN
-		-	 ValueOf(PRODSTRUCT.ANNDATE) >= (PRODSTRUCT-u: FEATURE.FIRSTANNDATE)
-		ErrorMessage LD(PRODSTRUCT) LD(ANNDATE) 'is earlier than the' LD(FEATURE) LD(FIRSTANNDATE)
-		-	 ValueOf(PRODSTRUCT.ANNDATE) >= (MODEL.ANNDATE)
-		ErrorMessage LD(PRODSTRUCT) LD(ANNDATE) 'is earlier than the' LD(MODEL) LD(ANNDATE)
-		-	AllValuesOf(OOFAVAIL-d: AVAIL.EFFECTIVEDATE) => ValueOf(PRODSTRUCT.ANNDATE) WHERE ValueOf(AVAIL.AVAILTYPE) = 146 (Planned Availability)
-		ErrorMessage LD(PRODSTRUCT) NDN(PRODSTRUCT) LD(ANNDATE) 'is later than the' LD(AVAIL) NDN(AVAIL)
-	d.	ELSE
-		-	AllValuesOf (OOFAVAIL-d: AVAIL.EFFECTIVEDATE) => ValueOf(PRODSTRUCT-u: FEATURE.FIRSTANNDATE) WHERE AVAIL.AVAILTYPE = 146 (Planned Availability)
-		ErrorMessage LD(FEATURE) NDN(PRODSTRUCT) LD(FIRSTANNDATE) 'is later than the' LD(AVAIL) NDN(AVAIL)
-4.	AllValuesOf(MODELAVAIL-d: AVAIL.EFFECTIVEDATE) => MODEL.ANNDATE WHERE AVAIL.AVAILTYPE = 146 (Planned Availability)
-	ErrorMessage LD(MODEL) NDN(MODEL) LD(ANNDATE) 'is later than the' LD(AVAIL) NDN(AVAIL)
-5.	AllValuesOf(PRODSTRUCT-u: OOFAVAIL-d: AVAIL.EFFECTIVEDATE) => (PRODSTRUCT-u: OOFAVAIL-d: AVAILANNA-a: ANNOUNCEMENT.ANNDATE) WHERE AVAIL.AVAILTYPE = 146 (Planned Availability)
-	ErrorMessage LD(PRODSTRUCT) NDN(PRODSTRUCT) LD(AVAIL) NDN(AVAIL) "is earlier than the" LD(ANNOUNCEMENT) NDN(ANNOUNCEMENT) LD(ANNDATE)
-6.	AllValuesOf(PRODSTRUCT-u: OOFAVAIL-d: AVAIL.EFFECTIVEDATE) => (PRODSTRUCT-u: OOFAVAIL-d: AVAILANNA-a: ANNOUNCEMENT.ANNDATE) WHERE AVAIL.AVAILTYPE = 143 (First Order)
-	ErrorMessage LD(PRODSTRUCT) NDN(PRODSTRUCT) LD(AVAIL) NDN(AVAIL) "is earlier than the" LD(ANNOUNCEMENT) NDN(ANNOUNCEMENT) LD(ANNDATE)
-
-	*
-	*C.	STATUS changed to Ready for Review
-	*1.	Set COMPATGENABR = 0020 (Queued)
-	*2.	PropagateOStoWWSEO
-	3.	Set ADSABRSTATUS = 0020 (Queued)
-	*
-	*D.	STATUS changed to Final
-	*1.	IF FirstTime(MODEL.STATUS = 0020 (Final)) THEN  ELSE obtain the value for SAPASSORTMODULE that was in effect at the 'last DTS that STATUS was Final' and set SAPASSORTMODULEPRIOR equal to that value.
-	*2.	PropagateOStoWWSEO
-	*3.	QueueSAPL
-	*4.	Set COMPATGENABR = 0020 (Queued)
-	*5.	Set WWPRTABRSTATUS = ABRWAITODS2 (Wait for ODS Data)
-	*6.	Set EPIMSABRSTATUS =  ABRWAITODS (Wait for ODS Data)
-	*7.	IF (MODEL: MODELAVAIL-d: AVAILANNA: ANNOUNCEMENT.STATUS = 0020 (Final) and
-	* (MODEL: MODELAVAIL: AVAILANNA: ANNOUNCEMENT.ANNTYPE) = 19 (New) then
-	* Set (MODEL: MODELAVAIL: AVAILANNA: ANNOUNCEMENT.WWPRTABRSTATUS) = ABRWAITODS2 (Wait for ODS Data)
-	*
-	*E.	Status = Final
-	*Data Quality checking is not required; however, the data may need to be sent via XML to SAPL. This occurs when data is sent to SAPL but there is a downstream failure which requires the XML to be sent again. The UI allows the setting of SAPL to Send which will queue this ABR.
-	*1.	QueueSAPL
-	*/
-	protected void doDQChecking(EntityItem rootEntity, String statusFlag) throws Exception
-	{
-		int cnt =0;
-		String modelCOFCAT = getAttributeFlagEnabledValue(rootEntity, "COFCAT");
-		if(modelCOFCAT == null)	{
-			modelCOFCAT = "";
-		}
-		addDebug(rootEntity.getKey()+" COFCAT: "+modelCOFCAT);
-
-		// always do some of these checks now
-		if(HARDWARE.equals(modelCOFCAT)) {
-			checkHardware(rootEntity,statusFlag);
-		}
-
-		if(SERVICE.equals(modelCOFCAT)) {
-			//2.	IF ValueOf(MODEL.COFCAT) = 102 (Service) THEN
-			//	a.	CountOf(MDLCGMDL-u: MODELCG) = 0
-			//	ErrorMessage 'is a Service and must not be in a' LD(MODELCG)
-			cnt = getCount("MDLCGMDL");
-			if(cnt > 0)	{
-				EntityGroup eGrp = m_elist.getEntityGroup("MODELCG");
-				//SVC_SEOCG_ERR = is a Service and must not be in a {0}
-				args[0] = eGrp.getLongDescription();
-				addError("SVC_SEOCG_ERR",args);
-			}
-			//	b.	CountOf(SEOCGSEO-u: SEOCG) = 0
-			//	ErrorMessage 'is a Service and must not be in a' LD(SEOCG)
-			cnt = getCount("SEOCGSEO");
-			if(cnt > 0)	{
-				EntityGroup eGrp = m_elist.getEntityGroup("SEOCG");
-				//SVC_SEOCG_ERR = is a Service and must not be in a {0}
-				args[0] = eGrp.getLongDescription();
-				addError("SVC_SEOCG_ERR",args);
-			}
-		} // end svc model
-
-		//always 3.CountOf( MODELAVAIL-d: AVAIL)  => 1 WHERE ValueOf(AVAILTYPE = 146 (Planned Availability)
-		//ErrorMessage 'must have at least one Planned Availability'
-		//only R4R does this
-		//4.AllValuesOf(MODELAVAIL-d: AVAIL.EFFECTIVEDATE) => MODEL.ANNDATE WHERE AVAIL.AVAILTYPE = 146 (Planned Availability)
-		//ErrorMessage LD(MODEL) NDN(MODEL) LD(ANNDATE) 'is later than the' LD(AVAIL) NDN(AVAIL)
-		checkModelAvails(rootEntity, statusFlag);
-
-        if(STATUS_R4REVIEW.equals(statusFlag)) // 'Ready for Review to Final'
-        {
-			//5.	AllValuesOf(PRODSTRUCT-u: OOFAVAIL-d: AVAIL.EFFECTIVEDATE) =>
-			//	(PRODSTRUCT-u: OOFAVAIL-d: AVAILANNA-a: ANNOUNCEMENT.ANNDATE) WHERE AVAIL.AVAILTYPE = 146 (Planned Availability)
-			//ErrorMessage LD(PRODSTRUCT) NDN(PRODSTRUCT) LD(AVAIL) NDN(AVAIL) "is earlier than the" LD(ANNOUNCEMENT) NDN(ANNOUNCEMENT) LD(ANNDATE)
-			//6.	AllValuesOf(PRODSTRUCT-u: OOFAVAIL-d: AVAIL.EFFECTIVEDATE) =>
-			//	(PRODSTRUCT-u: OOFAVAIL-d: AVAILANNA-a: ANNOUNCEMENT.ANNDATE) WHERE AVAIL.AVAILTYPE = 143 (First Order)
-			//ErrorMessage LD(PRODSTRUCT) NDN(PRODSTRUCT) LD(AVAIL) NDN(AVAIL) "is earlier than the" LD(ANNOUNCEMENT) NDN(ANNOUNCEMENT) LD(ANNDATE)
-			checkAvailDates();
-		}
-	}
-
-    /***********************************************
-	b.	AllValuesOf(MODELAVAIL-d: AVAIL.ANNCODENAME) IN (PRODSTRUCT-u: OOFAVAIL-d: AVAIL.ANNCODENAME)
-	WHERE AVAIL.AVAILTYPE = 146 (Planned Availability)
-	ErrorMessage LD(MODEL) NDN(MODEL) LD(AVAIL) NDN(AVAIL) LD(ANNCODENAME) "does not announce any" LD(FEATURE)
-	*/
-	private void checkAnn(EntityItem rootEntity) throws java.sql.SQLException,
-		COM.ibm.opicmpdh.middleware.MiddlewareException
-	{
-		// get AVAIL from MODELAVAIL
-		Vector availVct = PokUtils.getAllLinkedEntities(rootEntity, "MODELAVAIL", "AVAIL");
-		Vector plannedavailVector = PokUtils.getEntitiesWithMatchedAttr(availVct, "AVAILTYPE", PLANNEDAVAIL);//Planned Availability
-		addDebug("checkAnn "+rootEntity.getKey()+" availVct "+availVct.size()+" plannedavailVector "+plannedavailVector.size());
-
-		EntityGroup psGrp = m_elist.getEntityGroup("PRODSTRUCT");
-		// get AVAIL from OOFAVAIL
-		Vector psavailVct = PokUtils.getAllLinkedEntities(psGrp, "OOFAVAIL", "AVAIL");
-		Vector plannedPsAvailVector = PokUtils.getEntitiesWithMatchedAttr(psavailVct, "AVAILTYPE", PLANNEDAVAIL);//Planned Availability
-		addDebug("checkAnn psavailVct: "+psavailVct.size()+" plannedPsAvailVector: "+plannedPsAvailVector.size());
-
-		Hashtable mdlTbl = new Hashtable();
-		HashSet psSet = new HashSet();
-		for (int ai=0; ai<plannedavailVector.size(); ai++){ // look at mdlavails
-			EntityItem avail = (EntityItem)plannedavailVector.elementAt(ai);
-			EANFlagAttribute fAtt = (EANFlagAttribute)avail.getAttribute("ANNCODENAME");
-			addDebug("modelavail "+avail.getKey()+" ANNCODENAME "+
-				PokUtils.getAttributeFlagValue(avail, "ANNCODENAME")+NEWLINE);
-			if (fAtt!=null && fAtt.toString().length()>0){
-				// Get the selected Flag codes.
-				MetaFlag[] mfArray = (MetaFlag[]) fAtt.get();
-				for (int i = 0; i < mfArray.length; i++){
-					// get selection
-					if (mfArray[i].isSelected()){
-						mdlTbl.put(mfArray[i].getFlagCode(), avail);
-					}  // metaflag is selected
-				}// end of flagcodes
-			}
-		}
-		for (int ai=0; ai<plannedPsAvailVector.size(); ai++){ // look at psavails
-			EntityItem avail = (EntityItem)plannedPsAvailVector.elementAt(ai);
-			EANFlagAttribute fAtt = (EANFlagAttribute)avail.getAttribute("ANNCODENAME");
-			addDebug("psavail "+avail.getKey()+" ANNCODENAME "+
-				PokUtils.getAttributeFlagValue(avail, "ANNCODENAME")+NEWLINE);
-			if (fAtt!=null && fAtt.toString().length()>0){
-				// Get the selected Flag codes.
-				MetaFlag[] mfArray = (MetaFlag[]) fAtt.get();
-				for (int i = 0; i < mfArray.length; i++){
-					// get selection
-					if (mfArray[i].isSelected()){
-						psSet.add(mfArray[i].getFlagCode());
-					}  // metaflag is selected
-				}// end of flagcodes
-			}
-		}
-
-		// look for a match in prodstruct->plannedavail to the model->plannedavail
-		Iterator itr = mdlTbl.keySet().iterator();
-		while(itr.hasNext()) {
-			String anncodename = (String) itr.next();
-			if(!psSet.contains(anncodename))  {
-				EntityItem avail = (EntityItem)mdlTbl.get(anncodename);
-
-				//	ErrorMessage LD(AVAIL) NDN(AVAIL) LD(ANNCODENAME) "does not announce any" LD(FEATURE)
-				//NO_ANNOUNCE_FEATURE = {0} {1} {2} does not announce any {3}
-				args[0] = avail.getEntityGroup().getLongDescription();
-				args[1] = getNavigationName(avail);
-				args[2] = PokUtils.getAttributeDescription(avail.getEntityGroup(), "ANNCODENAME", "ANNCODENAME");
-				args[3] = m_elist.getEntityGroup("FEATURE").getLongDescription();
-				addError("NO_ANNOUNCE_FEATURE",args);
-			}
-		}
-
-		mdlTbl.clear();
-		psSet.clear();
-	}
-
-    /***********************************************
-	5.	AllValuesOf(PRODSTRUCT-u: OOFAVAIL-d: AVAIL.EFFECTIVEDATE) =>
-		(PRODSTRUCT-u: OOFAVAIL-d: AVAILANNA-a: ANNOUNCEMENT.ANNDATE) WHERE AVAIL.AVAILTYPE = 146 (Planned Availability)
-	ErrorMessage LD(PRODSTRUCT) NDN(PRODSTRUCT) LD(AVAIL) NDN(AVAIL) "is earlier than the" LD(ANNOUNCEMENT) NDN(ANNOUNCEMENT) LD(ANNDATE)
-	6.	AllValuesOf(PRODSTRUCT-u: OOFAVAIL-d: AVAIL.EFFECTIVEDATE) =>
-		(PRODSTRUCT-u: OOFAVAIL-d: AVAILANNA-a: ANNOUNCEMENT.ANNDATE) WHERE AVAIL.AVAILTYPE = 143 (First Order)
-	ErrorMessage LD(PRODSTRUCT) NDN(PRODSTRUCT) LD(AVAIL) NDN(AVAIL) "is earlier than the" LD(ANNOUNCEMENT) NDN(ANNOUNCEMENT) LD(ANNDATE)
-	*/
-	private void checkAvailDates() throws java.sql.SQLException,
-		COM.ibm.opicmpdh.middleware.MiddlewareException
-	{
-		EntityGroup psGrp = m_elist.getEntityGroup("PRODSTRUCT");
-        for(int i = 0; i < psGrp.getEntityItemCount(); i++) {
-			EntityItem prodstructItem = psGrp.getEntityItem(i);
-			// get AVAIL from OOFAVAIL
-			Vector availVct = PokUtils.getAllLinkedEntities(prodstructItem, "OOFAVAIL", "AVAIL");
-			addDebug("checkAvailDates "+prodstructItem.getKey()+" availVct: "+availVct.size());
-
-			for (int ai=0; ai<availVct.size(); ai++){ // look at avails
-				EntityItem avail = (EntityItem)availVct.elementAt(ai);
-				String effDate = PokUtils.getAttributeValue(avail, "EFFECTIVEDATE",", ", "", false);
-				String availtype = getAttributeFlagEnabledValue(avail, "AVAILTYPE");
-				addDebug("checkAvailDates "+avail.getKey()+" EFFECTIVEDATE: "+effDate+" AVAILTYPE: "+availtype);
-				if((PLANNEDAVAIL.equals(availtype) || FIRSTORDERAVAIL.equals(availtype))
-					&& effDate.length()>0){
-
-					// get ANNOUNCEMENT from AVAILANNA
-					Vector annVct = PokUtils.getAllLinkedEntities(avail, "AVAILANNA", "ANNOUNCEMENT");
-					addDebug("checkAvailDates "+avail.getKey()+" annVct: "+annVct.size());
-					for (int a=0; a<annVct.size(); a++){
-						EntityItem annitem = (EntityItem)annVct.elementAt(a);
-						String annDate = PokUtils.getAttributeValue(annitem, "ANNDATE",", ", "", false);
-						addDebug("checkAvailDates "+annitem.getKey()+" annDate: "+annDate);
-						if(annDate.length()>0 && effDate.compareTo(annDate)<0){
-							//ErrorMessage LD(AVAIL) NDN(AVAIL) 'is earlier than' LD(ANNOUNCEMENT) NDN(ANNOUNCEMENT) LD(ANNDATE)
-							//EARLY_DATE_ERR = {0} is earlier than the {1} {2} {3}
-							args[0] = avail.getEntityGroup().getLongDescription()+" "+ getNavigationName(avail);
-							args[1] = annitem.getEntityGroup().getLongDescription();
-							args[2] = getNavigationName(annitem);
-							args[3] = PokUtils.getAttributeDescription(annitem.getEntityGroup(), "ANNDATE", "ANNDATE");
-							addError("EARLY_DATE_ERR",args);
-						}
-					}
-					annVct.clear();
-				}
-			}
-		}
-	}
-
-    /***********************************************
-    *  Get ABR description
-    *
-    *@return java.lang.String
-    */
-    public String getDescription()
-    {
-        String desc =  "MODEL ABR";
-        return desc;
-    }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getABRVersion()
-    {
-        return "1.43";
-    }
-
-    /***********************************************
-    * MODEL.COFCAT=Hardware
-    MN36320529 - Incorrectly checks MODELs that are not Hardware and requires a hardware feature.
-    *
-1.	IF ValueOf(MODEL.COFCAT) = 100 (Hardware) & ValueOf(MODEL.COFSUBCAT) = 126 (System) THEN
-	a.	CountOf(MDLCGMDL-u: MODELCG) => 1
-	ErrorMessage 'must be in at least one' LD(MODELCG)
-if R4R
-2.	IF ValueOf(MODEL.COFCAT) = 100 (Hardware) & ValueOf(MODEL.COFSUBCAT) = 126 (System) THEN
-	a.	CountOf(MODELIMG-d: IMG) => 1
-	ErrorMessage 'must have at least one' LD(IMG)
-	b.	CountOf(MODELWARR-d. WARR) => 1
-	ErrorMessage 'must have at least one' LD(WARR)
-
-3.	IF ValueOf(MODEL.COFCAT) = 100 (Hardware) THEN
-	a.	 MODELMONITOR.QTY * CountOf(MODELMONITOR-d: MONITOR) <= 1
-	ErrorMessage 'has more than one' LD(MONITOR)
-	b.	AllValuesOf(MODELAVAIL-d: AVAIL.ANNCODENAME) IN (PRODSTRUCT-u: OOFAVAIL-d: AVAIL.ANNCODENAME) WHERE AVAIL.AVAILTYPE = 146 (Planned Availability)
-	ErrorMessage LD(MODEL) NDN(MODEL) LD(AVAIL) NDN(AVAIL) LD(ANNCODENAME) "does not announce any" LD(FEATURE)
-	c.	IF NotNull(PRODSTRUCT.ANNDATE) THEN
-	-	 ValueOf(PRODSTRUCT.ANNDATE) >= (PRODSTRUCT-u: FEATURE.FIRSTANNDATE)
-	ErrorMessage LD(PRODSTRUCT) LD(ANNDATE) 'is earlier than the' LD(FEATURE) LD(FIRSTANNDATE)
-	-	 ValueOf(PRODSTRUCT.ANNDATE) >= (MODEL.ANNDATE)
-	ErrorMessage LD(PRODSTRUCT) LD(ANNDATE) 'is earlier than the' LD(MODEL) LD(ANNDATE)
-	-	AllValuesOf(OOFAVAIL-d: AVAIL.EFFECTIVEDATE) => ValueOf(PRODSTRUCT.ANNDATE) WHERE ValueOf(AVAIL.AVAILTYPE) = 146 (Planned Availability)
-	ErrorMessage LD(PRODSTRUCT) NDN(PRODSTRUCT) LD(ANNDATE) 'is later than the' LD(AVAIL) NDN(AVAIL)
-	d.	ELSE
-	-	AllValuesOf (OOFAVAIL-d: AVAIL.EFFECTIVEDATE) => ValueOf(PRODSTRUCT-u: FEATURE.FIRSTANNDATE) WHERE AVAIL.AVAILTYPE = 146 (Planned Availability)
-	ErrorMessage LD(FEATURE) NDN(PRODSTRUCT) LD(FIRSTANNDATE) 'is later than the' LD(AVAIL) NDN(AVAIL)
-
-    */
-    private void checkHardware(EntityItem rootEntity, String statusFlag) throws MiddlewareException, java.sql.SQLException
-    {
-		String modelCOFSUBCAT = getAttributeFlagEnabledValue(rootEntity, "COFSUBCAT");
-
-		if(modelCOFSUBCAT == null) {
-			modelCOFSUBCAT = "";
-		}
-		addDebug("checkHardware "+rootEntity.getKey()+" COFSUBCAT: "+modelCOFSUBCAT);
-		if(SYSTEM.equals(modelCOFSUBCAT)) {
-			int cnt=0;
-			if(STATUS_R4REVIEW.equals(statusFlag)) // 'Ready for Review to Final'
-			{
-				//2.	IF ValueOf(MODEL.COFCAT) = 100 (Hardware) & ValueOf(MODEL.COFSUBCAT) = 126 (System) THEN
-				//a.	CountOf(MODELIMG-d: IMG) => 1
-				//ErrorMessage 'must have at least one' LD(IMG)
-				cnt = getCount("MODELIMG");
-				if(cnt == 0)	{
-					EntityGroup eGrp = m_elist.getEntityGroup("IMG");
-					//MINIMUM_ERR = must have at least one {0}
-					args[0] = eGrp.getLongDescription();
-					addError("MINIMUM_ERR",args);
-				}
-				//b.	CountOf(MODELWARR-d. WARR) => 1
-				//ErrorMessage 'must have at least one' LD(WARR)
-				cnt = getCount("MODELWARR");
-				if(cnt == 0)	{
-					EntityGroup eGrp = m_elist.getEntityGroup("WARR");
-					//MINIMUM_ERR = must have at least one {0}
-					args[0] = eGrp.getLongDescription();
-					addError("MINIMUM_ERR",args);
-				}
-			}
-			// do this for R4R or chgreq or draft
-			//1.a.	CountOf(MDLCGMDL-u: MODELCG) => 1
-			//ErrorMessage 'must be in at least one' LD(MODELCG)
-			cnt = getCount("MDLCGMDL");
-			if(cnt == 0)	{
-				EntityGroup eGrp = m_elist.getEntityGroup("MODELCG");
-				//MUST_BE_IN_ATLEAST_ONE_ERR = must be in at least one {0}
-				args[0] = eGrp.getLongDescription();
-				addError("MUST_BE_IN_ATLEAST_ONE_ERR",args);
-			}
-		}
-
-		if(STATUS_R4REVIEW.equals(statusFlag)) // 'Ready for Review to Final'
-		{
-			//3.IF ValueOf(MODEL.COFCAT) = 100 (Hardware) THEN
-			//		- MODELMONITOR.QTY * CountOf(MODELMONITOR-d: MONITOR) <= 1
-			//		ErrorMessage 'has more than one' LD(MONITOR)
-			int cnt = getCount("MODELMONITOR");
-			if(cnt > 1)	{
-				EntityGroup eGrp = m_elist.getEntityGroup("MONITOR");
-				//MORE_THAN_ONE_ERR = Has more than one {0}
-				args[0] = eGrp.getLongDescription();
-				addError("MORE_THAN_ONE_ERR",args);
-			}
-
-			//b.	AllValuesOf(MODELAVAIL-d: AVAIL.ANNCODENAME) IN (PRODSTRUCT-u: OOFAVAIL-d: AVAIL.ANNCODENAME)
-			//	WHERE AVAIL.AVAILTYPE = 146 (Planned Availability)
-			//ErrorMessage LD(MODEL) NDN(MODEL) LD(AVAIL) NDN(AVAIL) LD(ANNCODENAME) "does not announce any" LD(FEATURE)
-			checkAnn(rootEntity);
-
-			//	c.IF (PRODSTRUCT.ANNDATE) <> Null THEN
-			//	 	-ValueOf(PRODSTRUCT.ANNDATE) >= (PRODSTRUCT-u: FEATURE.FIRSTANNDATE)
-			// 		ErrorMessage LD(PRODSTRUCT) LD(ANNDATE) 'is earlier than the' LD(FEATURE) LD(FIRSTANNDATE)
-			// 		-ValueOf(PRODSTRUCT.ANNDATE) >= (MODEL.ANNDATE)
-			// 		ErrorMessage LD(PRODSTRUCT) LD(ANNDATE) 'is earlier than the' LD(MODEL) LD(ANNDATE)
-			//		- AllValuesOf(OOFAVAIL-d: AVAIL.EFFECTIVEDATE) => ValueOf(PRODSTRUCT.ANNDATE) WHERE ValueOf(AVAIL.AVAILTYPE) = 146 (Planned Availability)
-			//		ErrorMessage LD(PRODSTRUCT) NDN(PRODSTRUCT) LD(ANNDATE) 'is later than the' LD(AVAIL) NDN(AVAIL)
-			//	d.	ELSE (PRODSTRUCT.ANNDATE is null)
-			//		-	AllValuesOf (OOFAVAIL-d: AVAIL.EFFECTIVEDATE) => ValueOf(PRODSTRUCT-u: FEATURE.FIRSTANNDATE) WHERE AVAIL.AVAILTYPE = 146 (Planned Availability)
-			//		ErrorMessage LD(FEATURE) NDN(PRODSTRUCT) LD(FIRSTANNDATE) 'is later than the' LD(AVAIL) NDN(AVAIL)
-			checkAnnDate(rootEntity);
-		}
-    }
-
-    /***********************************************
-	*3	a.	IF (PRODSTRUCT.ANNDATE) <> Null THEN
-	*		-	ValueOf(PRODSTRUCT.ANNDATE) >= (PRODSTRUCT-u: FEATURE.FIRSTANNDATE)
-	*		ErrorMessage LD(PRODSTRUCT) LD(ANNDATE) 'is earlier than the' LD(FEATURE) LD(FIRSTANNDATE)
-	*		-	ValueOf(PRODSTRUCT.ANNDATE) >= (MODEL.ANNDATE)
-	*		ErrorMessage LD(PRODSTRUCT) LD(ANNDATE) 'is earlier than the' LD(ANNDATE)
-	*		-	AllValuesOf(OOFAVAIL-d: AVAIL.EFFECTIVEDATE) => ValueOf(PRODSTRUCT.ANNDATE) WHERE ValueOf(AVAIL.AVAILTYPE) = 146 (Planned Availability)
-	*		ErrorMessage LD(PRODSTRUCT) NDN(PRODSTRUCT) LD(ANNDATE) 'is later than the' LD(AVAIL) NDN(AVAIL)
-	*		-	MODELMONITOR.QTY * CountOf(MODELMONITOR-d: MONITOR) <= 1
-	*		ErrorMessage 'has more than one' LD(MONITOR)
-	*	b.	ELSE (PRODSTRUCT.ANNDATE is null)
-	*		-	AllValuesOf (OOFAVAIL-d: AVAIL.EFFECTIVEDATE) => ValueOf(PRODSTRUCT-u: FEATURE.FIRSTANNDATE) WHERE AVAIL.AVAILTYPE = 146 (Planned Availability)
-	*		ErrorMessage LD(FEATURE) NDN(PRODSTRUCT) LD(FIRSTANNDATE) 'is later than the' LD(AVAIL) NDN(AVAIL)
-	*
-    */
-    private void checkAnnDate(EntityItem rootEntity) throws MiddlewareException, java.sql.SQLException
-    {
-        String modelAnnDate = getAttributeValue(rootEntity, "ANNDATE", "");
-		addDebug("checkAnnDate "+rootEntity.getKey()+" ANNDATE: "+modelAnnDate);
-		EntityGroup psGrp = m_elist.getEntityGroup("PRODSTRUCT");
-        for(int i = 0; i < psGrp.getEntityItemCount(); i++)
-        {
-			EntityItem prodstructItem = psGrp.getEntityItem(i);
-			// get AVAIL from OOFAVAIL
-			Vector availVct = PokUtils.getAllLinkedEntities(prodstructItem, "OOFAVAIL", "AVAIL");
-			String annDate = getAttributeValue(prodstructItem, "ANNDATE", "");
-			addDebug("checkAnnDate "+prodstructItem.getKey()+" ANNDATE: "+annDate+" availVct: "+availVct.size());
-			EntityItem featureItem = (EntityItem) getUpLinkEntityItem(prodstructItem, "FEATURE");
-			String featureFirstAnnDate = getAttributeValue(featureItem, "FIRSTANNDATE", "");
-			addDebug("checkAnnDate "+featureItem.getKey()+" FIRSTANNDATE: "+featureFirstAnnDate);
-
-			//a.IF (PRODSTRUCT.ANNDATE) <> Null THEN
-			if(annDate.length()>0)
-			{
-				//ValueOf(PRODSTRUCT.ANNDATE) >= (PRODSTRUCT-u: FEATURE.FIRSTANNDATE)
-				//ErrorMessage LD(PRODSTRUCT) LD(ANNDATE) 'is earlier than the' LD(FEATURE) LD(FIRSTANNDATE)
-				if(featureFirstAnnDate.length()>0 && annDate.compareTo(featureFirstAnnDate) < 0)
-				{
-					//EARLY_DATE_ERR = {0} is earlier than the {1} {2} {3}
-					args[0] = psGrp.getLongDescription()+" "+
-						PokUtils.getAttributeDescription(psGrp, "ANNDATE", "ANNDATE");
-					args[1] = featureItem.getEntityGroup().getLongDescription();
-					args[2] = PokUtils.getAttributeDescription(featureItem.getEntityGroup(), "FIRSTANNDATE", "FIRSTANNDATE");
-					args[3] = "";
-					addError("EARLY_DATE_ERR",args);
-				}
-
-				//ValueOf(PRODSTRUCT.ANNDATE) >= (MODEL.ANNDATE)
-				//ErrorMessage LD(PRODSTRUCT) LD(ANNDATE) 'is earlier than the' LD(MODEL) LD(ANNDATE)
-				if(modelAnnDate.length()>0 && annDate.compareTo(modelAnnDate) < 0)
-				{
-					//EARLY_DATE_ERR = {0} is earlier than the {1} {2} {3}
-					args[0] = psGrp.getLongDescription()+" "+
-						PokUtils.getAttributeDescription(psGrp, "ANNDATE", "ANNDATE");
-					args[1] = rootEntity.getEntityGroup().getLongDescription();
-					args[2] = PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), "ANNDATE", "ANNDATE");
-					args[3] = "";
-					addError("EARLY_DATE_ERR",args);
-				}
-
-				//-	AllValuesOf(OOFAVAIL-d: AVAIL.EFFECTIVEDATE) => ValueOf(PRODSTRUCT.ANNDATE) WHERE ValueOf(AVAIL.AVAILTYPE) = 146 (Planned Availability)
-				//ErrorMessage LD(PRODSTRUCT) NDN(PRODSTRUCT) LD(ANNDATE) 'is later than the' LD(AVAIL) NDN(AVAIL)
-				for (int ai=0; ai<availVct.size(); ai++){ // look at avails
-					EntityItem avail = (EntityItem)availVct.elementAt(ai);
-					String effDate = PokUtils.getAttributeValue(avail, "EFFECTIVEDATE",", ", "", false);
-					String availtype = getAttributeFlagEnabledValue(avail, "AVAILTYPE");
-					addDebug("checkAnnDate "+avail.getKey()+" EFFECTIVEDATE: "+effDate+" AVAILTYPE: "+availtype);
-					// check availtype too
-					if(PLANNEDAVAIL.equals(availtype) &&
-						effDate.length()>0 && effDate.compareTo(annDate)<0){
-						// 	ErrorMessage LD(PRODSTRUCT) NDN(PRODSTRUCT) LD(ANNDATE) 'is later than' LD(AVAIL) NDN(AVAIL)
-						//LATER_DATE_ERR = {0} {1} {2} is later than the {3} {4}
-						args[0] = prodstructItem.getEntityGroup().getLongDescription();
-						args[1] = getNavigationName(prodstructItem);
-						args[2] = PokUtils.getAttributeDescription(prodstructItem.getEntityGroup(), "ANNDATE", "ANNDATE");
-						args[3] = avail.getEntityGroup().getLongDescription();
-						args[4] = getNavigationName(avail);
-						addError("LATER_DATE_ERR",args);
-					}
-				}
-			}else{ // no PRODSTRUCT.ANNDATE
-				addDebug("No ANNDATE found for "+prodstructItem.getKey());
-				//b.	ELSE (PRODSTRUCT.ANNDATE is null)
-				//-	AllValuesOf (OOFAVAIL-d: AVAIL.EFFECTIVEDATE) => ValueOf(PRODSTRUCT-u: FEATURE.FIRSTANNDATE)
-				// WHERE AVAIL.AVAILTYPE = 146 (Planned Availability)
-				//ErrorMessage LD(FEATURE) NDN(PRODSTRUCT) LD(FIRSTANNDATE) 'is later than the' LD(AVAIL) NDN(AVAIL)
-				if(featureFirstAnnDate.length()>0){
-					for (int ai=0; ai<availVct.size(); ai++){ // look at avails
-						EntityItem avail = (EntityItem)availVct.elementAt(ai);
-						addDebug("checkAnnDate no PRODSTRUCT.ANNDATE checking "+avail.getKey());
-						if(PokUtils.isSelected(avail, "AVAILTYPE", PLANNEDAVAIL)){
-							String effDate = PokUtils.getAttributeValue(avail, "EFFECTIVEDATE",", ", "", false);
-							addDebug("checkAnnDate plannedavail "+avail.getKey()+" EFFECTIVEDATE: "+effDate);
-							if (effDate.length()>0 && effDate.compareTo(featureFirstAnnDate)<0){
-								//ErrorMessage LD(FEATURE) NDN(PRODSTRUCT) LD(FIRSTANNDATE) 'is later than the' LD(AVAIL) NDN(AVAIL)
-								//LATER_DATE_ERR = {0} {1} {2} is later than the {3} {4}
-								args[0] = featureItem.getEntityGroup().getLongDescription();
-								args[1] = getNavigationName(prodstructItem);
-								args[2] = PokUtils.getAttributeDescription(featureItem.getEntityGroup(), "FIRSTANNDATE", "FIRSTANNDATE");
-								args[3] = avail.getEntityGroup().getLongDescription();
-								args[4] = getNavigationName(avail);
-								addError("LATER_DATE_ERR",args);
-							}
-						} //end of plannedavail
-					} // end avails
-				} // FIRSTANNDATE exists
-			}
-        }
-    }
-
-    /***********************************************
-    *3.	CountOf( MODELAVAIL-d: AVAIL)  => 1 WHERE ValueOf(AVAILTYPE = 146 (Planned Availability)
-    *ErrorMessage 'must have at least one Planned Availability'
-    R4R only
-    *4.AllValuesOf(MODELAVAIL-d: AVAIL.EFFECTIVEDATE) => MODEL.ANNDATE WHERE AVAIL.AVAILTYPE = 146 (Planned Availability)
-	*ErrorMessage LD(MODEL) NDN(MODEL) LD(ANNDATE) 'is later than the' LD(AVAIL) NDN(AVAIL)
-    */
-    private void checkModelAvails(EntityItem rootEntity, String statusFlag) throws MiddlewareException, java.sql.SQLException
-    {
-		// get AVAIL from MODELAVAIL
-		Vector availVct = PokUtils.getAllLinkedEntities(rootEntity, "MODELAVAIL", "AVAIL");
-		Vector plannedavailVector = PokUtils.getEntitiesWithMatchedAttr(availVct, "AVAILTYPE", PLANNEDAVAIL);//Planned Availability
-		addDebug("checkModelAvails "+rootEntity.getKey()+" availVct "+availVct.size()+" plannedavailVector "+plannedavailVector.size());
-		availVct.clear();
-		if (plannedavailVector.size()==0)
-        {
-			//MINIMUM_ERR = must have at least one {0}
-			args[0] = "Planned Availability";
-			addError("MINIMUM_ERR",args);
-        }else if(STATUS_R4REVIEW.equals(statusFlag)) // 'Ready for Review to Final' do these checks too
-        {
-			// check dates
-        	String modelAnnDate = getAttributeValue(rootEntity, "ANNDATE", "");
-			addDebug("checkModelAvails "+rootEntity.getKey()+" ANNDATE: "+modelAnnDate);
-			if(modelAnnDate.length()>0){
-				for (int i=0; i<plannedavailVector.size(); i++){
-					EntityItem avail = (EntityItem)plannedavailVector.elementAt(i);
-					String effDate = PokUtils.getAttributeValue(avail, "EFFECTIVEDATE",", ", "", false);
-					addDebug("checkModelAvails "+avail.getKey()+" EFFECTIVEDATE: "+effDate);
-
-					if(effDate.length()>0 && effDate.compareTo(modelAnnDate)<0){
-						// ErrorMessage LD(MODEL) NDN(MODEL) LD(ANNDATE) 'is later than the' LD(AVAIL) NDN(AVAIL)
-						//LATER_DATE_ERR = {0} {1} {2} is later than the {3} {4}
-						args[0] = "";//dupes rootEntity.getEntityGroup().getLongDescription();
-						args[1] = "";//dupes getNavigationName(rootEntity);
-						args[2] = PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), "ANNDATE", "ANNDATE");
-						args[3] = avail.getEntityGroup().getLongDescription();
-						args[4] = getNavigationName(avail);
-						addError("LATER_DATE_ERR",args);
-					}
-				}
-			}
-			plannedavailVector.clear();
-		}
-    }
-
-    /********************************************************************************
-    *
-    *
-    * @param r EntityItem
-    * @param destType String
-    * @returns EANEntity
-    */
-    private EANEntity getUpLinkEntityItem(EntityItem r, String destType)
-    {
-        EANEntity entity = null;
-        for(int i = 0; i < r.getUpLinkCount(); i++) {
-            EANEntity eai = r.getUpLink(i);
-            if(eai.getEntityType().equals(destType)) {
-                entity = eai;
-                break;
-            }
-        }
-
-        return entity;
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\MODELABRSTATUS.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

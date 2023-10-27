@@ -1,1050 +1,1055 @@
-//Licensed Materials -- Property of IBM
+/*      */ package COM.ibm.eannounce.abr.sg.bh;
+/*      */ 
+/*      */ import COM.ibm.eannounce.abr.util.ABRUtil;
+/*      */ import COM.ibm.eannounce.abr.util.AttrComparator;
+/*      */ import COM.ibm.eannounce.abr.util.EACustom;
+/*      */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*      */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*      */ import COM.ibm.eannounce.objects.EANList;
+/*      */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*      */ import COM.ibm.eannounce.objects.EntityGroup;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.EntityList;
+/*      */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*      */ import COM.ibm.eannounce.objects.PDGUtility;
+/*      */ import COM.ibm.eannounce.objects.SBRException;
+/*      */ import COM.ibm.opicmpdh.middleware.DatePackage;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*      */ import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
+/*      */ import COM.ibm.opicmpdh.middleware.Stopwatch;
+/*      */ import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+/*      */ import COM.ibm.opicmpdh.objects.Attribute;
+/*      */ import COM.ibm.opicmpdh.objects.SingleFlag;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.io.PrintWriter;
+/*      */ import java.io.StringWriter;
+/*      */ import java.rmi.RemoteException;
+/*      */ import java.sql.SQLException;
+/*      */ import java.text.MessageFormat;
+/*      */ import java.util.Collections;
+/*      */ import java.util.Comparator;
+/*      */ import java.util.Enumeration;
+/*      */ import java.util.HashSet;
+/*      */ import java.util.Hashtable;
+/*      */ import java.util.ResourceBundle;
+/*      */ import java.util.Vector;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public class ELEMENTABRSTATUS
+/*      */   extends PokBaseABR
+/*      */ {
+/*  175 */   private StringBuffer rptSb = new StringBuffer();
+/*  176 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/*  177 */   static final String NEWLINE = new String(FOOL_JTEST);
+/*  178 */   private Object[] args = (Object[])new String[10];
+/*      */   
+/*  180 */   private ResourceBundle rsBundle = null;
+/*  181 */   private Hashtable metaTbl = new Hashtable<>();
+/*  182 */   private int abr_debuglvl = 0;
+/*  183 */   private String navName = "";
+/*  184 */   private Vector skippedStatusVct = new Vector();
+/*  185 */   private Hashtable queuedTbl = new Hashtable<>();
+/*  186 */   private Vector withdrawnVct = new Vector();
+/*  187 */   private Vector skippedABRVct = new Vector();
+/*      */   
+/*      */   private boolean hasWaitedBefore = false;
+/*      */   
+/*      */   private static final String ELEMENTCATDATA_SRCHACTION_NAME = "SRDELCATDATA";
+/*      */   
+/*      */   private static final String ABR_QUEUED = "0020";
+/*      */   private static final String ABR_PASSED = "0030";
+/*      */   private static final String ABR_INPROCESS = "0050";
+/*      */   private static final String ECSACTIVE_Active = "ECS1";
+/*      */   private static final String LIFECYCLE_Develop = "LF02";
+/*      */   private static final String LIFECYCLE_Plan = "LF01";
+/*      */   private static final String STATUS_FINAL = "0020";
+/*      */   private static final String STATUS_R4REVIEW = "0040";
+/*      */   private static final String FOREVER_DATE = "9999-12-31";
+/*  202 */   private StringBuffer summarySb = new StringBuffer();
+/*  203 */   private Vector vctReturnsEntityKeys = new Vector();
+/*  204 */   private String strNow = null;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void execute_run() {
+/*  244 */     String str1 = "<head>" + EACustom.getMetaTags(getDescription()) + NEWLINE + EACustom.getCSS() + NEWLINE + EACustom.getTitle("{0} {1}") + NEWLINE + "</head>" + NEWLINE + "<body id=\"ibm-com\">" + EACustom.getMastheadDiv() + NEWLINE + "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
+/*      */     
+/*  246 */     String str2 = "<table>" + NEWLINE + "<tr><th>Userid: </th><td>{0}</td></tr>" + NEWLINE + "<tr><th>Role: </th><td>{1}</td></tr>" + NEWLINE + "<tr><th>Workgroup: </th><td>{2}</td></tr>" + NEWLINE + "<tr><th>Date: </th><td>{3}</td></tr>" + NEWLINE + "<tr><th>Description: </th><td>{4}</td></tr>" + NEWLINE + "<tr><th>Entity Id: </th><td>{5}</td></tr>" + NEWLINE + "<tr><th>Return code: </th><td>{6}</td></tr>" + NEWLINE + "</table>" + NEWLINE + "<!-- {7} -->" + NEWLINE;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  258 */     String str3 = "";
+/*  259 */     String str4 = "";
+/*      */     
+/*  261 */     println(EACustom.getDocTypeHtml());
+/*      */ 
+/*      */     
+/*      */     try {
+/*  265 */       long l = System.currentTimeMillis();
+/*  266 */       start_ABRBuild();
+/*      */       
+/*  268 */       this.abr_debuglvl = ABRServerProperties.getABRDebugLevel(this.m_abri.getABRCode());
+/*      */ 
+/*      */       
+/*  271 */       this.rsBundle = ResourceBundle.getBundle(getClass().getName(), ABRUtil.getLocale(this.m_prof.getReadLanguage().getNLSID()));
+/*      */       
+/*  273 */       EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*      */       
+/*  275 */       addDebug(0, "DEBUG: " + getShortClassName(getClass()) + " entered for " + entityItem.getKey());
+/*      */ 
+/*      */       
+/*  278 */       addDebug(4, "Time to pull root VE: " + Stopwatch.format(System.currentTimeMillis() - l));
+/*      */ 
+/*      */       
+/*  281 */       setReturnCode(0);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  286 */       this.navName = getNavigationName(entityItem);
+/*      */       
+/*  288 */       str3 = this.m_elist.getParentEntityGroup().getLongDescription() + ": " + this.navName;
+/*      */ 
+/*      */       
+/*  291 */       Vector<?> vector = searchForELEMENTCATDATA(entityItem.getEntityType());
+/*  292 */       if (vector != null) {
+/*  293 */         this.strNow = this.m_db.getDates().getNow().substring(0, 10);
+/*      */         
+/*  295 */         if (vector.size() == 0) {
+/*      */           
+/*  297 */           addOutput(this.rsBundle.getString("NO_ACTIVE_FND"));
+/*      */         } else {
+/*      */           
+/*  300 */           Collections.sort(vector, (Comparator<?>)new AttrComparator("ECSVENAME"));
+/*  301 */           String str6 = null;
+/*  302 */           String str7 = null;
+/*  303 */           EntityList entityList = null;
+/*  304 */           HashSet<String> hashSet = new HashSet();
+/*  305 */           String str8 = "";
+/*      */ 
+/*      */ 
+/*      */           
+/*  309 */           for (byte b = 0; b < vector.size(); b++) {
+/*  310 */             EntityItem entityItem1 = (EntityItem)vector.elementAt(b);
+/*      */ 
+/*      */             
+/*  313 */             String str9 = PokUtils.getAttributeValue(entityItem1, "ECSVENAME", "", "", false);
+/*  314 */             String str10 = PokUtils.getAttributeValue(entityItem1, "ECSIMPACTET", "", "", false);
+/*  315 */             String str11 = PokUtils.getAttributeValue(entityItem1, "ECSSETATTR", "", "", false);
+/*      */             
+/*  317 */             addDebug(2, "activeVct[" + b + "] " + entityItem1.getKey() + " vename " + str9 + " impactedType " + str10 + " setAttr " + str11);
+/*      */             
+/*  319 */             String str12 = str10 + ":" + str11;
+/*  320 */             if (hashSet.contains(str12)) {
+/*  321 */               addDebug(1, "Skipping " + entityItem1.getKey() + " duplicate key " + str12);
+/*      */               continue;
+/*      */             } 
+/*  324 */             hashSet.add(str12);
+/*      */             
+/*  326 */             if (str8 == null) {
+/*  327 */               str8 = entityItem1.getEntityGroup().getLongDescription() + ": " + getNavigationName(entityItem1);
+/*      */             }
+/*      */ 
+/*      */             
+/*  331 */             if (str7 != null) {
+/*  332 */               outputSummary(str7, str8);
+/*      */             }
+/*  334 */             str8 = entityItem1.getEntityGroup().getLongDescription() + ": " + getNavigationName(entityItem1);
+/*      */             
+/*  336 */             if (!str9.equals(str6)) {
+/*  337 */               if (entityList != null) {
+/*  338 */                 entityList.dereference();
+/*      */               }
+/*  340 */               str6 = str9;
+/*      */               
+/*  342 */               entityList = this.m_db.getEntityList(this.m_prof, new ExtractActionItem(null, this.m_db, this.m_prof, str6), new EntityItem[] { entityItem });
+/*      */ 
+/*      */               
+/*  345 */               addDebug(0, "Extract " + str6 + NEWLINE + PokUtils.outputList(entityList));
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */               
+/*  350 */               if (str10.equals("WWSEO") && entityList
+/*  351 */                 .getEntityGroup("WWSEO") == null) {
+/*  352 */                 EntityList entityList1 = getWWSEOList(entityList);
+/*  353 */                 if (entityList1 != null) {
+/*  354 */                   entityList.dereference();
+/*  355 */                   entityList = entityList1;
+/*      */                 } else {
+/*      */                   
+/*      */                   continue;
+/*      */                 } 
+/*      */               } 
+/*      */             } else {
+/*  362 */               addDebug(1, "using same ve " + str9);
+/*  363 */               if (!str10.equals(str7) && ("WWSEO"
+/*  364 */                 .equals(str10) || "WWSEO".equals(str7))) {
+/*  365 */                 if ("WWSEO".equals(str10)) {
+/*  366 */                   addDebug(1, "types chgd, now wwseo impactedType " + str10 + " prevType " + str7);
+/*  367 */                   if (entityList.getEntityGroup("WWSEO") == null) {
+/*      */                     
+/*  369 */                     EntityList entityList1 = getWWSEOList(entityList);
+/*  370 */                     if (entityList1 != null) {
+/*  371 */                       entityList.dereference();
+/*  372 */                       entityList = entityList1;
+/*      */                     } else {
+/*      */                       
+/*      */                       continue;
+/*      */                     } 
+/*      */                   } 
+/*      */                 } else {
+/*  379 */                   addDebug(1, "types chgd, was wwseo impactedType " + str10 + " prevType " + str7);
+/*  380 */                   if (!entityList.getParentActionItem().getActionItemKey().equals(str6)) {
+/*  381 */                     entityList.dereference();
+/*      */                     
+/*  383 */                     entityList = this.m_db.getEntityList(this.m_prof, new ExtractActionItem(null, this.m_db, this.m_prof, str6), new EntityItem[] { entityItem });
+/*      */ 
+/*      */                     
+/*  386 */                     addDebug(0, "Extract " + str6 + NEWLINE + PokUtils.outputList(entityList));
+/*      */                   } else {
+/*  388 */                     addDebug(1, "types chgd, ve was not updated");
+/*      */                   } 
+/*      */                 } 
+/*      */               }
+/*      */             } 
+/*      */             
+/*  394 */             str7 = str10;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */             
+/*  400 */             EntityGroup entityGroup = entityList.getEntityGroup(str10);
+/*  401 */             if (entityGroup != null) {
+/*      */ 
+/*      */               
+/*  404 */               EANMetaAttribute eANMetaAttribute = entityGroup.getMetaAttribute(str11);
+/*  405 */               if (eANMetaAttribute == null) {
+/*  406 */                 addDebug(0, str11 + " was not in meta for " + entityGroup.getEntityType());
+/*      */                 
+/*  408 */                 this.args[0] = str11;
+/*  409 */                 this.args[1] = entityGroup.getEntityType();
+/*  410 */                 addError("ATTR_ERR", this.args);
+/*      */               }
+/*      */               else {
+/*      */                 
+/*  414 */                 String str = eANMetaAttribute.getActualLongDescription();
+/*  415 */                 Vector vector1 = (Vector)this.queuedTbl.get(str);
+/*  416 */                 if (vector1 == null) {
+/*  417 */                   vector1 = new Vector();
+/*  418 */                   this.queuedTbl.put(str, vector1);
+/*      */                 } 
+/*  420 */                 for (byte b1 = 0; b1 < entityGroup.getEntityItemCount(); b1++) {
+/*  421 */                   EntityItem entityItem2 = entityGroup.getEntityItem(b1);
+/*  422 */                   if (!checkABRStatus(entityItem2, str11)) {
+/*      */                     
+/*  424 */                     this.skippedABRVct.add(entityItem2.getKey());
+/*      */ 
+/*      */ 
+/*      */                   
+/*      */                   }
+/*  429 */                   else if (!checkStatus(entityItem2)) {
+/*      */                     
+/*  431 */                     this.skippedStatusVct.add(entityItem2.getKey());
+/*      */ 
+/*      */                   
+/*      */                   }
+/*  435 */                   else if (!checkDates(entityItem2)) {
+/*      */                     
+/*  437 */                     this.withdrawnVct.add(entityItem2.getKey());
+/*      */                   
+/*      */                   }
+/*      */                   else {
+/*      */                     
+/*  442 */                     queueABR(entityItem2, str11);
+/*      */                   } 
+/*      */                 } 
+/*      */               } 
+/*      */             } else {
+/*      */               
+/*  448 */               this.args[0] = str10;
+/*  449 */               this.args[1] = str6;
+/*  450 */               addError("VEDEF_ERR", this.args);
+/*      */             } 
+/*      */             
+/*      */             continue;
+/*      */           } 
+/*  455 */           if (str7 != null) {
+/*  456 */             outputSummary(str7, str8);
+/*      */           }
+/*      */           
+/*  459 */           if (getReturnCode() == 0) {
+/*  460 */             updatePDH();
+/*      */           } else {
+/*  462 */             addDebug(0, "Errors occured. PDH was not updated");
+/*  463 */             this.summarySb.setLength(0);
+/*      */           } 
+/*      */           
+/*  466 */           if (entityList != null) {
+/*  467 */             entityList.dereference();
+/*  468 */             entityList = null;
+/*      */           } 
+/*      */           
+/*  471 */           addDebug(4, "Total Time: " + Stopwatch.format(System.currentTimeMillis() - l));
+/*  472 */           hashSet.clear();
+/*  473 */           vector.clear();
+/*  474 */           this.queuedTbl.clear();
+/*  475 */           this.skippedStatusVct.clear();
+/*  476 */           this.withdrawnVct.clear();
+/*  477 */           this.skippedABRVct.clear();
+/*      */         }
+/*      */       
+/*      */       } 
+/*  481 */     } catch (Throwable throwable) {
+/*  482 */       StringWriter stringWriter = new StringWriter();
+/*  483 */       String str6 = "<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
+/*  484 */       String str7 = "<pre>{0}</pre>";
+/*  485 */       MessageFormat messageFormat1 = new MessageFormat(str6);
+/*  486 */       setReturnCode(-3);
+/*  487 */       throwable.printStackTrace(new PrintWriter(stringWriter));
+/*      */       
+/*  489 */       this.args[0] = throwable.getMessage();
+/*  490 */       this.rptSb.append(messageFormat1.format(this.args) + NEWLINE);
+/*  491 */       messageFormat1 = new MessageFormat(str7);
+/*  492 */       this.args[0] = stringWriter.getBuffer().toString();
+/*  493 */       this.rptSb.append(messageFormat1.format(this.args) + NEWLINE);
+/*  494 */       logError("Exception: " + throwable.getMessage());
+/*  495 */       logError(stringWriter.getBuffer().toString());
+/*      */     }
+/*      */     finally {
+/*      */       
+/*  499 */       setDGTitle(this.navName);
+/*  500 */       setDGRptName(getShortClassName(getClass()));
+/*  501 */       setDGRptClass(getABRCode());
+/*      */       
+/*  503 */       if (!isReadOnly())
+/*      */       {
+/*  505 */         clearSoftLock();
+/*      */       }
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/*  511 */     MessageFormat messageFormat = new MessageFormat(str1);
+/*  512 */     this.args[0] = getDescription();
+/*  513 */     this.args[1] = str3;
+/*  514 */     String str5 = messageFormat.format(this.args);
+/*  515 */     messageFormat = new MessageFormat(str2);
+/*  516 */     this.args[0] = this.m_prof.getOPName();
+/*  517 */     this.args[1] = this.m_prof.getRoleDescription();
+/*  518 */     this.args[2] = this.m_prof.getWGName();
+/*  519 */     this.args[3] = getNow();
+/*  520 */     this.args[4] = str3;
+/*  521 */     this.args[5] = "" + this.m_abri.getEntityID();
+/*  522 */     this.args[6] = (getReturnCode() == 0) ? "Passed" : "Failed";
+/*  523 */     this.args[7] = str4 + " " + getABRVersion();
+/*      */     
+/*  525 */     this.rptSb.insert(0, str5 + messageFormat.format(this.args) + NEWLINE);
+/*      */     
+/*  527 */     this.rptSb.append(this.summarySb.toString());
+/*      */     
+/*  529 */     println(this.rptSb.toString());
+/*  530 */     printDGSubmitString();
+/*  531 */     println(EACustom.getTOUDiv());
+/*  532 */     buildReportFooter();
+/*      */     
+/*  534 */     this.metaTbl.clear();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityList getWWSEOList(EntityList paramEntityList) throws MiddlewareRequestException, SQLException, MiddlewareException {
+/*  548 */     EntityGroup entityGroup = paramEntityList.getEntityGroup("PRODSTRUCT");
+/*  549 */     if (entityGroup == null) {
+/*      */       
+/*  551 */       this.args[0] = "WWSEO";
+/*  552 */       this.args[1] = "PRODSTRUCT";
+/*  553 */       this.args[2] = paramEntityList.getParentActionItem().getActionItemKey();
+/*  554 */       addError("VEDEF2_ERR", this.args);
+/*  555 */       return null;
+/*      */     } 
+/*      */     
+/*  558 */     EntityItem[] arrayOfEntityItem = null;
+/*  559 */     if (entityGroup.getEntityItemCount() > 0) {
+/*  560 */       arrayOfEntityItem = entityGroup.getEntityItemsAsArray();
+/*      */     } else {
+/*      */       
+/*  563 */       arrayOfEntityItem = new EntityItem[] { new EntityItem(null, this.m_prof, "PRODSTRUCT", 0) };
+/*      */     } 
+/*      */     
+/*  566 */     EntityList entityList = this.m_db.getEntityList(this.m_prof, new ExtractActionItem(null, this.m_db, this.m_prof, "XCDPRODSTRUCT"), arrayOfEntityItem);
+/*      */ 
+/*      */     
+/*  569 */     addDebug(0, "getWWSEOList Extract XCDPRODSTRUCT" + NEWLINE + PokUtils.outputList(entityList));
+/*  570 */     return entityList;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean checkABRStatus(EntityItem paramEntityItem, String paramString) {
+/*  579 */     String str = PokUtils.getAttributeFlagValue(paramEntityItem, paramString);
+/*  580 */     addDebug(4, "checkABRStatus " + paramEntityItem.getKey() + " " + paramString + " value " + str);
+/*      */     
+/*  582 */     return ("0030".equals(str) || "0050".equals(str));
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean checkStatus(EntityItem paramEntityItem) {
+/*  597 */     String str1 = PokUtils.getAttributeFlagValue(paramEntityItem, "STATUS");
+/*  598 */     String str2 = PokUtils.getAttributeFlagValue(paramEntityItem, "LIFECYCLE");
+/*  599 */     addDebug(1, "checkStatus " + paramEntityItem.getKey() + "  status " + str1 + " lifecycle " + str2);
+/*  600 */     if (str2 == null || str2.length() == 0) {
+/*  601 */       str2 = "LF01";
+/*      */     }
+/*      */     
+/*  604 */     return ("0020".equals(str1) || ("0040"
+/*  605 */       .equals(str1) && ("LF01"
+/*      */       
+/*  607 */       .equals(str2) || "LF02".equals(str2))));
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean checkDates(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/*  621 */     String str = paramEntityItem.getEntityType();
+/*  622 */     if (str.equals("MODEL")) {
+/*      */       
+/*  624 */       String str1 = PokUtils.getAttributeValue(paramEntityItem, "WTHDRWEFFCTVDATE", "", "9999-12-31", false);
+/*  625 */       addDebug(1, "checkDates " + paramEntityItem.getKey() + " wdDate: " + str1 + " now: " + this.strNow);
+/*  626 */       return (this.strNow.compareTo(str1) < 0);
+/*      */     } 
+/*  628 */     if (str.equals("FEATURE")) {
+/*      */       
+/*  630 */       String str1 = PokUtils.getAttributeValue(paramEntityItem, "WITHDRAWDATEEFF_T", "", "9999-12-31", false);
+/*  631 */       addDebug(1, "checkDates " + paramEntityItem.getKey() + " wdDate: " + str1 + " now: " + this.strNow);
+/*  632 */       return (this.strNow.compareTo(str1) < 0);
+/*      */     } 
+/*  634 */     if (str.equals("WWSEO")) {
+/*  635 */       Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(paramEntityItem, "MODELWWSEO", "MODEL");
+/*  636 */       if (vector.size() == 0) {
+/*      */         
+/*  638 */         this.args[0] = paramEntityItem.getEntityGroup().getLongDescription() + ": " + getNavigationName(paramEntityItem);
+/*  639 */         addError("MODEL_ERR", this.args);
+/*      */       } 
+/*  641 */       byte b = 0; if (b < vector.size()) {
+/*      */         
+/*  643 */         EntityItem entityItem = vector.elementAt(b);
+/*  644 */         String str1 = PokUtils.getAttributeValue(entityItem, "WTHDRWEFFCTVDATE", "", "9999-12-31", false);
+/*  645 */         addDebug(1, "checkDates " + entityItem.getKey() + " wdDate: " + str1 + " now: " + this.strNow);
+/*  646 */         return (this.strNow.compareTo(str1) < 0);
+/*      */       } 
+/*      */     } 
+/*  649 */     return false;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void outputSummary(String paramString1, String paramString2) {
+/*  671 */     this.summarySb.append("<br /><h2>" + paramString2 + "</h2>" + NEWLINE);
+/*  672 */     this.summarySb.append("<h3>" + paramString1 + ":</h3>" + NEWLINE);
+/*  673 */     this.summarySb.append("<table width='350'>" + NEWLINE);
+/*  674 */     this.summarySb.append("<colgroup><col width=\"5%\"><col width=\"60%\"/><col width=\"35%\"/></colgroup>" + NEWLINE);
+/*      */     
+/*  676 */     String str1 = "";
+/*  677 */     for (Enumeration<String> enumeration = this.queuedTbl.keys(); enumeration.hasMoreElements(); ) {
+/*  678 */       str1 = enumeration.nextElement();
+/*  679 */       Vector vector = (Vector)this.queuedTbl.get(str1);
+/*      */       
+/*  681 */       String str = this.rsBundle.getString("QUEUED_MSG");
+/*  682 */       MessageFormat messageFormat = new MessageFormat(str);
+/*  683 */       this.args[0] = str1;
+/*  684 */       str = messageFormat.format(this.args);
+/*      */       
+/*  686 */       this.summarySb.append("<tr><td colspan='2'>" + str + "</td><td>" + vector.size() + "</td></tr>" + NEWLINE);
+/*  687 */       vector.clear();
+/*      */     } 
+/*      */     
+/*  690 */     this.summarySb.append("<tr><td colspan='3'>" + NEWLINE);
+/*      */     
+/*  692 */     String str2 = this.rsBundle.getString("NOT_PROC_MSG");
+/*  693 */     this.summarySb.append("<span class=\"orange-med\"><b>" + str2 + "</b></span></td></tr>" + NEWLINE);
+/*      */     
+/*  695 */     str2 = this.rsBundle.getString("STATUS_MSG");
+/*  696 */     this.summarySb.append("<tr><td>&nbsp;</td><td>" + str2 + "</td><td>" + this.skippedStatusVct.size() + "</td></tr>" + NEWLINE);
+/*      */     
+/*  698 */     str2 = this.rsBundle.getString("WITHDRAWN_MSG");
+/*  699 */     this.summarySb.append("<tr><td>&nbsp;</td><td>" + str2 + "</td><td>" + this.withdrawnVct.size() + "</td></tr>" + NEWLINE);
+/*  700 */     this.summarySb.append("<tr><td>&nbsp;</td><td>" + str1 + ":</td><td>" + this.skippedABRVct.size() + "</td></tr>" + NEWLINE);
+/*      */     
+/*  702 */     this.summarySb.append("</table>" + NEWLINE);
+/*  703 */     this.queuedTbl.clear();
+/*  704 */     this.skippedStatusVct.clear();
+/*  705 */     this.withdrawnVct.clear();
+/*  706 */     this.skippedABRVct.clear();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector searchForELEMENTCATDATA(String paramString) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  722 */     EntityItem[] arrayOfEntityItem = null;
+/*  723 */     Vector<EntityItem> vector = new Vector(1);
+/*  724 */     Vector<String> vector1 = new Vector(2);
+/*  725 */     Vector<String> vector2 = new Vector(2);
+/*      */     
+/*  727 */     vector2.addElement("ECSCHGET");
+/*  728 */     vector2.addElement("ECSACTIVE");
+/*      */     
+/*  730 */     String str = null;
+/*      */     
+/*  732 */     PDGUtility pDGUtility = new PDGUtility();
+/*      */     
+/*  734 */     String[] arrayOfString = pDGUtility.getFlagCodeForExactDesc(this.m_db, this.m_prof, "ECSCHGET", paramString);
+/*  735 */     pDGUtility.dereference();
+/*  736 */     if (arrayOfString != null && arrayOfString.length > 0) {
+/*  737 */       str = arrayOfString[0];
+/*  738 */       addDebug(2, "searchForELEMENTCATDATA ECSCHGET desc : " + paramString + " flagcode " + str);
+/*      */     } else {
+/*  740 */       addDebug(0, "searchForELEMENTCATDATA NO match found for ECSCHGET desc : " + paramString);
+/*      */       
+/*  742 */       this.args[0] = "ECSCHGET";
+/*  743 */       this.args[1] = paramString;
+/*  744 */       addError("METADEF_ERR", this.args);
+/*  745 */       return null;
+/*      */     } 
+/*      */     
+/*  748 */     vector1.addElement(str);
+/*  749 */     vector1.addElement("ECS1");
+/*  750 */     addDebug(2, "searchForELEMENTCATDATA attrVct " + vector2 + " valVct " + vector1);
+/*      */     try {
+/*  752 */       StringBuffer stringBuffer = new StringBuffer();
+/*  753 */       arrayOfEntityItem = ABRUtil.doSearch(getDatabase(), this.m_prof, "SRDELCATDATA", "ELEMENTCATDATA", false, vector2, vector1, stringBuffer);
+/*      */       
+/*  755 */       if (stringBuffer.length() > 0) {
+/*  756 */         addDebug(2, stringBuffer.toString());
+/*      */       }
+/*  758 */     } catch (SBRException sBRException) {
+/*      */       
+/*  760 */       StringWriter stringWriter = new StringWriter();
+/*  761 */       sBRException.printStackTrace(new PrintWriter(stringWriter));
+/*  762 */       addDebug(1, "searchForELEMENTCATDATA SBRException: " + stringWriter.getBuffer().toString());
+/*      */     } 
+/*  764 */     if (arrayOfEntityItem != null && arrayOfEntityItem.length > 0) {
+/*  765 */       for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/*  766 */         addDebug(2, "searchForELEMENTCATDATA found " + arrayOfEntityItem[b].getKey());
+/*  767 */         vector.add(arrayOfEntityItem[b]);
+/*  768 */         arrayOfEntityItem[b] = null;
+/*      */       } 
+/*      */     }
+/*      */     
+/*  772 */     vector2.clear();
+/*  773 */     vector1.clear();
+/*      */     
+/*  775 */     vector2 = null;
+/*  776 */     vector1 = null;
+/*      */     
+/*  778 */     return vector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void updatePDH() throws SQLException, MiddlewareException, RemoteException, MiddlewareShutdownInProgressException, EANBusinessRuleException {
+/*  792 */     logMessage(getDescription() + " updating PDH");
+/*  793 */     addDebug(0, "updatePDH entered for vctReturnsEntityKeys: " + this.vctReturnsEntityKeys.size());
+/*      */     
+/*  795 */     if (this.vctReturnsEntityKeys.size() > 0) {
+/*      */       try {
+/*  797 */         this.m_db.update(this.m_prof, this.vctReturnsEntityKeys, false, false);
+/*      */       } finally {
+/*      */         
+/*  800 */         this.vctReturnsEntityKeys.clear();
+/*  801 */         this.m_db.commit();
+/*  802 */         this.m_db.freeStatement();
+/*  803 */         this.m_db.isPending("finally after updatePDH");
+/*      */       } 
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void queueABR(EntityItem paramEntityItem, String paramString) {
+/*  820 */     logMessage(getDescription() + " ***** " + paramEntityItem.getKey() + " " + paramString + " set to: " + "0020");
+/*  821 */     addDebug(2, "queueABR entered " + paramEntityItem.getKey() + " for " + paramString + " set to: " + "0020");
+/*      */ 
+/*      */     
+/*  824 */     EANMetaAttribute eANMetaAttribute = paramEntityItem.getEntityGroup().getMetaAttribute(paramString);
+/*      */ 
+/*      */ 
+/*      */     
+/*  828 */     if (!checkForInProcess(paramEntityItem, paramString)) {
+/*      */       
+/*  830 */       this.skippedABRVct.add(paramEntityItem);
+/*      */       
+/*      */       return;
+/*      */     } 
+/*  834 */     if (this.m_cbOn == null) {
+/*  835 */       setControlBlock();
+/*      */     }
+/*      */     
+/*  838 */     Vector<Attribute> vector = null;
+/*      */     
+/*  840 */     for (byte b1 = 0; b1 < this.vctReturnsEntityKeys.size(); b1++) {
+/*  841 */       ReturnEntityKey returnEntityKey = this.vctReturnsEntityKeys.elementAt(b1);
+/*  842 */       if (returnEntityKey.getEntityID() == paramEntityItem.getEntityID() && returnEntityKey
+/*  843 */         .getEntityType().equals(paramEntityItem.getEntityType())) {
+/*  844 */         vector = returnEntityKey.m_vctAttributes;
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/*  848 */     if (vector == null) {
+/*  849 */       ReturnEntityKey returnEntityKey = new ReturnEntityKey(paramEntityItem.getEntityType(), paramEntityItem.getEntityID(), true);
+/*  850 */       vector = new Vector();
+/*  851 */       returnEntityKey.m_vctAttributes = vector;
+/*  852 */       this.vctReturnsEntityKeys.addElement(returnEntityKey);
+/*      */     } 
+/*      */     
+/*  855 */     SingleFlag singleFlag = new SingleFlag(this.m_prof.getEnterprise(), paramEntityItem.getEntityType(), paramEntityItem.getEntityID(), paramString, "0020", 1, this.m_cbOn);
+/*      */ 
+/*      */ 
+/*      */     
+/*  859 */     for (byte b2 = 0; b2 < vector.size(); b2++) {
+/*  860 */       Attribute attribute = vector.elementAt(b2);
+/*  861 */       if (attribute.getAttributeCode().equals(paramString)) {
+/*  862 */         singleFlag = null;
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/*  866 */     if (singleFlag != null) {
+/*  867 */       vector.addElement(singleFlag);
+/*  868 */       String str = eANMetaAttribute.getActualLongDescription();
+/*  869 */       Vector<EntityItem> vector1 = (Vector)this.queuedTbl.get(str);
+/*  870 */       vector1.add(paramEntityItem);
+/*      */     } else {
+/*  872 */       addDebug(2, "queueABR:  " + paramEntityItem.getKey() + " " + paramString + " was already added for updates ");
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean checkForInProcess(EntityItem paramEntityItem, String paramString) {
+/*  886 */     boolean bool = true;
+/*      */     try {
+/*  888 */       byte b = 0;
+/*      */       
+/*  890 */       String str = PokUtils.getAttributeFlagValue(paramEntityItem, paramString);
+/*      */       
+/*  892 */       addDebug(1, "checkForInProcess:  entered " + paramEntityItem.getKey() + " " + paramString + " is " + str);
+/*      */       
+/*  894 */       if ("0050".equals(str)) {
+/*  895 */         logMessage(getDescription() + " ***** " + paramEntityItem.getKey() + " " + paramString + " INPROCESS");
+/*  896 */         DatePackage datePackage = this.m_db.getDates();
+/*      */         
+/*  898 */         this.m_prof.setValOnEffOn(datePackage.getEndOfDay(), datePackage.getEndOfDay());
+/*      */         
+/*  900 */         if (this.hasWaitedBefore) {
+/*      */           
+/*  902 */           EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, paramEntityItem.getEntityType(), "Edit", false);
+/*  903 */           EntityItem entityItem = new EntityItem(entityGroup, this.m_prof, this.m_db, paramEntityItem.getEntityType(), paramEntityItem.getEntityID());
+/*  904 */           str = PokUtils.getAttributeFlagValue(entityItem, paramString);
+/*  905 */           addDebug(1, "checkForInProcess: haswaitedbefore " + paramString + " is now " + str);
+/*  906 */           entityGroup.dereference();
+/*      */         } 
+/*  908 */         this.hasWaitedBefore = true;
+/*  909 */         while ("0050".equals(str) && b < 5) {
+/*  910 */           b++;
+/*  911 */           addDebug(1, "checkForInProcess: " + paramString + " is " + str + " sleeping 5 mins");
+/*  912 */           logMessage(getDescription() + " ***** " + paramEntityItem.getKey() + " " + paramString + " " + str + " sleeping 5 mins");
+/*  913 */           Thread.sleep(300000L);
+/*      */           
+/*  915 */           EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, paramEntityItem.getEntityType(), "Edit", false);
+/*  916 */           EntityItem entityItem = new EntityItem(entityGroup, this.m_prof, this.m_db, paramEntityItem.getEntityType(), paramEntityItem.getEntityID());
+/*  917 */           str = PokUtils.getAttributeFlagValue(entityItem, paramString);
+/*  918 */           addDebug(1, "checkForInProcess: valon " + this.m_prof.getValOn() + " " + paramString + " is now " + str + " after sleeping");
+/*  919 */           logMessage(getDescription() + " ***** valon " + this.m_prof.getValOn() + " " + paramEntityItem.getKey() + " " + paramString + " is now " + str + " after sleeping");
+/*  920 */           datePackage = this.m_db.getDates();
+/*      */           
+/*  922 */           this.m_prof.setValOnEffOn(datePackage.getEndOfDay(), datePackage.getEndOfDay());
+/*  923 */           entityGroup.dereference();
+/*      */         } 
+/*  925 */         bool = "0030".equals(str);
+/*      */       } 
+/*  927 */     } catch (Exception exception) {
+/*  928 */       System.err.println("Exception in checkForInProcess " + exception);
+/*  929 */       exception.printStackTrace();
+/*      */     } 
+/*  931 */     return bool;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void dereference() {
+/*  937 */     super.dereference();
+/*      */     
+/*  939 */     this.rsBundle = null;
+/*  940 */     this.rptSb = null;
+/*  941 */     this.args = null;
+/*      */     
+/*  943 */     this.metaTbl = null;
+/*  944 */     this.navName = null;
+/*  945 */     this.vctReturnsEntityKeys = null;
+/*  946 */     this.skippedStatusVct.clear();
+/*  947 */     this.skippedStatusVct = null;
+/*  948 */     this.queuedTbl.clear();
+/*  949 */     this.queuedTbl = null;
+/*  950 */     this.withdrawnVct.clear();
+/*  951 */     this.withdrawnVct = null;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addOutput(String paramString) {
+/*  958 */     this.rptSb.append("<p>" + paramString + "</p>" + NEWLINE);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addDebug(int paramInt, String paramString) {
+/*  966 */     if (paramInt <= this.abr_debuglvl) {
+/*  967 */       this.rptSb.append("<!-- " + paramString + " -->" + NEWLINE);
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addError(String paramString, Object[] paramArrayOfObject) {
+/*  981 */     EntityGroup entityGroup = this.m_elist.getParentEntityGroup();
+/*  982 */     setReturnCode(-1);
+/*      */ 
+/*      */     
+/*  985 */     MessageFormat messageFormat = new MessageFormat(this.rsBundle.getString("ERROR_PREFIX"));
+/*  986 */     Object[] arrayOfObject = new Object[2];
+/*  987 */     arrayOfObject[0] = entityGroup.getLongDescription();
+/*  988 */     arrayOfObject[1] = this.navName;
+/*      */     
+/*  990 */     addMessage(messageFormat.format(arrayOfObject), paramString, paramArrayOfObject);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addMessage(String paramString1, String paramString2, Object[] paramArrayOfObject) {
+/*  999 */     String str = this.rsBundle.getString(paramString2);
+/*      */     
+/* 1001 */     if (paramArrayOfObject != null) {
+/* 1002 */       MessageFormat messageFormat = new MessageFormat(str);
+/* 1003 */       str = messageFormat.format(paramArrayOfObject);
+/*      */     } 
+/*      */     
+/* 1006 */     addOutput(paramString1 + " " + str);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getNavigationName(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 1016 */     StringBuffer stringBuffer = new StringBuffer();
+/*      */ 
+/*      */ 
+/*      */     
+/* 1020 */     EANList eANList = (EANList)this.metaTbl.get(paramEntityItem.getEntityType());
+/* 1021 */     if (eANList == null) {
+/* 1022 */       EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, paramEntityItem.getEntityType(), "Navigate");
+/* 1023 */       eANList = entityGroup.getMetaAttribute();
+/* 1024 */       this.metaTbl.put(paramEntityItem.getEntityType(), eANList);
+/*      */     } 
+/* 1026 */     for (byte b = 0; b < eANList.size(); b++) {
+/* 1027 */       EANMetaAttribute eANMetaAttribute = (EANMetaAttribute)eANList.getAt(b);
+/* 1028 */       stringBuffer.append(PokUtils.getAttributeValue(paramEntityItem, eANMetaAttribute.getAttributeCode(), ", ", "", false));
+/* 1029 */       if (b + 1 < eANList.size()) {
+/* 1030 */         stringBuffer.append(" ");
+/*      */       }
+/*      */     } 
+/*      */     
+/* 1034 */     return stringBuffer.toString().trim();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getABRVersion() {
+/* 1040 */     return "$Revision: 1.2 $";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getDescription() {
+/* 1047 */     return "ELEMENTABRSTATUS";
+/*      */   }
+/*      */ }
 
-//(C) Copyright IBM Corp. 2011  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
 
-package COM.ibm.eannounce.abr.sg.bh;
-
-import java.sql.SQLException;
-import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.Vector;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.opicmpdh.objects.Attribute;
-import COM.ibm.opicmpdh.objects.SingleFlag;
-
-
-/**********************************************************************************
- * ELEMENTABRSTATUS class 
- *  
- *BH FS ABR Element CATDATA 20110525.doc
- * need ELEMENTSTATUS and ELEMENTABRSTATUS abr attr for it added to all elements
- * need transitions of ELEMENTSTATUS to queue this ELEMENTABRSTATUS
- * need ELEMENTCATDATA and all attr and VE defs and actions to create/edit
- * All attributes will be required via an EXIST rule.
- * ECSACTIVE and ECSCHGET will be SEARCHABLE
- * Need search action to find ELEMENTCATDATA
- *
- * The purpose of this document is to describe the ABR and process that supports changes to entities that do not have Data Quality rules 
- * but affect the derivation of Catalog Data (CATDATA) the downstream systems can process the XML feed of this data
- *
- * An ABR is an application that is automatically queued by a change in the “Status” of one of these entity types. 
- * These entity types will have a new attribute code “Status” (ELEMENTSTATUS) that has three values:
- * •	“Draft”
- * •	“Change”
- * •	“Final”
- * 
- * A change in “Status” from “Draft” to “Final” will queue this ABR and lock all attributes from further update. 
- * A user may change the “Status” to “Change” at any time. A change in “Status” from “Change” to “Final” will 
- * queue this ABR. There is no need to queue the Data Quality ABR.
- * 
- * Changes to “Catalog Derived Data” (CATDATA) may require that the parent entity be queued in order to send 
- * XML downstream.
- *
- * Work Item 472923 “Catalog Derivation - Linda has concerns with the process with respect to updating an Element and having the changes flow”
- *
- * There are a significant number of entities that will have a new attribute “Status” (ELEMENTSTATUS)  added 
- * in order to manage the potential impact to Catalog Derived Data” (CATDATA).
- * 
- * The entities involved are all of the children and grand children of Features (FEATURE) and some children of 
- * “WW Single Entity Offering” (WWSEO). These entity types are listed in a table on the next page.
- * 
- * When a new instance of any of these entity types is created, the “Status” will default to “Draft”. Once the 
- * data is entered, the user will change “Status” to “Final”. This will queue this ABR.
- * 
- * In order to change any data, the user will have to change “Status” to “Change”, make the changes, and then 
- * change “Status” back to “Final”. Again, this will queue this ABR.
- *
-EntityType
-AUD
-BAY
-BAT
-BAYSAVAIL
-CABLE
-CNTRYPACK
-DERIVEDDATA
-ENVIRNMTLINFO
-EXPDUNIT
-FAXMODM
-GRPHADAPTER
-HDC
-HDD
-INPUTDVC
-KEYBD
-LANGPACK
-MECHPKG
-MECHRACKCAB
-MEMORY
-MEMORYCARD
-MONITOR
-NIC
-OPTCALDVC
-PLANAR
-PORT
-PRN
-PROC
-PWRSUPPLY
-REMOVBLSTOR
-SECUR
-SLOT
-SLOTSAVAIL
-SPEAKER
-SVC
-SYSMGADPTR
-TAPEDRIVE
-TECHCAP
-TECHINFO
-TECHINFOFEAT
-WEIGHTNDIMN
-WLESSNC
-
- * VII.	ABR
- * 
- * The ABR will be invoked for a single instance of one of these entity types. The ABR will look up the entity type 
- * in “ELEMENT CATDATA Setup” (ELEMENTCATDATA) using attribute code “Entity Type Changed” (ECSCHGET). If the 
- * attribute “Active” (ECSACTIVE) is set to “InActive”, do not proceed. For each instance where attribute “Active” 
- * (ECSACTIVE) is set to “Active”, proceed with the following.
- * 
- * Use the Virtual Entity “VENAME” (ECSVENAME) to extract the structure of interest. The entity type that may be 
- * impacted is identified via attribute “Entity Type Impacted” (ECSIMPACTET) and is found in the structure obtained 
- * using this VE. The VE will be such that there is only one path from ECSCHGET to ECSIMPACTET and hence the code 
- * may simply look for the “Entity Type Impacted” within the structure. There may be multiple instances of this entity 
- * type, all of which are impacted.
- * 
- * If the following criteria is met
- * 1.	Data Quality of the “Entity Type Impacted” (ECSIMPACTET) entity – either of the following:
- * 	“Life Cycle” (LIFECYCLE) = "Develop" (LF02)  | "Plan" (LF01)
- *            and
- *   "Status” (STATUS) = "Ready for Review" (0040)
- *   “Status” (STATUS) = "Final" (0020)
- * 2.	“Entity Type Impacted” (ECSIMPACTET) entity not withdrawn
- * •	FEATURE
- * WITHDRAWDATEEFF_T  > NOW()
- * •	MODEL
- * WTHDRWEFFCTVDATE > NOW()
- * •	WWSEO
- * MODELWWSEO-u: MODEL. WTHDRWEFFCTVDATE > NOW()
- * 
- * Then the ABR for “Entity Type Impacted” (ECSIMPACTET) should set “Set Attribute” (ECSSETATTR) to “Queued” 
- * (0020) if  the current value is “Passed” (0030).
- * 
- * If “Set Attribute” (ECSSETATTR) is “In Process” (0050), then wait for 5 minutes and check again. 
- * This step should be repeated for a maximum of 5 times after which, simply exit. For all other values of 
- * “ABR Advance Status”, simply exit.
- * 
- * 
-
-The subscription information for the ABR Report will be:
-CAT1= “ELEMENTCATDATA”
-CAT2= value of (root entity.PDHDOMAIN)
-CAT3=RptStatus (aka Return Code)
-CAT4= 
-
- *
-ELEMENTABRSTATUS_class=COM.ibm.eannounce.abr.sg.bh.ELEMENTABRSTATUS
-ELEMENTABRSTATUS_enabled=true
-ELEMENTABRSTATUS_idler_class=A
-ELEMENTABRSTATUS_keepfile=true
-ELEMENTABRSTATUS_report_type=DGTYPE01
-ELEMENTABRSTATUS_vename=dummy
-ELEMENTABRSTATUS_CAT1=ELEMENTCATDATA
-ELEMENTABRSTATUS_CAT2=RPTCLASS.PDHDOMAIN
-ELEMENTABRSTATUS_CAT3=RPTSTATUS
-ELEMENTABRSTATUS_debugLevel=0
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\bh\ELEMENTABRSTATUS.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-//$Log: ELEMENTABRSTATUS.java,v $
-//Revision 1.2  2014/01/13 13:53:29  wendy
-//migration to V17
-//
-//Revision 1.1  2011/06/30 20:24:16  wendy
-//BH FS ABR Element CATDATA 20110525.doc - Work Item 472923
-//
-public class ELEMENTABRSTATUS extends PokBaseABR {
-	private StringBuffer rptSb = new StringBuffer();
-	private static final char[] FOOL_JTEST = {'\n'};
-	static final String NEWLINE = new String(FOOL_JTEST);
-	private Object[] args = new String[10];
-
-	private ResourceBundle rsBundle = null;
-	private Hashtable metaTbl = new Hashtable();
-	private int abr_debuglvl=D.EBUG_ERR;
-	private String navName = "";
-	private Vector skippedStatusVct = new Vector(); // status not rfr or final
-	private Hashtable queuedTbl = new Hashtable();
-	private Vector withdrawnVct = new Vector(); // withdrawn
-	private Vector skippedABRVct = new Vector(); // abr not passed or inprocess
-	private boolean hasWaitedBefore = false;
-
-	private static final String ELEMENTCATDATA_SRCHACTION_NAME = "SRDELCATDATA"; 
-
-	private static final String ABR_QUEUED = "0020";
-	private static final String ABR_PASSED = "0030";
-	private static final String ABR_INPROCESS = "0050";
-	private static final String ECSACTIVE_Active="ECS1";
-	private static final String LIFECYCLE_Develop	= "LF02";// LIFECYCLE	=	"Develop" (LF02)
-	private static final String LIFECYCLE_Plan = "LF01";// LIFECYCLE	=	LF01	Plan
-	private static final String STATUS_FINAL = "0020";
-	private static final String STATUS_R4REVIEW   = "0040";
-	private final static String FOREVER_DATE = "9999-12-31";
-
-	private StringBuffer summarySb = new StringBuffer();
-	private Vector vctReturnsEntityKeys = new Vector();
-	private String strNow=null;
-
-	/**********************************
-	 *  Execute ABR.
-	 */
-	public void execute_run()
-	{
-		/*
-The report should identify the entity that was being processed as follows:
-•	Entity Type using Long Description
-•	Entity Navigation Display Name
-•	Entity Id
-•	Date Time Stamp
-
-Error conditions should be reported via a report.
-
-A summary of data impacted should be produced. This summary show by impacted entity type a count of 
-affected entities and counts for entities skipped because they are withdrawn and skipped due to status.
-
-For example (similar or alternative formatting is acceptable):
-•	Model
-o	Queued	456
-o	Withdrawn	247
-o	Status		123
-•	FEATURE
-o	Queued	57
-o	Withdrawn	25
-o	Status		12
-•	WWSEO
-o	Queued	654
-o	Withdrawn	150
-o	Status		154
-
-		 */
-		// must split because too many arguments for messageformat, max of 10.. this was 11
-		String HEADER = "<head>"+
-		EACustom.getMetaTags(getDescription()) + NEWLINE +
-		EACustom.getCSS() + NEWLINE +
-		EACustom.getTitle("{0} {1}") + NEWLINE +
-		"</head>" + NEWLINE + "<body id=\"ibm-com\">" +
-		EACustom.getMastheadDiv() + NEWLINE +
-		"<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
-		String HEADER2 = "<table>"+NEWLINE +
-		"<tr><th>Userid: </th><td>{0}</td></tr>"+NEWLINE +
-		"<tr><th>Role: </th><td>{1}</td></tr>"+NEWLINE +
-		"<tr><th>Workgroup: </th><td>{2}</td></tr>"+NEWLINE +
-		"<tr><th>Date: </th><td>{3}</td></tr>"+NEWLINE +
-		"<tr><th>Description: </th><td>{4}</td></tr>"+NEWLINE +
-		"<tr><th>Entity Id: </th><td>{5}</td></tr>"+NEWLINE +
-		"<tr><th>Return code: </th><td>{6}</td></tr>"+NEWLINE +
-		"</table>"+NEWLINE+
-		"<!-- {7} -->" + NEWLINE;
-
-		MessageFormat msgf;
-		String rootDesc="";
-		String abrversion="";
-
-		println(EACustom.getDocTypeHtml()); //Output the doctype and html
-  
-		try
-		{
-			long startTime = System.currentTimeMillis();
-			start_ABRBuild(); // pull dummy VE
-
-			abr_debuglvl = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getABRDebugLevel(m_abri.getABRCode());
-
-			//get properties file for the base class
-			rsBundle = ResourceBundle.getBundle(getClass().getName(), ABRUtil.getLocale(m_prof.getReadLanguage().getNLSID()));
-			// get root from VE
-			EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-			// debug display list of groups
-			addDebug(D.EBUG_ERR,"DEBUG: "+getShortClassName(getClass())+" entered for " +rootEntity.getKey());
-			//  +" extract: "+m_abri.getVEName()+" using DTS: "+m_prof.getValOn()+NEWLINE + PokUtils.outputList(m_elist));
-
-			addDebug(D.EBUG_SPEW,"Time to pull root VE: "+Stopwatch.format(System.currentTimeMillis()-startTime));
-
-			//Default set to pass
-			setReturnCode(PASS);
-//			fixme remove this.. avoid msgs to userid for testing
-//			setCreateDGEntity(false);
-
-			//NAME is navigate attributes
-			navName = getNavigationName(rootEntity);
-
-			rootDesc = m_elist.getParentEntityGroup().getLongDescription()+": "+navName;
-
-			// find all Active ELEMENTCATDATA 
-			Vector activeVct = searchForELEMENTCATDATA(rootEntity.getEntityType());
-			if(activeVct!=null){ // error finding flagcode if null returned
-				strNow = m_db.getDates().getNow().substring(0, 10);
-
-				if (activeVct.size()==0){
-					//NO_ACTIVE_FND = No Active ELEMENTCATDATA found.
-					addOutput(rsBundle.getString("NO_ACTIVE_FND"));
-				}else{
-					// sort active on VENAME, only pull when needed - some maybe shared
-					Collections.sort(activeVct, new AttrComparator("ECSVENAME"));
-					String VeName = null;
-					String prevType = null;
-					EntityList offeringlist = null;
-					Set completedTypeSet = new HashSet();
-					String ecdNavName = "";
-
-					//For each instance where attribute “Active” (ECSACTIVE) is set to “Active”, proceed with the following.
-					//loop thru active
-					for(int i=0; i<activeVct.size(); i++){
-						EntityItem ecdItem = (EntityItem)activeVct.elementAt(i);
-
-						// pull VE to get to offerings for each, maybe use VE already pulled
-						String curVeName = PokUtils.getAttributeValue(ecdItem, "ECSVENAME", "", "", false);//use long desc
-						String impactedType = PokUtils.getAttributeValue(ecdItem, "ECSIMPACTET", "", "", false);//use long desc
-						String setAttr = PokUtils.getAttributeValue(ecdItem, "ECSSETATTR", "", "", false);//use long desc
-
-						addDebug(D.EBUG_INFO,"activeVct["+i+"] "+ecdItem.getKey()+" vename "+curVeName+" impactedType "+impactedType+
-								" setAttr "+setAttr);
-						String key = impactedType+":"+setAttr;
-						if(completedTypeSet.contains(key)){
-							addDebug(D.EBUG_WARN,"Skipping "+ecdItem.getKey()+" duplicate key "+key);
-							continue;
-						}
-						completedTypeSet.add(key);  // keep track of any duplicate requests
-						
-						if(ecdNavName==null){ // get it for the first summary output
-							ecdNavName = ecdItem.getEntityGroup().getLongDescription()+": "+this.getNavigationName(ecdItem);
-						}
-						
-						// output summary info for prevtype
-						if(prevType!=null){
-							outputSummary(prevType,ecdNavName);
-						}
-						ecdNavName = ecdItem.getEntityGroup().getLongDescription()+": "+this.getNavigationName(ecdItem); // get it after outputting summary info
-		
-						if(!curVeName.equals(VeName)){
-							if(offeringlist!=null){
-								offeringlist.dereference();
-							}
-							VeName = curVeName;
-							//Use the Virtual Entity “VENAME” (ECSVENAME) to extract the structure of interest. 
-							offeringlist = m_db.getEntityList(m_prof,
-									new ExtractActionItem(null, m_db, m_prof, VeName),
-									new EntityItem[] {rootEntity});
-							addDebug(D.EBUG_ERR,"Extract "+VeName+NEWLINE+PokUtils.outputList(offeringlist));
-							
-							//use this ve and extract to get to prodstructs.. then pull 
-							// another ve from prodstructs to wwseo and its model
-							// if impacted type is WWSEO
-							if(impactedType.equals("WWSEO") &&
-									offeringlist.getEntityGroup("WWSEO")==null){ // some VEs dont go thru prodstruct
-								EntityList wwseolist = getWWSEOList(offeringlist);
-								if(wwseolist!=null){
-									offeringlist.dereference();
-									offeringlist = wwseolist;
-								}else{
-									// there was a VE def error
-									continue;
-								}
-							}
-						}else{
-							addDebug(D.EBUG_WARN,"using same ve "+curVeName); 
-							if((!impactedType.equals(prevType)) && // type changed
-									("WWSEO".equals(impactedType) || "WWSEO".equals(prevType))){ // one was WWSEO
-								if("WWSEO".equals(impactedType)){ // now wwseo
-									addDebug(D.EBUG_WARN,"types chgd, now wwseo impactedType "+impactedType+" prevType "+prevType);
-									if(offeringlist.getEntityGroup("WWSEO")==null){ // some VEs dont go thru prodstruct
-										// get wwseo ve
-										EntityList wwseolist = getWWSEOList(offeringlist);
-										if(wwseolist!=null){
-											offeringlist.dereference();
-											offeringlist = wwseolist;
-										}else{
-											// there was a VE def error
-											continue;
-										}
-									}
-								}else{ // was wwseo, pull again to get this ve
-									addDebug(D.EBUG_WARN,"types chgd, was wwseo impactedType "+impactedType+" prevType "+prevType);
-									if(!offeringlist.getParentActionItem().getActionItemKey().equals(VeName)){
-										offeringlist.dereference();
-										//Use the Virtual Entity “VENAME” (ECSVENAME) to extract the structure of interest. 
-										offeringlist = m_db.getEntityList(m_prof,
-												new ExtractActionItem(null, m_db, m_prof, VeName),
-												new EntityItem[] {rootEntity});
-										addDebug(D.EBUG_ERR,"Extract "+VeName+NEWLINE+PokUtils.outputList(offeringlist));
-									}else{
-										addDebug(D.EBUG_WARN,"types chgd, ve was not updated");			
-									}
-								}
-							}
-						}
-						
-						prevType = impactedType;
-
-						//The entity type that may be impacted is identified via attribute “Entity Type Impacted” (ECSIMPACTET)
-						//and is found in the structure obtained using this VE. The VE will be such that there is only one path 
-						//from ECSCHGET to ECSIMPACTET and hence the code may simply look for the “Entity Type Impacted” within 
-						// the structure. There may be multiple instances of this entity type, all of which are impacted.
-						EntityGroup impactedGrp = offeringlist.getEntityGroup(impactedType);
-						if(impactedGrp!=null){
-							// check if it is in the meta.. user may have mixed impacttype and attr to queue
-							// if meta does not have this attribute it is an error
-							EANMetaAttribute metaAttr = impactedGrp.getMetaAttribute(setAttr);
-							if (metaAttr==null) {
-								addDebug(D.EBUG_ERR,setAttr+" was not in meta for "+impactedGrp.getEntityType());
-								//ATTR_ERR = {0} was not found in meta for {1}
-								args[0] = setAttr;
-								args[1] = impactedGrp.getEntityType();
-								addError("ATTR_ERR",args);
-								continue;
-							}
-							// do this here to get message if nothing is queued
-							String qkey = metaAttr.getActualLongDescription();
-							Vector codevct = (Vector)queuedTbl.get(qkey);
-							if(codevct == null){
-								codevct = new Vector();
-								queuedTbl.put(qkey,codevct);
-							}
-							for(int g=0; g<impactedGrp.getEntityItemCount(); g++){
-								EntityItem impactedItem = impactedGrp.getEntityItem(g);
-								if(!checkABRStatus(impactedItem,setAttr)){
-									//skipped because of abr status
-									skippedABRVct.add(impactedItem.getKey());
-									continue;
-								}
-
-								// check lifecycle and status
-								if(!checkStatus(impactedItem)){
-									//skipped because of status
-									skippedStatusVct.add(impactedItem.getKey());
-									continue;
-								}
-								// check withdrawn
-								if(!checkDates(impactedItem)){
-									//skipped because of dates
-									withdrawnVct.add(impactedItem.getKey());
-									continue;
-								}
-
-								//all criteria are met
-								queueABR(impactedItem, setAttr);	
-								
-							} // end impacted group
-						}//end group not null
-						else{
-							//VEDEF_ERR = {0} was not found in the {1} extract.
-							args[0] = impactedType;
-							args[1] = VeName;
-							addError("VEDEF_ERR",args);
-						}
-					}   // end active loop
-
-					// output summary info for prevtype
-					if(prevType!=null){
-						outputSummary(prevType,ecdNavName);
-					}
-
-					if(getReturnCode()==PASS){
-						updatePDH();
-					}else{
-						addDebug(D.EBUG_ERR,"Errors occured. PDH was not updated");
-						summarySb.setLength(0);
-					}
-
-					if(offeringlist!=null){
-						offeringlist.dereference(); 
-						offeringlist = null;
-					}
-
-					addDebug(D.EBUG_SPEW,"Total Time: "+Stopwatch.format(System.currentTimeMillis()-startTime));
-					completedTypeSet.clear();
-					activeVct.clear();
-					queuedTbl.clear();
-					skippedStatusVct.clear();
-					withdrawnVct.clear();
-					skippedABRVct.clear();
-				}
-			}// activevct != null
-		}
-		catch(Throwable exc) {
-			java.io.StringWriter exBuf = new java.io.StringWriter();
-			String Error_EXCEPTION="<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
-			String Error_STACKTRACE="<pre>{0}</pre>";
-			msgf = new MessageFormat(Error_EXCEPTION);
-			setReturnCode(INTERNAL_ERROR);
-			exc.printStackTrace(new java.io.PrintWriter(exBuf));
-			// Put exception into document
-			args[0] = exc.getMessage();
-			rptSb.append(msgf.format(args) + NEWLINE);
-			msgf = new MessageFormat(Error_STACKTRACE);
-			args[0] = exBuf.getBuffer().toString();
-			rptSb.append(msgf.format(args) + NEWLINE);
-			logError("Exception: "+exc.getMessage());
-			logError(exBuf.getBuffer().toString());
-		}
-		finally
-		{
-			setDGTitle(navName);
-			setDGRptName(getShortClassName(getClass()));
-			setDGRptClass(getABRCode());
-			// make sure the lock is released
-			if(!isReadOnly())
-			{
-				clearSoftLock();
-			}
-		}
-
-		//Print everything up to </html>
-		//Insert Header into beginning of report
-		msgf = new MessageFormat(HEADER);
-		args[0] = getDescription();
-		args[1] = rootDesc;
-		String header1 = msgf.format(args);
-		msgf = new MessageFormat(HEADER2);
-		args[0] = m_prof.getOPName();
-		args[1] = m_prof.getRoleDescription();
-		args[2] = m_prof.getWGName();
-		args[3] = getNow();
-		args[4] = rootDesc;
-		args[5] = ""+m_abri.getEntityID();
-		args[6] = (this.getReturnCode()==PokBaseABR.PASS?"Passed":"Failed");
-		args[7] = abrversion+" "+getABRVersion();
-
-		rptSb.insert(0, header1+msgf.format(args) + NEWLINE);
-
-		rptSb.append(summarySb.toString());
-
-		println(rptSb.toString()); // Output the Report
-		printDGSubmitString();
-		println(EACustom.getTOUDiv());
-		buildReportFooter(); // Print </html>
-
-		metaTbl.clear();
-	}
-
-	/**
-	 * get to WWSEO from PRODSTRUCTs
-	 * @param offeringlist
-	 * @return
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	private EntityList getWWSEOList(EntityList offeringlist) 
-	throws MiddlewareRequestException, SQLException, MiddlewareException
-	{
-		EntityGroup psGrp = offeringlist.getEntityGroup("PRODSTRUCT");
-		if(psGrp==null){
-			//VEDEF2_ERR = {0} or {1} was not found in the {2} extract.  Cannot get to WWSEO.
-			args[0] = "WWSEO";
-			args[1] = "PRODSTRUCT";
-			args[2] = offeringlist.getParentActionItem().getActionItemKey();
-			addError("VEDEF2_ERR",args);
-			return null;
-		}
-	
-		EntityItem[] eia = null;
-		if(psGrp.getEntityItemCount()>0){
-			eia = psGrp.getEntityItemsAsArray();
-		}else{
-			// do this to get the structure
-			eia = new EntityItem[]{ new EntityItem(null, m_prof, "PRODSTRUCT", 0) };
-		}
-		
-		EntityList list = m_db.getEntityList(m_prof,
-				new ExtractActionItem(null, m_db, m_prof, "XCDPRODSTRUCT"),
-				eia);
-		addDebug(D.EBUG_ERR,"getWWSEOList Extract XCDPRODSTRUCT"+NEWLINE+PokUtils.outputList(list));
-		return list;
-	}
-	/**
-	 * check status of ABR to be queued, it must be passed or inprocess
-	 * @param impactedItem
-	 * @param setAttr
-	 * @return
-	 */
-	private boolean checkABRStatus(EntityItem impactedItem,String setAttr){
-		String attrValue = PokUtils.getAttributeFlagValue(impactedItem, setAttr);
-		addDebug(D.EBUG_SPEW,"checkABRStatus "+impactedItem.getKey()+" "+setAttr+" value "+attrValue);
-		//If the following criteria is met
-		return (ABR_PASSED.equals(attrValue) || ABR_INPROCESS.equals(attrValue));
-	}
-
-	/**
-	 * 1.	Data Quality of the “Entity Type Impacted” (ECSIMPACTET) entity – either of the following:
-	 * “Life Cycle” (LIFECYCLE) = "Develop" (LF02)  | "Plan" (LF01)
-	 *            and
-	 * "Status” (STATUS) = "Ready for Review" (0040) 
-	 * OR
-	 * “Status” (STATUS) = "Final" (0020)
-	 * @param impactedItem
-	 * @return
-	 */
-	private boolean checkStatus(EntityItem impactedItem){
-		// check lifecycle and status
-		String status = PokUtils.getAttributeFlagValue(impactedItem, "STATUS");
-		String lifecycle = PokUtils.getAttributeFlagValue(impactedItem, "LIFECYCLE");
-		addDebug(D.EBUG_WARN,"checkStatus "+impactedItem.getKey()+"  status "+status+" lifecycle "+lifecycle);
-		if (lifecycle==null || lifecycle.length()==0){ 
-			lifecycle = LIFECYCLE_Plan;
-		}
-
-		return (STATUS_FINAL.equals(status) || 
-				(STATUS_R4REVIEW.equals(status) && 
-						// first time moving to RFR or been RFR before
-						(LIFECYCLE_Plan.equals(lifecycle) ||LIFECYCLE_Develop.equals(lifecycle))));
-	}
-	/**
-	 * 2.	“Entity Type Impacted” (ECSIMPACTET) entity not withdrawn
-	 * •	FEATURE - WITHDRAWDATEEFF_T  > NOW()
-	 * •	MODEL - WTHDRWEFFCTVDATE > NOW()
-	 * •	WWSEO MODELWWSEO-u: MODEL. WTHDRWEFFCTVDATE > NOW()
-	 * @param impactedItem
-	 * @return
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 */
-	private boolean checkDates(EntityItem impactedItem) throws SQLException, MiddlewareException{
-		// check dates
-		String impactedType = impactedItem.getEntityType();
-		if(impactedType.equals("MODEL")){
-			//	MODEL - WTHDRWEFFCTVDATE > NOW()
-			String wdDate = PokUtils.getAttributeValue(impactedItem, "WTHDRWEFFCTVDATE", "", FOREVER_DATE, false);
-			addDebug(D.EBUG_WARN,"checkDates "+impactedItem.getKey()+" wdDate: "+wdDate+" now: "+strNow);
-			return strNow.compareTo(wdDate)<0;
-		}
-		if(impactedType.equals("FEATURE")){
-			//	FEATURE - WITHDRAWDATEEFF_T  > NOW()
-			String wdDate = PokUtils.getAttributeValue(impactedItem, "WITHDRAWDATEEFF_T", "", FOREVER_DATE, false);
-			addDebug(D.EBUG_WARN,"checkDates "+impactedItem.getKey()+" wdDate: "+wdDate+" now: "+strNow);
-			return strNow.compareTo(wdDate)<0;
-		}
-		if(impactedType.equals("WWSEO")){
-			Vector modelVct = PokUtils.getAllLinkedEntities(impactedItem, "MODELWWSEO", "MODEL");
-			if(modelVct.size()==0){
-				//MODEL_ERR = A Model was not found for {0}.
-				args[0] = impactedItem.getEntityGroup().getLongDescription()+": "+this.getNavigationName(impactedItem);
-				addError("MODEL_ERR",args);
-			}
-			for(int i=0; i<modelVct.size(); i++){
-				//WWSEO MODELWWSEO-u: MODEL. WTHDRWEFFCTVDATE > NOW()
-				EntityItem mdlitem = (EntityItem)modelVct.elementAt(i);// there should only be one
-				String wdDate = PokUtils.getAttributeValue(mdlitem, "WTHDRWEFFCTVDATE", "", FOREVER_DATE, false);
-				addDebug(D.EBUG_WARN,"checkDates "+mdlitem.getKey()+" wdDate: "+wdDate+" now: "+strNow);
-				return strNow.compareTo(wdDate)<0;
-			}
-		}
-		return false;
-	}
-	/**
-	 * A summary of data impacted should be produced. This summary show by impacted entity type a count of affected entities and counts for entities skipped because they are withdrawn and skipped due to status.
-
-For example (similar or alternative formatting is acceptable):
-•	Model
-o	Queued	456
-o	Withdrawn	247
-o	Status		123
-•	FEATURE
-o	Queued	57
-o	Withdrawn	25
-o	Status		12
-•	WWSEO
-o	Queued	654
-o	Withdrawn	150
-o	Status		154
-
-	 * @return
-	 */
-	private void outputSummary(String impactedType, String ecdNavName){
-		summarySb.append("<br /><h2>"+ecdNavName+"</h2>"+NEWLINE);
-		summarySb.append("<h3>"+impactedType+":</h3>"+NEWLINE);
-		summarySb.append("<table width='350'>"+NEWLINE);
-		summarySb.append("<colgroup><col width=\"5%\"><col width=\"60%\"/><col width=\"35%\"/></colgroup>"+NEWLINE);
-
-		String attrdesc ="";
-		for(Enumeration e = queuedTbl.keys(); e.hasMoreElements();) {
-			attrdesc = (String) e.nextElement();
-			Vector codevct = (Vector)queuedTbl.get(attrdesc);
-			//QUEUED_MSG = Queued {0}:
-			String msg = rsBundle.getString("QUEUED_MSG");
-			MessageFormat msgf = new MessageFormat(msg);
-			args[0]=attrdesc;
-			msg = msgf.format(args);
-	
-			summarySb.append("<tr><td colspan='2'>"+msg+"</td><td>"+codevct.size()+"</td></tr>"+NEWLINE);
-			codevct.clear();
-		}
-	
-		summarySb.append("<tr><td colspan='3'>"+NEWLINE);
-		//NOT_PROC_MSG = Not processed due to the following:
-		String msg = rsBundle.getString("NOT_PROC_MSG");
-		summarySb.append("<span class=\"orange-med\"><b>"+msg+"</b></span></td></tr>"+NEWLINE);
-		//STATUS_MSG= Status:
-		msg = rsBundle.getString("STATUS_MSG");
-		summarySb.append("<tr><td>&nbsp;</td><td>"+msg+"</td><td>"+skippedStatusVct.size()+"</td></tr>"+NEWLINE);
-		//WITHDRAWN_MSG = Withdrawn:
-		msg = rsBundle.getString("WITHDRAWN_MSG");
-		summarySb.append("<tr><td>&nbsp;</td><td>"+msg+"</td><td>"+withdrawnVct.size()+"</td></tr>"+NEWLINE);
-		summarySb.append("<tr><td>&nbsp;</td><td>"+attrdesc+":</td><td>"+skippedABRVct.size()+"</td></tr>"+NEWLINE);
-
-		summarySb.append("</table>"+NEWLINE);
-		queuedTbl.clear();
-		skippedStatusVct.clear();
-		withdrawnVct.clear();
-		skippedABRVct.clear();
-	}
-
-	/*************************************
-	 * The ABR will be invoked for a single instance of one of these entity types. 
-	 * The ABR will look up the entity type in ELEMENTCATDATA 
-	 * using attribute code “Changed” (ECSCHGET). If the attribute “Active” (ECSACTIVE) is set to “InActive”, do not proceed.
-	 * 
-	 * @return
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws MiddlewareShutdownInProgressException
-	 */
-	private Vector searchForELEMENTCATDATA(String elemType) 
-	throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException
-	{
-		EntityItem eia[]= null;
-		Vector eiVct = new Vector(1);
-		Vector valVct = new Vector(2);
-		Vector attrVct = new Vector(2);
-
-		attrVct.addElement("ECSCHGET");
-		attrVct.addElement("ECSACTIVE");
-
-		String elemFlag = null;
-		
-		PDGUtility pdgutil = new PDGUtility();
-		// find flag code corresponding to the ECSCHGET desc
-		String[] flagArray = pdgutil.getFlagCodeForExactDesc(m_db, m_prof, "ECSCHGET", elemType);
-		pdgutil.dereference();
-		if (flagArray != null && flagArray.length > 0) {
-			elemFlag = flagArray[0];
-			addDebug(D.EBUG_INFO,"searchForELEMENTCATDATA ECSCHGET desc : "+elemType+" flagcode "+elemFlag);
-		}else{
-			addDebug(D.EBUG_ERR,"searchForELEMENTCATDATA NO match found for ECSCHGET desc : "+elemType);
-			//METADEF_ERR = A corresponding Flag code was not found for {0} {1}
-			args[0] = "ECSCHGET";
-			args[1] = elemType;
-			addError("METADEF_ERR",args);
-			return null;
-		}
-
-		valVct.addElement(elemFlag); // this needs a flag value, not the flag desc
-		valVct.addElement(ECSACTIVE_Active); 
-		addDebug(D.EBUG_INFO,"searchForELEMENTCATDATA attrVct "+attrVct+" valVct "+valVct);
-		try{
-			StringBuffer debugSb = new StringBuffer();
-			eia= ABRUtil.doSearch(getDatabase(), m_prof, 
-					ELEMENTCATDATA_SRCHACTION_NAME, "ELEMENTCATDATA", false, attrVct, valVct, debugSb);
-			if (debugSb.length()>0){
-				addDebug(D.EBUG_INFO,debugSb.toString());
-			}
-		}catch(SBRException exc){
-			// these exceptions are for missing flagcodes or failed business rules, dont pass back
-			java.io.StringWriter exBuf = new java.io.StringWriter();
-			exc.printStackTrace(new java.io.PrintWriter(exBuf));
-			addDebug(D.EBUG_WARN,"searchForELEMENTCATDATA SBRException: "+exBuf.getBuffer().toString());
-		}
-		if (eia!=null && eia.length > 0){			
-			for (int i=0; i<eia.length; i++){
-				addDebug(D.EBUG_INFO,"searchForELEMENTCATDATA found "+eia[i].getKey());
-				eiVct.add(eia[i]);
-				eia[i] = null;
-			}
-		}
-
-		attrVct.clear();
-		valVct.clear();
-
-		attrVct=null;
-		valVct=null;
-
-		return eiVct;
-	}
-
-	/***********************************************
-	 * Update the PDH with the values in the vector, do all at once
-	 *
-	 */
-	private void updatePDH()
-	throws java.sql.SQLException,
-	COM.ibm.opicmpdh.middleware.MiddlewareException,
-	java.rmi.RemoteException,
-	COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-	COM.ibm.eannounce.objects.EANBusinessRuleException
-	{
-		logMessage(getDescription()+" updating PDH");
-		addDebug(D.EBUG_ERR,"updatePDH entered for vctReturnsEntityKeys: "+vctReturnsEntityKeys.size());
-
-		if(vctReturnsEntityKeys.size()>0) {
-			try {
-				m_db.update(m_prof, vctReturnsEntityKeys, false, false);
-			}
-			finally {
-				vctReturnsEntityKeys.clear();
-				m_db.commit();
-				m_db.freeStatement();
-				m_db.isPending("finally after updatePDH");
-			}
-		}
-	}
-
-	/***********************************************	
-	 * Then the ABR for “Entity Type Impacted” (ECSIMPACTET) should set “Set Attribute” (ECSSETATTR) to “Queued” 
-	 * (0020) if the current value is “Passed” (0030).
-	 * 
-	 * If “Set Attribute” (ECSSETATTR) is “In Process” (0050), then wait for 5 minutes and check again. 
-	 * This step should be repeated for a maximum of 5 times after which, simply exit. For all other values of 
-	 * “ABR Advance Status”, simply exit.
-	 * @param item
-	 * @param strAttributeCode
-	 */
-	private void queueABR(EntityItem item, String strAttributeCode)
-	{
-		logMessage(getDescription()+" ***** "+item.getKey()+" "+strAttributeCode+" set to: " + ABR_QUEUED);
-		addDebug(D.EBUG_INFO,"queueABR entered "+item.getKey()+" for "+strAttributeCode+" set to: " +
-				ABR_QUEUED);
-
-		EANMetaAttribute metaAttr = item.getEntityGroup().getMetaAttribute(strAttributeCode);
-		
-		// make sure it isnt 'in process' now
-		// if the specified abr is inprocess, wait
-		if(!checkForInProcess(item,strAttributeCode)){
-			// abr failed or timed out
-			skippedABRVct.add(item);
-			return;
-		}
-
-		if (m_cbOn==null){
-			setControlBlock(); // needed for attribute updates
-		}
-
-		Vector vctAtts = null;
-		// look at each key to see if root is there yet
-		for (int i=0; i<vctReturnsEntityKeys.size(); i++){
-			ReturnEntityKey rek = (ReturnEntityKey)vctReturnsEntityKeys.elementAt(i);
-			if (rek.getEntityID() == item.getEntityID() &&
-					rek.getEntityType().equals(item.getEntityType())){
-				vctAtts = rek.m_vctAttributes;
-				break;
-			}
-		}
-		if (vctAtts ==null){
-			ReturnEntityKey rek = new ReturnEntityKey(item.getEntityType(),item.getEntityID(), true);
-			vctAtts = new Vector();
-			rek.m_vctAttributes = vctAtts;
-			vctReturnsEntityKeys.addElement(rek);
-		}
-
-		SingleFlag sf = new SingleFlag (m_prof.getEnterprise(), item.getEntityType(), item.getEntityID(),
-				strAttributeCode, ABR_QUEUED, 1, m_cbOn);
-
-		// look at each attr to see if this is there yet
-		for (int i=0; i<vctAtts.size(); i++){
-			Attribute attr = (Attribute)vctAtts.elementAt(i);
-			if (attr.getAttributeCode().equals(strAttributeCode)){
-				sf = null;
-				break;
-			}
-		}
-		if(sf != null){
-			vctAtts.addElement(sf);
-			String key = metaAttr.getActualLongDescription();
-			Vector codevct = (Vector)queuedTbl.get(key);
-			codevct.add(item);
-		}else{
-			addDebug(D.EBUG_INFO,"queueABR:  "+item.getKey()+" "+strAttributeCode+" was already added for updates ");
-		}
-	}
-
-	/**
-	 * if the specified abr is inprocess, wait
-	 * If “ABR Advance Status” is “In Process” (0050), then wait for 5 minutes and check again. 
-	 * This step should be repeated for a maximum of 5 times after which, simply exit. For all other values of 
-	 * “ABR Advance Status”, simply exit.
-	 * 
-	 * @param item
-	 * @param strAttributeCode
-	 */
-	private boolean checkForInProcess(EntityItem item,String strAttributeCode){
-		boolean passed = true;
-		try{
-			int maxTries = 0;
-			String curval = // doesnt work on 'A' type attr getAttributeFlagEnabledValue(item,strAttributeCode);
-				PokUtils.getAttributeFlagValue(item,strAttributeCode);
-
-			addDebug(D.EBUG_WARN,"checkForInProcess:  entered "+item.getKey()+" "+strAttributeCode+" is "+curval);
-			
-			if (ABR_INPROCESS.equals(curval)){
-				logMessage(getDescription()+" ***** "+item.getKey()+" "+strAttributeCode+" INPROCESS");
-				DatePackage dpNow = m_db.getDates();
-				// get current updates by setting to endofday
-				m_prof.setValOnEffOn(dpNow.getEndOfDay(),dpNow.getEndOfDay());
-
-				if(hasWaitedBefore){
-					// get entity again- the previous wait may have cleared this value
-					EntityGroup eg = new EntityGroup(null,m_db, m_prof, item.getEntityType(), "Edit", false);
-					EntityItem curItem = new EntityItem(eg, m_prof, m_db, item.getEntityType(), item.getEntityID());
-					curval = PokUtils.getAttributeFlagValue(curItem,strAttributeCode);
-					addDebug(D.EBUG_WARN,"checkForInProcess: haswaitedbefore "+strAttributeCode+" is now "+curval);
-					eg.dereference();
-				}
-				hasWaitedBefore = true;
-				while(ABR_INPROCESS.equals(curval) && maxTries<5){ // allow 25 minutes
-					maxTries++;
-					addDebug(D.EBUG_WARN,"checkForInProcess: "+strAttributeCode+" is "+curval+" sleeping 5 mins");
-					logMessage(getDescription()+" ***** "+item.getKey()+" "+strAttributeCode+" "+curval+" sleeping 5 mins");
-					Thread.sleep(300000); //sleep 5 minutes
-					// get entity again
-					EntityGroup eg = new EntityGroup(null,m_db, m_prof, item.getEntityType(), "Edit", false);
-					EntityItem curItem = new EntityItem(eg, m_prof, m_db, item.getEntityType(), item.getEntityID());
-					curval = PokUtils.getAttributeFlagValue(curItem,strAttributeCode);
-					addDebug(D.EBUG_WARN,"checkForInProcess: valon "+m_prof.getValOn()+" "+strAttributeCode+" is now "+curval+" after sleeping");
-					logMessage(getDescription()+" ***** valon "+m_prof.getValOn()+" "+item.getKey()+" "+strAttributeCode+" is now "+curval+" after sleeping");
-					dpNow = m_db.getDates();
-					// get current updates by setting to endofday - do this just in case crossed midnight
-					m_prof.setValOnEffOn(dpNow.getEndOfDay(),dpNow.getEndOfDay());
-					eg.dereference();
-				}
-				passed = ABR_PASSED.equals(curval);
-			}
-		}catch(Exception exc){
-			System.err.println("Exception in checkForInProcess "+exc);
-			exc.printStackTrace();
-		}
-		return passed;
-	}
-	/******
-	 * @see COM.ibm.eannounce.abr.util.PokBaseABR#dereference()
-	 */
-	public void dereference(){
-		super.dereference();
-
-		rsBundle = null;
-		rptSb = null;
-		args = null;
-
-		metaTbl = null;
-		navName = null;
-		vctReturnsEntityKeys=null;
-		skippedStatusVct.clear();
-		skippedStatusVct = null;
-		queuedTbl.clear();
-		queuedTbl = null;
-		withdrawnVct.clear();
-		withdrawnVct = null;
-	}
-
-	/**********************************
-	 * add msg to report output
-	 * @param msg
-	 */
-	private void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
-
-	/**********************
-	 * support conditional msgs
-	 * @param level
-	 * @param msg
-	 */
-	private void addDebug(int level,String msg) { 
-		if (level <= abr_debuglvl) {
-			rptSb.append("<!-- "+msg+" -->"+NEWLINE);
-		}
-	}
-
-	/**********************************
-	 * used for error output
-	 * Prefix with LD(EntityType) NDN(EntityType) of the EntityType that the ABR is checking
-	 * (root EntityType)
-	 *
-	 * The entire message should be prefixed with 'Error: '
-	 *
-	 */
-	private void addError(String errCode, Object args[])
-	{
-		EntityGroup eGrp = m_elist.getParentEntityGroup();
-		setReturnCode(FAIL);
-
-		//ERROR_PREFIX = Error: &quot;{0} {1}&quot;
-		MessageFormat msgf = new MessageFormat(rsBundle.getString("ERROR_PREFIX"));
-		Object args2[] = new Object[2];
-		args2[0] = eGrp.getLongDescription();
-		args2[1] = navName;
-
-		addMessage(msgf.format(args2), errCode, args);
-	} 
-
-	/**********************************
-	 * used for warning or error output
-	 *
-	 */
-	private void addMessage(String msgPrefix, String errCode, Object args[])
-	{
-		String msg = rsBundle.getString(errCode);
-		// get message to output
-		if (args!=null){
-			MessageFormat msgf = new MessageFormat(msg);
-			msg = msgf.format(args);
-		}
-
-		addOutput(msgPrefix+" "+msg);
-	}
-
-	/**********************************************************************************
-	 *  Get Name based on navigation attributes for specified entity
-	 *
-	 *@return java.lang.String
-	 */
-	private String getNavigationName(EntityItem theItem) throws java.sql.SQLException, MiddlewareException
-	{
-		StringBuffer navName = new StringBuffer();
-
-		// NAME is navigate attributes
-		// check hashtable to see if we already got this meta
-		EANList metaList = (EANList)metaTbl.get(theItem.getEntityType());
-		if (metaList==null)	{
-			EntityGroup eg = new EntityGroup(null, m_db, m_prof, theItem.getEntityType(), "Navigate");
-			metaList = eg.getMetaAttribute();  // iterator does not maintain navigate order
-			metaTbl.put(theItem.getEntityType(), metaList);
-		}
-		for (int ii=0; ii<metaList.size(); ii++){
-			EANMetaAttribute ma = (EANMetaAttribute)metaList.getAt(ii);
-			navName.append(PokUtils.getAttributeValue(theItem, ma.getAttributeCode(),", ", "", false));
-			if (ii+1<metaList.size()){
-				navName.append(" ");
-			}
-		}
-
-		return navName.toString().trim();
-	}
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.util.PokBaseABR#getABRVersion()
-	 */
-	public String getABRVersion() {
-		return "$Revision: 1.2 $";
-	}
-
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.util.PokBaseABR#getDescription()
-	 */
-	public String getDescription() {
-		return "ELEMENTABRSTATUS";
-	}
-
-}

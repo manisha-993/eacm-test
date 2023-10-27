@@ -1,94 +1,100 @@
-/* Copyright IBM Corp. 2016 */
-package COM.ibm.eannounce.abr.util;
+/*    */ package COM.ibm.eannounce.abr.util;
+/*    */ 
+/*    */ import java.text.DateFormat;
+/*    */ import java.text.SimpleDateFormat;
+/*    */ import java.util.Calendar;
+/*    */ import java.util.Date;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class DateUtility
+/*    */ {
+/* 24 */   private static DateFormat _format = new SimpleDateFormat("yyyy-MM-dd");
+/* 25 */   private static DateFormat _format_simple = new SimpleDateFormat("yyyyMMdd");
+/* 26 */   private static DateFormat _format_time = new SimpleDateFormat("HHmmss");
+/* 27 */   private static DateFormat _format_aeszn = new SimpleDateFormat("yyMMdd");
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public static Date getTodayDate() {
+/* 32 */     Calendar calendar = getToday();
+/* 33 */     return calendar.getTime();
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public static Calendar getToday() {
+/* 38 */     return Calendar.getInstance();
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public static boolean isBeforeToday(Date paramDate) {
+/* 43 */     return paramDate.before(getTodayDate());
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public static boolean isAfterToday(Date paramDate) {
+/* 48 */     return paramDate.after(getTodayDate());
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public static String getTodayStringWithSapFormat() {
+/* 58 */     return getDateStringWithSapFormat(getTodayDate());
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public static String getDateStringWithSapFormat(Date paramDate) {
+/* 63 */     return getDateStringUsing(paramDate, _format);
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public static String getDateStringWithSimpleFormat(Date paramDate) {
+/* 68 */     return getDateStringUsing(paramDate, _format_simple);
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public static String getTodayStringWithSimpleFormat() {
+/* 73 */     return getDateStringWithSimpleFormat(getTodayDate());
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   private static String getDateStringUsing(Date paramDate, DateFormat paramDateFormat) {
+/* 78 */     if (paramDate == null)
+/*    */     {
+/* 80 */       return null;
+/*    */     }
+/* 82 */     return paramDateFormat.format(paramDate);
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public static String getTimeStringWithTimeFormatForToday() {
+/* 87 */     return getDateStringUsing(getTodayDate(), _format_time);
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public static String getDateStringWithAesznFormat(Date paramDate) {
+/* 92 */     return getDateStringUsing(paramDate, _format_aeszn);
+/*    */   }
+/*    */ }
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
-/**
- * the class is a utility class to format date
- * 
- * @author will
- * 
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\DateUtility.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class DateUtility
-{
-    private static DateFormat _format;
-    private static DateFormat _format_simple;
-    private static DateFormat _format_time;
-    private static DateFormat _format_aeszn;
-
-    static
-    {
-        _format = new SimpleDateFormat("yyyy-MM-dd");
-        _format_simple = new SimpleDateFormat("yyyyMMdd");
-        _format_time = new SimpleDateFormat("HHmmss");
-        _format_aeszn = new SimpleDateFormat("yyMMdd");
-    }
-
-    public static Date getTodayDate()
-    {
-        Calendar cal = getToday();
-        return cal.getTime();
-    }
-
-    public static Calendar getToday()
-    {
-        return Calendar.getInstance();
-    }
-    
-    public static boolean isBeforeToday(Date date)
-    {
-        return date.before(getTodayDate());
-    }
-    
-    public static boolean isAfterToday(Date date)
-    {
-        return date.after(getTodayDate());
-    }
-
-    /**
-     * get the date string of today based on SAP format
-     * 
-     * @return
-     */
-    public static String getTodayStringWithSapFormat()
-    {
-        return getDateStringWithSapFormat(getTodayDate());
-    }
-
-    public static String getDateStringWithSapFormat(Date date)
-    {
-        return getDateStringUsing(date, _format);
-    }
-    
-    public static String getDateStringWithSimpleFormat(Date date)
-    {
-        return getDateStringUsing(date, _format_simple);
-    }
-    
-    public static String getTodayStringWithSimpleFormat()
-    {
-        return getDateStringWithSimpleFormat(getTodayDate());
-    }
-
-    private static String getDateStringUsing(Date date, DateFormat dateFormat)
-    {
-        if(date == null)
-        {
-            return null;
-        }
-        return dateFormat.format(date);
-    }
-    
-    public static String getTimeStringWithTimeFormatForToday()
-    {
-        return getDateStringUsing(getTodayDate(), _format_time);
-    }
-    
-    public static String getDateStringWithAesznFormat(Date date)
-    {
-        return getDateStringUsing(date, _format_aeszn);
-    }
-}

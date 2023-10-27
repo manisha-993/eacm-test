@@ -1,311 +1,317 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.opicmpdh.middleware.D;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import COM.ibm.opicmpdh.transactions.NLSItem;
+/*     */ import com.ibm.transform.oim.eacm.diff.DiffEntity;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Hashtable;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ import org.w3c.dom.Node;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class XMLNLSElem
+/*     */   extends XMLElem
+/*     */ {
+/*     */   public XMLNLSElem(String paramString) {
+/*  69 */     super(paramString);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addElements(Database paramDatabase, EntityList paramEntityList, Document paramDocument, Element paramElement, EntityItem paramEntityItem, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  92 */     D.ebug(0, "Working on the item:" + this.nodeName);
+/*  93 */     Profile profile = paramEntityList.getProfile();
+/*     */     
+/*  95 */     profile.setReadLanguage(Profile.ENGLISH_LANGUAGE);
+/*  96 */     ABRUtil.append(paramStringBuffer, "XMLNLSElem.addElements node:" + this.nodeName + " " + paramEntityItem.getKey() + " ReadLanguage() " + profile.getReadLanguage() + NEWLINE);
+/*     */     
+/*  98 */     super.addElements(paramDatabase, paramEntityList, paramDocument, paramElement, paramEntityItem, paramStringBuffer);
+/*     */ 
+/*     */     
+/* 101 */     for (byte b = 0; b < profile.getReadLanguages().size(); b++) {
+/* 102 */       NLSItem nLSItem = profile.getReadLanguage(b);
+/* 103 */       if (nLSItem.getNLSID() != 1) {
+/*     */ 
+/*     */ 
+/*     */         
+/* 107 */         ABRUtil.append(paramStringBuffer, "XMLNLSElem.addElements node:" + this.nodeName + " " + paramEntityItem.getKey() + " ReadLanguage[" + b + "] " + nLSItem + NEWLINE);
+/* 108 */         profile.setReadLanguage(b);
+/*     */         
+/* 110 */         if (hasNodeValueForNLS(paramEntityItem, paramStringBuffer)) {
+/*     */           
+/* 112 */           super.addElements(paramDatabase, paramEntityList, paramDocument, paramElement, paramEntityItem, paramStringBuffer);
+/*     */         } else {
+/* 114 */           ABRUtil.append(paramStringBuffer, "XMLNLSElem.addElements node:" + this.nodeName + " " + paramEntityItem.getKey() + " ReadLanguage[" + b + "] " + nLSItem + " does not have any node values" + NEWLINE);
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/* 118 */     profile.setReadLanguage(Profile.ENGLISH_LANGUAGE);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addElements(Database paramDatabase, Hashtable paramHashtable, Document paramDocument, Element paramElement, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 143 */     D.ebug(0, "Working on the item:" + this.nodeName);
+/* 144 */     Profile profile1 = null;
+/* 145 */     Profile profile2 = null;
+/* 146 */     EntityItem entityItem1 = paramDiffEntity.getCurrentEntityItem();
+/* 147 */     EntityItem entityItem2 = paramDiffEntity.getPriorEntityItem();
+/* 148 */     if (entityItem1 != null) {
+/* 149 */       profile1 = entityItem1.getProfile();
+/*     */     }
+/* 151 */     if (entityItem2 != null) {
+/* 152 */       profile2 = entityItem2.getProfile();
+/*     */     }
+/*     */     
+/* 155 */     Profile profile3 = (profile1 == null) ? profile2 : profile1;
+/*     */ 
+/*     */     
+/* 158 */     for (byte b = 0; b < profile3.getReadLanguages().size(); b++) {
+/* 159 */       NLSItem nLSItem = profile3.getReadLanguage(b);
+/*     */       
+/* 161 */       ABRUtil.append(paramStringBuffer, "XMLNLSElem.addElements node:" + this.nodeName + " " + paramDiffEntity.getKey() + " ReadLanguage[" + b + "] " + nLSItem + NEWLINE);
+/* 162 */       if (profile1 != null) {
+/* 163 */         profile1.setReadLanguage(b);
+/*     */       }
+/* 165 */       if (profile2 != null) {
+/* 166 */         profile2.setReadLanguage(b);
+/*     */       }
+/*     */ 
+/*     */ 
+/*     */       
+/* 171 */       if (hasNodeValueChgForNLS(paramDiffEntity, paramStringBuffer)) {
+/*     */         
+/* 173 */         Element element = paramDocument.createElement(this.nodeName);
+/* 174 */         addXMLAttrs(element);
+/* 175 */         if (paramElement == null) {
+/* 176 */           paramDocument.appendChild(element);
+/*     */         } else {
+/* 178 */           paramElement.appendChild(element);
+/*     */         } 
+/*     */         
+/* 181 */         Node node = getContentNode(paramDocument, paramDiffEntity, paramElement, paramStringBuffer);
+/* 182 */         if (node != null) {
+/* 183 */           element.appendChild(node);
+/*     */         }
+/*     */ 
+/*     */         
+/* 187 */         for (byte b1 = 0; b1 < this.childVct.size(); b1++) {
+/* 188 */           XMLElem xMLElem = this.childVct.elementAt(b1);
+/* 189 */           xMLElem.addElements(paramDatabase, paramHashtable, paramDocument, element, paramDiffEntity, paramStringBuffer);
+/*     */         } 
+/*     */       } else {
+/* 192 */         ABRUtil.append(paramStringBuffer, "XMLNLSElem.addElements node:" + this.nodeName + " " + paramDiffEntity.getKey() + " ReadLanguage[" + b + "] " + nLSItem + " does not have any node value chgs" + NEWLINE);
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 196 */     if (profile1 != null) {
+/* 197 */       profile1.setReadLanguage(Profile.ENGLISH_LANGUAGE);
+/*     */     }
+/* 199 */     if (profile2 != null) {
+/* 200 */       profile2.setReadLanguage(Profile.ENGLISH_LANGUAGE);
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean hasChanges(Hashtable paramHashtable, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) {
+/* 214 */     boolean bool = false;
+/* 215 */     Profile profile1 = null;
+/* 216 */     Profile profile2 = null;
+/* 217 */     EntityItem entityItem1 = paramDiffEntity.getCurrentEntityItem();
+/* 218 */     EntityItem entityItem2 = paramDiffEntity.getPriorEntityItem();
+/* 219 */     if (entityItem1 != null) {
+/* 220 */       profile1 = entityItem1.getProfile();
+/*     */     }
+/* 222 */     if (entityItem2 != null) {
+/* 223 */       profile2 = entityItem2.getProfile();
+/*     */     }
+/*     */     
+/* 226 */     Profile profile3 = (profile1 == null) ? profile2 : profile1;
+/*     */ 
+/*     */     
+/* 229 */     for (byte b = 0; b < profile3.getReadLanguages().size(); b++) {
+/* 230 */       NLSItem nLSItem = profile3.getReadLanguage(b);
+/*     */       
+/* 232 */       ABRUtil.append(paramStringBuffer, "XMLNLSElem.hasChanges node:" + this.nodeName + " " + paramDiffEntity.getKey() + " ReadLanguage[" + b + "] " + nLSItem + NEWLINE);
+/* 233 */       if (profile1 != null) {
+/* 234 */         profile1.setReadLanguage(b);
+/*     */       }
+/* 236 */       if (profile2 != null) {
+/* 237 */         profile2.setReadLanguage(b);
+/*     */       }
+/*     */ 
+/*     */       
+/* 241 */       if (hasNodeValueChgForNLS(paramDiffEntity, paramStringBuffer)) {
+/* 242 */         bool = true;
+/*     */         break;
+/*     */       } 
+/* 245 */       ABRUtil.append(paramStringBuffer, "XMLNLSElem.hasChanges node:" + this.nodeName + " " + paramDiffEntity.getKey() + " ReadLanguage[" + b + "] " + nLSItem + " does not have any changed node values" + NEWLINE);
+/*     */     } 
+/*     */ 
+/*     */     
+/* 249 */     if (profile1 != null) {
+/* 250 */       profile1.setReadLanguage(Profile.ENGLISH_LANGUAGE);
+/*     */     }
+/* 252 */     if (profile2 != null) {
+/* 253 */       profile2.setReadLanguage(Profile.ENGLISH_LANGUAGE);
+/*     */     }
+/*     */     
+/* 256 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean hasChanges(DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) {
+/* 267 */     boolean bool = false;
+/* 268 */     Profile profile1 = null;
+/* 269 */     Profile profile2 = null;
+/* 270 */     EntityItem entityItem1 = paramDiffEntity.getCurrentEntityItem();
+/* 271 */     EntityItem entityItem2 = paramDiffEntity.getPriorEntityItem();
+/* 272 */     if (entityItem1 != null) {
+/* 273 */       profile1 = entityItem1.getProfile();
+/*     */     }
+/* 275 */     if (entityItem2 != null) {
+/* 276 */       profile2 = entityItem2.getProfile();
+/*     */     }
+/*     */     
+/* 279 */     Profile profile3 = (profile1 == null) ? profile2 : profile1;
+/*     */ 
+/*     */     
+/* 282 */     for (byte b = 0; b < profile3.getReadLanguages().size(); b++) {
+/* 283 */       NLSItem nLSItem = profile3.getReadLanguage(b);
+/*     */       
+/* 285 */       ABRUtil.append(paramStringBuffer, "XMLNLSElem.hasChanges node:" + this.nodeName + " " + paramDiffEntity.getKey() + " ReadLanguage[" + b + "] " + nLSItem + NEWLINE);
+/* 286 */       if (profile1 != null) {
+/* 287 */         profile1.setReadLanguage(b);
+/*     */       }
+/* 289 */       if (profile2 != null) {
+/* 290 */         profile2.setReadLanguage(b);
+/*     */       }
+/*     */ 
+/*     */       
+/* 294 */       if (hasNodeValueChgForNLS(paramDiffEntity, paramStringBuffer)) {
+/* 295 */         bool = true;
+/*     */         break;
+/*     */       } 
+/* 298 */       ABRUtil.append(paramStringBuffer, "XMLNLSElem.hasChanges node:" + this.nodeName + " " + paramDiffEntity.getKey() + " ReadLanguage[" + b + "] " + nLSItem + " does not have any changed node values" + NEWLINE);
+/*     */     } 
+/*     */ 
+/*     */     
+/* 302 */     if (profile1 != null) {
+/* 303 */       profile1.setReadLanguage(Profile.ENGLISH_LANGUAGE);
+/*     */     }
+/* 305 */     if (profile2 != null) {
+/* 306 */       profile2.setReadLanguage(Profile.ENGLISH_LANGUAGE);
+/*     */     }
+/*     */     
+/* 309 */     return bool;
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.util;
 
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.opicmpdh.transactions.*;
-import COM.ibm.eannounce.objects.*;
-
-import com.ibm.transform.oim.eacm.diff.*;
-
-import java.io.*;
-import java.util.*;
-
-import org.w3c.dom.*;
-
-/**********************************************************************************
-*  Class used to hold info and structure to be generated for the xml feed
-* for abrs. This class will generate one child for each nlsitem in the profile
-* if a value exists in that nls
-* 1.	NLSID
-All data is passed as US English (NLSID = 1) unless it is part of a complex element where NLSID is
-the DB Key for that element.
-
-<LANGUAGEELEMENT>
-This is a complex element within <LANGUAGELIST> that has zero or more (0..N) instances.
-
-An instance based on <NLSID> is passed if any element within the instance has changed.
-
-*/
-// $Log: XMLNLSElem.java,v $
-// Revision 1.4  2020/02/05 13:29:08  xujianbo
-// Add debug info to investigate   performance issue
-//
-// Revision 1.3  2015/01/26 15:53:39  wangyul
-// fix the issue PR24222 -- SPF ADS abr string buffer
-//
-// Revision 1.2  2010/08/10 09:41:38  yang
-// new add method hasChanges(DiffEntity diffitem, StringBuffer debugSb)
-//
-// Revision 1.1  2008/04/17 19:37:53  wendy
-// Init for
-// -   CQ00003539-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC
-// -   CQ00005096-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Add Category MM and Images
-// -   CQ00005046-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Support CRAD in BHC
-// -   CQ00005045-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Upgrade/Conversion Support
-// -   CQ00006862-WI  - BHC 3.0 Support - Support for Services Data UI
-//
-//
-
-public class XMLNLSElem extends XMLElem
-{
-    /**********************************************************************************
-    * Constructor for nls sensitive elements
-    *
-    * 1		<LANGUAGELIST>
-    * 0..N	<LANGUAGEELEMENT> => will only be created if a value exists in that nls
-    * 1		<NLSID>	</NLSID>
-    *
-    *
-    *@param nname String with name of node to be created
-    */
-    public XMLNLSElem(String nname)
-    {
-        super(nname);
-    }
-
-    /**********************************************************************************
-    * Create a node for this element for each nlsid and add to the parent and any children this node has
-    *
-    *@param dbCurrent Database
-    *@param list EntityList
-    *@param document Document needed to create nodes
-    *@param parent Element node to add this node too
-    *@param debugSb StringBuffer for debug output
-    */
-    public void addElements(Database dbCurrent,EntityList list, Document document, Element parent,
-        EntityItem parentItem, StringBuffer debugSb)
-    throws COM.ibm.eannounce.objects.EANBusinessRuleException,
-    java.sql.SQLException,
-    COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-    COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-    java.rmi.RemoteException,
-    IOException,
-    COM.ibm.opicmpdh.middleware.MiddlewareException,
-    COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {
-    	D.ebug(D.EBUG_ERR,"Working on the item:"+nodeName);
-        Profile profile = list.getProfile();
-        // always do nlsid=1, english even if no values exist for these nodes fixme this isnt true anymore more work needed if this is used
-        profile.setReadLanguage(Profile.ENGLISH_LANGUAGE);
-        ABRUtil.append(debugSb,"XMLNLSElem.addElements node:"+nodeName+" "+parentItem.getKey()+" ReadLanguage() "+profile.getReadLanguage()+NEWLINE);
-        // create this node and its children for each nlsid
-        super.addElements(dbCurrent,list, document, parent,parentItem, debugSb);
-
-        // this is NLS sensitive, do each one
-        for (int ix = 0; ix < profile.getReadLanguages().size(); ix++) {
-            NLSItem nlsitem = profile.getReadLanguage(ix);
-            if (nlsitem.getNLSID()==1){  // already did this one
-                //ABRUtil.append(debugSb,"XMLNLSElem.addElements already handled profile.getReadLanguage("+ix+") "+nlsitem+NEWLINE);
-                continue;
-            }
-            ABRUtil.append(debugSb,"XMLNLSElem.addElements node:"+nodeName+" "+parentItem.getKey()+" ReadLanguage["+ix+"] "+nlsitem+NEWLINE);
-            profile.setReadLanguage(ix);
-            // check to see if this nlsid has any values before adding the nodeset
-            if (hasNodeValueForNLS(parentItem,debugSb)){
-                // create this node and its children for each nlsid
-                super.addElements(dbCurrent,list, document, parent,parentItem,debugSb);
-            }else{
-                ABRUtil.append(debugSb,"XMLNLSElem.addElements node:"+nodeName+" "+parentItem.getKey()+" ReadLanguage["+ix+"] "+nlsitem+" does not have any node values"+NEWLINE);
-            }
-        } // end each read language
-        // restore to nlsid=1
-        profile.setReadLanguage(Profile.ENGLISH_LANGUAGE);
-    }
-
-    /**********************************************************************************
-    * Create a node for this element and add to the parent and any children this node has
-    *
-    *@param dbCurrent Database
-    *@param table Hashtable of Vectors of DiffEntity
-    *@param document Document needed to create nodes
-    *@param parent Element node to add this node too
-	*@param parentItem DiffEntity - parent to use if path is specified in XMLGroupElem, item to use otherwise
-    *@param debugSb StringBuffer for debug output
-    */
-	public void addElements(Database dbCurrent,Hashtable table, Document document, Element parent,
-		DiffEntity parentItem, StringBuffer debugSb)
-    throws
-        COM.ibm.eannounce.objects.EANBusinessRuleException,
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-        java.rmi.RemoteException,
-        IOException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {
-		D.ebug(D.EBUG_ERR,"Working on the item:"+nodeName);
-		Profile currprofile = null;
-		Profile prevprofile = null;
-		EntityItem curritem = parentItem.getCurrentEntityItem();
-		EntityItem previtem = parentItem.getPriorEntityItem();
-		if (curritem != null){
-			currprofile = curritem.getProfile();
-		}
-		if (previtem != null){
-			prevprofile = previtem.getProfile();
-		}
-
-        Profile profile = (currprofile==null?prevprofile:currprofile); // both will have the same languages, use one
-
-        // this is NLS sensitive, do each one
-        for (int ix = 0; ix < profile.getReadLanguages().size(); ix++) {
-            NLSItem nlsitem = profile.getReadLanguage(ix);
-
-            ABRUtil.append(debugSb,"XMLNLSElem.addElements node:"+nodeName+" "+parentItem.getKey()+" ReadLanguage["+ix+"] "+nlsitem+NEWLINE);
-            if (currprofile != null){
-            	currprofile.setReadLanguage(ix);
-			}
-            if (prevprofile != null){
-            	prevprofile.setReadLanguage(ix);
-			}
-
-			// check to see if this nlsid has any values before adding the nodeset
-			// if one node is added, all must be added
-            if (hasNodeValueChgForNLS(parentItem,debugSb)){
-                // create this node and its children for each nlsid
-				Element elem = (Element) document.createElement(nodeName);
-				addXMLAttrs(elem);
-				if (parent ==null){ // create the root
-					document.appendChild(elem);
-				}else{ // create a node
-					parent.appendChild(elem);
-				}
-
-				Node contentElem = getContentNode(document, parentItem, parent, debugSb);
-				if (contentElem!=null){
-					elem.appendChild(contentElem);
-				}
-
-				// all must be output if the parent element is output
-				for (int c=0; c<childVct.size(); c++){
-					XMLElem childElem = (XMLElem)childVct.elementAt(c);
-					childElem.addElements(dbCurrent,table, document,elem,parentItem,debugSb);
-				}
-            }else{
-                ABRUtil.append(debugSb,"XMLNLSElem.addElements node:"+nodeName+" "+parentItem.getKey()+" ReadLanguage["+ix+"] "+nlsitem+" does not have any node value chgs"+NEWLINE);
-            }
-        } // end each read language
-        // restore to nlsid=1
-		if (currprofile != null){
-			currprofile.setReadLanguage(Profile.ENGLISH_LANGUAGE);
-		}
-		if (prevprofile != null){
-			prevprofile.setReadLanguage(Profile.ENGLISH_LANGUAGE);
-		}
-	}
-
-    /**********************************************************************************
-    * Check to see if there are any changes in this node or in the children for each NLS
-    * must check the attributes because they may not exist at all -> so a deleted or new entity
-    * would not mean a change happened.
-    *@param diffitem DiffEntity
-    *@param debugSb StringBuffer
-    *
-    */
-    protected boolean hasChanges(Hashtable table, DiffEntity diffitem, StringBuffer debugSb)
-    {
-		boolean changed=false;
-		Profile currprofile = null;
-		Profile prevprofile = null;
-		EntityItem curritem = diffitem.getCurrentEntityItem();
-		EntityItem previtem = diffitem.getPriorEntityItem();
-		if (curritem != null){
-			currprofile = curritem.getProfile();
-		}
-		if (previtem != null){
-			prevprofile = previtem.getProfile();
-		}
-
-        Profile profile = (currprofile==null?prevprofile:currprofile); // both will have the same languages, use one
-
-        // this is NLS sensitive, do each one
-        for (int ix = 0; ix < profile.getReadLanguages().size(); ix++) {
-            NLSItem nlsitem = profile.getReadLanguage(ix);
-
-            ABRUtil.append(debugSb,"XMLNLSElem.hasChanges node:"+nodeName+" "+diffitem.getKey()+" ReadLanguage["+ix+"] "+nlsitem+NEWLINE);
-            if (currprofile != null){
-            	currprofile.setReadLanguage(ix);
-			}
-            if (prevprofile != null){
-            	prevprofile.setReadLanguage(ix);
-			}
-
-			// check to see if this nlsid has any changes
-            if (hasNodeValueChgForNLS(diffitem,debugSb)){
-				changed = true; // one change one is enough
-				break;
-            }else{
-                ABRUtil.append(debugSb,"XMLNLSElem.hasChanges node:"+nodeName+" "+diffitem.getKey()+" ReadLanguage["+ix+"] "+nlsitem+" does not have any changed node values"+NEWLINE);
-            }
-        } // end each read language
-        // restore to nlsid=1
-		if (currprofile != null){
-			currprofile.setReadLanguage(Profile.ENGLISH_LANGUAGE);
-		}
-		if (prevprofile != null){
-			prevprofile.setReadLanguage(Profile.ENGLISH_LANGUAGE);
-		}
-
-        return changed;
-    }
-    /**********************************************************************************
-     * Check to see if there are any changes in this node or in the children for each NLS
-     * must check the attributes because they may not exist at all -> so a deleted or new entity
-     * would not mean a change happened.
-     *@param diffitem DiffEntity
-     *@param debugSb StringBuffer
-     */
-     protected boolean hasChanges(DiffEntity diffitem, StringBuffer debugSb)
-     {
- 		boolean changed=false;
- 		Profile currprofile = null;
- 		Profile prevprofile = null;
- 		EntityItem curritem = diffitem.getCurrentEntityItem();
- 		EntityItem previtem = diffitem.getPriorEntityItem();
- 		if (curritem != null){
- 			currprofile = curritem.getProfile();
- 		}
- 		if (previtem != null){
- 			prevprofile = previtem.getProfile();
- 		}
-
-         Profile profile = (currprofile==null?prevprofile:currprofile); // both will have the same languages, use one
-
-         // this is NLS sensitive, do each one
-         for (int ix = 0; ix < profile.getReadLanguages().size(); ix++) {
-             NLSItem nlsitem = profile.getReadLanguage(ix);
-
-             ABRUtil.append(debugSb,"XMLNLSElem.hasChanges node:"+nodeName+" "+diffitem.getKey()+" ReadLanguage["+ix+"] "+nlsitem+NEWLINE);
-             if (currprofile != null){
-             	currprofile.setReadLanguage(ix);
- 			}
-             if (prevprofile != null){
-             	prevprofile.setReadLanguage(ix);
- 			}
-
- 			// check to see if this nlsid has any changes
-             if (hasNodeValueChgForNLS(diffitem,debugSb)){
- 				changed = true; // one change one is enough
- 				break;
-             }else{
-                 ABRUtil.append(debugSb,"XMLNLSElem.hasChanges node:"+nodeName+" "+diffitem.getKey()+" ReadLanguage["+ix+"] "+nlsitem+" does not have any changed node values"+NEWLINE);
-             }
-         } // end each read language
-         // restore to nlsid=1
- 		if (currprofile != null){
- 			currprofile.setReadLanguage(Profile.ENGLISH_LANGUAGE);
- 		}
- 		if (prevprofile != null){
- 			prevprofile.setReadLanguage(Profile.ENGLISH_LANGUAGE);
- 		}
-
-         return changed;
-     }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\XMLNLSElem.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

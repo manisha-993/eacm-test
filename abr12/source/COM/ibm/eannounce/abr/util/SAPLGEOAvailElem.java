@@ -1,113 +1,118 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2007  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Vector;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ import org.w3c.dom.Node;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class SAPLGEOAvailElem
+/*     */   extends SAPLElem
+/*     */ {
+/*     */   public SAPLGEOAvailElem(String paramString1, String paramString2) {
+/*  52 */     super(paramString1, "AVAIL", paramString2, false);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void addGEOElements(Vector paramVector, Document paramDocument, Element paramElement, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  73 */     if (paramVector != null && paramVector.size() > 0) {
+/*  74 */       Vector<EntityItem> vector = new Vector(); byte b;
+/*  75 */       for (b = 0; b < AVAIL_ORDER.length; b++) {
+/*  76 */         vector = PokUtils.getEntitiesWithMatchedAttr(paramVector, "AVAILTYPE", AVAIL_ORDER[b]);
+/*  77 */         if (vector.size() > 0) {
+/*     */           break;
+/*     */         }
+/*  80 */         paramStringBuffer.append("SAPLGEOAvailElem: No AVAIL of AVAILTYPE[" + AVAIL_ORDER[b] + "] found for node:" + this.nodeName + NEWLINE);
+/*     */       } 
+/*     */ 
+/*     */       
+/*  84 */       if (vector.size() == 0) {
+/*  85 */         Element element = paramDocument.createElement(this.nodeName);
+/*  86 */         addXMLAttrs(element);
+/*  87 */         paramElement.appendChild(element);
+/*  88 */         if (this.attrCode != null) {
+/*  89 */           element.appendChild(paramDocument.createTextNode("@@"));
+/*     */         }
+/*     */       } 
+/*  92 */       for (b = 0; b < vector.size(); b++) {
+/*  93 */         EntityItem entityItem = vector.elementAt(b);
+/*  94 */         Element element = paramDocument.createElement(this.nodeName);
+/*  95 */         addXMLAttrs(element);
+/*  96 */         paramElement.appendChild(element);
+/*  97 */         Node node = getContentNode(paramDocument, entityItem, paramElement);
+/*  98 */         if (node != null) {
+/*  99 */           element.appendChild(node);
+/*     */         }
+/*     */       } 
+/* 102 */       vector.clear();
+/*     */     } else {
+/* 104 */       paramStringBuffer.append("SAPLGEOAvailElem: No AVAIL passed in for node:" + this.nodeName + NEWLINE);
+/* 105 */       Element element = paramDocument.createElement(this.nodeName);
+/* 106 */       addXMLAttrs(element);
+/* 107 */       paramElement.appendChild(element);
+/* 108 */       if (this.attrCode != null)
+/* 109 */         element.appendChild(paramDocument.createTextNode("@@")); 
+/*     */     } 
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.util;
 
-import COM.ibm.eannounce.objects.*;
-import com.ibm.transform.oim.eacm.util.*;
-
-import java.util.*;
-import java.io.*;
-
-import org.w3c.dom.*;
-
-/**********************************************************************************
-*  Class used to hold info and structure to be generated for the xml feed
-* for SAPLABRSTATUS abrs
-* This class will look at AVAILs in order for a particular country and use first one found
-* The EACM XML Payloads specify AVAIL that do not specify an AVAILTYPE use the
-* 	instance of AVAIL based on the following priority of AVAILTYPE:
-* 	1.	146 (Planned Availability)
-* 	2.	143 (First Order)
-* 	3.	149 (Last Order)
-* 	4.	AVT220 (Lease Rental Withdrawal)
-*
-*/
-// $Log: SAPLGEOAvailElem.java,v $
-// Revision 1.3  2008/02/19 17:18:25  wendy
-// Cleanup RSA warnings
-//
-// Revision 1.2  2007/04/20 14:58:33  wendy
-// RQ0417075638 updates
-//
-// Revision 1.1  2007/04/02 17:38:17  wendy
-// Support classes for SAPL xml generation
-//
-
-public class SAPLGEOAvailElem extends SAPLElem
-{
-    /**********************************************************************************
-    * Constructor for filtered AVAIL entities
-    * look in order (the first one you find) from AVAILTYPE
-    *
-    *@param nname String with name of node to be created
-    *@param code String with attribute code to retrieve
-    */
-    public SAPLGEOAvailElem(String nname, String code)
-    {
-        super(nname,"AVAIL",code,false);
-    }
-
-    /**********************************************************************************
-    * Create a node for this element add to the parent
-    *
-    *@param itemVct Vector of AVAIL EntityItem for a country, find the one that matches this filter
-    *@param document Document needed to create nodes
-    *@param parent Element node to add this node too
-    *@param debugSb StringBuffer used for debug output
-    */
-    protected void addGEOElements(Vector itemVct, Document document, Element parent,StringBuffer debugSb)
-    throws COM.ibm.eannounce.objects.EANBusinessRuleException,
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-        java.rmi.RemoteException,
-        IOException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {
-		if (itemVct !=null && itemVct.size()>0){
-			Vector matchVct = new Vector();
-			for(int t=0; t<AVAIL_ORDER.length; t++){
-            	matchVct = PokUtils.getEntitiesWithMatchedAttr(itemVct, "AVAILTYPE", AVAIL_ORDER[t]);
-				if (matchVct.size()>0){
-					break;
-				}else{
-					debugSb.append("SAPLGEOAvailElem: No AVAIL of AVAILTYPE["+AVAIL_ORDER[t]+"] found for node:"+
-						nodeName+NEWLINE);
-				}
-			}
-			if (matchVct.size()==0){
-				Element elem = (Element) document.createElement(nodeName);
-				addXMLAttrs(elem);
-				parent.appendChild(elem);
-				if (attrCode!=null){ // a value is expected, prevent a normal empty tag, OIDH cant handle it
-					elem.appendChild(document.createTextNode(CHEAT));
-				}
-			}
-			for (int i=0; i<matchVct.size(); i++){
-				EntityItem item = (EntityItem)matchVct.elementAt(i);
-				Element elem = (Element) document.createElement(nodeName);
-				addXMLAttrs(elem);
-				parent.appendChild(elem);
-				Node contentElem = getContentNode(document, item,parent);
-				if (contentElem!=null){
-					elem.appendChild(contentElem);
-				}
-			}
-			matchVct.clear();
-		}else{
-			debugSb.append("SAPLGEOAvailElem: No AVAIL passed in for node:"+nodeName+NEWLINE);
-			Element elem = (Element) document.createElement(nodeName);
-			addXMLAttrs(elem);
-			parent.appendChild(elem);
-			if (attrCode!=null){ // a value is expected, prevent a normal empty tag, OIDH cant handle it
-				elem.appendChild(document.createTextNode(CHEAT));
-			}
-		}
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\SAPLGEOAvailElem.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

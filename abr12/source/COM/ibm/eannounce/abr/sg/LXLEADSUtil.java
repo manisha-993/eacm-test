@@ -1,739 +1,745 @@
-//Licensed Materials -- Property of IBM
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.ABRUtil;
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EANMetaFlagAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*     */ import COM.ibm.eannounce.objects.LinkActionItem;
+/*     */ import COM.ibm.eannounce.objects.MetaFlag;
+/*     */ import COM.ibm.eannounce.objects.SBRException;
+/*     */ import COM.ibm.eannounce.objects.WorkflowException;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.LockException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.PrintWriter;
+/*     */ import java.io.StringWriter;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.HashSet;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.Vector;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class LXLEADSUtil
+/*     */ {
+/*     */   protected static final String COFCAT_HW = "100";
+/*     */   protected static final String COFCAT_SW = "101";
+/*     */   protected static final String COFCAT_SVC = "102";
+/*     */   protected static final String COFSUBCAT_HIPO = "125";
+/*     */   protected static final String COFSUBCAT_Application = "127";
+/*     */   protected static final String COFSUBCAT_Subscription = "133";
+/*     */   protected static final HashSet SW_COFSUBCAT_SET;
+/*     */   protected static final String COFGRP_BASE = "150";
+/*     */   private static final String MODEL_SRCHACTION_NAME = "LDSRDMODEL";
+/*     */   private static final String WWSEO_SRCHACTION_NAME = "LDSRDWWSEO";
+/*     */   private static final String LSEO_SRCHACTION_NAME = "LDSRDLSEO";
+/*     */   private static final String WWSEO_CREATEACTION_NAME = "LDCRWWSEO";
+/*     */   private static final String LSEO_CREATEACTION_NAME = "LDCRLSEO";
+/*     */   private static final String WWSEOPS_LINKACTION_NAME = "LDLINKPRODSTWWSEO";
+/*     */   private static final String WWSEOSWPS_LINKACTION_NAME = "LDLINKSWPRODWWSEO";
+/*     */   private static final String GENERALAREA_SRCHACTION_NAME = "LDSRDGENAREA";
+/*     */   protected static final String PS_SRCHACTION_NAME = "LDSRDPRODSTRUCT";
+/*     */   protected static final String SWPS_SRCHACTION_NAME = "LDSRDSWPRODSTRUCT";
+/*  77 */   private static Hashtable SG_GENAREACODE_TBL = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*  98 */   private static final Hashtable AUDIEN_TBL = new Hashtable<>(); static {
+/*  99 */     AUDIEN_TBL.put("Enterprise Direct", "10062");
+/* 100 */     AUDIEN_TBL.put("Odyssey", "10062");
+/* 101 */     Vector<String> vector = new Vector(3);
+/* 102 */     vector.add("10062");
+/* 103 */     vector.add("10046");
+/* 104 */     vector.add("10048");
+/* 105 */     AUDIEN_TBL.put("Indirect", vector);
+/* 106 */     SW_COFSUBCAT_SET = new HashSet();
+/* 107 */     SW_COFSUBCAT_SET.add("125");
+/* 108 */     SW_COFSUBCAT_SET.add("127");
+/* 109 */     SW_COFSUBCAT_SET.add("133");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected static EntityItem searchForModel(LXABRSTATUS paramLXABRSTATUS, String paramString1, String paramString2) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 136 */     EntityItem entityItem = null;
+/* 137 */     if (paramString1 != null && paramString2 != null) {
+/* 138 */       Vector<String> vector1 = new Vector(2);
+/* 139 */       vector1.addElement("MACHTYPEATR");
+/* 140 */       vector1.addElement("MODELATR");
+/* 141 */       Vector<String> vector2 = new Vector(2);
+/* 142 */       vector2.addElement(paramString1);
+/* 143 */       vector2.addElement(paramString2);
+/*     */       
+/* 145 */       EntityItem[] arrayOfEntityItem = null;
+/*     */       
+/*     */       try {
+/* 148 */         StringBuffer stringBuffer = new StringBuffer();
+/* 149 */         arrayOfEntityItem = ABRUtil.doSearch(paramLXABRSTATUS.getDatabase(), paramLXABRSTATUS.getProfile(), "LDSRDMODEL", "MODEL", false, vector1, vector2, stringBuffer);
+/*     */         
+/* 151 */         if (stringBuffer.length() > 0) {
+/* 152 */           paramLXABRSTATUS.addDebug(stringBuffer.toString());
+/*     */         }
+/* 154 */       } catch (SBRException sBRException) {
+/*     */         
+/* 156 */         StringWriter stringWriter = new StringWriter();
+/* 157 */         sBRException.printStackTrace(new PrintWriter(stringWriter));
+/* 158 */         paramLXABRSTATUS.addDebug("searchForModel SBRException: " + stringWriter.getBuffer().toString());
+/*     */       } 
+/* 160 */       if (arrayOfEntityItem != null && arrayOfEntityItem.length > 0) {
+/* 161 */         if (arrayOfEntityItem.length == 1) {
+/* 162 */           entityItem = arrayOfEntityItem[0];
+/* 163 */           paramLXABRSTATUS.addDebug("LXLEADSUtil.searchForModel found single " + entityItem.getKey() + " for mt:" + paramString1 + " model:" + paramString2);
+/*     */         } else {
+/*     */           
+/* 166 */           boolean bool = true;
+/* 167 */           for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/* 168 */             EntityItem entityItem1 = arrayOfEntityItem[b];
+/*     */             
+/* 170 */             String str = PokUtils.getAttributeFlagValue(entityItem1, "COFCAT");
+/* 171 */             if ("100".equals(str)) {
+/*     */               
+/* 173 */               String str1 = PokUtils.getAttributeFlagValue(entityItem1, "COFGRP");
+/* 174 */               paramLXABRSTATUS.addDebug("LXLEADSUtil.searchForModel found HW " + entityItem1.getKey() + " cofcatflag:" + str + " cofgrp:" + str1 + " for mt:" + paramString1 + " model:" + paramString2);
+/*     */ 
+/*     */               
+/* 177 */               if ("150".equals(str1)) {
+/* 178 */                 if (entityItem != null) {
+/* 179 */                   bool = false;
+/*     */                   break;
+/*     */                 } 
+/* 182 */                 entityItem = entityItem1;
+/*     */               } 
+/* 184 */             } else if ("101".equals(str)) {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */               
+/* 191 */               String str1 = PokUtils.getAttributeFlagValue(entityItem1, "COFGRP");
+/* 192 */               String str2 = PokUtils.getAttributeFlagValue(entityItem1, "COFSUBCAT");
+/* 193 */               paramLXABRSTATUS.addDebug("LXLEADSUtil.searchForModel found SW " + entityItem1.getKey() + " cofgrp:" + str1 + " cofsubcatflag: " + str2);
+/*     */               
+/* 195 */               if ("150".equals(str1) && SW_COFSUBCAT_SET
+/* 196 */                 .contains(str2)) {
+/*     */                 
+/* 198 */                 if (entityItem != null) {
+/* 199 */                   bool = false;
+/*     */                   break;
+/*     */                 } 
+/* 202 */                 entityItem = entityItem1;
+/*     */               } 
+/* 204 */             } else if ("102".equals(str)) {
+/* 205 */               paramLXABRSTATUS.addDebug("LXLEADSUtil.searchForModel found SVC " + entityItem1.getKey() + " cofcatflag:" + str + " for mt:" + paramString1 + " model:" + paramString2);
+/*     */               
+/* 207 */               if (entityItem != null) {
+/* 208 */                 bool = false;
+/*     */                 break;
+/*     */               } 
+/* 211 */               entityItem = entityItem1;
+/*     */             } else {
+/* 213 */               paramLXABRSTATUS.addDebug("LXLEADSUtil.searchForModel found UNKNOWN " + entityItem1.getKey() + " cofcatflag:" + str + " for mt:" + paramString1 + " model:" + paramString2);
+/*     */             } 
+/*     */           } 
+/*     */           
+/* 217 */           if (!bool) {
+/* 218 */             StringBuffer stringBuffer = new StringBuffer();
+/*     */             
+/* 220 */             stringBuffer.append(paramLXABRSTATUS.getResourceMsg("ERROR_MODEL_MORETHAN_1", new Object[] { paramString1 + ":" + paramString2 }));
+/*     */             
+/* 222 */             for (byte b1 = 0; b1 < arrayOfEntityItem.length; b1++) {
+/* 223 */               stringBuffer.append("<br />" + arrayOfEntityItem[b1].getKey() + ":" + arrayOfEntityItem[b1]);
+/*     */             }
+/* 225 */             paramLXABRSTATUS.addError(stringBuffer.toString());
+/* 226 */             entityItem = null;
+/*     */           } 
+/*     */         } 
+/* 229 */         if (entityItem != null) {
+/*     */           
+/* 231 */           EntityGroup entityGroup = new EntityGroup(null, paramLXABRSTATUS.getDatabase(), paramLXABRSTATUS.getProfile(), "MODEL", "Edit");
+/* 232 */           entityItem = new EntityItem(entityGroup, paramLXABRSTATUS.getProfile(), paramLXABRSTATUS.getDatabase(), "MODEL", entityItem.getEntityID());
+/* 233 */           entityGroup.putEntityItem(entityItem);
+/*     */         } else {
+/* 235 */           entityItem = arrayOfEntityItem[0];
+/*     */         } 
+/*     */       } 
+/* 238 */       vector1.clear();
+/* 239 */       vector2.clear();
+/*     */     } 
+/*     */     
+/* 242 */     return entityItem;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected static EntityItem searchForWWSEO(LXABRSTATUS paramLXABRSTATUS, String paramString) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 258 */     EntityItem entityItem = null;
+/* 259 */     Vector<String> vector1 = new Vector(1);
+/* 260 */     vector1.addElement("SEOID");
+/* 261 */     Vector<String> vector2 = new Vector(1);
+/* 262 */     vector2.addElement(paramString);
+/*     */     
+/* 264 */     EntityItem[] arrayOfEntityItem = null;
+/*     */     try {
+/* 266 */       StringBuffer stringBuffer = new StringBuffer();
+/* 267 */       arrayOfEntityItem = ABRUtil.doSearch(paramLXABRSTATUS.getDatabase(), paramLXABRSTATUS.getProfile(), "LDSRDWWSEO", "WWSEO", false, vector1, vector2, stringBuffer);
+/*     */       
+/* 269 */       if (stringBuffer.length() > 0) {
+/* 270 */         paramLXABRSTATUS.addDebug(stringBuffer.toString());
+/*     */       }
+/* 272 */     } catch (SBRException sBRException) {
+/*     */       
+/* 274 */       StringWriter stringWriter = new StringWriter();
+/* 275 */       sBRException.printStackTrace(new PrintWriter(stringWriter));
+/* 276 */       paramLXABRSTATUS.addDebug("searchForWWSEO SBRException: " + stringWriter.getBuffer().toString());
+/*     */     } 
+/* 278 */     if (arrayOfEntityItem != null && arrayOfEntityItem.length > 0) {
+/* 279 */       for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/* 280 */         paramLXABRSTATUS.addDebug("LXLEADSUtil.searchForWWSEO found " + arrayOfEntityItem[b].getKey());
+/*     */       }
+/* 282 */       if (arrayOfEntityItem.length > 1) {
+/* 283 */         StringBuffer stringBuffer = new StringBuffer();
+/* 284 */         stringBuffer.append("More than one WWSEO found for " + paramString);
+/* 285 */         for (byte b1 = 0; b1 < arrayOfEntityItem.length; b1++) {
+/* 286 */           stringBuffer.append("<br />" + arrayOfEntityItem[b1].getKey() + ":" + arrayOfEntityItem[b1]);
+/*     */         }
+/* 288 */         paramLXABRSTATUS.addError(stringBuffer.toString());
+/*     */       } 
+/* 290 */       entityItem = arrayOfEntityItem[0];
+/*     */     } 
+/*     */     
+/* 293 */     vector1.clear();
+/* 294 */     vector2.clear();
+/* 295 */     return entityItem;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected static EntityItem searchForLSEO(LXABRSTATUS paramLXABRSTATUS, String paramString) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 312 */     EntityItem entityItem = null;
+/* 313 */     Vector<String> vector1 = new Vector(1);
+/* 314 */     vector1.addElement("SEOID");
+/* 315 */     Vector<String> vector2 = new Vector(1);
+/* 316 */     vector2.addElement(paramString);
+/*     */     
+/* 318 */     EntityItem[] arrayOfEntityItem = null;
+/*     */     try {
+/* 320 */       StringBuffer stringBuffer = new StringBuffer();
+/* 321 */       arrayOfEntityItem = ABRUtil.doSearch(paramLXABRSTATUS.getDatabase(), paramLXABRSTATUS.getProfile(), "LDSRDLSEO", "LSEO", false, vector1, vector2, stringBuffer);
+/*     */       
+/* 323 */       if (stringBuffer.length() > 0) {
+/* 324 */         paramLXABRSTATUS.addDebug(stringBuffer.toString());
+/*     */       }
+/* 326 */     } catch (SBRException sBRException) {
+/*     */       
+/* 328 */       StringWriter stringWriter = new StringWriter();
+/* 329 */       sBRException.printStackTrace(new PrintWriter(stringWriter));
+/* 330 */       paramLXABRSTATUS.addDebug("searchForLSEO SBRException: " + stringWriter.getBuffer().toString());
+/*     */     } 
+/* 332 */     if (arrayOfEntityItem != null && arrayOfEntityItem.length > 0) {
+/* 333 */       for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/* 334 */         paramLXABRSTATUS.addDebug("LXLEADSUtil.searchForLSEO found " + arrayOfEntityItem[b].getKey());
+/*     */       }
+/* 336 */       if (arrayOfEntityItem.length > 1) {
+/* 337 */         StringBuffer stringBuffer = new StringBuffer();
+/* 338 */         stringBuffer.append("More than one LSEO found for " + paramString);
+/* 339 */         for (byte b1 = 0; b1 < arrayOfEntityItem.length; b1++) {
+/* 340 */           stringBuffer.append("<br />" + arrayOfEntityItem[b1].getKey() + ":" + arrayOfEntityItem[b1]);
+/*     */         }
+/* 342 */         paramLXABRSTATUS.addError(stringBuffer.toString());
+/*     */       } 
+/* 344 */       entityItem = arrayOfEntityItem[0];
+/*     */     } 
+/* 346 */     vector1.clear();
+/* 347 */     vector2.clear();
+/* 348 */     return entityItem;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected static EntityItem createWWSEO(LXABRSTATUS paramLXABRSTATUS, EntityItem paramEntityItem, String paramString1, String paramString2, Object paramObject) throws MiddlewareRequestException, SQLException, MiddlewareException, EANBusinessRuleException, RemoteException, MiddlewareShutdownInProgressException {
+/* 385 */     EntityItem entityItem = null;
+/*     */     
+/* 387 */     Vector<String> vector = new Vector();
+/* 388 */     Hashtable<Object, Object> hashtable = new Hashtable<>();
+/* 389 */     vector.addElement("SEOID");
+/* 390 */     hashtable.put("SEOID", paramString1);
+/* 391 */     vector.addElement("COMNAME");
+/* 392 */     hashtable.put("COMNAME", paramString1);
+/* 393 */     vector.addElement("SEOTECHDESC");
+/* 394 */     hashtable.put("SEOTECHDESC", paramString2);
+/* 395 */     vector.addElement("PROJCDNAM");
+/*     */     
+/* 397 */     String str1 = "722";
+/* 398 */     if (paramLXABRSTATUS.getPROJCDNAME() != null) {
+/* 399 */       str1 = paramLXABRSTATUS.getPROJCDNAME();
+/*     */     }
+/* 401 */     hashtable.put("PROJCDNAM", str1);
+/* 402 */     vector.addElement("SEOORDERCODE");
+/* 403 */     hashtable.put("SEOORDERCODE", "10");
+/* 404 */     vector.addElement("SPECBID");
+/* 405 */     hashtable.put("SPECBID", "11458");
+/* 406 */     vector.addElement("UNSPSCCD");
+/* 407 */     String str2 = PokUtils.getAttributeFlagValue(paramEntityItem, "UNSPSCCD");
+/* 408 */     paramLXABRSTATUS.addDebug(paramEntityItem.getKey() + " has UNSPSCCD " + str2);
+/* 409 */     if (str2 == null) {
+/* 410 */       paramLXABRSTATUS.addDebug(paramEntityItem.getKey() + " did not have UNSPSCCD attr meta: " + paramEntityItem
+/* 411 */           .getEntityGroup().getMetaAttribute("UNSPSCCD"));
+/* 412 */       str2 = "43171806";
+/*     */     } 
+/* 414 */     hashtable.put("UNSPSCCD", str2);
+/* 415 */     vector.addElement("RATECARDCD");
+/* 416 */     String str3 = PokUtils.getAttributeFlagValue(paramEntityItem, "RATECARDCD");
+/* 417 */     paramLXABRSTATUS.addDebug(paramEntityItem.getKey() + " has RATECARDCD " + str3);
+/* 418 */     if (str3 == null) {
+/* 419 */       paramLXABRSTATUS.addDebug(paramEntityItem.getKey() + " did not have RATECARDCD attr meta: " + paramEntityItem
+/* 420 */           .getEntityGroup().getMetaAttribute("RATECARDCD"));
+/* 421 */       str3 = "SSM-0080";
+/*     */     } 
+/* 423 */     hashtable.put("RATECARDCD", str3);
+/*     */     
+/* 425 */     vector.addElement("PDHDOMAIN");
+/* 426 */     hashtable.put("PDHDOMAIN", paramObject);
+/*     */     
+/* 428 */     StringBuffer stringBuffer = new StringBuffer();
+/*     */     try {
+/* 430 */       entityItem = ABRUtil.createEntity(paramLXABRSTATUS.getDatabase(), paramLXABRSTATUS.getProfile(), "LDCRWWSEO", paramEntityItem, "WWSEO", vector, hashtable, stringBuffer);
+/*     */     }
+/* 432 */     catch (EANBusinessRuleException eANBusinessRuleException) {
+/* 433 */       throw eANBusinessRuleException;
+/*     */     } finally {
+/* 435 */       if (stringBuffer.length() > 0) {
+/* 436 */         paramLXABRSTATUS.addDebug(stringBuffer.toString());
+/*     */       }
+/* 438 */       if (entityItem == null) {
+/* 439 */         paramLXABRSTATUS.addError("ERROR: Can not create WWSEO entity for seoid: " + paramString1);
+/*     */       }
+/*     */ 
+/*     */       
+/* 443 */       vector.clear();
+/* 444 */       hashtable.clear();
+/*     */     } 
+/*     */     
+/* 447 */     return entityItem;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected static EntityItem createLSEO(LXABRSTATUS paramLXABRSTATUS, EntityItem paramEntityItem, String paramString1, String paramString2, Vector paramVector, Object paramObject1, Object paramObject2) throws MiddlewareRequestException, SQLException, MiddlewareException, EANBusinessRuleException, RemoteException, MiddlewareShutdownInProgressException {
+/* 483 */     EntityItem entityItem = null;
+/*     */     
+/* 485 */     Vector<String> vector = new Vector();
+/* 486 */     Hashtable<Object, Object> hashtable = new Hashtable<>();
+/* 487 */     vector.addElement("SEOID");
+/* 488 */     hashtable.put("SEOID", paramString1);
+/* 489 */     vector.addElement("COMNAME");
+/* 490 */     hashtable.put("COMNAME", paramString1);
+/* 491 */     vector.addElement("LSEOPUBDATEMTRGT");
+/* 492 */     hashtable.put("LSEOPUBDATEMTRGT", paramString2);
+/* 493 */     vector.addElement("AUDIEN");
+/* 494 */     hashtable.put("AUDIEN", paramObject2);
+/* 495 */     vector.addElement("ACCTASGNGRP");
+/* 496 */     hashtable.put("ACCTASGNGRP", "01");
+/* 497 */     vector.addElement("COUNTRYLIST");
+/* 498 */     hashtable.put("COUNTRYLIST", paramVector);
+/*     */     
+/* 500 */     vector.addElement("PDHDOMAIN");
+/* 501 */     hashtable.put("PDHDOMAIN", paramObject1);
+/*     */     
+/* 503 */     StringBuffer stringBuffer = new StringBuffer();
+/*     */     try {
+/* 505 */       entityItem = ABRUtil.createEntity(paramLXABRSTATUS.getDatabase(), paramLXABRSTATUS.getProfile(), "LDCRLSEO", paramEntityItem, "LSEO", vector, hashtable, stringBuffer);
+/*     */     }
+/* 507 */     catch (EANBusinessRuleException eANBusinessRuleException) {
+/* 508 */       throw eANBusinessRuleException;
+/*     */     } finally {
+/* 510 */       if (stringBuffer.length() > 0) {
+/* 511 */         paramLXABRSTATUS.addDebug(stringBuffer.toString());
+/*     */       }
+/* 513 */       if (entityItem == null) {
+/* 514 */         paramLXABRSTATUS.addError("ERROR: Can not create LSEO entity for seoid: " + paramString1);
+/*     */       }
+/*     */ 
+/*     */       
+/* 518 */       vector.clear();
+/* 519 */       hashtable.clear();
+/*     */     } 
+/*     */     
+/* 522 */     return entityItem;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected static void createFeatureRefs(LXABRSTATUS paramLXABRSTATUS, EntityItem paramEntityItem1, EntityItem paramEntityItem2, Vector paramVector, Hashtable paramHashtable) throws MiddlewareRequestException, SQLException, MiddlewareException, LockException, MiddlewareShutdownInProgressException, EANBusinessRuleException, WorkflowException, RemoteException {
+/* 560 */     String str1 = "";
+/* 561 */     String str2 = "";
+/* 562 */     String str3 = "";
+/* 563 */     String str4 = PokUtils.getAttributeFlagValue(paramEntityItem2, "COFCAT");
+/*     */     
+/* 565 */     if ("100".equals(str4)) {
+/* 566 */       str1 = "LDLINKPRODSTWWSEO";
+/* 567 */       str2 = "PRODSTRUCT";
+/* 568 */       str3 = "CONFQTY";
+/* 569 */     } else if ("101".equals(str4)) {
+/* 570 */       str1 = "LDLINKSWPRODWWSEO";
+/* 571 */       str2 = "SWPRODSTRUCT";
+/* 572 */       str3 = "SWCONFQTY";
+/* 573 */     } else if ("102".equals(str4)) {
+/* 574 */       paramLXABRSTATUS.addDebug("LXLEADSUtil.createFeatureRefs Model is Service, no references created");
+/*     */       
+/*     */       return;
+/*     */     } 
+/* 578 */     LinkActionItem linkActionItem = new LinkActionItem(null, paramLXABRSTATUS.getDatabase(), paramLXABRSTATUS.getProfile(), str1);
+/* 579 */     EntityItem[] arrayOfEntityItem1 = { paramEntityItem1 };
+/* 580 */     EntityItem[] arrayOfEntityItem2 = new EntityItem[paramVector.size()];
+/*     */ 
+/*     */     
+/* 583 */     paramVector.copyInto((Object[])arrayOfEntityItem2);
+/*     */ 
+/*     */     
+/* 586 */     linkActionItem.setParentEntityItems(arrayOfEntityItem1);
+/* 587 */     linkActionItem.setChildEntityItems(arrayOfEntityItem2);
+/* 588 */     paramLXABRSTATUS.getDatabase().executeAction(paramLXABRSTATUS.getProfile(), linkActionItem);
+/*     */ 
+/*     */ 
+/*     */     
+/* 592 */     Profile profile = paramLXABRSTATUS.getProfile().getNewInstance(paramLXABRSTATUS.getDatabase());
+/* 593 */     String str5 = paramLXABRSTATUS.getDatabase().getDates().getNow();
+/* 594 */     profile.setValOnEffOn(str5, str5);
+/*     */     
+/* 596 */     EntityList entityList = paramLXABRSTATUS.getDatabase().getEntityList(profile, new ExtractActionItem(null, paramLXABRSTATUS
+/* 597 */           .getDatabase(), profile, "EXRPT3WWSEO3"), arrayOfEntityItem1);
+/*     */ 
+/*     */     
+/* 600 */     paramLXABRSTATUS.addDebug("LXLEADSUtil.createFeatureRefs list using VE EXRPT3WWSEO3 after linkaction: " + str1 + "\n" + 
+/* 601 */         PokUtils.outputList(entityList));
+/* 602 */     EntityGroup entityGroup = entityList.getEntityGroup(str2);
+/*     */     
+/* 604 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/* 605 */       EntityItem entityItem1 = entityGroup.getEntityItem(b);
+/*     */       
+/* 607 */       String str = (String)paramHashtable.get(entityItem1.getKey());
+/* 608 */       EntityItem entityItem2 = (EntityItem)entityItem1.getUpLink(0);
+/* 609 */       paramLXABRSTATUS.addDebug("LXLEADSUtil " + entityItem1.getKey() + " use qty: " + str + " on " + entityItem2.getKey());
+/* 610 */       if (str != null && !str.equals("1")) {
+/* 611 */         StringBuffer stringBuffer = new StringBuffer();
+/*     */         
+/* 613 */         ABRUtil.setText(entityItem2, str3, str, stringBuffer);
+/* 614 */         if (stringBuffer.length() > 0) {
+/* 615 */           paramLXABRSTATUS.addDebug(stringBuffer.toString());
+/*     */         }
+/*     */         
+/* 618 */         entityItem2.commit(paramLXABRSTATUS.getDatabase(), null);
+/*     */       } 
+/*     */     } 
+/* 621 */     entityList.dereference();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private static String getGenAreaCodeForCtry(Database paramDatabase, Profile paramProfile, String paramString) throws MiddlewareRequestException, SQLException, MiddlewareException {
+/* 637 */     if (SG_GENAREACODE_TBL == null) {
+/* 638 */       SG_GENAREACODE_TBL = new Hashtable<>();
+/*     */       
+/* 640 */       EntityGroup entityGroup = new EntityGroup(null, paramDatabase, paramProfile, "GENERALAREA", "Edit", false);
+/* 641 */       EANMetaFlagAttribute eANMetaFlagAttribute = (EANMetaFlagAttribute)entityGroup.getMetaAttribute("GENAREACODE");
+/* 642 */       if (eANMetaFlagAttribute != null) {
+/* 643 */         for (byte b = 0; b < eANMetaFlagAttribute.getMetaFlagCount(); b++) {
+/*     */           
+/* 645 */           MetaFlag metaFlag = eANMetaFlagAttribute.getMetaFlag(b);
+/* 646 */           if (metaFlag.isExpired()) {
+/* 647 */             paramDatabase.debug(4, "LXLEADSUtil.getGenAreaCodeForCtry skipping expired flag: " + metaFlag + "[" + metaFlag
+/* 648 */                 .getFlagCode() + "] for GENERALAREA.GENAREACODE");
+/*     */           } else {
+/*     */             
+/* 651 */             SG_GENAREACODE_TBL.put(metaFlag.toString(), metaFlag.getFlagCode());
+/*     */           } 
+/*     */         } 
+/*     */       }
+/*     */     } 
+/* 656 */     return (String)SG_GENAREACODE_TBL.get(paramString);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static EntityItem searchForGENERALAREA(Database paramDatabase, Profile paramProfile, String paramString, StringBuffer paramStringBuffer) throws MiddlewareRequestException, SQLException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 677 */     EntityItem entityItem = null;
+/*     */ 
+/*     */     
+/* 680 */     String str = getGenAreaCodeForCtry(paramDatabase, paramProfile, paramString);
+/* 681 */     paramStringBuffer.append("LXLEADSUtil.searchForGENERALAREA country: " + paramString + " genAreaCodeFlg: " + str + "\n");
+/* 682 */     paramDatabase.debug(4, "LXLEADSUtil.searchForGENERALAREA country: " + paramString + " genAreaCodeFlg: " + str);
+/* 683 */     if (str != null) {
+/* 684 */       Vector<String> vector1 = new Vector(1);
+/* 685 */       vector1.addElement("GENAREACODE");
+/* 686 */       Vector<String> vector2 = new Vector(1);
+/* 687 */       vector2.addElement(str);
+/* 688 */       EntityItem[] arrayOfEntityItem = null;
+/*     */       try {
+/* 690 */         arrayOfEntityItem = ABRUtil.doSearch(paramDatabase, paramProfile, "LDSRDGENAREA", "GENERALAREA", false, vector1, vector2, paramStringBuffer);
+/*     */       }
+/* 692 */       catch (SBRException sBRException) {
+/*     */         
+/* 694 */         StringWriter stringWriter = new StringWriter();
+/* 695 */         sBRException.printStackTrace(new PrintWriter(stringWriter));
+/* 696 */         paramStringBuffer.append("searchForGENERALAREA SBRException: " + stringWriter.getBuffer().toString() + "\n");
+/*     */       } 
+/* 698 */       if (arrayOfEntityItem != null && arrayOfEntityItem.length > 0) {
+/* 699 */         for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/* 700 */           paramStringBuffer.append("LXLEADSUtil.searchForGENERALAREA found " + arrayOfEntityItem[b].getKey() + "\n");
+/*     */         }
+/* 702 */         entityItem = arrayOfEntityItem[0];
+/*     */       } 
+/* 704 */       vector1.clear();
+/* 705 */       vector2.clear();
+/*     */     } else {
+/* 707 */       paramStringBuffer.append("LXLEADSUtil.searchForGENERALAREA GENAREACODE table: " + SG_GENAREACODE_TBL + "\n");
+/*     */     } 
+/*     */     
+/* 710 */     return entityItem;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected static Object deriveAudien(String paramString) {
+/* 733 */     Object object = AUDIEN_TBL.get(paramString);
+/* 734 */     if (object == null) {
+/* 735 */       object = "10062";
+/*     */     }
+/* 737 */     return object;
+/*     */   }
+/*     */ }
 
-//(C) Copyright IBM Corp. 2008  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
 
-package COM.ibm.eannounce.abr.sg;
-
-import java.rmi.RemoteException;
-import java.sql.SQLException;
-import java.util.*;
-
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.abr.util.ABRUtil;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
-/**********************************************************************************
- * From "SG FS Inbound Feed Leads 20090423.doc"
- * Utilities for LEADS SG ABRs
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\LXLEADSUtil.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-//LXLEADSUtil.java,v
-//Revision 1.7  2010/03/01 17:15:32  wendy
-//Expanded to support Blue Harmony (BH) IDLs.
-//
-//Revision 1.6  2009/05/20 19:09:47  wendy
-//spec updates
-//
-//Revision 1.5  2009/05/20 01:03:18  wendy
-//Add filter for multiple SW Model, replace modelItem from search with edit version
-//
-//Revision 1.4  2009/05/06 12:38:52  wendy
-//RCQ00028947 - LEADS to EACM Feed - Update Mapping for Audience, Rate Card Code, UNSPSC Code
-//RCQ00029975 - LEADS inbound feed Workgroup Selection
-//
-//Revision 1.3  2009/04/07 12:19:36  wendy
-//Enhance error msgs
-//
-//Revision 1.2  2009/04/02 19:42:16  wendy
-//Change projcdnam flag code
-//
-//Revision 1.1  2009/01/20 19:39:08  wendy
-//CQ00016138-RQ: STG - HVEC EACM Inbound Feed from LEADS - New Feed
-//CQ00002984-RQ: STG - EACM Inbound Feed from LEADS - New Feed
-//
-public class LXLEADSUtil {
-	
-	//COFCAT	100	Hardware
-	//COFCAT	101	Software
-	//COFCAT	102	Service
-	protected static final String COFCAT_HW="100";
-	protected static final String COFCAT_SW="101";
-	protected static final String COFCAT_SVC="102";
-	//COFSUBCAT	125		HIPO
-	//COFSUBCAT	127		Application
-	//COFSUBCAT	133		Subscription
-	protected static final String COFSUBCAT_HIPO="125";
-	protected static final String COFSUBCAT_Application="127";
-	protected static final String COFSUBCAT_Subscription="133";
-	protected static final HashSet SW_COFSUBCAT_SET; 
-	
-	//COFGRP	150		Base
-	protected static final String COFGRP_BASE="150";
-
-	private static final String MODEL_SRCHACTION_NAME = "LDSRDMODEL";//"SRDMODEL4";
-	private static final String WWSEO_SRCHACTION_NAME = "LDSRDWWSEO";//"SRDWWSEO5";
-	private static final String LSEO_SRCHACTION_NAME = "LDSRDLSEO";//"SRDLSEO3";
-	private static final String WWSEO_CREATEACTION_NAME = "LDCRWWSEO";//"CRWWSEO";
-	private static final String LSEO_CREATEACTION_NAME = "LDCRLSEO";//"CRPEERLSEO"; 
-	private static final String WWSEOPS_LINKACTION_NAME = "LDLINKPRODSTWWSEO";//"LINKPRODSTRUCTWWSEO"; // for WWSEOPRODSTRUCT
-	private static final String WWSEOSWPS_LINKACTION_NAME = "LDLINKSWPRODWWSEO";//"LINKSWPRODSTRUCTWWSEO"; // for WWSEOSWPRODSTRUCT	
-	private static final String GENERALAREA_SRCHACTION_NAME = "LDSRDGENAREA";//"SRDGENERALAREA"; 
-
-	protected static final String PS_SRCHACTION_NAME = "LDSRDPRODSTRUCT";//"SRDPRODSTRUCT03";// wont accept model attr->"SRDPRODSTRUCT01";
-	protected static final String SWPS_SRCHACTION_NAME = "LDSRDSWPRODSTRUCT";//"SRDSWPRODSTRUCT03";// wont accept model attr->"SRDSWPRODSTRUCT2";
-
-	private static Hashtable SG_GENAREACODE_TBL = null;
-	private static final Hashtable AUDIEN_TBL;
-	/*
-AUDIEN	100		SDI Channel
-AUDIEN	10046	Catalog - Business Partner	Catalog - Business Partner
-AUDIEN	10048	Catalog - Indirect/Reseller	Catalog - Indirect/Reseller
-AUDIEN	10054	Public	Public
-AUDIEN	10055	None	None
-AUDIEN	10062	LE Direct	LE Direct
-AUDIEN	10067	DAC/MAX	DAC/MAX
-
-ACCOUNTTYPE					CHW								HVEC
-							AUDIEN							CATALOGNAME_CVAR
-Null (i.e. not supplied)	LE Direct (10062)				Default from meta data
-Enterprise Direct			LE Direct (10062)				LE Direct (10062)
-Odyssey						LE Direct (10062)				LE Direct (10062) +DAC/MAX (10067)
-Indirect					LE Direct (10062) +				LE Direct (10062) +
-			Catalog - Indirect/Reseller (10048) +			Catalog - Indirect/Reseller (10048) +
-			Catalog - Business Partner (10046)				Catalog - Business Partner (10046)		
-	 */
-	static{
-		AUDIEN_TBL = new Hashtable();
-		AUDIEN_TBL.put("Enterprise Direct", "10062");
-		AUDIEN_TBL.put("Odyssey", "10062");
-		Vector vct = new Vector(3);
-		vct.add("10062");
-		vct.add("10046");
-		vct.add("10048");
-		AUDIEN_TBL.put("Indirect", vct);
-		SW_COFSUBCAT_SET = new HashSet();
-		SW_COFSUBCAT_SET.add(COFSUBCAT_HIPO);
-		SW_COFSUBCAT_SET.add(COFSUBCAT_Application);
-		SW_COFSUBCAT_SET.add(COFSUBCAT_Subscription);
-	}
-	
-	/****************
-	 * 1.	Search for MODEL using: 
-	 * -	MACHTYPEATR = <MT>
-	 * -	MODELATR = <MODEL>
-	 * 
-	 * 1.	Search (restricted to PDHDOMAIN) for the Model using: 
-•	MACHTYPEATR = <MT>
-•	MODELATR = <MODEL>
-2.	If more than one MODEL, then:
-•	If COFCAT = Hardware (100), choose the one where COFGRP = Base (150)
-•	If COFCAT = Software(101), chose the one where COFGRP = Base (150) and COFSUBCAT = {Application (127) or HIPO (125) or Subscription (133)}.
-3.	Use the PDHDOMAIN of this MODEL for all data created. 
-
-	 * @param lxAbr
-	 * @param mt
-	 * @param model
-	 * @return
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws MiddlewareShutdownInProgressException
-	 */
-	protected static EntityItem searchForModel(LXABRSTATUS lxAbr,String mt, String model) 
-	throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException
-	{
-		EntityItem modelItem = null;
-		if (mt != null && model!= null){
-			Vector attrVct = new Vector(2);
-			attrVct.addElement("MACHTYPEATR");
-			attrVct.addElement("MODELATR");
-			Vector valVct = new Vector(2);
-			valVct.addElement(mt);
-			valVct.addElement(model);
-
-			EntityItem eia[]= null;
-			
-			try{
-				StringBuffer debugSb = new StringBuffer();
-				eia= ABRUtil.doSearch(lxAbr.getDatabase(), lxAbr.getProfile(), 
-						MODEL_SRCHACTION_NAME, "MODEL", false, attrVct, valVct, debugSb);
-				if (debugSb.length()>0){
-					lxAbr.addDebug(debugSb.toString());
-				}
-			}catch(SBRException exc){
-				// these exceptions are for missing flagcodes or failed business rules, dont pass back
-				java.io.StringWriter exBuf = new java.io.StringWriter();
-				exc.printStackTrace(new java.io.PrintWriter(exBuf));
-				lxAbr.addDebug("searchForModel SBRException: "+exBuf.getBuffer().toString());
-			}
-			if (eia!=null && eia.length >0){
-				if (eia.length==1){
-					modelItem = eia[0];
-					lxAbr.addDebug("LXLEADSUtil.searchForModel found single "+modelItem.getKey()+
-							" for mt:"+mt+" model:"+model);
-				}else{
-					boolean isOneMdl=true;
-					for (int i=0; i<eia.length; i++){
-						EntityItem item = eia[i];
-						// be filter based on cofcat.. mt:mdl is not unique
-						String cofcatflag = PokUtils.getAttributeFlagValue(item, "COFCAT");
-						if (COFCAT_HW.equals(cofcatflag)){
-							//cofcat = Hardware and cofgrp = Base ----- that ensures only 1
-							String cofgrp = PokUtils.getAttributeFlagValue(item, "COFGRP");
-							lxAbr.addDebug("LXLEADSUtil.searchForModel found HW "+item.getKey()+
-									" cofcatflag:"+cofcatflag+
-									" cofgrp:"+cofgrp+" for mt:"+mt+" model:"+model);
-							if (COFGRP_BASE.equals(cofgrp)){
-								if (modelItem!=null){
-									isOneMdl = false;
-									break;
-								}
-								modelItem = item;
-							}
-						}else if (COFCAT_SW.equals(cofcatflag)){
-							//if more than one SW model for mt+mdl must find one with:
-							/*Cofsubcat		Cofgrp	
-						Application		Base OR
-						HIPO			Base OR
-						Subscription	Base
-							 */					
-							String cofgrp = PokUtils.getAttributeFlagValue(item, "COFGRP");
-							String cofsubcatflag = PokUtils.getAttributeFlagValue(item, "COFSUBCAT");
-							lxAbr.addDebug("LXLEADSUtil.searchForModel found SW "+item.getKey()+" cofgrp:"+
-									cofgrp+" cofsubcatflag: "+cofsubcatflag);
-							if (COFGRP_BASE.equals(cofgrp) &&
-								SW_COFSUBCAT_SET.contains(cofsubcatflag))
-							{
-								if (modelItem!=null){
-									isOneMdl = false;
-									break;
-								}
-								modelItem = item;
-							}
-						}else if (COFCAT_SVC.equals(cofcatflag)){
-							lxAbr.addDebug("LXLEADSUtil.searchForModel found SVC "+item.getKey()+" cofcatflag:"+cofcatflag+
-									" for mt:"+mt+" model:"+model);
-							if (modelItem!=null){
-								isOneMdl = false;
-								break;
-							}
-							modelItem = item;
-						}else{
-							lxAbr.addDebug("LXLEADSUtil.searchForModel found UNKNOWN "+item.getKey()+" cofcatflag:"+cofcatflag+
-									" for mt:"+mt+" model:"+model);
-						}
-					}
-					if (!isOneMdl){
-						StringBuffer sb = new StringBuffer();
-						//ERROR_MODEL_MORETHAN_1 = More than one MODEL found for {0}
-						sb.append(lxAbr.getResourceMsg("ERROR_MODEL_MORETHAN_1", new Object[]{ mt+":"+model}));
-						//sb.append("More than one MODEL found for "+mt+":"+model);
-						for (int i=0; i<eia.length; i++){
-							sb.append("<br />"+eia[i].getKey()+":"+eia[i]);
-						}
-						lxAbr.addError(sb.toString());
-						modelItem = null;
-					}
-				} // end more than one found
-				if (modelItem!=null){
-					// must pull this again, only nav attributes come back with search
-					EntityGroup eg =  new EntityGroup(null,lxAbr.getDatabase(),lxAbr.getProfile(),"MODEL", "Edit");
-					modelItem = new EntityItem(eg, lxAbr.getProfile(), lxAbr.getDatabase(), "MODEL", modelItem.getEntityID());
-					eg.putEntityItem(modelItem);
-				}else{
-					modelItem = eia[0]; // give it something to prevent not found msg
-				}
-			} // end something found
-			attrVct.clear();
-			valVct.clear();
-		}
-		
-		return modelItem;
-	}	
-	/*********************************
-	 * 2.	Search for WWSEO using:
-	 * -	<SEOID>
-	 * 
-	 * @param lxAbr
-	 * @param seoid
-	 * @return
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws MiddlewareShutdownInProgressException
-	 */
-	protected static EntityItem searchForWWSEO(LXABRSTATUS lxAbr, String seoid) 
-	throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException
-	{
-		EntityItem wwseo = null;
-		Vector attrVct = new Vector(1);
-		attrVct.addElement("SEOID");
-		Vector valVct = new Vector(1);
-		valVct.addElement(seoid);
-
-		EntityItem eia[]= null;
-		try{
-			StringBuffer debugSb = new StringBuffer();
-			eia = ABRUtil.doSearch(lxAbr.getDatabase(), lxAbr.getProfile(), 
-					WWSEO_SRCHACTION_NAME, "WWSEO", false, attrVct, valVct, debugSb);
-			if (debugSb.length()>0){
-				lxAbr.addDebug(debugSb.toString());
-			}
-		}catch(SBRException exc){
-			// these exceptions are for missing flagcodes or failed business rules, dont pass back
-			java.io.StringWriter exBuf = new java.io.StringWriter();
-			exc.printStackTrace(new java.io.PrintWriter(exBuf));
-			lxAbr.addDebug("searchForWWSEO SBRException: "+exBuf.getBuffer().toString());
-		}
-		if (eia!=null && eia.length >0){
-			for (int i=0; i<eia.length; i++){
-				lxAbr.addDebug("LXLEADSUtil.searchForWWSEO found "+eia[i].getKey());
-			}
-			if (eia.length>1){
-				StringBuffer sb = new StringBuffer();
-				sb.append("More than one WWSEO found for "+seoid);
-				for (int i=0; i<eia.length; i++){
-					sb.append("<br />"+eia[i].getKey()+":"+eia[i]);
-				}
-				lxAbr.addError(sb.toString());
-			}
-			wwseo = eia[0];
-		}
-
-		attrVct.clear();
-		valVct.clear();
-		return wwseo;
-	}	
-
-	/*****************************************
-	 * 3.	Search for LSEO using:
-	 * -	<SEOID>
-	 * 
-	 * @param lxAbr
-	 * @param seoid
-	 * @return
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws MiddlewareShutdownInProgressException
-	 */
-	protected static EntityItem searchForLSEO(LXABRSTATUS lxAbr, String seoid) 
-	throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException
-	{
-		EntityItem lseo = null;
-		Vector attrVct = new Vector(1);
-		attrVct.addElement("SEOID");
-		Vector valVct = new Vector(1);
-		valVct.addElement(seoid);
-
-		EntityItem eia[]= null;
-		try{
-			StringBuffer debugSb = new StringBuffer();
-			eia= ABRUtil.doSearch(lxAbr.getDatabase(), lxAbr.getProfile(), 
-					LSEO_SRCHACTION_NAME, "LSEO", false, attrVct, valVct, debugSb);
-			if (debugSb.length()>0){
-				lxAbr.addDebug(debugSb.toString());
-			}
-		}catch(SBRException exc){
-			// these exceptions are for missing flagcodes or failed business rules, dont pass back
-			java.io.StringWriter exBuf = new java.io.StringWriter();
-			exc.printStackTrace(new java.io.PrintWriter(exBuf));
-			lxAbr.addDebug("searchForLSEO SBRException: "+exBuf.getBuffer().toString());
-		}
-		if (eia!=null && eia.length > 0){			
-			for (int i=0; i<eia.length; i++){
-				lxAbr.addDebug("LXLEADSUtil.searchForLSEO found "+eia[i].getKey());
-			}
-			if (eia.length>1){
-				StringBuffer sb = new StringBuffer();
-				sb.append("More than one LSEO found for "+seoid);
-				for (int i=0; i<eia.length; i++){
-					sb.append("<br />"+eia[i].getKey()+":"+eia[i]);
-				}
-				lxAbr.addError(sb.toString());
-			}
-			lseo = eia[0];
-		}
-		attrVct.clear();
-		valVct.clear();
-		return lseo;
-	}
-
-	/*****************************************************
-	 * 4.	Create WWSEO
-	 * The parent MODEL is the MODEL found in step 1.
-	 * The attributes of the WWSEO are supplied via the XML shown in the SS on the SG_XML_LSEO tab with
-	 * details provided on the SG Notes tab.
-	 * COMNAME	T	Common Name	<SEOID>
-	 * PROJCDNAM	U	Project Code Name	"LEADS FEED SPECIAL BID" =>'722'
-	 * . If the LEADSXML has a value for PROJCDNAM, then use it; otherwise, use the default specified in the SS.
-	 * PDHDOMAIN	F	Domains	Derived from MODEL
-	 * SEOID	T	SEO ID	<SEOID>
-	 * SEOORDERCODE	U	SEO Ordercode	"Initial"
-	 * SEOTECHDESC	L	SEO Technical Description	<SEOTECHDESC>
-	 * SPECBID	U	Special Bid	"Yes"
-	 * UNSPSCCD	U	UN SPSC Code	RCQ00028947
-	 * UNSPSCCDSECONDRYUOM	U	UN Unit of Measure	Default
-	 * RATECARDCD	U	Rate Card Code	RCQ00028947 use value from Model
-	 * 
-	 * @param lxAbr
-	 * @param modelItem
-	 * @param seoid
-	 * @param seoTechDesc
-	 * @return
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws EANBusinessRuleException
-	 * @throws RemoteException
-	 * @throws MiddlewareShutdownInProgressException
-	 */
-	protected static EntityItem createWWSEO(LXABRSTATUS lxAbr, EntityItem modelItem, String seoid, 
-			String seoTechDesc, Object domain) 
-	throws MiddlewareRequestException, SQLException, MiddlewareException, EANBusinessRuleException, 
-	RemoteException, MiddlewareShutdownInProgressException
-	{
-		EntityItem wwseo = null;
-		
-		Vector attrCodeVct = new Vector();
-		Hashtable attrValTbl = new Hashtable();
-		attrCodeVct.addElement("SEOID");
-		attrValTbl.put("SEOID", seoid);
-		attrCodeVct.addElement("COMNAME");
-		attrValTbl.put("COMNAME", seoid); //COMNAME	T	Common Name	<SEOID>
-		attrCodeVct.addElement("SEOTECHDESC");
-		attrValTbl.put("SEOTECHDESC", seoTechDesc); //SEOTECHDESC	L	SEO Technical Description	<SEOTECHDESC>
-		attrCodeVct.addElement("PROJCDNAM");
-		// get the PROJCDNAM - expanded to support Blue Harmony (BH) IDLs.
-		String prjname = "722";
-		if(lxAbr.getPROJCDNAME() !=null){
-			prjname = lxAbr.getPROJCDNAME();
-		}
-		attrValTbl.put("PROJCDNAM", prjname); //PROJCDNAM	U	Project Code Name	"LEADS FEED SPECIAL BID" =>'722'
-		attrCodeVct.addElement("SEOORDERCODE");
-		attrValTbl.put("SEOORDERCODE", "10");//SEOORDERCODE	U	SEO Ordercode	"Initial" =>SEOORDERCODE	10		Initial
-		attrCodeVct.addElement("SPECBID");
-		attrValTbl.put("SPECBID","11458");//SPECBID	U	Special Bid	"Yes" =>SPECBID	11458	Y	Yes
-		attrCodeVct.addElement("UNSPSCCD");
-		String unspsccd = PokUtils.getAttributeFlagValue(modelItem, "UNSPSCCD");//RCQ00028947
-		lxAbr.addDebug(modelItem.getKey()+" has UNSPSCCD "+unspsccd);
-		if (unspsccd==null){
-			lxAbr.addDebug(modelItem.getKey()+" did not have UNSPSCCD attr meta: "+
-					modelItem.getEntityGroup().getMetaAttribute("UNSPSCCD"));
-			unspsccd = "43171806";
-		}
-		attrValTbl.put("UNSPSCCD",unspsccd);//UNSPSCCD	U	UN SPSC Code use Model value	"43171806 - Servers"=>43171806	43171806 - Servers
-		attrCodeVct.addElement("RATECARDCD");
-		String ratecardcd = PokUtils.getAttributeFlagValue(modelItem, "RATECARDCD");//RCQ00028947
-		lxAbr.addDebug(modelItem.getKey()+" has RATECARDCD "+ratecardcd);
-		if (ratecardcd==null){
-			lxAbr.addDebug(modelItem.getKey()+" did not have RATECARDCD attr meta: "+
-					modelItem.getEntityGroup().getMetaAttribute("RATECARDCD"));
-			ratecardcd = "SSM-0080";
-		}
-		attrValTbl.put("RATECARDCD",ratecardcd);//RATECARDCD	U	Rate Card Code	use Model value
-		// PDHDOMAIN was derived
-		attrCodeVct.addElement("PDHDOMAIN");
-		attrValTbl.put("PDHDOMAIN", domain);
-				
-		StringBuffer debugSb = new StringBuffer();
-		try{
-			wwseo = ABRUtil.createEntity(lxAbr.getDatabase(), lxAbr.getProfile(), WWSEO_CREATEACTION_NAME, modelItem,  
-				"WWSEO", attrCodeVct, attrValTbl, debugSb); 
-		}catch(EANBusinessRuleException ere){
-			throw ere;
-		}finally{
-			if (debugSb.length()>0){
-				lxAbr.addDebug(debugSb.toString());
-			}
-			if (wwseo==null){
-				lxAbr.addError("ERROR: Can not create WWSEO entity for seoid: "+seoid);
-			}
-
-			// release memory
-			attrCodeVct.clear();
-			attrValTbl.clear();
-		}
-		
-		return wwseo;
-	}
-	/*****************************************************
-	 * 5.	Create LSEO
-	 * The parent WWSEO is the WWSEO created in step 4.
-	 * The attributes of the LSEO are supplied via the XML shown in the SS on the SG_XML_LSEO tab with 
-	 * details provided on the SG Notes tab.
-	 * ACCTASGNGRP	U	Account Assignment Group	"01 - 3000100000" =>ACCTASGNGRP	01	01 - 3000100000
-	 * COMNAME	T	Common Name	<SEOID>
-	 * COUNTRYLIST	F	Country List	<COUNTRY>
-	 * DATAQUALITY	S	DataQuality	Default
-	 * PDHDOMAIN	F	Domains	Derived from MODEL
-	 * SEOID	T	SEO ID	SEOID
-	 * TRANSLATIONWATCH	U	Translation Watch	Default
-	 * LSEOPUBDATEMTRGT	T <PUBFROM>	
-	 *
-	 * @param lxAbr
-	 * @param wwseoItem
-	 * @param seoid
-	 * @param pubfrom
-	 * @param countryVct
-	 * @param domain - comes from Model now
-	 * @param audien - derived from XML msg now
-	 * @return
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws EANBusinessRuleException
-	 * @throws RemoteException
-	 * @throws MiddlewareShutdownInProgressException
-	 */
-	protected static EntityItem createLSEO(LXABRSTATUS lxAbr, EntityItem wwseoItem, String seoid, String pubfrom, 
-			Vector countryVct, Object domain, Object audien) 
-	throws MiddlewareRequestException, SQLException, MiddlewareException, EANBusinessRuleException, 
-	RemoteException, MiddlewareShutdownInProgressException
-	{
-		EntityItem lseo = null;
-		
-		Vector attrCodeVct = new Vector();
-		Hashtable attrValTbl = new Hashtable();
-		attrCodeVct.addElement("SEOID");
-		attrValTbl.put("SEOID", seoid);
-		attrCodeVct.addElement("COMNAME");
-		attrValTbl.put("COMNAME", seoid); //COMNAME	T	Common Name	<SEOID>
-		attrCodeVct.addElement("LSEOPUBDATEMTRGT");
-		attrValTbl.put("LSEOPUBDATEMTRGT", pubfrom); //LSEOPUBDATEMTRGT	<PUBFROM>
-		attrCodeVct.addElement("AUDIEN");
-		attrValTbl.put("AUDIEN", audien);//"10062"); //AUDIEN	F	Audience	"LE Direct"	flag code = 10062
-		attrCodeVct.addElement("ACCTASGNGRP");
-		attrValTbl.put("ACCTASGNGRP", "01"); //ACCTASGNGRP	U	Account Assignment Group	"01 - 3000100000" =>ACCTASGNGRP	01	01 - 3000100000
-		attrCodeVct.addElement("COUNTRYLIST");
-		attrValTbl.put("COUNTRYLIST", countryVct); //COUNTRYLIST	F	Country List	<COUNTRY>
-		// PDHDOMAIN was derived
-		attrCodeVct.addElement("PDHDOMAIN");
-		attrValTbl.put("PDHDOMAIN", domain);
-		
-		StringBuffer debugSb = new StringBuffer();
-		try{
-			lseo = ABRUtil.createEntity(lxAbr.getDatabase(), lxAbr.getProfile(), LSEO_CREATEACTION_NAME, wwseoItem,  
-				"LSEO", attrCodeVct, attrValTbl, debugSb); 
-		}catch(EANBusinessRuleException ere){
-			throw ere;
-		}finally{
-			if (debugSb.length()>0){
-				lxAbr.addDebug(debugSb.toString());
-			}
-			if (lseo==null){
-				lxAbr.addError("ERROR: Can not create LSEO entity for seoid: "+seoid);
-			}
-
-			// release memory
-			attrCodeVct.clear();
-			attrValTbl.clear();
-		}
-				
-		return lseo;
-	}
-
-	/************************************
-	 * 6.	Create references to features 
-	 * For each instance of <FEATUREELEMENT> and based on the value of COFCAT for the MODEL found in step 1:
-	 * 
-	 * 1.	Hardware
-	 * Search for PRODSTRUCT using <MT> <MODEL> <FEATURECODE> and create WWSEOPRODSTRUCT from the 
-	 * WWSEO created in step 5 to the PRODSTRUCT.
-	 * 
-	 * 2.	Software 
-	 * Search for SWPRODSTRUCT using <MT> <MODEL> <FEATURECODE> and create WWSEOSWPRODSTRUCT from the 
-	 * WWSEO created in step 5 to the SWPRODSTRUCT. 
-	 * 
-	 * 3.	Service 
-	 * Service WWSEOs do not have Service Features and therefore there is nothing to do at this step.
-	 * 
-	 * @param lxAbr
-	 * @param wwseoItem
-	 * @param modelItem
-	 * @param tmfVct
-	 * @param psQtyTbl
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws LockException
-	 * @throws MiddlewareShutdownInProgressException
-	 * @throws EANBusinessRuleException
-	 * @throws WorkflowException
-	 * @throws RemoteException
-	 */
-	protected static void createFeatureRefs(LXABRSTATUS lxAbr, EntityItem wwseoItem, EntityItem modelItem,
-			Vector tmfVct, Hashtable psQtyTbl) 
-	throws MiddlewareRequestException, SQLException, MiddlewareException, LockException, 
-	MiddlewareShutdownInProgressException, EANBusinessRuleException, WorkflowException, RemoteException 
-	{
-		// get create action based on model.cofcat
-		String linkAction = "";
-		String pstype="";
-		String qtyAttr="";
-		String cofcatflag = PokUtils.getAttributeFlagValue(modelItem, "COFCAT");
-
-		if (COFCAT_HW.equals(cofcatflag)){
-			linkAction = WWSEOPS_LINKACTION_NAME; //WWSEOPRODSTRUCT
-			pstype = "PRODSTRUCT";
-			qtyAttr = "CONFQTY";
-		}else if (COFCAT_SW.equals(cofcatflag)){
-			linkAction = WWSEOSWPS_LINKACTION_NAME; //WWSEOSWPRODSTRUCT
-			pstype = "SWPRODSTRUCT";
-			qtyAttr = "SWCONFQTY";
-		}else if (COFCAT_SVC.equals(cofcatflag)){
-			lxAbr.addDebug("LXLEADSUtil.createFeatureRefs Model is Service, no references created");
-			return;
-		}
-
-		LinkActionItem lai = new LinkActionItem(null, lxAbr.getDatabase(), lxAbr.getProfile(),linkAction);
-		EntityItem parentArray[] = new EntityItem[]{wwseoItem};
-		EntityItem childArray[] = new EntityItem[tmfVct.size()];
-
-		// get each prodstruct
-		tmfVct.copyInto(childArray);
-
-		// do the link	
-		lai.setParentEntityItems(parentArray);     
-		lai.setChildEntityItems(childArray);
-		lxAbr.getDatabase().executeAction(lxAbr.getProfile(), lai);
-
-		// extract and update QTY
-		//update dts in profile
-		Profile profile = lxAbr.getProfile().getNewInstance(lxAbr.getDatabase());
-		String now = lxAbr.getDatabase().getDates().getNow();
-		profile.setValOnEffOn(now, now);
-		// VE for wwseo to each ps EXRPT3WWSEO3
-		EntityList list = lxAbr.getDatabase().getEntityList(profile, 
-				new ExtractActionItem(null, lxAbr.getDatabase(),profile, "EXRPT3WWSEO3"), 
-				parentArray);
-
-		lxAbr.addDebug("LXLEADSUtil.createFeatureRefs list using VE EXRPT3WWSEO3 after linkaction: "+
-				linkAction+"\n"+PokUtils.outputList(list));
-		EntityGroup psGrp = list.getEntityGroup(pstype);
-		
-		for (int x=0; x<psGrp.getEntityItemCount(); x++){
-			EntityItem psitem = psGrp.getEntityItem(x);
-			
-			String qty = (String)psQtyTbl.get(psitem.getKey());
-			EntityItem wspsitem = (EntityItem)psitem.getUpLink(0);  // get the new relator
-			lxAbr.addDebug("LXLEADSUtil "+psitem.getKey()+" use qty: "+qty+" on "+wspsitem.getKey());
-			if (qty!= null && !qty.equals("1")){  // 1 is default so nothing needed
-				StringBuffer debugSb = new StringBuffer();
-				// save the qty attribute
-				ABRUtil.setText(wspsitem,qtyAttr, qty, debugSb); 
-				if (debugSb.length()>0){
-					lxAbr.addDebug(debugSb.toString());
-				}
-				// must commit changed entity to the PDH 
-				wspsitem.commit(lxAbr.getDatabase(), null);	
-			}
-		}
-		list.dereference();
-	}
-	
-	/***************************************
-	 * Find the flag code for this flag description for the GENAREACODE attribute
-	 * @param dbCurrent
-	 * @param profile
-	 * @param ctry
-	 * @return
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	private static String getGenAreaCodeForCtry(Database dbCurrent, Profile profile,String ctry) throws
-		MiddlewareRequestException, SQLException, MiddlewareException
-	{
-		if (SG_GENAREACODE_TBL==null){
-			SG_GENAREACODE_TBL = new Hashtable();
-			// get meta info
-			EntityGroup eg = new EntityGroup(null,dbCurrent, profile, "GENERALAREA", "Edit", false);
-			EANMetaFlagAttribute fma =(EANMetaFlagAttribute)eg.getMetaAttribute("GENAREACODE");
-			if (fma!=null) {
-                for (int i=0; i<fma.getMetaFlagCount(); i++)
-                {
-                    MetaFlag omf = fma.getMetaFlag(i);
-                    if (omf.isExpired()){
-                    	dbCurrent.debug(D.EBUG_SPEW, "LXLEADSUtil.getGenAreaCodeForCtry skipping expired flag: "+omf+"["+
-                    			omf.getFlagCode()+"] for GENERALAREA.GENAREACODE");
-                    	continue;
-                    }
-                    SG_GENAREACODE_TBL.put(omf.toString(), omf.getFlagCode());
-                }
-            }
-		}
-
-		return (String)SG_GENAREACODE_TBL.get(ctry);
-	}
-
-	/***********
-	 * search GENERALAREA using GENAREACODE. 
-	 * 2 character Country Code found in GENERALAREA.GENAREACODE and used to get
-	 *  GENAREANAME which is the same as COUNTRYLIST
-	 * @param dbCurrent
-	 * @param profile
-	 * @param country
-	 * @param debugSb
-	 * @return
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws MiddlewareShutdownInProgressException
-	 */
-	public static EntityItem searchForGENERALAREA(Database dbCurrent, Profile profile, 
-			String country,StringBuffer debugSb) throws MiddlewareRequestException, 
-			SQLException, MiddlewareException, MiddlewareShutdownInProgressException
-	{
-		EntityItem genarea = null;
-		
-		// HVEC and SG meta is different for GENAREACODE
-		String genAreaCodeFlg = getGenAreaCodeForCtry(dbCurrent, profile,country);
-		debugSb.append("LXLEADSUtil.searchForGENERALAREA country: "+country+" genAreaCodeFlg: "+genAreaCodeFlg+"\n");
-		dbCurrent.debug(D.EBUG_SPEW, "LXLEADSUtil.searchForGENERALAREA country: "+country+" genAreaCodeFlg: "+genAreaCodeFlg);
-		if (genAreaCodeFlg!= null){
-			Vector attrVct = new Vector(1);
-			attrVct.addElement("GENAREACODE");
-			Vector valVct = new Vector(1);
-			valVct.addElement(genAreaCodeFlg);
-			EntityItem eia[]= null;
-			try{
-				eia= ABRUtil.doSearch(dbCurrent, profile, 
-						GENERALAREA_SRCHACTION_NAME, "GENERALAREA", false, attrVct, valVct, debugSb);
-			}catch(SBRException exc){
-				// these exceptions are for missing flagcodes or failed business rules, dont pass back
-				java.io.StringWriter exBuf = new java.io.StringWriter();
-				exc.printStackTrace(new java.io.PrintWriter(exBuf));
-				debugSb.append("searchForGENERALAREA SBRException: "+exBuf.getBuffer().toString()+"\n");
-			}
-			if (eia!=null && eia.length > 0){			
-				for (int i=0; i<eia.length; i++){
-					debugSb.append("LXLEADSUtil.searchForGENERALAREA found "+eia[i].getKey()+"\n");
-				}
-				genarea = eia[0];
-			}
-			attrVct.clear();
-			valVct.clear();
-		}else{
-			debugSb.append("LXLEADSUtil.searchForGENERALAREA GENAREACODE table: "+SG_GENAREACODE_TBL+"\n");
-		}
-		
-		return genarea;
-	}	
-	
-	/**
-	 * RCQ00028947
-	 * C.	Derivation of Audience (AUDIEN)
-
-The XML message provides <ACCOUNTTYPE> which is used to determine AUDIEN as follows:
-
-ACCOUNTTYPE					CHW								HVEC
-							AUDIEN							CATALOGNAME_CVAR
-Null (i.e. not supplied)	LE Direct (10062)				Default from meta data
-Enterprise Direct			LE Direct (10062)				LE Direct (10062)
-Odyssey						LE Direct (10062)				LE Direct (10062) +DAC/MAX (10067)
-Indirect					LE Direct (10062) +				LE Direct (10062) +
-			Catalog - Indirect/Reseller (10048) +			Catalog - Indirect/Reseller (10048) +
-			Catalog - Business Partner (10046)				Catalog - Business Partner (10046)			
-
-	 * @param msgAudien
-	 * @return
-	 */
-	protected static Object deriveAudien(String XFSAccountType){
-		//AUDIEN	F	Audience	"LE Direct"	flag code = 10062
-		Object audien = AUDIEN_TBL.get(XFSAccountType);
-		if (audien==null){
-			audien = "10062";
-		}
-		return audien;
-	}
-}

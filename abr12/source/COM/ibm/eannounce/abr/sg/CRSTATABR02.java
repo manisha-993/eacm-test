@@ -1,529 +1,533 @@
-//Licensed Materials -- Property of IBM
-//
-//(C) Copyright IBM Corp. 2002, 2006  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-//CRSTATABR02.java,v
-//Revision 1.14  2008/01/30 20:02:00  wendy
-//Cleanup RSA warnings
-//
-//Revision 1.13  2006/03/13 19:42:03  couto
-//Fixed copyright info.
-//
-//Revision 1.12  2006/03/13 13:31:28  couto
-//Changed layout, using EACustom methods. Changes for Jtest.
-//Fixed br tags. Chaged font tags. Fixed table header.
-//buildReportHeader and printNavigateAttributes are now local methods.
-//
-//Revision 1.11  2006/03/03 19:23:27  bala
-//remove reference to Constants.CSS
-//
-//Revision 1.10  2006/01/24 17:08:03  yang
-//Jtest Changes
-//
-//Revision 1.9  2003/11/07 01:21:06  yang
-//Adding setDGRptClass
-//
-//Revision 1.8  2003/09/18 20:05:25  yang
-//syntax
-//
-//Revision 1.7  2003/09/18 19:51:38  yang
-//adding bala's stuff to finally {
-//
-//Revision 1.6  2003/09/18 18:48:04  yang
-//more fixes
-//
-//Revision 1.5  2003/09/18 18:08:49  yang
-//test
-//
-//Revision 1.4  2003/06/04 03:53:08  dave
-//un Staticing getABRVersion
-//
-//Revision 1.3  2003/06/04 03:44:25  dave
-//minor syntax
-//
-//Revision 1.2  2003/06/04 03:41:44  dave
-//adding getABRVersion
-//
-//Revision 1.1.1.1  2003/06/03 19:02:24  dave
-//new 1.1.1 abr
-//
-//Revision 1.16  2002/12/12 21:52:02  minhthy
-//printNavigateAttributes()
-//
-//Revision 1.15  2002/11/06 22:06:44  naomi
-//remove setReturnCode(PASS) in the finally clause
-//
-//Revision 1.14  2002/10/31 18:35:19  naomi
-//added setDGName
-//
-//Revision 1.13  2002/10/22 20:00:15  naomi
-//add entityID for setDGTitle
-//
-//Revision 1.12  2002/10/17 00:36:00  minhthy
-//changed 'ANCYCLESTATUS' description
-//
-//Revision 1.11  2002/10/14 22:04:28  minhthy
-//added ANNDESC
-//
-//Revision 1.10  2002/10/11 23:08:44  minhthy
-//added "ChangeRequest's Details'
-//
-//Revision 1.9  2002/10/08 00:47:41  minhthy
-//modified perform checks
-//
-//Revision 1.8  2002/09/19 21:18:25  naomi
-//Added buildReportHeader(),setDGTitle() and replaced getEntityGroup() with getParentEntityGroup()
-//
-//Revision 1.7  2002/09/17 20:38:04  naomi
-//added the Class Description
-//
-//Revision 1.6  2002/09/11 21:15:17  bala
-//remove getTable function as its not used anymore...also getAllChildren
-//
-//Revision 1.5  2002/09/06 16:45:45  bala
-//removing DG update code...will be done by taskmaster from now on
-//
-//Revision 1.4  2002/09/04 22:01:28  bala
-//1 more message
-//
-//Revision 1.3  2002/09/04 21:59:28  bala
-//added message
-//
-//Revision 1.2  2002/09/04 21:49:51  bala
-//strStatus defined twice. correcting
-//
-//Revision 1.1  2002/09/04 21:47:38  bala
-//check in
-//
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.EACustom;
+/*     */ import COM.ibm.eannounce.abr.util.LockPDHEntityException;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.abr.util.UpdatePDHEntityException;
+/*     */ import COM.ibm.eannounce.objects.EANAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.opicmpdh.middleware.DatePackage;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
+/*     */ import COM.ibm.opicmpdh.objects.ControlBlock;
+/*     */ import COM.ibm.opicmpdh.objects.SingleFlag;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Vector;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class CRSTATABR02
+/*     */   extends PokBaseABR
+/*     */ {
+/*     */   public static final String COPYRIGHT = "(C) Copyright IBM Corp. 2002, 2006  All Rights Reserved.";
+/*     */   public static final String ABR = "CRSTATABR02";
+/* 134 */   private EntityGroup m_egParent = null;
+/* 135 */   private EntityItem m_ei = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/* 148 */     String str1 = null;
+/*     */     
+/* 150 */     String str2 = null;
+/* 151 */     String str3 = null;
+/* 152 */     String str4 = null;
+/* 153 */     EntityGroup entityGroup1 = null;
+/* 154 */     EntityGroup entityGroup2 = null;
+/*     */     try {
+/* 156 */       start_ABRBuild();
+/*     */ 
+/*     */ 
+/*     */       
+/* 160 */       buildRptHeader();
+/*     */       
+/* 162 */       this.m_egParent = this.m_elist.getParentEntityGroup();
+/* 163 */       this.m_ei = this.m_egParent.getEntityItem(0);
+/*     */       
+/* 165 */       setDGTitle(setDGName(this.m_ei, "CRSTATABR02"));
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 176 */       setReturnCode(0);
+/*     */       
+/* 178 */       entityGroup1 = this.m_elist.getEntityGroup("ANNOUNCEMENT");
+/*     */       
+/* 180 */       if (getEntityType() == null) {
+/* 181 */         logMessage("****************Announcement Not found ");
+/* 182 */         setReturnCode(-1);
+/*     */       } 
+/*     */ 
+/*     */       
+/* 186 */       for (byte b = 0; b < entityGroup1.getEntityItemCount(); b++) {
+/* 187 */         EntityItem entityItem = entityGroup1.getEntityItem(b);
+/*     */         
+/* 189 */         logMessage("************Entity Type returned is " + entityItem
+/*     */             
+/* 191 */             .getEntityType() + ", " + entityItem
+/*     */             
+/* 193 */             .getEntityID());
+/*     */         
+/* 195 */         println("<br /><b>" + entityGroup1.getLongDescription() + "</b>");
+/*     */         
+/* 197 */         printNavAttributes(entityItem, entityGroup1, true, b + 1);
+/*     */ 
+/*     */         
+/* 200 */         str1 = getAttributeValue(entityItem
+/* 201 */             .getEntityType(), entityItem
+/* 202 */             .getEntityID(), "ANNDESC", "<em>** Not Populated ** </em>");
+/*     */ 
+/*     */         
+/* 205 */         println("<br /><table summary=\"Announcement Description\" width=\"100%\"><tr><td class=\"PsgLabel\">Announcement Description</td></tr><tr><td class=\"PsgText\">" + str1 + "</td></tr></table>");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 217 */         str4 = entityItem.getEntityType();
+/* 218 */         str3 = getFlagCode(entityItem, "ANCYCLESTATUS");
+/* 219 */         logMessage("*************** strStatus1: " + str3);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 229 */         if (str4.equals("ANNOUNCEMENT") && str3
+/* 230 */           .equals("111")) {
+/* 231 */           str2 = "117";
+/* 232 */         } else if (str4
+/* 233 */           .equals("ANNOUNCEMENT") && str3
+/* 234 */           .equals("112")) {
+/* 235 */           str2 = "117";
+/* 236 */         } else if (str4
+/* 237 */           .equals("ANNOUNCEMENT") && str3
+/* 238 */           .equals("113")) {
+/* 239 */           str2 = "117";
+/*     */         } 
+/*     */       } 
+/* 242 */       logMessage("******************AFter checking Status of announcement");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 263 */       if (str2 != null) {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 269 */         EntityItem entityItem = new EntityItem(null, this.m_prof, getEntityType(), getEntityID());
+/*     */ 
+/*     */ 
+/*     */         
+/* 273 */         ReturnEntityKey returnEntityKey = new ReturnEntityKey(entityItem.getEntityType(), entityItem.getEntityID(), true);
+/*     */         
+/* 275 */         DatePackage datePackage = this.m_db.getDates();
+/* 276 */         String str5 = datePackage.getNow();
+/* 277 */         String str6 = datePackage.getForever();
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 285 */         ControlBlock controlBlock = new ControlBlock(str5, str6, str5, str6, this.m_prof.getOPWGID(), this.m_prof.getTranID());
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 290 */         SingleFlag singleFlag = new SingleFlag(this.m_prof.getEnterprise(), returnEntityKey.getEntityType(), returnEntityKey.getEntityID(), "CRSTATUS", str2, 1, controlBlock);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 295 */         Vector<SingleFlag> vector = new Vector();
+/* 296 */         Vector<ReturnEntityKey> vector1 = new Vector();
+/*     */         
+/* 298 */         if (singleFlag != null) {
+/* 299 */           vector.addElement(singleFlag);
+/*     */         }
+/*     */         
+/* 302 */         returnEntityKey.m_vctAttributes = vector;
+/* 303 */         vector1.addElement(returnEntityKey);
+/*     */         
+/* 305 */         this.m_db.update(this.m_prof, vector1, false, false);
+/* 306 */         this.m_db.commit();
+/* 307 */         println("<br /><b>This Change Request was cancelled because the Announcement is not eligible for Change Requests.</b>");
+/*     */       } else {
+/*     */         
+/* 310 */         println("<br /><b>Please review and approve as required.</b>");
+/*     */       } 
+/*     */       
+/* 313 */       str1 = null;
+/* 314 */       str2 = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 319 */       this.m_prof.setValOn(getValOn());
+/* 320 */       this.m_prof.setEffOn(getEffOn());
+/* 321 */       start_ABRBuild();
+/*     */       
+/* 323 */       entityGroup2 = this.m_elist.getParentEntityGroup();
+/* 324 */       if (entityGroup2 == null) {
+/* 325 */         logMessage("**************** CHANGEREQUEST Not found ");
+/* 326 */         setReturnCode(-1);
+/*     */       } else {
+/*     */         
+/* 329 */         EntityItem entityItem = entityGroup2.getEntityItem(0);
+/* 330 */         println("<br /><br /><b>" + entityGroup2.getLongDescription() + "</b>");
+/*     */         
+/* 332 */         printNavAttributes(entityItem, entityGroup1, false, 0);
+/*     */       } 
+/*     */       
+/* 335 */       println("<br /><b>" + 
+/*     */           
+/* 337 */           buildMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 340 */               getABRDescription(), 
+/* 341 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }) + "</b>");
+/*     */       
+/* 344 */       log(
+/* 345 */           buildLogMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 348 */               getABRDescription(), 
+/* 349 */               (getReturnCode() == 0) ? "Passed" : "Failed" }));
+/* 350 */     } catch (LockPDHEntityException lockPDHEntityException) {
+/* 351 */       setReturnCode(-2);
+/* 352 */       println("<h3 style=\"color:#c00; font-weight:bold;\">IAB1007E: Could not get soft lock.  Rule execution is terminated.<br />" + lockPDHEntityException
+/*     */ 
+/*     */ 
+/*     */           
+/* 356 */           .getMessage() + "</h3>");
+/*     */       
+/* 358 */       logError(lockPDHEntityException.getMessage());
+/* 359 */     } catch (UpdatePDHEntityException updatePDHEntityException) {
+/* 360 */       setReturnCode(-2);
+/* 361 */       println("<h3 style=\"color:#c00; font-weight:bold;\">UpdatePDH error: " + updatePDHEntityException
+/*     */           
+/* 363 */           .getMessage() + "</h3>");
+/*     */       
+/* 365 */       logError(updatePDHEntityException.getMessage());
+/* 366 */     } catch (Exception exception) {
+/*     */       
+/* 368 */       println("Error in " + this.m_abri.getABRCode() + ":" + exception.getMessage());
+/* 369 */       println("" + exception);
+/*     */ 
+/*     */       
+/* 372 */       if (getABRReturnCode() != -2) {
+/* 373 */         setReturnCode(-3);
+/*     */       
+/*     */       }
+/*     */     }
+/*     */     finally {
+/*     */       
+/* 379 */       setDGString(getABRReturnCode());
+/* 380 */       setDGRptName("CRSTATABR02");
+/* 381 */       setDGRptClass("CRSTATABR02");
+/*     */       
+/* 383 */       if (!isReadOnly()) {
+/* 384 */         clearSoftLock();
+/*     */       }
+/*     */     } 
+/*     */ 
+/*     */     
+/* 389 */     printDGSubmitString();
+/* 390 */     println(EACustom.getTOUDiv());
+/* 391 */     buildReportFooter();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getABREntityDesc(String paramString, int paramInt) {
+/* 402 */     return null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 412 */     return "<br /><br />";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getStyle() {
+/* 423 */     return "";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getRevision() {
+/* 433 */     return "1.14";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String getVersion() {
+/* 442 */     return "CRSTATABR02.java,v 1.14 2008/01/30 20:02:00 wendy Exp";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 452 */     return getVersion();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void buildRptHeader() throws SQLException, MiddlewareException {
+/* 460 */     String str1 = getVersion();
+/* 461 */     String[] arrayOfString = { getABRDescription(), str1, getEnterprise() };
+/* 462 */     String str2 = buildMessage("<b>IAB0001I: ABRName:</b> %1# <b>Version:</b> %2# <b>Enterprise:</b> %3#", arrayOfString);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 469 */     println(EACustom.getDocTypeHtml());
+/* 470 */     println("<head>");
+/* 471 */     println(EACustom.getMetaTags("CRSTATABR02.java"));
+/* 472 */     println(EACustom.getCSS());
+/* 473 */     println(EACustom.getTitle(getShortClassName(getClass())));
+/* 474 */     println("</head>");
+/* 475 */     println("<body id=\"ibm-com\">");
+/* 476 */     println(EACustom.getMastheadDiv());
+/*     */     
+/* 478 */     println("<p class=\"ibm-intro ibm-alternate-three\"><em>" + str2 + "</em></p>");
+/*     */     
+/* 480 */     println("<table summary=\"layout\" width=\"750\" cellpadding=\"0\" cellspacing=\"0\">\n<tr><td width=\"25%\"><b>Abr Version: </b></td><td>" + 
+/*     */         
+/* 482 */         getABRVersion() + "</td></tr>" + "\n" + "<tr><td width=\"25%\"><b>Valid Date: </b></td><td>" + 
+/*     */         
+/* 484 */         getValOn() + "</td></tr>" + "\n" + "<tr><td width=\"25%\"><b>Effective Date: </b></td><td>" + 
+/*     */         
+/* 486 */         getEffOn() + "</td></tr>" + "\n" + "<tr><td width=\"25%\"><b>Date Generated: </b></td><td>" + 
+/*     */         
+/* 488 */         getNow() + "</td></tr>" + "\n" + "</table>");
+/*     */     
+/* 490 */     println("<h3>Description: </h3>" + getDescription() + "\n" + "<hr />" + "\n");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void printNavAttributes(EntityItem paramEntityItem, EntityGroup paramEntityGroup, boolean paramBoolean, int paramInt) {
+/* 500 */     println("<br /><br /><table summary=\"" + paramEntityGroup.getLongDescription() + "\" width=\"100%\">" + "\n");
+/*     */     
+/* 502 */     for (byte b = 0; b < paramEntityGroup.getMetaAttributeCount(); b++) {
+/* 503 */       EANMetaAttribute eANMetaAttribute = paramEntityGroup.getMetaAttribute(b);
+/* 504 */       EANAttribute eANAttribute = paramEntityItem.getAttribute(eANMetaAttribute.getAttributeCode());
+/* 505 */       if (paramBoolean) {
+/* 506 */         if (b == 0) {
+/* 507 */           println("<tr><th class=\"PsgLabel\" width=\"50%\" id=\"attribute" + paramInt + "\">Navigation Attribute</th>");
+/* 508 */           println("<th class=\"PsgLabel\" width=\"50%\" id=\"value" + paramInt + "\">Attribute Value</th></tr>");
+/*     */         } 
+/* 510 */         if (eANMetaAttribute.isNavigate()) {
+/* 511 */           println("<tr><td headers=\"attribute" + paramInt + "\" class=\"PsgText\" width=\"50%\">" + eANMetaAttribute.getLongDescription() + "</td>");
+/* 512 */           println("<td headers=\"value" + paramInt + "\" class=\"PsgText\" width=\"50%\">" + ((eANAttribute == null || eANAttribute.toString().length() == 0) ? "** Not Populated **" : eANAttribute.toString()) + "</td></tr>");
+/*     */         } 
+/*     */       } else {
+/*     */         
+/* 516 */         if (b == 0) {
+/* 517 */           println("<tr><th class=\"PsgLabel\" width=\"50%\" id=\"attribute" + paramInt + "\">Attribute Description</th>");
+/* 518 */           println("<th class=\"PsgLabel\" width=\"50%\" id=\"value" + paramInt + "\">Attribute Value</th></tr>");
+/*     */         } 
+/* 520 */         println("<tr><td headers=\"attribute" + paramInt + "\" class=\"PsgText\" width=\"50%\">" + eANMetaAttribute.getLongDescription() + "</td>");
+/* 521 */         println("<td headers=\"value" + paramInt + "\" class=\"PsgText\" width=\"50%\">" + ((eANAttribute == null || eANAttribute.toString().length() == 0) ? "** Not Populated **" : eANAttribute.toString()) + "</td></tr>");
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 525 */     println("</table>");
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.sg;
 
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.opicmpdh.objects.*;
-//import COM.ibm.opicmpdh.transactions.*;
-//import COM.ibm.opicmpdh.taskmaster.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.eannounce.abr.util.*;
-
-import java.sql.SQLException;
-import java.util.*;
-//import java.io.*;
-
-/**
- *  Description of the Class
- *  This ABR handles the case where CRSTATUS is set to Requires PDT Review by the ODM
- *  and produces a report for the Announcement entity
- *  Return Code
- *  Pass
- *
- *@author
- *@created
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\CRSTATABR02.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class CRSTATABR02 extends PokBaseABR {
-	/** object copyright statement */
-	public static final String COPYRIGHT="(C) Copyright IBM Corp. 2002, 2006  All Rights Reserved.";
-	
-  /**
-   *  Execute ABR.
-   *
-   */
-  public final static String ABR = "CRSTATABR02";
-
-  private EntityGroup m_egParent = null;
-  private EntityItem m_ei = null;
-
-  //ANCYCLESTATUS
-  //private final String strANCYCLEValue1 = "111"; //Draft
-  //private final String strANCYCLEValue2 = "112"; //Ready for Final Review
-  //private final String strANCYCLEValue3 = "113"; //Change(Final Review)
-
-  /**
-     * execute_run
-     *
-     * @author Owner
-     */
-    public void execute_run() {
-    String strANNDesc = null;
-    //String strStatus = null;
-    String strCR = null;
-    String strStatus1 = null;
-    String strEntityType = null;
-    EntityGroup annGroup = null;
-    EntityGroup egParent = null;
-    try {
-      start_ABRBuild();
-
-      // Build the report header
-      //buildReportHeader();
-	  buildRptHeader();
-
-      m_egParent = m_elist.getParentEntityGroup();
-      m_ei = m_egParent.getEntityItem(0);
-
-      setDGTitle(setDGName(m_ei, ABR));
-
-      /*
-       *  ANNOUNCEMENT
-       *  |
-       *  CHANGEREQUEST ** We are here at this point
-       *
-       *  Get the announcement columns
-       *  Set the CHANGEREQUEST to value based on ANCYCLESTATUS
-       */
-
-      setReturnCode(PASS);
-      // Print parents
-      annGroup = m_elist.getEntityGroup("ANNOUNCEMENT");
-
-      if (getEntityType() == null) {
-        logMessage("****************Announcement Not found ");
-        setReturnCode(FAIL);
-
-      }
-
-      for (int iALL = 0; iALL < annGroup.getEntityItemCount(); iALL++) {
-        EntityItem entity = annGroup.getEntityItem(iALL);
-
-        logMessage(
-          "************Entity Type returned is "
-            + entity.getEntityType()
-            + ", "
-            + entity.getEntityID());
-
-        println("<br /><b>" + annGroup.getLongDescription() + "</b>");
-        //printNavigateAttributes(entity, annGroup, true);
-		printNavAttributes(entity, annGroup, true, iALL + 1);
-
-        strANNDesc =
-          getAttributeValue(
-            entity.getEntityType(),
-            entity.getEntityID(),
-            "ANNDESC",
-            "<em>** Not Populated ** </em>");
-        println(
-          "<br /><table summary=\"Announcement Description\" width=\"100%\"><tr><td class=\"PsgLabel\">Announcement Description</td></tr><tr><td class=\"PsgText\">"
-            + strANNDesc
-            + "</td></tr></table>");
-
-        /*strStatus =
-          getAttributeValue(
-            entity.getEntityType(),
-            entity.getEntityID(),
-            "ANCYCLESTATUS",
-            "<em>** Not Populated ** </em>");*/
-
-        strEntityType = entity.getEntityType();
-        strStatus1 = getFlagCode(entity, "ANCYCLESTATUS");
-        logMessage("*************** strStatus1: " + strStatus1);
-
-        /*if (strStatus != null) {
-          EANFlagAttribute ema = (EANFlagAttribute) strStatus;
-          MetaFlag[] amf = (MetaFlag[]) ema.get();
-          for (int f = 0; f < amf.length; f++) {
-            if (amf[f].isSelected()) {
-              String sFlagClass = amf[f].getFlagCode().trim();
-              logMessage("*************** sFlagClass: " + sFlagClass);*/
-
-        if (strEntityType.equals("ANNOUNCEMENT")
-          && strStatus1.equals("111")) {
-          strCR = "117";
-        } else if (
-          strEntityType.equals("ANNOUNCEMENT")
-          && strStatus1.equals("112")) {
-          strCR = "117";
-        } else if (
-          strEntityType.equals("ANNOUNCEMENT")
-          && strStatus1.equals("113")) {
-          strCR = "117";
-        }
-      }
-      logMessage("******************AFter checking Status of announcement");
-
-      /*
-       *  Now Update the CHANGEREQUEST column in CHANGEREQUEST Entity
-       */
-      /*try {
-        EntityGroup rstAnnReview = m_elist.getEntityGroup("CHANGEREQUEST");
-        RowSelectableTable rstAnnouncement = rstAnnReview.getEntityGroupTable();
-
-        int iTextCol = rstAnnouncement.getColumnIndex("CHANGEREQUEST:CHANGEREQUEST");
-        logMessage("**********************Text column returned " + iTextCol);
-        rstAnnouncement.put(0, iTextCol, strCR);
-        rstAnnouncement.commit(getDatabase());
-        setReturnCode(PASS);
-      } catch (EANBusinessRuleException ebx) {
-        D.ebug(D.EBUG_ERR, " trouble getting ABR update for ANNReview " + ebx.getMessage());
-      }*/
-
-      /*
-      *  Now Update the CHANGEREQUEST column in CHANGEREQUEST Entity
-      */
-      if (strCR != null) {
-        EntityItem eiParm =
-          new EntityItem(
-            null,
-            m_prof,
-            getEntityType(),
-            getEntityID());
-        ReturnEntityKey rek =
-          new ReturnEntityKey(
-            eiParm.getEntityType(),
-            eiParm.getEntityID(),
-            true);
-        DatePackage dbNow = m_db.getDates();
-        String strNow = dbNow.getNow();
-        String strForever = dbNow.getForever();
-        ControlBlock cbOn =
-          new ControlBlock(
-            strNow,
-            strForever,
-            strNow,
-            strForever,
-            m_prof.getOPWGID(),
-            m_prof.getTranID());
-        SingleFlag sf =
-          new SingleFlag(
-            m_prof.getEnterprise(),
-            rek.getEntityType(),
-            rek.getEntityID(),
-            "CRSTATUS",
-            strCR,
-            1,
-            cbOn);
-        Vector vctAtts = new Vector();
-        Vector vctReturnsEntityKeys = new Vector();
-
-        if (sf != null) {
-          vctAtts.addElement(sf);
-        }
-
-        rek.m_vctAttributes = vctAtts;
-        vctReturnsEntityKeys.addElement(rek);
-
-        m_db.update(m_prof, vctReturnsEntityKeys, false, false);
-        m_db.commit();
-        println("<br /><b>This Change Request was cancelled because the Announcement is not eligible for Change Requests.</b>");
-
-      } else {
-        println("<br /><b>Please review and approve as required.</b>");
-      }
-      
-      strANNDesc = null;
-      strCR = null;
-
-      //} //end of for loop
-
-      //reRun Extract Action after DB updated
-      m_prof.setValOn(getValOn());
-      m_prof.setEffOn(getEffOn());
-      start_ABRBuild();
-
-      egParent = m_elist.getParentEntityGroup();
-      if (egParent == null) {
-        logMessage("**************** CHANGEREQUEST Not found ");
-        setReturnCode(FAIL);
-
-      } else {
-        EntityItem entity = egParent.getEntityItem(0);
-        println("<br /><br /><b>" + egParent.getLongDescription() + "</b>");
-        //printNavigateAttributes(entity, annGroup, false);
-		printNavAttributes(entity, annGroup, false, 0);
-      }
-
-      println(
-        "<br /><b>"
-          + buildMessage(
-            MSG_IAB2016I,
-            new String[] {
-              getABRDescription(),
-              (getReturnCode() == PASS ? "Passed" : "Failed")})
-          + "</b>");
-
-      log(
-        buildLogMessage(
-          MSG_IAB2016I,
-          new String[] {
-            getABRDescription(),
-            (getReturnCode() == PASS ? "Passed" : "Failed")}));
-    } catch (LockPDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3 style=\"color:#c00; font-weight:bold;\">"
-          + ERR_IAB1007E
-          + "<br />"
-          + le.getMessage()
-          + "</h3>");
-      logError(le.getMessage());
-    } catch (UpdatePDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3 style=\"color:#c00; font-weight:bold;\">UpdatePDH error: "
-          + le.getMessage()
-          + "</h3>");
-      logError(le.getMessage());
-    } catch (Exception exc) {
-      // Report this error to both the datbase log and the PrintWriter
-      println("Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-      println("" + exc);
-
-      // don't overwrite an update exception
-      if (getABRReturnCode() != UPDATE_ERROR) {
-        setReturnCode(INTERNAL_ERROR);
-      }
-    } finally {
-      //Everything is fine...so lets pass
-      //setReturnCode(PASS);
-      // set DG submit string
-      setDGString(getABRReturnCode());
-      setDGRptName("CRSTATABR02"); //Set the report name
-      setDGRptClass("CRSTATABR02"); //Set the report class
-      // make sure the lock is released
-      if (!isReadOnly()) {
-        clearSoftLock();
-      }
-    }
-    
-	//Print everything up to </html>
-	printDGSubmitString();
-	println(EACustom.getTOUDiv());
-	buildReportFooter();    // Print </html>
-  }
-
-  /**
-   *  Get the entity description to use in error messages
-   *
-   *@param  entityType  Description of the Parameter
-   *@param  entityId    Description of the Parameter
-   *@return             String
-   */
-  protected String getABREntityDesc(String entityType, int entityId) {
-    return null;
-  }
-
-  /**
-   *  Get ABR description
-   *
-   *@return    java.lang.String
-   */
-  public String getDescription() {
-    //return Constants.IAB3053I + "<br /><br />" + Constants.IAB3050I;
-    return "<br /><br />";
-  }
-
-  /**
-   *  Get any style that should be used for this page. Derived classes can
-   *  override this to set styles They must include the <style>...</style> tags
-   *
-   *@return    String
-   */
-  protected String getStyle() {
-    // Print out the PSG stylesheet
-    return "";
-  }
-
-  /**
-     * getRevision
-     *
-     * @return
-     * @author Owner
-     */
-    public String getRevision() {
-    return "1.14";
-  }
-  /**
-     * getVersion
-     *
-     * @return
-     * @author Owner
-     */
-    public static String getVersion() {
-    return ("CRSTATABR02.java,v 1.14 2008/01/30 20:02:00 wendy Exp");
-  }
-
-  /**
-     * getABRVersion
-     *
-     * @return
-     * @author Owner
-     */
-    public String getABRVersion() {
-    return getVersion();
-  }
-
-  /*
-   *  builds the standard header and submits it to the passed PrintWriter
-   */
-  private void buildRptHeader() throws SQLException, MiddlewareException{
-
-	  String strVersion = getVersion();
-	  String astr1[] = new String[]{getABRDescription(), strVersion, getEnterprise()};
-	  String strMessage1 = buildMessage(MSG_IAB0001I, astr1);
-	
-	  // output html header
-	  //String abrName = getShortClassName(getClass());
-	  //println("<html>\n<head>\n<title>" + abrName + "</title>\n" +
-	  //	getStyle() + "</head>\n<body>\n");
-		
-	  println(EACustom.getDocTypeHtml());
-	  println("<head>");
-	  println(EACustom.getMetaTags("CRSTATABR02.java"));
-	  println(EACustom.getCSS());
-	  println(EACustom.getTitle(getShortClassName(getClass())));
-	  println("</head>");
-	  println("<body id=\"ibm-com\">");
-	  println(EACustom.getMastheadDiv());
-	  
-	  println("<p class=\"ibm-intro ibm-alternate-three\"><em>" + strMessage1 + "</em></p>");
-
-	  println("<table summary=\"layout\" width=\"750\" cellpadding=\"0\" cellspacing=\"0\">" + NEW_LINE +
-		  "<tr><td width=\"25%\"><b>Abr Version: </b></td><td>" +
-		  getABRVersion() + "</td></tr>" + NEW_LINE +
-		  "<tr><td width=\"25%\"><b>Valid Date: </b></td><td>" +
-		  getValOn() + "</td></tr>" + NEW_LINE +
-		  "<tr><td width=\"25%\"><b>Effective Date: </b></td><td>" +
-		  getEffOn() + "</td></tr>" + NEW_LINE +
-		  "<tr><td width=\"25%\"><b>Date Generated: </b></td><td>" +
-		  getNow() + "</td></tr>" + NEW_LINE +
-		  "</table>");
-	  println("<h3>Description: </h3>" + getDescription() + NEW_LINE + "<hr />" + NEW_LINE);
-
-  }
-  
-  /*
-   *Get  Attributes of an Entity
-   *
-   */
-  private void printNavAttributes(EntityItem entity, EntityGroup eg, boolean navigate, int counter){
-	  
-	  println("<br /><br /><table summary=\"" + eg.getLongDescription() + "\" width=\"100%\">" + NEW_LINE);
-
-	  for(int i=0;i<eg.getMetaAttributeCount();i++){
-		  EANMetaAttribute ma = eg.getMetaAttribute(i);
-		  EANAttribute att = entity.getAttribute(ma.getAttributeCode());
-		  if(navigate){
-			  if(i ==0) {
-				  println("<tr><th class=\"PsgLabel\" width=\"50%\" id=\"attribute" + counter + "\">Navigation Attribute</th>");
-				  println("<th class=\"PsgLabel\" width=\"50%\" id=\"value" + counter + "\">Attribute Value</th></tr>");				  				 
-			  }
-			  if(ma.isNavigate()) {
-				  println("<tr><td headers=\"attribute" + counter + "\" class=\"PsgText\" width=\"50%\">"+ ma.getLongDescription()+"</td>");
-				  println("<td headers=\"value" + counter + "\" class=\"PsgText\" width=\"50%\">" +(att == null || att.toString().length() ==0 ? "** Not Populated **" : att.toString()) + "</td></tr>");
-			  }
-		  }
-		  else {
-			  if(i ==0) {
-				  println("<tr><th class=\"PsgLabel\" width=\"50%\" id=\"attribute" + counter + "\">Attribute Description</th>");
-				  println("<th class=\"PsgLabel\" width=\"50%\" id=\"value" + counter + "\">Attribute Value</th></tr>");				  				  
-			  }
-			  println("<tr><td headers=\"attribute" + counter + "\" class=\"PsgText\" width=\"50%\">"+ ma.getLongDescription()+"</td>");
-			  println("<td headers=\"value" + counter + "\" class=\"PsgText\" width=\"50%\">" +(att == null || att.toString().length() ==0 ? "** Not Populated **" : att.toString()) + "</td></tr>");			  
-		  }
-
-	  }
-	  println("</table>");
-
- }
-
-}

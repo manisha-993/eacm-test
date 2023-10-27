@@ -1,1848 +1,1854 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.abr.sg.adsxmlbh1;
+/*      */ package COM.ibm.eannounce.abr.sg.adsxmlbh1;
+/*      */ 
+/*      */ import COM.ibm.eannounce.abr.util.ABRUtil;
+/*      */ import COM.ibm.eannounce.abr.util.Constants;
+/*      */ import COM.ibm.eannounce.abr.util.XMLElem;
+/*      */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*      */ import COM.ibm.eannounce.objects.EntityGroup;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.EntityList;
+/*      */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*      */ import COM.ibm.eannounce.objects.SBRException;
+/*      */ import COM.ibm.opicmpdh.middleware.Database;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareServerProperties;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*      */ import COM.ibm.opicmpdh.middleware.Profile;
+/*      */ import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+/*      */ import com.ibm.eacm.AES256Utils;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.io.IOException;
+/*      */ import java.rmi.RemoteException;
+/*      */ import java.sql.Connection;
+/*      */ import java.sql.DriverManager;
+/*      */ import java.sql.PreparedStatement;
+/*      */ import java.sql.ResultSet;
+/*      */ import java.sql.SQLException;
+/*      */ import java.util.Hashtable;
+/*      */ import java.util.Iterator;
+/*      */ import java.util.MissingResourceException;
+/*      */ import java.util.StringTokenizer;
+/*      */ import java.util.Vector;
+/*      */ import javax.xml.parsers.ParserConfigurationException;
+/*      */ import javax.xml.transform.TransformerException;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public abstract class XMLMQAdapter
+/*      */   implements XMLMQ, Constants
+/*      */ {
+/*      */   protected static final Hashtable ADSTYPES_TBL;
+/*      */   private static final boolean isDebug = true;
+/*      */   private boolean isVaildREFOFERFEAT = true;
+/*      */   private boolean isService = false;
+/*      */   protected static final String CHEAT = "@@@";
+/*      */   protected static boolean isFilterWWCOMPAT = false;
+/*  136 */   protected Hashtable wwcompMQTable = new Hashtable<>();
+/*  137 */   private String attrXMLABRPROPFILE = "XMLABRPROPFILE";
+/*  138 */   private Profile _swProfile = null;
+/*      */   protected static final String KEY_SETUPArry = "SETUPARRAY";
+/*  140 */   private EntityList mf_elist = null;
+/*      */   static {
+/*  142 */     ADSTYPES_TBL = new Hashtable<>();
+/*  143 */     ADSTYPES_TBL.put("20", "GENERALAREA");
+/*  144 */     ADSTYPES_TBL.put("30", "Deletes");
+/*  145 */     ADSTYPES_TBL.put("40", "XLATE");
+/*  146 */     ADSTYPES_TBL.put("50", "WWCOMPAT");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  154 */     FILTER_TBL = new Hashtable<>();
+/*      */ 
+/*      */     
+/*  157 */     FILTER_TBL.put("FEATURE", new String[] { "STATUS", "FCTYPE", "COUNTRYLIST", "PDHDOMAIN" });
+/*  158 */     FILTER_TBL.put("MODEL", new String[] { "STATUS", "SPECBID", "COFCAT", "COFSUBCAT", "COFGRP", "COFSUBGRP", "COUNTRYLIST", "FLFILSYSINDC", "PDHDOMAIN", "DIVTEXT", "OLDINDC" });
+/*  159 */     FILTER_TBL.put("SVCMOD", new String[] { "STATUS", "SVCMODCATG", "SVCMODGRP", "SVCMODSUBCATG", "SVCMODSUBGRP", "COUNTRYLIST", "PDHDOMAIN", "DIVTEXT" });
+/*  160 */     FILTER_TBL.put("LSEOBUNDLE", new String[] { "STATUS", "SPECBID", "BUNDLETYPE", "COUNTRYLIST", "FLFILSYSINDC", "PDHDOMAIN", "DIVTEXT" });
+/*  161 */     FILTER_TBL.put("LSEO", new String[] { "STATUS", "SPECBID", "COFCAT", "COFSUBCAT", "COFGRP", "COFSUBGRP", "COUNTRYLIST", "FLFILSYSINDC", "PDHDOMAIN", "DIVTEXT" });
+/*      */     
+/*  163 */     FILTER_TBL.put("PRODSTRUCT", new String[] { "STATUS", "FCTYPE", "MACHTYPEATR", "MODELATR", "COUNTRYLIST", "FLFILSYSINDC", "PDHDOMAIN", "OLDINDC" });
+/*  164 */     FILTER_TBL.put("SWPRODSTRUCT", new String[] { "STATUS", "FCTYPE", "MACHTYPEATR", "MODELATR", "COUNTRYLIST", "PDHDOMAIN" });
+/*      */     
+/*  166 */     FILTER_TBL.put("MODELCONVERT", new String[] { "STATUS", "MACHTYPEATR", "MODELATR", "COUNTRYLIST", "PDHDOMAIN" });
+/*  167 */     FILTER_TBL.put("FCTRANSACTION", new String[] { "STATUS", "MACHTYPEATR", "MODELATR", "PDHDOMAIN" });
+/*  168 */     FILTER_TBL.put("IMG", new String[] { "STATUS", "COUNTRYLIST", "PDHDOMAIN" });
+/*      */ 
+/*      */     
+/*  171 */     FILTER_TBL.put("CATNAV", new String[] { "STATUS", "FLFILSYSINDC" });
+/*  172 */     FILTER_TBL.put("SWFEATURE", new String[] { "STATUS", "FCTYPE", "PDHDOMAIN" });
+/*  173 */     FILTER_TBL.put("GBT", new String[] { "STATUS" });
+/*  174 */     FILTER_TBL.put("REVUNBUNDCOMP", new String[] { "STATUS" });
+/*  175 */     FILTER_TBL.put("SLEORGNPLNTCODE", new String[] { "STATUS" });
+/*      */ 
+/*      */     
+/*  178 */     FILTER_TBL.put("SVCLEV", new String[] { "STATUS" });
+/*  179 */     FILTER_TBL.put("WARR", new String[] { "STATUS" });
+/*      */     
+/*  181 */     FILTER_TBL.put("WWCOMPAT", new String[] { "BRANDCD" });
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  186 */     FILTER_TBL.put("REFOFER", new String[] { "STATUS", "COUNTRYLIST", "ENDOFSVC", "DCG" });
+/*  187 */     FILTER_TBL.put("REFOFERFEAT", new String[] { "STATUS", "COUNTRYLIST", "ENDOFSVC" });
+/*      */ 
+/*      */     
+/*  190 */     FILTER_TBL.put("SWSPRODSTRUCT", new String[] { "STATUS" });
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private static final Hashtable FILTER_TBL;
+/*      */ 
+/*      */   
+/*      */   private static final String XMLSTATUS = "XMLSTATUS";
+/*      */ 
+/*      */   
+/*      */   public Vector getMQPropertiesFN(EntityItem paramEntityItem, ADSABRSTATUS paramADSABRSTATUS) {
+/*  202 */     paramADSABRSTATUS.addDebug("countryfilter start");
+/*  203 */     String str = PokUtils.getAttributeFlagValue(paramEntityItem, this.attrXMLABRPROPFILE);
+/*  204 */     Vector<String> vector = new Vector();
+/*  205 */     if (str != null) {
+/*      */       
+/*  207 */       StringTokenizer stringTokenizer = new StringTokenizer(str, "|");
+/*  208 */       while (stringTokenizer.hasMoreTokens())
+/*      */       {
+/*  210 */         vector.addElement(stringTokenizer.nextToken());
+/*      */       }
+/*      */     } 
+/*      */     
+/*  214 */     Vector vector1 = new Vector();
+/*      */     try {
+/*  216 */       vector1 = getMQPropertiesFilter(paramEntityItem, paramADSABRSTATUS);
+/*  217 */     } catch (Exception exception) {
+/*  218 */       paramADSABRSTATUS.addDebug("getMQPropertiesFN error=" + exception.getMessage());
+/*  219 */       exception.printStackTrace();
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  227 */     if (!this.isVaildREFOFERFEAT) {
+/*  228 */       return new Vector();
+/*      */     }
+/*      */     
+/*  231 */     addAllMq(vector, vector1, paramADSABRSTATUS);
+/*      */     
+/*  233 */     if (vector.size() == 0)
+/*      */     {
+/*      */       
+/*  236 */       vector.add("ADSMQSERIES");
+/*      */     }
+/*      */     
+/*  239 */     paramADSABRSTATUS.addDebug("countryfilter end");
+/*  240 */     return vector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public Hashtable getMQPropertiesVN(EntityItem paramEntityItem, ADSABRSTATUS paramADSABRSTATUS) throws SQLException, MiddlewareException {
+/*  248 */     paramADSABRSTATUS.addDebug("countryfilter start");
+/*  249 */     String str = PokUtils.getAttributeFlagValue(paramEntityItem, this.attrXMLABRPROPFILE);
+/*  250 */     Vector<String> vector = new Vector();
+/*  251 */     if (str != null && paramEntityItem.getEntityType().equals("ADSXMLSETUP")) {
+/*      */       
+/*  253 */       StringTokenizer stringTokenizer = new StringTokenizer(str, "|");
+/*  254 */       while (stringTokenizer.hasMoreTokens())
+/*      */       {
+/*  256 */         vector.addElement(stringTokenizer.nextToken());
+/*      */       }
+/*      */     } 
+/*  259 */     Hashtable<Object, Object> hashtable = new Hashtable<>();
+/*      */     
+/*  261 */     boolean bool = true;
+/*      */     try {
+/*  263 */       bool = checkModelVaild(paramEntityItem, paramADSABRSTATUS);
+/*  264 */     } catch (SQLException sQLException) {
+/*  265 */       paramADSABRSTATUS.addDebug("getMQPropertiesVN error=" + sQLException.getMessage());
+/*  266 */       sQLException.printStackTrace();
+/*  267 */       throw sQLException;
+/*      */     } 
+/*  269 */     if (!bool) {
+/*  270 */       paramADSABRSTATUS.addOutput("Data is not valid for filter of MODEL based on classification attributes (COFCAT,COFSUBCAT,COFGRP) ");
+/*  271 */       return hashtable;
+/*      */     } 
+/*      */ 
+/*      */     
+/*      */     try {
+/*  276 */       hashtable = getMQPropertiesFilterVN(paramEntityItem, paramADSABRSTATUS, vector);
+/*      */ 
+/*      */       
+/*  279 */       hashtable = shadowFilter(paramEntityItem, paramADSABRSTATUS, hashtable);
+/*  280 */     } catch (Exception exception) {
+/*  281 */       if (exception instanceof SBRException) {
+/*  282 */         SBRException sBRException = (SBRException)exception;
+/*  283 */         paramADSABRSTATUS.addError("getMQPropertiesVN error=" + sBRException.toString());
+/*  284 */         exception.printStackTrace();
+/*  285 */         MiddlewareException middlewareException1 = new MiddlewareException("getMQPropertiesVN error=" + sBRException.toString());
+/*  286 */         throw middlewareException1;
+/*      */       } 
+/*  288 */       paramADSABRSTATUS.addError("getMQPropertiesVN error=" + exception.getMessage());
+/*  289 */       exception.printStackTrace();
+/*  290 */       MiddlewareException middlewareException = new MiddlewareException("getMQPropertiesVN error=" + exception.getMessage());
+/*  291 */       throw middlewareException;
+/*      */     } finally {
+/*      */       
+/*  294 */       if (this.mf_elist != null) {
+/*  295 */         this.mf_elist = null;
+/*      */       }
+/*      */     } 
+/*  298 */     return hashtable;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Hashtable shadowFilter(EntityItem paramEntityItem, ADSABRSTATUS paramADSABRSTATUS, Hashtable paramHashtable) {
+/*  313 */     boolean bool = false;
+/*      */     
+/*  315 */     String str1 = "10";
+/*  316 */     Vector<String> vector1 = (Vector)paramHashtable.get(str1);
+/*  317 */     Hashtable<Object, Object> hashtable = new Hashtable<>();
+/*  318 */     Vector<String> vector2 = new Vector();
+/*  319 */     hashtable.put(str1, vector2);
+/*  320 */     hashtable.put("SETUPARRAY", paramHashtable.get("SETUPARRAY"));
+/*  321 */     String str2 = null;
+/*  322 */     if (paramEntityItem.getEntityType().equals("MODEL")) {
+/*  323 */       str2 = PokUtils.getAttributeValue(paramEntityItem, "COFSUBCAT", "|", "");
+/*  324 */       paramADSABRSTATUS.addDebug("shadowFilter MODEL.COFSUBCAT=" + str2);
+/*  325 */     } else if (paramEntityItem.getEntityType().equals("FCTRANSACTION")) {
+/*  326 */       str2 = PokUtils.getAttributeValue(paramEntityItem, "FTSUBCAT", "|", "");
+/*  327 */       paramADSABRSTATUS.addDebug("shadowFilter FCTRANSACTION.FTSUBCAT=" + str2);
+/*      */     } 
+/*  329 */     if ("Shadow".equals(str2)) {
+/*  330 */       bool = true;
+/*  331 */       paramADSABRSTATUS.addDebug("shadowFilter isShadowFilter=" + bool);
+/*  332 */       String str = ABRServerProperties.getValue("ADSABRSTATUS", "_shadow_filter");
+/*  333 */       if (str != null && str.length() > 0) {
+/*  334 */         paramADSABRSTATUS.addDebug("shadowFilter ADSABRSTATUS_shadow_filter=" + str);
+/*  335 */         String[] arrayOfString = str.trim().split(",");
+/*  336 */         paramADSABRSTATUS.addDebug("shadowFilter found " + arrayOfString.length + " configs from file");
+/*  337 */         for (byte b = 0; b < arrayOfString.length; b++) {
+/*  338 */           String str3 = arrayOfString[b].trim();
+/*  339 */           if (vector1 != null && vector1.contains(str3)) {
+/*  340 */             vector2.add(str3);
+/*      */           }
+/*      */         } 
+/*      */       } else {
+/*  344 */         paramADSABRSTATUS.addDebug("shadowFilter not found in abr.server.properties for ADSABRSTATUS");
+/*      */       } 
+/*      */     } 
+/*      */     
+/*  348 */     if (bool) {
+/*  349 */       Vector<String> vector = (Vector)hashtable.get(str1);
+/*  350 */       if (vector.size() > 0) {
+/*      */         
+/*  352 */         StringBuffer stringBuffer = new StringBuffer();
+/*  353 */         stringBuffer.append("There is a shadow filter matched, the original MQ:"); byte b;
+/*  354 */         for (b = 0; b < vector1.size(); b++) {
+/*  355 */           stringBuffer.append(" ");
+/*  356 */           stringBuffer.append(vector1.get(b));
+/*      */         } 
+/*  358 */         stringBuffer.append(", we will only send to MQ:");
+/*  359 */         for (b = 0; b < vector.size(); b++) {
+/*  360 */           stringBuffer.append(" ");
+/*  361 */           stringBuffer.append(vector.get(b));
+/*      */         } 
+/*  363 */         paramADSABRSTATUS.addOutput(stringBuffer.toString());
+/*      */       } else {
+/*  365 */         paramADSABRSTATUS.addOutput("The " + paramEntityItem.getKey() + " matched shadow filter, but not found matched MQ.");
+/*      */       } 
+/*  367 */       return hashtable;
+/*      */     } 
+/*  369 */     return paramHashtable;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addAllMq(Vector<String> paramVector1, Vector<String> paramVector2, ADSABRSTATUS paramADSABRSTATUS) {
+/*  379 */     String str = ""; byte b;
+/*  380 */     for (b = 0; b < paramVector2.size(); b++) {
+/*  381 */       str = paramVector2.get(b);
+/*  382 */       if (!paramVector1.contains(str)) {
+/*  383 */         paramVector1.add(str);
+/*      */       }
+/*      */     } 
+/*      */     
+/*  387 */     for (b = 0; b < paramVector1.size(); b++) {
+/*  388 */       paramADSABRSTATUS.addDebug("Print MQ[" + b + "]= " + paramVector1.get(b));
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityItem getEntityItem(Database paramDatabase, EntityItem paramEntityItem) throws MiddlewareRequestException, SQLException, MiddlewareException {
+/*  402 */     EntityList entityList = paramDatabase.getEntityList(this._swProfile, new ExtractActionItem(null, paramDatabase, this._swProfile, "dummy"), new EntityItem[] { new EntityItem(null, this._swProfile, paramEntityItem
+/*      */             
+/*  404 */             .getEntityType(), paramEntityItem.getEntityID()) });
+/*  405 */     return entityList.getParentEntityGroup().getEntityItem(0);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String convertValue(String paramString) {
+/*  414 */     return (paramString == null) ? "" : paramString;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setRootEntity(EntityItem paramEntityItem, Hashtable<String, String> paramHashtable, ADSABRSTATUS paramADSABRSTATUS) throws MiddlewareRequestException, SQLException, MiddlewareException {
+/*  428 */     String str1 = paramEntityItem.getEntityType();
+/*  429 */     String[] arrayOfString = (String[])FILTER_TBL.get(str1);
+/*      */     
+/*  431 */     String str2 = "";
+/*  432 */     for (byte b = 0; b < arrayOfString.length; b++) {
+/*  433 */       String str = arrayOfString[b];
+/*  434 */       if (str.equals("FCTYPE")) {
+/*  435 */         if (str1.equals("PRODSTRUCT") || str1.equals("SWPRODSTRUCT")) {
+/*  436 */           str2 = getFCTYPE(paramEntityItem, str1, str, paramADSABRSTATUS);
+/*      */         } else {
+/*  438 */           str2 = convertValue(PokUtils.getAttributeFlagValue(paramEntityItem, str));
+/*      */         } 
+/*  440 */         paramHashtable.put(str, str2);
+/*  441 */       } else if (str.equals("STATUS") || str.equals("BUNDLETYPE") || str
+/*  442 */         .equals("SVCMODCATG") || str.equals("SVCMODGRP") || str
+/*  443 */         .equals("SVCMODSUBCATG") || str.equals("SVCMODSUBGRP") || str
+/*  444 */         .equals("FLFILSYSINDC") || str.equals("PDHDOMAIN")) {
+/*  445 */         str2 = convertValue(PokUtils.getAttributeFlagValue(paramEntityItem, str));
+/*  446 */         paramHashtable.put(str, str2);
+/*  447 */       } else if (str.equals("COFCAT") || str.equals("COFSUBCAT") || str
+/*  448 */         .equals("COFGRP") || str.equals("COFSUBGRP")) {
+/*  449 */         if (str1.equals("MODEL")) {
+/*  450 */           str2 = convertValue(PokUtils.getAttributeFlagValue(paramEntityItem, str));
+/*      */         } else {
+/*      */           
+/*  453 */           str2 = getCOFMODEL(paramEntityItem, str1, str, paramADSABRSTATUS);
+/*      */         } 
+/*  455 */         if (str.equals("COFCAT") && 
+/*  456 */           str2.equals("102")) {
+/*  457 */           this.isService = true;
+/*      */         }
+/*      */         
+/*  460 */         paramHashtable.put(str, str2);
+/*  461 */       } else if (str.equals("SPECBID")) {
+/*  462 */         str2 = convertValue(getSPECBID(paramEntityItem, str1, str, paramADSABRSTATUS));
+/*  463 */         paramHashtable.put(str, str2);
+/*  464 */       } else if (str.equals("MACHTYPEATR")) {
+/*      */         
+/*  466 */         if (str1.equals("MODELCONVERT") || str1.equals("FCTRANSACTION")) {
+/*  467 */           str2 = convertValue(PokUtils.getAttributeValue(paramEntityItem, "TOMACHTYPE", "", null, false));
+/*      */         } else {
+/*      */           
+/*  470 */           str2 = getMACHTYPEATR(paramEntityItem, str1, str, paramADSABRSTATUS);
+/*      */         } 
+/*  472 */         paramHashtable.put(str, str2);
+/*  473 */       } else if (str.equals("MODELATR")) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/*  478 */         if (str1.equals("MODELCONVERT") || str1.equals("FCTRANSACTION")) {
+/*  479 */           str2 = getMACHTYPEATR(paramEntityItem, str1, "TOMODEL", paramADSABRSTATUS);
+/*      */         } else {
+/*  481 */           str2 = getMACHTYPEATR(paramEntityItem, str1, str, paramADSABRSTATUS);
+/*      */         } 
+/*      */         
+/*  484 */         paramHashtable.put(str, str2);
+/*  485 */       } else if (str.equals("COUNTRYLIST")) {
+/*  486 */         str2 = convertValue(getCOUNTRYLIST(paramEntityItem, str1, str, paramADSABRSTATUS));
+/*  487 */         paramHashtable.put(str, str2);
+/*  488 */       } else if (str.equals("ENDOFSVC")) {
+/*  489 */         if (str1.equals("REFOFER")) {
+/*  490 */           str2 = convertValue(PokUtils.getAttributeValue(paramEntityItem, str, "", null, false));
+/*  491 */         } else if (str1.equals("REFOFERFEAT")) {
+/*  492 */           str2 = getENDOFSVC(paramEntityItem, str1, str, paramADSABRSTATUS);
+/*      */         } 
+/*  494 */         paramHashtable.put(str, str2);
+/*      */       
+/*      */       }
+/*  497 */       else if (str.equals("DIVTEXT")) {
+/*  498 */         str2 = getDIVISION(paramEntityItem, str1, "DIV", paramADSABRSTATUS);
+/*  499 */         paramHashtable.put(str, str2);
+/*  500 */       } else if (str.equals("DCG")) {
+/*  501 */         if (str1.equals("REFOFER")) {
+/*  502 */           str2 = convertValue(PokUtils.getAttributeValue(paramEntityItem, str, "", null, false));
+/*      */         }
+/*  504 */         paramHashtable.put(str, str2);
+/*  505 */       } else if (str.equals("OLDINDC")) {
+/*  506 */         str2 = convertValue(PokUtils.getAttributeValue(paramEntityItem, str, "", null, false));
+/*  507 */         paramHashtable.put(str, str2);
+/*      */       } 
+/*      */     } 
+/*      */     
+/*  511 */     Iterator<String> iterator = paramHashtable.keySet().iterator();
+/*  512 */     while (iterator.hasNext()) {
+/*  513 */       String str = iterator.next();
+/*  514 */       paramADSABRSTATUS.addDebug("rootTable:key=" + str + ";value=" + paramHashtable.get(str));
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityItem[] doSearch(String paramString1, String paramString2, ADSABRSTATUS paramADSABRSTATUS) throws InstantiationException, IllegalAccessException, ClassNotFoundException, MiddlewareBusinessRuleException, MiddlewareRequestException, SQLException, MiddlewareException, MiddlewareShutdownInProgressException, RemoteException, EANBusinessRuleException, IOException {
+/*  546 */     EntityItem[] arrayOfEntityItem = null;
+/*      */     
+/*  548 */     StringBuffer stringBuffer = new StringBuffer();
+/*  549 */     Database database = paramADSABRSTATUS.getDB();
+/*      */     
+/*  551 */     String str1 = paramADSABRSTATUS.getSimpleABRName(paramString1);
+/*  552 */     XMLMQ xMLMQ = (XMLMQ)Class.forName(str1).newInstance();
+/*      */     
+/*  554 */     Profile profile = null;
+/*      */     
+/*  556 */     profile = paramADSABRSTATUS.switchRoles(xMLMQ.getRoleCode());
+/*  557 */     setSwitchProfile(profile);
+/*  558 */     String str2 = "SRDEXTXMLFEED";
+/*  559 */     String str3 = "EXTXMLFEED";
+/*  560 */     Vector<String> vector1 = new Vector();
+/*  561 */     Vector<String> vector2 = new Vector();
+/*      */     
+/*  563 */     vector1.add("XMLENTITYTYPE");
+/*  564 */     vector1.add("XMLSETUPTYPE");
+/*  565 */     vector1.add("PDHDOMAIN");
+/*  566 */     vector2.add(paramString1);
+/*  567 */     vector2.add("Production");
+/*  568 */     vector2.add(paramString2);
+/*      */     
+/*  570 */     paramADSABRSTATUS.addDebug("XMLENTITYTYPE2=" + paramString1);
+/*  571 */     paramADSABRSTATUS.addDebug("XMLSETUPTYPE2=Production");
+/*      */     try {
+/*  573 */       arrayOfEntityItem = ABRUtil.doSearch(database, profile, str2, str3, false, vector1, vector2, stringBuffer);
+/*      */       
+/*  575 */       paramADSABRSTATUS.addDebug("ABRUtil.doSearch with domain message:" + stringBuffer.toString());
+/*  576 */     } catch (Exception exception) {
+/*  577 */       paramADSABRSTATUS.addDebug("ABRUtil.doSearch with domain error:" + stringBuffer.toString());
+/*  578 */       paramADSABRSTATUS.addDebug("doSearch error=" + exception.getMessage());
+/*  579 */       exception.printStackTrace();
+/*      */     } 
+/*  581 */     paramADSABRSTATUS.addDebug("EXTXMLFEEDArray=" + arrayOfEntityItem.length);
+/*  582 */     return arrayOfEntityItem;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityItem[] doSearch(String paramString, ADSABRSTATUS paramADSABRSTATUS) throws InstantiationException, IllegalAccessException, ClassNotFoundException, MiddlewareBusinessRuleException, MiddlewareRequestException, SQLException, MiddlewareException, MiddlewareShutdownInProgressException, RemoteException, EANBusinessRuleException, IOException {
+/*  615 */     EntityItem[] arrayOfEntityItem = null;
+/*      */     
+/*  617 */     StringBuffer stringBuffer = new StringBuffer();
+/*  618 */     Database database = paramADSABRSTATUS.getDB();
+/*      */     
+/*  620 */     String str1 = paramADSABRSTATUS.getSimpleABRName(paramString);
+/*  621 */     XMLMQ xMLMQ = (XMLMQ)Class.forName(str1).newInstance();
+/*      */     
+/*  623 */     Profile profile = null;
+/*      */     
+/*  625 */     profile = paramADSABRSTATUS.switchRoles(xMLMQ.getRoleCode());
+/*  626 */     setSwitchProfile(profile);
+/*  627 */     String str2 = "SRDEXTXMLFEED";
+/*  628 */     String str3 = "EXTXMLFEED";
+/*  629 */     Vector<String> vector1 = new Vector();
+/*  630 */     Vector<String> vector2 = new Vector();
+/*      */     
+/*  632 */     vector1.add("XMLENTITYTYPE");
+/*  633 */     vector1.add("XMLSETUPTYPE");
+/*  634 */     vector2.add(paramString);
+/*  635 */     vector2.add("Production");
+/*      */     
+/*  637 */     paramADSABRSTATUS.addDebug("XMLENTITYTYPE2=" + paramString);
+/*  638 */     paramADSABRSTATUS.addDebug("XMLSETUPTYPE2=Production");
+/*      */     try {
+/*  640 */       arrayOfEntityItem = ABRUtil.doSearch(database, profile, str2, str3, false, vector1, vector2, stringBuffer);
+/*      */       
+/*  642 */       paramADSABRSTATUS.addDebug("ABRUtil.doSearch no domain message:" + stringBuffer.toString());
+/*  643 */     } catch (Exception exception) {
+/*  644 */       paramADSABRSTATUS.addDebug("ABRUtil.doSearch no domain error:" + stringBuffer.toString());
+/*  645 */       paramADSABRSTATUS.addDebug("doSearch error=" + exception.getMessage());
+/*  646 */       exception.printStackTrace();
+/*      */     } 
+/*  648 */     paramADSABRSTATUS.addDebug("EXTXMLFEEDArray=" + arrayOfEntityItem.length);
+/*  649 */     return arrayOfEntityItem;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void setSwitchProfile(Profile paramProfile) {
+/*  656 */     this._swProfile = paramProfile;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setFilterTable(String paramString, Hashtable<String, String> paramHashtable, EntityItem paramEntityItem, ADSABRSTATUS paramADSABRSTATUS) throws MiddlewareRequestException, MiddlewareException {
+/*  670 */     String[] arrayOfString = (String[])FILTER_TBL.get(paramString);
+/*  671 */     String str1 = "";
+/*  672 */     String str2 = "";
+/*  673 */     String str3 = "";
+/*  674 */     String str4 = "";
+/*  675 */     String str5 = "";
+/*  676 */     String str6 = "";
+/*  677 */     String str7 = "";
+/*      */     
+/*  679 */     for (byte b = 0; b < arrayOfString.length; b++) {
+/*  680 */       str1 = arrayOfString[b];
+/*  681 */       paramADSABRSTATUS.addDebug("attrcode=" + str1);
+/*      */       
+/*  683 */       if (str1.equals("MODELATR") || str1.equals("ENDOFSVC") || str1.equals("DIVTEXT")) {
+/*  684 */         str2 = convertValue(PokUtils.getAttributeValue(paramEntityItem, str1, "", null, false));
+/*  685 */         paramHashtable.put(str1, str2);
+/*  686 */       } else if (str1.equals("STATUS")) {
+/*      */         
+/*  688 */         str2 = convertValue(PokUtils.getAttributeFlagValue(paramEntityItem, "XMLSTATUS"));
+/*  689 */         if (str2.equals("XSTATUS02")) {
+/*  690 */           str2 = "0020";
+/*      */         } else {
+/*  692 */           str2 = "";
+/*      */         } 
+/*  694 */         paramHashtable.put(str1, str2);
+/*  695 */       } else if (str1.equals("DCG")) {
+/*  696 */         str2 = convertValue(PokUtils.getAttributeFlagValue(paramEntityItem, str1));
+/*  697 */         if (str1.length() > 0)
+/*  698 */           paramHashtable.put(str1, str2); 
+/*      */       } else {
+/*  700 */         str2 = convertValue(PokUtils.getAttributeFlagValue(paramEntityItem, str1));
+/*  701 */         paramHashtable.put(str1, str2);
+/*      */       } 
+/*      */     } 
+/*  704 */     if (paramString.equals("MODEL") || paramString.equals("LSEO")) {
+/*      */       
+/*  706 */       str3 = convertValue(PokUtils.getAttributeFlagValue(paramEntityItem, "COFCAT"));
+/*  707 */       str4 = convertValue(PokUtils.getAttributeFlagValue(paramEntityItem, "COFSUBCAT"));
+/*  708 */       str5 = convertValue(PokUtils.getAttributeFlagValue(paramEntityItem, "COFGRP"));
+/*  709 */       str6 = convertValue(PokUtils.getAttributeFlagValue(paramEntityItem, "COFSUBGRP"));
+/*      */ 
+/*      */       
+/*  712 */       if (this.isService) {
+/*  713 */         str5 = "";
+/*  714 */         str6 = "";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*      */       }
+/*  722 */       else if ("".equals(str5)) {
+/*  723 */         str5 = "150";
+/*      */       } 
+/*      */       
+/*  726 */       paramHashtable.put("COFCAT", str3);
+/*  727 */       paramHashtable.put("COFSUBCAT", str4);
+/*  728 */       paramHashtable.put("COFGRP", str5);
+/*  729 */       paramHashtable.put("COFSUBGRP", str6);
+/*      */     } 
+/*      */     
+/*  732 */     Iterator<String> iterator = paramHashtable.keySet().iterator();
+/*  733 */     while (iterator.hasNext()) {
+/*  734 */       String str = iterator.next();
+/*  735 */       paramADSABRSTATUS.addDebug("EXTXMLFEED SetupEntity filterTable:key=" + str + ";value=" + paramHashtable.get(str));
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector getMQPropertiesFilter(EntityItem paramEntityItem, ADSABRSTATUS paramADSABRSTATUS) throws MiddlewareRequestException, SQLException, MiddlewareException, MiddlewareShutdownInProgressException, SBRException, InstantiationException, IllegalAccessException, ClassNotFoundException, RemoteException, EANBusinessRuleException, IOException {
+/*  760 */     Vector vector = new Vector();
+/*      */     
+/*  762 */     String str1 = paramEntityItem.getEntityType();
+/*  763 */     String[] arrayOfString = (String[])FILTER_TBL.get(str1);
+/*  764 */     Hashtable<Object, Object> hashtable1 = new Hashtable<>();
+/*  765 */     String str2 = "";
+/*  766 */     Hashtable<Object, Object> hashtable2 = new Hashtable<>();
+/*      */ 
+/*      */ 
+/*      */     
+/*  770 */     Database database = paramADSABRSTATUS.getDB();
+/*  771 */     if (arrayOfString != null) {
+/*  772 */       EntityItem[] arrayOfEntityItem = doSearch(str1, paramADSABRSTATUS);
+/*      */       
+/*  774 */       setRootEntity(paramEntityItem, hashtable1, paramADSABRSTATUS);
+/*  775 */       for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/*  776 */         EntityItem entityItem = arrayOfEntityItem[b];
+/*  777 */         entityItem = getEntityItem(database, entityItem);
+/*      */ 
+/*      */ 
+/*      */         
+/*  781 */         setFilterTable(str1, hashtable2, entityItem, paramADSABRSTATUS);
+/*  782 */         str2 = convertValue(PokUtils.getAttributeFlagValue(entityItem, this.attrXMLABRPROPFILE));
+/*      */ 
+/*      */ 
+/*      */         
+/*  786 */         boolean bool = false;
+/*      */         
+/*  788 */         String str = "";
+/*  789 */         boolean bool1 = true;
+/*  790 */         boolean bool2 = true;
+/*  791 */         for (byte b1 = 0; b1 < arrayOfString.length; b1++) {
+/*  792 */           str = arrayOfString[b1];
+/*  793 */           if (str.equals("BUNDLETYPE") || str.equals("COUNTRYLIST") || str
+/*  794 */             .equals("FLFILSYSINDC") || str.equals("PDHDOMAIN") || str.equals("DIVTEXT")) {
+/*  795 */             bool1 = false;
+/*      */           }
+/*  797 */           paramADSABRSTATUS.addDebug("match" + (String)hashtable1.get(str) + ":" + (String)hashtable2.get(str) + ":" + str + ":" + bool1);
+/*      */           
+/*  799 */           bool = isVailidCompare((String)hashtable1.get(str), (String)hashtable2.get(str), str, bool1);
+/*  800 */           paramADSABRSTATUS.addDebug("match" + bool);
+/*  801 */           if (!bool) {
+/*  802 */             bool2 = false;
+/*      */             break;
+/*      */           } 
+/*      */         } 
+/*  806 */         if (bool2) {
+/*  807 */           addXMLPropfile(vector, str2);
+/*      */         }
+/*      */       }
+/*      */     
+/*      */     }
+/*      */     else {
+/*      */       
+/*  814 */       EntityItem[] arrayOfEntityItem = null;
+/*  815 */       if (str1.equals("ADSXMLSETUP")) {
+/*  816 */         String str = PokUtils.getAttributeFlagValue(paramEntityItem, "ADSTYPE");
+/*  817 */         if (str != null) {
+/*  818 */           str1 = (String)ADSTYPES_TBL.get(str);
+/*  819 */           if (str1 == null) {
+/*  820 */             str1 = "@@@";
+/*      */           }
+/*      */         } 
+/*  823 */       } else if (str1.equals("XMLPRODPRICESETUP")) {
+/*  824 */         str1 = "@@@";
+/*      */       } 
+/*  826 */       if (str1.equals("@@@")) {
+/*  827 */         arrayOfEntityItem = null;
+/*      */       } else {
+/*  829 */         arrayOfEntityItem = doSearch(str1, paramADSABRSTATUS);
+/*      */       } 
+/*      */ 
+/*      */ 
+/*      */       
+/*  834 */       if (str1.equals("WWCOMPAT")) {
+/*  835 */         this.wwcompMQTable = new Hashtable<>();
+/*  836 */         if (arrayOfEntityItem.length > 0) {
+/*  837 */           isFilterWWCOMPAT = true;
+/*  838 */           for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/*  839 */             EntityItem entityItem = arrayOfEntityItem[b];
+/*  840 */             entityItem = getEntityItem(database, entityItem);
+/*      */             
+/*  842 */             str2 = convertValue(PokUtils.getAttributeFlagValue(entityItem, this.attrXMLABRPROPFILE));
+/*  843 */             String str3 = convertValue(PokUtils.getAttributeFlagValue(entityItem, "BRANDCD"));
+/*  844 */             paramADSABRSTATUS.addDebug("fBRANDCD=" + str3);
+/*  845 */             paramADSABRSTATUS.addDebug("wwcompat role code=" + this._swProfile.getRoleCode());
+/*      */ 
+/*      */             
+/*  848 */             if (str3.equals("")) str3 = "@@@";
+/*      */ 
+/*      */             
+/*  851 */             Vector<String> vector1 = (Vector)this.wwcompMQTable.get(str3);
+/*  852 */             if (vector1 == null) vector1 = new Vector(); 
+/*  853 */             StringTokenizer stringTokenizer = new StringTokenizer(str2, "|");
+/*  854 */             String str4 = "";
+/*  855 */             while (stringTokenizer.hasMoreTokens()) {
+/*  856 */               str4 = stringTokenizer.nextToken();
+/*  857 */               if (!vector1.contains(str4)) {
+/*  858 */                 vector1.add(str4);
+/*      */               }
+/*      */             } 
+/*      */             
+/*  862 */             String str5 = PokUtils.getAttributeFlagValue(paramEntityItem, this.attrXMLABRPROPFILE);
+/*  863 */             if (str5 != null) {
+/*      */               
+/*  865 */               StringTokenizer stringTokenizer1 = new StringTokenizer(str5, "|");
+/*  866 */               while (stringTokenizer1.hasMoreTokens()) {
+/*      */                 
+/*  868 */                 str4 = stringTokenizer1.nextToken();
+/*  869 */                 if (!vector1.contains(str4)) {
+/*  870 */                   vector1.add(str4);
+/*      */                 }
+/*      */               } 
+/*      */             } 
+/*      */             
+/*  875 */             if (vector1.size() == 0) {
+/*  876 */               vector1.add("ADSMQSERIES");
+/*      */             }
+/*  878 */             this.wwcompMQTable.put(str3, vector1);
+/*      */           } 
+/*      */         } else {
+/*      */           
+/*  882 */           isFilterWWCOMPAT = false;
+/*      */         }
+/*      */       
+/*  885 */       } else if (arrayOfEntityItem != null) {
+/*  886 */         for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/*  887 */           EntityItem entityItem = arrayOfEntityItem[b];
+/*  888 */           entityItem = getEntityItem(database, entityItem);
+/*  889 */           String str = convertValue(PokUtils.getAttributeFlagValue(entityItem, this.attrXMLABRPROPFILE));
+/*  890 */           addXMLPropfile(vector, str);
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */     
+/*  895 */     paramADSABRSTATUS.addDebug("MQ size =" + vector.size());
+/*  896 */     return vector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Hashtable getMQPropertiesFilterVN(EntityItem paramEntityItem, ADSABRSTATUS paramADSABRSTATUS, Vector paramVector) throws MiddlewareRequestException, SQLException, MiddlewareException, MiddlewareShutdownInProgressException, SBRException, InstantiationException, IllegalAccessException, ClassNotFoundException, RemoteException, EANBusinessRuleException, IOException {
+/*  904 */     Hashtable<Object, Object> hashtable1 = new Hashtable<>();
+/*      */ 
+/*      */ 
+/*      */     
+/*  908 */     String str1 = paramEntityItem.getEntityType();
+/*  909 */     String[] arrayOfString = (String[])FILTER_TBL.get(str1);
+/*  910 */     Hashtable<Object, Object> hashtable2 = new Hashtable<>();
+/*  911 */     String str2 = "";
+/*  912 */     Hashtable<Object, Object> hashtable3 = new Hashtable<>();
+/*      */ 
+/*      */     
+/*  915 */     String str3 = "";
+/*  916 */     String str4 = "";
+/*  917 */     String str5 = "";
+/*      */ 
+/*      */     
+/*  920 */     EntityItem[] arrayOfEntityItem = null;
+/*  921 */     Vector<EntityItem> vector = new Vector();
+/*      */     
+/*  923 */     Database database = paramADSABRSTATUS.getDB();
+/*  924 */     if (arrayOfString != null) {
+/*      */       
+/*  926 */       String str = PokUtils.getAttributeFlagValue(paramEntityItem, "PDHDOMAIN");
+/*  927 */       paramADSABRSTATUS.addDebug(paramEntityItem.getKey() + " pdhdomain: " + str);
+/*  928 */       if (str != null) {
+/*  929 */         arrayOfEntityItem = doSearch(str1, str, paramADSABRSTATUS);
+/*      */       } else {
+/*  931 */         arrayOfEntityItem = doSearch(str1, paramADSABRSTATUS);
+/*      */       } 
+/*      */       
+/*  934 */       setRootEntity(paramEntityItem, hashtable2, paramADSABRSTATUS);
+/*  935 */       if (arrayOfEntityItem != null) {
+/*  936 */         for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/*  937 */           EntityItem entityItem = arrayOfEntityItem[b];
+/*  938 */           entityItem = getEntityItem(database, entityItem);
+/*      */ 
+/*      */ 
+/*      */           
+/*  942 */           setFilterTable(str1, hashtable3, entityItem, paramADSABRSTATUS);
+/*  943 */           str2 = convertValue(PokUtils.getAttributeFlagValue(entityItem, this.attrXMLABRPROPFILE));
+/*      */ 
+/*      */ 
+/*      */           
+/*  947 */           boolean bool = false;
+/*      */           
+/*  949 */           String str6 = "";
+/*  950 */           boolean bool1 = true;
+/*  951 */           boolean bool2 = true;
+/*  952 */           for (byte b1 = 0; b1 < arrayOfString.length; b1++) {
+/*  953 */             str6 = arrayOfString[b1];
+/*  954 */             if (str6.equals("BUNDLETYPE") || str6.equals("COUNTRYLIST") || str6
+/*  955 */               .equals("FLFILSYSINDC") || str6.equals("PDHDOMAIN") || str6.equals("DIVTEXT")) {
+/*  956 */               bool1 = false;
+/*      */             }
+/*  958 */             paramADSABRSTATUS.addDebug("match" + (String)hashtable2.get(str6) + ":" + (String)hashtable3.get(str6) + ":" + str6 + ":" + bool1);
+/*  959 */             bool = isVailidCompare((String)hashtable2.get(str6), (String)hashtable3.get(str6), str6, bool1);
+/*  960 */             paramADSABRSTATUS.addDebug("match" + bool);
+/*  961 */             if (!bool) {
+/*  962 */               bool2 = false;
+/*      */               break;
+/*      */             } 
+/*      */           } 
+/*  966 */           if (bool2) {
+/*  967 */             str3 = convertValue(PokUtils.getAttributeValue(entityItem, "XMLVERSION", "", null, false));
+/*  968 */             str4 = convertValue(PokUtils.getAttributeValue(entityItem, "XMLMOD", "", null, false));
+/*  969 */             if (!"".equals(str3) && !"".equals(str4) && this.isVaildREFOFERFEAT) {
+/*  970 */               str5 = str3 + str4;
+/*  971 */               if (hashtable1.containsKey(str5)) {
+/*  972 */                 paramVector = (Vector)hashtable1.get(str5);
+/*  973 */                 addXMLPropfile(paramVector, str2);
+/*  974 */                 hashtable1.put(str5, paramVector);
+/*      */               } else {
+/*  976 */                 paramVector = new Vector();
+/*  977 */                 addXMLPropfile(paramVector, str2);
+/*  978 */                 hashtable1.put(str5, paramVector);
+/*      */               } 
+/*      */               
+/*  981 */               vector.add(entityItem);
+/*      */             }
+/*      */           
+/*      */           }
+/*      */         
+/*      */         }
+/*      */       
+/*      */       }
+/*      */     }
+/*      */     else {
+/*      */       
+/*  992 */       if (str1.equals("ADSXMLSETUP")) {
+/*  993 */         String str = PokUtils.getAttributeFlagValue(paramEntityItem, "ADSTYPE");
+/*  994 */         if (str != null) {
+/*  995 */           str1 = (String)ADSTYPES_TBL.get(str);
+/*  996 */           if (str1 == null) {
+/*  997 */             str1 = "@@@";
+/*      */           }
+/*      */         } 
+/* 1000 */       } else if (str1.equals("XMLPRODPRICESETUP")) {
+/* 1001 */         str1 = "@@@";
+/*      */       } 
+/* 1003 */       if (str1.equals("@@@")) {
+/* 1004 */         arrayOfEntityItem = null;
+/*      */       } else {
+/* 1006 */         arrayOfEntityItem = doSearch(str1, paramADSABRSTATUS);
+/*      */       } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1013 */       if (str1.equals("WWCOMPAT")) {
+/* 1014 */         this.wwcompMQTable = new Hashtable<>();
+/* 1015 */         if (arrayOfEntityItem != null && arrayOfEntityItem.length > 0) {
+/* 1016 */           isFilterWWCOMPAT = true;
+/* 1017 */           for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/* 1018 */             EntityItem entityItem = arrayOfEntityItem[b];
+/* 1019 */             entityItem = getEntityItem(database, entityItem);
+/*      */             
+/* 1021 */             str2 = convertValue(PokUtils.getAttributeFlagValue(entityItem, this.attrXMLABRPROPFILE));
+/* 1022 */             String str6 = convertValue(PokUtils.getAttributeFlagValue(entityItem, "BRANDCD"));
+/* 1023 */             paramADSABRSTATUS.addDebug("fBRANDCD=" + str6);
+/* 1024 */             paramADSABRSTATUS.addDebug("wwcompat role code=" + this._swProfile.getRoleCode());
+/*      */ 
+/*      */             
+/* 1027 */             if (str6.equals("")) str6 = "@@@";
+/*      */ 
+/*      */             
+/* 1030 */             Vector<String> vector1 = (Vector)this.wwcompMQTable.get(str6);
+/* 1031 */             if (vector1 == null) vector1 = new Vector(); 
+/* 1032 */             StringTokenizer stringTokenizer = new StringTokenizer(str2, "|");
+/* 1033 */             String str7 = "";
+/* 1034 */             while (stringTokenizer.hasMoreTokens()) {
+/* 1035 */               str7 = stringTokenizer.nextToken();
+/* 1036 */               if (!vector1.contains(str7)) {
+/* 1037 */                 vector1.add(str7);
+/*      */               }
+/*      */             } 
+/*      */             
+/* 1041 */             String str8 = PokUtils.getAttributeFlagValue(paramEntityItem, this.attrXMLABRPROPFILE);
+/* 1042 */             if (str8 != null) {
+/*      */               
+/* 1044 */               StringTokenizer stringTokenizer1 = new StringTokenizer(str8, "|");
+/* 1045 */               while (stringTokenizer1.hasMoreTokens()) {
+/*      */                 
+/* 1047 */                 str7 = stringTokenizer1.nextToken();
+/* 1048 */                 if (!vector1.contains(str7)) {
+/* 1049 */                   vector1.add(str7);
+/*      */                 }
+/*      */               } 
+/*      */             } 
+/*      */             
+/* 1054 */             if (vector1.size() == 0) {
+/* 1055 */               vector1.add("ADSMQSERIES");
+/*      */             }
+/* 1057 */             this.wwcompMQTable.put(str6, vector1);
+/*      */           } 
+/*      */         } else {
+/*      */           
+/* 1061 */           isFilterWWCOMPAT = false;
+/*      */         }
+/*      */       
+/* 1064 */       } else if (arrayOfEntityItem != null) {
+/* 1065 */         for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/* 1066 */           EntityItem entityItem = arrayOfEntityItem[b];
+/* 1067 */           entityItem = getEntityItem(database, entityItem);
+/* 1068 */           String str = convertValue(PokUtils.getAttributeFlagValue(entityItem, this.attrXMLABRPROPFILE));
+/* 1069 */           str3 = convertValue(PokUtils.getAttributeValue(entityItem, "XMLVERSION", "", null, false));
+/* 1070 */           str4 = convertValue(PokUtils.getAttributeValue(entityItem, "XMLMOD", "", null, false));
+/* 1071 */           if (!"".equals(str3) && !"".equals(str4) && this.isVaildREFOFERFEAT) {
+/* 1072 */             str5 = str3 + str4;
+/* 1073 */             if (hashtable1.containsKey(str5)) {
+/* 1074 */               paramVector = (Vector)hashtable1.get(str5);
+/* 1075 */               addXMLPropfile(paramVector, str);
+/* 1076 */               hashtable1.put(str5, paramVector);
+/*      */             } else {
+/*      */               
+/* 1079 */               addXMLPropfile(paramVector, str);
+/* 1080 */               hashtable1.put(str5, paramVector);
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1089 */     hashtable1.put("SETUPARRAY", vector);
+/*      */ 
+/*      */     
+/* 1092 */     paramADSABRSTATUS.addDebug("MQ Table =" + hashtable1.size());
+/* 1093 */     if (hashtable1.containsKey("10")) {
+/* 1094 */       paramADSABRSTATUS.addDebug("MQ Table 10 =" + hashtable1.get("10").toString());
+/*      */     } else {
+/* 1096 */       paramADSABRSTATUS.addDebug("MQ Table 10 is null ");
+/*      */     } 
+/* 1098 */     if (hashtable1.containsKey("05")) {
+/* 1099 */       paramADSABRSTATUS.addDebug("MQ Table 05 =" + hashtable1.get("05").toString());
+/*      */     } else {
+/* 1101 */       paramADSABRSTATUS.addDebug("MQ Table 05 is null ");
+/*      */     } 
+/* 1103 */     return hashtable1;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addXMLPropfile(Vector<String> paramVector, String paramString) {
+/* 1112 */     StringTokenizer stringTokenizer = new StringTokenizer(paramString, "|");
+/* 1113 */     String str = "";
+/* 1114 */     while (stringTokenizer.hasMoreTokens()) {
+/* 1115 */       str = stringTokenizer.nextToken();
+/* 1116 */       if (!paramVector.contains(str)) {
+/* 1117 */         paramVector.add(str);
+/*      */       }
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean isVailidCompare(String paramString1, String paramString2, String paramString3, boolean paramBoolean) {
+/* 1126 */     boolean bool = false;
+/* 1127 */     if (paramString1 == null) paramString1 = "";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1132 */     if (paramString1.equals("@@@")) return true; 
+/* 1133 */     if (paramString2 != null && !"".equals(paramString2)) {
+/* 1134 */       if ("ENDOFSVC".equals(paramString3)) {
+/*      */         
+/* 1136 */         if ("".equals(paramString1))
+/* 1137 */           return true; 
+/* 1138 */         if (paramString1.compareTo(paramString2) >= 0) {
+/* 1139 */           return true;
+/*      */         }
+/*      */       }
+/* 1142 */       else if (paramBoolean) {
+/* 1143 */         if ("DCG".equals(paramString3) && (paramString1 == null || "".equals(paramString1)))
+/* 1144 */           return true; 
+/* 1145 */         if (paramString2.equals(paramString1)) {
+/* 1146 */           bool = true;
+/*      */         } else {
+/* 1148 */           bool = false;
+/*      */         } 
+/*      */       } else {
+/*      */         
+/* 1152 */         String str1 = "";
+/* 1153 */         if ("DIVTEXT".equals(paramString3)) {
+/* 1154 */           str1 = ",";
+/*      */         } else {
+/* 1156 */           str1 = "|";
+/*      */         } 
+/* 1158 */         StringTokenizer stringTokenizer = new StringTokenizer(paramString2, str1);
+/* 1159 */         String str2 = "";
+/* 1160 */         String str3 = "";
+/* 1161 */         while (stringTokenizer.hasMoreTokens()) {
+/* 1162 */           str2 = stringTokenizer.nextToken();
+/* 1163 */           if ("".equals(str2)) return true; 
+/* 1164 */           StringTokenizer stringTokenizer1 = new StringTokenizer(paramString1, "|");
+/* 1165 */           while (stringTokenizer1.hasMoreTokens()) {
+/* 1166 */             str3 = stringTokenizer1.nextToken();
+/* 1167 */             if (str3.equals(str2)) {
+/* 1168 */               return true;
+/*      */             }
+/*      */           }
+/*      */         
+/*      */         } 
+/*      */       } 
+/*      */     } else {
+/*      */       
+/* 1176 */       bool = true;
+/*      */     } 
+/* 1178 */     if ("OLDINDC".equals(paramString3)) {
+/* 1179 */       if (paramString2 != null && !"".equals(paramString2.trim())) {
+/* 1180 */         if ("".equals(paramString1))
+/* 1181 */           return true; 
+/* 1182 */         if (paramString2.equals(paramString1)) {
+/* 1183 */           bool = true;
+/*      */         } else {
+/* 1185 */           bool = false;
+/*      */         }
+/*      */       
+/* 1188 */       } else if ("Y".equals(paramString1)) {
+/* 1189 */         bool = false;
+/*      */       } 
+/*      */     }
+/*      */ 
+/*      */     
+/* 1194 */     return bool;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getCOUNTRYLIST(EntityItem paramEntityItem, String paramString1, String paramString2, ADSABRSTATUS paramADSABRSTATUS) throws MiddlewareRequestException, SQLException, MiddlewareException {
+/* 1207 */     String str = "";
+/* 1208 */     if (paramString1.equals("FEATURE") || paramString1.equals("IMG") || paramString1
+/* 1209 */       .equals("LSEOBUNDLE") || paramString1.equals("LSEO")) {
+/* 1210 */       str = convertValue(PokUtils.getAttributeFlagValue(paramEntityItem, paramString2));
+/* 1211 */     } else if (paramString1.equals("REFOFER")) {
+/* 1212 */       str = convertValue(PokUtils.getAttributeFlagValue(paramEntityItem, paramString2));
+/*      */       
+/* 1214 */       if (str.equals("")) {
+/* 1215 */         str = "@@@";
+/*      */       
+/*      */       }
+/*      */     }
+/* 1219 */     else if (paramString1.equals("REFOFERFEAT")) {
+/* 1220 */       EntityList entityList = getEntityList(paramEntityItem, paramString1, paramADSABRSTATUS);
+/* 1221 */       EntityGroup entityGroup = entityList.getEntityGroup("REFOFER");
+/* 1222 */       EntityItem[] arrayOfEntityItem = null;
+/* 1223 */       if (entityGroup != null) arrayOfEntityItem = entityGroup.getEntityItemsAsArray();
+/*      */       
+/* 1225 */       if (arrayOfEntityItem != null) {
+/* 1226 */         for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/* 1227 */           EntityItem entityItem = arrayOfEntityItem[b];
+/* 1228 */           if (entityItem != null && "REFOFER".equals(entityItem.getEntityType())) {
+/* 1229 */             String str1 = convertValue(PokUtils.getAttributeFlagValue(entityItem, paramString2));
+/*      */             
+/* 1231 */             if (str1.equals("")) {
+/* 1232 */               str = "@@@";
+/*      */               break;
+/*      */             } 
+/* 1235 */             if ("".equals(str)) {
+/* 1236 */               str = str1;
+/*      */             } else {
+/* 1238 */               str = str + "|" + str1;
+/*      */             }
+/*      */           
+/*      */           }
+/*      */         
+/*      */         } 
+/*      */       }
+/* 1245 */     } else if (paramString1.equals("PRODSTRUCT")) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1253 */       EntityItem entityItem = null;
+/* 1254 */       EntityList entityList = getEntityList(paramEntityItem, paramString1, paramADSABRSTATUS);
+/*      */       
+/* 1256 */       EntityGroup entityGroup = entityList.getEntityGroup("FEATURE");
+/* 1257 */       EntityItem[] arrayOfEntityItem = null;
+/* 1258 */       if (entityGroup != null) arrayOfEntityItem = entityGroup.getEntityItemsAsArray(); 
+/* 1259 */       if (arrayOfEntityItem != null) {
+/* 1260 */         for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/* 1261 */           EntityItem entityItem1 = arrayOfEntityItem[b];
+/* 1262 */           if (entityItem1 != null && "FEATURE".equals(entityItem1.getEntityType())) {
+/* 1263 */             entityItem = entityItem1;
+/*      */ 
+/*      */             
+/*      */             break;
+/*      */           } 
+/*      */         } 
+/*      */       }
+/*      */       
+/* 1271 */       String str1 = "";
+/* 1272 */       if (entityItem != null) {
+/* 1273 */         str1 = convertValue(PokUtils.getAttributeFlagValue(entityItem, "FCTYPE"));
+/* 1274 */         if (str1.equals("100") || str1.equals("110")) {
+/* 1275 */           str = getCountryList(paramEntityItem, paramString1, paramString2, paramADSABRSTATUS);
+/*      */         } else {
+/* 1277 */           str = convertValue(PokUtils.getAttributeFlagValue(entityItem, paramString2));
+/*      */         }
+/*      */       
+/*      */       } 
+/*      */     } else {
+/*      */       
+/* 1283 */       str = getCountryList(paramEntityItem, paramString1, paramString2, paramADSABRSTATUS);
+/*      */     } 
+/* 1285 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getCountryList(EntityItem paramEntityItem, String paramString1, String paramString2, ADSABRSTATUS paramADSABRSTATUS) throws SQLException, MiddlewareException, MiddlewareRequestException {
+/* 1305 */     String str = "";
+/* 1306 */     EntityList entityList = getEntityList(paramEntityItem, paramString1, paramADSABRSTATUS);
+/*      */     
+/* 1308 */     EntityGroup entityGroup = entityList.getEntityGroup("AVAIL");
+/* 1309 */     EntityItem[] arrayOfEntityItem = null;
+/* 1310 */     if (entityGroup != null) arrayOfEntityItem = entityGroup.getEntityItemsAsArray(); 
+/* 1311 */     if (arrayOfEntityItem == null || arrayOfEntityItem.length == 0) {
+/* 1312 */       paramADSABRSTATUS.addDebug("avail is null");
+/* 1313 */       str = "@@@";
+/*      */     } else {
+/*      */       
+/* 1316 */       paramADSABRSTATUS.addDebug("avail is not null");
+/* 1317 */       EntityItem entityItem = null;
+/* 1318 */       StringBuffer stringBuffer = new StringBuffer();
+/* 1319 */       String str1 = "";
+/* 1320 */       String str2 = "";
+/* 1321 */       String str3 = "";
+/* 1322 */       boolean bool1 = false;
+/* 1323 */       boolean bool2 = false;
+/* 1324 */       byte b1 = 0;
+/* 1325 */       for (byte b2 = 0; b2 < arrayOfEntityItem.length; b2++) {
+/* 1326 */         entityItem = arrayOfEntityItem[b2];
+/*      */         
+/* 1328 */         str1 = convertValue(PokUtils.getAttributeFlagValue(entityItem, "AVAILTYPE"));
+/*      */         
+/* 1330 */         str2 = convertValue(PokUtils.getAttributeFlagValue(entityItem, "STATUS"));
+/*      */         
+/* 1332 */         if (str1.equals("146")) {
+/*      */           
+/* 1334 */           str3 = PokUtils.getAttributeValue(entityItem, "EFFECTIVEDATE", ",", "@@@", false);
+/* 1335 */           if (str3.compareTo("2010-03-01") <= 0) {
+/* 1336 */             bool1 = true;
+/*      */           } else {
+/* 1338 */             bool1 = false;
+/*      */           } 
+/* 1340 */           if (bool1) {
+/* 1341 */             bool2 = true;
+/* 1342 */           } else if ("0020".equals(str2) || "0040".equals(str2)) {
+/* 1343 */             bool2 = true;
+/*      */           } else {
+/* 1345 */             bool2 = false;
+/*      */           } 
+/* 1347 */           if (bool2) {
+/* 1348 */             if (b1) stringBuffer.append("|"); 
+/* 1349 */             stringBuffer.append(PokUtils.getAttributeFlagValue(entityItem, paramString2));
+/* 1350 */             b1++;
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/* 1354 */       str = stringBuffer.toString();
+/* 1355 */       if (str.equals("")) {
+/* 1356 */         str = "@@@";
+/*      */       }
+/*      */     } 
+/* 1359 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getDIVISION(EntityItem paramEntityItem, String paramString1, String paramString2, ADSABRSTATUS paramADSABRSTATUS) throws MiddlewareRequestException, SQLException, MiddlewareException {
+/* 1374 */     String str = "";
+/*      */     
+/* 1376 */     EntityList entityList = getEntityList(paramEntityItem, paramString1, paramADSABRSTATUS);
+/*      */     
+/* 1378 */     paramADSABRSTATUS.addDebug("getDIVISION: m_elist=" + entityList);
+/*      */     
+/* 1380 */     EntityGroup entityGroup = entityList.getEntityGroup("SGMNTACRNYM");
+/*      */     
+/* 1382 */     EntityItem[] arrayOfEntityItem = null;
+/* 1383 */     if (entityGroup != null) {
+/* 1384 */       arrayOfEntityItem = entityGroup.getEntityItemsAsArray();
+/* 1385 */       paramADSABRSTATUS.addDebug("getDIVISIONÃ©âÂ¿Ã¦Â¶Â³Ã¦â¹Â· itemArray=" + arrayOfEntityItem.length);
+/*      */     } 
+/* 1387 */     byte b1 = 0;
+/* 1388 */     for (byte b2 = 0; b2 < arrayOfEntityItem.length; b2++) {
+/* 1389 */       EntityItem entityItem = arrayOfEntityItem[b2];
+/* 1390 */       if (entityItem != null) {
+/* 1391 */         b1++;
+/* 1392 */         if (b1 == 1) {
+/* 1393 */           str = convertValue(PokUtils.getAttributeFlagValue(entityItem, paramString2));
+/*      */         } else {
+/* 1395 */           str = str + "|" + convertValue(PokUtils.getAttributeFlagValue(entityItem, paramString2));
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/* 1399 */     paramADSABRSTATUS.addDebug("getDIVISIONÃ©âÂ¿Ã¦Â¶â¢Ã§âÂ±nd");
+/* 1400 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getMACHTYPEATR(EntityItem paramEntityItem, String paramString1, String paramString2, ADSABRSTATUS paramADSABRSTATUS) throws MiddlewareRequestException, SQLException, MiddlewareException {
+/* 1415 */     String str = "";
+/* 1416 */     if (paramString1.equals("PRODSTRUCT") || paramString1.equals("SWPRODSTRUCT")) {
+/*      */       
+/* 1418 */       EntityItem entityItem = null;
+/* 1419 */       EntityList entityList = getEntityList(paramEntityItem, paramString1, paramADSABRSTATUS);
+/*      */       
+/* 1421 */       EntityGroup entityGroup = entityList.getEntityGroup("MODEL");
+/* 1422 */       paramADSABRSTATUS.addDebug("mdlGrp=" + entityGroup);
+/* 1423 */       EntityItem[] arrayOfEntityItem = null;
+/* 1424 */       if (entityGroup != null) arrayOfEntityItem = entityGroup.getEntityItemsAsArray(); 
+/* 1425 */       for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/* 1426 */         EntityItem entityItem1 = arrayOfEntityItem[b];
+/* 1427 */         if (entityItem1 != null && "MODEL".equals(entityItem1.getEntityType())) {
+/* 1428 */           entityItem = entityItem1;
+/*      */           break;
+/*      */         } 
+/*      */       } 
+/* 1432 */       if (entityItem != null) {
+/* 1433 */         if (paramString2.equals("MODELATR")) {
+/* 1434 */           str = convertValue(PokUtils.getAttributeValue(entityItem, paramString2, "", null, false));
+/*      */         } else {
+/* 1436 */           str = convertValue(PokUtils.getAttributeFlagValue(entityItem, paramString2));
+/*      */         } 
+/*      */         
+/* 1439 */         paramADSABRSTATUS.addDebug("get model attrcode=" + paramString2 + "modelItem =" + entityItem.getEntityID() + ";attrvalue=" + str);
+/*      */       } 
+/*      */     } else {
+/* 1442 */       str = "";
+/*      */     } 
+/* 1444 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getENDOFSVC(EntityItem paramEntityItem, String paramString1, String paramString2, ADSABRSTATUS paramADSABRSTATUS) throws MiddlewareRequestException, SQLException, MiddlewareException {
+/* 1459 */     String str = "@@@";
+/* 1460 */     if (paramString1.equals("REFOFERFEAT")) {
+/*      */       
+/* 1462 */       EntityList entityList = getEntityList(paramEntityItem, paramString1, paramADSABRSTATUS);
+/* 1463 */       EntityGroup entityGroup = entityList.getEntityGroup("REFOFER");
+/* 1464 */       EntityItem[] arrayOfEntityItem = null;
+/* 1465 */       if (entityGroup != null) arrayOfEntityItem = entityGroup.getEntityItemsAsArray();
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1477 */       if (arrayOfEntityItem != null) {
+/* 1478 */         this.isVaildREFOFERFEAT = true;
+/* 1479 */         String str1 = "";
+/* 1480 */         for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/* 1481 */           EntityItem entityItem = arrayOfEntityItem[b];
+/* 1482 */           if (entityItem != null && "REFOFER".equals(entityItem.getEntityType())) {
+/* 1483 */             str1 = convertValue(PokUtils.getAttributeValue(entityItem, "ENDOFSVC", "", null, false));
+/* 1484 */             if (str.equals("@@@")) {
+/* 1485 */               str = str1;
+/*      */             }
+/* 1487 */             if ("".equals(str) || "".equals(str1)) {
+/* 1488 */               str = "@@@"; break;
+/*      */             } 
+/* 1490 */             if (str.compareTo(str1) <= 0)
+/*      */             {
+/* 1492 */               if (str.compareTo(str1) <= 0)
+/* 1493 */                 str = str1; 
+/*      */             }
+/*      */           } 
+/*      */         } 
+/*      */       } else {
+/* 1498 */         str = "";
+/* 1499 */         this.isVaildREFOFERFEAT = false;
+/*      */       } 
+/*      */     } else {
+/* 1502 */       str = "";
+/*      */     } 
+/* 1504 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityList getEntityList(EntityItem paramEntityItem, String paramString, ADSABRSTATUS paramADSABRSTATUS) throws SQLException, MiddlewareException, MiddlewareRequestException {
+/* 1517 */     if (this.mf_elist != null) {
+/* 1518 */       return this.mf_elist;
+/*      */     }
+/* 1520 */     String str = "ADF" + paramString;
+/* 1521 */     Database database = paramADSABRSTATUS.getDB();
+/* 1522 */     Profile profile = paramADSABRSTATUS.getProfile();
+/* 1523 */     this.mf_elist = database.getEntityList(profile, new ExtractActionItem(null, database, profile, str), new EntityItem[] { new EntityItem(null, profile, paramEntityItem
+/*      */             
+/* 1525 */             .getEntityType(), paramEntityItem.getEntityID()) });
+/*      */     
+/* 1527 */     return this.mf_elist;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getFCTYPE(EntityItem paramEntityItem, String paramString1, String paramString2, ADSABRSTATUS paramADSABRSTATUS) throws MiddlewareRequestException, SQLException, MiddlewareException {
+/* 1542 */     String str1 = "";
+/* 1543 */     EntityItem entityItem = null;
+/* 1544 */     EntityList entityList = getEntityList(paramEntityItem, paramString1, paramADSABRSTATUS);
+/*      */     
+/* 1546 */     String str2 = paramString1.equals("PRODSTRUCT") ? "FEATURE" : "SWFEATURE";
+/*      */     
+/* 1548 */     EntityGroup entityGroup = entityList.getEntityGroup(str2);
+/* 1549 */     EntityItem[] arrayOfEntityItem = null;
+/* 1550 */     if (entityGroup != null) arrayOfEntityItem = entityGroup.getEntityItemsAsArray(); 
+/* 1551 */     for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/* 1552 */       EntityItem entityItem1 = arrayOfEntityItem[b];
+/* 1553 */       if (entityItem1 != null && str2.equals(entityItem1.getEntityType())) {
+/* 1554 */         entityItem = entityItem1;
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/* 1558 */     if (entityItem != null) {
+/* 1559 */       str1 = convertValue(PokUtils.getAttributeFlagValue(entityItem, "FCTYPE"));
+/*      */     }
+/* 1561 */     return str1;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getCOFMODEL(EntityItem paramEntityItem, String paramString1, String paramString2, ADSABRSTATUS paramADSABRSTATUS) throws MiddlewareRequestException, SQLException, MiddlewareException {
+/* 1574 */     String str = "";
+/* 1575 */     EntityItem entityItem = null;
+/* 1576 */     if (paramString1.equals("LSEO")) {
+/* 1577 */       EntityList entityList = getEntityList(paramEntityItem, paramString1, paramADSABRSTATUS);
+/*      */       
+/* 1579 */       EntityGroup entityGroup = entityList.getEntityGroup("MODEL");
+/* 1580 */       paramADSABRSTATUS.addDebug("mdlGrp=" + entityGroup);
+/* 1581 */       EntityItem[] arrayOfEntityItem = null;
+/* 1582 */       if (entityGroup != null) arrayOfEntityItem = entityGroup.getEntityItemsAsArray(); 
+/* 1583 */       for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/* 1584 */         EntityItem entityItem1 = arrayOfEntityItem[b];
+/* 1585 */         if (entityItem1 != null && "MODEL".equals(entityItem1.getEntityType())) {
+/* 1586 */           entityItem = entityItem1;
+/*      */           break;
+/*      */         } 
+/*      */       } 
+/* 1590 */       if (entityItem != null) {
+/* 1591 */         str = convertValue(PokUtils.getAttributeFlagValue(entityItem, paramString2));
+/*      */       }
+/*      */     } else {
+/*      */       
+/* 1595 */       str = convertValue(PokUtils.getAttributeFlagValue(paramEntityItem, paramString2));
+/*      */     } 
+/* 1597 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getSPECBID(EntityItem paramEntityItem, String paramString1, String paramString2, ADSABRSTATUS paramADSABRSTATUS) throws MiddlewareRequestException, SQLException, MiddlewareException {
+/* 1610 */     String str = "";
+/* 1611 */     if (paramString1.equals("LSEO")) {
+/*      */       
+/* 1613 */       EntityItem entityItem = null;
+/* 1614 */       EntityList entityList = getEntityList(paramEntityItem, paramString1, paramADSABRSTATUS);
+/*      */       
+/* 1616 */       EntityGroup entityGroup = entityList.getEntityGroup("WWSEO");
+/* 1617 */       paramADSABRSTATUS.addDebug("mdlGrp=" + entityGroup);
+/* 1618 */       EntityItem[] arrayOfEntityItem = null;
+/* 1619 */       if (entityGroup != null) arrayOfEntityItem = entityGroup.getEntityItemsAsArray(); 
+/* 1620 */       for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/* 1621 */         EntityItem entityItem1 = arrayOfEntityItem[b];
+/* 1622 */         if (entityItem1 != null && "WWSEO".equals(entityItem1.getEntityType())) {
+/* 1623 */           entityItem = entityItem1;
+/*      */           break;
+/*      */         } 
+/*      */       } 
+/* 1627 */       if (entityItem != null) {
+/* 1628 */         str = convertValue(PokUtils.getAttributeFlagValue(entityItem, paramString2));
+/*      */       }
+/*      */     } else {
+/*      */       
+/* 1632 */       str = convertValue(PokUtils.getAttributeFlagValue(paramEntityItem, paramString2));
+/*      */     } 
+/* 1634 */     return str;
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   public boolean checkIDLMQPropertiesFN(EntityItem paramEntityItem) {
+/* 1639 */     String str = PokUtils.getAttributeFlagValue(paramEntityItem, this.attrXMLABRPROPFILE);
+/* 1640 */     return (str != null);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public Vector getPeriodicMQ(EntityItem paramEntityItem) {
+/* 1649 */     Vector<String> vector = new Vector();
+/* 1650 */     String str1 = convertValue(PokUtils.getAttributeFlagValue(paramEntityItem, this.attrXMLABRPROPFILE));
+/* 1651 */     StringTokenizer stringTokenizer = new StringTokenizer(str1, "|");
+/* 1652 */     String str2 = "";
+/* 1653 */     while (stringTokenizer.hasMoreTokens()) {
+/* 1654 */       str2 = stringTokenizer.nextToken();
+/* 1655 */       vector.add(str2);
+/*      */     } 
+/* 1657 */     if (vector.size() == 0) vector = null; 
+/* 1658 */     return vector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public boolean createXML(EntityItem paramEntityItem) {
+/* 1667 */     return true;
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   public XMLElem getXMLMap() {
+/* 1672 */     return null;
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   public String getVeName() {
+/* 1677 */     return "dummy";
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   public String getVeName2() {
+/* 1682 */     return "dummy";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getRoleCode() {
+/* 1688 */     return "BHFEED";
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   public String getStatusAttr() {
+/* 1693 */     return "";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getVersion() {
+/* 1706 */     return "";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void processThis(ADSABRSTATUS paramADSABRSTATUS, Profile paramProfile1, Profile paramProfile2, EntityItem paramEntityItem) throws SQLException, MiddlewareException, ParserConfigurationException, RemoteException, EANBusinessRuleException, MiddlewareShutdownInProgressException, IOException, TransformerException, MissingResourceException {}
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected Connection setupConnection() throws SQLException {
+/*      */     try {
+/* 1733 */       Connection connection = DriverManager.getConnection(
+/* 1734 */           MiddlewareServerProperties.getPDHDatabaseURL(), 
+/* 1735 */           MiddlewareServerProperties.getPDHDatabaseUser(), 
+/* 1736 */           AES256Utils.decrypt(MiddlewareServerProperties.getPDHDatabasePassword()));
+/* 1737 */       connection.setAutoCommit(false);
+/* 1738 */       return connection;
+/* 1739 */     } catch (SQLException sQLException) {
+/*      */       
+/* 1741 */       throw sQLException;
+/* 1742 */     } catch (Exception exception) {
+/*      */       
+/* 1744 */       exception.printStackTrace();
+/*      */       
+/* 1746 */       return null;
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void closeConnection(Connection paramConnection) throws SQLException {
+/* 1757 */     if (paramConnection != null) {
+/*      */       try {
+/* 1759 */         paramConnection.rollback();
+/*      */       }
+/* 1761 */       catch (Throwable throwable) {
+/* 1762 */         System.err.println("XMLMQAdapter.closeConnection(), unable to rollback. " + throwable);
+/*      */       } finally {
+/*      */         
+/* 1765 */         paramConnection.close();
+/* 1766 */         paramConnection = null;
+/*      */       } 
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void mergeLists(ADSABRSTATUS paramADSABRSTATUS, EntityList paramEntityList1, EntityList paramEntityList2) throws SQLException, MiddlewareException, MiddlewareRequestException, MiddlewareShutdownInProgressException {}
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean checkModelVaild(EntityItem paramEntityItem, ADSABRSTATUS paramADSABRSTATUS) throws SQLException {
+/* 1801 */     boolean bool = false;
+/* 1802 */     String str1 = paramEntityItem.getEntityType();
+/* 1803 */     if (!"MODEL".equals(str1)) {
+/* 1804 */       return true;
+/*      */     }
+/* 1806 */     String str2 = " select count(*) as count from opicm.filter_model where \r\n (cofcat=? or cofcat='*') and                         \r\n (cofsubcat=? or cofsubcat='*') and                   \r\n (cofgrp=? or cofgrp='*') with ur                     \r\n";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1811 */     ResultSet resultSet = null;
+/* 1812 */     Connection connection = null;
+/* 1813 */     PreparedStatement preparedStatement = null;
+/* 1814 */     int i = 0;
+/*      */     try {
+/* 1816 */       connection = setupConnection();
+/* 1817 */       preparedStatement = connection.prepareStatement(str2);
+/* 1818 */       preparedStatement.setString(1, convertValue(PokUtils.getAttributeFlagValue(paramEntityItem, "COFCAT")));
+/* 1819 */       preparedStatement.setString(2, convertValue(PokUtils.getAttributeFlagValue(paramEntityItem, "COFSUBCAT")));
+/* 1820 */       preparedStatement.setString(3, convertValue(PokUtils.getAttributeFlagValue(paramEntityItem, "COFGRP")));
+/* 1821 */       resultSet = preparedStatement.executeQuery();
+/* 1822 */       if (resultSet.next()) {
+/* 1823 */         i = resultSet.getInt("count");
+/* 1824 */         if (i > 0) {
+/* 1825 */           bool = true;
+/*      */         } else {
+/* 1827 */           bool = false;
+/*      */         } 
+/*      */       } 
+/*      */     } finally {
+/*      */       try {
+/* 1832 */         if (preparedStatement != null) {
+/* 1833 */           preparedStatement.close();
+/* 1834 */           preparedStatement = null;
+/*      */         } 
+/* 1836 */       } catch (Exception exception) {
+/* 1837 */         paramADSABRSTATUS.addDebug("getPriced unable to close statement. " + exception);
+/*      */       } 
+/* 1839 */       if (resultSet != null) {
+/* 1840 */         resultSet.close();
+/*      */       }
+/* 1842 */       closeConnection(connection);
+/*      */     } 
+/* 1844 */     return bool;
+/*      */   }
+/*      */   
+/*      */   public abstract String getMQCID();
+/*      */ }
 
 
-import java.io.IOException;
-import java.rmi.RemoteException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.MissingResourceException;
-import java.util.StringTokenizer;
-import java.util.Vector;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import COM.ibm.eannounce.abr.util.ABRUtil;
-import COM.ibm.eannounce.abr.util.Constants;
-import COM.ibm.eannounce.abr.util.XMLElem;
-import COM.ibm.eannounce.objects.EANBusinessRuleException;
-import COM.ibm.eannounce.objects.EntityGroup;
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.eannounce.objects.EntityList;
-import COM.ibm.eannounce.objects.ExtractActionItem;
-import COM.ibm.eannounce.objects.SBRException;
-import COM.ibm.opicmpdh.middleware.Database;
-import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
-import COM.ibm.opicmpdh.middleware.MiddlewareServerProperties;
-import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
-import COM.ibm.opicmpdh.middleware.Profile;
-import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
-
-import com.ibm.eacm.AES256Utils;
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-/**********************************************************************************
-* base class for ADS feeds in ADSABRSTATUS abr
-*
-*/
-//$Log: XMLMQAdapter.java,v $
-//Revision 1.29  2019/03/08 06:53:58  xujianbo
-//Roll back again for the code for  Story 1909631 EACM XML version control by XSLT
-//
-//Revision 1.27  2019/02/26 07:18:09  xujianbo
-//roll back code for Story 1909631 EACM XML version control by XSLT
-//
-//Revision 1.23  2017/06/21 13:05:52  wangyul
-//1693242: EACM SPF Feed to PEP - Meta and Process Updates for Feature conversions and filtering support for shadow products
-//
-//Revision 1.22  2015/02/04 14:48:54  wangyul
-//RCQ00337765-RQ change the XML mapping to pull DIV from PROJ for Lenovo
-//
-//Revision 1.21  2014/01/07 13:03:00  guobin
-//fix throw null error , add more debug infor.
-//
-//Revision 1.20  2013/08/13 08:31:02  wangyulo
-//buid request for the RTC WI 986855 -- DIVISION FILTER FOR PRODUCT FEED
-//
-//Revision 1.19  2012/11/08 14:12:36  guobin
-//Ticket Number IN3037198 has been opened for the EACM Data Issue  add PDHDOMAIN as search condition
-//
-//Revision 1.18  2012/08/31 16:01:40  wangyulo
-//Fix the defect of  the New Sev 1 (126457) where another few FC sent only to WWPRT queue
-//
-//Revision 1.17  2011/12/14 02:27:31  guobin
-//update country filter for service LSEO
-//
-//Revision 1.16  2011/10/26 08:05:36  guobin
-// Final é–¿ç‡‚æ‹· support for old data é–¿ç‡‚æ‹· CQ 67890  Changed to handle offerings that have an AVAIL left in Draft where the data is older than é–¿ç‡‚æ‹·2010-03-01é–¿ç‡‚æ‹·.
-//
-//Revision 1.15  2011/10/17 13:45:39  guobin
-//Support both 0.5 and 1.0 XML together  (BH FS ABR Data Transformation System Feed 20110914.doc)
-//
-//Revision 1.14  2011/09/26 08:33:05  guobin
-//update the filter for REFOFER and REFOFERFEAT entity
-//
-//Revision 1.13  2011/09/08 07:45:16  guobin
-//add for REFOFER & REFOFERFEAT ADS ABR
-//
-//Revision 1.12  2011/07/06 13:35:37  guobin
-//Expand XMLSTATUS filter to other entities - pages 12 and 19
-//some entitys need to add the XMLSTATUS for the country filter.
-//XMLMQAdapter.java has undated and need to check into CVS.
-//Nancy approved.
-//
-//Revision 1.11  2011/07/05 14:04:55  guobin
-//Expand XMLSTATUS filter to other entities
-//XMLMQAdapter.java has undated and need to check into CVS
-//Nancy approved
-//
-//Revision 1.10  2011/06/28 07:58:56  guobin
-// Build request - update country filter according to latest spec
-//1. Expand FCTYPE filter to other entities - pages 12 and 18
-//XMLMQAdapter.java has undated and need to check into CVS
-//Approved by Fred
-//
-//Revision 1.9  2011/06/13 14:08:22  guobin
-//add the MOELATR for MODELCONVERT and FCTRANSACTION
-//
-//Revision 1.8  2011/06/01 02:19:08  guobin
-//change the country filter
-//
-// Revision 1.2  2008/04/29 14:29:11  wendy
-// Add CID support
-//
-// Revision 1.1  2008/04/25 12:11:37  wendy
-// Init for
-//  -   CQ00003539-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC
-//  -   CQ00005096-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Add Category MM and Images
-//  -   CQ00005046-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Support CRAD in BHC
-//  -   CQ00005045-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Upgrade/Conversion Support
-//  -   CQ00006862-WI  - BHC 3.0 Support - Support for Services Data UI
-//
-//
-public abstract class XMLMQAdapter implements XMLMQ, Constants
-{
-	protected static final Hashtable ADSTYPES_TBL;	
-	/**
-	 * ADSTYPE for PeriodicABR
-	 */
-	private static final boolean isDebug = true;
-	private boolean isVaildREFOFERFEAT = true;
-	private boolean isService = false;
-	protected static final String CHEAT ="@@@";
-	protected static boolean isFilterWWCOMPAT = false;
-	protected Hashtable wwcompMQTable = new Hashtable();
-	private String attrXMLABRPROPFILE ="XMLABRPROPFILE";
-	private Profile _swProfile = null;
-	protected static final String KEY_SETUPArry = "SETUPARRAY";
-	private EntityList mf_elist = null;
-	static {
-		ADSTYPES_TBL = new Hashtable();
-		ADSTYPES_TBL.put("20","GENERALAREA");//need use 'GENERALAREA' to compare with XMLENTITYTYPE attribute of EXTXMLFEED 
-		ADSTYPES_TBL.put("30","Deletes");
-		ADSTYPES_TBL.put("40","XLATE");
-		ADSTYPES_TBL.put("50","WWCOMPAT");
-	}
-	/********************************************************
-	 * Do for CR 32199 - Country Filter for EACM product data
-	 * ******************************************************
-	 */
-	private static final Hashtable FILTER_TBL;	//Entity and filter Attributes for ADSIDLSTATUS
-	static{
-		FILTER_TBL = new Hashtable();
-		
-        //they must be in ATTRCODE format 
-		FILTER_TBL.put("FEATURE", new String[]{"STATUS","FCTYPE","COUNTRYLIST","PDHDOMAIN"});
-		FILTER_TBL.put("MODEL", new String[]{"STATUS","SPECBID","COFCAT","COFSUBCAT","COFGRP","COFSUBGRP","COUNTRYLIST","FLFILSYSINDC","PDHDOMAIN","DIVTEXT","OLDINDC"});
-		FILTER_TBL.put("SVCMOD", new String[]{"STATUS","SVCMODCATG","SVCMODGRP","SVCMODSUBCATG","SVCMODSUBGRP","COUNTRYLIST","PDHDOMAIN","DIVTEXT"});
-		FILTER_TBL.put("LSEOBUNDLE", new String[]{"STATUS","SPECBID","BUNDLETYPE","COUNTRYLIST","FLFILSYSINDC","PDHDOMAIN","DIVTEXT"});
-		FILTER_TBL.put("LSEO", new String[]{"STATUS","SPECBID","COFCAT","COFSUBCAT","COFGRP","COFSUBGRP","COUNTRYLIST","FLFILSYSINDC","PDHDOMAIN","DIVTEXT"});
-		
-		FILTER_TBL.put("PRODSTRUCT",   new String[]{"STATUS","FCTYPE","MACHTYPEATR","MODELATR","COUNTRYLIST","FLFILSYSINDC","PDHDOMAIN","OLDINDC"});
-		FILTER_TBL.put("SWPRODSTRUCT", new String[]{"STATUS","FCTYPE","MACHTYPEATR","MODELATR","COUNTRYLIST","PDHDOMAIN"});
-		//MACHTYPEATR used for TOMACHTYPE T, WTHDRWEFFCTVDATE will be on the MODEL
-		FILTER_TBL.put("MODELCONVERT",  new String[]{"STATUS","MACHTYPEATR","MODELATR","COUNTRYLIST","PDHDOMAIN"});
-		FILTER_TBL.put("FCTRANSACTION", new String[]{"STATUS","MACHTYPEATR","MODELATR","PDHDOMAIN"});		
-		FILTER_TBL.put("IMG", new String[]{"STATUS","COUNTRYLIST","PDHDOMAIN"});
-		
-		// need add the FLFILSYSINDC attribute of CATNAV
-		FILTER_TBL.put("CATNAV", new String[]{"STATUS","FLFILSYSINDC"});//no domains no FLFILSYSINDC		
-		FILTER_TBL.put("SWFEATURE", new String[]{"STATUS","FCTYPE","PDHDOMAIN"});		
-		FILTER_TBL.put("GBT", new String[]{"STATUS"});
-		FILTER_TBL.put("REVUNBUNDCOMP", new String[]{"STATUS"});
-		FILTER_TBL.put("SLEORGNPLNTCODE", new String[]{"STATUS"});
-		
-		
-		FILTER_TBL.put("SVCLEV", new String[]{"STATUS"});
-		FILTER_TBL.put("WARR", new String[]{"STATUS"});
-		//isPeriodicABR
-		FILTER_TBL.put("WWCOMPAT", 	new String[]{"BRANDCD"}); //WWCOMPAT doesnt exist
-		//XLATE
-		//GENAREA
-		
-		//new add REFOFER and REFOFERFEAT
-		FILTER_TBL.put("REFOFER",new String[]{"STATUS","COUNTRYLIST","ENDOFSVC","DCG"});
-		FILTER_TBL.put("REFOFERFEAT",new String[]{"STATUS","COUNTRYLIST","ENDOFSVC"});
-		//new add REFOFER and REFOFERFEAT end
-		
-		FILTER_TBL.put("SWSPRODSTRUCT", new String[]{"STATUS"});
-	}
-	private static final String XMLSTATUS = "XMLSTATUS";
-	
-	/**********************************
-    * get the name(s) of the MQ properties file to use
-    */
-	// RQK Change this to pass in root entity
-	// change to get mq propfile names from attribute on root entity
-	// if attribute does not exist then use ADSMQSERIES. Return Vector 
-	// *** it will not call by other java class ***
-    public Vector getMQPropertiesFN(EntityItem rootEntity,ADSABRSTATUS abr) { 
-    	abr.addDebug("countryfilter start");
-    	String val = PokUtils.getAttributeFlagValue(rootEntity, attrXMLABRPROPFILE);
-    	Vector vct = new Vector();    	
-    	if (val != null) {
-    		// parse the string into substrings    	        
-    	    StringTokenizer st = new StringTokenizer(val,PokUtils.DELIMITER);    	           
-    	    while(st.hasMoreTokens())
-            {
-    	        vct.addElement(st.nextToken());
-            }                       	        
-    	} 	
-    	
-    	Vector mqVctFilter = new Vector();
-    	try {
-			mqVctFilter = getMQPropertiesFilter(rootEntity,abr);
-		} catch (Exception e) {
-			abr.addDebug("getMQPropertiesFN error="+e.getMessage());
-			e.printStackTrace();
-		}
-		/**
-		 * If after processing all of the referenced REFOFER 
-		 * there are no instances of <RELATEDREFOFERELEMENT>,
-		 * then do not send the XML
-		 * use isVaildREFOFERFEAT to check it
-		 */
-		if(isVaildREFOFERFEAT == false){
-			return new Vector();
-		}
-		
-		addAllMq(vct,mqVctFilter,abr);
-		
-		if(vct.size()==0)
-		{
-			//default queue
-			vct.add(ADSABRSTATUS.ADSMQSERIES);	
-		}
-		
-		abr.addDebug("countryfilter end");
-        return vct;
-    }
-    /**
-     * get the MQ properties file to use for Version0.5 and Version1.0
-     * @throws SQLException 
-     * @throws Exception 
-     */
-    public Hashtable getMQPropertiesVN(EntityItem rootEntity,ADSABRSTATUS abr) throws SQLException ,MiddlewareException{ 
-    	abr.addDebug("countryfilter start");
-    	String val = PokUtils.getAttributeFlagValue(rootEntity, attrXMLABRPROPFILE);
-    	Vector vct = new Vector();    	
-    	if (val != null && rootEntity.getEntityType().equals("ADSXMLSETUP")) {
-    		// parse the string into substrings    	        
-    	    StringTokenizer st = new StringTokenizer(val,PokUtils.DELIMITER);    	           
-    	    while(st.hasMoreTokens())
-            {
-    	        vct.addElement(st.nextToken());
-            }                       	        
-    	}    	
-    	Hashtable mqTable = new Hashtable();
-    	//start to check the special filtering of MODEL based on classification attributes.
-    	boolean isVaildModel = true;
-    	try {
-			isVaildModel = checkModelVaild(rootEntity,abr);
-		} catch (SQLException e1) {
-			abr.addDebug("getMQPropertiesVN error="+e1.getMessage());
-			e1.printStackTrace();
-			throw e1;
-		}    	
-    	if(!isVaildModel) {
-    		abr.addOutput("Data is not valid for filter of MODEL based on classification attributes (COFCAT,COFSUBCAT,COFGRP) ");
-    		return mqTable;
-    	} 
-    	//End the check for model
-    	
-    	try {
-    		mqTable = getMQPropertiesFilterVN(rootEntity,abr,vct);
-    		
-    		// shadow filter
-    		mqTable = shadowFilter(rootEntity, abr, mqTable);
-		} catch (Exception e) {
-			if(e instanceof SBRException){
-				SBRException sbrException = (SBRException) e;
-				abr.addError("getMQPropertiesVN error=" + sbrException.toString());				
-				e.printStackTrace();
-				MiddlewareException ex=  new MiddlewareException("getMQPropertiesVN error="+sbrException.toString());
-				throw ex;
-			} else{
-				abr.addError("getMQPropertiesVN error="+e.getMessage());				
-				e.printStackTrace();
-				MiddlewareException ex=  new MiddlewareException("getMQPropertiesVN error="+e.getMessage());
-				throw ex;
-			}
-		} finally{
-			if (mf_elist != null){				
-				mf_elist = null;
-			}
-		}
-		return mqTable;
-    }
-    
-    /**
-     * 1693242: EACM SPF Feed to PEP - Meta and Process Updates for Feature conversions and filtering support for shadow products
-     * When we send xml to downstream,
-     * for MODEL if MODEL.COFSUBCAT=Shadow
-     * for FCTRANSACTION if FCTRANSACTION.FTSUBCAT=Shadow
-     * then we don't send xml to any downstream except PEP
-     * 
-     * @param rootEntity - Root entity for the ADSABRSATUS
-     * @param mqTable - MQ map for version 1.0
-     * return - Matched MQ map
-     */
-	private Hashtable shadowFilter(EntityItem rootEntity, ADSABRSTATUS abr, Hashtable mqTable) {
-		boolean isShadowFilter = false;
-		// we just send 10 version currently
-		String version10 = "10";
-		Vector mqVct = (Vector)mqTable.get(version10);
-		Hashtable matchedMqTable = new Hashtable();
-		Vector mq10Vct = new Vector();
-		matchedMqTable.put(version10, mq10Vct);
-		matchedMqTable.put(KEY_SETUPArry, mqTable.get(KEY_SETUPArry));
-		String attrValue = null;
-		if (rootEntity.getEntityType().equals("MODEL")) {
-			attrValue = PokUtils.getAttributeValue(rootEntity, "COFSUBCAT", "|", "");
-			abr.addDebug("shadowFilter MODEL.COFSUBCAT=" + attrValue);
-		} else if (rootEntity.getEntityType().equals("FCTRANSACTION")) {
-			attrValue = PokUtils.getAttributeValue(rootEntity, "FTSUBCAT", "|", "");
-			abr.addDebug("shadowFilter FCTRANSACTION.FTSUBCAT=" + attrValue);
-		}
-		if ("Shadow".equals(attrValue)) {
-			isShadowFilter = true;
-			abr.addDebug("shadowFilter isShadowFilter=" + isShadowFilter);
-			String shadowFilterStr = ABRServerProperties.getValue("ADSABRSTATUS", "_shadow_filter");
-			if (shadowFilterStr != null && shadowFilterStr.length() > 0) {
-				abr.addDebug("shadowFilter ADSABRSTATUS_shadow_filter=" + shadowFilterStr);
-	    		String[] shadowFilterMQs = shadowFilterStr.trim().split(",");
-	    		abr.addDebug("shadowFilter found " + shadowFilterMQs.length + " configs from file");
-	    		for (int i = 0; i < shadowFilterMQs.length; i++) {
-	    			String mq = shadowFilterMQs[i].trim();
-	    			if (mqVct != null && mqVct.contains(mq)) {
-	    				mq10Vct.add(mq);
-	    			}
-	    		}
-	    	} else {
-	    		abr.addDebug("shadowFilter not found in abr.server.properties for ADSABRSTATUS");
-	    	}
-		}
-
-    	if (isShadowFilter) {
-    		Vector matchedMqVct = (Vector)matchedMqTable.get(version10);
-    		if (matchedMqVct.size() > 0) {
-        		// generate a message show in report, tell the user shadow filter info
-        		StringBuffer sb = new StringBuffer();
-        		sb.append("There is a shadow filter matched, the original MQ:");
-        		for (int i = 0; i < mqVct.size(); i++) {
-        			sb.append(" ");
-        			sb.append((String)mqVct.get(i));
-        		}
-        		sb.append(", we will only send to MQ:");
-        		for (int i = 0; i < matchedMqVct.size(); i++) {
-        			sb.append(" ");
-        			sb.append((String)matchedMqVct.get(i));
-        		}
-        		abr.addOutput(sb.toString());
-    		} else {
-    			abr.addOutput("The " + rootEntity.getKey() + " matched shadow filter, but not found matched MQ.");
-    		}
-    		return matchedMqTable;
-    	}
-    	return mqTable;
-    }
-    
-    /**
-     * add the mq and the filter mq together
-     * @param mqVct
-     * @param mqVctFilter
-     * @param abr
-     */
-	private void addAllMq(Vector vct, Vector mqVctFilter,ADSABRSTATUS abr) {
-		String mqFileName = "";
-    	for(int i=0;i<mqVctFilter.size();i++){
-    		mqFileName = (String)mqVctFilter.get(i);
-    		if(!vct.contains(mqFileName)){
-    			vct.add(mqFileName);
-    		}
-    	}
-    	if(XMLMQAdapter.isDebug){
-    		for(int i=0;i<vct.size();i++){
-    			abr.addDebug("Print MQ["+i+"]= "+vct.get(i));
-    		}
-    	}
-	}
-    /**
-     * get the entity according the entityid and entitytype
-     * @param dbCurrent
-     * @param item
-     * @return
-     * @throws MiddlewareRequestException
-     * @throws SQLException
-     * @throws MiddlewareException
-     */
-    private EntityItem getEntityItem(Database dbCurrent, EntityItem item) throws MiddlewareRequestException, SQLException, MiddlewareException {
-	   	 EntityList m_elist = dbCurrent.getEntityList(_swProfile,
-	                new ExtractActionItem(null, dbCurrent, _swProfile,"dummy"),
-	                new EntityItem[] { new EntityItem(null, _swProfile, item.getEntityType(), item.getEntityID()) });
-	   	 EntityItem rootEntity  = m_elist.getParentEntityGroup().getEntityItem(0);	   	    	 
-	   	 return rootEntity;
-	} 
-    /**
-     * convert the null to blank to escape the nullpointer exception
-     * @param fromValue
-     * @return
-     */
-    private String convertValue(String fromValue){
-    	return fromValue==null?"":fromValue;
-    }
-    /**
-     * set the attribute value from the root entity to the rootTable
-     * setRoot entity
-     * @param rootItem
-     * @param rootTable
-     * @param abr
-     * @throws MiddlewareRequestException
-     * @throws SQLException
-     * @throws MiddlewareException
-     */
-    private void setRootEntity(EntityItem rootItem,Hashtable rootTable,ADSABRSTATUS abr) 
-    throws MiddlewareRequestException, SQLException, MiddlewareException{
-    	String rootEntityType = rootItem.getEntityType();
-    	String filters[] = (String[])FILTER_TBL.get(rootEntityType);
-    	
-		String attrvalue ="";
-    	for (int i=0; i<filters.length; i++){
-			String attrcode = filters[i];			
-			if(attrcode.equals("FCTYPE")){
-				if(rootEntityType.equals("PRODSTRUCT")||rootEntityType.equals("SWPRODSTRUCT")){
-					attrvalue = getFCTYPE(rootItem, rootEntityType, attrcode, abr);
-				}else{
-					attrvalue = convertValue(PokUtils.getAttributeFlagValue(rootItem, attrcode));
-				}				
-				rootTable.put(attrcode, attrvalue);
-			}else if(attrcode.equals("STATUS")||attrcode.equals("BUNDLETYPE")
-					 ||attrcode.equals("SVCMODCATG")||attrcode.equals("SVCMODGRP")
-					 ||attrcode.equals("SVCMODSUBCATG")||attrcode.equals("SVCMODSUBGRP")
-					 ||attrcode.equals("FLFILSYSINDC")||attrcode.equals("PDHDOMAIN")){
-				attrvalue = convertValue(PokUtils.getAttributeFlagValue(rootItem, attrcode));
-				rootTable.put(attrcode, attrvalue);
-			}else if(attrcode.equals("COFCAT")||attrcode.equals("COFSUBCAT")
-					||attrcode.equals("COFGRP")||attrcode.equals("COFSUBGRP")){
-				if(rootEntityType.equals("MODEL")){
-					attrvalue = convertValue(PokUtils.getAttributeFlagValue(rootItem, attrcode));					
-				}else{
-					//LSEO WWSEOLSEO-u: MODELWWESO-u	MODEL	COFCAT
-					attrvalue = getCOFMODEL(rootItem, rootEntityType, attrcode, abr);
-				}
-				if(attrcode.equals("COFCAT")){
-					if(attrvalue.equals("102")){
-						isService = true;
-					}
-				}
-				rootTable.put(attrcode, attrvalue);
-			} else if(attrcode.equals("SPECBID")){
-				attrvalue = convertValue(getSPECBID(rootItem, rootEntityType, attrcode, abr));
-				rootTable.put(attrcode, attrvalue);
-			} else if(attrcode.equals("MACHTYPEATR")){
-				//MACHTYPEATR is used to filter on TOMACHTYPE for MODELCONVERT and FCTRANSACTION
-				if(rootEntityType.equals("MODELCONVERT")||rootEntityType.equals("FCTRANSACTION")){
-					attrvalue = convertValue(PokUtils.getAttributeValue(rootItem, "TOMACHTYPE", "", null, false));
-				}else{
-					//PRODSTRUCT-d	MODEL	MACHTYPEATR
-					attrvalue = getMACHTYPEATR(rootItem, rootEntityType, attrcode,abr);									
-				}
-				rootTable.put(attrcode, attrvalue);
-			} else if(attrcode.equals("MODELATR")){
-				//MODELATR is used to filter on TOMODEL for MODELCONVERT and FCTRANSACTION
-				//Does MODELATR attribute support to filter on MODELCONVERT and FCTRANSACTION entity ? 
-				//Wayne: No
-				//attrvalue = PokUtils.getAttributeValue(rootItem, attrcode, "", null, false);//TEXT
-				if(rootEntityType.equals("MODELCONVERT")||rootEntityType.equals("FCTRANSACTION")){
-					attrvalue = getMACHTYPEATR(rootItem, rootEntityType, "TOMODEL",abr);
-				}else{
-					attrvalue = getMACHTYPEATR(rootItem, rootEntityType, attrcode,abr);
-				}
-				
-				rootTable.put(attrcode, attrvalue);
-			} else if(attrcode.equals("COUNTRYLIST")){
-				attrvalue = convertValue(getCOUNTRYLIST(rootItem, rootEntityType, attrcode,abr));
-				rootTable.put(attrcode, attrvalue);
-			} else if(attrcode.equals("ENDOFSVC")){
-				if(rootEntityType.equals("REFOFER")){
-					attrvalue = convertValue(PokUtils.getAttributeValue(rootItem, attrcode, "", null, false));
-				}else if(rootEntityType.equals("REFOFERFEAT")){
-					attrvalue = getENDOFSVC(rootItem, rootEntityType, attrcode, abr);
-				}
-				rootTable.put(attrcode, attrvalue);
-			}
-			// 2013-07-29 RCQ00255719 - filter feed by Division
-			else if(attrcode.equals("DIVTEXT")){
-				attrvalue = getDIVISION(rootItem, rootEntityType, "DIV", abr);				
-				rootTable.put(attrcode, attrvalue);				
-			}else if(attrcode.equals("DCG")){
-				if(rootEntityType.equals("REFOFER")){
-					attrvalue = convertValue(PokUtils.getAttributeValue(rootItem, attrcode, "", null, false));
-				}			
-				rootTable.put(attrcode, attrvalue);				
-			}else if(attrcode.equals("OLDINDC")){
-				attrvalue = convertValue(PokUtils.getAttributeValue(rootItem, attrcode, "", null, false));	
-				rootTable.put(attrcode, attrvalue);				
-			}
-		} 
-    	//print the rootItme filter information
- 		Iterator it = rootTable.keySet().iterator();
- 		while (it.hasNext()){
- 			String key =(String)it.next();
- 			abr.addDebug("rootTable:key=" + key + ";value=" + rootTable.get(key));
- 		}
-    }
-    // add pdhdomain as search attribute
-    
-    /**
-     * do search setup entity
-     * @param rootEntityType
-     * @param abr
-     * @return
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws ClassNotFoundException
-     * @throws MiddlewareBusinessRuleException
-     * @throws MiddlewareRequestException
-     * @throws SQLException
-     * @throws MiddlewareException
-     * @throws MiddlewareShutdownInProgressException
-     * @throws RemoteException
-     * @throws EANBusinessRuleException
-     * @throws IOException
-     */
-    
-    private EntityItem[] doSearch(String rootEntityType, String pdhdomain, ADSABRSTATUS abr) 
-    throws InstantiationException, IllegalAccessException, ClassNotFoundException, 
-           MiddlewareBusinessRuleException, MiddlewareRequestException, SQLException, 
-           MiddlewareException, MiddlewareShutdownInProgressException, RemoteException, 
-           EANBusinessRuleException, IOException{
-        /////////////////////////////////////////////////////////////////////////////////////////////////////
-		// get attribute of EXTXMLFEED Entitys
-		// search for the EXTXMLFEED by XMLSETUPTYPE='Production' and XMLENTITYTYPE='Root Entity Type'
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-		EntityItem[] EXTXMLFEEDArray = null;
-		//DOne need check with Rupal and Wayne
-		StringBuffer debugSb = new StringBuffer();
-		Database m_db = abr.getDB();
-		
-		String clsname = abr.getSimpleABRName(rootEntityType);
-		XMLMQ mqAbr = (XMLMQ) Class.forName(clsname).newInstance();
-		
-		Profile m_prof = null;
-				
-		m_prof = abr.switchRoles(mqAbr.getRoleCode());
-		setSwitchProfile(m_prof);
-		String searchAction ="SRDEXTXMLFEED";//Done need rupal set up it
-		String srchType = "EXTXMLFEED";
-		Vector attrVct = new Vector(); 
-		Vector valVct  = new Vector();
-		
-		attrVct.add("XMLENTITYTYPE");
-		attrVct.add("XMLSETUPTYPE");
-		attrVct.add("PDHDOMAIN");
-		valVct.add(rootEntityType);
-		valVct.add("Production");
-		valVct.add(pdhdomain);
-		
-		abr.addDebug("XMLENTITYTYPE2="+rootEntityType);
-		abr.addDebug("XMLSETUPTYPE2=Production");
-		try {
-			EXTXMLFEEDArray = ABRUtil.doSearch(m_db, m_prof, searchAction,srchType, false, attrVct, valVct, debugSb);
-				//doSearch(m_db, m_prof, searchAction,srchType, false, attrVct, valVct, debugSb,abr);
-			abr.addDebug("ABRUtil.doSearch with domain message:"+debugSb.toString());	
-		} catch (Exception e) {
-			abr.addDebug("ABRUtil.doSearch with domain error:"+debugSb.toString());
-			abr.addDebug("doSearch error="+e.getMessage());
-			e.printStackTrace();
-		}
-		abr.addDebug("EXTXMLFEEDArray="+EXTXMLFEEDArray.length);
-		return EXTXMLFEEDArray;
-		////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// search end
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////
-    }
-    
-
-	/**
-     * do search setup entity
-     * @param rootEntityType
-     * @param abr
-     * @return
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws ClassNotFoundException
-     * @throws MiddlewareBusinessRuleException
-     * @throws MiddlewareRequestException
-     * @throws SQLException
-     * @throws MiddlewareException
-     * @throws MiddlewareShutdownInProgressException
-     * @throws RemoteException
-     * @throws EANBusinessRuleException
-     * @throws IOException
-     */
-    private EntityItem[] doSearch(String rootEntityType, ADSABRSTATUS abr) 
-    throws InstantiationException, IllegalAccessException, ClassNotFoundException, 
-           MiddlewareBusinessRuleException, MiddlewareRequestException, SQLException, 
-           MiddlewareException, MiddlewareShutdownInProgressException, RemoteException, 
-           EANBusinessRuleException, IOException{
-        /////////////////////////////////////////////////////////////////////////////////////////////////////
-		// get attribute of EXTXMLFEED Entitys
-		// search for the EXTXMLFEED by XMLSETUPTYPE='Production' and XMLENTITYTYPE='Root Entity Type'
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-		EntityItem[] EXTXMLFEEDArray = null;
-		//DOne need check with Rupal and Wayne
-		StringBuffer debugSb = new StringBuffer();
-		Database m_db = abr.getDB();
-		
-		String clsname = abr.getSimpleABRName(rootEntityType);
-		XMLMQ mqAbr = (XMLMQ) Class.forName(clsname).newInstance();
-		
-		Profile m_prof = null;
-				
-		m_prof = abr.switchRoles(mqAbr.getRoleCode());
-		setSwitchProfile(m_prof);
-		String searchAction ="SRDEXTXMLFEED";//Done need rupal set up it
-		String srchType = "EXTXMLFEED";
-		Vector attrVct = new Vector(); 
-		Vector valVct  = new Vector();
-		
-		attrVct.add("XMLENTITYTYPE");
-		attrVct.add("XMLSETUPTYPE");
-		valVct.add(rootEntityType);
-		valVct.add("Production");
-		
-		abr.addDebug("XMLENTITYTYPE2="+rootEntityType);
-		abr.addDebug("XMLSETUPTYPE2=Production");
-		try {
-			EXTXMLFEEDArray = ABRUtil.doSearch(m_db, m_prof, searchAction,srchType, false, attrVct, valVct, debugSb);
-				//doSearch(m_db, m_prof, searchAction,srchType, false, attrVct, valVct, debugSb,abr);
-			abr.addDebug("ABRUtil.doSearch no domain message:"+debugSb.toString());	
-		} catch (Exception e) {
-			abr.addDebug("ABRUtil.doSearch no domain error:"+debugSb.toString());
-			abr.addDebug("doSearch error="+e.getMessage());
-			e.printStackTrace();
-		}
-		abr.addDebug("EXTXMLFEEDArray="+EXTXMLFEEDArray.length);
-		return EXTXMLFEEDArray;
-		////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// search end
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////
-    }
-    
-    public void setSwitchProfile(Profile swProfile){
-    	_swProfile = swProfile;
-    }
-    
-    /**
-     * setFilter 
-     * @param rootEntityType
-     * @param filterTable (This is the filter table for the setup entity)
-     * @param EXTXMLFEEDItem
-     * @throws MiddlewareException 
-     * @throws SQLException 
-     * @throws MiddlewareRequestException 
-     */
-    private void setFilterTable(String rootEntityType,  Hashtable filterTable, EntityItem EXTXMLFEEDItem, ADSABRSTATUS abr) 
-    throws MiddlewareRequestException, MiddlewareException{
-    	String filters[] = (String[])FILTER_TBL.get(rootEntityType);
-    	String attrcode ="";
-    	String attrvalue ="";
-		String fCOFCAT = "";
-		String fCOFSUBCAT = "";
-		String fCOFGRP = "";
-		String fCOFSUBGRP = "";
-		String FDCG = "";
-		
-		for (int i=0; i<filters.length; i++){
-    		attrcode = filters[i];
-    		abr.addDebug("attrcode="+attrcode);
-    		//2013-07-29 RCQ00255719 - filter feed by Division
-    		if(attrcode.equals("MODELATR")||attrcode.equals("ENDOFSVC")||attrcode.equals("DIVTEXT")){
-    			attrvalue = convertValue(PokUtils.getAttributeValue(EXTXMLFEEDItem, attrcode, "", null, false));
-    			filterTable.put(attrcode, attrvalue);
-    		}else if(attrcode.equals("STATUS")){
-    			//need put the same attributevalue and attributecode into the table for the comparation. 
-    			attrvalue = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,XMLSTATUS));
-    			if(attrvalue.equals("XSTATUS02")){
-    				attrvalue = "0020";
-    			}else{
-    				attrvalue = "";
-    			}
-    			filterTable.put(attrcode, attrvalue);
-    		}else if(attrcode.equals("DCG")){
-    			attrvalue = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,attrcode));
-    			if(attrcode.length()>0)
-    			filterTable.put(attrcode, attrvalue);
-    		}else{    			
-    			attrvalue = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,attrcode));
-    			filterTable.put(attrcode, attrvalue);
-    		}
-    	}
-		if(rootEntityType.equals("MODEL")||rootEntityType.equals("LSEO")){
-					
-			fCOFCAT    = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,"COFCAT"));
-			fCOFSUBCAT = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,"COFSUBCAT"));
-			fCOFGRP    = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,"COFGRP"));
-			fCOFSUBGRP = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,"COFSUBGRP"));
-			//If COFCAT = é–³ãƒ¦è—©erviceé–³ãƒ¯æ‹· (102), then the following are not applicable: COFGRP, and COFSUBGRP
-			//check COFCAT from MODEL or LSEO with isService
-			if(isService){
-				fCOFGRP = "";
-				fCOFSUBGRP = "";
-			}
-//			if(fCOFCAT.equals("102")){
-//				fCOFGRP = "";
-//				fCOFSUBGRP = "";
-//			}
-			else{
-				//If COFGRP is applicable, then it defaults to é–³ãƒ¦çª‚aseé–³ãƒ¯æ‹· (150) if not specified
-				if("".equals(fCOFGRP)){
-					fCOFGRP = "150";
-				}
-			}
-			filterTable.put("COFCAT", fCOFCAT);
-			filterTable.put("COFSUBCAT", fCOFSUBCAT);
-			filterTable.put("COFGRP", fCOFGRP);
-			filterTable.put("COFSUBGRP", fCOFSUBGRP);
-		}
-		if(isDebug){
-     		Iterator it = filterTable.keySet().iterator();
-     		while (it.hasNext()){
-     			String key =(String)it.next();
-     			abr.addDebug("EXTXMLFEED SetupEntity filterTable:key=" + key + ";value=" + filterTable.get(key));
-     		}
-    	}
-    }
-    
-    /**
-     * Get the MQ from the XMLABRPROPFILE of the EXTXMLFEED Entity by filtering the queue entity
-     * @param rootItem
-     * @return
-     * @throws MiddlewareException 
-     * @throws SQLException 
-     * @throws MiddlewareRequestException 
-     * @throws SBRException 
-     * @throws MiddlewareShutdownInProgressException 
-     * @throws ClassNotFoundException 
-     * @throws IllegalAccessException 
-     * @throws InstantiationException 
-     * @throws IOException 
-     * @throws EANBusinessRuleException 
-     * @throws RemoteException 
-     */
-    private Vector getMQPropertiesFilter(EntityItem rootItem, ADSABRSTATUS abr) 
-    throws MiddlewareRequestException, SQLException, MiddlewareException, MiddlewareShutdownInProgressException, SBRException, 
-    InstantiationException, IllegalAccessException, ClassNotFoundException, RemoteException, EANBusinessRuleException, 
-    IOException {
-		Vector MQ = new Vector();
-    	//get filters
-    	String rootEntityType = rootItem.getEntityType();
-		String filters[] = (String[])FILTER_TBL.get(rootEntityType);
-		Hashtable rootTable = new Hashtable();
-		String XMLABRPROPFILE = "";
-		Hashtable filterTable = new Hashtable();
-		// add any filters
-//		DO search and get the EntityItems
-		
-		Database m_db = abr.getDB();
-		if (filters!=null){
-			EntityItem[] EXTXMLFEEDArray = doSearch(rootEntityType, abr);
-			// get each attribute of rootItem
-			setRootEntity(rootItem, rootTable, abr);			
-			for(int i=0;i<EXTXMLFEEDArray.length;i++){
-				EntityItem  EXTXMLFEEDItem = EXTXMLFEEDArray[i];
-				EXTXMLFEEDItem = getEntityItem(m_db,EXTXMLFEEDItem);
-				
-				//step 1 get the attribute of EXTXMLFEED Entity[i]
-				//F: LSEOBUNDLE COUNTRYLIST FLFILSYSINDC PDHDOMAIN
-				setFilterTable(rootEntityType, filterTable, EXTXMLFEEDItem,abr);
-				XMLABRPROPFILE = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,attrXMLABRPROPFILE));
-				
-				
-				//step 2 compare between rootItem and EXTXMLFEEDItem
-				boolean isvaild = false;
-				////FILTER_TBL.put("FEATURE", new String[]{"FCTYPE","COUNTRYLIST","PDHDOMAIN"});
-				String attrcode ="";
-				boolean isEquals = true;
-				boolean isMatch = true;
-		    	for (int j=0; j<filters.length; j++){
-		    		attrcode = filters[j];
-		    		if(attrcode.equals("BUNDLETYPE")||attrcode.equals("COUNTRYLIST")
-		    		   || attrcode.equals("FLFILSYSINDC")||attrcode.equals("PDHDOMAIN")||attrcode.equals("DIVTEXT")){
-		    			isEquals = false;
-		    		}
-		    		abr.addDebug("match"+(String)rootTable.get(attrcode)+":"+ (String)filterTable.get(attrcode)+":"+attrcode+":"+ isEquals);
-		    		
-		    		isvaild = isVailidCompare((String)rootTable.get(attrcode), (String)filterTable.get(attrcode),attrcode, isEquals);
-		    		abr.addDebug("match"+isvaild);
-		    		if(!isvaild){
-						isMatch = false;
-						break;
-					}
-		    	}
-		    	if(isMatch){
-		    		addXMLPropfile(MQ, XMLABRPROPFILE);
-		    	}
-			}//end for
-		}else{
-			//when the entity is not in filter list
-			//check for the PeriodicABR 
-			//new add for the XMLPRODPRICESETUP
-			EntityItem[] EXTXMLFEEDArray = null;
-			if(rootEntityType.equals("ADSXMLSETUP")){
-	    		String ADSTYPE = PokUtils.getAttributeFlagValue(rootItem, "ADSTYPE");
-	    		if (ADSTYPE != null){
-	    			rootEntityType = (String)ADSTYPES_TBL.get(ADSTYPE);
-	    			if(rootEntityType==null) {
-	    				rootEntityType =CHEAT;
-	    			}
-	    		}
-	    	}else if(rootEntityType.equals("XMLPRODPRICESETUP")){
-	    		rootEntityType =CHEAT;
-	    	}
-			if(rootEntityType.equals(CHEAT)){
-				EXTXMLFEEDArray = null;
-			}else{
-				EXTXMLFEEDArray = doSearch(rootEntityType, abr);
-			}
-			//new add for the XMLPRODPRICESETUP end
-			
-			//for the WWCOMPAT filter
-			if(rootEntityType.equals("WWCOMPAT")){
-				wwcompMQTable = new Hashtable();
-				if(EXTXMLFEEDArray.length>0){
-					isFilterWWCOMPAT = true;	
-					for(int i=0;i<EXTXMLFEEDArray.length;i++){
-						EntityItem  EXTXMLFEEDItem = EXTXMLFEEDArray[i];
-						EXTXMLFEEDItem =getEntityItem(m_db,EXTXMLFEEDItem);
-						
-						XMLABRPROPFILE = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,attrXMLABRPROPFILE));
-						String fBRANDCD = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,"BRANDCD"));
-						abr.addDebug("fBRANDCD="+fBRANDCD);
-						abr.addDebug("wwcompat role code="+_swProfile.getRoleCode());
-						
-						
-						if(fBRANDCD.equals("")) fBRANDCD = CHEAT;
-						
-						//add wwcompat filer MQ of the EXTXMLFEED
-						Vector wwcompMQ = (Vector)wwcompMQTable.get(fBRANDCD);
-						if(wwcompMQ==null) wwcompMQ = new Vector();
-						StringTokenizer str = new StringTokenizer(XMLABRPROPFILE, PokUtils.DELIMITER);
-						String MQfile ="";
-						while (str.hasMoreTokens()) {
-							MQfile = str.nextToken();
-							if(!wwcompMQ.contains(MQfile)){
-								wwcompMQ.add(MQfile);
-							}
-						}
-						//add ADSXMLSETUP entity itself MQ of the XMLABRPROPFILE attribute and ADSTYPE = 'WWCOMPAT'
-						String val = PokUtils.getAttributeFlagValue(rootItem, attrXMLABRPROPFILE);
-				    	if (val != null) {
-				    		// parse the string into substrings    	        
-				    	    StringTokenizer st = new StringTokenizer(val,PokUtils.DELIMITER);    	           
-				    	    while(st.hasMoreTokens())
-				            {
-				    	        MQfile = st.nextToken();
-				    	        if(!wwcompMQ.contains(MQfile)){
-									wwcompMQ.add(MQfile);
-								}
-				            }                       	        
-				    	} 
-				    	//if null, sent to default MQ
-				    	if(wwcompMQ.size()==0) {
-				    		wwcompMQ.add(ADSABRSTATUS.ADSMQSERIES);				    	
-				    	}
-						wwcompMQTable.put(fBRANDCD, wwcompMQ);						
-					}
-					
-				}else{
-					isFilterWWCOMPAT = false;					
-				}				
-			}else{	
-				if(EXTXMLFEEDArray!=null){
-					for(int i=0;i<EXTXMLFEEDArray.length;i++){
-						EntityItem  EXTXMLFEEDItem2 = EXTXMLFEEDArray[i];
-						EXTXMLFEEDItem2 =getEntityItem(m_db,EXTXMLFEEDItem2);				
-						String XMLABRPROPFILE2 = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem2,attrXMLABRPROPFILE));
-						addXMLPropfile(MQ, XMLABRPROPFILE2);
-					}
-				}
-			}
-		}
-		abr.addDebug("MQ size ="+MQ.size());
-		return MQ;
-		
-	}   
-    
-    private Hashtable getMQPropertiesFilterVN(EntityItem rootItem, ADSABRSTATUS abr, Vector MQKEY) 
-    throws MiddlewareRequestException, SQLException, MiddlewareException, MiddlewareShutdownInProgressException, SBRException, 
-    InstantiationException, IllegalAccessException, ClassNotFoundException, RemoteException, EANBusinessRuleException, 
-    IOException {
-    	Hashtable mqTable = new Hashtable();
-    	//temp vector for the MQ by the key
-		//Vector MQKEY = new Vector();
-    	//get filters
-    	String rootEntityType = rootItem.getEntityType();
-		String filters[] = (String[])FILTER_TBL.get(rootEntityType);
-		Hashtable rootTable = new Hashtable();
-		String XMLABRPROPFILE = "";
-		Hashtable filterTable = new Hashtable();
-		//R 0.5 ==> XMLVERSION = 0 & XMLMOD = 5
-		//R 1.0 ==> XMLVERSION = 1 & XMLMOD = 0
-		String XMLVERSION = "";
-		String XMLMOD  = "";
-		String VERSIONKEY = "";
-		// add any filters
-//		DO search and get the EntityItems
-		EntityItem[] EXTXMLFEEDArray = null;
-		Vector validEXTXMLFEEDArray  = new Vector();
-		
-		Database m_db = abr.getDB();
-		if (filters!=null){
-			// add pdhdomain as search attribute 
-			String pdhdomain = PokUtils.getAttributeFlagValue(rootItem, "PDHDOMAIN");
-			abr.addDebug(rootItem.getKey()+" pdhdomain: "+pdhdomain);
-			if(pdhdomain!=null){
-			    EXTXMLFEEDArray = doSearch(rootEntityType, pdhdomain, abr);
-			}else {
-				EXTXMLFEEDArray = doSearch(rootEntityType, abr);
-			}
-			// get each attribute of rootItem
-			setRootEntity(rootItem, rootTable, abr);
-			if(EXTXMLFEEDArray!=null){
-				for(int i=0;i<EXTXMLFEEDArray.length;i++){
-					EntityItem  EXTXMLFEEDItem = EXTXMLFEEDArray[i];
-					EXTXMLFEEDItem = getEntityItem(m_db,EXTXMLFEEDItem);
-					
-					//step 1 get the attribute of EXTXMLFEED Entity[i]
-					//F: LSEOBUNDLE COUNTRYLIST FLFILSYSINDC PDHDOMAIN
-					setFilterTable(rootEntityType, filterTable, EXTXMLFEEDItem,abr);
-					XMLABRPROPFILE = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,attrXMLABRPROPFILE));
-					
-					
-					//step 2 compare between rootItem and EXTXMLFEEDItem
-					boolean isvaild = false;
-					////FILTER_TBL.put("FEATURE", new String[]{"FCTYPE","COUNTRYLIST","PDHDOMAIN"});
-					String attrcode ="";
-					boolean isEquals = true;
-					boolean isMatch = true;
-			    	for (int j=0; j<filters.length; j++){
-			    		attrcode = filters[j];
-			    		if(attrcode.equals("BUNDLETYPE")||attrcode.equals("COUNTRYLIST")
-			    		|| attrcode.equals("FLFILSYSINDC")||attrcode.equals("PDHDOMAIN")||attrcode.equals("DIVTEXT")){
-			    			isEquals = false;
-			    		}
-			    		abr.addDebug("match"+(String)rootTable.get(attrcode)+":"+ (String)filterTable.get(attrcode)+":"+attrcode+":"+ isEquals);
-			    		isvaild = isVailidCompare((String)rootTable.get(attrcode), (String)filterTable.get(attrcode),attrcode, isEquals);
-			    		abr.addDebug("match"+isvaild);
-			    		if(!isvaild){
-							isMatch = false;
-							break;
-						}
-			    	}
-			    	if(isMatch){
-			    		XMLVERSION = convertValue(PokUtils.getAttributeValue(EXTXMLFEEDItem, "XMLVERSION", "", null, false));
-			    		XMLMOD     = convertValue(PokUtils.getAttributeValue(EXTXMLFEEDItem, "XMLMOD", "", null, false));
-			    		if(!"".equals(XMLVERSION) && !"".equals(XMLMOD) && isVaildREFOFERFEAT){
-			    			VERSIONKEY = XMLVERSION + XMLMOD;
-			    			if(mqTable.containsKey(VERSIONKEY)){
-			    				MQKEY = (Vector)mqTable.get(VERSIONKEY);
-			    				addXMLPropfile(MQKEY, XMLABRPROPFILE);	
-			    				mqTable.put(VERSIONKEY, MQKEY);
-			    			}else{
-			    				MQKEY = new Vector();
-			    				addXMLPropfile(MQKEY, XMLABRPROPFILE);
-			    				mqTable.put(VERSIONKEY, MQKEY);		    				
-			    			}
-			    			// reconciliation report
-			    			validEXTXMLFEEDArray.add(EXTXMLFEEDItem);
-			    			
-			    		}
-			    	    
-			    	}
-				}//end for
-			}
-		}else{
-			//when the entity is not in filter list
-			//check for the PeriodicABR 
-			//new add for the XMLPRODPRICESETUP
-			if(rootEntityType.equals("ADSXMLSETUP")){
-	    		String ADSTYPE = PokUtils.getAttributeFlagValue(rootItem, "ADSTYPE");
-	    		if (ADSTYPE != null){
-	    			rootEntityType = (String)ADSTYPES_TBL.get(ADSTYPE);
-	    			if(rootEntityType==null) {
-	    				rootEntityType =CHEAT;
-	    			}
-	    		}
-	    	}else if(rootEntityType.equals("XMLPRODPRICESETUP")){
-	    		rootEntityType =CHEAT;
-	    	}
-			if(rootEntityType.equals(CHEAT)){
-				EXTXMLFEEDArray = null;
-			}else{
-				EXTXMLFEEDArray = doSearch(rootEntityType, abr);
-			}
-			//new add for the XMLPRODPRICESETUP end
-			
-			//for the WWCOMPAT filter
-			// need check with Wayne for the wwcompat and PeriodicABR
-			
-			if(rootEntityType.equals("WWCOMPAT")){
-				wwcompMQTable = new Hashtable();
-				if(EXTXMLFEEDArray!=null && EXTXMLFEEDArray.length>0){
-					isFilterWWCOMPAT = true;	
-					for(int i=0;i<EXTXMLFEEDArray.length;i++){
-						EntityItem  EXTXMLFEEDItem = EXTXMLFEEDArray[i];
-						EXTXMLFEEDItem =getEntityItem(m_db,EXTXMLFEEDItem);
-						
-						XMLABRPROPFILE = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,attrXMLABRPROPFILE));
-						String fBRANDCD = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,"BRANDCD"));
-						abr.addDebug("fBRANDCD="+fBRANDCD);
-						abr.addDebug("wwcompat role code="+_swProfile.getRoleCode());
-						
-						
-						if(fBRANDCD.equals("")) fBRANDCD = CHEAT;
-						
-						//add wwcompat filer MQ of the EXTXMLFEED
-						Vector wwcompMQ = (Vector)wwcompMQTable.get(fBRANDCD);
-						if(wwcompMQ==null) wwcompMQ = new Vector();
-						StringTokenizer str = new StringTokenizer(XMLABRPROPFILE, PokUtils.DELIMITER);
-						String MQfile ="";
-						while (str.hasMoreTokens()) {
-							MQfile = str.nextToken();
-							if(!wwcompMQ.contains(MQfile)){
-								wwcompMQ.add(MQfile);
-							}
-						}
-						//add ADSXMLSETUP entity itself MQ of the XMLABRPROPFILE attribute and ADSTYPE = 'WWCOMPAT'
-						String val = PokUtils.getAttributeFlagValue(rootItem, attrXMLABRPROPFILE);
-				    	if (val != null) {
-				    		// parse the string into substrings    	        
-				    	    StringTokenizer st = new StringTokenizer(val,PokUtils.DELIMITER);    	           
-				    	    while(st.hasMoreTokens())
-				            {
-				    	        MQfile = st.nextToken();
-				    	        if(!wwcompMQ.contains(MQfile)){
-									wwcompMQ.add(MQfile);
-								}
-				            }                       	        
-				    	} 
-				    	//if null, sent to default MQ
-				    	if(wwcompMQ.size()==0) {
-				    		wwcompMQ.add(ADSABRSTATUS.ADSMQSERIES);				    	
-				    	}
-						wwcompMQTable.put(fBRANDCD, wwcompMQ);						
-					}
-					
-				}else{
-					isFilterWWCOMPAT = false;					
-				}				
-			}else{	
-				if(EXTXMLFEEDArray!=null){
-					for(int i=0;i<EXTXMLFEEDArray.length;i++){
-						EntityItem  EXTXMLFEEDItem2 = EXTXMLFEEDArray[i];
-						EXTXMLFEEDItem2 =getEntityItem(m_db,EXTXMLFEEDItem2);				
-						String XMLABRPROPFILE2 = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem2,attrXMLABRPROPFILE));
-						XMLVERSION = convertValue(PokUtils.getAttributeValue(EXTXMLFEEDItem2, "XMLVERSION", "", null, false));
-						XMLMOD     = convertValue(PokUtils.getAttributeValue(EXTXMLFEEDItem2, "XMLMOD", "", null, false));
-			    		if(!"".equals(XMLVERSION) && !"".equals(XMLMOD) && isVaildREFOFERFEAT){
-			    			VERSIONKEY = XMLVERSION + XMLMOD;
-			    			if(mqTable.containsKey(VERSIONKEY)){
-			    				MQKEY = (Vector)mqTable.get(VERSIONKEY);
-			    				addXMLPropfile(MQKEY, XMLABRPROPFILE2);	
-			    				mqTable.put(VERSIONKEY, MQKEY);
-			    			}else{
-			    				//MQKEY = new Vector(); //add the XMLABRPROPFILE of ADSXMLSETUP
-			    				addXMLPropfile(MQKEY, XMLABRPROPFILE2);
-			    				mqTable.put(VERSIONKEY, MQKEY);		    				
-			    			}
-			    		}
-					}
-				}
-				
-			}
-		}
-		// reconciliation report put EXTXMLFEED infor to HashTable
-		mqTable.put(KEY_SETUPArry, validEXTXMLFEEDArray);
-		
-		//only for the debug test
-		abr.addDebug("MQ Table ="+mqTable.size());
-		if(mqTable.containsKey("10")) {
-			abr.addDebug("MQ Table 10 ="+mqTable.get("10").toString());
-		} else{
-			abr.addDebug("MQ Table 10 is null ");
-		}
-		if(mqTable.containsKey("05")) {
-			abr.addDebug("MQ Table 05 ="+mqTable.get("05").toString());
-		} else{
-			abr.addDebug("MQ Table 05 is null ");
-		}		
-		return mqTable;
-		
-	}  
-    
-	/**
-	 * @param MQ
-	 * @param XMLABRPROPFILE
-	 */
-	private void addXMLPropfile(Vector MQ, String XMLABRPROPFILE) {		
-		StringTokenizer str = new StringTokenizer(XMLABRPROPFILE, PokUtils.DELIMITER);
-		String MQfile ="";
-		while (str.hasMoreTokens()) {
-			MQfile = str.nextToken();
-			if(!MQ.contains(MQfile)){
-				MQ.add(MQfile);
-			}
-		}
-	}
-	/**
-	 * @param FCTYPE
-	 * @param fFCTYPE
-	 */
-	private boolean isVailidCompare(String rootItemAttributeValue, String EXTXMLFEEDItemAttributeValue, String attrcode,boolean isEquals) {
-		boolean isvaild =false;
-		if(rootItemAttributeValue==null) rootItemAttributeValue="";
-		//for  If MODEL, MODELCONVERT, SVCMOD, SWPRODSTRUCT 
-		//do not have an AVAIL of this type, then assume "World Wide" and hence this data is NOT filtered out
-		
-				
-		if(rootItemAttributeValue.equals(CHEAT)) return true;
-		if(EXTXMLFEEDItemAttributeValue!=null && !"".equals(EXTXMLFEEDItemAttributeValue)){
-			if("ENDOFSVC".equals(attrcode)){
-				//its ENDOFSVC is greater than the value specified in the EXTXMLFEED setup entity
-				if("".equals(rootItemAttributeValue)) {
-					return true;
-				}else if(rootItemAttributeValue.compareTo(EXTXMLFEEDItemAttributeValue)>=0){
-					return true;					
-				}
-			}else{
-				if(isEquals){
-					if("DCG".equals(attrcode)&&(rootItemAttributeValue==null||"".equals(rootItemAttributeValue)))
-					return true;
-						if(EXTXMLFEEDItemAttributeValue.equals(rootItemAttributeValue)){
-						isvaild = true;
-					}else{
-						isvaild = false;
-					}
-				}else{
-					//check the multi values of the EXTXMLFEED entity
-					String separator = "";
-					if("DIVTEXT".equals(attrcode)){
-						separator = ",";
-					}else{
-						separator = PokUtils.DELIMITER;
-					}
-					StringTokenizer str = new StringTokenizer(EXTXMLFEEDItemAttributeValue, separator);
-					String EXTXMLFEEDValue = "";
-					String rootItemValue = "";										
-					while (str.hasMoreTokens()) {						
-						EXTXMLFEEDValue = str.nextToken();
-						if("".equals(EXTXMLFEEDValue)) return true;
-						StringTokenizer rootstr = new StringTokenizer(rootItemAttributeValue, PokUtils.DELIMITER);
-						while (rootstr.hasMoreTokens()) {
-							rootItemValue = rootstr.nextToken();
-							if(rootItemValue.equals(EXTXMLFEEDValue)){
-								return true;
-							}
-						}
-					}
-				}
-			}
-			
-		}else{
-			isvaild = true;
-		}
-		if("OLDINDC".equals(attrcode)) {
-			if (EXTXMLFEEDItemAttributeValue != null && !"".equals(EXTXMLFEEDItemAttributeValue.trim())) {
-				if("".equals(rootItemAttributeValue)) {
-					return true;
-				}else if(EXTXMLFEEDItemAttributeValue.equals(rootItemAttributeValue)){
-					isvaild = true;
-				}else{
-					isvaild = false;
-				}
-			}else {
-				if("Y".equals(rootItemAttributeValue)) {
-					isvaild = false;
-				}
-				}		
-		}
-		
-		return isvaild;
-	}
-
-	/**
-	 * @param rootItem
-	 * @param rootEntityType
-	 * @param attrcode
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 * @throws MiddlewareRequestException 
-	 */
-	private String getCOUNTRYLIST(EntityItem rootItem, String rootEntityType, String attrcode, ADSABRSTATUS abr) 
-	throws MiddlewareRequestException, SQLException, MiddlewareException {
-		String COUNTRYLIST ="";
-		if(rootEntityType.equals("FEATURE")||rootEntityType.equals("IMG")
-		   ||rootEntityType.equals("LSEOBUNDLE")||rootEntityType.equals("LSEO")){
-			COUNTRYLIST = convertValue(PokUtils.getAttributeFlagValue(rootItem, attrcode));//F multi
-		} else if(rootEntityType.equals("REFOFER")){
-			COUNTRYLIST = convertValue(PokUtils.getAttributeFlagValue(rootItem, attrcode));//F multi
-			//when no country, considering the data to be World Wide
-			if(COUNTRYLIST.equals("")) {
-				COUNTRYLIST = CHEAT;
-			}
-		}
-		//new add REFOFER and REFOFERFEAT
-		else if(rootEntityType.equals("REFOFERFEAT")){
-			EntityList m_elist = getEntityList(rootItem, rootEntityType, abr);			
-			EntityGroup mdlGrp = m_elist.getEntityGroup("REFOFER");
-			EntityItem itemArray[] = null;
-			if(mdlGrp!=null) itemArray = mdlGrp.getEntityItemsAsArray();
-			//1(REFOFERFEAT)--->0...N(REFOFER)
-			if(itemArray!=null){
-				for(int i=0;i<itemArray.length;i++){
-					EntityItem relator = (EntityItem)itemArray[i];
-					if(relator != null && "REFOFER".equals(relator.getEntityType())){
-						String countrytemp = convertValue(PokUtils.getAttributeFlagValue(relator, attrcode));
-						//when no country, considering the data to be World Wide
-						if(countrytemp.equals("")){							
-							COUNTRYLIST =CHEAT;
-							break;							
-						}else{
-							if("".equals(COUNTRYLIST)){
-								COUNTRYLIST = countrytemp;
-							}else{
-								COUNTRYLIST = COUNTRYLIST + PokUtils.DELIMITER + countrytemp;
-							}
-						}
-					}
-				}
-			}						
-		}//new add REFOFER and REFOFERFEAT end
-		else if(rootEntityType.equals("PRODSTRUCT")){
-			//PRODSTRUCT: AVAIL then FEATURE
-			//Orange - PRODSTRUCT only has AVAILs for GA products. If it is a RPQ, then the COUNTRYLIST is obtained from the FEATURE.
-			//FEATURE	PRODSTRUCT-u		
-			// WHEN		FCTYPE	=	Primary FC (100) | "Secondary FC" (110) 	 Then  GA  Logic
-			// WHEN		FCTYPE	<>	Primary FC (100) | "Secondary FC" (110)      Then  RPQ Logic
-			//XMLElem feature = new XMLGroupElem(null, "FEATURE", "U:FEATURE");
-			//Step1 get the feature
-			EntityItem featureItem = null;
-            EntityList m_elist = getEntityList(rootItem, rootEntityType, abr);
-			
-			EntityGroup mdlGrp = m_elist.getEntityGroup("FEATURE");
-			EntityItem itemArray[] = null;
-			if(mdlGrp!=null) itemArray = mdlGrp.getEntityItemsAsArray();
-			if(itemArray!=null){
-				for(int i=0;i<itemArray.length;i++){
-					EntityItem relator = (EntityItem)itemArray[i];
-					if(relator != null && "FEATURE".equals(relator.getEntityType())){
-						featureItem= relator;
-						break;
-					}
-				}
-			}
-			//step2 check GA or RPQ 
-			// if GA get the COUNTRYLIST of AVAILs
-			// if RPQ get the COUNTRYLIST of FEATURE
-			String pFCTYPE ="";
-			if(featureItem!=null){
-				pFCTYPE = convertValue(PokUtils.getAttributeFlagValue(featureItem, "FCTYPE"));
-				if(pFCTYPE.equals("100") || pFCTYPE.equals("110")){
-					COUNTRYLIST = getCountryList(rootItem, rootEntityType, attrcode, abr);
-				}else{
-					COUNTRYLIST = convertValue(PokUtils.getAttributeFlagValue(featureItem, attrcode));
-				}
-			}
-			
-		} else {
-			//add the VEs
-			COUNTRYLIST = getCountryList(rootItem, rootEntityType, attrcode, abr);
-		}
-		return COUNTRYLIST;
-	}
-	/**
-	 * @param rootItem
-	 * @param rootEntityType
-	 * @param attrcode
-	 * @param abr
-	 * @return
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws MiddlewareRequestException
-	 */
-	private String getCountryList(EntityItem rootItem, String rootEntityType, String attrcode, ADSABRSTATUS abr) throws SQLException, MiddlewareException, MiddlewareRequestException {
-		//AVAIL: MODEL,      MODELCONVERT     SVCMOD      SWPRODSTRUCT      PRODSTRUCT
-		//VE:    ADFMODEL    ADFMODELCONVERT  ADFSVCMOD   ADFSWPRODSTRUCT   ADFPRODSTRUCT
-		//AVAILTYPE = "Planned Availability" (146)
-		//COUNTRYLIST é–³ãƒ¯æ‹· The é–³ãƒ¦ç©¾vailabilityé–³ãƒ¯æ‹· (AVAIL) of type é–³ãƒ¦é˜€lanned Availabilityé–³ãƒ¯æ‹· (146) is used for this filter. 
-		//If MODEL, MODELCONVERT, SVCMOD, SWPRODSTRUCT do not have an AVAIL of this type, 
-		//then assume "World Wide" and hence this data is NOT filtered out (i.e. it is sent).
-		//Add AVAIL's status must be ready for review and final
-		String COUNTRYLIST="";
-		EntityList m_elist = getEntityList(rootItem, rootEntityType, abr);
-		
-		EntityGroup mdlGrp = m_elist.getEntityGroup("AVAIL");
-		EntityItem itemArray[] = null;
-		if(mdlGrp!=null) itemArray = mdlGrp.getEntityItemsAsArray();
-		if(itemArray==null || itemArray.length==0){
-			abr.addDebug("avail is null");
-			COUNTRYLIST = CHEAT;
-		}else{
-			//check avail type? yes (146)
-			abr.addDebug("avail is not null");
-			EntityItem availItem = null;
-			StringBuffer buffer = new StringBuffer();
-			String availType ="";
-			String availStatus ="";
-			String anndate = "";
-			boolean isOldAvail = false;
-			boolean isAvailCountry = false;
-			int j =0;
-			for(int i=0;i<itemArray.length;i++){
-				availItem = itemArray[i];
-				//add the check that AVAILTYPE = "Planned Availability" (146)
-				availType= convertValue(PokUtils.getAttributeFlagValue(availItem, "AVAILTYPE"));
-				//add status check
-				availStatus = convertValue(PokUtils.getAttributeFlagValue(availItem, "STATUS"));
-				
-				if(availType.equals("146")){
-					// add the check of the old data of 
-					anndate = PokUtils.getAttributeValue(availItem, "EFFECTIVEDATE", ",", CHEAT, false);
-					if(anndate.compareTo(ADSABRSTATUS.OLDEFFECTDATE) <= 0){
-						isOldAvail = true;
-					}else{
-						isOldAvail = false;
-					}
-					if(isOldAvail){
-						isAvailCountry = true;						
-					}else if("0020".equals(availStatus)|| "0040".equals(availStatus)){
-						isAvailCountry = true;						
-					}else{
-						isAvailCountry = false;
-					}
-					if(isAvailCountry){
-						if(j!=0) buffer.append(PokUtils.DELIMITER);
-						buffer.append(PokUtils.getAttributeFlagValue(availItem, attrcode));
-						j++;
-					}					
-				}
-			}
-			COUNTRYLIST = buffer.toString();
-			if(COUNTRYLIST.equals("")) {
-				COUNTRYLIST = CHEAT;
-			}
-		}
-		return COUNTRYLIST;
-	}
-	
-	/**
-	 * get DIVISION of LSEO | LSEOBUNDLE | MODEL | SVCMOD
-	 * @param rootItem
-	 * @param rootEntityType
-	 * @param attrcode
-	 * @return
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 * @throws MiddlewareRequestException 
-	 */	
-    private String getDIVISION(EntityItem rootItem, String rootEntityType, String attrcode,ADSABRSTATUS abr) throws MiddlewareRequestException, SQLException, MiddlewareException {
-    	
-    	String attrvalue="";
-		//LSEO | LSEOBUNDLE | MODEL | SVCMOD
-		EntityList m_elist = getEntityList(rootItem, rootEntityType, abr);
-		
-		abr.addDebug("getDIVISION: m_elist=" +m_elist);
-		
-		EntityGroup mdlGrp = m_elist.getEntityGroup("SGMNTACRNYM");
-		
-		EntityItem itemArray[] = null;
-		if(mdlGrp!=null) {
-			itemArray = mdlGrp.getEntityItemsAsArray();
-			abr.addDebug("getDIVISIONé–¿æ¶³æ‹· itemArray=" +itemArray.length);
-		}
-		int k=0;
-		for(int i=0;i<itemArray.length;i++){
-			EntityItem entityItem = (EntityItem)itemArray[i];
-			if(entityItem != null){
-				k++;
-				if(k==1){
-					attrvalue = convertValue(PokUtils.getAttributeFlagValue(entityItem, attrcode));
-				}else{
-					attrvalue = attrvalue + PokUtils.DELIMITER + convertValue(PokUtils.getAttributeFlagValue(entityItem, attrcode));
-				}
-			}
-		}
-		abr.addDebug("getDIVISIONé–¿æ¶™ç“±nd");
-		return attrvalue;
-	}
-	
-	/**
-	 * get MACHTYPEATR of PRODSTRUCT and SWPRODSTRUCT
-	 * @param rootItem
-	 * @param rootEntityType
-	 * @param attrcode
-	 * @return
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 * @throws MiddlewareRequestException 
-	 */	
-    private String getMACHTYPEATR(EntityItem rootItem, String rootEntityType, String attrcode,ADSABRSTATUS abr) throws MiddlewareRequestException, SQLException, MiddlewareException {
-    	
-    	String attrvalue="";
-		if(rootEntityType.equals("PRODSTRUCT")||rootEntityType.equals("SWPRODSTRUCT")){
-			//PRODSTRUCT-d	MODEL	MACHTYPEATR
-			EntityItem modelItem = null;
-			EntityList m_elist = getEntityList(rootItem, rootEntityType, abr);
-			
-			EntityGroup mdlGrp = m_elist.getEntityGroup("MODEL");
-			abr.addDebug("mdlGrp="+mdlGrp);
-			EntityItem itemArray[] = null;
-			if(mdlGrp!=null) itemArray = mdlGrp.getEntityItemsAsArray();
-			for(int i=0;i<itemArray.length;i++){
-				EntityItem relator = (EntityItem)itemArray[i];
-				if(relator != null && "MODEL".equals(relator.getEntityType())){
-					modelItem= relator;
-					break;
-				}
-			}
-		    if(modelItem!=null){
-		    	if(attrcode.equals("MODELATR")){
-		    		attrvalue = convertValue(PokUtils.getAttributeValue(modelItem, attrcode, "", null, false));
-		    	}else{
-		    		attrvalue = convertValue(PokUtils.getAttributeFlagValue(modelItem, attrcode));
-		    	}
-		    	
-		    	abr.addDebug("get model attrcode="+attrcode +"modelItem ="+modelItem.getEntityID()+";attrvalue="+attrvalue);
-		    }
-		}else{
-			attrvalue = "";
-		}
-		return attrvalue;
-	}
-    /**
-     * get ENDOFSVC
-     * @param rootItem
-     * @param rootEntityType
-     * @param attrcode
-     * @param abr
-     * @return
-     * @throws MiddlewareRequestException
-     * @throws SQLException
-     * @throws MiddlewareException
-     */
-     private String getENDOFSVC(EntityItem rootItem, String rootEntityType, String attrcode,ADSABRSTATUS abr) throws MiddlewareRequestException, SQLException, MiddlewareException {
-    	
-    	String attrvalue=CHEAT;
-		if(rootEntityType.equals("REFOFERFEAT")){
-			//REFOFERFEAT-U	REFOFER	ENDOFSVC
-			EntityList m_elist = getEntityList(rootItem, rootEntityType, abr);
-			EntityGroup mdlGrp = m_elist.getEntityGroup("REFOFER");
-			EntityItem itemArray[] = null;
-			if(mdlGrp!=null) itemArray = mdlGrp.getEntityItemsAsArray();
-			//1(REFOFERFEAT)--->0...N(REFOFER)
-			/**
-			 * If after processing all of the referenced REFOFER 
-			 * there are no instances of <RELATEDREFOFERELEMENT>,
-			 * then do not send the XML
-			 * use isVaildREFOFERFEAT to check it
-			 * 
-			 * If there are muitiple records of thereferenced REFOFER
-			 * should be set to the maximum value from all referenced parent REFOFER ENDOFSVC.
-			 * 
-			 */
-			if(itemArray!=null){
-				isVaildREFOFERFEAT = true;
-				String ENDOFSVC ="";
-				for(int i=0;i<itemArray.length;i++){
-					EntityItem relator = (EntityItem)itemArray[i];
-					if(relator != null && "REFOFER".equals(relator.getEntityType())){
-						ENDOFSVC = convertValue(PokUtils.getAttributeValue(relator, "ENDOFSVC", "", null, false));
-						if(attrvalue.equals(CHEAT)){
-							attrvalue = ENDOFSVC;
-						} 
-						if("".equals(attrvalue)||"".equals(ENDOFSVC)){
-							attrvalue = CHEAT;
-							break;
-						} else if(attrvalue.compareTo(ENDOFSVC)>0){							
-							//attrvalue = attrvalue;// do nothing
-						} else if(attrvalue.compareTo(ENDOFSVC)<=0){
-							attrvalue = ENDOFSVC;
-						}
-					}
-				}
-			}else{
-				attrvalue = "";
-				isVaildREFOFERFEAT = false;
-			}	
-		}else{
-			attrvalue = "";
-		}
-		return attrvalue;
-	}
-
-	/**
-	 * @param rootItem
-	 * @param rootEntityType
-	 * @param abr
-	 * @return
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws MiddlewareRequestException
-	 */
-	private EntityList getEntityList(EntityItem rootItem, String rootEntityType, ADSABRSTATUS abr) throws SQLException, MiddlewareException, MiddlewareRequestException {
-		if (mf_elist != null){
-			return mf_elist;
-		}else{
-			String veName ="ADF"+rootEntityType; //Need to add the VEs
-			Database m_db = abr.getDB();
-			Profile m_prof = abr.getProfile();
-			mf_elist = m_db.getEntityList(m_prof,
-			        new ExtractActionItem(null, m_db, m_prof, veName),
-			        new EntityItem[] { new EntityItem(null, m_prof, rootItem.getEntityType(), rootItem.getEntityID()) });
-		}
-		return mf_elist;		
-	}
-	/**
-	 * get FCTYPE of PRODSTRUCT and SWPRODSTRUCT
-	 * @param rootItem
-	 * @param rootEntityType
-	 * @param attrcode
-	 * @param abr
-	 * @return
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	private String getFCTYPE(EntityItem rootItem, String rootEntityType, String attrcode, ADSABRSTATUS abr) 
-	throws MiddlewareRequestException, SQLException, MiddlewareException {
-		String FCTYPE="";
-		EntityItem featureItem = null;
-		EntityList m_elist = getEntityList(rootItem, rootEntityType, abr);
-		
-		String sGroup = rootEntityType.equals("PRODSTRUCT")?"FEATURE":"SWFEATURE";
-		
-		EntityGroup featureGrp = m_elist.getEntityGroup(sGroup);
-		EntityItem itemArray[] = null;
-		if(featureGrp!=null) itemArray = featureGrp.getEntityItemsAsArray();
-		for(int i=0;i<itemArray.length;i++){
-			EntityItem relator = (EntityItem)itemArray[i];
-			if(relator != null && sGroup.equals(relator.getEntityType())){
-				featureItem= relator;
-				break;
-			}
-		}
-		if(featureItem!=null){
-			FCTYPE = convertValue(PokUtils.getAttributeFlagValue(featureItem, "FCTYPE"));			
-		}		
-		return FCTYPE;
-	}
-    
-    /**
-	 * @param rootItem
-	 * @param rootEntityType
-	 * @param attrcode
-     * @throws MiddlewareException 
-     * @throws SQLException 
-     * @throws MiddlewareRequestException 
-	 */
-	private String getCOFMODEL(EntityItem rootItem, String rootEntityType, String attrcode, ADSABRSTATUS abr) 
-	throws MiddlewareRequestException, SQLException, MiddlewareException {
-		String COF="";
-		EntityItem modelentity = null ;
-		if(rootEntityType.equals("LSEO")){
-			EntityList m_elist = getEntityList(rootItem, rootEntityType, abr);
-			
-			EntityGroup mdlGrp = m_elist.getEntityGroup("MODEL");
-			abr.addDebug("mdlGrp="+mdlGrp);
-			EntityItem itemArray[] = null;
-			if(mdlGrp!=null) itemArray = mdlGrp.getEntityItemsAsArray();
-			for(int i=0;i<itemArray.length;i++){
-				EntityItem relator = (EntityItem)itemArray[i];
-				if(relator != null && "MODEL".equals(relator.getEntityType())){
-					modelentity= relator;
-					break;
-				}
-			}			
-		    if(modelentity!=null){
-		    	COF = convertValue(PokUtils.getAttributeFlagValue(modelentity, attrcode));
-		    }
-		}else{
-			//WWSEO.SPECBID
-			COF = convertValue(PokUtils.getAttributeFlagValue(rootItem, attrcode));
-		}
-		return COF;
-	}
-	
-	/**
-	 * @param rootItem
-	 * @param rootEntityType
-	 * @param attrcode
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 * @throws MiddlewareRequestException 
-	 */
-	private String getSPECBID(EntityItem rootItem, String rootEntityType, String attrcode, ADSABRSTATUS abr) 
-	throws MiddlewareRequestException, SQLException, MiddlewareException {
-		String SPECBID="";
-		if(rootEntityType.equals("LSEO")){
-			//LSEO: WWSEOLSEO-u
-			EntityItem wwseoItem = null;
-            EntityList m_elist = getEntityList(rootItem, rootEntityType, abr);
-			
-			EntityGroup mdlGrp = m_elist.getEntityGroup("WWSEO");
-			abr.addDebug("mdlGrp="+mdlGrp);
-			EntityItem itemArray[] = null;
-			if(mdlGrp!=null) itemArray = mdlGrp.getEntityItemsAsArray();
-			for(int i=0;i<itemArray.length;i++){
-				EntityItem relator = (EntityItem)itemArray[i];
-				if(relator != null && "WWSEO".equals(relator.getEntityType())){
-					wwseoItem= relator;
-					break;
-				}
-			}		
-		    if(wwseoItem!=null){
-		    	SPECBID = convertValue(PokUtils.getAttributeFlagValue(wwseoItem, attrcode));
-		    }
-		}else{
-			//WWSEO.SPECBID
-			SPECBID = convertValue(PokUtils.getAttributeFlagValue(rootItem, attrcode));
-		}
-		return SPECBID;
-	}
-    //  RQK add new method checkMQPropertiesFN to check if mq propfile name attribute exists
-    // on root entity. this will indicate an IDL and pass back true, else pass false
-    public boolean checkIDLMQPropertiesFN(EntityItem rootEntity) {
-    	String val = PokUtils.getAttributeFlagValue(rootEntity, attrXMLABRPROPFILE);
-        return !(val == null);
-    }
-    
-    /**
-	 * get the XMLABRPROPFILE attribute of the setup entity(XMLCOMPATSETUP, XMLXLATESETUP, GA and price)
-	 * @param rootEntity
-	 * @return
-	 */
-	public Vector getPeriodicMQ(EntityItem rootEntity){
-		Vector wwcompMQ = new Vector();
-		String XMLABRPROPFILE = convertValue(PokUtils.getAttributeFlagValue(rootEntity,attrXMLABRPROPFILE));
-		StringTokenizer str = new StringTokenizer(XMLABRPROPFILE, PokUtils.DELIMITER);
-		String MQfile ="";
-		while (str.hasMoreTokens()) {
-			MQfile = str.nextToken();
-			wwcompMQ.add(MQfile);
-		}
-		if(wwcompMQ.size()==0) wwcompMQ = null;
-		return wwcompMQ;
-	}
-    
-    // RQK add new method checkMQPropertiesFN to check if mq propfile name attribute exists
-    // on root entity. this will indicate an IDL and pass back true, else pass false
-
-    /**********************************
-    * check if xml should be created for this
-    */
-    public boolean createXML(EntityItem rootItem) { return true;}
-
-    /**********************************
-    * get xml object mapping
-    */
-    public XMLElem getXMLMap() {return null;}
-
-    /**********************************
-    * get the name of the VE to use
-    */
-    public String getVeName() {return "dummy";}
-    
-    /**********************************
-    * get the name of the VE to use
-    */
-    public String getVeName2() {return "dummy";}
-
-
-    /**********************************
-    * get the role code to use for this ABR
-    */
-    public String getRoleCode() { return "BHFEED"; }
-
-    /**********************************
-    * get the status attribute to use for this ABR
-    */
-    public String getStatusAttr(){ return "";}
-
-    /**********************************
-    *
-	A.	MQ-Series CID
-    */
-    public abstract String getMQCID();
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getVersion(){ return "";}
-
-    /**********************************
-    * create xml and write to queue
-    */
-    public void processThis(ADSABRSTATUS abr, Profile profileT1, Profile profileT2, EntityItem rootEntity)
-    throws
-    java.sql.SQLException,
-    COM.ibm.opicmpdh.middleware.MiddlewareException,
-    ParserConfigurationException,
-    java.rmi.RemoteException,
-    COM.ibm.eannounce.objects.EANBusinessRuleException,
-    COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-    IOException,
-    javax.xml.transform.TransformerException,
-	MissingResourceException
-    {}
-
-    /********************************************************************************
-    * setup the connection and preparedstatements
-    */
-    protected Connection setupConnection()
-        throws java.sql.SQLException
-    {
-    	try {
-        Connection connection;
-		
-			connection = DriverManager.getConnection(
-                MiddlewareServerProperties.getPDHDatabaseURL(),
-                MiddlewareServerProperties.getPDHDatabaseUser(),
-                AES256Utils.decrypt(MiddlewareServerProperties.getPDHDatabasePassword()));
-			connection.setAutoCommit(false);
-			 return connection;
-		} catch (SQLException e) {
-			// TODO: handle exception
-			throw e;
-		}catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-
-        
-
-       
-    }
-    /********************************************************************************
-    * close the connection and preparedstatements
-    */
-    protected void closeConnection(Connection connection) throws java.sql.SQLException
-    {
-        if(connection != null) {
-            try {
-                connection.rollback();
-            }
-            catch (Throwable ex) {
-                System.err.println("XMLMQAdapter.closeConnection(), unable to rollback. "+ ex);
-            }
-            finally {
-                connection.close();
-                connection = null;
-            }
-        }
-    }
-    protected void mergeLists(ADSABRSTATUS abr, EntityList list1, EntityList list2) throws
-    java.sql.SQLException,
-    COM.ibm.opicmpdh.middleware.MiddlewareException,
-    COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-    COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {}
-    
-    /**
-     * There is special filtering of MODEL based on classification attributes. 
-	  Only MODELs that match the filtering are to flow. The functional specification 
-	  é–³ãƒ¦çª‚H FS ABR XML IDL 2011mmdd.docé–³ãƒ¯æ‹· describes the é–³ãƒ¦å��ML Setup Entityé–³ãƒ¯æ‹· (EXTXMLFEED) 
-	  which may be used to further filter data for downstream systems 
-	  (i.e. a subset of the data that matches the following criteria).
-	    COFCAT   COFSUBCAT COFGRP  
-	    -------- --------- --------
-	    101      125       150     
-	    100      *         150     
-	    102      *         *       
-	    101      127       150     
-	    101      128       150     
-	    101      129       150     
-	    101      131       150     
-	    101      133       150     
-	    101      134       150     
-	    101      194       150
-     * @param rootEntity
-     * @param abr
-     * @return
-     * @throws SQLException
-     */
-    private boolean checkModelVaild(EntityItem rootEntity, ADSABRSTATUS abr) throws SQLException {
-    	boolean bReturn = false;
-    	String entitytype = rootEntity.getEntityType();
-    	if(!"MODEL".equals(entitytype)){ 
-    		return true; 
-    	}    	
-		String querysql = 
-			" select count(*) as count from opicm.filter_model where \r\n"+
-			" (cofcat=? or cofcat='*') and                         \r\n"+
-			" (cofsubcat=? or cofsubcat='*') and                   \r\n"+
-			" (cofgrp=? or cofgrp='*') with ur                     \r\n";
-		ResultSet result=null;
-		Connection connection=null;
-		PreparedStatement pstatement = null;
-		int iCount =0;
-		try {
-            connection = setupConnection();
-            pstatement = connection.prepareStatement(querysql);
-            pstatement.setString(1, convertValue(PokUtils.getAttributeFlagValue(rootEntity, "COFCAT")));//"COFCAT"
-            pstatement.setString(2, convertValue(PokUtils.getAttributeFlagValue(rootEntity, "COFSUBCAT")));//"COFCAT"
-            pstatement.setString(3, convertValue(PokUtils.getAttributeFlagValue(rootEntity, "COFGRP")));//"COFCAT"
-            result = pstatement.executeQuery();
-            if(result.next()) {
-            	iCount = result.getInt("count");
-            	if(iCount>0) {
-            		bReturn = true;
-            	} else {
-            		bReturn = false;            	
-            	}
-            }            
-		}finally{
-			try {
-				if (pstatement!=null) {
-					pstatement.close();
-					pstatement=null;
-				}
-			}catch(Exception e){
-				abr.addDebug("getPriced unable to close statement. "+e);
-			}
-            if (result!=null){
-                result.close();
-            }
-            closeConnection(connection);
-        }
-		return bReturn;
-		
-		
-	}
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\adsxmlbh1\XMLMQAdapter.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

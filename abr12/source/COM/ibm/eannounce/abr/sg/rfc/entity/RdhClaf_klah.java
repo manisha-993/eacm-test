@@ -1,28 +1,32 @@
-/* Copyright IBM Corp. 2016 */
-package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ 
+/*    */ import com.google.gson.annotations.SerializedName;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class RdhClaf_klah
+/*    */ {
+/*    */   @SerializedName("CLASS")
+/*    */   private String _class;
+/*    */   
+/*    */   public String get_class() {
+/* 16 */     return this._class;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void set_class(String paramString) {
+/* 24 */     this._class = paramString;
+/*    */   }
+/*    */ }
 
-import com.google.gson.annotations.SerializedName;
 
-public class RdhClaf_klah
-{
-    @SerializedName("CLASS")
-    private String _class;
-
-    /**
-     * @return the _class
-     */
-    public String get_class()
-    {
-        return _class;
-    }
-
-    /**
-     * @param _class the _class to set
-     */
-    public void set_class(String _class)
-    {
-        this._class = _class;
-    }
-    
-    
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\entity\RdhClaf_klah.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

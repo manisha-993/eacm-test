@@ -1,46 +1,52 @@
-/* Copyright IBM Corp. 2016 */
-package COM.ibm.eannounce.abr.util;
+/*    */ package COM.ibm.eannounce.abr.util;
+/*    */ 
+/*    */ import java.io.FileInputStream;
+/*    */ import java.security.KeyStore;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class KeyStoreLoader
+/*    */ {
+/*    */   public static KeyStore loadKeyStore(String paramString1, String paramString2, String paramString3) throws Exception {
+/* 26 */     if (paramString1 == null || paramString1.trim().isEmpty())
+/*    */     {
+/* 28 */       paramString1 = "JKS";
+/*    */     }
+/*    */     
+/* 31 */     FileInputStream fileInputStream = null;
+/*    */     
+/*    */     try {
+/* 34 */       KeyStore keyStore = KeyStore.getInstance(paramString1);
+/* 35 */       fileInputStream = new FileInputStream(paramString2);
+/* 36 */       keyStore.load(fileInputStream, paramString3.toCharArray());
+/* 37 */       return keyStore;
+/*    */     } finally {
+/*    */       
+/* 40 */       if (fileInputStream != null)
+/*    */       {
+/* 42 */         fileInputStream.close();
+/*    */       }
+/*    */     } 
+/*    */   }
+/*    */ }
 
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.security.KeyStore;
 
-/**
- * A utility class to load KeyStore from the given location.
- * 
- * @author Li Chao Ji (jilichao@cn.ibm.com)
- * @since 08/11/2016
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\KeyStoreLoader.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class KeyStoreLoader
-{
-    /***
-     * 
-     * @param keyStoreType The types can be jceks, jks, pkcs12
-     * @param keyStore The keystore file location
-     * @param password A password is used to unlock the keystore
-     * @return
-     * @throws Exception
-     */
-    public static KeyStore loadKeyStore(String keyStoreType, String keyStore, String password) throws Exception
-    {
-        if (keyStoreType == null || keyStoreType.trim().isEmpty())
-        {
-            keyStoreType = "JKS";
-        }
-
-        InputStream in = null;
-        try
-        {
-            KeyStore ks = KeyStore.getInstance(keyStoreType);
-            in = new FileInputStream(keyStore);
-            ks.load(in, password.toCharArray());
-            return ks;
-        } finally
-        {
-            if (in != null)
-            {
-                in.close();
-            }
-        }
-    }
-}

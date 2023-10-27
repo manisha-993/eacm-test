@@ -1,114 +1,120 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import com.ibm.transform.oim.eacm.diff.DiffEntity;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Hashtable;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class XMLFixedElem
+/*     */   extends XMLElem
+/*     */ {
+/*     */   private String value;
+/*     */   
+/*     */   public XMLFixedElem(String paramString1, String paramString2) {
+/*  43 */     super(paramString1);
+/*  44 */     this.value = paramString2;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addElements(Database paramDatabase, EntityList paramEntityList, Document paramDocument, Element paramElement, EntityItem paramEntityItem, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  68 */     Element element = paramDocument.createElement(this.nodeName);
+/*  69 */     addXMLAttrs(element);
+/*     */     
+/*  71 */     element.appendChild(paramDocument.createTextNode(this.value));
+/*  72 */     paramElement.appendChild(element);
+/*     */ 
+/*     */     
+/*  75 */     for (byte b = 0; b < this.childVct.size(); b++) {
+/*  76 */       XMLElem xMLElem = this.childVct.elementAt(b);
+/*  77 */       xMLElem.addElements(paramDatabase, paramEntityList, paramDocument, element, paramEntityItem, paramStringBuffer);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addElements(Database paramDatabase, Hashtable paramHashtable, Document paramDocument, Element paramElement, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 102 */     Element element = paramDocument.createElement(this.nodeName);
+/* 103 */     addXMLAttrs(element);
+/*     */     
+/* 105 */     element.appendChild(paramDocument.createTextNode(this.value));
+/* 106 */     paramElement.appendChild(element);
+/*     */ 
+/*     */     
+/* 109 */     for (byte b = 0; b < this.childVct.size(); b++) {
+/* 110 */       XMLElem xMLElem = this.childVct.elementAt(b);
+/* 111 */       xMLElem.addElements(paramDatabase, paramHashtable, paramDocument, element, paramDiffEntity, paramStringBuffer);
+/*     */     } 
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.util;
 
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.objects.*;
-
-import org.w3c.dom.*;
-import java.util.*;
-import com.ibm.transform.oim.eacm.diff.*;
-
-/**********************************************************************************
-*  Class used to hold info and structure to be generated for the xml feed
-* for abrs.  values are fixed for these nodes
-*/
-// $Log: XMLFixedElem.java,v $
-// Revision 1.1  2008/04/17 19:37:53  wendy
-// Init for
-// -   CQ00003539-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC
-// -   CQ00005096-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Add Category MM and Images
-// -   CQ00005046-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Support CRAD in BHC
-// -   CQ00005045-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Upgrade/Conversion Support
-// -   CQ00006862-WI  - BHC 3.0 Support - Support for Services Data UI
-//
-//
-
-public class XMLFixedElem extends XMLElem
-{
-    private String value;
-    /**********************************************************************************
-    * Constructor for Fixed value elements
-    *
-    *@param nname String with name of node to be created
-    *@param val String with value
-    */
-    public XMLFixedElem(String nname, String val)
-    {
-        super(nname);
-        value = val;
-    }
-
-    /**********************************************************************************
-    * Create a node for this element and add to the parent and any children this node has
-    *
-    *@param dbCurrent Database
-    *@param list EntityList
-    *@param document Document needed to create nodes
-    *@param parent Element node to add this node too
-    *@param debugSb StringBuffer for debug output
-    */
-    public void addElements(Database dbCurrent,EntityList list, Document document, Element parent,
-        EntityItem parentItem,StringBuffer debugSb)
-    throws
-        COM.ibm.eannounce.objects.EANBusinessRuleException,
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-        java.rmi.RemoteException,
-        java.io.IOException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {
-        Element elem = (Element) document.createElement(nodeName);
-        addXMLAttrs(elem);
-        // use value from constructor
-        elem.appendChild(document.createTextNode(value));
-        parent.appendChild(elem);
-
-        // add any children
-        for (int c=0; c<childVct.size(); c++){
-            XMLElem childElem = (XMLElem)childVct.elementAt(c);
-            childElem.addElements(dbCurrent,list, document,elem,parentItem,debugSb);
-        }
-    }
-    /**********************************************************************************
-    * Create a node for this element and add to the parent and any children this node has
-    *
-    *@param dbCurrent Database
-    *@param table Hashtable of Vectors of DiffEntity
-    *@param document Document needed to create nodes
-    *@param parent Element node to add this node too
-	*@param parentItem DiffEntity - parent to use if path is specified in XMLGroupElem, item to use otherwise
-    *@param debugSb StringBuffer for debug output
-    */
-	public void addElements(Database dbCurrent,Hashtable table, Document document, Element parent,
-		DiffEntity parentItem, StringBuffer debugSb)
-    throws
-        COM.ibm.eannounce.objects.EANBusinessRuleException,
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-        java.rmi.RemoteException,
-        java.io.IOException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {
-        Element elem = (Element) document.createElement(nodeName);
-        addXMLAttrs(elem);
-        // use value from constructor
-        elem.appendChild(document.createTextNode(value));
-        parent.appendChild(elem);
-
-        // add any children
-        for (int c=0; c<childVct.size(); c++){
-            XMLElem childElem = (XMLElem)childVct.elementAt(c);
-            childElem.addElements(dbCurrent,table, document,elem,parentItem,debugSb);
-        }
-	}
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\XMLFixedElem.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

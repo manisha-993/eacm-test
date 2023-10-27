@@ -1,232 +1,218 @@
-/* Copyright IBM Corp. 2016 */
-package COM.ibm.eannounce.abr.sg.rfc;
+/*     */ package COM.ibm.eannounce.abr.sg.rfc;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_api_ausp;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_klah;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_kssk;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_mara;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_object_key;
+/*     */ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_rcuco;
+/*     */ import COM.ibm.eannounce.abr.util.DateUtility;
+/*     */ import com.google.gson.annotations.SerializedName;
+/*     */ import java.util.ArrayList;
+/*     */ import java.util.List;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class RdhClassificationMaint
+/*     */   extends RdhBase
+/*     */ {
+/*     */   @SerializedName("CHARVAL_REFRESH")
+/*     */   private String charval_refresh;
+/*     */   @SerializedName("OBJECT_KEY")
+/*     */   private List<RdhClaf_object_key> object_keys;
+/*     */   @Foo
+/*     */   private RdhClaf_object_key object_key;
+/*     */   @SerializedName("KLAH")
+/*     */   private List<RdhClaf_klah> klahs;
+/*     */   @Foo
+/*     */   private RdhClaf_klah klah;
+/*     */   @SerializedName("KSSK")
+/*     */   private List<RdhClaf_kssk> kssks;
+/*     */   @Foo
+/*     */   private RdhClaf_kssk kssk;
+/*     */   @SerializedName("RCUCO")
+/*     */   private List<RdhClaf_rcuco> rcucos;
+/*     */   @Foo
+/*     */   private RdhClaf_rcuco rcuco;
+/*     */   @SerializedName("MARA")
+/*     */   private List<RdhClaf_mara> maras;
+/*     */   @Foo
+/*     */   private RdhClaf_mara mara;
+/*     */   @SerializedName("API_AUSP")
+/*     */   private List<RdhClaf_api_ausp> api_ausp;
+/*     */   
+/*     */   public RdhClassificationMaint(String paramString1, String paramString2, String paramString3, String paramString4) {
+/* 102 */     super(paramString4, "Z_DM_SAP_CLASSIFICATION_MAINT".toLowerCase(), null);
+/* 103 */     this.charval_refresh = "1";
+/* 104 */     this.object_key = new RdhClaf_object_key();
+/* 105 */     this.object_key.setKey_feld("MATNR");
+/* 106 */     this.object_key.setKpara_valu(paramString1);
+/* 107 */     this.object_keys = new ArrayList<>();
+/* 108 */     this.object_keys.add(this.object_key);
+/* 109 */     this.klah = new RdhClaf_klah();
+/* 110 */     this.klah.set_class(paramString2);
+/* 111 */     this.klahs = new ArrayList<>();
+/* 112 */     this.klahs.add(this.klah);
+/* 113 */     this.kssk = new RdhClaf_kssk();
+/* 114 */     this.kssk.setKlart(paramString3);
+/* 115 */     this.kssks = new ArrayList<>();
+/* 116 */     this.kssks.add(this.kssk);
+/* 117 */     this.api_ausp = new ArrayList<>();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public RdhClassificationMaint(String paramString1, String paramString2, String paramString3, String paramString4, String paramString5) {
+/* 127 */     super(paramString5, "Z_DM_SAP_CLASSIFICATION_MAINT".toLowerCase(), null);
+/* 128 */     this.pims_identity = paramString4;
+/* 129 */     this.charval_refresh = "1";
+/* 130 */     this.object_key = new RdhClaf_object_key();
+/* 131 */     this.object_key.setKey_feld("MATNR");
+/* 132 */     this.object_key.setKpara_valu(paramString1);
+/* 133 */     this.object_keys = new ArrayList<>();
+/* 134 */     this.object_keys.add(this.object_key);
+/* 135 */     this.klah = new RdhClaf_klah();
+/* 136 */     this.klah.set_class(paramString2);
+/* 137 */     this.klahs = new ArrayList<>();
+/* 138 */     this.klahs.add(this.klah);
+/* 139 */     this.kssk = new RdhClaf_kssk();
+/* 140 */     this.kssk.setKlart(paramString3);
+/* 141 */     this.kssks = new ArrayList<>();
+/* 142 */     this.kssks.add(this.kssk);
+/* 143 */     this.api_ausp = new ArrayList<>();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addCharacteristic(String paramString1, String paramString2) {
+/* 154 */     RdhClaf_api_ausp rdhClaf_api_ausp = new RdhClaf_api_ausp();
+/* 155 */     rdhClaf_api_ausp.setCharact(paramString1);
+/* 156 */     rdhClaf_api_ausp.setValue(paramString2);
+/*     */     
+/* 158 */     if (paramString2 != null && paramString2.length() > 0) {
+/* 159 */       this.api_ausp.add(rdhClaf_api_ausp);
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public int getCharacteristicCount() {
+/* 170 */     return this.api_ausp.size();
+/*     */   }
+/*     */   
+/*     */   public String getClassificationName() {
+/* 174 */     return this.klah.get_class();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void setDefaultValues() {
+/* 183 */     super.setDefaultValues();
+/* 184 */     this.charval_refresh = "1";
+/* 185 */     this.rcuco = new RdhClaf_rcuco();
+/* 186 */     this.rcuco.setObtab("MARA");
+/* 187 */     this.rcucos = new ArrayList<>();
+/* 188 */     this.rcucos.add(this.rcuco);
+/* 189 */     this.mara = new RdhClaf_mara();
+/* 190 */     this.mara.setErsda(DateUtility.getTodayStringWithSimpleFormat());
+/* 191 */     this.maras = new ArrayList<>();
+/* 192 */     this.maras.add(this.mara);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean isReadyToExecute() {
+/* 198 */     if (checkFieldsNotEmplyOrNull(this.object_key, "kpara_valu"))
+/*     */     {
+/*     */       
+/* 201 */       if (checkFieldsNotEmplyOrNull(this.klah, "_class"))
+/*     */       {
+/*     */         
+/* 204 */         if (checkFieldsNotEmplyOrNull(this.kssk, "klart"))
+/*     */         {
+/* 206 */           return checkFieldsNotEmplyOrNullInCollection(this.api_ausp, "value");
+/*     */         }
+/*     */       }
+/*     */     }
+/* 210 */     return false;
+/*     */   }
+/*     */ }
 
-import java.util.ArrayList;
-import java.util.List;
 
-import COM.ibm.eannounce.abr.sg.adsxmlbh1.ADSABRSTATUS;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_api_ausp;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_klah;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_kssk;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_mara;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_object_key;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_rcuco;
-import COM.ibm.eannounce.abr.util.DateUtility;
-
-import com.google.gson.annotations.SerializedName;
-
-
-/**
- * The RdhClassificationMaint java class assigns a classification definition (ex. "MM_FIELDS") to a material master.  
- * If characteristics and values are supplied with the RFC call, this remote function will assign the attributes 
- * associated with a characteristic.
- * @author will
- *
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\RdhClassificationMaint.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class RdhClassificationMaint extends RdhBase
-{
-    @SerializedName("CHARVAL_REFRESH")
-    private String charval_refresh;
-    @SerializedName("OBJECT_KEY")
-    private List<RdhClaf_object_key> object_keys;
-    @Foo
-    private RdhClaf_object_key object_key;
-    
-    @SerializedName("KLAH")
-    private List<RdhClaf_klah> klahs;
-    @Foo
-    private RdhClaf_klah klah;
-    
-    @SerializedName("KSSK")
-    private List<RdhClaf_kssk> kssks;
-    @Foo
-    private RdhClaf_kssk kssk;
-    
-    @SerializedName("RCUCO")
-    private List<RdhClaf_rcuco> rcucos;
-    @Foo
-    private RdhClaf_rcuco rcuco;
-    
-    @SerializedName("MARA")
-    private List <RdhClaf_mara> maras;
-    @Foo
-    private RdhClaf_mara mara;
-    
-    @SerializedName("API_AUSP")
-    private List<RdhClaf_api_ausp> api_ausp;
-    
-   /* *//**
-     * Constructor
-     * @param productSchedule
-     * @param obj_id
-     * @param class_name
-     * @param class_type
-     *//*
-    public RdhClassificationMaint ( String obj_id, String class_name, String class_type ){
-        super("",
-                "Z_DM_SAP_CLASSIFICATION_MAINT".toLowerCase(), null);
-       
-        charval_refresh="1";
-        
-        
-        object_key = new RdhClaf_object_key();
-        object_key.setKey_feld("MATNR");
-        object_key.setKpara_valu(obj_id);
-        object_keys = new ArrayList<RdhClaf_object_key>();
-        object_keys.add(object_key);
-        
-        klah = new RdhClaf_klah();
-        klah.set_class(class_name);
-        kssk = new RdhClaf_kssk();
-        kssk.setKlart(class_type);
-        
-        rcuco= new RdhClaf_rcuco();
-        rcuco.s
-        klahs = new ArrayList<RdhClaf_klah>();
-        klahs.add(klah);
-       
-        kssks = new ArrayList<RdhClaf_kssk>();
-        kssks.add(kssk);
-        api_ausp = new ArrayList<RdhClaf_api_ausp>();
-    }*/
-    /**
-     * Constructor
-     * @param productSchedule
-     * @param obj_id
-     * @param class_name
-     * @param class_type
-     * @param enablementprocess
-     */
-    public RdhClassificationMaint (String obj_id, String class_name, String class_type, String rfaNum )
-    {
-    	super(rfaNum,"Z_DM_SAP_CLASSIFICATION_MAINT".toLowerCase(),null);
-    	charval_refresh = "1";
-    	object_key = new RdhClaf_object_key();
-    	object_key.setKey_feld("MATNR");
-    	object_key.setKpara_valu(obj_id);
-    	object_keys = new ArrayList<RdhClaf_object_key>();
-    	object_keys.add(object_key);
-    	klah = new RdhClaf_klah();
-    	klah.set_class(class_name);
-    	klahs = new ArrayList<RdhClaf_klah>();
-    	klahs.add(klah);
-    	kssk = new RdhClaf_kssk();
-    	kssk.setKlart(class_type);
-    	kssks = new ArrayList<RdhClaf_kssk>();
-    	kssks.add(kssk);
-    	api_ausp = new ArrayList<RdhClaf_api_ausp>();
-    }
-    
-    /**
-     * Constructor
-     *  add pims_identity 
-     * @param enablementprocess
-     */
-    public RdhClassificationMaint (String obj_id, String class_name, String class_type, String pims_identity, String rfaNum)
-    {
-    	super(rfaNum,"Z_DM_SAP_CLASSIFICATION_MAINT".toLowerCase(),null);
-    	this.pims_identity = pims_identity;
-    	charval_refresh = "1";
-    	object_key = new RdhClaf_object_key();
-    	object_key.setKey_feld("MATNR");
-    	object_key.setKpara_valu(obj_id);
-    	object_keys = new ArrayList<RdhClaf_object_key>();
-    	object_keys.add(object_key);
-    	klah = new RdhClaf_klah();
-    	klah.set_class(class_name);
-    	klahs = new ArrayList<RdhClaf_klah>();
-    	klahs.add(klah);
-    	kssk = new RdhClaf_kssk();
-    	kssk.setKlart(class_type);
-    	kssks = new ArrayList<RdhClaf_kssk>();
-    	kssks.add(kssk);
-    	api_ausp = new ArrayList<RdhClaf_api_ausp>();
-    }
-    
-    /**
-     * Adds a characteristic and its value to an SAP classification.
-     * @param charact Characteristic name
-     * @param value Characteristic value
-     * @param abr 
-     */
-    public void addCharacteristic (String charact, String value)
-    {
-        RdhClaf_api_ausp apiausp = new RdhClaf_api_ausp();
-        apiausp.setCharact(charact);
-        apiausp.setValue(value);
-		
-		  if(value!=null&&value.length()>0) {
-		  api_ausp.add(apiausp);
-		  }
-		 
-    }
-    
-    /**
-     * Returns the number of characteristics which have been added to the RdhClassificationMaint object.
-     * @return
-     */
-    public int getCharacteristicCount()
-    {
-        return api_ausp.size();
-    }
-    
-    public String getClassificationName(){
-        return klah.get_class();
-    }
-    
-    /* (non-Javadoc)
-     * @see com.ibm.sdpi.cmd.interfaces.rdh.esw.caller.RdhBase#setDefaultValues()
-     */
-    @Override
-    protected void setDefaultValues()
-    {
-        super.setDefaultValues();
-        charval_refresh = "1";
-        rcuco = new RdhClaf_rcuco();
-        rcuco.setObtab("MARA");
-        rcucos = new ArrayList<RdhClaf_rcuco>();
-        rcucos.add(rcuco);
-        mara = new RdhClaf_mara();
-        mara.setErsda(DateUtility.getTodayStringWithSimpleFormat());
-        maras = new ArrayList<RdhClaf_mara>();
-        maras.add(mara);
-    }
-
-    @Override
-    protected boolean isReadyToExecute()
-    {
-        if(this.checkFieldsNotEmplyOrNull(object_key, "kpara_valu"))
-        {
-            
-            if(this.checkFieldsNotEmplyOrNull(klah, "_class"))
-            {
-                
-                if(this.checkFieldsNotEmplyOrNull(kssk, "klart"))
-                {
-                    return checkFieldsNotEmplyOrNullInCollection(api_ausp,"value");
-                }
-            }
-        }
-        return false;
-//        if (isNullOrBlank(object_key.getKpara_valu()))
-//        {
-//            this.setRfcrc(8);
-//            this.setError_text("The Rdhclaf_object_key.kpara_valu attribute is not set to a value");
-//            return false;
-//        }
-//        if (isNullOrBlank(klah.get_class()))
-//        {
-//            this.setRfcrc(8);
-//            this.setError_text("The RdhClaf_klah.class attribute is not set to a value");
-//            return false;
-//        }
-//        if (isNullOrBlank(kssk.getKlart()))
-//        {
-//            this.setRfcrc(8);
-//            this.setError_text("The RdhClaf_kssk.klart attribute is not set to a value");
-//            return false;
-//        }
-//        return true;
-    }
-
-}

@@ -90,6 +90,7 @@
 				</xsd:simpleType>
 			</xsd:element>
 			<xsd:element name="TAXCLASSIFICATION" type="xsd:string" />
+			<xsd:element name="PRODUCTCODE" type="xsd:string" />
 			<xsd:element name="SLEORGGRPLIST" type="SLEORGGRPLISTTYPE" minOccurs="1" maxOccurs="1" />
 			<xsd:element name="SLEORGNPLNTCODELIST" type="SLEORGNPLNTCODELISTTYPE" minOccurs="1" maxOccurs="1" />
 

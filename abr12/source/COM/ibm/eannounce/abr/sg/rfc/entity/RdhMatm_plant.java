@@ -1,240 +1,246 @@
-/* Copyright IBM Corp. 2020 */
-package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*     */ package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*     */ 
+/*     */ import com.google.gson.annotations.SerializedName;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class RdhMatm_plant
+/*     */ {
+/*     */   @SerializedName("WERKS")
+/*     */   private String werks;
+/*     */   @SerializedName("LGORT")
+/*     */   private String lgort;
+/*     */   @SerializedName("STAWN")
+/*     */   private String stawn;
+/*     */   @SerializedName("HERKL")
+/*     */   private String herkl;
+/*     */   @SerializedName("HERKR")
+/*     */   private String herkr;
+/*     */   @SerializedName("EKGRP")
+/*     */   private String ekgrp;
+/*     */   @SerializedName("DISMM")
+/*     */   private String dismm;
+/*     */   @SerializedName("BESKZ")
+/*     */   private String beskz;
+/*     */   @SerializedName("MTVFP")
+/*     */   private String mtvfp;
+/*     */   @SerializedName("PLIFZ")
+/*     */   private String plifz;
+/*     */   @SerializedName("WEBAZ")
+/*     */   private String webaz;
+/*     */   @SerializedName("VPRSV")
+/*     */   private String vprsv;
+/*     */   @SerializedName("MTVER")
+/*     */   private String mtver;
+/*     */   @SerializedName("PRCTR")
+/*     */   private String prctr;
+/*     */   @SerializedName("STEUC")
+/*     */   private String steuc;
+/*     */   
+/*     */   public String getLgort() {
+/*  49 */     return this.lgort;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setLgort(String paramString) {
+/*  56 */     this.lgort = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getWerks() {
+/*  63 */     return this.werks;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setWerks(String paramString) {
+/*  70 */     this.werks = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getStawn() {
+/*  77 */     return this.stawn;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setStawn(String paramString) {
+/*  84 */     this.stawn = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getHerkl() {
+/*  91 */     return this.herkl;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setHerkl(String paramString) {
+/*  98 */     this.herkl = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getHerkr() {
+/* 105 */     return this.herkr;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setHerkr(String paramString) {
+/* 112 */     this.herkr = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getEkgrp() {
+/* 119 */     return this.ekgrp;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setEkgrp(String paramString) {
+/* 126 */     this.ekgrp = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDismm() {
+/* 133 */     return this.dismm;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setDismm(String paramString) {
+/* 140 */     this.dismm = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getBeskz() {
+/* 147 */     return this.beskz;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setBeskz(String paramString) {
+/* 154 */     this.beskz = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getMtvfp() {
+/* 161 */     return this.mtvfp;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setMtvfp(String paramString) {
+/* 168 */     this.mtvfp = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getPlifz() {
+/* 175 */     return this.plifz;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setPlifz(String paramString) {
+/* 182 */     this.plifz = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getWebaz() {
+/* 189 */     return this.webaz;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setWebaz(String paramString) {
+/* 196 */     this.webaz = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVprsv() {
+/* 203 */     return this.vprsv;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setVprsv(String paramString) {
+/* 210 */     this.vprsv = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getMtver() {
+/* 217 */     return this.mtver;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setMtver(String paramString) {
+/* 224 */     this.mtver = paramString;
+/*     */   }
+/*     */   public String getPrctr() {
+/* 227 */     return this.prctr;
+/*     */   }
+/*     */   public void setPrctr(String paramString) {
+/* 230 */     this.prctr = paramString;
+/*     */   }
+/*     */   
+/*     */   public String getSteuc() {
+/* 234 */     return this.steuc;
+/*     */   }
+/*     */   
+/*     */   public void setSteuc(String paramString) {
+/* 238 */     this.steuc = paramString;
+/*     */   }
+/*     */ }
 
-import com.google.gson.annotations.SerializedName;
 
-/**
- * PLANT for MATERIAL CREATION RFC
- * @author will
- *
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\entity\RdhMatm_plant.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class RdhMatm_plant
-{
-    @SerializedName("WERKS")
-    private String werks;
-    @SerializedName("LGORT")
-    private String lgort;
-    
-    @SerializedName("STAWN")
-    private String stawn;
-    @SerializedName("HERKL")
-    private String herkl;
-    @SerializedName("HERKR")
-    private String herkr;
-    @SerializedName("EKGRP")
-    private String ekgrp;
-    @SerializedName("DISMM")
-    private String dismm;
-    @SerializedName("BESKZ")
-    private String beskz;
-    @SerializedName("MTVFP")
-    private String mtvfp;
-    @SerializedName("PLIFZ")
-    private String plifz;
-    @SerializedName("WEBAZ")
-    private String webaz;
-    @SerializedName("VPRSV")
-    private String vprsv;
-    @SerializedName("MTVER")
-    private String mtver;
-    @SerializedName("PRCTR")
-    private String prctr;
-    @SerializedName("STEUC")
-    private String steuc;
-    /**
-     * @return the lgort
-     */
-    public String getLgort()
-    {
-        return lgort;
-    }
-    /**
-     * @param lgort the lgort to set
-     */
-    public void setLgort(String lgort)
-    {
-        this.lgort = lgort;
-    }
-    /**
-     * @return the werks
-     */
-    public String getWerks()
-    {
-        return werks;
-    }
-    /**
-     * @param werks the werks to set
-     */
-    public void setWerks(String werks)
-    {
-        this.werks = werks;
-    }
-    /**
-     * @return the stawn
-     */
-    public String getStawn()
-    {
-        return stawn;
-    }
-    /**
-     * @param stawn the stawn to set
-     */
-    public void setStawn(String stawn)
-    {
-        this.stawn = stawn;
-    }
-    /**
-     * @return the herkl
-     */
-    public String getHerkl()
-    {
-        return herkl;
-    }
-    /**
-     * @param herkl the herkl to set
-     */
-    public void setHerkl(String herkl)
-    {
-        this.herkl = herkl;
-    }
-    /**
-     * @return the herkr
-     */
-    public String getHerkr()
-    {
-        return herkr;
-    }
-    /**
-     * @param herkr the herkr to set
-     */
-    public void setHerkr(String herkr)
-    {
-        this.herkr = herkr;
-    }
-    /**
-     * @return the ekgrp
-     */
-    public String getEkgrp()
-    {
-        return ekgrp;
-    }
-    /**
-     * @param ekgrp the ekgrp to set
-     */
-    public void setEkgrp(String ekgrp)
-    {
-        this.ekgrp = ekgrp;
-    }
-    /**
-     * @return the dismm
-     */
-    public String getDismm()
-    {
-        return dismm;
-    }
-    /**
-     * @param dismm the dismm to set
-     */
-    public void setDismm(String dismm)
-    {
-        this.dismm = dismm;
-    }
-    /**
-     * @return the beskz
-     */
-    public String getBeskz()
-    {
-        return beskz;
-    }
-    /**
-     * @param beskz the beskz to set
-     */
-    public void setBeskz(String beskz)
-    {
-        this.beskz = beskz;
-    }
-    /**
-     * @return the mtvfp
-     */
-    public String getMtvfp()
-    {
-        return mtvfp;
-    }
-    /**
-     * @param mtvfp the mtvfp to set
-     */
-    public void setMtvfp(String mtvfp)
-    {
-        this.mtvfp = mtvfp;
-    }
-    /**
-     * @return the plifz
-     */
-    public String getPlifz()
-    {
-        return plifz;
-    }
-    /**
-     * @param plifz the plifz to set
-     */
-    public void setPlifz(String plifz)
-    {
-        this.plifz = plifz;
-    }
-    /**
-     * @return the webaz
-     */
-    public String getWebaz()
-    {
-        return webaz;
-    }
-    /**
-     * @param webaz the webaz to set
-     */
-    public void setWebaz(String webaz)
-    {
-        this.webaz = webaz;
-    }
-    /**
-     * @return the vprsv
-     */
-    public String getVprsv()
-    {
-        return vprsv;
-    }
-    /**
-     * @param vprsv the vprsv to set
-     */
-    public void setVprsv(String vprsv)
-    {
-        this.vprsv = vprsv;
-    }
-    /**
-     * @return the mtver
-     */
-    public String getMtver()
-    {
-        return mtver;
-    }
-    /**
-     * @param mtver the mtver to set
-     */
-    public void setMtver(String mtver)
-    {
-        this.mtver = mtver;
-    }
-	public String getPrctr() {
-		return prctr;
-	}
-	public void setPrctr(String prctr) {
-		this.prctr = prctr;
-	}
-
-    public String getSteuc() {
-        return steuc;
-    }
-
-    public void setSteuc(String steuc) {
-        this.steuc = steuc;
-    }
-}

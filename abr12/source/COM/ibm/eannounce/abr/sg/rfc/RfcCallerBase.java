@@ -1,59 +1,63 @@
-package COM.ibm.eannounce.abr.sg.rfc;
+/*    */ package COM.ibm.eannounce.abr.sg.rfc;
+/*    */ 
+/*    */ 
+/*    */ public class RfcCallerBase
+/*    */ {
+/*  6 */   public StringBuffer rptSb = new StringBuffer();
+/*  7 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/*  8 */   private int abr_debuglvl = 0;
+/*  9 */   static final String NEWLINE = new String(FOOL_JTEST);
+/*    */   
+/*    */   public StringBuffer getRptSb() {
+/* 12 */     return this.rptSb;
+/*    */   }
+/*    */   private boolean isdebug = true;
+/*    */   protected void addDebug(String paramString) {
+/* 16 */     if (3 <= this.abr_debuglvl || this.isdebug)
+/*    */     {
+/* 18 */       this.rptSb.append("<!-- " + paramString + " -->" + NEWLINE);
+/*    */     }
+/*    */   }
+/*    */   
+/*    */   protected void addOutput(String paramString) {
+/* 23 */     this.rptSb.append("<p>" + paramString + "</p>" + NEWLINE);
+/*    */   }
+/*    */   
+/*    */   protected void addMsg(StringBuffer paramStringBuffer) {
+/* 27 */     this.rptSb.append(paramStringBuffer.toString() + NEWLINE);
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   protected void addRfcName(RdhBase paramRdhBase) {
+/* 32 */     addDebug("Calling " + paramRdhBase.getRFCName());
+/*    */   }
+/*    */   
+/*    */   protected void addRfcResult(RdhBase paramRdhBase) {
+/* 36 */     addDebug(paramRdhBase.createLogEntry());
+/* 37 */     if (paramRdhBase.getRfcrc() == 0) {
+/* 38 */       addOutput(paramRdhBase.getRFCName() + " called successfully!");
+/*    */     } else {
+/* 40 */       addOutput(paramRdhBase.getRFCName() + " called  faild!");
+/* 41 */       addOutput("return code is " + paramRdhBase.getRfcrc());
+/* 42 */       addOutput(paramRdhBase.getError_text());
+/*    */     } 
+/*    */   }
+/*    */   
+/*    */   protected void runRfcCaller(RdhBase paramRdhBase) throws Exception {
+/* 47 */     addDebug("Calling " + paramRdhBase.getRFCName());
+/* 48 */     paramRdhBase.execute();
+/* 49 */     addDebug(paramRdhBase.createLogEntry());
+/* 50 */     if (paramRdhBase.getRfcrc() == 0) {
+/* 51 */       addOutput(paramRdhBase.getRFCName() + " called successfully!");
+/*    */     } else {
+/* 53 */       addOutput(paramRdhBase.getRFCName() + " called  faild!");
+/* 54 */       addOutput(paramRdhBase.getError_text());
+/*    */     } 
+/*    */   }
+/*    */ }
 
-import COM.ibm.opicmpdh.middleware.D;
 
-public class RfcCallerBase {
-	public StringBuffer rptSb = new StringBuffer();
-	private static final char[] FOOL_JTEST = { '\n' };
-	private int abr_debuglvl = D.EBUG_ERR;
-	static final String NEWLINE = new String(FOOL_JTEST);
-	private boolean isdebug = true;
-	public StringBuffer getRptSb() {
-		return rptSb;
-	}	
-	
-	protected void addDebug(String msg) {
-		if (D.EBUG_DETAIL <= abr_debuglvl || isdebug) {
-		//if (D.EBUG_DETAIL <= abr_debuglvl) {
-			rptSb.append("<!-- " + msg + " -->" + NEWLINE);
-		}
-	}
-	
-	protected void addOutput(String msg) { 
-		rptSb.append("<p>"+msg+"</p>"+NEWLINE);
-	}
-	
-	protected void addMsg(StringBuffer msg) { 
-		rptSb.append(msg.toString()+NEWLINE);
-	}
-	
-	
-	protected void addRfcName(RdhBase rdhBase){
-		this.addDebug("Calling " + rdhBase.getRFCName());
-	}
-	
-	protected void addRfcResult(RdhBase rdhBase) {
-		this.addDebug(rdhBase.createLogEntry());
-		if (rdhBase.getRfcrc() == 0) {
-			this.addOutput(rdhBase.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(rdhBase.getRFCName() + " called  faild!");
-			this.addOutput("return code is " + rdhBase.getRfcrc());
-			this.addOutput(rdhBase.getError_text());
-		}
-	}
-	
-	protected void runRfcCaller(RdhBase caller) throws Exception {
-		this.addDebug("Calling " + caller.getRFCName());
-		caller.execute();
-		this.addDebug(caller.createLogEntry());
-		if (caller.getRfcrc() == 0) {
-			this.addOutput(caller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(caller.getRFCName() + " called  faild!");
-			this.addOutput(caller.getError_text());
-		}
-	}
-	
-
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\RfcCallerBase.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

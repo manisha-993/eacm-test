@@ -1,641 +1,647 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2007  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANTextAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.eannounce.objects.MetaFlag;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import COM.ibm.opicmpdh.transactions.NLSItem;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.IOException;
+/*     */ import java.io.StringReader;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Collections;
+/*     */ import java.util.Enumeration;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.Vector;
+/*     */ import javax.xml.parsers.DocumentBuilderFactory;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.DocumentFragment;
+/*     */ import org.w3c.dom.Element;
+/*     */ import org.w3c.dom.Node;
+/*     */ import org.w3c.dom.Text;
+/*     */ import org.xml.sax.InputSource;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class SAPLElem
+/*     */ {
+/*     */   public static final int ATTRVAL = 0;
+/*     */   public static final int FLAGVAL = 1;
+/*  54 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/*  55 */   static final String NEWLINE = new String(FOOL_JTEST);
+/*     */   
+/*     */   protected static final String CHEAT = "@@";
+/*  58 */   protected static final String[] AVAIL_ORDER = new String[] { "146", "143", "149", "AVT220" };
+/*     */   protected boolean isRoot = false;
+/*     */   protected boolean isReq = false;
+/*     */   protected String nodeName;
+/*  62 */   protected String etype = null;
+/*  63 */   protected String attrCode = null;
+/*  64 */   protected Vector childVct = new Vector(1);
+/*  65 */   protected Hashtable xmlAttrTbl = new Hashtable<>();
+/*  66 */   protected int attrSrc = 0;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public SAPLElem(String paramString) {
+/*  75 */     this(paramString, null, null, false, 0);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public SAPLElem(String paramString1, String paramString2, String paramString3) {
+/*  86 */     this(paramString1, paramString2, paramString3, false, 0);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public SAPLElem(String paramString1, String paramString2, String paramString3, int paramInt) {
+/*  99 */     this(paramString1, paramString2, paramString3, false, paramInt);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public SAPLElem(String paramString1, String paramString2, String paramString3, boolean paramBoolean) {
+/* 112 */     this(paramString1, paramString2, paramString3, paramBoolean, 0);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public SAPLElem(String paramString1, String paramString2, String paramString3, boolean paramBoolean, int paramInt) {
+/* 126 */     this.nodeName = paramString1;
+/* 127 */     this.etype = paramString2;
+/* 128 */     this.attrCode = paramString3;
+/* 129 */     this.isRoot = paramBoolean;
+/* 130 */     this.attrSrc = paramInt;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String toString() {
+/* 139 */     StringBuffer stringBuffer = new StringBuffer();
+/* 140 */     stringBuffer.append("Node:" + this.nodeName + " type:" + this.etype + " attr:" + this.attrCode + " root:" + this.isRoot + " req:" + this.isReq + " childCnt:" + this.childVct
+/* 141 */         .size());
+/* 142 */     for (byte b = 0; b < this.childVct.size(); b++) {
+/* 143 */       stringBuffer.append(NEWLINE + "  " + this.childVct.elementAt(b).toString());
+/*     */     }
+/* 145 */     return stringBuffer.toString();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addChild(SAPLElem paramSAPLElem) {
+/* 153 */     this.childVct.add(paramSAPLElem);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String removeCheat(String paramString) {
+/* 165 */     StringBuffer stringBuffer = new StringBuffer(paramString);
+/* 166 */     int i = 0;
+/* 167 */     while (i != -1) {
+/*     */       
+/* 169 */       i = stringBuffer.toString().indexOf("@@", i);
+/* 170 */       if (i != -1) {
+/* 171 */         stringBuffer.replace(i, i + "@@".length(), "");
+/*     */       }
+/*     */     } 
+/* 174 */     return stringBuffer.toString();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addXMLAttribute(String paramString1, String paramString2) {
+/* 183 */     this.xmlAttrTbl.put(paramString1, paramString2);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setRequired() {
+/* 190 */     this.isReq = true;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected Vector getEntities(EntityGroup paramEntityGroup) {
+/* 199 */     Vector<EntityItem> vector = new Vector();
+/* 200 */     if (paramEntityGroup != null) {
+/* 201 */       for (byte b = 0; b < paramEntityGroup.getEntityItemCount(); b++) {
+/* 202 */         vector.addElement(paramEntityGroup.getEntityItem(b));
+/*     */       }
+/*     */     }
+/* 205 */     return vector;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private DocumentFragment parseXml(Document paramDocument, String paramString) {
+/* 215 */     DocumentFragment documentFragment = null;
+/*     */     
+/* 217 */     paramString = "<fragment>" + paramString + "</fragment>";
+/*     */     
+/*     */     try {
+/* 220 */       DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+/* 221 */       Document document = documentBuilderFactory.newDocumentBuilder().parse(new InputSource(new StringReader(paramString)));
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 226 */       Node node = paramDocument.importNode(document.getDocumentElement(), true);
+/*     */ 
+/*     */       
+/* 229 */       documentFragment = paramDocument.createDocumentFragment();
+/*     */ 
+/*     */       
+/* 232 */       while (node.hasChildNodes()) {
+/* 233 */         documentFragment.appendChild(node.removeChild(node.getFirstChild()));
+/*     */       }
+/* 235 */     } catch (Exception exception) {
+/*     */       
+/* 237 */       exception.printStackTrace(System.out);
+/*     */     } 
+/*     */ 
+/*     */     
+/* 241 */     return documentFragment;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void addXMLAttrs(Element paramElement) {
+/* 250 */     for (Enumeration<String> enumeration = this.xmlAttrTbl.keys(); enumeration.hasMoreElements(); ) {
+/*     */       
+/* 252 */       String str1 = enumeration.nextElement();
+/* 253 */       String str2 = (String)this.xmlAttrTbl.get(str1);
+/* 254 */       paramElement.setAttribute(str1, str2);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addElements(Database paramDatabase, EntityList paramEntityList, Document paramDocument, Element paramElement, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 278 */     if (this.etype == null) {
+/* 279 */       if (paramElement == null) {
+/* 280 */         Element element = paramDocument.createElement(this.nodeName);
+/* 281 */         addXMLAttrs(element);
+/* 282 */         paramDocument.appendChild(element);
+/* 283 */         for (byte b = 0; b < this.childVct.size(); b++) {
+/* 284 */           SAPLElem sAPLElem = this.childVct.elementAt(b);
+/* 285 */           sAPLElem.addElements(paramDatabase, paramEntityList, paramDocument, element, paramStringBuffer);
+/*     */         } 
+/*     */       } else {
+/* 288 */         Element element = paramDocument.createElement(this.nodeName);
+/* 289 */         addXMLAttrs(element);
+/* 290 */         paramElement.appendChild(element);
+/* 291 */         for (byte b = 0; b < this.childVct.size(); b++) {
+/* 292 */           SAPLElem sAPLElem = this.childVct.elementAt(b);
+/* 293 */           sAPLElem.addElements(paramDatabase, paramEntityList, paramDocument, element, paramStringBuffer);
+/*     */         } 
+/*     */       } 
+/*     */     } else {
+/*     */       
+/* 298 */       EntityGroup entityGroup = null;
+/* 299 */       if (this.isRoot) {
+/* 300 */         entityGroup = paramEntityList.getParentEntityGroup();
+/*     */       } else {
+/* 302 */         entityGroup = paramEntityList.getEntityGroup(this.etype);
+/*     */       } 
+/* 304 */       if (entityGroup == null) {
+/* 305 */         Element element = paramDocument.createElement(this.nodeName);
+/* 306 */         addXMLAttrs(element);
+/* 307 */         paramElement.appendChild(element);
+/* 308 */         element.appendChild(paramDocument.createTextNode("Error: " + this.etype + " not found in extract!"));
+/*     */         
+/* 310 */         if (this.isReq) {
+/* 311 */           throw new IOException(this.nodeName + " is required but " + this.etype + " is not in extract");
+/*     */         }
+/*     */         
+/* 314 */         for (byte b = 0; b < this.childVct.size(); b++) {
+/* 315 */           SAPLElem sAPLElem = this.childVct.elementAt(b);
+/* 316 */           sAPLElem.addElements(paramDatabase, paramEntityList, paramDocument, element, paramStringBuffer);
+/*     */         } 
+/*     */       } else {
+/*     */         
+/* 320 */         Vector<EntityItem> vector = getEntities(entityGroup);
+/* 321 */         if (vector.size() == 0) {
+/* 322 */           Element element = paramDocument.createElement(this.nodeName);
+/* 323 */           addXMLAttrs(element);
+/* 324 */           paramElement.appendChild(element);
+/* 325 */           if (this.attrCode != null) {
+/* 326 */             element.appendChild(paramDocument.createTextNode("@@"));
+/*     */           }
+/* 328 */           if (this.isReq) {
+/* 329 */             throw new IOException(this.nodeName + " is required but " + this.etype + " is not in the data");
+/*     */           }
+/*     */           
+/* 332 */           for (byte b1 = 0; b1 < this.childVct.size(); b1++) {
+/* 333 */             SAPLElem sAPLElem = this.childVct.elementAt(b1);
+/* 334 */             sAPLElem.addElements(paramDatabase, paramEntityList, paramDocument, element, paramStringBuffer);
+/*     */           } 
+/*     */         } 
+/*     */         
+/* 338 */         for (byte b = 0; b < vector.size(); b++) {
+/* 339 */           EntityItem entityItem = vector.elementAt(b);
+/*     */           
+/* 341 */           Element element = paramDocument.createElement(this.nodeName);
+/* 342 */           addXMLAttrs(element);
+/* 343 */           paramElement.appendChild(element);
+/* 344 */           Node node = getContentNode(paramDocument, entityItem, paramElement);
+/* 345 */           if (node != null) {
+/* 346 */             element.appendChild(node);
+/*     */           }
+/*     */           
+/* 349 */           for (byte b1 = 0; b1 < this.childVct.size(); b1++) {
+/* 350 */             SAPLElem sAPLElem = this.childVct.elementAt(b1);
+/* 351 */             sAPLElem.addElements(paramDatabase, paramEntityList, paramDocument, element, paramStringBuffer);
+/*     */           } 
+/*     */         } 
+/* 354 */         vector.clear();
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void addGEOElements(Vector paramVector, Document paramDocument, Element paramElement, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 379 */     throw new IOException("SAPLElem addElements(Vector..) needs to be overridden by derived class");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean hasNodeValueForNLS(EntityItem paramEntityItem) {
+/* 408 */     String[] arrayOfString = PokUtils.convertToArray(this.attrCode);
+/* 409 */     StringBuffer stringBuffer = new StringBuffer();
+/*     */     
+/* 411 */     EntityGroup entityGroup = paramEntityItem.getEntityGroup();
+/* 412 */     EntityList entityList = entityGroup.getEntityList();
+/* 413 */     for (byte b = 0; b < arrayOfString.length; b++) {
+/* 414 */       String str = arrayOfString[b];
+/* 415 */       EANMetaAttribute eANMetaAttribute = entityGroup.getMetaAttribute(str);
+/* 416 */       if (eANMetaAttribute != null) {
+/* 417 */         Profile profile = entityList.getProfile();
+/*     */ 
+/*     */         
+/* 420 */         EANAttribute eANAttribute = paramEntityItem.getAttribute(str);
+/* 421 */         if (eANAttribute instanceof EANTextAttribute) {
+/* 422 */           NLSItem nLSItem = profile.getReadLanguage();
+/* 423 */           int i = nLSItem.getNLSID();
+/*     */           
+/* 425 */           if (((EANTextAttribute)eANAttribute).containsNLS(i)) {
+/* 426 */             stringBuffer.append(eANAttribute.toString());
+/*     */           }
+/*     */         } else {
+/* 429 */           stringBuffer.append(PokUtils.getAttributeValue(paramEntityItem, str, ", ", "", false));
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/* 433 */     return (stringBuffer.length() > 0);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean hasNodeValueForNLS(EntityList paramEntityList, StringBuffer paramStringBuffer) {
+/* 445 */     boolean bool = false;
+/* 446 */     if (this.etype == null) {
+/* 447 */       for (byte b = 0; b < this.childVct.size() && !bool; b++) {
+/* 448 */         SAPLElem sAPLElem = this.childVct.elementAt(b);
+/* 449 */         bool = sAPLElem.hasNodeValueForNLS(paramEntityList, paramStringBuffer);
+/*     */       } 
+/*     */     } else {
+/*     */       
+/* 453 */       EntityGroup entityGroup = null;
+/* 454 */       if (this.isRoot) {
+/* 455 */         entityGroup = paramEntityList.getParentEntityGroup();
+/*     */       } else {
+/* 457 */         entityGroup = paramEntityList.getEntityGroup(this.etype);
+/*     */       } 
+/* 459 */       if (entityGroup != null) {
+/*     */         
+/* 461 */         Vector<EntityItem> vector = getEntities(entityGroup);
+/* 462 */         for (byte b = 0; b < vector.size() && !bool; b++) {
+/* 463 */           EntityItem entityItem = vector.elementAt(b);
+/* 464 */           bool = hasNodeValueForNLS(entityItem);
+/* 465 */           if (bool) {
+/*     */             break;
+/*     */           }
+/*     */           
+/* 469 */           for (byte b1 = 0; b1 < this.childVct.size() && !bool; b1++) {
+/* 470 */             SAPLElem sAPLElem = this.childVct.elementAt(b1);
+/* 471 */             bool = sAPLElem.hasNodeValueForNLS(paramEntityList, paramStringBuffer);
+/*     */           } 
+/*     */         } 
+/* 474 */         vector.clear();
+/*     */       } 
+/*     */     } 
+/* 477 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected Node getContentNode(Document paramDocument, EntityItem paramEntityItem, Element paramElement) throws IOException {
+/*     */     Text text;
+/* 491 */     String[] arrayOfString = PokUtils.convertToArray(this.attrCode);
+/*     */     
+/* 493 */     EntityGroup entityGroup = paramEntityItem.getEntityGroup();
+/* 494 */     EntityList entityList = entityGroup.getEntityList();
+/* 495 */     DocumentFragment documentFragment = null;
+/* 496 */     StringBuffer stringBuffer = new StringBuffer();
+/* 497 */     for (byte b = 0; b < arrayOfString.length; b++) {
+/* 498 */       String str1 = "";
+/* 499 */       String str2 = arrayOfString[b];
+/* 500 */       EANMetaAttribute eANMetaAttribute = entityGroup.getMetaAttribute(str2);
+/* 501 */       if (eANMetaAttribute == null) {
+/* 502 */         if (this.isReq) {
+/* 503 */           throw new IOException(this.nodeName + " is required but " + str2 + " is not in " + paramEntityItem
+/* 504 */               .getEntityType() + " META data");
+/*     */         }
+/*     */ 
+/*     */         
+/* 508 */         str1 = "Error: Attribute " + str2 + " not found in " + paramEntityItem.getEntityType() + " META data.";
+/* 509 */         stringBuffer.append(str1);
+/*     */       } else {
+/* 511 */         Profile profile = entityList.getProfile();
+/*     */ 
+/*     */         
+/* 514 */         EANAttribute eANAttribute = paramEntityItem.getAttribute(str2);
+/* 515 */         if (eANAttribute instanceof EANTextAttribute) {
+/* 516 */           NLSItem nLSItem = profile.getReadLanguage();
+/* 517 */           int i = nLSItem.getNLSID();
+/*     */           
+/* 519 */           if (((EANTextAttribute)eANAttribute).containsNLS(i)) {
+/* 520 */             str1 = eANAttribute.toString();
+/*     */           } else {
+/*     */             
+/* 523 */             str1 = "@@";
+/*     */           } 
+/*     */         } else {
+/* 526 */           str1 = PokUtils.getAttributeValue(paramEntityItem, str2, ", ", "@@", false);
+/*     */         } 
+/*     */         
+/* 529 */         if (this.isReq && str1.equals("@@")) {
+/* 530 */           throw new IOException(this.nodeName + " is required but " + str2 + " is not set in " + paramEntityItem
+/* 531 */               .getKey());
+/*     */         }
+/* 533 */         if (eANMetaAttribute.getAttributeType().equals("X")) {
+/*     */ 
+/*     */           
+/* 536 */           documentFragment = parseXml(paramDocument, str1);
+/*     */         }
+/* 538 */         else if (eANMetaAttribute.getAttributeType().equals("U") && this.attrSrc == 1) {
+/* 539 */           EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)paramEntityItem.getAttribute(str2);
+/* 540 */           if (eANFlagAttribute != null && eANFlagAttribute.toString().length() > 0) {
+/*     */             
+/* 542 */             MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 543 */             for (byte b1 = 0; b1 < arrayOfMetaFlag.length; b1++) {
+/*     */               
+/* 545 */               if (arrayOfMetaFlag[b1].isSelected()) {
+/* 546 */                 stringBuffer.append(arrayOfMetaFlag[b1].getFlagCode());
+/*     */                 break;
+/*     */               } 
+/*     */             } 
+/*     */           } else {
+/* 551 */             stringBuffer.append("@@");
+/*     */           } 
+/* 553 */         } else if (eANMetaAttribute.getAttributeType().equals("F")) {
+/* 554 */           Element element = (Element)paramElement.getParentNode();
+/*     */ 
+/*     */           
+/* 557 */           EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)paramEntityItem.getAttribute(str2);
+/* 558 */           if (eANFlagAttribute != null && eANFlagAttribute.toString().length() > 0) {
+/* 559 */             Vector<String> vector = new Vector(1);
+/*     */             
+/* 561 */             MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get(); byte b1;
+/* 562 */             for (b1 = 0; b1 < arrayOfMetaFlag.length; b1++) {
+/*     */               
+/* 564 */               if (arrayOfMetaFlag[b1].isSelected())
+/*     */               {
+/* 566 */                 if (this.attrSrc == 1) {
+/* 567 */                   vector.addElement(arrayOfMetaFlag[b1].getFlagCode());
+/*     */                 } else {
+/* 569 */                   vector.addElement(arrayOfMetaFlag[b1].toString());
+/*     */                 } 
+/*     */               }
+/*     */             } 
+/*     */             
+/* 574 */             for (b1 = 0; b1 < vector.size() - 1; b1++) {
+/* 575 */               Element element1 = paramDocument.createElement(paramElement.getTagName());
+/* 576 */               Element element2 = paramDocument.createElement(this.nodeName);
+/* 577 */               element.insertBefore(element1, paramElement);
+/* 578 */               element1.appendChild(element2);
+/* 579 */               element2.appendChild(paramDocument.createTextNode(vector.elementAt(b1).toString()));
+/*     */             } 
+/*     */             
+/* 582 */             stringBuffer.append(vector.lastElement().toString());
+/* 583 */             vector.clear();
+/*     */           } else {
+/* 585 */             stringBuffer.append("@@");
+/*     */           } 
+/*     */         } else {
+/*     */           
+/* 589 */           stringBuffer.append(str1);
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 594 */     if (documentFragment == null && stringBuffer.length() > 0) {
+/* 595 */       text = paramDocument.createTextNode(stringBuffer.toString());
+/*     */     }
+/* 597 */     return text;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getCountryCodes(EntityList paramEntityList, Vector<EntityItem> paramVector, String paramString, StringBuffer paramStringBuffer) {
+/* 610 */     StringBuffer stringBuffer = new StringBuffer();
+/* 611 */     Vector<String> vector = new Vector(1);
+/*     */     byte b;
+/* 613 */     for (b = 0; b < paramVector.size(); b++) {
+/* 614 */       EntityItem entityItem = paramVector.elementAt(b);
+/* 615 */       Vector vector1 = PokUtils.getAllLinkedEntities(entityItem, paramString, "GENERALAREA");
+/*     */ 
+/*     */       
+/* 618 */       Vector<EntityItem> vector2 = PokUtils.getEntitiesWithMatchedAttr(vector1, "GENAREATYPE", "2452");
+/* 619 */       paramStringBuffer.append("SAPLElem:getCountryCodes: " + entityItem.getKey() + " has " + vector2.size() + " GENERALAREA.GENAREATYPE = 2452 " + NEWLINE);
+/* 620 */       for (byte b1 = 0; b1 < vector2.size(); b1++) {
+/* 621 */         EntityItem entityItem1 = vector2.elementAt(b1);
+/* 622 */         String str = PokUtils.getAttributeValue(entityItem1, "GENAREACODE", ", ", "", false);
+/*     */         
+/* 624 */         if (!vector.contains(str)) {
+/* 625 */           vector.add(str);
+/*     */         }
+/*     */       } 
+/*     */     } 
+/* 629 */     Collections.sort(vector);
+/*     */     
+/* 631 */     for (b = 0; b < vector.size(); b++) {
+/* 632 */       String str = vector.elementAt(b).toString();
+/* 633 */       stringBuffer.append("/" + str);
+/*     */     } 
+/* 635 */     if (stringBuffer.length() == 0) {
+/* 636 */       stringBuffer.append("/ ");
+/*     */     }
+/*     */     
+/* 639 */     return stringBuffer.toString();
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.util;
 
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.opicmpdh.transactions.*;
-import COM.ibm.eannounce.objects.*;
-import com.ibm.transform.oim.eacm.util.*;
-
-import java.util.*;
-import java.io.*;
-
-import javax.xml.parsers.*;
-import org.w3c.dom.*;
-import org.xml.sax.*;
-
-/**********************************************************************************
-* Base Class used to hold info and structure to be generated for the xml feed
-* for SAPLABRSTATUS abrs
-* If a value is not available in the desired NLSID, then the TAGs should still be
-* generated with an empty data value.
-*
-*/
-// $Log: SAPLElem.java,v $
-// Revision 1.6  2008/02/19 17:18:25  wendy
-// Cleanup RSA warnings
-//
-// Revision 1.5  2007/05/04 17:31:39  wendy
-// Only generate tabs for nls section if values exist in that nls
-//
-// Revision 1.4  2007/04/30 19:32:26  wendy
-// More OIDH empty tag workaround, again
-//
-// Revision 1.3  2007/04/20 21:36:09  wendy
-// More OIDH empty tag workaround
-//
-// Revision 1.2  2007/04/20 14:58:33  wendy
-// RQ0417075638 updates
-//
-// Revision 1.1  2007/04/02 17:38:17  wendy
-// Support classes for SAPL xml generation
-//
-
-public class SAPLElem
-{
-	public static final int ATTRVAL = 0; // get value from attribute
-	public static final int FLAGVAL = 1; // get value from flag code
-
-	private static final char[] FOOL_JTEST = {'\n'};
-	static final String NEWLINE = new String(FOOL_JTEST);
-	protected static final String CHEAT = "@@";
-
-	protected final static String AVAIL_ORDER[] = new String[]{"146","143","149","AVT220"};
-
-	protected boolean isRoot=false, isReq=false;
-	protected String nodeName;
-	protected String etype =null;
-	protected String attrCode =null; // could be attr1|attr2 for concatenated attrs
-	protected Vector childVct = new Vector(1);
-	protected Hashtable xmlAttrTbl = new Hashtable();
-	protected int attrSrc = ATTRVAL;
-
-	/**********************************************************************************
-	* Constructor - used when element does not have text nodes and is not root
-	*
-	*@param nname String with name of node to be created
-	*/
-	public SAPLElem(String nname)
-	{
-		this(nname,null,null,false,ATTRVAL);
-	}
-	/**********************************************************************************
-	* Constructor - used when element has a text node
-	*
-	*@param nname String with name of node to be created
-	*@param type String with entity type
-	*@param code String with attribute code
-	*/
-	public SAPLElem(String nname, String type, String code)
-	{
-		this(nname,type,code,false,ATTRVAL);
-	}
-
-	/**********************************************************************************
-	* Constructor - used when element has a text node
-	*
-	*@param nname String with name of node to be created
-	*@param type String with entity type
-	*@param code String with attribute code
-	*@param src int for flag attributes
-	*/
-	public SAPLElem(String nname, String type, String code, int src)
-	{
-		this(nname,type,code,false,src);
-	}
-
-	/**********************************************************************************
-	* Constructor - used when element has a text node
-	*
-	*@param nname String with name of node to be created
-	*@param type String with entity type
-	*@param code String with attribute code
-	*@param isroot boolean if true, entity is root
-	*/
-	public SAPLElem(String nname, String type, String code, boolean isroot)
-	{
-		this(nname, type, code, isroot, ATTRVAL);
-	}
-
-	/**********************************************************************************
-	* Constructor - used when element has a text node
-	*
-	*@param nname String with name of node to be created
-	*@param type String with entity type
-	*@param code String with attribute code
-	*@param isroot boolean if true, entity is root
-	*@param src int for flag attributes
-	*/
-	public SAPLElem(String nname, String type, String code, boolean isroot, int src)
-	{
-		nodeName = nname;
-		etype = type;
-		attrCode = code;
-		isRoot = isroot;
-		attrSrc = src;
-	}
-
-	/**********************************************************************************
-	* string rep
-	*
-	*@return String
-	*/
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("Node:"+nodeName+" type:"+etype+" attr:"+attrCode+" root:"+
-			isRoot+" req:"+isReq+" childCnt:"+childVct.size());
-		for(int i=0; i<childVct.size(); i++){
-			sb.append(NEWLINE+"  "+childVct.elementAt(i).toString());
-		}
-		return sb.toString();
-	}
-
-	/**********************************************************************************
-	* Add a child element to this 'node'
-	*
-	*@param sap SAPLElem with node to be added
-	*/
-	public void addChild(SAPLElem sap) {childVct.add(sap);}
-
-	/**********************************************************************************
-	* OIDH can't handle a standard empty XML tag <info/>, must have <info></info>
-	* cheat is to always have a value so the document creates the open and close tags
-	* then remove the cheat value
-	*
-	*@param xmltoFix String with xml that needs cheat value removed
-	*@return String with cheat values removed
-	*/
-    public static String removeCheat(String xmltoFix)
-    {
-		StringBuffer outputXml = new StringBuffer(xmltoFix);
-        int id = 0;
-        while(id != -1)
-        {
-            id = outputXml.toString().indexOf(CHEAT,id);
-            if (id != -1) {
-                outputXml.replace(id, id+CHEAT.length(),"");
-            }
-        }
-        return outputXml.toString();
-    }
-	/**********************************************************************************
-	* add an XML tag attribute
-	*
-	*@param a String with name of xml tag attr
-	*@param v String with value
-	*/
-	public void addXMLAttribute(String a, String v){
-		xmlAttrTbl.put(a,v);
-	}
-
-	/**********************************************************************************
-	* set this as required content
-	*
-	*/
-	public void setRequired(){ isReq=true;}
-
-	/**********************************************************************************
-	* Get entities to output, overridden by derived classes when filtering is needed
-	*
-	*@param egrp EntityGroup
-	*/
-	protected Vector getEntities(EntityGroup egrp)
-	{
-		Vector vct = new Vector();
-		if(egrp!=null){  // should not be the case if extract is properly defined
-			for(int i=0; i<egrp.getEntityItemCount(); i++){
-				vct.addElement(egrp.getEntityItem(i));
-			}
-		}
-		return vct;
-	}
-
-	/**********************************************************************************
-	* Parses a string containing XML and returns a DocumentFragment
-	* containing the nodes of the parsed XML.
-	*@param doc Document
-	*@param fragment String
-	*/
-	private DocumentFragment parseXml(Document doc, String fragment) {
-		DocumentFragment docfrag = null;
-		// Wrap the fragment in an arbitrary element
-		fragment = "<fragment>"+fragment+"</fragment>";
-		try {
-			// Create a DOM builder and parse the fragment
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			Document d = factory.newDocumentBuilder().parse(
-				new InputSource(new StringReader(fragment)));
-
-			// Import the nodes of the new document into doc so that they
-			// will be compatible with doc
-			Node node = doc.importNode(d.getDocumentElement(), true);
-
-			// Create the document fragment node to hold the new nodes
-			docfrag = doc.createDocumentFragment();
-
-			// Move the nodes into the fragment
-			while (node.hasChildNodes()) {
-				docfrag.appendChild(node.removeChild(node.getFirstChild()));
-			}
-		} catch (Exception e) {
-			// A parsing error occurred; the xml input is not valid
-			e.printStackTrace(System.out);
-		}
-
-		// Return the fragment
-		return docfrag;
-	}
-
-	/**********************************************************************************
-	* Add attributes to this node
-	*
-	*@param elem Element
-	*/
-	protected void addXMLAttrs(Element elem){
-		for (Enumeration e = xmlAttrTbl.keys(); e.hasMoreElements();)
-		{
-			String attr = (String)e.nextElement();
-			String value = (String)xmlAttrTbl.get(attr);
-			elem.setAttribute(attr,value);
-		}
-	}
-	/**********************************************************************************
-	* Create a node for this element and add to the parent and any children this node has
-	*
-	*@param dbCurrent Database
-	*@param list EntityList
-	*@param document Document needed to create nodes
-	*@param parent Element node to add this node too
-	*@param debugSb StringBuffer for debug output
-	*/
-	public void addElements(Database dbCurrent,EntityList list, Document document, Element parent,
-		StringBuffer debugSb)
-	throws
-		COM.ibm.eannounce.objects.EANBusinessRuleException,
-		java.sql.SQLException,
-		COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-		COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-		java.rmi.RemoteException,
-		IOException,
-		COM.ibm.opicmpdh.middleware.MiddlewareException,
-		COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-	{
-		if (etype==null){  // just create element and its children, can't be required if no type or attr
-			if (parent ==null){ // create the root
-				Element root = (Element) document.createElement(nodeName);
-				addXMLAttrs(root);
-				document.appendChild(root);
-				for (int c=0; c<childVct.size(); c++){
-					SAPLElem childElem = (SAPLElem)childVct.elementAt(c);
-					childElem.addElements(dbCurrent,list, document,root,debugSb);
-				}
-			}else{ // create a node with no content
-				Element elem = (Element) document.createElement(nodeName);
-				addXMLAttrs(elem);
-				parent.appendChild(elem);
-				for (int c=0; c<childVct.size(); c++){
-					SAPLElem childElem = (SAPLElem)childVct.elementAt(c);
-					childElem.addElements(dbCurrent,list, document,elem,debugSb);
-				}
-			}
-		}else{
-			// get all entitys of etype
-			EntityGroup egrp = null;
-			if (isRoot) {
-				egrp = list.getParentEntityGroup();
-			} else {
-				egrp = list.getEntityGroup(etype);
-			}
-			if (egrp==null){
-				Element elem = (Element) document.createElement(nodeName);
-				addXMLAttrs(elem);
-				parent.appendChild(elem);
-				elem.appendChild(document.createTextNode("Error: "+etype+" not found in extract!"));
-
-				if(isReq){
-					throw new IOException(nodeName+" is required but "+etype+" is not in extract");
-				}
-				// add any children
-				for (int c=0; c<childVct.size(); c++){
-					SAPLElem childElem = (SAPLElem)childVct.elementAt(c);
-					childElem.addElements(dbCurrent,list, document,elem,debugSb);
-				}
-			}else{
-				// get list of entities to look at, filtering may have been done
-				Vector entityVct = getEntities(egrp);
-				if (entityVct.size()==0){	// create an empty node and children
-					Element elem = (Element) document.createElement(nodeName);
-					addXMLAttrs(elem);
-					parent.appendChild(elem);
-					if (attrCode!=null){ // a value is expected, prevent a normal empty tag, OIDH cant handle it
-						elem.appendChild(document.createTextNode(CHEAT));
-					}
-					if(isReq){
-						throw new IOException(nodeName+" is required but "+etype+" is not in the data");
-					}
-					// add any children
-					for (int c=0; c<childVct.size(); c++){
-						SAPLElem childElem = (SAPLElem)childVct.elementAt(c);
-						childElem.addElements(dbCurrent,list, document,elem,debugSb);
-					}
-				}
-
-				for(int i=0; i<entityVct.size(); i++){
-					EntityItem item = (EntityItem)entityVct.elementAt(i);
-					// create one element for each entity, all will be at same level
-					Element elem = (Element) document.createElement(nodeName);
-					addXMLAttrs(elem);
-					parent.appendChild(elem);
-					Node contentElem = getContentNode(document, item, parent);
-					if (contentElem!=null){
-						elem.appendChild(contentElem);
-					}
-					// add any children
-					for (int c=0; c<childVct.size(); c++){
-						SAPLElem childElem = (SAPLElem)childVct.elementAt(c);
-						childElem.addElements(dbCurrent,list, document,elem,debugSb);
-					}
-				}
-				entityVct.clear();
-			}
-		}
-	}
-
-	/**********************************************************************************
-	* Create a node for this element add to the parent using the set of items passed in
-	*
-	*@param itemVct Vector of EntityItem
-	*@param document Document needed to create nodes
-	*@param parent Element node to add this node too
-	*@param debugSb StringBuffer for debug output
-	*/
-	protected void addGEOElements(Vector itemVct, Document document, Element parent,StringBuffer debugSb)
-	throws COM.ibm.eannounce.objects.EANBusinessRuleException,
-		java.sql.SQLException,
-		COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-		COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-		java.rmi.RemoteException,
-		IOException,
-		COM.ibm.opicmpdh.middleware.MiddlewareException,
-		COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-	{
-		// itemvct is AVAIL or GEODATE called from SAPLGEOElem..
-		// this method is not abstract because all classes would need it then
-		throw new IOException("SAPLElem addElements(Vector..) needs to be overridden by derived class");
-		/*if (itemVct !=null && itemVct.size()>0){
-			for (int i=0; i<itemVct.size(); i++){
-				EntityItem item = (EntityItem)itemVct.elementAt(i);
-				Element elem = (Element) document.createElement(nodeName);
-				addXMLAttrs(elem);
-				parent.appendChild(elem);
-				Node contentElem = getContentNode(document, item,parent);
-				if (contentElem!=null){
-					elem.appendChild(contentElem);
-				}
-			}
-		}else{
-			debugSb.append("SAPLElem: No "+etype+" passed in for node:"+nodeName+NEWLINE);
-			Element elem = (Element) document.createElement(nodeName);
-			addXMLAttrs(elem);
-			parent.appendChild(elem);
-		}*/
-	}
-
-	/**********************************************************************************
-	* Check to see if this node has a value
-	*
-	*@param document Document
-	*@param item EntityItem
-	*@param parent Element
-	*/
-	protected boolean hasNodeValueForNLS(EntityItem item)
-	{
-		String attrCodes[] = PokUtils.convertToArray(attrCode); // if more than one, concatenate them
-		StringBuffer sbb = new StringBuffer();
-
-		EntityGroup egrp = item.getEntityGroup();
-		EntityList list = egrp.getEntityList();
-		for(int a=0; a<attrCodes.length; a++){
-			String code = attrCodes[a];
-			EANMetaAttribute metaAttr = egrp.getMetaAttribute(code);
-			if (metaAttr!=null) {  // meta exists for this attribute
-				Profile profile = list.getProfile();
-				// avoid using fallback to nlsid==1 for text attributes
-				// this node may only want a value for a specific nlsid
-				EANAttribute att = item.getAttribute(code);
-				if (att instanceof EANTextAttribute){
-					NLSItem nlsitem = profile.getReadLanguage();
-					int nlsid = nlsitem.getNLSID();
-					//true if information for the given NLSID is contained in the Text data
-					if (((EANTextAttribute)att).containsNLS(nlsid)) {
-						sbb.append(att.toString());
-					} // end attr has this language
-				}else{
-					sbb.append(PokUtils.getAttributeValue(item, code,", ", "", false));
-				}
-			}
-		}
-		return (sbb.length()>0);
-	}
-
-	/**********************************************************************************
-	* Check if this node will have any values or its children will, this is only needed from
-	* SAPNLSElem node generation
-	*
-	*@param list EntityList
-	*@param debugSb StringBuffer for debug output
-	*/
-	protected boolean hasNodeValueForNLS(EntityList list, StringBuffer debugSb)
-	{
-		boolean hasvalue=false;
-		if (etype==null){  // just check its children
-			for (int c=0; c<childVct.size() && !hasvalue; c++){
-				SAPLElem childElem = (SAPLElem)childVct.elementAt(c);
-				hasvalue =childElem.hasNodeValueForNLS(list, debugSb);
-			}
-		}else{
-			// get all entitys of etype
-			EntityGroup egrp = null;
-			if (isRoot) {
-				egrp = list.getParentEntityGroup();
-			} else {
-				egrp = list.getEntityGroup(etype);
-			}
-			if (egrp!=null){
-				// get list of entities to look at, filtering may have been done
-				Vector entityVct = getEntities(egrp);
-				for(int i=0; i<entityVct.size() && !hasvalue; i++){
-					EntityItem item = (EntityItem)entityVct.elementAt(i);
-					hasvalue = hasNodeValueForNLS(item);
-					if (hasvalue){
-						break;
-					}
-					// check any children
-					for (int c=0; c<childVct.size() && !hasvalue; c++){
-						SAPLElem childElem = (SAPLElem)childVct.elementAt(c);
-						hasvalue =childElem.hasNodeValueForNLS(list, debugSb);
-					}
-				}
-				entityVct.clear();
-			}
-		}
-		return hasvalue;
-	}
-
-	/**********************************************************************************
-	* Get the content node for this attribute(s), if this is a F (multiflag) then
-	* create one parent and node for each value
-	*
-	*@param document Document
-	*@param item EntityItem
-	*@param parent Element
-	*/
-	protected Node getContentNode(Document document, EntityItem item, Element parent)
-	throws IOException
-	{
-		String attrCodes[] = PokUtils.convertToArray(attrCode); // if more than one, concatenate them
-
-		EntityGroup egrp = item.getEntityGroup();
-		EntityList list = egrp.getEntityList();
-		Node contentElem = null;
-		StringBuffer sbb = new StringBuffer();
-		for(int a=0; a<attrCodes.length; a++){
-			String value="";
-			String code = attrCodes[a];
-			EANMetaAttribute metaAttr = egrp.getMetaAttribute(code);
-			if (metaAttr==null) {
-				if(isReq){
-					throw new IOException(nodeName+" is required but "+
-						code+" is not in "+item.getEntityType()+" META data");
-				}
-
-				value= "Error: Attribute "+code+" not found in "+
-					item.getEntityType()+" META data.";
-				sbb.append(value);
-			}else{ // meta exists for this attribute
-				Profile profile = list.getProfile();
-				// avoid using fallback to nlsid==1 for text attributes
-				// this node may only want a value for a specific nlsid
-				EANAttribute att = item.getAttribute(code);
-				if (att instanceof EANTextAttribute){
-					NLSItem nlsitem = profile.getReadLanguage();
-					int nlsid = nlsitem.getNLSID();
-					//true if information for the given NLSID is contained in the Text data
-					if (((EANTextAttribute)att).containsNLS(nlsid)) {
-						value = att.toString();
-					} // end attr has this language
-					else{
-						value = CHEAT;
-					}
-				}else{
-					value = PokUtils.getAttributeValue(item, code,", ", CHEAT, false);
-				}
-
-				if(isReq && value.equals(CHEAT)){
-					throw new IOException(nodeName+" is required but "+
-						code+" is not set in "+item.getKey());
-				}
-				if (metaAttr.getAttributeType().equals("X")){ // XML attribute
-					// xml attr must be parsed and added to doc, they will not be concatenated
-					// Create a fragment
-					contentElem = parseXml(document, value);
-				}else{
-					if(metaAttr.getAttributeType().equals("U") && attrSrc == FLAGVAL){ //Unique Flag and flagcode needed
-            			EANFlagAttribute fAtt = (EANFlagAttribute)item.getAttribute(code);
-						if (fAtt!=null && fAtt.toString().length()>0){
-							// Get the selected Flag code
-							MetaFlag[] mfArray = (MetaFlag[]) fAtt.get();
-							for (int i = 0; i < mfArray.length; i++){
-								// get selection
-								if (mfArray[i].isSelected()){
-									sbb.append(mfArray[i].getFlagCode());
-									break;
-								}  // metaflag is selected
-							}// end of flagcodes
-						}else{ //OIDH workaround
-							sbb.append(CHEAT);
-						}
-					}else if(metaAttr.getAttributeType().equals("F")){ //MultiFlagAttribute
-						Element grandparent = (Element)parent.getParentNode();
-
-            			// get countrylist attr, it is F
-            			EANFlagAttribute fAtt = (EANFlagAttribute)item.getAttribute(code);
-						if (fAtt!=null && fAtt.toString().length()>0){
-							Vector selectedVct = new Vector(1);
-							// Get the selected Flag codes.
-							MetaFlag[] mfArray = (MetaFlag[]) fAtt.get();
-							for (int i = 0; i < mfArray.length; i++){
-								// get selection
-								if (mfArray[i].isSelected()){
-									// may need to get flagcode instead of flag value here
-									if (attrSrc == FLAGVAL){
-										selectedVct.addElement(mfArray[i].getFlagCode());
-									}else{
-										selectedVct.addElement(mfArray[i].toString());
-									}
-								}  // metaflag is selected
-							}// end of flagcodes
-							// add all but last element as new parent nodes
-							for (int x=0; x<selectedVct.size()-1; x++){
-            					Element newParent = (Element) document.createElement(parent.getTagName());
-            					Element newElem = (Element) document.createElement(nodeName);
-								grandparent.insertBefore(newParent, parent);
-								newParent.appendChild(newElem);
-								newElem.appendChild(document.createTextNode(selectedVct.elementAt(x).toString()));
-							}
-							// return last to caller to add to parent
- 							sbb.append(selectedVct.lastElement().toString());
- 							selectedVct.clear();
-						}else{ //OIDH workaround
-							sbb.append(CHEAT);
-						}
-					}
-					else{
-						sbb.append(value);
-					}
-				} // not an X type attr
-			} // end meta ok
-		} // end each attrcode
-		if (contentElem==null && sbb.length()>0){
-			contentElem = document.createTextNode(sbb.toString());
-		}
-		return contentElem;
-	}
-
-    /**********************************************************************************
-    * Get the countrycodes from the GENERALAREA
-    * Use the instance of COUNTRYLIST via an Association to GENERALAREA where GENERALAREA.GENAREATYPE = 2452.
-    *
-    *@param list EntityList
-    *@param itemVct Vector of EntityItem to use for FROM association
-    *@param assocName String association name
-    *@param debugSb StringBuffer used for debug output
-    */
-	protected String getCountryCodes(EntityList list, Vector itemVct, String assocName, StringBuffer debugSb){
-		StringBuffer sb = new StringBuffer();
-		Vector ctryCodeVct = new Vector(1);
-		// the set of FROM entities may be filtered.. some only want countrylist from a subset of AVAILs
-		for (int i=0; i<itemVct.size(); i++){
-			EntityItem item = (EntityItem)itemVct.elementAt(i);
-			Vector genareaVector = PokUtils.getAllLinkedEntities(item, assocName, "GENERALAREA");
-			//debugSb.append("SAPLElem:getCountryCodes: "+item.getKey()+" has "+genareaVector.size()+" GENERALAREA thru "+assocName+NEWLINE);
-			// find those of GENAREATYPE = 2452.
-			Vector ctryVector = PokUtils.getEntitiesWithMatchedAttr(genareaVector, "GENAREATYPE", "2452");
-			debugSb.append("SAPLElem:getCountryCodes: "+item.getKey()+" has "+ctryVector.size()+" GENERALAREA.GENAREATYPE = 2452 "+NEWLINE);
-			for (int ii=0; ii<ctryVector.size(); ii++){
-				EntityItem genAreaItem = (EntityItem) ctryVector.elementAt(ii);
-				String ctryCode = PokUtils.getAttributeValue(genAreaItem, "GENAREACODE",", ", "", false);
-				// avoid duplicates
-				if (!ctryCodeVct.contains(ctryCode)){
-					ctryCodeVct.add(ctryCode);
-				}
-			}
-		}
-		Collections.sort(ctryCodeVct); // sort alphabetically
-
-		for (int i=0; i<ctryCodeVct.size(); i++){
-			String ctryCode = ctryCodeVct.elementAt(i).toString();
-			sb.append("/"+ctryCode);
-		}
-		if (sb.length()==0){
-			sb.append("/ ");
-		}
-
-		return sb.toString();
-	}
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\SAPLElem.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

@@ -1,506 +1,512 @@
-package COM.ibm.eannounce.abr.sg.rfc;
+/*     */ package COM.ibm.eannounce.abr.sg.rfc;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.AttributeChangeHistoryGroup;
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import com.ibm.rdh.chw.entity.CHWAnnouncement;
+/*     */ import com.ibm.rdh.chw.entity.CHWGeoAnn;
+/*     */ import com.ibm.rdh.chw.entity.LifecycleData;
+/*     */ import com.ibm.rdh.chw.entity.TypeFeature;
+/*     */ import com.ibm.rdh.chw.entity.TypeModelFeature;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.text.SimpleDateFormat;
+/*     */ import java.util.ArrayList;
+/*     */ import java.util.Date;
+/*     */ import java.util.List;
+/*     */ import java.util.Vector;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class RFCSWPRODSTRUCTABR
+/*     */   extends RFCPRODSTRUCTABR
+/*     */ {
+/*     */   private boolean isTFPromoted = false;
+/*     */   private boolean isTFChanged = false;
+/*     */   private boolean isTFGeoPromoted = false;
+/*     */   private boolean isTFGeoChanged = false;
+/*     */   private boolean needUpdatParkingTable = false;
+/*  59 */   private static List<String> tmfMarkChangedAttrs = new ArrayList<>(); static {
+/*  60 */     tmfMarkChangedAttrs.add("INSTALL");
+/*  61 */   } private static List<String> feaMarkChangedAttrs = new ArrayList<>(); static {
+/*  62 */     feaMarkChangedAttrs.add("INVNAME");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public RFCSWPRODSTRUCTABR(RFCABRSTATUS paramRFCABRSTATUS) throws MiddlewareRequestException, SQLException, MiddlewareException, RemoteException, EANBusinessRuleException, IOException, MiddlewareShutdownInProgressException {
+/*  68 */     super(paramRFCABRSTATUS);
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public void processThis() throws RfcAbrException, Exception {
+/*  73 */     this.abr.addDebug("Start processThis()");
+/*  74 */     EntityList entityList1 = null;
+/*  75 */     EntityItem entityItem1 = null;
+/*  76 */     EntityList entityList2 = null;
+/*  77 */     EntityList entityList3 = null;
+/*  78 */     EntityItem entityItem2 = null;
+/*  79 */     boolean bool = false;
+/*     */ 
+/*     */     
+/*     */     try {
+/*  83 */       entityItem2 = getRooEntityItem();
+/*     */       
+/*  85 */       if (!"0020".equals(getAttributeFlagValue(entityItem2, "STATUS"))) {
+/*  86 */         throw new RfcAbrException("The status is not final, it will not promote this SWPRODSTRUCT");
+/*     */       }
+/*     */       
+/*  89 */       EntityItem entityItem3 = this.entityList.getEntityGroup("MODEL").getEntityItem(0);
+/*     */       
+/*  91 */       EntityItem entityItem4 = this.entityList.getEntityGroup("SWFEATURE").getEntityItem(0);
+/*     */       
+/*  93 */       Vector vector = PokUtils.getAllLinkedEntities(entityItem2, "SWPRODSTRUCTAVAIL", "AVAIL");
+/*  94 */       Vector<EntityItem> vector1 = PokUtils.getEntitiesWithMatchedAttr(vector, "AVAILTYPE", "146");
+/*  95 */       Vector<EntityItem> vector2 = PokUtils.getEntitiesWithMatchedAttr(vector, "AVAILTYPE", "149");
+/*  96 */       this.abr.addDebug("SWPRODSTRUCTAVAIL all availVct: " + vector.size() + " plannedavail: " + vector1.size() + " Last Order avail " + vector2
+/*  97 */           .size());
+/*     */       
+/*  99 */       String str1 = getAttributeValue(entityItem3, "MACHTYPEATR");
+/* 100 */       String str2 = getAttributeValue(entityItem3, "MODELATR");
+/* 101 */       String str3 = getAttributeValue(entityItem4, "FEATURECODE");
+/*     */ 
+/*     */       
+/* 104 */       String str4 = str1 + "-" + str2;
+/*     */       
+/* 106 */       List<EntityItem> list = getMACHTYPEsByType(str1);
+/* 107 */       EntityItem entityItem5 = null;
+/* 108 */       if (list.size() > 0) {
+/* 109 */         entityItem5 = list.get(0);
+/* 110 */         EntityList entityList = getEntityList(this.abr.getDatabase(), this.abr.getProfile(), "dummy", entityItem5
+/* 111 */             .getEntityType(), entityItem5.getEntityID());
+/* 112 */         this.abr.addDebug("getModelByVe2 EntityList for " + this.abr.getProfile() + " extract dummy contains the following entities: \n" + 
+/* 113 */             PokUtils.outputList(entityList));
+/* 114 */         entityItem5 = entityList.getParentEntityGroup().getEntityItem(0);
+/*     */       } else {
+/* 116 */         throw new RfcAbrException("There is no MACHTYPE for type " + str1 + ", it will not promote this SWPRODSTRUCT");
+/*     */       } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 122 */       TypeFeature typeFeature = new TypeFeature();
+/* 123 */       boolean bool1 = isRPQ(entityItem4);
+/* 124 */       if (bool1) {
+/* 125 */         typeFeature.setFeatureID("Q");
+/*     */       } else {
+/* 127 */         typeFeature.setFeatureID("R");
+/*     */       } 
+/*     */       
+/* 130 */       typeFeature.setFeature(str3);
+/* 131 */       typeFeature.setType(str1);
+/* 132 */       typeFeature.setDescription(getAttributeValue(entityItem4, "INVNAME"));
+/* 133 */       typeFeature.setNoChargePurchase(getNoChargePurchase(entityItem4));
+/* 134 */       typeFeature.setNetPriceMES(isNetPriceMES(entityItem3));
+/*     */ 
+/*     */       
+/* 137 */       typeFeature.setItemReturned(false);
+/* 138 */       typeFeature.setRemovalCharge(false);
+/* 139 */       typeFeature.setCustomerSetup(false);
+/* 140 */       typeFeature.setCapOnDemand(false);
+/* 141 */       typeFeature.setApprovalRPQ(isApprovalRPQ(entityItem4));
+/* 142 */       typeFeature.setUFLinked(false);
+/* 143 */       String str5 = calculateRange(entityItem5, entityItem4, typeFeature);
+/* 144 */       this.abr.addDebug("thisRange: " + str5);
+/* 145 */       typeFeature.setFeatureRange(str5);
+/* 146 */       this.abr.addDebug("TypeFeature: " + typeFeature.toString());
+/* 147 */       this.abr.addDebug("TypeFeature  ApprovalRPQ:" + typeFeature.getApprovalRPQ());
+/*     */       
+/* 149 */       TypeModelFeature typeModelFeature = new TypeModelFeature();
+/* 150 */       typeModelFeature.setType(str1);
+/* 151 */       typeModelFeature.setModel(str2);
+/* 152 */       typeModelFeature.setFeature(str3);
+/* 153 */       typeModelFeature.setAnnDocNo(str4);
+/* 154 */       typeModelFeature.setFeatureID(typeFeature.getFeatureID());
+/* 155 */       this.abr.addDebug("TypeModelFeature: " + typeModelFeature.toString());
+/*     */       
+/* 157 */       String str6 = "C";
+/* 158 */       this.abr.addDebug("PimsIdentity:" + str6);
+/*     */ 
+/*     */       
+/* 161 */       bool = "Yes".equals(getAttributeFlagValue(entityItem2, "SYSFEEDRESEND"));
+/* 162 */       this.abr.addDebug("Resend full: " + bool);
+/*     */ 
+/*     */       
+/* 165 */       AttributeChangeHistoryGroup attributeChangeHistoryGroup = getAttributeHistory(entityItem2, "RFCABRSTATUS");
+/* 166 */       boolean bool2 = existBefore(attributeChangeHistoryGroup, "0030");
+/* 167 */       this.abr.addDebug("Exist passed RFCABRSTATUS before: " + bool2);
+/* 168 */       if (!bool && bool2) {
+/* 169 */         this.isTFPromoted = true;
+/* 170 */         String str7 = getLatestValFromForAttributeValue(attributeChangeHistoryGroup, "0030");
+/* 171 */         String str8 = this.abr.getCurrentTime();
+/* 172 */         Profile profile = this.abr.switchRole("BHFEED");
+/* 173 */         profile.setValOnEffOn(str7, str7);
+/* 174 */         profile.setEndOfDay(str8);
+/* 175 */         profile.setReadLanguage(Profile.ENGLISH_LANGUAGE);
+/* 176 */         profile.setLoginTime(str8);
+/* 177 */         entityList1 = getEntityList(profile);
+/* 178 */         this.abr.addDebug("EntityList for T1 " + profile.getValOn() + " extract " + getVeName() + " contains the following entities: \n" + 
+/* 179 */             PokUtils.outputList(entityList1));
+/*     */ 
+/*     */         
+/* 182 */         entityItem1 = entityList1.getParentEntityGroup().getEntityItem(0);
+/*     */         
+/* 184 */         this.isTFChanged = isTypeFeatureChanged(entityItem1, entityItem2);
+/*     */       } 
+/*     */       
+/* 187 */       if (vector1.size() == 0)
+/*     */       {
+/* 189 */         throw new RfcAbrException("There is no Planned Availability for " + entityItem2.getKey() + ", it will not promote this SWPRODSTRUCT");
+/*     */       }
+/*     */       byte b;
+/* 192 */       for (b = 0; b < vector1.size(); b++) {
+/* 193 */         EntityItem entityItem = vector1.get(b);
+/* 194 */         this.abr.addDebug("Promote Type Feature for " + entityItem.getKey());
+/*     */         
+/* 196 */         String str = getTMFAnnDate(entityItem2, entityItem3, entityItem4, entityItem);
+/* 197 */         this.abr.addDebug("T2 ANNDATE: " + str);
+/*     */         
+/* 199 */         Vector vector3 = PokUtils.getAllLinkedEntities(entityItem, "AVAILGAA", "GENERALAREA");
+/* 200 */         List<SalesOrgPlants> list1 = getAllSalesOrgPlant(vector3);
+/*     */         
+/* 202 */         if (this.isTFPromoted) {
+/* 203 */           if (entityList1 != null && entityItem1 != null) {
+/* 204 */             EntityItem entityItem6 = entityList1.getEntityGroup("SWFEATURE").getEntityItem(0);
+/* 205 */             EntityItem entityItem7 = entityList1.getEntityGroup("MODEL").getEntityItem(0);
+/* 206 */             Vector vector4 = PokUtils.getAllLinkedEntities(entityItem1, "SWPRODSTRUCTAVAIL", "AVAIL");
+/* 207 */             Vector vector5 = PokUtils.getEntitiesWithMatchedAttr(vector4, "AVAILTYPE", "146");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */             
+/* 212 */             EntityItem entityItem8 = getEntityItemAtT1(vector5, entityItem);
+/* 213 */             String str7 = getTMFAnnDate(entityItem1, entityItem7, entityItem6, entityItem8);
+/* 214 */             this.abr.addDebug("T1 ANNDATE: " + str7);
+/* 215 */             this.isTFGeoChanged = !str.equals(str7);
+/*     */             
+/* 217 */             if (!this.isTFGeoChanged) {
+/* 218 */               List<String> list2 = getNewCountries(vector5, entityItem);
+/* 219 */               this.isTFGeoPromoted = (list2.size() == 0);
+/* 220 */               if (!this.isTFGeoPromoted) {
+/* 221 */                 list1 = getAllSalesOrgPlantByCountryList(list1, list2);
+/*     */               }
+/*     */             } 
+/*     */           } else {
+/*     */             
+/* 226 */             this.abr.addDebug("t1EntityList not null:" + ((entityList1 != null) ? 1 : 0) + " t1TmfItem not null:" + ((entityItem1 != null) ? 1 : 0));
+/*     */           } 
+/*     */         }
+/*     */         
+/* 230 */         this.abr.addDebug("isTFPromoted: " + this.isTFPromoted + " isTFChanged: " + this.isTFChanged + " isTFGeoPromoted: " + this.isTFGeoPromoted + " isTFGeoChanged: " + this.isTFGeoChanged);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 235 */         CHWAnnouncement cHWAnnouncement = new CHWAnnouncement();
+/* 236 */         cHWAnnouncement.setAnnDocNo(str4);
+/* 237 */         cHWAnnouncement.setAnnouncementType("New");
+/* 238 */         cHWAnnouncement.setSegmentAcronym(getSegmentAcronymForAnn(entityItem2));
+/* 239 */         this.abr.addDebug("CHWAnnouncement: " + cHWAnnouncement.toString());
+/*     */         
+/* 241 */         CHWGeoAnn cHWGeoAnn = new CHWGeoAnn();
+/* 242 */         cHWGeoAnn.setAnnouncementDate((new SimpleDateFormat("yyyy-MM-dd")).parse(str));
+/* 243 */         this.abr.addDebug("CHWAnnouncementGEO: " + cHWGeoAnn.toString());
+/*     */         
+/* 245 */         promoteTypeModelFeature(typeFeature, typeModelFeature, cHWAnnouncement, cHWGeoAnn, list1, str6, str5);
+/*     */       } 
+/*     */ 
+/*     */ 
+/*     */       
+/* 250 */       this.abr.addDebug("Start promote WDFM(Withdraw From Market) announcement for PRODSTRUCT");
+/* 251 */       b = 0;
+/* 252 */       boolean bool3 = false;
+/* 253 */       if (vector2.size() > 0) {
+/* 254 */         for (byte b1 = 0; b1 < vector2.size(); b1++) {
+/* 255 */           EntityItem entityItem = vector2.get(b1);
+/*     */           
+/* 257 */           this.abr.addDebug("Promote WDFM Announcement for " + entityItem.getKey());
+/*     */           
+/* 259 */           SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+/* 260 */           Date date = simpleDateFormat.parse(getAttributeValue(entityItem, "EFFECTIVEDATE"));
+/*     */           
+/* 262 */           Vector vector3 = PokUtils.getAllLinkedEntities(entityItem, "AVAILGAA", "GENERALAREA");
+/* 263 */           List<SalesOrgPlants> list1 = getAllSalesOrgPlant(vector3);
+/*     */           
+/* 265 */           if (!bool && bool2 && 
+/* 266 */             entityList1 != null && entityItem1 != null) {
+/* 267 */             Vector vector4 = PokUtils.getAllLinkedEntities(entityItem1, "SWPRODSTRUCTAVAIL", "AVAIL");
+/* 268 */             Vector vector5 = PokUtils.getEntitiesWithMatchedAttr(vector4, "AVAILTYPE", "149");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */             
+/* 273 */             bool3 = isSameEffectiveDate(vector5, entityItem);
+/* 274 */             if (!bool3) {
+/* 275 */               List<String> list2 = getNewCountries(vector5, entityItem);
+/* 276 */               if (list2.size() > 0) {
+/* 277 */                 b = 0;
+/* 278 */                 list1 = getAllSalesOrgPlantByCountryList(list1, list2);
+/*     */               } else {
+/*     */                 
+/* 281 */                 b = 1;
+/*     */               } 
+/*     */             } 
+/*     */           } 
+/*     */           
+/* 286 */           this.abr.addDebug("isTfwPromoted: " + b + " isTfwChanged: " + bool3);
+/* 287 */           if (b == 0 || bool3) {
+/* 288 */             LifecycleDataGenerator lifecycleDataGenerator = new LifecycleDataGenerator(typeModelFeature);
+/* 289 */             for (SalesOrgPlants salesOrgPlants : list1) {
+/* 290 */               String str = salesOrgPlants.getSalesorg();
+/* 291 */               LifecycleData lifecycleData = this.rdhRestProxy.r200(lifecycleDataGenerator.getMaterial(), lifecycleDataGenerator.getVarCond(), typeModelFeature
+/* 292 */                   .getAnnDocNo(), "wdfm", str6, str);
+/* 293 */               this.abr.addDebug("Call r200 successfully for SalesOrg " + str + " " + lifecycleData);
+/* 294 */               updateWDFMLifecyle(lifecycleData, lifecycleDataGenerator.getVarCond(), lifecycleDataGenerator.getMaterial(), date, typeModelFeature
+/* 295 */                   .getAnnDocNo(), str6, str);
+/* 296 */               this.abr.addDebug("updateWDFMLifecyle successfully for SalesOrg " + str);
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */       }
+/* 301 */       this.abr.addDebug("End promote WDFM(Withdraw From Market) announcement for PRODSTRUCT");
+/*     */       
+/* 303 */       if (this.needUpdatParkingTable) {
+/* 304 */         if (needReleaseParkingTable()) {
+/* 305 */           this.rdhRestProxy.r144(str4, "R", str6);
+/*     */         } else {
+/* 307 */           this.rdhRestProxy.r144(str4, "H", str6);
+/*     */         } 
+/*     */       }
+/*     */     } finally {
+/*     */       
+/* 312 */       if (bool && entityItem2 != null) {
+/* 313 */         setFlagValue("SYSFEEDRESEND", "No", entityItem2);
+/*     */       }
+/*     */       
+/* 316 */       if (entityList1 != null) {
+/* 317 */         entityList1.dereference();
+/* 318 */         entityList1 = null;
+/*     */       } 
+/* 320 */       if (entityList3 != null) {
+/* 321 */         entityList3.dereference();
+/* 322 */         entityList3 = null;
+/*     */       } 
+/* 324 */       if (this.entityList != null) {
+/* 325 */         this.entityList.dereference();
+/* 326 */         this.entityList = null;
+/*     */       } 
+/* 328 */       if (entityList2 != null) {
+/* 329 */         entityList2.dereference();
+/* 330 */         entityList2 = null;
+/*     */       } 
+/* 332 */       this.abr.addDebug("End processThis()");
+/*     */     } 
+/*     */   }
+/*     */   
+/*     */   public String getVeName() {
+/* 337 */     return "RFCSWPRODSTRUCT";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void promoteTypeModelFeature(TypeFeature paramTypeFeature, TypeModelFeature paramTypeModelFeature, CHWAnnouncement paramCHWAnnouncement, CHWGeoAnn paramCHWGeoAnn, List<SalesOrgPlants> paramList, String paramString1, String paramString2) throws RfcAbrException, Exception {
+/* 343 */     this.abr.addDebug("Start promote Type Feature");
+/* 344 */     if (!this.isTFPromoted || this.isTFChanged || !this.isTFGeoPromoted || this.isTFGeoChanged) {
+/* 345 */       if ("Q".equals(paramTypeFeature.getFeatureID())) {
+/* 346 */         this.abr.addDebug("Start RPQ Feature");
+/* 347 */         this.rdhRestProxy.r126(paramTypeFeature, paramCHWAnnouncement, paramString1);
+/* 348 */         if (!this.isTFPromoted) {
+/* 349 */           callr127WithAccessAuthority(paramTypeFeature, paramString2, paramCHWAnnouncement, paramString1);
+/*     */         }
+/* 351 */         this.rdhRestProxy.r128(paramTypeFeature, paramString2, paramCHWAnnouncement, paramString1);
+/* 352 */         this.rdhRestProxy.r152(paramTypeFeature, paramCHWAnnouncement, paramString1);
+/* 353 */         this.abr.addDebug("End RPQ Feature");
+/*     */       } else {
+/* 355 */         this.abr.addDebug("Start not RPQ Feature");
+/* 356 */         this.rdhRestProxy.r129(paramTypeFeature, paramTypeModelFeature.getModel(), paramCHWAnnouncement, paramString1);
+/* 357 */         if (paramTypeFeature.ifAlphaNumeric()) {
+/* 358 */           callr130WithAccessAuthority(paramTypeFeature.getType(), paramTypeModelFeature.getModel(), paramString2, paramCHWAnnouncement, paramString1);
+/* 359 */           this.rdhRestProxy.r176(paramTypeFeature.getType(), paramTypeModelFeature.getModel(), paramString2, "NEW", paramCHWAnnouncement, paramString1);
+/* 360 */           this.rdhRestProxy.r176(paramTypeFeature.getType(), paramTypeModelFeature.getModel(), paramString2, "UPG", paramCHWAnnouncement, paramString1);
+/*     */         } 
+/* 362 */         this.rdhRestProxy.r134(paramTypeFeature, paramTypeModelFeature.getModel(), paramCHWAnnouncement, paramString1);
+/* 363 */         this.rdhRestProxy.r153(paramTypeFeature, paramTypeModelFeature.getModel(), paramCHWAnnouncement, paramString1);
+/* 364 */         this.abr.addDebug("End not RPQ Feature");
+/*     */       } 
+/*     */       
+/* 367 */       this.abr.addDebug("Start updateAnnLifecyle for Type Feature");
+/* 368 */       for (SalesOrgPlants salesOrgPlants : paramList) {
+/* 369 */         String str = salesOrgPlants.getSalesorg();
+/* 370 */         LifecycleDataGenerator lifecycleDataGenerator = new LifecycleDataGenerator(paramTypeFeature);
+/* 371 */         updateAnnLifecyle(lifecycleDataGenerator.getVarCond(), lifecycleDataGenerator.getMaterial(), paramCHWGeoAnn.getAnnouncementDate(), paramCHWAnnouncement
+/* 372 */             .getAnnDocNo(), paramCHWAnnouncement.getAnnouncementType(), paramString1, str);
+/*     */       } 
+/* 374 */       this.abr.addDebug("End updateAnnLifecyle for Type Feature");
+/*     */     } 
+/*     */     
+/* 377 */     if ("Q".equals(paramTypeFeature.getFeatureID())) {
+/* 378 */       this.abr.addDebug("Start RPQ Feature");
+/* 379 */       this.rdhRestProxy.r138(paramTypeFeature, "NEW", paramCHWAnnouncement, paramString1);
+/* 380 */       this.rdhRestProxy.r138(paramTypeFeature, "UPG", paramCHWAnnouncement, paramString1);
+/* 381 */       boolean bool = this.rdhRestProxy.r204(paramTypeFeature.getType() + "MTC");
+/* 382 */       if (bool) {
+/* 383 */         this.rdhRestProxy.r138(paramTypeFeature, "MTC", paramCHWAnnouncement, paramString1);
+/*     */       }
+/* 385 */       this.abr.addDebug("End RPQ Feature");
+/*     */     } 
+/* 387 */     this.abr.addDebug("End promote Type Feature");
+/*     */ 
+/*     */     
+/* 390 */     if (!this.isTFPromoted || !this.isTFGeoPromoted || this.isTFGeoChanged) {
+/* 391 */       this.abr.addDebug("Start updateAnnLifecyle for Type Model Feature");
+/* 392 */       for (SalesOrgPlants salesOrgPlants : paramList) {
+/* 393 */         String str = salesOrgPlants.getSalesorg();
+/* 394 */         LifecycleDataGenerator lifecycleDataGenerator = new LifecycleDataGenerator(paramTypeModelFeature);
+/* 395 */         updateAnnLifecyle(lifecycleDataGenerator.getVarCond(), lifecycleDataGenerator.getMaterial(), paramCHWGeoAnn.getAnnouncementDate(), paramTypeModelFeature
+/* 396 */             .getAnnDocNo(), paramCHWAnnouncement.getAnnouncementType(), paramString1, str);
+/*     */       } 
+/* 398 */       this.abr.addDebug("End updateAnnLifecyle for Type Model Feature");
+/*     */     } 
+/*     */     
+/* 401 */     this.needUpdatParkingTable = true;
+/* 402 */     this.abr.addDebug("set needUpdatParkingTable to " + this.needUpdatParkingTable);
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   private boolean isTypeFeatureChanged(EntityItem paramEntityItem1, EntityItem paramEntityItem2) throws RfcAbrException {
+/* 407 */     if (isDiff(paramEntityItem1, paramEntityItem2, tmfMarkChangedAttrs)) {
+/* 408 */       return true;
+/*     */     }
+/*     */ 
+/*     */     
+/* 412 */     EntityItem entityItem1 = null;
+/* 413 */     EntityItem entityItem2 = null;
+/* 414 */     List<EntityItem> list1 = getLinkedRelator(paramEntityItem1, "MODEL");
+/* 415 */     if (list1.size() > 0) {
+/* 416 */       entityItem1 = list1.get(0);
+/*     */     } else {
+/* 418 */       throw new RfcAbrException("isTypeFeatureChanged not found MODEL at T1 for " + paramEntityItem1.getKey());
+/*     */     } 
+/* 420 */     List<EntityItem> list2 = getLinkedRelator(paramEntityItem2, "MODEL");
+/* 421 */     if (list2.size() > 0) {
+/* 422 */       entityItem2 = list2.get(0);
+/*     */     } else {
+/* 424 */       throw new RfcAbrException("isTypeFeatureChanged not found MODEL at T2 for " + paramEntityItem1.getKey());
+/*     */     } 
+/* 426 */     boolean bool1 = isNetPriceMES(entityItem1);
+/* 427 */     boolean bool2 = isNetPriceMES(entityItem2);
+/* 428 */     this.abr.addDebug("isTypeFeatureChanged NetPriceMES T1: " + bool1 + " T2: " + bool2);
+/* 429 */     if (bool1 != bool2) {
+/* 430 */       return true;
+/*     */     }
+/*     */ 
+/*     */     
+/* 434 */     EntityItem entityItem3 = null;
+/* 435 */     EntityItem entityItem4 = null;
+/* 436 */     List<EntityItem> list3 = getLinkedRelator(paramEntityItem1, "SWFEATURE");
+/* 437 */     if (list3.size() > 0) {
+/* 438 */       entityItem3 = list3.get(0);
+/*     */     } else {
+/* 440 */       throw new RfcAbrException("isTypeFeatureChanged not found SWFEATURE at T1 for " + paramEntityItem1.getKey());
+/*     */     } 
+/* 442 */     List<EntityItem> list4 = getLinkedRelator(paramEntityItem2, "SWFEATURE");
+/* 443 */     if (list4.size() > 0) {
+/* 444 */       entityItem4 = list4.get(0);
+/*     */     } else {
+/* 446 */       throw new RfcAbrException("isTypeFeatureChanged not found SWFEATURE at T2 for " + paramEntityItem1.getKey());
+/*     */     } 
+/* 448 */     if (isDiff(entityItem3, entityItem4, feaMarkChangedAttrs)) {
+/* 449 */       return true;
+/*     */     }
+/* 451 */     boolean bool3 = isRPQ(entityItem3);
+/* 452 */     boolean bool4 = isRPQ(entityItem4);
+/* 453 */     if (bool3 != bool4) {
+/* 454 */       this.abr.addDebug("isTypeFeatureChanged isRPQ T1: " + bool3 + " T2: " + bool4);
+/* 455 */       return true;
+/*     */     } 
+/* 457 */     boolean bool5 = getNoChargePurchase(entityItem3);
+/* 458 */     boolean bool6 = getNoChargePurchase(entityItem4);
+/* 459 */     if (bool5 != bool6) {
+/* 460 */       this.abr.addDebug("isTypeFeatureChanged NoChargePurchase T1: " + bool5 + " T2: " + bool6);
+/* 461 */       return true;
+/*     */     } 
+/* 463 */     return false;
+/*     */   }
+/*     */   
+/*     */   private boolean isSameEffectiveDate(Vector paramVector, EntityItem paramEntityItem) throws RfcAbrException {
+/* 467 */     EntityItem entityItem = getEntityItemAtT1(paramVector, paramEntityItem);
+/* 468 */     if (entityItem != null) {
+/* 469 */       String str1 = getAttributeValue(entityItem, "EFFECTIVEDATE");
+/* 470 */       String str2 = getAttributeValue(paramEntityItem, "EFFECTIVEDATE");
+/* 471 */       if (!str2.equals(str1)) {
+/* 472 */         this.abr.addDebug("isTypeFeatureGeoChanged true T1 Date " + str1 + " T2 Date " + str2);
+/* 473 */         return true;
+/*     */       } 
+/*     */     } else {
+/* 476 */       this.abr.addDebug("isTypeFeatureGeoChanged true AVAIL is null at T1 for " + paramEntityItem.getKey());
+/* 477 */       return true;
+/*     */     } 
+/* 479 */     this.abr.addDebug("isTypeFeatureGeoChanged false");
+/* 480 */     return false;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String getTMFAnnDate(EntityItem paramEntityItem1, EntityItem paramEntityItem2, EntityItem paramEntityItem3, EntityItem paramEntityItem4) throws RfcAbrException {
+/* 490 */     String str = null;
+/* 491 */     if (paramEntityItem4 != null) {
+/* 492 */       Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(paramEntityItem4, "AVAILANNA", "ANNOUNCEMENT");
+/* 493 */       if (vector != null && vector.size() > 0) {
+/* 494 */         EntityItem entityItem = vector.get(0);
+/* 495 */         str = getAttributeValue(entityItem, "ANNDATE");
+/*     */       } 
+/*     */     } 
+/* 498 */     if (str == null || "".equals(str)) {
+/* 499 */       str = getAttributeValue(paramEntityItem2, "ANNDATE");
+/*     */     }
+/* 501 */     if (str == null || "".equals(str)) {
+/* 502 */       throw new RfcAbrException("ANNDATE is null, it will not promote this PRODSTRUCT");
+/*     */     }
+/* 504 */     return str;
+/*     */   }
+/*     */ }
 
-import COM.ibm.eannounce.objects.AttributeChangeHistoryGroup;
-import COM.ibm.eannounce.objects.EANBusinessRuleException;
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.eannounce.objects.EntityList;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
-import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
-import COM.ibm.opicmpdh.middleware.Profile;
-import com.ibm.rdh.chw.entity.*;
-import com.ibm.transform.oim.eacm.util.PokUtils;
 
-import java.io.IOException;
-import java.rmi.RemoteException;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Vector;
-
-//$Log: RFCSWPRODSTRUCTABR.java,v $
-//Revision 1.7  2018/07/27 12:24:07  dlwlan
-//Unique ID Code Roll back
-//Add RFAREFNUMBER to MODEL
-//
-//Revision 1.6  2018/06/21 01:42:30  dlwlan
-//Finished changes regards Unique RFA number
-//
-//Revision 1.5  2017/11/28 07:58:23  wangyul
-//defect 1783205: 锘縈illennium Partners ESS -- plant order numbers
-//
-//Revision 1.4  2017/08/04 09:41:38  wangyul
-//Defect 1735504	 - RPQ TMF RFCABR support old MODEL without plan avail
-//
-//Revision 1.3  2017/05/18 12:23:41  wangyul
-//1701370: TMF and SWPRODSTRUCT RFCABR performance issue
-//
-//Revision 1.2  2017/04/18 07:49:58  wangyul
-//[Work Item 1681790] New: ESW - unique CLASS (range) and featurenaming support needed for CHW EACM HIPO materials
-//
-//Revision 1.1  2017/03/09 09:26:44  wangyul
-// [Work Item 1658567] RFCABR support HIPO
-//
-
-@SuppressWarnings({ "rawtypes" })
-public class RFCSWPRODSTRUCTABR extends RFCPRODSTRUCTABR {
-
-	private boolean isTFPromoted = false;
-	private boolean isTFChanged = false;
-	private boolean isTFGeoPromoted = false;
-	private boolean isTFGeoChanged = false;
-	private boolean needUpdatParkingTable = false;
-	private static List<String> tmfMarkChangedAttrs;
-	private static List<String> feaMarkChangedAttrs;
-
-	static {
-		tmfMarkChangedAttrs = new ArrayList<>();
-		tmfMarkChangedAttrs.add(TMF_INSTALL);
-		feaMarkChangedAttrs = new ArrayList<>();
-		feaMarkChangedAttrs.add(FEATURE_INVNAME);
-	}
-
-	public RFCSWPRODSTRUCTABR(RFCABRSTATUS rfcAbrStatus)
-			throws MiddlewareRequestException, SQLException, MiddlewareException, RemoteException,
-			EANBusinessRuleException, IOException, MiddlewareShutdownInProgressException {
-		super(rfcAbrStatus);
-	}
-
-	@Override
-	public void processThis() throws RfcAbrException, Exception {
-		abr.addDebug("Start processThis()");
-		EntityList t1EntityList = null;
-		EntityItem t1TmfItem = null;
-		EntityList entityList2 = null;
-		EntityList t1EntityList2 = null;
-		EntityItem tmfItem = null;
-		boolean isResendFull = false;
-		try {
-			// ----------------------- Get values from EACM entities -----------------------
-			// SWPRODSTRUCT
-			tmfItem = getRooEntityItem();
-			// Check status
-			if (!STATUS_FINAL.equals(getAttributeFlagValue(tmfItem, ATTR_STATUS))) {
-				throw new RfcAbrException("The status is not final, it will not promote this SWPRODSTRUCT");
-			}
-			// MODEL
-			EntityItem mdlItem = entityList.getEntityGroup(MODEL).getEntityItem(0); // has to exist
-			// SWFEATURE
-			EntityItem feaItem = entityList.getEntityGroup(SWFEATURE).getEntityItem(0); // has to exist
-			// AVAIL
-			Vector availVct = PokUtils.getAllLinkedEntities(tmfItem, "SWPRODSTRUCTAVAIL", AVAIL);
-			Vector planAvailVct = PokUtils.getEntitiesWithMatchedAttr(availVct, AVAIL_AVAILTYPE, PLANNEDAVAIL);
-			Vector lastOrderAvailVct = PokUtils.getEntitiesWithMatchedAttr(availVct, AVAIL_AVAILTYPE, LASTORDERAVAIL);
-			abr.addDebug("SWPRODSTRUCTAVAIL all availVct: " + availVct.size() + " plannedavail: " + planAvailVct.size()
-					+ " Last Order avail " + lastOrderAvailVct.size());
-
-			String type = getAttributeValue(mdlItem, MODEL_MACHTYPEATR);
-			String model = getAttributeValue(mdlItem, MODEL_MODELATR);
-			String feaCode = getAttributeValue(feaItem, FEATURE_FEATURECODE);
-			// String annDocNo = type + STRING_SEPARATOR + model + STRING_SEPARATOR +
-			// feaCode;
-			String annDocNo = type + STRING_SEPARATOR + model;
-			// MACHTYPE
-			List<EntityItem> machTypeItems = getMACHTYPEsByType(type);
-			EntityItem machTypeItem = null;
-			if (machTypeItems.size() > 0) {
-				machTypeItem = machTypeItems.get(0);
-				EntityList entityList = getEntityList(abr.getDatabase(), abr.getProfile(), "dummy",
-						machTypeItem.getEntityType(), machTypeItem.getEntityID());
-				abr.addDebug("getModelByVe2 EntityList for " + abr.getProfile()
-						+ " extract dummy contains the following entities: \n" + PokUtils.outputList(entityList));
-				machTypeItem = entityList.getParentEntityGroup().getEntityItem(0);
-			} else {
-				throw new RfcAbrException(
-						"There is no MACHTYPE for type " + type + ", it will not promote this SWPRODSTRUCT");
-			}
-
-			// ----------------------- Create RFC input entities -----------------------
-			// Type Feature
-			TypeFeature tfObj = new TypeFeature();
-			boolean isRPQ = isRPQ(feaItem);
-			if (isRPQ) {
-				tfObj.setFeatureID("Q"); // RPQ = Q
-			} else {
-				tfObj.setFeatureID("R");
-			}
-
-			tfObj.setFeature(feaCode);
-			tfObj.setType(type);
-			tfObj.setDescription(getAttributeValue(feaItem, FEATURE_INVNAME));
-			tfObj.setNoChargePurchase(getNoChargePurchase(feaItem));
-			tfObj.setNetPriceMES(isNetPriceMES(mdlItem));
-			// Linda and Rupal confirmed ITEMRETURN, REMOVALCHARGE, CUSTOMERSETUP,
-			// CAPONDEMAND They all need to be set to NO.
-			tfObj.setItemReturned(false);
-			tfObj.setRemovalCharge(false);
-			tfObj.setCustomerSetup(false);
-			tfObj.setCapOnDemand(false);
-			tfObj.setApprovalRPQ(isApprovalRPQ(feaItem));
-			tfObj.setUFLinked(false);// from Rupal UFLink not required for EACM.
-			String thisRange = calculateRange(machTypeItem, feaItem, tfObj);
-			abr.addDebug("thisRange: " + thisRange);
-			tfObj.setFeatureRange(thisRange);
-			abr.addDebug("TypeFeature: " + tfObj.toString());
-			abr.addDebug("TypeFeature  ApprovalRPQ:" + tfObj.getApprovalRPQ());
-
-			TypeModelFeature tmfObj = new TypeModelFeature();
-			tmfObj.setType(type);
-			tmfObj.setModel(model);
-			tmfObj.setFeature(feaCode);
-			tmfObj.setAnnDocNo(annDocNo);
-			tmfObj.setFeatureID(tfObj.getFeatureID());
-			abr.addDebug("TypeModelFeature: " + tmfObj.toString());
-
-			String pimsIdentity = "C";
-			abr.addDebug("PimsIdentity:" + pimsIdentity);
-
-			// ----------------------- Check Resend full -----------------------
-			isResendFull = SYSFEEDRESEND_YES.equals(getAttributeFlagValue(tmfItem, ATTR_SYSFEEDRESEND));
-			abr.addDebug("Resend full: " + isResendFull);
-
-			// Check isTFPromoted and isTFChanged
-			AttributeChangeHistoryGroup rfcAbrHistory = getAttributeHistory(tmfItem, RFCABRSTATUS);
-			boolean isPassedAbrExist = existBefore(rfcAbrHistory, STATUS_PASSED);
-			abr.addDebug("Exist passed RFCABRSTATUS before: " + isPassedAbrExist);
-			if (!isResendFull && isPassedAbrExist) {
-				isTFPromoted = true;
-				String t1DTS = getLatestValFromForAttributeValue(rfcAbrHistory, STATUS_PASSED);
-				String t2DTS = abr.getCurrentTime();
-				Profile profileT1 = abr.switchRole(ROLE_CODE);
-				profileT1.setValOnEffOn(t1DTS, t1DTS);
-				profileT1.setEndOfDay(t2DTS);
-				profileT1.setReadLanguage(Profile.ENGLISH_LANGUAGE);
-				profileT1.setLoginTime(t2DTS);
-				t1EntityList = getEntityList(profileT1);
-				abr.addDebug("EntityList for T1 " + profileT1.getValOn() + " extract " + getVeName()
-						+ " contains the following entities: \n" + PokUtils.outputList(t1EntityList));
-
-				// TMF at T1
-				t1TmfItem = t1EntityList.getParentEntityGroup().getEntityItem(0);
-
-				isTFChanged = isTypeFeatureChanged(t1TmfItem, tmfItem);
-			}
-
-			if (planAvailVct.size() == 0) {
-				// SWPRODSTRUCT no RPQ, must have a Planned Availability
-				throw new RfcAbrException("There is no Planned Availability for " + tmfItem.getKey()
-						+ ", it will not promote this SWPRODSTRUCT");
-			} else {
-				for (int i = 0; i < planAvailVct.size(); i++) {
-					EntityItem availItem = (EntityItem) planAvailVct.get(i);
-					abr.addDebug("Promote Type Feature for " + availItem.getKey());
-
-					String annDate = getTMFAnnDate(tmfItem, mdlItem, feaItem, availItem);
-					abr.addDebug("T2 ANNDATE: " + annDate);
-					// Get all salesorg and plants from GENERALAREA linked to AVAIL
-					Vector generalAreaVct = PokUtils.getAllLinkedEntities(availItem, "AVAILGAA", GENERALAREA);
-					List<SalesOrgPlants> salesOrgPlantList = getAllSalesOrgPlant(generalAreaVct);
-
-					if (isTFPromoted) {
-						if (t1EntityList != null && t1TmfItem != null) {
-							EntityItem t1FeaItem = t1EntityList.getEntityGroup(SWFEATURE).getEntityItem(0);
-							EntityItem t1MdlItem = t1EntityList.getEntityGroup(MODEL).getEntityItem(0);
-							Vector t1AvailVct = PokUtils.getAllLinkedEntities(t1TmfItem, "SWPRODSTRUCTAVAIL", AVAIL);
-							Vector t1PlanAvailVct = PokUtils.getEntitiesWithMatchedAttr(t1AvailVct, AVAIL_AVAILTYPE,
-									PLANNEDAVAIL);
-							// Check isTFGeoChanged
-							// 1. ANNDATE change
-							// 2. New country
-							EntityItem t1Avail = getEntityItemAtT1(t1PlanAvailVct, availItem);
-							String t1AnnDate = getTMFAnnDate(t1TmfItem, t1MdlItem, t1FeaItem, t1Avail);
-							abr.addDebug("T1 ANNDATE: " + t1AnnDate);
-							isTFGeoChanged = !annDate.equals(t1AnnDate);
-							// isTFGeoChanged = isTypeFeatureGeoChanged(t1PlanAvailVct, availItem);
-							if (!isTFGeoChanged) {
-								List<String> t2NewCountries = getNewCountries(t1PlanAvailVct, availItem);
-								isTFGeoPromoted = t2NewCountries.size() == 0;
-								if (!isTFGeoPromoted) {
-									salesOrgPlantList = getAllSalesOrgPlantByCountryList(salesOrgPlantList,
-											t2NewCountries);
-								}
-							}
-						} else {
-							abr.addDebug("t1EntityList not null:" + (t1EntityList != null) + " t1TmfItem not null:"
-									+ (t1TmfItem != null));
-						}
-					}
-					abr.addDebug("isTFPromoted: " + isTFPromoted + " isTFChanged: " + isTFChanged + " isTFGeoPromoted: "
-							+ isTFGeoPromoted + " isTFGeoChanged: " + isTFGeoChanged);
-
-					// ----------------------- Create RFC input entitie CHWAnnouncement and
-					// CHWGeoAnn -----------------------
-					CHWAnnouncement chwA = new CHWAnnouncement();
-					chwA.setAnnDocNo(annDocNo); // MACHTYPEATR|MODELATR|FEATURECODE
-					chwA.setAnnouncementType(ANNTYPE_lONG_NEW);
-					chwA.setSegmentAcronym(getSegmentAcronymForAnn(tmfItem));
-					abr.addDebug("CHWAnnouncement: " + chwA.toString());
-
-					CHWGeoAnn chwAg = new CHWGeoAnn();
-					chwAg.setAnnouncementDate(new SimpleDateFormat("yyyy-MM-dd").parse(annDate));
-					abr.addDebug("CHWAnnouncementGEO: " + chwAg.toString());
-
-					promoteTypeModelFeature(tfObj, tmfObj, chwA, chwAg, salesOrgPlantList, pimsIdentity, thisRange);
-
-				}
-			}
-
-			abr.addDebug("Start promote WDFM(Withdraw From Market) announcement for PRODSTRUCT");
-			boolean isTfwPromoted = false;
-			boolean isTfwChanged = false;
-			if (lastOrderAvailVct.size() > 0) {
-				for (int i = 0; i < lastOrderAvailVct.size(); i++) {
-					EntityItem lastOrderAvailItem = (EntityItem) lastOrderAvailVct.get(i);
-
-					abr.addDebug("Promote WDFM Announcement for " + lastOrderAvailItem.getKey());
-
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-					Date wdfmDate = sdf.parse(getAttributeValue(lastOrderAvailItem, AVAIL_EFFECTIVEDATE));
-
-					Vector generalareaVct = PokUtils.getAllLinkedEntities(lastOrderAvailItem, "AVAILGAA", GENERALAREA);
-					List<SalesOrgPlants> salesOrgPlantList = getAllSalesOrgPlant(generalareaVct);
-
-					if (!isResendFull && isPassedAbrExist) {
-						if (t1EntityList != null && t1TmfItem != null) {
-							Vector t1AvailVct = PokUtils.getAllLinkedEntities(t1TmfItem, "SWPRODSTRUCTAVAIL", AVAIL);
-							Vector t1LastOrderAvailVct = PokUtils.getEntitiesWithMatchedAttr(t1AvailVct,
-									AVAIL_AVAILTYPE, LASTORDERAVAIL);
-							// Check isTfwChanged
-							// 1. AVAIL effective date change
-							// 2. New country
-							isTfwChanged = isSameEffectiveDate(t1LastOrderAvailVct, lastOrderAvailItem);
-							if (!isTfwChanged) {
-								List<String> t2NewCountries = getNewCountries(t1LastOrderAvailVct, lastOrderAvailItem);
-								if (t2NewCountries.size() > 0) {
-									isTfwPromoted = false;
-									salesOrgPlantList = getAllSalesOrgPlantByCountryList(salesOrgPlantList,
-											t2NewCountries);
-								} else {
-									isTfwPromoted = true;
-								}
-							}
-						}
-					}
-					abr.addDebug("isTfwPromoted: " + isTfwPromoted + " isTfwChanged: " + isTfwChanged);
-					if (!isTfwPromoted || isTfwChanged) {
-						LifecycleDataGenerator lcdGen = new LifecycleDataGenerator(tmfObj);
-						for (SalesOrgPlants salesOrgPlants : salesOrgPlantList) {
-							String salesOrg = salesOrgPlants.getSalesorg();
-							LifecycleData lcd = rdhRestProxy.r200(lcdGen.getMaterial(), lcdGen.getVarCond(),
-									tmfObj.getAnnDocNo(), "wdfm", pimsIdentity, salesOrg);
-							abr.addDebug("Call r200 successfully for SalesOrg " + salesOrg + " " + lcd);
-							updateWDFMLifecyle(lcd, lcdGen.getVarCond(), lcdGen.getMaterial(), wdfmDate,
-									tmfObj.getAnnDocNo(), pimsIdentity, salesOrg);
-							abr.addDebug("updateWDFMLifecyle successfully for SalesOrg " + salesOrg);
-						}
-					}
-				}
-			}
-			abr.addDebug("End promote WDFM(Withdraw From Market) announcement for PRODSTRUCT");
-
-			if (needUpdatParkingTable) {
-				if (needReleaseParkingTable()) {
-					rdhRestProxy.r144(annDocNo, "R", pimsIdentity);
-				} else {
-					rdhRestProxy.r144(annDocNo, "H", pimsIdentity);
-				}
-			}
-		} finally {
-			// Set SYSFEEDRESEND to No
-			if (isResendFull && tmfItem != null) {
-				setFlagValue(ATTR_SYSFEEDRESEND, SYSFEEDRESEND_NO, tmfItem);
-			}
-			// release memory
-			if (t1EntityList != null) {
-				t1EntityList.dereference();
-				t1EntityList = null;
-			}
-			if (t1EntityList2 != null) {
-				t1EntityList2.dereference();
-				t1EntityList2 = null;
-			}
-			if (entityList != null) {
-				entityList.dereference();
-				entityList = null;
-			}
-			if (entityList2 != null) {
-				entityList2.dereference();
-				entityList2 = null;
-			}
-			abr.addDebug("End processThis()");
-		}
-	}
-
-	public String getVeName() {
-		return "RFCSWPRODSTRUCT";
-	}
-
-	private void promoteTypeModelFeature(TypeFeature tfObj, TypeModelFeature tmfObj, CHWAnnouncement chwA,
-			CHWGeoAnn chwAg, List<SalesOrgPlants> salesOrgPlantList, String pimsIdentity, String thisRange)
-			throws RfcAbrException, Exception {
-		abr.addDebug("Start promote Type Feature");
-		if (!isTFPromoted || isTFChanged || !isTFGeoPromoted || isTFGeoChanged) {
-			if ("Q".equals(tfObj.getFeatureID())) {
-				abr.addDebug("Start RPQ Feature");
-				rdhRestProxy.r126(tfObj, chwA, pimsIdentity);
-				if (!isTFPromoted) {
-					callr127WithAccessAuthority(tfObj, thisRange, chwA, pimsIdentity);
-				}
-				rdhRestProxy.r128(tfObj, thisRange, chwA, pimsIdentity);
-				rdhRestProxy.r152(tfObj, chwA, pimsIdentity);
-				abr.addDebug("End RPQ Feature");
-			} else {
-				abr.addDebug("Start not RPQ Feature");
-				rdhRestProxy.r129(tfObj, tmfObj.getModel(), chwA, pimsIdentity);
-				if (tfObj.ifAlphaNumeric()) {
-					callr130WithAccessAuthority(tfObj.getType(), tmfObj.getModel(), thisRange, chwA, pimsIdentity);
-					rdhRestProxy.r176(tfObj.getType(), tmfObj.getModel(), thisRange, "NEW", chwA, pimsIdentity);
-					rdhRestProxy.r176(tfObj.getType(), tmfObj.getModel(), thisRange, "UPG", chwA, pimsIdentity);
-				}
-				rdhRestProxy.r134(tfObj, tmfObj.getModel(), chwA, pimsIdentity);
-				rdhRestProxy.r153(tfObj, tmfObj.getModel(), chwA, pimsIdentity);
-				abr.addDebug("End not RPQ Feature");
-			}
-
-			abr.addDebug("Start updateAnnLifecyle for Type Feature");
-			for (SalesOrgPlants saleOrgPalnts : salesOrgPlantList) {
-				String salesOrg = saleOrgPalnts.getSalesorg();
-				LifecycleDataGenerator lcdGen = new LifecycleDataGenerator(tfObj);
-				this.updateAnnLifecyle(lcdGen.getVarCond(), lcdGen.getMaterial(), chwAg.getAnnouncementDate(),
-						chwA.getAnnDocNo(), chwA.getAnnouncementType(), pimsIdentity, salesOrg);
-			}
-			abr.addDebug("End updateAnnLifecyle for Type Feature");
-		}
-
-		if ("Q".equals(tfObj.getFeatureID())) {
-			abr.addDebug("Start RPQ Feature");
-			rdhRestProxy.r138(tfObj, "NEW", chwA, pimsIdentity);
-			rdhRestProxy.r138(tfObj, "UPG", chwA, pimsIdentity);
-			boolean featureTypeMTCExists = rdhRestProxy.r204(tfObj.getType() + "MTC");
-			if (featureTypeMTCExists) {
-				rdhRestProxy.r138(tfObj, "MTC", chwA, pimsIdentity);
-			}
-			abr.addDebug("End RPQ Feature");
-		}
-		abr.addDebug("End promote Type Feature");
-
-		// Type Model Feature
-		if (!isTFPromoted || !isTFGeoPromoted || isTFGeoChanged) {
-			abr.addDebug("Start updateAnnLifecyle for Type Model Feature");
-			for (SalesOrgPlants saleOrgPalnts : salesOrgPlantList) {
-				String salesOrg = saleOrgPalnts.getSalesorg();
-				LifecycleDataGenerator lcdGen = new LifecycleDataGenerator(tmfObj);
-				this.updateAnnLifecyle(lcdGen.getVarCond(), lcdGen.getMaterial(), chwAg.getAnnouncementDate(),
-						tmfObj.getAnnDocNo(), chwA.getAnnouncementType(), pimsIdentity, salesOrg);
-			}
-			abr.addDebug("End updateAnnLifecyle for Type Model Feature");
-		}
-
-		needUpdatParkingTable = true;
-		abr.addDebug("set needUpdatParkingTable to " + needUpdatParkingTable);
-	}
-
-	private boolean isTypeFeatureChanged(EntityItem t1TmfItem, EntityItem t2TmfItem) throws RfcAbrException {
-		// TMF
-		if (isDiff(t1TmfItem, t2TmfItem, tmfMarkChangedAttrs)) {
-			return true;
-		}
-
-		// MODEL
-		EntityItem t1MdlItem = null;
-		EntityItem t2MdlItem = null;
-		List<EntityItem> t1MdlVct = getLinkedRelator(t1TmfItem, MODEL);
-		if (t1MdlVct.size() > 0) {
-			t1MdlItem = t1MdlVct.get(0);
-		} else {
-			throw new RfcAbrException("isTypeFeatureChanged not found MODEL at T1 for " + t1TmfItem.getKey());
-		}
-		List<EntityItem> t2MdlVct = getLinkedRelator(t2TmfItem, MODEL);
-		if (t2MdlVct.size() > 0) {
-			t2MdlItem = t2MdlVct.get(0);
-		} else {
-			throw new RfcAbrException("isTypeFeatureChanged not found MODEL at T2 for " + t1TmfItem.getKey());
-		}
-		boolean t1NoPriceMES = isNetPriceMES(t1MdlItem);
-		boolean t2NoPriceMES = isNetPriceMES(t2MdlItem);
-		abr.addDebug("isTypeFeatureChanged NetPriceMES T1: " + t1NoPriceMES + " T2: " + t2NoPriceMES);
-		if (t1NoPriceMES != t2NoPriceMES) {
-			return true;
-		}
-
-		// FEATURE
-		EntityItem t1FeaItem = null;
-		EntityItem t2FeaItem = null;
-		List<EntityItem> t1FeaVct = getLinkedRelator(t1TmfItem, SWFEATURE);
-		if (t1FeaVct.size() > 0) {
-			t1FeaItem = t1FeaVct.get(0);
-		} else {
-			throw new RfcAbrException("isTypeFeatureChanged not found SWFEATURE at T1 for " + t1TmfItem.getKey());
-		}
-		List<EntityItem> t2FeaVct = getLinkedRelator(t2TmfItem, SWFEATURE);
-		if (t2FeaVct.size() > 0) {
-			t2FeaItem = t2FeaVct.get(0);
-		} else {
-			throw new RfcAbrException("isTypeFeatureChanged not found SWFEATURE at T2 for " + t1TmfItem.getKey());
-		}
-		if (isDiff(t1FeaItem, t2FeaItem, feaMarkChangedAttrs)) {
-			return true;
-		}
-		boolean t1IsRPQ = isRPQ(t1FeaItem);
-		boolean t2IsRPQ = isRPQ(t2FeaItem);
-		if (t1IsRPQ != t2IsRPQ) {
-			abr.addDebug("isTypeFeatureChanged isRPQ T1: " + t1IsRPQ + " T2: " + t2IsRPQ);
-			return true;
-		}
-		boolean t1NoCharge = getNoChargePurchase(t1FeaItem);
-		boolean t2NoCharge = getNoChargePurchase(t2FeaItem);
-		if (t1NoCharge != t2NoCharge) {
-			abr.addDebug("isTypeFeatureChanged NoChargePurchase T1: " + t1NoCharge + " T2: " + t2NoCharge);
-			return true;
-		}
-		return false;
-	}
-
-	private boolean isSameEffectiveDate(Vector t1AvailItemVct, EntityItem t2AvailItem) throws RfcAbrException {
-		EntityItem t1Avail = getEntityItemAtT1(t1AvailItemVct, t2AvailItem);
-		if (t1Avail != null) {
-			String t1Date = getAttributeValue(t1Avail, AVAIL_EFFECTIVEDATE);
-			String t2Date = getAttributeValue(t2AvailItem, AVAIL_EFFECTIVEDATE);
-			if (!t2Date.equals(t1Date)) {
-				abr.addDebug("isTypeFeatureGeoChanged true T1 Date " + t1Date + " T2 Date " + t2Date);
-				return true;
-			}
-		} else {
-			abr.addDebug("isTypeFeatureGeoChanged true AVAIL is null at T1 for " + t2AvailItem.getKey());
-			return true;
-		}
-		abr.addDebug("isTypeFeatureGeoChanged false");
-		return false;
-	}
-
-	// <ANNDATE>
-	// 1.聽聽聽聽 SWPRODSTRUCTAVAIL-d: AVAILANNA-d: ANNOUNCEMENT.ANNDATE for the AVAIL
-	// where AVAILTYPE = 鈥淧lanned Availability鈥� (146).
-	// Countries found in ANNOUNCEMENT.COUNTRYLIST.
-	// 2.聽聽聽聽 IF SWPRODSTRUCT, THEN MODEL.ANNDATE
-	private String getTMFAnnDate(EntityItem tmfItem, EntityItem mdlItem, EntityItem feaItem, EntityItem availItem)
-			throws RfcAbrException {
-		String annDate = null;
-		if (availItem != null) {
-			Vector annVect = PokUtils.getAllLinkedEntities(availItem, "AVAILANNA", ANNOUNCEMENT);
-			if (annVect != null && annVect.size() > 0) {
-				EntityItem annItem = (EntityItem) annVect.get(0); // AVAIL must only link one ANNOUNCEMENT
-				annDate = getAttributeValue(annItem, ANNDATE);
-			}
-		}
-		if (annDate == null || "".equals(annDate)) {
-			annDate = getAttributeValue(mdlItem, ANNDATE);
-		}
-		if (annDate == null || "".equals(annDate)) {
-			throw new RfcAbrException("ANNDATE is null, it will not promote this PRODSTRUCT");
-		}
-		return annDate;
-	}
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\RFCSWPRODSTRUCTABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

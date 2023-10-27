@@ -1,83 +1,88 @@
-package COM.ibm.eannounce.darule.parser;
+/*    */ package COM.ibm.eannounce.darule.parser;
+/*    */ 
+/*    */ import COM.ibm.eannounce.objects.EANEntity;
+/*    */ import COM.ibm.eannounce.objects.EntityItem;
+/*    */ import COM.ibm.opicmpdh.middleware.D;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class RelatorAttributeRule
+/*    */   extends AttributeRule
+/*    */ {
+/*    */   private static final long serialVersionUID = 1676051960908659011L;
+/*    */   private String relatorName;
+/*    */   private char direction;
+/*    */   
+/*    */   public RelatorAttributeRule(String paramString, char paramChar) {
+/* 36 */     this.relatorName = paramString;
+/* 37 */     this.direction = paramChar;
+/*    */   }
+/*    */   
+/*    */   public void executeRule(AttributeRuleContext paramAttributeRuleContext) throws Exception {
+/* 41 */     EntityItem entityItem = paramAttributeRuleContext.getCurrentEntity();
+/*    */     
+/* 43 */     char c = paramAttributeRuleContext.getCurrentDirection();
+/*    */     
+/* 45 */     paramAttributeRuleContext.setCurrentDirection(this.direction);
+/* 46 */     boolean bool = false;
+/* 47 */     if (c == 'd' || c == 'b') {
+/*    */       
+/* 49 */       for (byte b = 0; b < entityItem.getDownLinkCount(); b++) {
+/* 50 */         EANEntity eANEntity = entityItem.getDownLink(b);
+/* 51 */         if (eANEntity.getEntityType().equals(this.relatorName)) {
+/* 52 */           bool = true;
+/* 53 */           D.ebug(4, "RelatorAttributeRule: going from " + entityItem.getKey() + " down to " + eANEntity
+/* 54 */               .getKey());
+/*    */           
+/* 56 */           paramAttributeRuleContext.setCurrentEntity((EntityItem)eANEntity);
+/* 57 */           executeNextRule(paramAttributeRuleContext);
+/*    */         } 
+/*    */       } 
+/* 60 */     } else if (c == 'u' || c == 'b') {
+/*    */       
+/* 62 */       for (byte b = 0; b < entityItem.getUpLinkCount(); b++) {
+/* 63 */         EANEntity eANEntity = entityItem.getUpLink(b);
+/* 64 */         if (eANEntity.getEntityType().equals(this.relatorName)) {
+/* 65 */           bool = true;
+/* 66 */           D.ebug(4, "RelatorAttributeRule: going from " + entityItem.getKey() + " up to " + eANEntity
+/* 67 */               .getKey());
+/*    */           
+/* 69 */           paramAttributeRuleContext.setCurrentEntity((EntityItem)eANEntity);
+/* 70 */           executeNextRule(paramAttributeRuleContext);
+/*    */         } 
+/*    */       } 
+/*    */     } 
+/* 74 */     if (!bool) {
+/*    */       
+/* 76 */       String str = "RelatorAttributeRule: No link found from " + entityItem.getKey() + " [" + c + "] to '" + this.relatorName + "'";
+/*    */ 
+/*    */       
+/* 79 */       paramAttributeRuleContext.log(str);
+/*    */     } 
+/*    */   }
+/*    */ }
 
-import COM.ibm.eannounce.objects.EANEntity;
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.opicmpdh.middleware.D;
 
-//$Log: RelatorAttributeRule.java,v $
-//Revision 1.4  2011/04/28 19:51:27  lucasrg
-//Fixed rule path logic
-//Added better logging
-//
-//Revision 1.3  2011/04/07 21:27:57  lucasrg
-//Applied fixes after testing
-//
-//Revision 1.2  2011/03/29 17:28:54  lucasrg
-//Added support for multiple links and paths
-//
-//Revision 1.1  2011/03/23 13:53:51  lucasrg
-//Initial commit
-//
-
-/**
- * Responsible for the Relator part of the syntax: RelatorType-{u|d}
- *  
- * @author lucasrg
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\darule\parser\RelatorAttributeRule.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class RelatorAttributeRule extends AttributeRule {
-
-	private static final long serialVersionUID = 1676051960908659011L;
-
-	private String relatorName;
-
-	private char direction;
-
-	public RelatorAttributeRule(String relatorName, char direction) {
-		this.relatorName = relatorName;
-		this.direction = direction;
-	}
-
-	public void executeRule(AttributeRuleContext context) throws Exception {
-		EANEntity entityItem = context.getCurrentEntity();
-		//Store the direction we are taking
-		char currentDirection = context.getCurrentDirection();
-		//Set next direction
-		context.setCurrentDirection(direction);
-		boolean linkFound = false;
-		if (currentDirection == AttributeRuleContext.DOWN 
-				|| currentDirection == AttributeRuleContext.BOTH) {
-			for (int di = 0; di < entityItem.getDownLinkCount(); di++) {
-				EANEntity entityLink = entityItem.getDownLink(di);
-				if (entityLink.getEntityType().equals(relatorName)) {
-					linkFound = true;
-					D.ebug(D.EBUG_SPEW, "RelatorAttributeRule: going from " + entityItem.getKey()
-							+ " down to " + entityLink.getKey());
-					//Set the current entity for the next rule in chain
-					context.setCurrentEntity((EntityItem) entityLink);
-					executeNextRule(context);
-				}
-			}
-		} else if (currentDirection == AttributeRuleContext.UP 
-				|| currentDirection == AttributeRuleContext.BOTH) {
-			for (int ui = 0; ui < entityItem.getUpLinkCount(); ui++) {
-				EANEntity entityLink = entityItem.getUpLink(ui);
-				if (entityLink.getEntityType().equals(relatorName)) {
-					linkFound = true;
-					D.ebug(D.EBUG_SPEW, "RelatorAttributeRule: going from " + entityItem.getKey()
-							+ " up to " + entityLink.getKey());
-					//Set the current entity for the next rule in chain
-					context.setCurrentEntity((EntityItem) entityLink);
-					executeNextRule(context);
-				}
-			}
-		}
-		if (!linkFound) {
-			String errorMsg = "RelatorAttributeRule: No link found from "
-					+ entityItem.getKey()
-					+ " [" + currentDirection+ "] to " 
-					+ "'" + relatorName	+ "'";
-			context.log(errorMsg);
-		}
-	}
-
-}

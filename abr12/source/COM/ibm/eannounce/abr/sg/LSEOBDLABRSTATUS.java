@@ -1,762 +1,768 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2005, 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.abr.sg;
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANTextAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*     */ import COM.ibm.eannounce.objects.MetaFlag;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.ArrayList;
+/*     */ import java.util.HashSet;
+/*     */ import java.util.Set;
+/*     */ import java.util.Vector;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class LSEOBDLABRSTATUS
+/*     */   extends DQABRSTATUS
+/*     */ {
+/* 147 */   private Object[] args = (Object[])new String[5];
+/*     */ 
+/*     */   
+/*     */   private EntityList mdlList;
+/*     */ 
+/*     */   
+/*     */   private static final String HARDWARE = "100";
+/*     */   
+/*     */   private static final String SOFTWARE = "101";
+/*     */   
+/* 157 */   private static final Set TESTSET = new HashSet(); static {
+/* 158 */     TESTSET.add("100");
+/* 159 */     TESTSET.add("101");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean isVEneeded(String paramString) {
+/* 165 */     return true;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void doAlreadyFinalProcessing() {
+/* 181 */     doFinalProcessing(this.m_elist.getParentEntityGroup().getEntityItem(0));
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void completeNowR4RProcessing() throws SQLException, MiddlewareException, MiddlewareRequestException {
+/* 194 */     setFlagValue(this.m_elist.getProfile(), "COMPATGENABR", "0020");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void completeNowFinalProcessing() throws SQLException, MiddlewareException, MiddlewareRequestException {
+/* 218 */     checkAssortModule();
+/* 219 */     setFlagValue(this.m_elist.getProfile(), "COMPATGENABR", "0020");
+/*     */     
+/* 221 */     doFinalProcessing(this.m_elist.getParentEntityGroup().getEntityItem(0));
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void doFinalProcessing(EntityItem paramEntityItem) {
+/* 249 */     setFlagValue(this.m_elist.getProfile(), "EPIMSABRSTATUS", "0020");
+/*     */     
+/* 251 */     String str = getAttributeFlagEnabledValue(paramEntityItem, "SPECBID");
+/* 252 */     addDebug(paramEntityItem.getKey() + " SPECBID: " + str);
+/* 253 */     if ("11457".equals(str)) {
+/* 254 */       EntityGroup entityGroup = this.m_elist.getEntityGroup("ANNOUNCEMENT"); byte b;
+/* 255 */       for (b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/* 256 */         EntityItem entityItem = entityGroup.getEntityItem(b);
+/* 257 */         String str1 = getAttributeFlagEnabledValue(entityItem, "ANNSTATUS");
+/* 258 */         String str2 = getAttributeFlagEnabledValue(entityItem, "ANNTYPE");
+/* 259 */         addDebug(entityItem.getKey() + " status " + str1 + " type " + str2);
+/* 260 */         if (str1 == null || str1.length() == 0) {
+/* 261 */           str1 = "0020";
+/*     */         }
+/* 263 */         if ("0020".equals(str1) && "19".equals(str2)) {
+/* 264 */           addDebug(entityItem.getKey() + " is Final and New");
+/* 265 */           setFlagValue(this.m_elist.getProfile(), "WWPRTABRSTATUS", "0020", entityItem);
+/*     */         } 
+/*     */       } 
+/*     */       
+/* 269 */       entityGroup = this.m_elist.getEntityGroup("AVAIL");
+/* 270 */       for (b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/* 271 */         EntityItem entityItem = entityGroup.getEntityItem(b);
+/* 272 */         String str1 = getAttributeFlagEnabledValue(entityItem, "AVAILTYPE");
+/* 273 */         addDebug(entityItem.getKey() + " type " + str1);
+/*     */         
+/* 275 */         if ("146".equals(str1) || "149".equals(str1)) {
+/* 276 */           Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(entityItem, "AVAILANNA", "ANNOUNCEMENT");
+/* 277 */           for (byte b1 = 0; b1 < vector.size(); b1++) {
+/* 278 */             EntityItem entityItem1 = vector.elementAt(b1);
+/* 279 */             String str2 = getAttributeFlagEnabledValue(entityItem1, "ANNSTATUS");
+/* 280 */             String str3 = getAttributeFlagEnabledValue(entityItem1, "ANNTYPE");
+/* 281 */             addDebug(entityItem1.getKey() + " status " + str2 + " type " + str3);
+/* 282 */             if (str2 == null || str2.length() == 0) {
+/* 283 */               str2 = "0020";
+/*     */             }
+/*     */             
+/* 286 */             if ("0020".equals(str2)) {
+/* 287 */               if ("146".equals(str1) && "19".equals(str3)) {
+/* 288 */                 addDebug(entityItem1.getKey() + " is Final and New");
+/*     */ 
+/*     */                 
+/* 291 */                 setFlagValue(this.m_elist.getProfile(), "QSMRPTABRSTATUS", getQueuedValue("QSMRPTABRSTATUS"), entityItem1);
+/*     */               } 
+/* 293 */               if ("149".equals(str1) && "14".equals(str3)) {
+/* 294 */                 addDebug(entityItem1.getKey() + " is Final and EOL");
+/*     */ 
+/*     */                 
+/* 297 */                 setFlagValue(this.m_elist.getProfile(), "QSMRPTABRSTATUS", getQueuedValue("QSMRPTABRSTATUS"), entityItem1);
+/*     */               } 
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */     } else {
+/*     */       
+/* 305 */       setFlagValue(this.m_elist.getProfile(), "WWPRTABRSTATUS", "0020");
+/*     */ 
+/*     */       
+/* 308 */       setFlagValue(this.m_elist.getProfile(), "QSMRPTABRSTATUS", getQueuedValue("QSMRPTABRSTATUS"));
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void doDQChecking(EntityItem paramEntityItem, String paramString) throws Exception {
+/* 324 */     int i = getCount("LSEOBUNDLELSEO");
+/* 325 */     if (i < 2) {
+/*     */       
+/* 327 */       this.args[0] = this.m_elist.getEntityGroup("LSEO").getLongDescription();
+/* 328 */       addError("MINIMUM_TWO_ERR", this.args);
+/*     */     } 
+/*     */ 
+/*     */     
+/* 332 */     checkLSEOStatus(paramString);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 342 */     i = getCount("SEOCGBDL");
+/* 343 */     if (!PokUtils.contains(paramEntityItem, "BUNDLETYPE", TESTSET)) {
+/* 344 */       if (i != 0)
+/*     */       {
+/* 346 */         this.args[0] = this.m_elist.getEntityGroup("SEOCG").getLongDescription();
+/* 347 */         addError("SVC_SEOCG_ERR", this.args);
+/*     */       }
+/*     */     
+/* 350 */     } else if (i == 0) {
+/*     */       
+/* 352 */       this.args[0] = this.m_elist.getEntityGroup("SEOCG").getLongDescription();
+/* 353 */       addError("MUST_BE_IN_ATLEAST_ONE_ERR", this.args);
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 359 */     checkCountry("LSEOBUNDLELSEO", "D", false);
+/*     */ 
+/*     */     
+/* 362 */     getModelVE(paramEntityItem);
+/*     */ 
+/*     */     
+/* 365 */     validateOS(paramEntityItem);
+/*     */ 
+/*     */     
+/* 368 */     validateBUNDLETYPE(paramEntityItem);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 378 */     String str = getAttributeFlagEnabledValue(paramEntityItem, "SPECBID");
+/* 379 */     addDebug(paramEntityItem.getKey() + " SPECBID: " + str);
+/* 380 */     if ("11457".equals(str)) {
+/*     */ 
+/*     */       
+/* 383 */       Vector vector1 = PokUtils.getAllLinkedEntities(paramEntityItem, "LSEOBUNDLEAVAIL", "AVAIL");
+/* 384 */       Vector vector2 = PokUtils.getEntitiesWithMatchedAttr(vector1, "AVAILTYPE", "146");
+/* 385 */       if (vector2.size() == 0) {
+/* 386 */         this.args[0] = this.m_elist.getEntityGroup("AVAIL").getLongDescription();
+/*     */         
+/* 388 */         addError("NOT_SPECBID_AVAIL_ERR", this.args);
+/*     */       } 
+/*     */ 
+/*     */ 
+/*     */       
+/* 393 */       checkCountry("LSEOBUNDLEAVAIL", "D", true);
+/*     */     } else {
+/* 395 */       i = getCount("LSEOBUNDLEAVAIL");
+/*     */ 
+/*     */ 
+/*     */       
+/* 399 */       if (i != 0) {
+/* 400 */         this.args[0] = this.m_elist.getEntityGroup("AVAIL").getLongDescription();
+/* 401 */         addError("SPECBID_AVAIL_ERR", this.args);
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 405 */     if ("0040".equals(paramString)) {
+/*     */ 
+/*     */ 
+/*     */       
+/* 409 */       checkDates(paramEntityItem);
+/*     */       
+/* 411 */       if ("11457".equals(str)) {
+/*     */ 
+/*     */         
+/* 414 */         EANTextAttribute eANTextAttribute = (EANTextAttribute)paramEntityItem.getAttribute("SAPASSORTMODULE");
+/*     */         
+/* 416 */         if (eANTextAttribute == null || !eANTextAttribute.containsNLS(1)) {
+/* 417 */           this.args[0] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "SAPASSORTMODULE", "SAPASSORTMODULE");
+/* 418 */           addError("NOT_SPECBID_VALUE_ERR", this.args);
+/*     */         } 
+/*     */       } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 425 */       checkAvailDates(paramEntityItem);
+/*     */     } 
+/*     */     
+/* 428 */     this.mdlList.dereference();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void getModelVE(EntityItem paramEntityItem) throws Exception {
+/* 437 */     String str = "EXRPT3LSEOBDL2";
+/*     */     
+/* 439 */     this.mdlList = this.m_db.getEntityList(this.m_elist.getProfile(), new ExtractActionItem(null, this.m_db, this.m_elist
+/* 440 */           .getProfile(), str), new EntityItem[] { new EntityItem(null, this.m_elist
+/* 441 */             .getProfile(), paramEntityItem.getEntityType(), paramEntityItem.getEntityID()) });
+/* 442 */     addDebug("getModelVE:: Extract " + str + NEWLINE + PokUtils.outputList(this.mdlList));
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 452 */     return "LSEOBUNDLE ABR.";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 463 */     return "1.33";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void checkLSEOStatus(String paramString) throws SQLException, MiddlewareException {
+/* 476 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("LSEO");
+/* 477 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/*     */       
+/* 479 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/* 480 */       String str = getAttributeFlagEnabledValue(entityItem, "STATUS");
+/* 481 */       addDebug("checkLSEOStatus " + entityItem.getKey() + " lseoStatus: " + str);
+/* 482 */       if (str == null || str.length() == 0) {
+/* 483 */         str = "0020";
+/*     */       }
+/* 485 */       if ("0040".equals(paramString)) {
+/* 486 */         if (!"0020".equals(str)) {
+/* 487 */           this.args[0] = entityGroup.getLongDescription();
+/* 488 */           this.args[1] = getNavigationName(entityItem);
+/*     */           
+/* 490 */           addError("ONE_NOT_FINAL_ERR", this.args);
+/*     */         }
+/*     */       
+/* 493 */       } else if (!"0020".equals(str) && !"0040".equals(str)) {
+/*     */         
+/* 495 */         this.args[0] = entityGroup.getLongDescription();
+/* 496 */         this.args[1] = getNavigationName(entityItem);
+/*     */         
+/* 498 */         addError("ONE_NOT_R4RFINAL_ERR", this.args);
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void checkDates(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 510 */     String str = getAttributeValue(paramEntityItem, "BUNDLPUBDATEMTRGT", "");
+/* 511 */     addDebug("checkDates " + paramEntityItem.getKey() + " BUNDLPUBDATEMTRGT: " + str);
+/* 512 */     if (str.length() == 0) {
+/*     */       return;
+/*     */     }
+/*     */     
+/* 516 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("LSEO");
+/* 517 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/*     */       
+/* 519 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/* 520 */       String str1 = getAttributeValue(entityItem, "LSEOPUBDATEMTRGT", "");
+/* 521 */       addDebug("checkDates " + entityItem.getKey() + " LSEOPUBDATEMTRGT: " + str1);
+/* 522 */       if (str1.length() > 0 && str1.compareTo(str) > 0) {
+/*     */         
+/* 524 */         this.args[0] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "BUNDLPUBDATEMTRGT", "BUNDLPUBDATEMTRGT");
+/* 525 */         this.args[1] = entityGroup.getLongDescription();
+/* 526 */         this.args[2] = getNavigationName(entityItem);
+/* 527 */         this.args[3] = PokUtils.getAttributeDescription(entityGroup, "LSEOPUBDATEMTRGT", "LSEOPUBDATEMTRGT");
+/*     */ 
+/*     */         
+/* 530 */         addError("EARLY_DATE_ERR", this.args);
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void checkAvailDates(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 545 */     Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(paramEntityItem, "LSEOBUNDLEAVAIL", "AVAIL");
+/* 546 */     String str1 = getAttributeValue(paramEntityItem, "BUNDLPUBDATEMTRGT", "");
+/* 547 */     String str2 = getAttributeValue(paramEntityItem, "BUNDLUNPUBDATEMTRGT", "");
+/* 548 */     addDebug("checkAvailDates " + paramEntityItem.getKey() + " BUNDLPUBDATEMTRGT: " + str1 + " BUNDLUNPUBDATEMTRGT: " + str2 + " availVct: " + vector
+/* 549 */         .size());
+/*     */     
+/* 551 */     for (byte b = 0; b < vector.size(); b++) {
+/* 552 */       EntityItem entityItem = vector.elementAt(b);
+/* 553 */       String str3 = PokUtils.getAttributeValue(entityItem, "EFFECTIVEDATE", ", ", "", false);
+/* 554 */       String str4 = getAttributeFlagEnabledValue(entityItem, "AVAILTYPE");
+/* 555 */       addDebug("checkAvailDates " + entityItem.getKey() + " EFFECTIVEDATE: " + str3 + " AVAILTYPE: " + str4);
+/*     */ 
+/*     */       
+/* 558 */       if (str1.trim().length() > 0 && (
+/* 559 */         "146".equals(str4) || "143".equals(str4)) && str3
+/* 560 */         .length() > 0 && str3.compareTo(str1) < 0) {
+/*     */ 
+/*     */         
+/* 563 */         this.args[0] = entityItem.getEntityGroup().getLongDescription() + " " + getNavigationName(entityItem);
+/* 564 */         this.args[1] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "BUNDLPUBDATEMTRGT", "BUNDLPUBDATEMTRGT");
+/* 565 */         this.args[2] = "";
+/* 566 */         this.args[3] = "";
+/* 567 */         addError("EARLY_DATE_ERR", this.args);
+/*     */       } 
+/*     */ 
+/*     */ 
+/*     */       
+/* 572 */       if (str2.trim().length() > 0 && 
+/* 573 */         "149".equals(str4) && str3.length() > 0 && str3.compareTo(str2) > 0) {
+/*     */ 
+/*     */         
+/* 576 */         this.args[0] = entityItem.getEntityGroup().getLongDescription();
+/* 577 */         this.args[1] = getNavigationName(entityItem);
+/* 578 */         this.args[2] = "";
+/* 579 */         this.args[3] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "BUNDLUNPUBDATEMTRGT", "BUNDLUNPUBDATEMTRGT");
+/* 580 */         this.args[4] = "";
+/* 581 */         addError("LATER_DATE_ERR", this.args);
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void validateOS(EntityItem paramEntityItem) throws MiddlewareException {
+/* 604 */     String str = "OSLEVEL";
+/* 605 */     EANMetaAttribute eANMetaAttribute = paramEntityItem.getEntityGroup().getMetaAttribute(str);
+/* 606 */     if (eANMetaAttribute == null) {
+/* 607 */       addDebug("validateOS ERROR:Attribute " + str + " NOT found in LSEOBUNDLE META data.");
+/*     */       
+/*     */       return;
+/*     */     } 
+/* 611 */     ArrayList<String> arrayList = new ArrayList();
+/*     */     
+/* 613 */     EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)paramEntityItem.getAttribute(str);
+/* 614 */     if (eANFlagAttribute != null) {
+/*     */       
+/* 616 */       MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 617 */       for (byte b1 = 0; b1 < arrayOfMetaFlag.length; b1++) {
+/*     */         
+/* 619 */         if (arrayOfMetaFlag[b1].isSelected()) {
+/* 620 */           arrayList.add(arrayOfMetaFlag[b1].getFlagCode());
+/*     */         }
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 625 */     addDebug("validateOS " + paramEntityItem.getKey() + " oslevel " + arrayList);
+/*     */ 
+/*     */     
+/* 628 */     EntityGroup entityGroup = this.mdlList.getEntityGroup("MODEL");
+/*     */     
+/* 630 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/* 631 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/* 632 */       String str1 = getAttributeFlagEnabledValue(entityItem, "COFCAT");
+/* 633 */       String str2 = getAttributeFlagEnabledValue(entityItem, "APPLICATIONTYPE");
+/* 634 */       addDebug("validateOS " + entityItem.getKey() + " COFCAT: " + str1 + " APPLICATIONTYPE: " + str2);
+/* 635 */       if ("101".equals(str1) && "33".equals(str2)) {
+/*     */         
+/* 637 */         Vector<EntityItem> vector1 = PokUtils.getAllLinkedEntities(entityItem, "MODELWWSEO", "WWSEO");
+/*     */         
+/* 639 */         EntityGroup entityGroup1 = this.m_elist.getEntityGroup("WWSEO");
+/* 640 */         Vector<EntityItem> vector2 = new Vector(1);
+/* 641 */         for (byte b1 = 0; b1 < vector1.size(); b1++) {
+/* 642 */           EntityItem entityItem1 = vector1.elementAt(b1);
+/* 643 */           EntityItem entityItem2 = entityGroup1.getEntityItem(entityItem1.getKey());
+/* 644 */           vector2.add(entityItem2);
+/*     */         } 
+/* 646 */         vector1.clear();
+/* 647 */         Vector<EntityItem> vector3 = PokUtils.getAllLinkedEntities(vector2, "WWSEOSWPRODSTRUCT", "SWPRODSTRUCT");
+/* 648 */         addDebug("validateOS " + entityItem.getKey() + " wwseoVct " + vector2.size() + " swpsVct: " + vector3.size());
+/*     */         
+/* 650 */         for (byte b2 = 0; b2 < vector3.size(); b2++) {
+/* 651 */           EntityItem entityItem1 = vector3.elementAt(b2);
+/* 652 */           addDebug("validateOS " + entityItem1.getKey() + " uplinkcnt: " + entityItem1.getUpLinkCount());
+/* 653 */           for (byte b3 = 0; b3 < entityItem1.getUpLinkCount(); b3++) {
+/* 654 */             EntityItem entityItem2 = (EntityItem)entityItem1.getUpLink(b3);
+/* 655 */             if (entityItem2.getEntityType().equals("SWFEATURE")) {
+/* 656 */               String str3 = getAttributeFlagEnabledValue(entityItem2, "SWFCCAT");
+/* 657 */               addDebug("validateOS " + entityItem2.getKey() + " SWFCCAT: " + str3);
+/* 658 */               if ("319".equals(str3)) {
+/* 659 */                 ArrayList<String> arrayList1 = new ArrayList();
+/*     */                 
+/* 661 */                 EANFlagAttribute eANFlagAttribute1 = (EANFlagAttribute)entityItem2.getAttribute(str);
+/* 662 */                 if (eANFlagAttribute1 != null) {
+/*     */                   
+/* 664 */                   MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute1.get();
+/* 665 */                   for (byte b4 = 0; b4 < arrayOfMetaFlag.length; b4++) {
+/*     */                     
+/* 667 */                     if (arrayOfMetaFlag[b4].isSelected()) {
+/* 668 */                       arrayList1.add(arrayOfMetaFlag[b4].getFlagCode());
+/*     */                     }
+/*     */                   } 
+/*     */                 } 
+/* 672 */                 addDebug("validateOS ValueMetric " + entityItem2.getKey() + " oslevel " + arrayList1);
+/* 673 */                 if (!arrayList.containsAll(arrayList1) || !arrayList1.containsAll(arrayList)) {
+/*     */                   
+/* 675 */                   this.args[0] = PokUtils.getAttributeDescription(entityItem2.getEntityGroup(), str, str);
+/* 676 */                   addError("OSLEVEL_ERR", this.args);
+/*     */                 } 
+/* 678 */                 arrayList1.clear();
+/*     */               } 
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/* 683 */         vector3.clear();
+/* 684 */         vector2.clear();
+/*     */       } 
+/*     */     } 
+/* 687 */     arrayList.clear();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void validateBUNDLETYPE(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 704 */     String str = "BUNDLETYPE";
+/* 705 */     ArrayList<String> arrayList1 = new ArrayList();
+/* 706 */     ArrayList<String> arrayList2 = new ArrayList();
+/* 707 */     EANMetaAttribute eANMetaAttribute = paramEntityItem.getEntityGroup().getMetaAttribute(str);
+/* 708 */     if (eANMetaAttribute == null) {
+/* 709 */       addDebug("validateBUNDLETYPE ERROR:Attribute " + str + " NOT found in LSEOBUNDLE META data.");
+/*     */       
+/*     */       return;
+/*     */     } 
+/* 713 */     EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)paramEntityItem.getAttribute(str);
+/* 714 */     if (eANFlagAttribute != null) {
+/*     */       
+/* 716 */       MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 717 */       for (byte b1 = 0; b1 < arrayOfMetaFlag.length; b1++) {
+/*     */         
+/* 719 */         if (arrayOfMetaFlag[b1].isSelected()) {
+/* 720 */           arrayList2.add(arrayOfMetaFlag[b1].getFlagCode());
+/*     */         }
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 725 */     addDebug("validateBUNDLETYPE " + paramEntityItem.getKey() + " bdlTypes " + arrayList2);
+/*     */ 
+/*     */     
+/* 728 */     EntityGroup entityGroup = this.mdlList.getEntityGroup("MODEL");
+/* 729 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/* 730 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/*     */       
+/* 732 */       String str1 = getAttributeFlagEnabledValue(entityItem, "COFCAT");
+/* 733 */       if (str1 == null) {
+/* 734 */         str1 = "";
+/*     */       }
+/* 736 */       addDebug("validateBUNDLETYPE " + entityItem.getKey() + " COFCAT: " + str1);
+/* 737 */       if (!arrayList2.contains(str1)) {
+/*     */ 
+/*     */ 
+/*     */         
+/* 741 */         this.args[0] = entityItem.getEntityGroup().getLongDescription();
+/* 742 */         this.args[1] = getNavigationName(entityItem);
+/* 743 */         this.args[2] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), str, str);
+/* 744 */         addError("MODEL_TYPE_ERR", this.args);
+/*     */       } 
+/* 746 */       arrayList1.add(str1);
+/*     */     } 
+/*     */ 
+/*     */     
+/* 750 */     addDebug("validateBUNDLETYPE all mdlTypes " + arrayList1);
+/* 751 */     if (!arrayList1.containsAll(arrayList2)) {
+/*     */ 
+/*     */ 
+/*     */       
+/* 755 */       this.args[0] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), str, str);
+/* 756 */       this.args[1] = this.m_elist.getEntityGroup("LSEO").getLongDescription();
+/* 757 */       addError("BDLE_TYPE_ERR", this.args);
+/*     */     } 
+/* 759 */     arrayList1.clear();
+/* 760 */     arrayList2.clear();
+/*     */   }
+/*     */ }
 
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.objects.*;
 
-import com.ibm.transform.oim.eacm.util.*;
-
-import java.util.*;
-
-/**
-LSEOBDLABRSTATUS_class=COM.ibm.eannounce.abr.sg.LSEOBDLABRSTATUS
-LSEOBDLABRSTATUS_enabled=true
-LSEOBDLABRSTATUS_idler_class=A
-LSEOBDLABRSTATUS_keepfile=true
-LSEOBDLABRSTATUS_report_type=DGTYPE01
-LSEOBDLABRSTATUS_vename=EXRPT3LSEOBDL1
-LSEOBDLABRSTATUS_CAT1=RPTCLASS.LSEOBDLABRSTATUS
-LSEOBDLABRSTATUS_CAT2=
-LSEOBDLABRSTATUS_CAT3=RPTSTATUS
-LSEOBDLABRSTATUS_domains=0050,0090,0150,0190,0210,0230,0240,0310,0330,0340,0360,0390
-
-*/
-
-/**********************************************************************************
-* LSEOBDLABRSTATUS class
-*
-* From "SG FS ABR Data Quality 20081016.doc"
-*A.	STATUS = Draft | Change Request
-*
-*1.	CountOf(LSEOBUNDLELSEO-d: LSEO) => 2
-*ErrorMessage 'must have at least two' LD(LSEO)
-*2.	ValueOf(LSEOBUNDLELSEO-d: LSEO.STATUS) = 0020 (Final) or 0040 (Ready for Review)
-*ErrorMessage 'has a' LD(LSEO) NDN(LSEO) 'that is not Ready for Review or Final'
-*3.	If 100 (Hardware) or 101 (Software) NOT IN ValueOf(LSEOBUNDLE. BUNDLETYPE) then
-*	a.	CountOf(SEOGCBDL-u: SEOCG) = 0
-*	ErrorMessage “a Service Bundle is in” LD(SEOCG) 
-*ELSE
-*	a. CountOf(SEOCGBDL-u: SEOCG)  => 1
-*	ErrorMessage 'has to be in a least one' LD(SEOCG)
-*4.	AllValuesOf(LSEOBUNDLE.COUNTRYLIST) IN (LSEOBUNDLELSEO-d: LSEO.COUNTRYLIST)
-*ErrorMessage 'has a Country in its' LD(COUNTRYLIST) 'that is not in 'LD(LSEO) NDN(LSEO) LD(COUNTRYLIST)
-*5.	ValidateOSLevel
-*6.	ValidateBUNDLETYPE
-7.	IF ValueOf(LSEOBUNDLE.SPECBID) = 11458 (Yes) THEN CountOf(LSEOBUNDLEAVAIL-d. AVAIL) = 0
- ErrorMessage  'is a Special Bid, but it has an' LD(AVAIL)
-8.	IF ValueOf(LSEOBUNDLE.SPECBID) = 11457 (No) THEN
-a.	CountOf(LSEOBUNDLEAVAIL-d. AVAIL) > 0
-ErrorMessage  'is not a Special Bid, but it does not have an' LD(AVAIL)
-b.	AllValuesOf(LSEOBUNDLEAVAIL-d:AVAIL. COUNTRYLIST) IN (LSEOBUNDLE.COUNTRYLIST)
-ErrorMessage LD(AVAIL) NDN(AVAIL) LD(COUNTRYLIST) 'has a Country that is not in the' LD(LSEOBUNDLE) NDN(LSEOBUNDLE) LD(COUNTRYLIST).
-
-*B.	STATUS = Ready for Review
-*
-*1.	Draft | Change Request Criteria
-*2.	ValueOf(LSEOBUNDLELSEO-d: LSEO.STATUS) = 0020 (Final)
-*ErrorMessage 'has a' LD(LSEO) NDN(LSEO) 'that is not Final'
-*3.	CompareAll(LSEOBUNDLELSEO-d: LSEO.LSEOPUBDATEMTRGT) <= LSEOBUNDLE.BUNDLPUBDATEMTRGT
-*ErrorMessage LD(BUNDLPUBDATEMTRGT) 'is earlier than' LD(LSEO) NDN(LSEO) LD(LSEOPUBDATEMTRGT)
-*4.	IF ValueOf(LSEOBUNDLE.SPECBID) = 11457 (No) THEN
-*a.	LSEOBUNDLE.SAPASSORTMODULE must exist for NLSID = 1
-*ErrorMessage  'is not a Special Bid, but it does not have a value for' LD(SAPASSORTMODULE)
-5.	AllValuesOf(LSEOBUNDLEAVAIL-d: AVAIL.EFFECTIVEDATE) => LSEOBUNDLE. BUNDLPUBDATEMTRGT where AVAIL.AVAILTYPE= 146 (Planned Availability) or 143 (First Order)
-ErrorMessage LD(AVAIL) NDN(AVAIL) 'is earlier than' LD(BUNDLPUBDATEMTRGT).
-6.	AllValuesOf(LSEOBUNDLEAVAIL-d: AVAIL.EFFECTIVEDATE) <= LSEOBUNDLE. BUNDLUNPUBDATEMTRGT where AVAIL.AVAILTYPE= 149 (Last Order)
-ErrorMessage LD(AVAIL) NDN(AVAIL) 'is later than' LD(BUNDLUNPUBDATEMTRGT).
-
-*
-*C.	STATUS changed to Final
-*
-*1.	IF FirstTime(LSEOBUNDLE.STATUS = 0020 (Final)) THEN  ELSE obtain the value for SAPASSORTMODULE that was in effect at the 'last DTS that STATUS was Final' and set SAPASSORTMODULEPRIOR equal to that value.
-*2.	Set COMPATGENABR = 0020 (Queued)
-*3.	Set WWPRTABRSTATUS = ABRWAITODS2 (Wait for ODS Data)
-*4.	Set EPIMSABRSTATUS =  ABRWAITODS (Wait for ODS Data)
-*
-*D.	STATUS changed to Ready for Review
-*
-*1.	Set COMPATGENABR = 0020 (Queued)
-*
-*E.	STATUS = Final
-*
-*1.	Set EPIMSABRSTATUS =  ABRWAITODS (Wait for ODS Data)
-*2.	IF ValueOf(LSEOBUNDLE.SPECBID) = 11457 (No) THEN
-*	a.	IF (LSEOBUNDLE: LSEOBUNDLEAVAIL-d: AVAILANNA: ANNOUNCEMENT.STATUS = 0020 (Final) and
-*	(LSEOBUNDLE: LSEOBUNDLEAVAIL: AVAILANNA: ANNOUNCEMENT.ANNTYPE) = 19 (New) THEN
-*	Set (LSEOBUNDLE: LSEOBUNDLEAVAIL: AVAILANNA: ANNOUNCEMENT.WWPRTABRSTATUS) = ABRWAITODS2 (Wait for ODS Data)
-*ELSE
-*	a.	Set WWPRTABRSTATUS = ABRWAITODS2 (Wait for ODS Data)
-*
-*/
-//LSEOBDLABRSTATUS.java,v
-//Revision 1.33  2009/02/05 13:42:49  wendy
-//CQ00016165 - Automated QSM feed from ePIMS HW to support the late change request from BIDS
-//
-//Revision 1.32  2009/01/28 17:34:12  wendy
-//MN38219508 include SW in SVC bundle check
-//
-//Revision 1.31  2008/10/16 18:21:11  wendy
-//CQ00012177-RQ more updates - support Services that are Special Bids
-//
-//Revision 1.30  2008/09/22 15:08:16  wendy
-//CQ00006066-WI updates
-//
-//Revision 1.29  2008/04/24 20:23:05  wendy
-//"SG FS ABR Data Quality 20080422.doc" spec updates
-//
-//Revision 1.28  2008/04/11 19:19:12  wendy
-//changes for spec SG FS ABR Data Quality 200803xx.doc
-//
-//Revision 1.27  2008/03/13 18:21:01  wendy
-//Correct country check, root must be subset in some cases
-//
-//Revision 1.26  2008/02/13 19:58:49  wendy
-//Make ABRWAITODSx into constants, allow easier change in future
-//
-//Revision 1.25  2008/01/21 17:26:55  wendy
-//Default null status to final
-//
-//Revision 1.24  2007/12/12 17:00:24  wendy
-//spec chg "Changed the value used to queue WWPRT since it uses VIEWs in the "legacy" ODS (i.e. not the "approved data ods")"
-//
-//Revision 1.23  2007/11/27 22:27:39  wendy
-//SG FS ABR Data Quality 20071127.doc chgs
-//
-//Revision 1.22  2007/11/16 22:17:21  nancy
-//Chgs for spec "SG FS ABR Data Quality 20071115.doc"
-//
-//Revision 1.21  2007/10/25 18:38:23  wendy
-//Spec updates
-//
-//Revision 1.20  2007/10/24 15:37:05  wendy
-//split into 2 VEs
-//
-//Revision 1.19  2007/10/23 17:47:12  wendy
-//Spec changes
-//
-//Revision 1.18  2007/09/14 17:43:55  wendy
-//Updated for GX
-//
-public class LSEOBDLABRSTATUS  extends DQABRSTATUS
-{
-    private Object[] args = new String[5];
-	private EntityList mdlList;
-	//BUNDLETYPE	100	Hardware
-	//BUNDLETYPE	101	Software
-	//BUNDLETYPE	102	Service
-
-	private static final String HARDWARE="100";
-	private static final String SOFTWARE="101";
-	private static final Set TESTSET;
-	static{
-		TESTSET = new HashSet();
-		TESTSET.add(HARDWARE);
-		TESTSET.add(SOFTWARE);//MN38219508
-	}
-	/**********************************
-	* check all states
-	*/
-	protected boolean isVEneeded(String statusFlag) {
-		return true;
-	}
-
-	/**********************************
-	* complete abr processing when status is already final; (dq was final too)
-	*E.	STATUS = Final
-	*
-	*1.	Set EPIMSABRSTATUS =  ABRWAITODS (Wait for ODS Data)
-	*2.	IF ValueOf(LSEOBUNDLE.SPECBID) = 11457 (No) THEN
-	*	a.	IF (LSEOBUNDLE: LSEOBUNDLEAVAIL-d: AVAILANNA: ANNOUNCEMENT.STATUS = 0020 (Final) and
-	*	(LSEOBUNDLE: LSEOBUNDLEAVAIL: AVAILANNA: ANNOUNCEMENT.ANNTYPE) = 19 (New) THEN
-	*	Set (LSEOBUNDLE: LSEOBUNDLEAVAIL: AVAILANNA: ANNOUNCEMENT.WWPRTABRSTATUS) = ABRWAITODS2 (Wait for ODS Data)
-	*ELSE
-	*	a.	Set WWPRTABRSTATUS = ABRWAITODS2 (Wait for ODS Data)
-	*/
-	protected void doAlreadyFinalProcessing() {
-		doFinalProcessing(m_elist.getParentEntityGroup().getEntityItem(0));
-	}
-
-    /**********************************
-    * complete abr processing after status moved to readyForReview; (status was chgreq)
-    *D.	STATUS changed to Ready for Review
-	*1.	Set COMPATGENABR = 0020 (Queued)
-    */
-    protected void completeNowR4RProcessing()throws
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-    {
-         setFlagValue(m_elist.getProfile(),"COMPATGENABR", ABR_QUEUED);
-    }
-
-	/**********************************
-	* complete abr processing after status moved to final; (status was r4r)
-	*C.	STATUS changed to Final
-	*1.	IF FirstTime(LSEOBUNDLE.STATUS = 0020 (Final)) THEN  ELSE obtain the value for SAPASSORTMODULE
-	*that was in effect at the 'last DTS that STATUS was Final' and set SAPASSORTMODULEPRIOR equal to
-	*that value.
-	*2.	Set COMPATGENABR = 0020 (Queued)
-	*3.	Set EPIMSABRSTATUS =  ABRWAITODS (Wait for ODS Data)
-	*4.	IF ValueOf(LSEOBUNDLE.SPECBID) = 11457 (No) THEN
-	*	a.	IF (LSEOBUNDLE: LSEOBUNDLEAVAIL-d: AVAILANNA: ANNOUNCEMENT.STATUS = 0020 (Final) and
-	*		(LSEOBUNDLE: LSEOBUNDLEAVAIL: AVAILANNA: ANNOUNCEMENT.ANNTYPE) = 19 (New) then
-	*		Set (LSEOBUNDLE: LSEOBUNDLEAVAIL: AVAILANNA: ANNOUNCEMENT.WWPRTABRSTATUS) = ABRWAITODS2
-	*	ELSE
-	*	a.	Set WWPRTABRSTATUS = ABRWAITODS2 (Wait for ODS Data)
-	*
-	*/
-	protected void completeNowFinalProcessing() throws
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-	{
-		checkAssortModule();
-		setFlagValue(m_elist.getProfile(),"COMPATGENABR", ABR_QUEUED);
-
-		doFinalProcessing(m_elist.getParentEntityGroup().getEntityItem(0));
-	}
-
-	/**********************************
-	* complete abr processing when status is already final or just set to final
-	*
-	*1.	Set EPIMSABRSTATUS =  ABRWAITODS (Wait for ODS Data)
-	*2.	IF ValueOf(LSEOBUNDLE.SPECBID) = 11457 (No) THEN
-	*	a.	IF (LSEOBUNDLE: LSEOBUNDLEAVAIL-d: AVAILANNA: ANNOUNCEMENT.STATUS = 0020 (Final) and
-	*	(LSEOBUNDLE: LSEOBUNDLEAVAIL: AVAILANNA: ANNOUNCEMENT.ANNTYPE) = 19 (New) THEN
-	*	Set (LSEOBUNDLE: LSEOBUNDLEAVAIL: AVAILANNA: ANNOUNCEMENT.WWPRTABRSTATUS) = ABRWAITODS2 (Wait for ODS Data)
-	* CQ00006066-WI
-b.	IF (LSEOBUNDLE: LSEOBUNDLEAVAIL-d: AVAIL.AVAILTYPE) =  146 (Planned Availability) and
-(AVAIL: AVAILANNA: ANNOUNCEMENT.STATUS) = 0020 (Final) and (AVAIL: AVAILANNA: ANNOUNCEMENT.ANNTYPE) = 19 (New)
-then Set (AVAIL: AVAILANNA: ANNOUNCEMENT. QSMRPTABRSTATUS= QSM2XPERWEEK (Load QSM Change Report)
-c.	IF (LSEOBUNDLE: LSEOBUNDLEAVAIL-d: AVAIL.AVAILTYPE) =  149 (Last Order) and
-(AVAIL: AVAILANNA: ANNOUNCEMENT.STATUS) = 0020 (Final) and (AVAIL: AVAILANNA: ANNOUNCEMENT.ANNTYPE) =  14
-("End Of Life - Withdrawal from mktg")
-then Set (AVAIL: AVAILANNA: ANNOUNCEMENT. QSMRPTABRSTATUS= QSM2XPERWEEK (Load QSM Change Report)
-
-	*ELSE
-	*	a.	Set WWPRTABRSTATUS = ABRWAITODS2 (Wait for ODS Data)
-	*CQ00006066-WI
-b.	Set QSMRPTABRSTATUS= QSM2XPERWEEK (Load QSM Change Report)
-
-	*/
-	private void doFinalProcessing(EntityItem rootEntity)
-	{
-        setFlagValue(m_elist.getProfile(),"EPIMSABRSTATUS", ABRWAITODS);
-
-		String specbid = getAttributeFlagEnabledValue(rootEntity, "SPECBID");
-		addDebug(rootEntity.getKey()+" SPECBID: "+specbid);
-		if ("11457".equals(specbid)){  // is No
-			EntityGroup eg = m_elist.getEntityGroup("ANNOUNCEMENT");
-			for (int i=0; i<eg.getEntityItemCount(); i++){
-				EntityItem annItem = eg.getEntityItem(i);
-				String annstatus = getAttributeFlagEnabledValue(annItem, "ANNSTATUS");
-				String anntype = getAttributeFlagEnabledValue(annItem, "ANNTYPE");
-				addDebug(annItem.getKey()+" status "+annstatus+" type "+anntype);
-				if (annstatus==null || annstatus.length()==0){
-					annstatus = STATUS_FINAL;
-				}
-				if (STATUS_FINAL.equals(annstatus) && "19".equals(anntype)){
-					addDebug(annItem.getKey()+" is Final and New");
-        			setFlagValue(m_elist.getProfile(),"WWPRTABRSTATUS", ABRWAITODS2,annItem);
-				}
-			}
-//			CQ00006066-WI go thru AVAILs to ANN
-			eg = m_elist.getEntityGroup("AVAIL");
-			for (int ai=0; ai<eg.getEntityItemCount(); ai++){
-				EntityItem availItem = eg.getEntityItem(ai);
-				String availType = getAttributeFlagEnabledValue(availItem, "AVAILTYPE");
-				addDebug(availItem.getKey()+" type "+availType);
-				//IF AVAILTYPE =  146 (Planned Availability) or 149 (Last Order)
-				if ("146".equals(availType) || "149".equals(availType)) {
-					Vector annVct= PokUtils.getAllLinkedEntities(availItem, "AVAILANNA", "ANNOUNCEMENT");
-					for (int i = 0; i < annVct.size(); i++) {
-						EntityItem ei = (EntityItem)annVct.elementAt(i);
-						String status = getAttributeFlagEnabledValue(ei, "ANNSTATUS");
-						String annType = getAttributeFlagEnabledValue(ei, "ANNTYPE");
-						addDebug(ei.getKey() + " status " + status + " type " + annType);
-						if (status==null || status.length()==0){
-							status = STATUS_FINAL;
-						}
-						//and (AVAIL: AVAILANNA: ANNOUNCEMENT.STATUS) = 0020 (Final)
-						if (STATUS_FINAL.equals(status)) {
-							if ("146".equals(availType)&& "19".equals(annType)) { //PlannedAvail and New ann
-								addDebug(ei.getKey()+" is Final and New");
-								//setFlagValue(m_elist.getProfile(),"QSMRPTABRSTATUS", QSM2XPERWEEK, ei);//CQ00006066-WI
-								//CQ00016165
-								setFlagValue(m_elist.getProfile(),"QSMRPTABRSTATUS", getQueuedValue("QSMRPTABRSTATUS"), ei);
-							}
-							if ("149".equals(availType)&& "14".equals(annType)) { // LastOrderAvail and EOL ann CQ00006066-WI
-								addDebug(ei.getKey()+" is Final and EOL");
-								//setFlagValue(m_elist.getProfile(),"QSMRPTABRSTATUS", QSM2XPERWEEK, ei);
-								//CQ00016165
-								setFlagValue(m_elist.getProfile(),"QSMRPTABRSTATUS", getQueuedValue("QSMRPTABRSTATUS"), ei);
-							}
-						}
-					}
-				}
-			}
-		}
-		else{
-        	setFlagValue(m_elist.getProfile(),"WWPRTABRSTATUS", ABRWAITODS2);
-        	//setFlagValue(m_elist.getProfile(),"QSMRPTABRSTATUS", QSM2XPERWEEK);//CQ00006066-WI
-			//CQ00016165
-			setFlagValue(m_elist.getProfile(),"QSMRPTABRSTATUS", getQueuedValue("QSMRPTABRSTATUS"));    	
-		}
-	}
-
-    /**********************************
-	* Note the ABR is only called when
-	* DATAQUALITY transitions from 'Draft to Ready for Review',
-	*	'Change Request to Ready for Review' and from 'Ready for Review to Final'
-	*/
-    protected void doDQChecking(EntityItem rootEntity, String status) throws Exception
-    {
-		//1.	Draft | Change Request Criteria done for Ready For Review too
-
-		//Status is Draft or Change
-		//1.	CountOf(LSEOBUNDLELSEO-d: LSEO) => 2
-		//ErrorMessage 'must have at least two' LD(LSEO)
-		int cnt = getCount("LSEOBUNDLELSEO");
-		if(cnt <2) {
-			//MINIMUM_TWO_ERR = must have at least two {0}
-			args[0] = m_elist.getEntityGroup("LSEO").getLongDescription();
-			addError("MINIMUM_TWO_ERR",args);
-		}
-		//2.	ValueOf(LSEOBUNDLELSEO-d: LSEO.STATUS) = 0020 (Final) or 0040 (Ready for Review)
-		//ErrorMessage 'has a' LD(LSEO) NDN(LSEO) 'that is not Ready for Review or Final'
-		checkLSEOStatus(status);
-
-		//orig 3.	If 100 (Hardware) NOT IN ValueOf(LSEOBUNDLE. BUNDLETYPE) then 
-		//MN38219508
-		//3.If 100 (Hardware) or 101 (Software) NOT IN ValueOf(LSEOBUNDLE. BUNDLETYPE) then	
-		//	a.	CountOf(SEOGCBDL-u: SEOCG) = 0
-		//	ErrorMessage “a Service Bundle is in” LD(SEOCG) 
-		//	ELSE
-		//	a. CountOf(SEOCGBDL-u: SEOCG)  => 1
-		//	ErrorMessage 'has to be in a least one' LD(SEOCG)
-		cnt = getCount("SEOCGBDL");
-		if (!PokUtils.contains(rootEntity, "BUNDLETYPE", TESTSET)){
-			if(cnt !=0) {
-				//SVC_SEOCG_ERR = is a Service and must not be in a {0}
-				args[0] = m_elist.getEntityGroup("SEOCG").getLongDescription();
-				addError("SVC_SEOCG_ERR",args);
-			}
-		}else{
-			if(cnt ==0) {
-				//MUST_BE_IN_ATLEAST_ONE_ERR = must be in at least one {0}
-				args[0] = m_elist.getEntityGroup("SEOCG").getLongDescription();
-				addError("MUST_BE_IN_ATLEAST_ONE_ERR",args);
-			}
-		}
-
-		//4.	AllValuesOf(LSEOBUNDLE.COUNTRYLIST) IN (LSEOBUNDLELSEO-d: LSEO.COUNTRYLIST)
-		//ErrorMessage LD(LSEOBUNDLE) NDN(LSEOBUNDLE) LD(COUNTRYLIST) 'has a Country that is not in the' LD(LSEO) NDN(LSEO) LD(COUNTRYLIST).
-		checkCountry("LSEOBUNDLELSEO","D", false);
-
-		// get VE2 to go from WWSEO-MODELWWSEO-MODEL and other MODEL links
-		getModelVE(rootEntity);
-
-		//5.	ValidateOSLevel
-		validateOS(rootEntity);
-
-		//6.	ValidateBUNDLETYPE
-		validateBUNDLETYPE(rootEntity);
-
-//7.	IF ValueOf(LSEOBUNDLE.SPECBID) = 11458 (Yes) THEN CountOf(LSEOBUNDLEAVAIL-d. AVAIL) = 0
-// 	ErrorMessage  'is a Special Bid, but it has an' LD(AVAIL)
-//8.	IF ValueOf(LSEOBUNDLE.SPECBID) = 11457 (No) THEN
-//	a.	CountOf(LSEOBUNDLEAVAIL-d. AVAIL) > 0
-//	ErrorMessage  'is not a Special Bid, but it does not have an' LD(AVAIL)
-//	b.	AllValuesOf(LSEOBUNDLEAVAIL-d:AVAIL. COUNTRYLIST) IN (LSEOBUNDLE.COUNTRYLIST)
-//	ErrorMessage LD(AVAIL) NDN(AVAIL) LD(COUNTRYLIST) 'has a Country that is not in the' LD(LSEOBUNDLE) NDN(LSEOBUNDLE) LD(COUNTRYLIST).
-
-		String specbid = getAttributeFlagEnabledValue(rootEntity, "SPECBID");
-		addDebug(rootEntity.getKey()+" SPECBID: "+specbid);
-		if ("11457".equals(specbid)){  // is No
-			//a.	CountOf(LSEOBUNDLEAVAIL-d. AVAIL) > 0
-			//ErrorMessage  'is not a Special Bid, but it does not have an' LD(AVAIL)
-			Vector availVct = PokUtils.getAllLinkedEntities(rootEntity, "LSEOBUNDLEAVAIL", "AVAIL");
-			Vector plannedavailVector = PokUtils.getEntitiesWithMatchedAttr(availVct, "AVAILTYPE", PLANNEDAVAIL);//Planned Availability
-			if (plannedavailVector.size()==0){
-				args[0] = m_elist.getEntityGroup("AVAIL").getLongDescription();
-				//NOT_SPECBID_AVAIL_ERR = is not a Special Bid, but it does not have an {0}
-				addError("NOT_SPECBID_AVAIL_ERR",args);
-			}
-
-			//b.	AllValuesOf(LSEOBUNDLEAVAIL-d:AVAIL. COUNTRYLIST) IN (LSEOBUNDLE.COUNTRYLIST)
-			//ErrorMessage LD(AVAIL) NDN(AVAIL) LD(COUNTRYLIST) 'has a Country that is not in the' LD(LSEOBUNDLE) NDN(LSEOBUNDLE) LD(COUNTRYLIST).
-			checkCountry("LSEOBUNDLEAVAIL","D", true);
-		}else{ // specbid=yes
-			cnt = getCount("LSEOBUNDLEAVAIL");
-			//4/7.	IF ValueOf(LSEOBUNDLE.SPECBID) = 11458 (Yes) THEN CountOf(LSEOBUNDLEAVAIL-d. AVAIL) = 0
-			// ErrorMessage  'is a Special Bid, but it has an' LD(AVAIL)
-			//SPECBID_AVAIL_ERR = is a Special Bid, but it has an {0}
-			if (cnt!=0){
-				args[0] = m_elist.getEntityGroup("AVAIL").getLongDescription();
-				addError("SPECBID_AVAIL_ERR",args);
-			}
-		}
-
- 		if(STATUS_R4REVIEW.equals(status)) // 'Ready for Review to Final'
-		{
-			//3.	CompareAll(LSEOBUNDLELSEO-d: LSEO.LSEOPUBDATEMTRGT) <= LSEOBUNDLE.BUNDLPUBDATEMTRGT
-			//ErrorMessage LD(BUNDLPUBDATEMTRGT) 'is earlier than' LD(LSEO) NDN(LSEO) LD(LSEOPUBDATEMTRGT)
-			checkDates(rootEntity);
-
-			if ("11457".equals(specbid)){  // is No
-				//c.	LSEOBUNDLE.SAPASSORTMODULE must exist for NLSID = 1
-				//ErrorMessage  'is not a Special Bid, but it does not have a value for' LD(SAPASSORTMODULE)
-				EANTextAttribute att = (EANTextAttribute)rootEntity.getAttribute("SAPASSORTMODULE");
-				//true if information for the given NLSID is contained in the Text data
-				if (att==null || (!((EANTextAttribute)att).containsNLS(1))) {
-					args[0] = PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), "SAPASSORTMODULE", "SAPASSORTMODULE");
-					addError("NOT_SPECBID_VALUE_ERR",args);
-				} // end attr has this language
-			}
-			//5.	AllValuesOf(LSEOBUNDLEAVAIL-d: AVAIL.EFFECTIVEDATE) => LSEOBUNDLE. BUNDLPUBDATEMTRGT where AVAIL.AVAILTYPE= 146 (Planned Availability) or 143 (First Order)
-			//ErrorMessage LD(AVAIL) NDN(AVAIL) 'is earlier than' LD(BUNDLPUBDATEMTRGT).
-			//6.	AllValuesOf(LSEOBUNDLEAVAIL-d: AVAIL.EFFECTIVEDATE) <= LSEOBUNDLE. BUNDLUNPUBDATEMTRGT where AVAIL.AVAILTYPE= 149 (Last Order)
-			//ErrorMessage LD(AVAIL) NDN(AVAIL) 'is later than' LD(BUNDLUNPUBDATEMTRGT).
-			checkAvailDates(rootEntity);
-		}
-
-		mdlList.dereference(); // not needed any more
-	}
-
-    /**********************************
-    * Must have MODELWWSEO in second VE because end up with SWPRODSTRUCTs and FEATUREs from this MODEL
-    * when all you want is SWPRODSTRUCTs from WWSEOPRODSTRUCT
-    */
-    private void getModelVE(EntityItem rootEntity) throws Exception
-    {
-        String VeName = "EXRPT3LSEOBDL2";
-
-        mdlList = m_db.getEntityList(m_elist.getProfile(),
-                new ExtractActionItem(null, m_db, m_elist.getProfile(), VeName),
-                new EntityItem[] { new EntityItem(null, m_elist.getProfile(), rootEntity.getEntityType(), rootEntity.getEntityID()) });
-        addDebug("getModelVE:: Extract "+VeName+NEWLINE+PokUtils.outputList(mdlList));
-	}
-
-    /***********************************************
-    *  Get ABR description
-    *
-    *@return java.lang.String
-    */
-    public String getDescription()
-    {
-        String desc =  "LSEOBUNDLE ABR.";
-        return desc;
-    }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getABRVersion()
-    {
-        return "1.33";
-    }
-
-    /***********************************************
-    *2.	ValueOf(LSEOBUNDLELSEO-d: LSEO.STATUS) = 0020 (Final) or 0040 (Ready for Review)
-	* ErrorMessage 'has a' LD(LSEO) NDN(LSEO) 'that is not Ready for Review or Final'
-	*or
-	*2.	ValueOf(LSEOBUNDLELSEO-d: LSEO.STATUS) = 0020 (Final)
-	*ErrorMessage 'has a' LD(LSEO) NDN(LSEO) 'that is not Final'
-    *
-    */
-    private void checkLSEOStatus(String status) throws java.sql.SQLException, MiddlewareException
-    {
-		EntityGroup lseoGrp = m_elist.getEntityGroup("LSEO");
-        for(int i = 0; i < lseoGrp.getEntityItemCount(); i++)
-        {
-            EntityItem lseoItem = lseoGrp.getEntityItem(i);
-            String lseoStatus = getAttributeFlagEnabledValue(lseoItem, "STATUS");
-            addDebug("checkLSEOStatus "+lseoItem.getKey()+" lseoStatus: "+lseoStatus);
-            if(lseoStatus == null || lseoStatus.length()==0) {
-                lseoStatus = STATUS_FINAL;
-            }
-			if(STATUS_R4REVIEW.equals(status)){ // 'Ready for Review to Final'
-				if(!STATUS_FINAL.equals(lseoStatus)) {
-					args[0] = lseoGrp.getLongDescription();
-					args[1] = getNavigationName(lseoItem);
-					//ONE_NOT_FINAL_ERR = has a {0} {1} that is not Final.
-					addError("ONE_NOT_FINAL_ERR",args);
-				}
-			} else{
-				if(STATUS_FINAL.equals(lseoStatus) || STATUS_R4REVIEW.equals(lseoStatus)) {
-				}else{
-					args[0] = lseoGrp.getLongDescription();
-					args[1] = getNavigationName(lseoItem);
-					//ONE_NOT_R4RFINAL_ERR = has a {0} {1} that is not Ready for Review or Final.
-					addError("ONE_NOT_R4RFINAL_ERR",args);
-				}
-			}
-        }
-    }
-
-    /***********************************************
-    *3.	CompareAll(LSEOBUNDLELSEO-d: LSEO.LSEOPUBDATEMTRGT) <= LSEOBUNDLE.BUNDLPUBDATEMTRGT
-    *ErrorMessage LD(BUNDLPUBDATEMTRGT) 'is earlier than' LD(LSEO) NDN(LSEO) LD(LSEOPUBDATEMTRGT)
-    */
-    private void checkDates(EntityItem rootEntity) throws java.sql.SQLException, MiddlewareException
-    {
-        String bundlPubDateTarget = getAttributeValue(rootEntity, "BUNDLPUBDATEMTRGT", "");
-        addDebug("checkDates "+rootEntity.getKey()+" BUNDLPUBDATEMTRGT: "+bundlPubDateTarget);
-        if (bundlPubDateTarget.length()==0) {
-			return;
-		}
-
-		EntityGroup lseoGrp = m_elist.getEntityGroup("LSEO");
-        for(int i = 0; i < lseoGrp.getEntityItemCount(); i++)
-        {
-            EntityItem lseoItem = lseoGrp.getEntityItem(i);
-            String pubDateTarget = getAttributeValue(lseoItem, "LSEOPUBDATEMTRGT", "");
-        	addDebug("checkDates "+lseoItem.getKey()+" LSEOPUBDATEMTRGT: "+pubDateTarget);
-            if(pubDateTarget.length()>0 && pubDateTarget.compareTo(bundlPubDateTarget) > 0)
-            {
-				args[0] = PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), "BUNDLPUBDATEMTRGT", "BUNDLPUBDATEMTRGT");
-				args[1] = lseoGrp.getLongDescription();
-				args[2] = getNavigationName(lseoItem);
-				args[3] = PokUtils.getAttributeDescription(lseoGrp, "LSEOPUBDATEMTRGT", "LSEOPUBDATEMTRGT");
-
-				//EARLY_DATE_ERR = {0} is earlier than the {1} {2} {3}
-				addError("EARLY_DATE_ERR",args);
-            }
-        }
-    }
-
-    /***********************************************
-	*5.	AllValuesOf(LSEOBUNDLEAVAIL-d: AVAIL.EFFECTIVEDATE) => LSEOBUNDLE. BUNDLPUBDATEMTRGT where
-	* 	AVAIL.AVAILTYPE= 146 (Planned Availability) or 143 (First Order)
-	*ErrorMessage LD(AVAIL) NDN(AVAIL) 'is earlier than' LD(BUNDLPUBDATEMTRGT).
-	*6.	AllValuesOf(LSEOBUNDLEAVAIL-d: AVAIL.EFFECTIVEDATE) <= LSEOBUNDLE. BUNDLUNPUBDATEMTRGT where
-	*	AVAIL.AVAILTYPE= 149 (Last Order)
-	*ErrorMessage LD(AVAIL) NDN(AVAIL) 'is later than' LD(BUNDLUNPUBDATEMTRGT).
-	*/
-	private void checkAvailDates(EntityItem rootEntity) throws java.sql.SQLException, MiddlewareException
-	{
-		Vector availVct = PokUtils.getAllLinkedEntities(rootEntity, "LSEOBUNDLEAVAIL", "AVAIL");
-		String pubDate = getAttributeValue(rootEntity, "BUNDLPUBDATEMTRGT", "");
-		String unpubDate = getAttributeValue(rootEntity, "BUNDLUNPUBDATEMTRGT", "");
-		addDebug("checkAvailDates "+rootEntity.getKey()+" BUNDLPUBDATEMTRGT: "+pubDate+" BUNDLUNPUBDATEMTRGT: "+
-			unpubDate+" availVct: "+availVct.size());
-
-		for (int ai=0; ai<availVct.size(); ai++){ // look at avails
-			EntityItem avail = (EntityItem)availVct.elementAt(ai);
-			String effDate = PokUtils.getAttributeValue(avail, "EFFECTIVEDATE",", ", "", false);
-			String availtype = getAttributeFlagEnabledValue(avail, "AVAILTYPE");
-			addDebug("checkAvailDates "+avail.getKey()+" EFFECTIVEDATE: "+effDate+" AVAILTYPE: "+availtype);
-			// 5.	AllValuesOf(LSEOBUNDLEAVAIL-d: AVAIL.EFFECTIVEDATE) => LSEOBUNDLE. BUNDLPUBDATEMTRGT where
-			//	 	AVAIL.AVAILTYPE= 146 (Planned Availability) or 143 (First Order)
-			if (pubDate.trim().length()>0){
-				if((PLANNEDAVAIL.equals(availtype) || FIRSTORDERAVAIL.equals(availtype))
-					&& effDate.length()>0 && effDate.compareTo(pubDate)<0){
-					//ErrorMessage LD(AVAIL) NDN(AVAIL) 'is earlier than' LD(BUNDLPUBDATEMTRGT).
-					//EARLY_DATE_ERR = {0} is earlier than the {1} {2} {3}
-					args[0] = avail.getEntityGroup().getLongDescription()+" "+ getNavigationName(avail);
-					args[1] = PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), "BUNDLPUBDATEMTRGT", "BUNDLPUBDATEMTRGT");
-					args[2] = "";
-					args[3] = "";
-					addError("EARLY_DATE_ERR",args);
-				}
-			}
-			//6.	AllValuesOf(LSEOBUNDLEAVAIL-d: AVAIL.EFFECTIVEDATE) <= LSEOBUNDLE. BUNDLUNPUBDATEMTRGT where
-			//	AVAIL.AVAILTYPE= 149 (Last Order)
-			if (unpubDate.trim().length()>0){
-				if(LASTORDERAVAIL.equals(availtype)	&& effDate.length()>0 && effDate.compareTo(unpubDate)>0){
-					//ErrorMessage LD(AVAIL) NDN(AVAIL) 'is later than' LD(BUNDLUNPUBDATEMTRGT).
-					//LATER_DATE_ERR = {0} {1} {2} is later than the {3} {4}
-					args[0] = avail.getEntityGroup().getLongDescription();
-					args[1] = getNavigationName(avail);
-					args[2] = "";
-					args[3] = PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), "BUNDLUNPUBDATEMTRGT", "BUNDLUNPUBDATEMTRGT");
-					args[4] = "";
-					addError("LATER_DATE_ERR",args);
-				}
-			}
-		}
-	}
-
-    /***********************************************
-    *5.For LSEOBUNDLEs, verify that its OSLEVEL matches the OS found on a
-    *	'ValueMetric' SWFEATURE that is part of the software LSEO.
-	*
-	*Find the WWSEO where LSEOBUNDLELSEO:WWSEOLSEO: MODELWWSEO:MODEL.COFCAT = 101 (Software)
-	*& MODEL.APPLICATIONTYPE = 33 (OperatingSystem) THEN
-	*	IF WWSEO:WWSEOSWPRODSTRUCT:SWFEATURE.OS <> LSEOBUNDLE.OSLEVEL WHERE
-	*		SWFEATURE.SWFCCAT = 319 (ValueMetric) THEN
-	*		ErrorMessage LD(OSLEVEL) 'Does not match the software LSEOs OS'
-	*END IF
-	*ELSE
-	*EXIT
-	*END IF
-    *
-    */
-    private void validateOS(EntityItem rootEntity) throws MiddlewareException
-    {
-		String oslvlAttr = "OSLEVEL";
-        EANMetaAttribute metaAttr = rootEntity.getEntityGroup().getMetaAttribute(oslvlAttr);
-        if (metaAttr==null) {
-           addDebug("validateOS ERROR:Attribute "+oslvlAttr+" NOT found in LSEOBUNDLE META data.");
-           return;
-        }
-
-    	ArrayList bdlOS = new ArrayList();
-		//get the oslevel from the bundle
-		EANFlagAttribute rootOS = (EANFlagAttribute)rootEntity.getAttribute(oslvlAttr);
-		if (rootOS != null) {
-			// Get the selected Flag codes.
-			MetaFlag[] mfArray = (MetaFlag[]) rootOS.get();
-			for (int i = 0; i < mfArray.length; i++) {
-				// get selection
-				if (mfArray[i].isSelected()) {
-					bdlOS.add(mfArray[i].getFlagCode());
-				}
-			}
-		}
-
-	    addDebug("validateOS "+rootEntity.getKey()+" oslevel "+bdlOS);
-
-	    // get MODEL from VE2  LSEOBUNDLELSEO-d: WWSEOLSEO-u: MODELWWSEO-u: MODEL
-		EntityGroup mdlGrp = mdlList.getEntityGroup("MODEL");
-		// find MODEL.COFCAT = 101 (Software) & MODEL.APPLICATIONTYPE = 33 (OperatingSystem)
-		for (int i=0; i<mdlGrp.getEntityItemCount(); i++){
-			EntityItem mdlItem = mdlGrp.getEntityItem(i);
-            String cofcat = getAttributeFlagEnabledValue(mdlItem , "COFCAT");
-            String appType = getAttributeFlagEnabledValue(mdlItem , "APPLICATIONTYPE");
-            addDebug("validateOS "+mdlItem.getKey()+" COFCAT: "+cofcat+" APPLICATIONTYPE: "+appType);
-            if ("101".equals(cofcat)&& "33".equals(appType)){
-				// find WWSEO for this MODEL
-				Vector wwseoVct2 = PokUtils.getAllLinkedEntities(mdlItem, "MODELWWSEO", "WWSEO");
-            	// find SWFEATURE for this WWSEO in VE1
-            	EntityGroup wwseoGrp = m_elist.getEntityGroup("WWSEO");
-            	Vector wwseoVct = new Vector(1);
-            	for (int w=0; w<wwseoVct2.size(); w++){
-					EntityItem wwseoItem2 = (EntityItem)wwseoVct2.elementAt(w);
-					EntityItem wwseoItem1 = wwseoGrp.getEntityItem(wwseoItem2.getKey());
-            		wwseoVct.add(wwseoItem1);
-				}
-				wwseoVct2.clear();
-            	Vector swpsVct = PokUtils.getAllLinkedEntities(wwseoVct, "WWSEOSWPRODSTRUCT", "SWPRODSTRUCT");
-            	addDebug("validateOS "+mdlItem.getKey()+" wwseoVct "+wwseoVct.size()+" swpsVct: "+swpsVct.size());
-            	// find SWFEATURE.SWFCCAT = 319 (ValueMetric)
-            	for (int w=0; w<swpsVct.size(); w++){
-					EntityItem swpsItem = (EntityItem)swpsVct.elementAt(w);
-            		addDebug("validateOS "+swpsItem.getKey()+" uplinkcnt: "+swpsItem.getUpLinkCount());
-            		for (int u=0; u<swpsItem.getUpLinkCount(); u++){
-						EntityItem swfcItem = (EntityItem)swpsItem.getUpLink(u);
-						if (swfcItem.getEntityType().equals("SWFEATURE")){
-							String swfccat = getAttributeFlagEnabledValue(swfcItem, "SWFCCAT");
-							addDebug("validateOS "+swfcItem.getKey()+" SWFCCAT: "+swfccat);
-							if ("319".equals(swfccat)){
-								ArrayList featOS = new ArrayList();
-								//get the oslevel from the feature
-								EANFlagAttribute featOSattr = (EANFlagAttribute)swfcItem.getAttribute(oslvlAttr);
-								if (featOSattr != null) {
-									// Get the selected Flag codes.
-									MetaFlag[] mfArray = (MetaFlag[]) featOSattr.get();
-									for (int im = 0; im < mfArray.length; im++) {
-										// get selection
-										if (mfArray[im].isSelected()) {
-											featOS.add(mfArray[im].getFlagCode());
-										}
-									}
-								}
-								addDebug("validateOS ValueMetric "+swfcItem.getKey()+" oslevel "+featOS);
-								if (!(bdlOS.containsAll(featOS) && featOS.containsAll(bdlOS))) {
-									//OSLEVEL_ERR = {0} Does not match the software LSEOs OS
-									args[0] = PokUtils.getAttributeDescription(swfcItem.getEntityGroup(), oslvlAttr, oslvlAttr);
-									addError("OSLEVEL_ERR",args);
-								}
-								featOS.clear();
-							}
-						}
-					}
-				}
-				swpsVct.clear();
-				wwseoVct.clear();
-			}
-		}
-		bdlOS.clear();
-    }
-
-	/*******************************************************
-	*K.	ValidateBUNDLETYPE
-	*
-	*Syntax:  ValidateBUNDLETYPE
-	*
-	*For LSEOBUNDLEs, verify that its BUNDLETYPE is consistent with the types of children LSEOs.
-	*
-	*1.	AllValuesOf(LSEOBUNDLELSEO-u: WWSEOLSEO-u: MODELWWSEO u: MODEL.COFCAT) IN LSEOBUNDLE.LSEOBUNDLETYPE
-	*ErrorMessage LD(LSEOBUNDLE) NDN(LSEOBUNDLE) 'has a' LD(MODEL) NDN(MODEL) 'that is not reflected in' LD(BUNDLETYPE).
-	*2.	AllValuesOf(LSEOBUNDLE.LSEOBUNDLETYPE) IN  LSEOBUNDLELSEO-u: WWSEOLSEO-u: MODELWWSEO-u: MODEL.COFCAT
-	*ErrorMessage LD(LSOBUNDLE) NDN(LSEOBUNDLE) LD(BUNDLETYPE) 'has a type that does not match any of the' LD(LSEO).
-	*/
-    private void validateBUNDLETYPE(EntityItem rootEntity) throws java.sql.SQLException, MiddlewareException
-    {
-		String attrCode = "BUNDLETYPE";
-		ArrayList mdlTypes = new ArrayList();
-		ArrayList bdlTypes = new ArrayList();
-        EANMetaAttribute metaAttr = rootEntity.getEntityGroup().getMetaAttribute(attrCode);
-        if (metaAttr==null) {
-           addDebug("validateBUNDLETYPE ERROR:Attribute "+attrCode+" NOT found in LSEOBUNDLE META data.");
-           return;
-        }
-
-		EANFlagAttribute bdlTypeAttr = (EANFlagAttribute)rootEntity.getAttribute(attrCode);
-		if (bdlTypeAttr != null) {
-			// Get the selected Flag codes.
-			MetaFlag[] mfArray = (MetaFlag[]) bdlTypeAttr.get();
-			for (int i = 0; i < mfArray.length; i++) {
-				// get selection
-				if (mfArray[i].isSelected()) {
-					bdlTypes.add(mfArray[i].getFlagCode());
-				}
-			}
-		}
-
-	    addDebug("validateBUNDLETYPE "+rootEntity.getKey()+" bdlTypes "+bdlTypes);
-
-	    // get MODEL from VE2  LSEOBUNDLELSEO-d: WWSEOLSEO-u: MODELWWSEO-u: MODEL
-		EntityGroup mdlGrp = mdlList.getEntityGroup("MODEL");
-		for (int i=0; i<mdlGrp.getEntityItemCount(); i++){
-			EntityItem mdlItem = mdlGrp.getEntityItem(i);
-
-			String modelCOFCAT = getAttributeFlagEnabledValue(mdlItem, "COFCAT");
-			if(modelCOFCAT == null)	{
-				modelCOFCAT = "";
-			}
-			addDebug("validateBUNDLETYPE "+mdlItem.getKey()+" COFCAT: "+modelCOFCAT);
-			if (!bdlTypes.contains(modelCOFCAT)){
-				//1.	AllValuesOf(LSEOBUNDLELSEO-u: WWSEOLSEO-u: MODELWWSEO u: MODEL.COFCAT) IN LSEOBUNDLE.LSEOBUNDLETYPE
-				//ErrorMessage LD(LSEOBUNDLE) NDN(LSEOBUNDLE) 'has a' LD(MODEL) NDN(MODEL) 'that is not reflected in' LD(BUNDLETYPE).
-				//MODEL_TYPE_ERR= has a {0} {1} that is not reflected in {2}.
-				args[0] = mdlItem.getEntityGroup().getLongDescription();
-				args[1] = getNavigationName(mdlItem);
-				args[2] = PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), attrCode, attrCode);
-				addError("MODEL_TYPE_ERR",args);
-			}
-			mdlTypes.add(modelCOFCAT);
-		} // end mdl group
-
-
-	    addDebug("validateBUNDLETYPE all mdlTypes "+mdlTypes);
-		if (!mdlTypes.containsAll(bdlTypes)) {
-			//2.	AllValuesOf(LSEOBUNDLE.LSEOBUNDLETYPE) IN  LSEOBUNDLELSEO-u: WWSEOLSEO-u: MODELWWSEO-u: MODEL.COFCAT
-			//ErrorMessage LD(LSOBUNDLE) NDN(LSEOBUNDLE) LD(BUNDLETYPE) 'has a type that does not match any of the' LD(LSEO).
-			//BDLE_TYPE_ERR= {0} has a type that does not match any of the {1}.
-			args[0] = PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), attrCode, attrCode);
-			args[1] = m_elist.getEntityGroup("LSEO").getLongDescription();
-			addError("BDLE_TYPE_ERR",args);
-		}
-		mdlTypes.clear();
-		bdlTypes.clear();
-	}
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\LSEOBDLABRSTATUS.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

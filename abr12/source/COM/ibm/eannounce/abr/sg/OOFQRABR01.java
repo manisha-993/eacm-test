@@ -1,411 +1,416 @@
-//  (c) Copyright International Business Machines Corporation, 2001
-//  All Rights Reserved.</pre>
-//
-//OOFQRABR01.java,v
-//Revision 1.25  2006/03/03 19:23:29  bala
-//remove reference to Constants.CSS
-//
-//Revision 1.24  2006/01/24 16:50:39  yang
-//Jtest Changes
-//
-//Revision 1.23  2004/03/23 21:01:59  joan
-//*** empty log message ***
-//
-//Revision 1.22  2003/11/07 01:22:12  yang
-//Adding setDGRptClass
-//
-//Revision 1.21  2003/09/18 19:52:19  yang
-//adding bala's stuff to finally {
-//
-//Revision 1.20  2003/06/28 00:47:11  yang
-//syntax
-//
-//Revision 1.19  2003/06/28 00:38:28  yang
-//syntax
-//
-//Revision 1.18  2003/06/28 00:24:06  yang
-//syntax
-//
-//Revision 1.17  2003/06/27 23:21:31  yang
-//syntax
-//
-//Revision 1.16  2003/06/27 22:53:45  yang
-//test
-//
-//Revision 1.15  2003/06/27 22:44:21  yang
-//test
-//
-//Revision 1.14  2003/06/27 22:10:46  yang
-//syntax
-//
-//Revision 1.13  2003/06/27 21:37:46  yang
-//changed V0002
-//
-//Revision 1.12  2003/06/27 18:11:45  minhthy
-//minor changed V0002
-//
-//Revision 1.11  2003/06/09 17:23:25  yang
-//Adding StackTrace
-//
-//Revision 1.10  2003/06/07 20:33:55  dave
-//more syntax
-//
-//Revision 1.9  2003/06/07 20:27:24  dave
-//syntax
-//
-//Revision 1.8  2003/06/07 20:23:40  dave
-//attempting OOFQABR01
-//
-//Revision 1.7  2003/06/04 03:53:09  dave
-//un Staticing getABRVersion
-//
-//Revision 1.6  2003/06/04 03:44:26  dave
-//minor syntax
-//
-//Revision 1.5  2003/06/04 03:41:45  dave
-//adding getABRVersion
-//
-//Revision 1.4  2003/06/03 23:28:34  dave
-//commonizing setControlBlock
-//
-//Revision 1.3  2003/06/03 23:16:14  dave
-//massive reorg for common routines
-//
-//Revision 1.2  2003/06/03 19:33:59  dave
-//more consolidation
-//
-//Revision 1.1.1.1  2003/06/03 19:02:24  dave
-//new 1.1.1 abr
-//
-//Revision 1.31  2003/06/03 18:17:38  dave
-//preping for common T1 and T2 processing
-//
-//Revision 1.30  2003/06/02 22:05:39  dave
-//trace
-//
-//Revision 1.29  2003/05/30 20:25:16  naomi
-//fix V0001 -check root entity
-//
-//Revision 1.27  2003/05/30 00:23:13  naomi
-//fixed M0003,  V0001
-//
-//Revision 1.26  2003/05/27 20:19:22  naomi
-//fixed checkS0001_GC
-//
-//Revision 1.25  2003/05/27 16:05:20  naomi
-//change to call V0002 first
-//
-//Revision 1.23  2003/05/23 00:24:02  naomi
-//fix checkV0002
-//
-//Revision 1.22  2003/05/16 20:04:56  naomi
-//fixed output message
-//
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.LockPDHEntityException;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.abr.util.UpdatePDHEntityException;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import java.io.PrintWriter;
+/*     */ import java.io.StringWriter;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class OOFQRABR01
+/*     */   extends PokBaseABR
+/*     */ {
+/* 129 */   public static final String ABR = new String("OOFQRABR01");
+/*     */   
+/* 131 */   private EntityGroup m_egParent = null;
+/* 132 */   private EntityItem m_eiParent = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/* 141 */     String str = null;
+/*     */     
+/*     */     try {
+/* 144 */       start_ABRBuild();
+/* 145 */       this.m_egParent = this.m_elist.getParentEntityGroup();
+/* 146 */       this.m_eiParent = this.m_egParent.getEntityItem(0);
+/*     */       
+/* 148 */       if (this.m_egParent == null) {
+/* 149 */         logMessage(ABR + ":" + 
+/*     */ 
+/*     */             
+/* 152 */             getVersion() + ":ERROR:1: m_egParent cannot be established.");
+/*     */         
+/* 154 */         setReturnCode(-1);
+/*     */         return;
+/*     */       } 
+/* 157 */       if (this.m_eiParent == null) {
+/* 158 */         logMessage(ABR + ":" + 
+/*     */ 
+/*     */             
+/* 161 */             getVersion() + ":ERROR:2: m_eiParent cannot be established.");
+/*     */         
+/* 163 */         setReturnCode(-1);
+/*     */         
+/*     */         return;
+/*     */       } 
+/* 167 */       logMessage(ABR + ":" + 
+/*     */ 
+/*     */           
+/* 170 */           getVersion() + ":Request to Work on Entity:" + this.m_eiParent
+/*     */           
+/* 172 */           .getEntityType() + ":" + this.m_eiParent
+/*     */           
+/* 174 */           .getEntityID());
+/*     */       
+/* 176 */       buildReportHeader();
+/* 177 */       setControlBlock();
+/* 178 */       setDGTitle(setDGName(this.m_eiParent, ABR));
+/*     */       
+/* 180 */       logMessage(ABR + ":" + 
+/*     */ 
+/*     */           
+/* 183 */           getVersion() + ":Setup Complete:" + this.m_eiParent
+/*     */           
+/* 185 */           .getEntityType() + ":" + this.m_eiParent
+/*     */           
+/* 187 */           .getEntityID());
+/*     */ 
+/*     */       
+/* 190 */       setReturnCode(0);
+/*     */       
+/* 192 */       displayHeader(this.m_egParent, this.m_eiParent);
+/*     */       
+/* 194 */       if (!checkA0001(this.m_eiParent)) {
+/* 195 */         setReturnCode(-1);
+/*     */       }
+/* 197 */       if (!checkA0002(this.m_eiParent)) {
+/* 198 */         setReturnCode(-1);
+/*     */       }
+/* 200 */       if (!checkS0001(this.m_eiParent)) {
+/* 201 */         setReturnCode(-1);
+/*     */       }
+/*     */       
+/* 204 */       if (!checkS0002(this.m_eiParent)) {
+/* 205 */         setReturnCode(-1);
+/*     */       }
+/* 207 */       if (!checkM0002(this.m_eiParent)) {
+/* 208 */         setReturnCode(-1);
+/*     */       }
+/* 210 */       if (!checkM0003(this.m_eiParent)) {
+/* 211 */         setReturnCode(-1);
+/*     */       }
+/* 213 */       if (!checkM0007(this.m_egParent, this.m_eiParent)) {
+/* 214 */         setReturnCode(-1);
+/*     */       }
+/* 216 */       if (!checkM0008(this.m_egParent, this.m_eiParent)) {
+/* 217 */         setReturnCode(-1);
+/*     */       }
+/* 219 */       if (!checkH0003(this.m_eiParent)) {
+/* 220 */         setReturnCode(-1);
+/*     */       }
+/* 222 */       if (!checkH0006(this.m_eiParent)) {
+/* 223 */         setReturnCode(-1);
+/*     */       }
+/* 225 */       if (!checkV0001(this.m_eiParent)) {
+/* 226 */         setReturnCode(-1);
+/*     */       }
+/*     */       
+/* 229 */       if (!checkFCFormat(this.m_eiParent)) {
+/* 230 */         setReturnCode(-1);
+/*     */       }
+/*     */       
+/* 233 */       if ((getFlagCode(this.m_eiParent, "OOFCAT").equals("100") && 
+/* 234 */         getFlagCode(this.m_eiParent, "OOFSUBCAT").equals("500") && 
+/* 235 */         getFlagCode(this.m_eiParent, "OOFGRP").equals("405") && 
+/* 236 */         getFlagCode(this.m_eiParent, "OOFSUBGRP").equals("405")) || (
+/* 237 */         getFlagCode(this.m_eiParent, "OOFCAT").equals("100") && 
+/* 238 */         getFlagCode(this.m_eiParent, "OOFSUBCAT").equals("506") && 
+/* 239 */         getFlagCode(this.m_eiParent, "OOFGRP").equals("405") && 
+/* 240 */         getFlagCode(this.m_eiParent, "OOFSUBGRP").equals("405")) || (
+/* 241 */         getFlagCode(this.m_eiParent, "OOFCAT").equals("101") && 
+/* 242 */         getFlagCode(this.m_eiParent, "OOFSUBCAT").equals("500") && 
+/* 243 */         getFlagCode(this.m_eiParent, "OOFGRP").equals("405") && 
+/* 244 */         getFlagCode(this.m_eiParent, "OOFSUBGRP").equals("405")) || (
+/* 245 */         getFlagCode(this.m_eiParent, "OOFCAT").equals("100") && 
+/* 246 */         getFlagCode(this.m_eiParent, "OOFSUBCAT").equals("501") && 
+/* 247 */         getFlagCode(this.m_eiParent, "OOFGRP").equals("600") && 
+/* 248 */         getFlagCode(this.m_eiParent, "OOFSUBGRP").equals("405")) || (
+/* 249 */         getFlagCode(this.m_eiParent, "OOFCAT").equals("100") && 
+/* 250 */         getFlagCode(this.m_eiParent, "OOFSUBCAT").equals("501") && 
+/* 251 */         getFlagCode(this.m_eiParent, "OOFGRP").equals("601") && 
+/* 252 */         getFlagCode(this.m_eiParent, "OOFSUBGRP").equals("405")) || (
+/* 253 */         getFlagCode(this.m_eiParent, "OOFCAT").equals("100") && 
+/* 254 */         getFlagCode(this.m_eiParent, "OOFSUBCAT").equals("501") && 
+/* 255 */         getFlagCode(this.m_eiParent, "OOFGRP").equals("602") && 
+/* 256 */         getFlagCode(this.m_eiParent, "OOFSUBGRP").equals("405")) || (
+/* 257 */         getFlagCode(this.m_eiParent, "OOFCAT").equals("100") && 
+/* 258 */         getFlagCode(this.m_eiParent, "OOFSUBCAT").equals("501") && 
+/* 259 */         getFlagCode(this.m_eiParent, "OOFGRP").equals("603") && 
+/* 260 */         getFlagCode(this.m_eiParent, "OOFSUBGRP").equals("405")) || (
+/* 261 */         getFlagCode(this.m_eiParent, "OOFCAT").equals("100") && 
+/* 262 */         getFlagCode(this.m_eiParent, "OOFSUBCAT").equals("501") && 
+/* 263 */         getFlagCode(this.m_eiParent, "OOFGRP").equals("604") && 
+/* 264 */         getFlagCode(this.m_eiParent, "OOFSUBGRP").equals("405")) || (
+/* 265 */         getFlagCode(this.m_eiParent, "OOFCAT").equals("100") && 
+/* 266 */         getFlagCode(this.m_eiParent, "OOFSUBCAT").equals("501") && 
+/* 267 */         getFlagCode(this.m_eiParent, "OOFGRP").equals("405") && 
+/* 268 */         getFlagCode(this.m_eiParent, "OOFSUBGRP").equals("405"))) {
+/*     */         
+/* 270 */         if (!checkV0002(this.m_eiParent)) {
+/* 271 */           setReturnCode(-1);
+/*     */         }
+/*     */       } else {
+/* 274 */         println("<br><br><b><I>Not Checking V0002:</I> FEATURECODE is not a valid attribute. </b>");
+/*     */       } 
+/* 276 */       if (getReturnCode() == 0) {
+/*     */         
+/* 278 */         setFlagValue(this.m_eiParent, 
+/*     */             
+/* 280 */             getStatusAttributeCode(this.m_eiParent), 
+/* 281 */             getNextStatusCode(this.m_eiParent));
+/* 282 */         if (isChangeRev(this.m_eiParent) || isChangeFinal(this.m_eiParent)) {
+/* 283 */           setNow();
+/* 284 */           println(processChangeReport(getT1(this.m_eiParent), getNow()));
+/*     */         } 
+/*     */       } 
+/* 287 */       println("<br /><b>" + 
+/*     */           
+/* 289 */           buildMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 292 */               getABRDescription(), 
+/* 293 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }) + "</b>");
+/*     */       
+/* 296 */       log(
+/* 297 */           buildLogMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 300 */               getABRDescription(), 
+/* 301 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }));
+/* 303 */     } catch (LockPDHEntityException lockPDHEntityException) {
+/* 304 */       setReturnCode(-2);
+/* 305 */       println("<h3><font color=red>IAB1007E: Could not get soft lock.  Rule execution is terminated.<br />" + lockPDHEntityException
+/*     */ 
+/*     */ 
+/*     */           
+/* 309 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 311 */       logError(lockPDHEntityException.getMessage());
+/* 312 */     } catch (UpdatePDHEntityException updatePDHEntityException) {
+/* 313 */       setReturnCode(-2);
+/* 314 */       println("<h3><font color=red>UpdatePDH error: " + updatePDHEntityException
+/*     */           
+/* 316 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 318 */       logError(updatePDHEntityException.getMessage());
+/* 319 */     } catch (Exception exception) {
+/*     */       
+/* 321 */       println("Error in " + this.m_abri.getABRCode() + ":" + exception.getMessage());
+/* 322 */       println("" + exception);
+/* 323 */       exception.printStackTrace();
+/*     */       
+/* 325 */       StringWriter stringWriter = new StringWriter();
+/* 326 */       exception.printStackTrace(new PrintWriter(stringWriter));
+/* 327 */       str = stringWriter.toString();
+/* 328 */       println(str);
+/*     */       
+/* 330 */       logMessage("Error in " + this.m_abri
+/* 331 */           .getABRCode() + ":" + exception.getMessage());
+/* 332 */       logMessage("" + exception);
+/*     */ 
+/*     */       
+/* 335 */       if (getABRReturnCode() != -2) {
+/* 336 */         setReturnCode(-3);
+/*     */       
+/*     */       }
+/*     */     }
+/*     */     finally {
+/*     */       
+/* 342 */       setDGString(getABRReturnCode());
+/* 343 */       setDGRptName("OOFQRABR01");
+/* 344 */       setDGRptClass("OOFQRABR01");
+/* 345 */       printDGSubmitString();
+/*     */ 
+/*     */       
+/* 348 */       buildReportFooter();
+/*     */       
+/* 350 */       if (!isReadOnly()) {
+/* 351 */         clearSoftLock();
+/*     */       }
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getABREntityDesc(String paramString, int paramInt) {
+/* 366 */     return null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 377 */     return "<br /><br />";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getStyle() {
+/* 388 */     return "";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String getVersion() {
+/* 398 */     return "OOFQRABR01.java,v 1.25 2006/03/03 19:23:29 bala Exp";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 408 */     return getVersion();
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.sg;
 
-//import COM.ibm.opicmpdh.middleware.*;
-//import COM.ibm.opicmpdh.objects.*;
-//import COM.ibm.opicmpdh.transactions.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.eannounce.abr.util.*;
-//import java.util.*;
-import java.io.*;
-//import java.sql.*;
-
-/**
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- *
- * @author Owner
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\OOFQRABR01.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class OOFQRABR01 extends PokBaseABR {
-
-  //ABR
-  /**
-     * ABR
-     *
-     */
-    public final static String ABR = new String("OOFQRABR01");
-
-  private EntityGroup m_egParent = null;
-  private EntityItem m_eiParent = null;
-
-  /**
-     * execute_run
-     *
-     * @author Owner
-     */
-    public void execute_run() {
-    StringWriter writer;
-    String x = null;
-    try {
-
-      start_ABRBuild();
-      m_egParent = m_elist.getParentEntityGroup();
-      m_eiParent = m_egParent.getEntityItem(0);
-
-      if (m_egParent == null) {
-        logMessage(
-          ABR
-            + ":"
-            + getVersion()
-            + ":ERROR:1: m_egParent cannot be established.");
-        setReturnCode(FAIL);
-        return;
-      }
-      if (m_eiParent == null) {
-        logMessage(
-          ABR
-            + ":"
-            + getVersion()
-            + ":ERROR:2: m_eiParent cannot be established.");
-        setReturnCode(FAIL);
-        return;
-      }
-
-      logMessage(
-        ABR
-          + ":"
-          + getVersion()
-          + ":Request to Work on Entity:"
-          + m_eiParent.getEntityType()
-          + ":"
-          + m_eiParent.getEntityID());
-
-      buildReportHeader();
-      setControlBlock();
-      setDGTitle(setDGName(m_eiParent, ABR));
-
-      logMessage(
-        ABR
-          + ":"
-          + getVersion()
-          + ":Setup Complete:"
-          + m_eiParent.getEntityType()
-          + ":"
-          + m_eiParent.getEntityID());
-
-      // Default the thing to pass...
-      setReturnCode(PASS);
-
-      displayHeader(m_egParent, m_eiParent);
-
-      if (!checkA0001(m_eiParent)) {
-        setReturnCode(FAIL);
-      }
-      if (!checkA0002(m_eiParent)) {
-        setReturnCode(FAIL);
-      }
-      if (!checkS0001(m_eiParent)) {
-        setReturnCode(FAIL);
-      }
-      // For now.. check them all.. until all the statuses can be entered
-      if (!checkS0002(m_eiParent)) {
-        setReturnCode(FAIL);
-      }
-      if (!checkM0002(m_eiParent)) {
-        setReturnCode(FAIL);
-      }
-      if (!checkM0003(m_eiParent)) {
-        setReturnCode(FAIL);
-      }
-      if (!checkM0007(m_egParent, m_eiParent)) {
-        setReturnCode(FAIL);
-      }
-      if (!checkM0008(m_egParent, m_eiParent)) {
-        setReturnCode(FAIL);
-      }
-      if (!checkH0003(m_eiParent)) {
-        setReturnCode(FAIL);
-      }
-      if (!checkH0006(m_eiParent)) {
-        setReturnCode(FAIL);
-      }
-      if (!checkV0001(m_eiParent)) {
-        setReturnCode(FAIL);
-      }
-
-      if (!checkFCFormat(m_eiParent)) {
-        setReturnCode(FAIL);
-      }
-
-      if ((getFlagCode(m_eiParent, "OOFCAT").equals("100")
-            && getFlagCode(m_eiParent, "OOFSUBCAT").equals("500")
-            && getFlagCode(m_eiParent, "OOFGRP").equals("405")
-            && getFlagCode(m_eiParent, "OOFSUBGRP").equals("405"))
-        || (getFlagCode(m_eiParent, "OOFCAT").equals("100")
-          && getFlagCode(m_eiParent, "OOFSUBCAT").equals("506")
-          && getFlagCode(m_eiParent, "OOFGRP").equals("405")
-          && getFlagCode(m_eiParent, "OOFSUBGRP").equals("405"))
-        || (getFlagCode(m_eiParent, "OOFCAT").equals("101")
-          && getFlagCode(m_eiParent, "OOFSUBCAT").equals("500")
-          && getFlagCode(m_eiParent, "OOFGRP").equals("405")
-          && getFlagCode(m_eiParent, "OOFSUBGRP").equals("405"))
-        || (getFlagCode(m_eiParent, "OOFCAT").equals("100")
-          && getFlagCode(m_eiParent, "OOFSUBCAT").equals("501")
-          && getFlagCode(m_eiParent, "OOFGRP").equals("600")
-          && getFlagCode(m_eiParent, "OOFSUBGRP").equals("405"))
-        || (getFlagCode(m_eiParent, "OOFCAT").equals("100")
-          && getFlagCode(m_eiParent, "OOFSUBCAT").equals("501")
-          && getFlagCode(m_eiParent, "OOFGRP").equals("601")
-          && getFlagCode(m_eiParent, "OOFSUBGRP").equals("405"))
-        || (getFlagCode(m_eiParent, "OOFCAT").equals("100")
-          && getFlagCode(m_eiParent, "OOFSUBCAT").equals("501")
-          && getFlagCode(m_eiParent, "OOFGRP").equals("602")
-          && getFlagCode(m_eiParent, "OOFSUBGRP").equals("405"))
-        || (getFlagCode(m_eiParent, "OOFCAT").equals("100")
-          && getFlagCode(m_eiParent, "OOFSUBCAT").equals("501")
-          && getFlagCode(m_eiParent, "OOFGRP").equals("603")
-          && getFlagCode(m_eiParent, "OOFSUBGRP").equals("405"))
-        || (getFlagCode(m_eiParent, "OOFCAT").equals("100")
-          && getFlagCode(m_eiParent, "OOFSUBCAT").equals("501")
-          && getFlagCode(m_eiParent, "OOFGRP").equals("604")
-          && getFlagCode(m_eiParent, "OOFSUBGRP").equals("405"))
-        || (getFlagCode(m_eiParent, "OOFCAT").equals("100")
-          && getFlagCode(m_eiParent, "OOFSUBCAT").equals("501")
-          && getFlagCode(m_eiParent, "OOFGRP").equals("405")
-          && getFlagCode(m_eiParent, "OOFSUBGRP").equals("405"))) {
-
-        if (!checkV0002(m_eiParent)) {
-          setReturnCode(FAIL);
-        }
-      } else {
-        println("<br><br><b><I>Not Checking V0002:</I> FEATURECODE is not a valid attribute. </b>");
-      }
-      if (getReturnCode() == PASS) {
-        // Change the status...
-        setFlagValue(
-          m_eiParent,
-          getStatusAttributeCode(m_eiParent),
-          getNextStatusCode(m_eiParent));
-        if (isChangeRev(m_eiParent) || isChangeFinal(m_eiParent)) {
-          setNow();
-          println(processChangeReport(getT1(m_eiParent), getNow()));
-        }
-      }
-      println(
-        "<br /><b>"
-          + buildMessage(
-            MSG_IAB2016I,
-            new String[] {
-              getABRDescription(),
-              (getReturnCode() == PASS ? "Passed" : "Failed")})
-          + "</b>");
-
-      log(
-        buildLogMessage(
-          MSG_IAB2016I,
-          new String[] {
-            getABRDescription(),
-            (getReturnCode() == PASS ? "Passed" : "Failed")}));
-
-    } catch (LockPDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>"
-          + ERR_IAB1007E
-          + "<br />"
-          + le.getMessage()
-          + "</font></h3>");
-      logError(le.getMessage());
-    } catch (UpdatePDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>UpdatePDH error: "
-          + le.getMessage()
-          + "</font></h3>");
-      logError(le.getMessage());
-    } catch (Exception exc) {
-      // Report this error to both the datbase log and the PrintWriter
-      println("Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-      println("" + exc);
-      exc.printStackTrace();
-
-      writer = new StringWriter();
-      exc.printStackTrace(new PrintWriter(writer));
-      x = writer.toString();
-      println(x);
-
-      logMessage(
-        "Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-      logMessage("" + exc);
-
-      // don't overwrite an update exception
-      if (getABRReturnCode() != UPDATE_ERROR) {
-        setReturnCode(INTERNAL_ERROR);
-      }
-    } finally {
-      //Everything is fine...so lets pass
-      //setReturnCode(PASS);
-      // set DG submit string
-      setDGString(getABRReturnCode());
-      setDGRptName("OOFQRABR01"); //Set the report name
-      setDGRptClass("OOFQRABR01"); //Set the report class
-      printDGSubmitString();
-      //Stuff into report for subscription and notification
-      // Tack on the DGString
-      buildReportFooter();
-      // make sure the lock is released
-      if (!isReadOnly()) {
-        clearSoftLock();
-      }
-    }
-
-  }
-
-  /**
-     * getABREntityDesc
-     *
-     * @param entityType
-     * @param entityId
-     * @return
-     * @author Owner
-     */
-    protected String getABREntityDesc(String entityType, int entityId) {
-    return null;
-  }
-
-  /**
-     * getDescription
-     *
-     * @return
-     * @author Owner
-     */
-    public String getDescription() {
-    //return Constants.IAB3053I + "<br /><br />" + Constants.IAB3050I;
-    return "<br /><br />";
-  }
-
-  /**
-     * getStyle
-     *
-     * @return
-     * @author Owner
-     */
-    protected String getStyle() {
-    // Print out the PSG stylesheet
-    return "";
-  }
-
-  /**
-     * getVersion
-     *
-     * @return
-     * @author Owner
-     */
-    public static String getVersion() {
-    return ("OOFQRABR01.java,v 1.25 2006/03/03 19:23:29 bala Exp");
-  }
-
-  /**
-     * getABRVersion
-     *
-     * @return
-     * @author Owner
-     */
-    public String getABRVersion() {
-    return getVersion();
-  }
-
-}

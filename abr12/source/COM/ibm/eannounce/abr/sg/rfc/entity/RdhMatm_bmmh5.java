@@ -1,63 +1,67 @@
-/* Copyright IBM Corp. 2016 */
-package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ 
+/*    */ import com.google.gson.annotations.SerializedName;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class RdhMatm_bmmh5
+/*    */ {
+/*    */   @SerializedName("SPRAS")
+/*    */   private String spras;
+/*    */   @SerializedName("MAKTX")
+/*    */   private String maktx;
+/*    */   @SerializedName("TDLINE")
+/*    */   private String tdline;
+/*    */   
+/*    */   public String getSpras() {
+/* 24 */     return this.spras;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setSpras(String paramString) {
+/* 31 */     this.spras = paramString;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getMaktx() {
+/* 38 */     return this.maktx;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setMaktx(String paramString) {
+/* 45 */     this.maktx = paramString;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getTdline() {
+/* 52 */     return this.tdline;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setTdline(String paramString) {
+/* 59 */     this.tdline = paramString;
+/*    */   }
+/*    */ }
 
-import com.google.gson.annotations.SerializedName;
 
-/**
- * BMMH5 for MATERIAL CREATION RFC
- * @author will
- *
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\entity\RdhMatm_bmmh5.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class RdhMatm_bmmh5
-{
-    @SerializedName("SPRAS")
-    private String spras;
-    @SerializedName("MAKTX")
-    private String maktx;
-    @SerializedName("TDLINE")
-    private String tdline;
-    /**
-     * @return the spras
-     */
-    public String getSpras()
-    {
-        return spras;
-    }
-    /**
-     * @param spras the spras to set
-     */
-    public void setSpras(String spras)
-    {
-        this.spras = spras;
-    }
-    /**
-     * @return the maktx
-     */
-    public String getMaktx()
-    {
-        return maktx;
-    }
-    /**
-     * @param maktx the maktx to set
-     */
-    public void setMaktx(String maktx)
-    {
-        this.maktx = maktx;
-    }
-    /**
-     * @return the tdline
-     */
-    public String getTdline()
-    {
-        return tdline;
-    }
-    /**
-     * @param tdline the tdline to set
-     */
-    public void setTdline(String tdline)
-    {
-        this.tdline = tdline;
-    }
-    
-    
-}

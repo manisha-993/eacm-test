@@ -1,1518 +1,1524 @@
-/**
- * <pre>
- * (c) Copyright International Business Machines Corporation, 2003
- * All Rights Reserved.
- *
- * $Log: DDABR.java,v $
- * Revision 1.17  2006/01/24 22:13:54  yang
- * Jtest changes
- *
- * Revision 1.16  2006/01/03 14:19:42  chris
- * Fix for MN25744163. Only look at HD for count.
- *
- * Revision 1.15  2005/11/21 18:49:43  yang
- * adding logs to debug for MN ticket
- *
- * Revision 1.14  2005/01/31 16:30:06  joan
- * make changes for Jtest
- *
- * Revision 1.13  2005/01/25 16:58:47  chris
- * Use ROUND_HALF_UP not ROUND_UP
- *
- * Revision 1.12  2005/01/25 16:21:31  chris
- * Fix for MN22518302 and some JTest cleanup.
- *
- * Revision 1.11  2005/01/05 15:42:37  chris
- * Fix for MN 22283522. Weight rounding error.
- *
- * Revision 1.10  2004/10/28 21:45:58  joan
- * change to different method than ei.getUpLink().values() b/c it's no longer valid
- *
- * Revision 1.9  2004/09/28 15:13:14  wendy
- * CR0702045701 chgs
- *
- * Revision 1.8  2004/08/11 12:50:29  chris
- * Implement fix for TIR USRO-R-NMHR-63QQXY ABR will now Fail under this condition
- *
- * Revision 1.7  2004/07/29 14:59:58  chris
- * Calculate Weight bases on CR0514046924
- *
- * Revision 1.6  2004/02/19 17:55:38  chris
- * Fix for feedback 53637:770C4C
- *
- * Revision 1.5  2004/01/08 16:51:54  chris
- * Fix for feedback 53508:6585EE
- *
- * Revision 1.4  2004/01/05 18:20:34  chris
- * Fix feedback 53458:07A50B
- *
- * Revision 1.3  2003/12/24 17:37:46  chris
- * Fix feedbacks 53466:78DBFD and 53467:7D1FEE
- *
- * Revision 1.2  2003/12/19 19:29:37  chris
- * Fix calculation
- *
- * Revision 1.1  2003/12/18 19:54:25  chris
- * Initial DDABR
- *
- *
- * </pre>
- *
- *@author     Christopher S. Stolpe
- *@created    November 10, 2003
+/*      */ package COM.ibm.eannounce.abr.psg;
+/*      */ 
+/*      */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*      */ import COM.ibm.eannounce.objects.CreateActionItem;
+/*      */ import COM.ibm.eannounce.objects.EANAttribute;
+/*      */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*      */ import COM.ibm.eannounce.objects.EANDataFoundation;
+/*      */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*      */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*      */ import COM.ibm.eannounce.objects.EntityGroup;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.EntityList;
+/*      */ import COM.ibm.eannounce.objects.MetaFlag;
+/*      */ import COM.ibm.eannounce.objects.MetaSingleFlagAttribute;
+/*      */ import COM.ibm.eannounce.objects.MetaTextAttribute;
+/*      */ import COM.ibm.eannounce.objects.SingleFlagAttribute;
+/*      */ import COM.ibm.eannounce.objects.TextAttribute;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*      */ import java.io.PrintWriter;
+/*      */ import java.io.StringWriter;
+/*      */ import java.math.BigDecimal;
+/*      */ import java.text.MessageFormat;
+/*      */ import java.util.ArrayList;
+/*      */ import java.util.Iterator;
+/*      */ import java.util.Locale;
+/*      */ import java.util.ResourceBundle;
+/*      */ import java.util.TreeMap;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public class DDABR
+/*      */   extends PokBaseABR
+/*      */ {
+/*   81 */   private MessageFormat mfOut = null;
+/*   82 */   private Object[] mfParms = (Object[])new String[10];
+/*   83 */   private ResourceBundle msgs = null;
+/*   84 */   private StringBuffer rpt = new StringBuffer();
+/*   85 */   private StringBuffer traceSb = new StringBuffer();
+/*      */   private static final int GB_VALUE = 1024;
+/*   87 */   private static final BigDecimal ONETHOUSAND = new BigDecimal(1000);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void execute_run() {
+/*   93 */     StringBuffer stringBuffer = new StringBuffer();
+/*      */ 
+/*      */     
+/*      */     try {
+/*   97 */       boolean bool = false;
+/*   98 */       start_ABRBuild();
+/*   99 */       setReturnCode(0);
+/*      */       
+/*  101 */       EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, getRootEntityType(), "Navigate");
+/*  102 */       Iterator<EANMetaAttribute> iterator = entityGroup.getMetaAttribute().values().iterator();
+/*  103 */       while (iterator.hasNext()) {
+/*  104 */         EANMetaAttribute eANMetaAttribute = iterator.next();
+/*  105 */         stringBuffer.append(
+/*  106 */             getAttributeValue(
+/*  107 */               getRootEntityType(), 
+/*  108 */               getRootEntityID(), eANMetaAttribute
+/*  109 */               .getAttributeCode()));
+/*  110 */         if (iterator.hasNext()) {
+/*  111 */           stringBuffer.append(" ");
+/*      */         }
+/*      */       } 
+/*  114 */       this
+/*  115 */         .msgs = ResourceBundle.getBundle(
+/*  116 */           getClass().getName(), 
+/*  117 */           getLocale(this.m_prof.getReadLanguage().getNLSID()));
+/*  118 */       this.mfParms = (Object[])new String[10];
+/*      */       
+/*  120 */       if ("OF".equals(getEntityType())) {
+/*  121 */         EANAttribute eANAttribute = this.m_elist.getParentEntityGroup().getEntityItem(0).getAttribute("OFFERINGTYPE");
+/*  122 */         if (eANAttribute != null && eANAttribute instanceof EANFlagAttribute) {
+/*  123 */           EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)eANAttribute;
+/*  124 */           bool = eANFlagAttribute.isSelected("0080");
+/*      */         } 
+/*      */       } 
+/*      */       
+/*  128 */       this.rpt.append("<ol>");
+/*  129 */       if ("VAR".equals(getEntityType()) || bool) {
+/*  130 */         EntityGroup entityGroup1 = this.m_elist.getEntityGroup("DD");
+/*  131 */         EntityItem entityItem = null;
+/*  132 */         if (entityGroup1.getEntityItemCount() == 0) {
+/*      */           
+/*  134 */           CreateActionItem createActionItem = new CreateActionItem(null, this.m_db, this.m_prof, "CR" + getEntityType() + "DD");
+/*  135 */           EntityItem[] arrayOfEntityItem = new EntityItem[1];
+/*      */           
+/*  137 */           entityGroup = this.m_elist.getParentEntityGroup();
+/*  138 */           arrayOfEntityItem[0] = entityGroup.getEntityItem(0);
+/*  139 */           EntityList entityList = new EntityList(this.m_db, this.m_prof, createActionItem, arrayOfEntityItem);
+/*  140 */           entityGroup1 = entityList.getEntityGroup("DD");
+/*  141 */           if (entityGroup1.getEntityItemCount() == 1) {
+/*      */             
+/*  143 */             entityItem = entityGroup1.getEntityItem(0);
+/*  144 */             EANAttribute eANAttribute = this.m_elist.getParentEntityGroup().getEntityItem(0).getAttribute("OFFERINGPNUMB");
+/*  145 */             setText(entityItem, "NAME", eANAttribute.get() + " - DD");
+/*      */           } else {
+/*  147 */             setReturnCode(-1);
+/*  148 */             this.mfOut = new MessageFormat(this.msgs.getString("DD_CR_ERR"));
+/*  149 */             this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */           } 
+/*  151 */         } else if (entityGroup1.getEntityItemCount() == 1) {
+/*  152 */           entityItem = entityGroup1.getEntityItem(0);
+/*  153 */         } else if (entityGroup1.getEntityItemCount() > 1) {
+/*      */           
+/*  155 */           this.mfOut = new MessageFormat(this.msgs.getString("DD_ERR"));
+/*  156 */           this.rpt.append(this.mfOut.format(this.mfParms));
+/*  157 */           setReturnCode(-1);
+/*      */         } 
+/*  159 */         if (entityItem != null) {
+/*  160 */           logMessage("DDABR:setTotalAvailableSlots");
+/*  161 */           setTotalAvailableSlots(entityItem);
+/*  162 */           logMessage("DDABR:setTotalAvailableBays");
+/*  163 */           setTotalAvailableBays(entityItem);
+/*  164 */           logMessage("DDABR:setMemoryStandard");
+/*  165 */           setMemoryRAMStandard(entityItem);
+/*  166 */           logMessage("DDABR:setTotalL2CacheStandard");
+/*  167 */           setTotalL2CacheStandard(entityItem);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */           
+/*  172 */           logMessage("DDABR:setNumberOfProcessorsStandard");
+/*  173 */           setNumberOfProcessorsStandard(entityItem);
+/*  174 */           logMessage("DDABR:setNumberOfInstalledHardDrives");
+/*  175 */           setNumberOfInstalledHardDrives(entityItem);
+/*  176 */           logMessage("DDABR:setWeight");
+/*  177 */           setWeight(entityItem);
+/*  178 */           if (entityItem.hasChanges()) {
+/*      */             
+/*  180 */             entityItem.commit(this.m_db, null);
+/*      */             
+/*  182 */             EntityItem entityItem1 = (EntityItem)entityItem.getUpLink(0);
+/*  183 */             entityItem1.commit(this.m_db, null);
+/*      */           } 
+/*      */         } 
+/*      */       } else {
+/*  187 */         this.mfOut = new MessageFormat(this.msgs.getString("SYS_ERR"));
+/*  188 */         this.rpt.append(this.mfOut.format(this.mfParms));
+/*  189 */         setReturnCode(-1);
+/*      */       } 
+/*  191 */       this.rpt.append("</ol>");
+/*  192 */       this.rpt.append("<!-- DEBUG: " + this.traceSb.toString() + " -->");
+/*  193 */     } catch (Throwable throwable) {
+/*  194 */       StringWriter stringWriter = new StringWriter();
+/*  195 */       setReturnCode(-1);
+/*      */       
+/*  197 */       this.mfOut = new MessageFormat(this.msgs.getString("EXCEPTION_ERROR"));
+/*  198 */       this.mfParms[0] = this.m_abri.getABRCode();
+/*  199 */       this.mfParms[1] = throwable.getMessage();
+/*  200 */       this.rpt.append(this.mfOut.format(this.mfParms));
+/*  201 */       throwable.printStackTrace(new PrintWriter(stringWriter));
+/*  202 */       this.rpt.append("<!-- ");
+/*  203 */       this.rpt.append(stringWriter.getBuffer().toString());
+/*  204 */       this.rpt.append(" -->");
+/*  205 */       this.rpt.append("</ol>\n");
+/*  206 */       this.rpt.append("<!-- DEBUG: " + this.traceSb.toString() + " -->");
+/*      */     } finally {
+/*  208 */       setDGTitle(stringBuffer.toString());
+/*  209 */       setDGRptName(getShortClassName(getClass()));
+/*  210 */       setDGRptClass("WWABR");
+/*      */       
+/*  212 */       if (!isReadOnly()) {
+/*  213 */         clearSoftLock();
+/*      */       }
+/*      */     } 
+/*      */     
+/*  217 */     stringBuffer.append((getReturnCode() == 0) ? " Passed" : " Failed");
+/*  218 */     this.mfOut = new MessageFormat(this.msgs.getString("HEADER"));
+/*  219 */     this.mfParms[0] = getShortClassName(getClass());
+/*  220 */     this.mfParms[1] = stringBuffer.toString();
+/*  221 */     this.mfParms[2] = getNow();
+/*  222 */     this.mfParms[3] = this.m_prof.getOPName();
+/*  223 */     this.mfParms[4] = this.m_prof.getRoleDescription();
+/*  224 */     this.mfParms[5] = getDescription();
+/*  225 */     this.mfParms[6] = getABRVersion();
+/*  226 */     this.rpt.insert(0, this.mfOut.format(this.mfParms));
+/*  227 */     println(this.rpt.toString());
+/*  228 */     printDGSubmitString();
+/*  229 */     buildReportFooter();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setTotalAvailableSlots(EntityItem paramEntityItem) throws MiddlewareRequestException, EANBusinessRuleException {
+/*      */     try {
+/*  282 */       EntityGroup entityGroup = this.m_elist.getEntityGroup("PSLAVAIL");
+/*      */       
+/*  284 */       if (entityGroup.getEntityItemCount() > 0)
+/*      */       {
+/*  286 */         int i = 0;
+/*      */         
+/*  288 */         Iterator<EntityItem> iterator = entityGroup.getEntityItem().values().iterator();
+/*  289 */         while (iterator.hasNext()) {
+/*  290 */           EntityItem entityItem = iterator.next();
+/*  291 */           EANAttribute eANAttribute = entityItem.getAttribute("SLOTS_AVAIL");
+/*      */           
+/*  293 */           if (eANAttribute != null && eANAttribute instanceof COM.ibm.eannounce.objects.EANTextAttribute)
+/*      */           {
+/*  295 */             i += 
+/*  296 */               Integer.parseInt(eANAttribute.get().toString());
+/*      */           }
+/*      */         } 
+/*      */         
+/*  300 */         setText(paramEntityItem, "TOTAVAILCARDSLOTS", Integer.toString(i));
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*      */       }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     }
+/*  317 */     catch (Exception exception) {
+/*  318 */       setReturnCode(-1);
+/*  319 */       this.mfOut = new MessageFormat(this.msgs.getString("Execption06"));
+/*  320 */       this.mfParms[0] = exception.getMessage();
+/*  321 */       this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setTotalAvailableBays(EntityItem paramEntityItem) throws MiddlewareRequestException, EANBusinessRuleException {
+/*      */     try {
+/*  340 */       EntityGroup entityGroup = this.m_elist.getEntityGroup("PBYAVAIL");
+/*      */       
+/*  342 */       if (entityGroup.getEntityItemCount() > 0) {
+/*  343 */         int i = 0;
+/*      */ 
+/*      */         
+/*  346 */         Iterator<EntityItem> iterator = entityGroup.getEntityItem().values().iterator();
+/*  347 */         while (iterator.hasNext()) {
+/*  348 */           EntityItem entityItem = iterator.next();
+/*  349 */           EANAttribute eANAttribute = entityItem.getAttribute("TOTAL_BAYS_AVAIL");
+/*  350 */           if (eANAttribute != null && eANAttribute instanceof COM.ibm.eannounce.objects.EANTextAttribute)
+/*      */           {
+/*      */             
+/*  353 */             i += 
+/*  354 */               Integer.parseInt(eANAttribute
+/*  355 */                 .get().toString());
+/*      */           }
+/*      */         } 
+/*      */         
+/*  359 */         setText(paramEntityItem, "TOTAVAILBAYS", Integer.toString(i));
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*      */       }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     }
+/*  376 */     catch (Exception exception) {
+/*  377 */       setReturnCode(-1);
+/*  378 */       this.mfOut = new MessageFormat(this.msgs.getString("Execption05"));
+/*  379 */       this.mfParms[0] = exception.getMessage();
+/*  380 */       this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setMemoryRAMStandard(EntityItem paramEntityItem) throws MiddlewareRequestException, EANBusinessRuleException {
+/*      */     try {
+/*  395 */       EntityGroup entityGroup = this.m_elist.getEntityGroup("MEM");
+/*      */       
+/*  397 */       if (entityGroup.getEntityItemCount() == 1) {
+/*  398 */         EntityItem entityItem = entityGroup.getEntityItem(0);
+/*      */         
+/*  400 */         EANAttribute eANAttribute = entityItem.getAttribute("MEMCAPACITY");
+/*  401 */         if (eANAttribute != null && eANAttribute instanceof COM.ibm.eannounce.objects.EANTextAttribute)
+/*      */         {
+/*      */           
+/*  404 */           int i = Integer.parseInt(eANAttribute.get().toString());
+/*      */ 
+/*      */           
+/*  407 */           i *= getSBBQTY(entityItem);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */           
+/*  413 */           String str = Integer.toString(i);
+/*  414 */           EANAttribute eANAttribute1 = entityItem.getAttribute("MEMCAPACITYUNITS");
+/*  415 */           if (eANAttribute1 != null && eANAttribute1 instanceof EANFlagAttribute) {
+/*      */             
+/*  417 */             EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)eANAttribute1;
+/*      */ 
+/*      */             
+/*  420 */             String str1 = eANFlagAttribute.getFirstActiveFlagCode();
+/*      */             
+/*  422 */             String str2 = eANFlagAttribute.getFlagLongDescription(str1);
+/*  423 */             if (i > 1000 && str1.equals("0010")) {
+/*      */ 
+/*      */ 
+/*      */               
+/*  427 */               str = Double.toString(i / 1000.0D);
+/*  428 */               int j = str.indexOf('.');
+/*  429 */               if (j > 0) {
+/*  430 */                 if (str.charAt(j + 1) == '0') {
+/*      */ 
+/*      */                   
+/*  433 */                   str = str.substring(0, j);
+/*      */                 }
+/*      */                 else {
+/*      */                   
+/*  437 */                   str = str.substring(0, j + 2);
+/*      */                 } 
+/*      */               }
+/*      */               
+/*  441 */               setFlagByCode(paramEntityItem, "MEMRAMSTDUNITS", "0040");
+/*      */             } else {
+/*      */               
+/*  444 */               setFlagByDescription(paramEntityItem, "MEMRAMSTDUNITS", str2);
+/*      */             } 
+/*      */           } 
+/*  447 */           setText(paramEntityItem, "MEMRAMSTD", str);
+/*      */         }
+/*      */       
+/*  450 */       } else if (entityGroup.getEntityItemCount() == 0) {
+/*      */ 
+/*      */         
+/*  453 */         setFlagByCode(paramEntityItem, "MEMRAMSTDUNITS", "0030");
+/*      */         
+/*  455 */         setText(paramEntityItem, "MEMRAMSTD", "0");
+/*      */       }
+/*  457 */       else if (entityGroup.getEntityItemCount() > 1) {
+/*  458 */         setMemoryStandardCR5701(paramEntityItem, entityGroup);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*      */       }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     }
+/*  556 */     catch (Exception exception) {
+/*  557 */       setReturnCode(-1);
+/*  558 */       this.mfOut = new MessageFormat(this.msgs.getString("Execption01"));
+/*  559 */       this.mfParms[0] = exception.getMessage();
+/*  560 */       this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setMemoryStandardCR5701(EntityItem paramEntityItem, EntityGroup paramEntityGroup) {
+/*  589 */     String str1 = "";
+/*  590 */     int i = 0;
+/*  591 */     String str2 = "";
+/*      */     
+/*      */     try {
+/*  594 */       Iterator<EntityItem> iterator = paramEntityGroup.getEntityItem().values().iterator();
+/*  595 */       while (iterator.hasNext()) {
+/*  596 */         EntityItem entityItem = iterator.next();
+/*      */         
+/*  598 */         String str = getAttributeFlagEnabledValue(entityItem, "MEMCAPACITYUNITS");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/*  603 */         if (str == null) {
+/*  604 */           str = "0010";
+/*      */         }
+/*  606 */         if (str.equals("0020")) {
+/*      */           
+/*  608 */           this.traceSb.append(entityItem.getEntityType() + ":" + entityItem.getEntityID() + " MEMCAPACITYUNITS is kB, so skipping\n");
+/*      */           
+/*      */           continue;
+/*      */         } 
+/*  612 */         EANAttribute eANAttribute = entityItem.getAttribute("MEMCAPACITY");
+/*  613 */         if (eANAttribute == null) {
+/*      */           
+/*  615 */           this.traceSb.append(entityItem.getEntityType() + ":" + entityItem.getEntityID() + " MEMCAPACITY was not set\n");
+/*      */           continue;
+/*      */         } 
+/*  618 */         int j = Integer.parseInt(eANAttribute.get().toString());
+/*  619 */         int k = getSBBQTY(entityItem);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/*  627 */         this.traceSb.append(entityItem.getEntityType() + ":" + entityItem.getEntityID() + " MEMCAPACITYUNITS = [" + str + "] " + 
+/*  628 */             getAttributeValue(entityItem.getEntityType(), entityItem.getEntityID(), "MEMCAPACITYUNITS", "") + " MEMCAPACITY: " + j + " SBBQTY: " + k + "\n");
+/*      */         
+/*  630 */         j *= k;
+/*      */         
+/*  632 */         if ("0030".equals(str)) {
+/*  633 */           j *= 1024;
+/*      */         }
+/*      */         
+/*  636 */         i += j;
+/*      */       } 
+/*  638 */       this.traceSb.append("Total capacity " + i + " (mb) \n");
+/*      */       
+/*  640 */       if (i < 1024) {
+/*      */         
+/*  642 */         str1 = "MB";
+/*  643 */         str2 = "" + i;
+/*      */       } else {
+/*  645 */         float f = i / 1024.0F;
+/*      */         
+/*  647 */         str1 = "GB";
+/*  648 */         i = (int)(f * 10.0D);
+/*      */         
+/*  650 */         if (i % 10 == 0) {
+/*      */           
+/*  652 */           str2 = "" + (i / 10);
+/*      */         } else {
+/*  654 */           f = i / 10.0F;
+/*      */           
+/*  656 */           str2 = Float.toString(f);
+/*      */         } 
+/*      */       } 
+/*      */       
+/*  660 */       this.traceSb.append("Setting MEMRAMSTD to " + str2 + " and MEMRAMSTDUNITS to " + str1 + "\n");
+/*      */ 
+/*      */       
+/*  663 */       setFlagByDescription(paramEntityItem, "MEMRAMSTDUNITS", str1);
+/*  664 */       setText(paramEntityItem, "MEMRAMSTD", str2);
+/*  665 */     } catch (Exception exception) {
+/*  666 */       setReturnCode(-1);
+/*  667 */       this.mfOut = new MessageFormat(this.msgs.getString("Execption01"));
+/*  668 */       this.mfParms[0] = exception.getMessage();
+/*  669 */       this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setTotalL2CacheStandard(EntityItem paramEntityItem) throws MiddlewareRequestException, EANBusinessRuleException {
+/*  685 */     String str = null;
+/*      */ 
+/*      */     
+/*      */     try {
+/*  689 */       EntityGroup entityGroup = this.m_elist.getEntityGroup("PRC");
+/*  690 */       if (entityGroup.getEntityItemCount() == 1) {
+/*      */         
+/*  692 */         EntityItem entityItem = entityGroup.getEntityItem(0);
+/*      */         
+/*  694 */         EANAttribute eANAttribute = entityItem.getAttribute("INTL2CACHESIZE");
+/*  695 */         if (eANAttribute != null && eANAttribute instanceof EANFlagAttribute)
+/*      */         {
+/*  697 */           EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)eANAttribute;
+/*      */           
+/*  699 */           str = eANFlagAttribute.getFlagLongDescription(eANFlagAttribute.getFirstActiveFlagCode());
+/*  700 */           BigDecimal bigDecimal = new BigDecimal(str);
+/*      */ 
+/*      */           
+/*  703 */           bigDecimal = bigDecimal.multiply(new BigDecimal(
+/*  704 */                 getSBBQTY(entityItem)));
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */           
+/*  709 */           EANAttribute eANAttribute1 = entityItem.getAttribute("INTL2CACHESIZEUNIT");
+/*  710 */           if (eANAttribute1 != null && eANAttribute1 instanceof EANFlagAttribute) {
+/*      */             
+/*  712 */             EANFlagAttribute eANFlagAttribute1 = (EANFlagAttribute)eANAttribute1;
+/*      */ 
+/*      */             
+/*  715 */             String str1 = eANFlagAttribute1.getFirstActiveFlagCode();
+/*      */ 
+/*      */             
+/*  718 */             if (bigDecimal.compareTo(ONETHOUSAND) > 0 && str1.equals("0010")) {
+/*      */ 
+/*      */               
+/*  721 */               bigDecimal = bigDecimal.divide(ONETHOUSAND, 4);
+/*      */ 
+/*      */ 
+/*      */               
+/*  725 */               setFlagByCode(paramEntityItem, "TOTL2CACHESTDUNITS", "0020");
+/*      */             } else {
+/*      */               
+/*  728 */               setFlagByCode(paramEntityItem, "TOTL2CACHESTDUNITS", str1);
+/*      */             } 
+/*      */           } 
+/*  731 */           setFlagToClosestNumericalMatch(paramEntityItem, "TOT_L2_CACHE_STD", bigDecimal);
+/*      */         }
+/*      */       
+/*  734 */       } else if (entityGroup.getEntityItemCount() == 0) {
+/*      */ 
+/*      */         
+/*  737 */         setFlagByCode(paramEntityItem, "TOTL2CACHESTDUNITS", "0010");
+/*      */         
+/*  739 */         setFlagByCode(paramEntityItem, "TOT_L2_CACHE_STD", "0010");
+/*      */       }
+/*  741 */       else if (entityGroup.getEntityItemCount() > 1) {
+/*      */ 
+/*      */ 
+/*      */         
+/*  745 */         String str1 = "";
+/*  746 */         boolean bool = true;
+/*  747 */         Iterator<EntityItem> iterator = entityGroup.getEntityItem().values().iterator();
+/*      */         
+/*  749 */         EANAttribute eANAttribute = ((EntityItem)iterator.next()).getAttribute("INTL2CACHESIZEUNIT");
+/*  750 */         if (eANAttribute != null && eANAttribute instanceof EANFlagAttribute) {
+/*      */           
+/*  752 */           EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)eANAttribute;
+/*      */           
+/*  754 */           MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/*  755 */           for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/*  756 */             if (arrayOfMetaFlag[b].isSelected()) {
+/*  757 */               str1 = arrayOfMetaFlag[b].getFlagCode();
+/*      */             }
+/*      */           } 
+/*      */         } else {
+/*  761 */           bool = false;
+/*      */         } 
+/*      */         
+/*  764 */         while (iterator.hasNext()) {
+/*  765 */           eANAttribute = ((EntityItem)iterator.next()).getAttribute("INTL2CACHESIZEUNIT");
+/*  766 */           if (eANAttribute != null && eANAttribute instanceof EANFlagAttribute) {
+/*      */             
+/*  768 */             EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)eANAttribute;
+/*      */             
+/*  770 */             if (!eANFlagAttribute.isSelected(str1))
+/*  771 */               bool = false; 
+/*      */             continue;
+/*      */           } 
+/*  774 */           bool = false;
+/*      */         } 
+/*      */ 
+/*      */         
+/*  778 */         if (bool) {
+/*      */           
+/*  780 */           BigDecimal bigDecimal = new BigDecimal("0");
+/*  781 */           iterator = entityGroup.getEntityItem().values().iterator();
+/*  782 */           while (iterator.hasNext()) {
+/*  783 */             EntityItem entityItem = iterator.next();
+/*  784 */             EANAttribute eANAttribute1 = entityItem.getAttribute("INTL2CACHESIZE");
+/*  785 */             if (eANAttribute1 != null && eANAttribute1 instanceof EANFlagAttribute) {
+/*      */               
+/*  787 */               logMessage("eaaINTL2CACHESIZE: " + eANAttribute1);
+/*  788 */               EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)eANAttribute1;
+/*      */               
+/*  790 */               logMessage("fa: " + eANFlagAttribute);
+/*      */ 
+/*      */               
+/*  793 */               BigDecimal bigDecimal1 = new BigDecimal(eANFlagAttribute.getFlagLongDescription(eANFlagAttribute
+/*  794 */                     .getFirstActiveFlagCode()));
+/*  795 */               bigDecimal1.multiply(new BigDecimal(getSBBQTY(entityItem)));
+/*  796 */               logMessage("tmp: " + bigDecimal1);
+/*  797 */               bigDecimal = bigDecimal.add(bigDecimal1);
+/*  798 */               logMessage("bdINTL2CACHESIZE: " + bigDecimal);
+/*      */             } 
+/*      */           } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */           
+/*  809 */           if (bigDecimal.compareTo(ONETHOUSAND) > 0 && str1.equals("0010")) {
+/*      */ 
+/*      */             
+/*  812 */             bigDecimal = bigDecimal.divide(ONETHOUSAND, 4);
+/*      */ 
+/*      */ 
+/*      */             
+/*  816 */             setFlagByCode(paramEntityItem, "TOTL2CACHESTDUNITS", "0020");
+/*      */           } else {
+/*      */             
+/*  819 */             setFlagByCode(paramEntityItem, "TOTL2CACHESTDUNITS", str1);
+/*      */           } 
+/*  821 */           setFlagToClosestNumericalMatch(paramEntityItem, "TOT_L2_CACHE_STD", bigDecimal);
+/*      */         } else {
+/*      */           
+/*  824 */           setReturnCode(-1);
+/*  825 */           this.mfOut = new MessageFormat(this.msgs.getString("L2_UNIT_ERR"));
+/*  826 */           this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */ 
+/*      */         
+/*      */         }
+/*      */ 
+/*      */ 
+/*      */       
+/*      */       }
+/*      */ 
+/*      */     
+/*      */     }
+/*  837 */     catch (Exception exception) {
+/*  838 */       logMessage("Exception e" + exception);
+/*  839 */       setReturnCode(-1);
+/*  840 */       this.mfOut = new MessageFormat(this.msgs.getString("Execption07"));
+/*  841 */       logMessage("mfOut" + this.mfOut);
+/*  842 */       this.mfParms[0] = exception.getMessage();
+/*  843 */       logMessage("mfParms[0]" + this.mfParms[0]);
+/*  844 */       this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setNumberOfProcessorsStandard(EntityItem paramEntityItem) throws MiddlewareRequestException, EANBusinessRuleException {
+/*      */     try {
+/*  935 */       int i = 0;
+/*  936 */       EntityGroup entityGroup1 = this.m_elist.getEntityGroup("PRC");
+/*      */ 
+/*      */ 
+/*      */       
+/*  940 */       if (entityGroup1.getEntityItemCount() == 0) {
+/*  941 */         setText(paramEntityItem, "NUMPROCSTD", Integer.toString(i));
+/*      */         return;
+/*      */       } 
+/*  944 */       Iterator<EntityItem> iterator = entityGroup1.getEntityItem().values().iterator();
+/*  945 */       while (iterator.hasNext()) {
+/*  946 */         EntityItem entityItem = iterator.next();
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/*  953 */         i += getSBBQTY(entityItem);
+/*      */       } 
+/*      */ 
+/*      */       
+/*  957 */       EntityGroup entityGroup2 = this.m_elist.getEntityGroup("MB");
+/*  958 */       if (entityGroup2.getEntityItemCount() == 1) {
+/*  959 */         EntityItem entityItem = entityGroup2.getEntityItem(0);
+/*  960 */         EANAttribute eANAttribute = entityItem.getAttribute("NUMPROCMAX");
+/*  961 */         int j = 1;
+/*  962 */         if (eANAttribute != null && eANAttribute instanceof COM.ibm.eannounce.objects.EANTextAttribute)
+/*      */         {
+/*      */           
+/*  965 */           j = Integer.parseInt(eANAttribute.get().toString());
+/*      */         }
+/*  967 */         if (i > j) {
+/*      */           
+/*  969 */           setReturnCode(-1);
+/*  970 */           this.mfOut = new MessageFormat(this.msgs.getString("MAX_PRC_ERR"));
+/*  971 */           this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */         } else {
+/*  973 */           setText(paramEntityItem, "NUMPROCSTD", Integer.toString(i));
+/*      */         } 
+/*      */       } else {
+/*  976 */         setReturnCode(-1);
+/*  977 */         this.mfParms[0] = entityGroup2.getLongDescription();
+/*  978 */         if (entityGroup2.getEntityItemCount() == 0) {
+/*  979 */           this.mfOut = new MessageFormat(this.msgs.getString("MISSING_MSG"));
+/*      */         } else {
+/*  981 */           this.mfOut = new MessageFormat(this.msgs.getString("TOO_MANY_MSG"));
+/*      */         } 
+/*  983 */         this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */ 
+/*      */ 
+/*      */       
+/*      */       }
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     }
+/*  992 */     catch (Exception exception) {
+/*  993 */       setReturnCode(-1);
+/*  994 */       this.mfOut = new MessageFormat(this.msgs.getString("Execption03"));
+/*  995 */       this.mfParms[0] = exception.getMessage();
+/*  996 */       this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setNumberOfInstalledHardDrives(EntityItem paramEntityItem) throws MiddlewareRequestException, EANBusinessRuleException {
+/*      */     try {
+/* 1021 */       int i = 0;
+/* 1022 */       EntityGroup entityGroup = this.m_elist.getEntityGroup("HD");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1040 */       Iterator<EntityItem> iterator = entityGroup.getEntityItem().values().iterator();
+/* 1041 */       while (iterator.hasNext()) {
+/* 1042 */         EntityItem entityItem = iterator.next();
+/*      */         
+/* 1044 */         EANAttribute eANAttribute = entityItem.getAttribute("HDDCAPACITY");
+/* 1045 */         if (eANAttribute != null && eANAttribute instanceof COM.ibm.eannounce.objects.EANTextAttribute)
+/*      */         {
+/* 1047 */           if (Double.parseDouble(eANAttribute.get().toString()) > 0.0D)
+/*      */           {
+/* 1049 */             i += getSBBQTY(entityItem);
+/*      */           }
+/*      */         }
+/*      */       } 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1056 */       if (!setText(paramEntityItem, "NUMINSTHD", Integer.toString(i))) {
+/* 1057 */         setReturnCode(-1);
+/* 1058 */         this.mfOut = new MessageFormat(this.msgs.getString("HD_ERR"));
+/* 1059 */         this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*      */       }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     }
+/* 1070 */     catch (Exception exception) {
+/* 1071 */       setReturnCode(-1);
+/* 1072 */       this.mfOut = new MessageFormat(this.msgs.getString("Execption02"));
+/* 1073 */       this.mfParms[0] = exception.getMessage();
+/* 1074 */       this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setWeight(EntityItem paramEntityItem) throws MiddlewareRequestException, EANBusinessRuleException {
+/* 1097 */     BigDecimal bigDecimal1 = new BigDecimal("0");
+/* 1098 */     BigDecimal bigDecimal2 = new BigDecimal("0");
+/* 1099 */     String str1 = null;
+/* 1100 */     String str2 = null;
+/* 1101 */     boolean bool = false;
+/* 1102 */     Iterator<EntityItem> iterator = this.m_elist.getEntityGroup("SBB").getEntityItem().values().iterator();
+/* 1103 */     if (!iterator.hasNext()) {
+/* 1104 */       this.mfOut = new MessageFormat(this.msgs.getString("NO_SBB"));
+/* 1105 */       this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */     } else {
+/* 1107 */       while (iterator.hasNext()) {
+/* 1108 */         EntityItem entityItem1 = iterator.next();
+/* 1109 */         EANAttribute eANAttribute1 = entityItem1.getAttribute("WEIGHT_METRIC_SBB");
+/* 1110 */         EANAttribute eANAttribute2 = entityItem1.getAttribute("WEIGHT_METUNITS_SBB");
+/* 1111 */         EANAttribute eANAttribute3 = entityItem1.getAttribute("WEIGHT_US_SBB");
+/* 1112 */         EANAttribute eANAttribute4 = entityItem1.getAttribute("WEIGHT_USUNITS_SBB");
+/*      */         
+/* 1114 */         EntityItem entityItem2 = (EntityItem)entityItem1.getUpLink(0);
+/*      */         
+/* 1116 */         EANAttribute eANAttribute5 = entityItem2.getAttribute(getRootEntityType() + "SBBQTY");
+/* 1117 */         BigDecimal bigDecimal = new BigDecimal("1");
+/* 1118 */         if (eANAttribute5 != null && eANAttribute5 instanceof COM.ibm.eannounce.objects.EANTextAttribute)
+/*      */         {
+/* 1120 */           bigDecimal = new BigDecimal(eANAttribute5.get().toString());
+/*      */         }
+/*      */         
+/* 1123 */         if (eANAttribute2 != null && eANAttribute4 != null) {
+/*      */           
+/* 1125 */           String str3 = null;
+/* 1126 */           String str4 = null;
+/* 1127 */           if (eANAttribute2 instanceof EANFlagAttribute)
+/*      */           {
+/*      */             
+/* 1130 */             str3 = ((EANFlagAttribute)eANAttribute2).getFirstActiveFlagCode();
+/*      */           }
+/* 1132 */           if (eANAttribute4 instanceof EANFlagAttribute)
+/*      */           {
+/*      */             
+/* 1135 */             str4 = ((EANFlagAttribute)eANAttribute4).getFirstActiveFlagCode();
+/*      */           }
+/* 1137 */           if (str1 == null) {
+/*      */             
+/* 1139 */             str1 = str3;
+/* 1140 */             str2 = str4;
+/*      */           } 
+/*      */           
+/* 1143 */           if (str1.equals(str3)) {
+/* 1144 */             if (eANAttribute1 != null)
+/*      */             {
+/* 1146 */               bigDecimal1 = bigDecimal1.add((new BigDecimal(eANAttribute1
+/*      */ 
+/*      */ 
+/*      */                     
+/* 1150 */                     .toString()))
+/* 1151 */                   .multiply(bigDecimal));
+/*      */             }
+/*      */           } else {
+/*      */             
+/* 1155 */             bool = true;
+/* 1156 */             this.mfParms[0] = entityItem1
+/* 1157 */               .getEntityGroup().getLongDescription();
+/* 1158 */             this.mfParms[1] = entityItem1.getEntityGroup().getMetaAttribute("WEIGHT_METUNITS_SBB").getLongDescription();
+/* 1159 */             this.mfOut = new MessageFormat(this.msgs.getString("UNITS_MISMATCH_ERR"));
+/* 1160 */             this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */           } 
+/*      */           
+/* 1163 */           if (str2.equals(str4)) {
+/* 1164 */             if (eANAttribute3 != null)
+/*      */             {
+/* 1166 */               bigDecimal2 = bigDecimal2.add((new BigDecimal(eANAttribute3
+/*      */ 
+/*      */ 
+/*      */                     
+/* 1170 */                     .toString()))
+/* 1171 */                   .multiply(bigDecimal));
+/*      */             }
+/*      */             continue;
+/*      */           } 
+/* 1175 */           bool = true;
+/* 1176 */           this.mfParms[0] = entityItem1
+/* 1177 */             .getEntityGroup().getLongDescription();
+/* 1178 */           this.mfParms[1] = entityItem1.getEntityGroup().getMetaAttribute("WEIGHT_USUNITS_SBB").getLongDescription();
+/* 1179 */           this.mfOut = new MessageFormat(this.msgs.getString("UNITS_MISMATCH_ERR"));
+/* 1180 */           this.rpt.append(this.mfOut.format(this.mfParms)); continue;
+/*      */         } 
+/* 1182 */         if (eANAttribute2 == null && eANAttribute4 == null && eANAttribute1 == null && eANAttribute3 == null) {
+/*      */           continue;
+/*      */         }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1189 */         bool = true;
+/* 1190 */         this.mfParms[0] = entityItem1.getEntityGroup().getLongDescription();
+/* 1191 */         this.mfOut = new MessageFormat(this.msgs.getString("UNITS_POP_ERR"));
+/* 1192 */         this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */       } 
+/*      */ 
+/*      */       
+/* 1196 */       if (!bool) {
+/* 1197 */         if (str1 != null) {
+/*      */ 
+/*      */ 
+/*      */           
+/* 1201 */           String str3 = bigDecimal2.toString();
+/*      */           
+/* 1203 */           String str4 = bigDecimal1.toString();
+/* 1204 */           if (str4.indexOf('.') < 0) {
+/* 1205 */             str4 = str4 + ".0";
+/*      */           }
+/* 1207 */           setText(paramEntityItem, "WEIGHT_METRIC", str4);
+/*      */           
+/* 1209 */           setFlagByCode(paramEntityItem, "WEIGHT_METRICUNITS", str1);
+/* 1210 */           if (str3.indexOf('.') < 0) {
+/* 1211 */             str3 = str3 + ".0";
+/*      */           }
+/* 1213 */           setText(paramEntityItem, "WEIGHT_US", str3);
+/*      */           
+/* 1215 */           setFlagByCode(paramEntityItem, "WEIGHT_USUNITS", str2);
+/*      */         } else {
+/* 1217 */           this.mfOut = new MessageFormat(this.msgs.getString("NO_DATA"));
+/* 1218 */           this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */         } 
+/*      */       } else {
+/* 1221 */         setReturnCode(-1);
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean setText(EntityItem paramEntityItem, String paramString1, String paramString2) throws MiddlewareRequestException, EANBusinessRuleException {
+/* 1242 */     boolean bool = false;
+/*      */     
+/* 1244 */     EANMetaAttribute eANMetaAttribute = paramEntityItem.getEntityGroup().getMetaAttribute(paramString1);
+/* 1245 */     if (eANMetaAttribute != null && eANMetaAttribute instanceof MetaTextAttribute) {
+/* 1246 */       TextAttribute textAttribute = new TextAttribute((EANDataFoundation)paramEntityItem, this.m_prof, (MetaTextAttribute)eANMetaAttribute);
+/*      */       
+/* 1248 */       textAttribute.put(paramString2);
+/* 1249 */       paramEntityItem.putAttribute((EANAttribute)textAttribute);
+/* 1250 */       bool = true;
+/* 1251 */       this.mfParms[0] = eANMetaAttribute.getLongDescription();
+/* 1252 */       this.mfParms[1] = paramString2;
+/* 1253 */       this.mfOut = new MessageFormat(this.msgs.getString("SET_MSG"));
+/* 1254 */       this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */     } else {
+/* 1256 */       setReturnCode(-1);
+/* 1257 */       this.mfParms[0] = paramString1;
+/* 1258 */       if (eANMetaAttribute == null) {
+/* 1259 */         this.mfOut = new MessageFormat(this.msgs.getString("CODE_ERR"));
+/* 1260 */         this.mfParms[1] = paramEntityItem.getLongDescription();
+/*      */       } else {
+/* 1262 */         this.mfOut = new MessageFormat(this.msgs.getString("TEXT_ERR"));
+/*      */       } 
+/* 1264 */       this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */     } 
+/* 1266 */     return bool;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean setFlagToClosestNumericalMatch(EntityItem paramEntityItem, String paramString, BigDecimal paramBigDecimal) throws MiddlewareRequestException, EANBusinessRuleException {
+/* 1285 */     TreeMap<Object, Object> treeMap = new TreeMap<>();
+/*      */     
+/* 1287 */     EANMetaAttribute eANMetaAttribute = paramEntityItem.getEntityGroup().getMetaAttribute(paramString);
+/* 1288 */     if (eANMetaAttribute != null && eANMetaAttribute instanceof MetaSingleFlagAttribute) {
+/* 1289 */       SingleFlagAttribute singleFlagAttribute = new SingleFlagAttribute((EANDataFoundation)paramEntityItem, this.m_prof, (MetaSingleFlagAttribute)eANMetaAttribute);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1294 */       MetaFlag[] arrayOfMetaFlag = (MetaFlag[])singleFlagAttribute.get();
+/*      */       
+/* 1296 */       for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/* 1297 */         treeMap.put(new BigDecimal(arrayOfMetaFlag[b]
+/* 1298 */               .getLongDescription()), arrayOfMetaFlag[b]);
+/*      */       }
+/*      */       
+/* 1301 */       MetaFlag metaFlag = (MetaFlag)treeMap.get(paramBigDecimal);
+/* 1302 */       if (metaFlag == null) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1308 */         treeMap.put(paramBigDecimal, paramBigDecimal);
+/*      */         
+/* 1310 */         ArrayList arrayList = new ArrayList(treeMap.keySet());
+/*      */         
+/* 1312 */         int i = arrayList.indexOf(paramBigDecimal) - 1;
+/* 1313 */         if (i < 0) {
+/* 1314 */           setReturnCode(-1);
+/* 1315 */           this.mfOut = new MessageFormat(this.msgs.getString("VALUE_ERR"));
+/* 1316 */           this.mfParms[0] = paramBigDecimal.toString();
+/* 1317 */           this.mfParms[1] = eANMetaAttribute.getLongDescription();
+/* 1318 */           this.rpt.append(this.mfOut.format(this.mfParms));
+/* 1319 */           return false;
+/*      */         } 
+/* 1321 */         metaFlag = (MetaFlag)treeMap.get(arrayList.get(i));
+/*      */       } 
+/* 1323 */       metaFlag.setSelected(true);
+/* 1324 */       singleFlagAttribute.put(arrayOfMetaFlag);
+/* 1325 */       paramEntityItem.putAttribute((EANAttribute)singleFlagAttribute);
+/* 1326 */       this.mfParms[0] = eANMetaAttribute.getLongDescription();
+/* 1327 */       this.mfParms[1] = metaFlag.getLongDescription();
+/* 1328 */       this.mfOut = new MessageFormat(this.msgs.getString("SET_MSG"));
+/* 1329 */       this.rpt.append(this.mfOut.format(this.mfParms));
+/* 1330 */       return true;
+/*      */     } 
+/* 1332 */     setReturnCode(-1);
+/* 1333 */     this.mfParms[0] = paramString;
+/* 1334 */     if (eANMetaAttribute == null) {
+/* 1335 */       this.mfOut = new MessageFormat(this.msgs.getString("CODE_ERR"));
+/* 1336 */       this.mfParms[1] = paramEntityItem.getLongDescription();
+/*      */     } else {
+/* 1338 */       this.mfOut = new MessageFormat(this.msgs.getString("FLAG_ERR"));
+/*      */     } 
+/* 1340 */     this.rpt.append(this.mfOut.format(this.mfParms));
+/* 1341 */     return false;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean setFlagByDescription(EntityItem paramEntityItem, String paramString1, String paramString2) throws MiddlewareRequestException, EANBusinessRuleException {
+/* 1351 */     boolean bool = false;
+/*      */     
+/* 1353 */     EANMetaAttribute eANMetaAttribute = paramEntityItem.getEntityGroup().getMetaAttribute(paramString1);
+/* 1354 */     if (eANMetaAttribute != null && eANMetaAttribute instanceof MetaSingleFlagAttribute) {
+/* 1355 */       SingleFlagAttribute singleFlagAttribute = new SingleFlagAttribute((EANDataFoundation)paramEntityItem, this.m_prof, (MetaSingleFlagAttribute)eANMetaAttribute);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1360 */       MetaFlag[] arrayOfMetaFlag = (MetaFlag[])singleFlagAttribute.get();
+/* 1361 */       for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/* 1362 */         if (arrayOfMetaFlag[b].getLongDescription().equals(paramString2)) {
+/* 1363 */           bool = true;
+/* 1364 */           arrayOfMetaFlag[b].setSelected(true);
+/* 1365 */           this.mfParms[0] = eANMetaAttribute.getLongDescription();
+/* 1366 */           this.mfParms[1] = paramString2;
+/* 1367 */           this.mfOut = new MessageFormat(this.msgs.getString("SET_MSG"));
+/* 1368 */           this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */         } 
+/*      */       } 
+/* 1371 */       if (bool) {
+/* 1372 */         singleFlagAttribute.put(arrayOfMetaFlag);
+/* 1373 */         paramEntityItem.putAttribute((EANAttribute)singleFlagAttribute);
+/*      */       } else {
+/* 1375 */         setReturnCode(-1);
+/* 1376 */         this.mfOut = new MessageFormat(this.msgs.getString("VALUE_ERR"));
+/* 1377 */         this.mfParms[0] = paramString2;
+/* 1378 */         this.mfParms[1] = eANMetaAttribute.getLongDescription();
+/* 1379 */         this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */       } 
+/*      */     } else {
+/* 1382 */       setReturnCode(-1);
+/* 1383 */       this.mfParms[0] = paramString1;
+/* 1384 */       if (eANMetaAttribute == null) {
+/* 1385 */         this.mfOut = new MessageFormat(this.msgs.getString("CODE_ERR"));
+/* 1386 */         this.mfParms[1] = paramEntityItem.getLongDescription();
+/*      */       } else {
+/* 1388 */         this.mfOut = new MessageFormat(this.msgs.getString("FLAG_ERR"));
+/*      */       } 
+/* 1390 */       this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */     } 
+/* 1392 */     return bool;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean setFlagByCode(EntityItem paramEntityItem, String paramString1, String paramString2) throws MiddlewareRequestException, EANBusinessRuleException {
+/* 1402 */     boolean bool = false;
+/*      */     
+/* 1404 */     EANMetaAttribute eANMetaAttribute = paramEntityItem.getEntityGroup().getMetaAttribute(paramString1);
+/* 1405 */     if (eANMetaAttribute != null && eANMetaAttribute instanceof MetaSingleFlagAttribute) {
+/* 1406 */       SingleFlagAttribute singleFlagAttribute = new SingleFlagAttribute((EANDataFoundation)paramEntityItem, this.m_prof, (MetaSingleFlagAttribute)eANMetaAttribute);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1411 */       MetaFlag[] arrayOfMetaFlag = (MetaFlag[])singleFlagAttribute.get();
+/* 1412 */       for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/* 1413 */         if (arrayOfMetaFlag[b].getFlagCode().equals(paramString2)) {
+/* 1414 */           bool = true;
+/* 1415 */           arrayOfMetaFlag[b].setSelected(true);
+/* 1416 */           this.mfParms[0] = eANMetaAttribute.getLongDescription();
+/* 1417 */           this.mfParms[1] = arrayOfMetaFlag[b].getLongDescription();
+/* 1418 */           this.mfOut = new MessageFormat(this.msgs.getString("SET_MSG"));
+/* 1419 */           this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */         } 
+/*      */       } 
+/* 1422 */       if (bool) {
+/* 1423 */         singleFlagAttribute.put(arrayOfMetaFlag);
+/* 1424 */         paramEntityItem.putAttribute((EANAttribute)singleFlagAttribute);
+/*      */       } else {
+/* 1426 */         setReturnCode(-1);
+/* 1427 */         this.mfOut = new MessageFormat(this.msgs.getString("VALUE_ERR"));
+/* 1428 */         this.mfParms[0] = paramString2;
+/* 1429 */         this.mfParms[1] = eANMetaAttribute.getLongDescription();
+/* 1430 */         this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */       } 
+/*      */     } else {
+/* 1433 */       this.mfParms[0] = paramString1;
+/* 1434 */       setReturnCode(-1);
+/* 1435 */       if (eANMetaAttribute == null) {
+/* 1436 */         this.mfOut = new MessageFormat(this.msgs.getString("CODE_ERR"));
+/* 1437 */         this.mfParms[1] = paramEntityItem.getLongDescription();
+/*      */       } else {
+/* 1439 */         this.mfOut = new MessageFormat(this.msgs.getString("FLAG_ERR"));
+/*      */       } 
+/* 1441 */       this.rpt.append(this.mfOut.format(this.mfParms));
+/*      */     } 
+/* 1443 */     return bool;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private int getSBBQTY(EntityItem paramEntityItem) {
+/* 1453 */     int i = 0;
+/* 1454 */     for (byte b = 0; b < paramEntityItem.getUpLinkCount(); b++) {
+/* 1455 */       EntityItem entityItem = (EntityItem)paramEntityItem.getUpLink(b);
+/* 1456 */       if (entityItem.getUpLink(0).getEntityType().equals("SBB")) {
+/* 1457 */         EntityItem entityItem1 = (EntityItem)entityItem.getUpLink(0);
+/* 1458 */         EntityItem entityItem2 = (EntityItem)entityItem1.getUpLink(0);
+/*      */         
+/* 1460 */         EANAttribute eANAttribute = entityItem2.getAttribute(getRootEntityType() + "SBBQTY");
+/* 1461 */         if (eANAttribute != null && eANAttribute instanceof COM.ibm.eannounce.objects.EANTextAttribute) {
+/*      */           
+/* 1463 */           i += Integer.parseInt(eANAttribute.get().toString());
+/*      */         } else {
+/* 1465 */           i++;
+/*      */         } 
+/*      */       } else {
+/* 1468 */         i++;
+/*      */       } 
+/*      */     } 
+/* 1471 */     return i;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getDescription() {
+/* 1479 */     return this.msgs.getString("DESCRIPTION");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getABRVersion() {
+/* 1488 */     return "$Revision: 1.17 $";
+/*      */   }
+/*      */   private Locale getLocale(int paramInt) {
+/* 1491 */     Locale locale = null;
+/* 1492 */     switch (paramInt)
+/*      */     { case 1:
+/* 1494 */         locale = Locale.US;
+/*      */       case 2:
+/* 1496 */         locale = Locale.GERMAN;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1516 */         return locale;case 3: locale = Locale.ITALIAN; return locale;case 4: locale = Locale.JAPANESE; return locale;case 5: locale = Locale.FRENCH; return locale;case 6: locale = new Locale("es", "ES"); return locale;case 7: locale = Locale.UK; return locale; }  locale = Locale.US; return locale;
+/*      */   }
+/*      */ }
+
+
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\psg\DDABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-package COM.ibm.eannounce.abr.psg;
-
-//import COM.ibm.opicmpdh.transactions.*;
-//import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-
-import java.util.*;
-import java.math.BigDecimal;
-import java.text.*;
-
-/**
- * Derives Data attributes from OF and VAR
- * @author cstolpe
- *
- */
-public class DDABR extends PokBaseABR {
-	private MessageFormat mfOut = null;
-	private Object[] mfParms = new String[10];
-	private ResourceBundle msgs = null;
-	private StringBuffer rpt = new StringBuffer();
-	private StringBuffer traceSb = new StringBuffer();
-	private static final int GB_VALUE = 1024;
-	private static final BigDecimal ONETHOUSAND = new BigDecimal(1000);
-	/**
-	 *  Execute ABR.
-	 *
-	 */
-	public void execute_run() {
-		StringBuffer navName = new StringBuffer();
-		try {
-			EntityGroup eg;
-			Iterator itMeta;
-			boolean system = false;
-			start_ABRBuild();
-			setReturnCode(PASS);
-			// NAME is navigate attributes
-			eg = new EntityGroup(null, m_db, m_prof, getRootEntityType(), "Navigate"); //$NON-NLS-1$
-			itMeta = eg.getMetaAttribute().values().iterator();
-			while (itMeta.hasNext()) {
-				EANMetaAttribute ma = (EANMetaAttribute) itMeta.next();
-				navName.append(
-					getAttributeValue(
-						getRootEntityType(),
-						getRootEntityID(),
-						ma.getAttributeCode()));
-				if (itMeta.hasNext()) {
-					navName.append(" "); //$NON-NLS-1$
-				}
-			}
-			msgs =
-				ResourceBundle.getBundle(
-					this.getClass().getName(),
-					getLocale(m_prof.getReadLanguage().getNLSID()));
-			mfParms = new String[10];
-
-			if ("OF".equals(getEntityType())) { //$NON-NLS-1$
-				EANAttribute eanAttr = m_elist.getParentEntityGroup().getEntityItem(0).getAttribute("OFFERINGTYPE"); //$NON-NLS-1$
-				if (eanAttr != null && eanAttr instanceof EANFlagAttribute) {
-					EANFlagAttribute eanfAttr = (EANFlagAttribute) eanAttr;
-					system = eanfAttr.isSelected("0080"); //$NON-NLS-1$
-				}
-			}
-
-			rpt.append("<ol>"); //$NON-NLS-1$
-			if ("VAR".equals(getEntityType()) || system) { //$NON-NLS-1$
-				EntityGroup egDD = m_elist.getEntityGroup("DD"); //$NON-NLS-1$
-				EntityItem eiDD = null;
-				if (egDD.getEntityItemCount() == 0) {
-					// Create and link a new one
-					CreateActionItem cai = new CreateActionItem(null, m_db, m_prof, "CR" + getEntityType() + "DD"); //$NON-NLS-2$  //$NON-NLS-1$
-					EntityItem[] aItems = new EntityItem[1];
-					EntityList elDD;
-					eg = m_elist.getParentEntityGroup();
-					aItems[0] = eg.getEntityItem(0); // This is the VAR or OF
-					elDD = new EntityList(m_db, m_prof, cai, aItems);
-					egDD = elDD.getEntityGroup("DD"); //$NON-NLS-1$
-					if (egDD.getEntityItemCount() == 1) {
-						EANAttribute eaaOFFERINGPNUMB;
-						eiDD = egDD.getEntityItem(0);
-						eaaOFFERINGPNUMB = m_elist.getParentEntityGroup().getEntityItem(0).getAttribute("OFFERINGPNUMB"); //$NON-NLS-1$
-						setText(eiDD, "NAME", eaaOFFERINGPNUMB.get() + " - DD"); //$NON-NLS-2$  //$NON-NLS-1$
-					} else {
-						setReturnCode(FAIL);
-						mfOut = new MessageFormat(msgs.getString("DD_CR_ERR")); //$NON-NLS-1$
-						rpt.append(mfOut.format(mfParms));
-					}
-				} else if (egDD.getEntityItemCount() == 1) {
-					eiDD = egDD.getEntityItem(0);
-				} else if (egDD.getEntityItemCount() > 1) {
-					// log an error message
-					mfOut = new MessageFormat(msgs.getString("DD_ERR")); //$NON-NLS-1$
-					rpt.append(mfOut.format(mfParms));
-					setReturnCode(FAIL);
-				}
-				if (eiDD != null) {
-					logMessage("DDABR:setTotalAvailableSlots"); //$NON-NLS-1$
-					setTotalAvailableSlots(eiDD);
-					logMessage("DDABR:setTotalAvailableBays"); //$NON-NLS-1$
-					setTotalAvailableBays(eiDD);
-					logMessage("DDABR:setMemoryStandard"); //$NON-NLS-1$
-					setMemoryRAMStandard(eiDD);
-					logMessage("DDABR:setTotalL2CacheStandard"); //$NON-NLS-1$
-					setTotalL2CacheStandard(eiDD);
-					/* postponed (but tested)
-					logMessage("DDABR:setRAMSocketsAvailable");
-					setRAMSocketsAvailable(eiDD);
-					*/
-					logMessage("DDABR:setNumberOfProcessorsStandard"); //$NON-NLS-1$
-					setNumberOfProcessorsStandard(eiDD);
-					logMessage("DDABR:setNumberOfInstalledHardDrives"); //$NON-NLS-1$
-					setNumberOfInstalledHardDrives(eiDD);
-					logMessage("DDABR:setWeight"); //$NON-NLS-1$
-					setWeight(eiDD);
-					if (eiDD.hasChanges()) {
-						EntityItem eiXXXDD;
-						eiDD.commit(m_db, null);
-						// Commit the relator too
-						eiXXXDD = (EntityItem) eiDD.getUpLink(0);
-						eiXXXDD.commit(m_db, null);
-					}
-				}
-			} else {
-				mfOut = new MessageFormat(msgs.getString("SYS_ERR")); //$NON-NLS-1$
-				rpt.append(mfOut.format(mfParms));
-				setReturnCode(FAIL);
-			}
-			rpt.append("</ol>"); //$NON-NLS-1$
-			rpt.append("<!-- DEBUG: " + traceSb.toString() + " -->"); //$NON-NLS-2$  //$NON-NLS-1$
-		} catch (Throwable exc) {
-			java.io.StringWriter exBuf = new java.io.StringWriter();
-			setReturnCode(FAIL);
-			// Report this error to both the datbase log and the PrintWriter
-			mfOut = new MessageFormat(msgs.getString("EXCEPTION_ERROR")); //$NON-NLS-1$
-			mfParms[0] = m_abri.getABRCode();
-			mfParms[1] = exc.getMessage();
-			rpt.append(mfOut.format(mfParms));
-			exc.printStackTrace(new java.io.PrintWriter(exBuf));
-			rpt.append("<!-- "); //$NON-NLS-1$
-			rpt.append(exBuf.getBuffer().toString());
-			rpt.append(" -->"); //$NON-NLS-1$
-			rpt.append("</ol>\n"); //$NON-NLS-1$
-			rpt.append("<!-- DEBUG: " + traceSb.toString() + " -->"); //$NON-NLS-2$  //$NON-NLS-1$
-		} finally {
-			setDGTitle(navName.toString());
-			setDGRptName(getShortClassName(getClass()));
-			setDGRptClass("WWABR"); //$NON-NLS-1$
-			// make sure the lock is released
-			if (!isReadOnly()) {
-				clearSoftLock();
-			}
-		}
-		// Insert Header into beginning of report
-		navName.append((getReturnCode() == PASS) ? " Passed" : " Failed"); //$NON-NLS-2$  //$NON-NLS-1$
-		mfOut = new MessageFormat(msgs.getString("HEADER")); //$NON-NLS-1$
-		mfParms[0] = getShortClassName(getClass());
-		mfParms[1] = navName.toString();
-		mfParms[2] = getNow();
-		mfParms[3] = m_prof.getOPName();
-		mfParms[4] = m_prof.getRoleDescription();
-		mfParms[5] = getDescription();
-		mfParms[6] = getABRVersion();
-		rpt.insert(0, mfOut.format(mfParms));
-		println(rpt.toString()); // Output the Report
-		printDGSubmitString();
-		buildReportFooter();
-	}
-
-	/**
-	 * Postponed=> MB:TOTCARDSLOTS=Sum(PSL:SLOTS_TOTAL)
-	 * DD:TOTAVAILCARDSLOTS=Sum(PSLAVAIL:SLOTS_AVAIL)
-	 */
-	private void setTotalAvailableSlots(EntityItem eiDD)
-		throws
-    COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-    COM.ibm.eannounce.objects.EANBusinessRuleException {
-		try {
-			//Rules:
-			//If [entityType=VAR] or [If entityType=OF and OF.OFFERINGTYPE = SYSTEM(0080)]
-			//  If OF/VAR has 1 MB (OFMB, OFSBBMB, VARSBBMB) and 1+ PSL or SBB-PSL attached
-			/* Postponed
-			EntityGroup egMB = m_elist.getEntityGroup("MB");
-			EntityGroup egPSL = m_elist.getEntityGroup("PSL");
-			if (egMB.getEntityItemCount() == 0) {
-			    // missing MB error
-			}
-			else if (egMB.getEntityItemCount() > 1) {
-			    // too many MB error
-			}
-			else {
-			    EntityItem eiMB = egMB.getEntityItem(0);
-			    EANAttribute att = eiMB.getAttribute("TOTCARDSLOTS");
-			    int total = 0;
-			    if (att != null) {
-			        total = Integer.parseInt(att.get().toString());
-			    }
-			    Iterator itPSL = egPSL.getEntityItem().values().iterator();
-			    // For each OFPSL, OF-SBBPSL, VAR-SBBPSL relator:
-			    while (itPSL.hasNext()) {
-			        EntityItem eiPSL = (EntityItem) itPSL.next();
-			        EANAttribute attSLOTS_TOTAL = eiPSL.getAttribute("SLOTS_TOTAL");
-			        // MB.TOTCARDSLOTS = Sum(PSL.SLOTS_TOTAL)
-			        if (attSLOTS_TOTAL != null) {
-			            try {
-			                total = Integer.parseInt(attSLOTS_TOTAL.get().toString());
-			            }
-			            catch(NumberFormatException e) {
-			                // Number format error
-			            }
-			        }
-			        else {
-			            // not populated error message
-			        }
-			    }
-			    //  Else Log to Error Report (Identify error to be reported)
-			}
-			Postponed */
-
-			EntityGroup egPSLAVAIL = m_elist.getEntityGroup("PSLAVAIL"); //$NON-NLS-1$
-			// If OF/VAR has 0/1 DD (OFDD, VARDD) and 1+ PSLAVAIL attached
-			if (egPSLAVAIL.getEntityItemCount() > 0) {
-				// For each OFPSLAVAIL, VARPSLAVAIL relator:
-				int iSLOTS_AVAIL = 0;
-				Iterator itPSLAVAIL =
-					egPSLAVAIL.getEntityItem().values().iterator();
-				while (itPSLAVAIL.hasNext()) {
-					EntityItem eiPSLAVAIL = (EntityItem) itPSLAVAIL.next();
-					EANAttribute eaaSLOTS_AVAIL = eiPSLAVAIL.getAttribute("SLOTS_AVAIL"); //$NON-NLS-1$
-					//  DD.TOTAVAILCARDSLOTS = Sum(PSLAVAIL.SLOTS_AVAIL)
-					if (eaaSLOTS_AVAIL != null
-						&& eaaSLOTS_AVAIL instanceof EANTextAttribute) {
-						iSLOTS_AVAIL
-							+= Integer.parseInt(eaaSLOTS_AVAIL.get().toString());
-					}
-				}
-				// Assign sum to DD.TOTAVAILCARDSLOTS
-				setText(eiDD, "TOTAVAILCARDSLOTS", Integer.toString(iSLOTS_AVAIL)); //$NON-NLS-1$
-			} else {
-				//  Else Log to Error Report (Identify error to be reported)
-				// missing PSLAVAIL
-				// Feedback 53458:07A50B
-				//setReturnCode(FAIL);
-				//mfParms[0] = egPSLAVAIL.getLongDescription();
-				//mfOut = new MessageFormat(msgs.getString("MISSING_MSG"));
-				//rpt.append(mfOut.format(mfParms));
-			}
-			//
-			//Error Report:
-			//  Concatenate errors and produce Error Report in Entity Structure Report Format:
-			//OF+DD+MB+SBBMB+PSL+SBBPSL+PSLAVAIL
-			//-or-  VAR+DD+SBBMB+SBBPSL+PSLAVAIL
-			//Message: The system reported here is missing a Planar, Slots, or Slots Available element.  Please correct and re-run this business rule to validate your changes.
-			//  Mapping: RptCat:WWDERDATA, Fail, PR:BRANDCODE
-		} catch (Exception e) {
-			setReturnCode(FAIL);
-			mfOut = new MessageFormat(msgs.getString("Execption06")); //$NON-NLS-1$
-			mfParms[0] = e.getMessage();
-			rpt.append(mfOut.format(mfParms));
-		}
-	}
-
-	/**
-	 * Postponed=> PP:TOTBAYS=Sum(PBY:TOTAL_BAYS)
-	 * DD:TOTAVAILBAYS=Sum(PBYAVAIL:TOTAL_BAYS_AVAIL)
-	 */
-	private void setTotalAvailableBays(EntityItem eiDD)
-		throws
-    COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-    COM.ibm.eannounce.objects.EANBusinessRuleException {
-		try {
-			//Rules:
-			//If [entityType=VAR] or [If entityType=OF and OF.OFFERINGTYPE = SYSTEM(0080)]
-			//  If OF/VAR has 1 PP (OFPP, OFSBBPP, VARSBBPP) and 1+ PBY or SBB-PBY attached
-			//      For each OFPBY, OF-SBBPBY, VAR-SBBPBY relator:
-			//          PP.TOTBAYS = Sum(PBY.TOTAL_BAYS)
-			//  Else Log to Error Report (Identify error to be reported)
-			EntityGroup egPBYAVAIL = m_elist.getEntityGroup("PBYAVAIL"); //$NON-NLS-1$
-			//  If OF/VAR has 0/1 DD (OFDD, VARDD) and 1+ PBYAVAIL attached
-			if (egPBYAVAIL.getEntityItemCount() > 0) {
-				int iTOTAL_BAYS_AVAIL = 0;
-				// For each OFPBYAVAIL, VARPBYAVAIL relator:
-				Iterator itPBYAVAIL =
-					egPBYAVAIL.getEntityItem().values().iterator();
-				while (itPBYAVAIL.hasNext()) {
-					EntityItem eiPBYAVAIL = (EntityItem) itPBYAVAIL.next();
-					EANAttribute eaaTOTAL_BAYS_AVAIL = eiPBYAVAIL.getAttribute("TOTAL_BAYS_AVAIL"); //$NON-NLS-1$
-					if (eaaTOTAL_BAYS_AVAIL != null
-						&& eaaTOTAL_BAYS_AVAIL instanceof EANTextAttribute) {
-						// DD.TOTAVAILBAYS = Sum(PBYAVAIL.TOTAL_BAYS_AVAIL)
-						iTOTAL_BAYS_AVAIL
-							+= Integer.parseInt(
-								eaaTOTAL_BAYS_AVAIL.get().toString());
-					}
-				}
-				// Assign sum to DD:TOTAVAILBAYS
-				setText(eiDD, "TOTAVAILBAYS", Integer.toString(iTOTAL_BAYS_AVAIL)); //$NON-NLS-1$
-			} else {
-				//  Else Log to Error Report (Identify error to be reported)
-				// Missing PBYAVAIL
-				// Feedback 53458:07A50B
-				//setReturnCode(FAIL);
-				//mfParms[0] = egPBYAVAIL.getLongDescription();
-				//mfOut = new MessageFormat(msgs.getString("MISSING_MSG"));
-				//rpt.append(mfOut.format(mfParms));
-			}
-			//
-			//Error Report:
-			//  Concatenate errors and produce Error Report in Entity Structure Report Format:
-			//OF+DD+PP+SBBPP+PBY+SBBPBY+PBYAVAIL
-			//-or-  VAR+DD+SBBPP+SBBPBY+PBYAVAIL
-			//Message: The system reported here is missing a Mechanical Package, Bays, or Bays Available element.  Please correct and re-run this business rule to validate your changes.
-			//  Mapping: RptCat:WWDERDATA, Fail, PR:BRANDCODE
-		} catch (Exception e) {
-			setReturnCode(FAIL);
-			mfOut = new MessageFormat(msgs.getString("Execption05")); //$NON-NLS-1$
-			mfParms[0] = e.getMessage();
-			rpt.append(mfOut.format(mfParms));
-		}
-	}
-
-	/**
-	 * DD:MEMRAMSTD=MEM:MEMCAPACITY * (OFSBB:OFSBBQTY or VARSBB:VARSBBQTY)
-	 * DD:MEMRAMSTDUNITS=MEM:MEMCAPACITYUNITS
-	 */
-	private void setMemoryRAMStandard(EntityItem eiDD)
-		throws
-    COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-    COM.ibm.eannounce.objects.EANBusinessRuleException {
-		try {
-			//Rules:
-			//If [entityType=VAR] or [If entityType=OF and OF.OFFERINGTYPE = SYSTEM(0080)]
-			EntityGroup egMEM = m_elist.getEntityGroup("MEM"); //$NON-NLS-1$
-			//If OF/VAR has only 1 MEM attached through OFMEM, OF-SBBMEM, or VAR-SBBMEM
-			if (egMEM.getEntityItemCount() == 1) {
-				EntityItem eiMEM = egMEM.getEntityItem(0);
-				// DD.MEMRAMSTDUNITS = MEM.MEMCAPACITYUNITS
-				EANAttribute eaaMEMCAPACITY = eiMEM.getAttribute("MEMCAPACITY"); //$NON-NLS-1$
-				if (eaaMEMCAPACITY != null
-					&& eaaMEMCAPACITY instanceof EANTextAttribute) {
-					int iMEMCAPACITY =
-						Integer.parseInt(eaaMEMCAPACITY.get().toString());
-					String strMEMCAPACITY;
-					EANAttribute eaaMEMCAPACITYUNITS;
-					iMEMCAPACITY *= getSBBQTY(eiMEM);
-					// If related through VARSBB or OFSBB and VARSBBQTY or OFSBBQTY > 1
-					//      DD.MEMRAMSTD = (xx.xxSBBQTY) x (MEM.MEMCAPACITY)
-					// Else
-					//      DD.MEMRAMSTD = MEM.MEMCAPACITY
-					//If DD.MEMRAMSTD > 1000 and DD.MEMRAMSTDUNITS = ‘MB’
-					strMEMCAPACITY = Integer.toString(iMEMCAPACITY);
-					eaaMEMCAPACITYUNITS = eiMEM.getAttribute("MEMCAPACITYUNITS"); //$NON-NLS-1$
-					if (eaaMEMCAPACITYUNITS != null
-						&& eaaMEMCAPACITYUNITS instanceof EANFlagAttribute) {
-						EANFlagAttribute fa =
-							(EANFlagAttribute) eaaMEMCAPACITYUNITS;
-						String strMEMCAPACITYUNITS =
-							fa.getFirstActiveFlagCode();
-						String strDesc =
-							fa.getFlagLongDescription(strMEMCAPACITYUNITS);
-						if (iMEMCAPACITY > 1000 && strMEMCAPACITYUNITS.equals("0010")) { //$NON-NLS-1$
-							//  DD.MEMRAMSTD = DD.MEMRAMSTD/1000 (truncated to 1 decimal)
-							int point;
-							strMEMCAPACITY =
-								Double.toString(iMEMCAPACITY / 1000.0);
-							point = strMEMCAPACITY.indexOf('.');
-							if (point > 0) {
-								if (strMEMCAPACITY.charAt(point + 1) == '0') {
-									// Remove decimal point and trailing digits
-									strMEMCAPACITY =
-										strMEMCAPACITY.substring(0, point);
-								} else {
-									// Remove trailing digits after the tenths place.
-									strMEMCAPACITY =
-										strMEMCAPACITY.substring(0, point + 2);
-								}
-							}
-							//  DD.MEMRAMSTDUNITS = ‘GB’
-							setFlagByCode(eiDD, "MEMRAMSTDUNITS", "0040"); //$NON-NLS-2$  //$NON-NLS-1$
-						} else {
-							// DD.MEMRAMSTDUNITS = MEM.MEMCAPACITYUNITS
-							setFlagByDescription(eiDD, "MEMRAMSTDUNITS", strDesc); //$NON-NLS-1$
-						}
-					}
-					setText(eiDD, "MEMRAMSTD", strMEMCAPACITY); //$NON-NLS-1$
-				}
-				//Else Log Problems to Error Report
-			} else if (egMEM.getEntityItemCount() == 0) {
-				//If OF/VAR has 0 MEM attached through OFMEM, OF-SBBMEM, or VAR-SBBMEM
-				// Set DD.MEMRAMSTDUNITS = MB (0030)
-				setFlagByCode(eiDD, "MEMRAMSTDUNITS", "0030"); //$NON-NLS-2$  //$NON-NLS-1$
-				// Set DD.MEMRAMSTD = 0
-				setText(eiDD, "MEMRAMSTD", "0"); //$NON-NLS-2$  //$NON-NLS-1$
-				//Else Log Problems to Error Report
-			} else if (egMEM.getEntityItemCount() > 1) {
-				setMemoryStandardCR5701(eiDD, egMEM);
-				/* from here comment this out for CR5701
-				
-				            //If OF/VAR has >1 MEM attached through OFMEM, OF-SBBMEM, or VAR-SBBMEM
-				            // If all MEM.MEMCAPACITYUNITS are identical
-				            String strMEMCAPACITYUNITS = "";
-				            String strDesc = "";
-				            boolean identical = true; // Assume they are
-				            Iterator itMEM = egMEM.getEntityItem().values().iterator();
-				            // Get the string value of the first one
-				            EANAttribute eaaMEMCAPACITYUNITS = ((EntityItem) itMEM.next()).getAttribute("MEMCAPACITYUNITS");
-				            if (eaaMEMCAPACITYUNITS != null && eaaMEMCAPACITYUNITS instanceof EANFlagAttribute) {
-				                EANFlagAttribute fa = (EANFlagAttribute) eaaMEMCAPACITYUNITS;
-				                MetaFlag[] mfa = (MetaFlag[]) fa.get();
-				                for (int i = 0; i < mfa.length; i++) {
-				                    if (mfa[i].isSelected()) {
-				                        strMEMCAPACITYUNITS = mfa[i].getFlagCode();
-				                        strDesc = mfa[i].getLongDescription();
-				                    }
-				                }
-				            }
-				            else {
-				                identical = false;
-				            }
-				            // Test that the rest have the same value
-				            while (itMEM.hasNext()) {
-				                eaaMEMCAPACITYUNITS = ((EntityItem) itMEM.next()).getAttribute("MEMCAPACITYUNITS");
-				                if (eaaMEMCAPACITYUNITS != null && eaaMEMCAPACITYUNITS instanceof EANFlagAttribute) {
-				                    EANFlagAttribute fa = (EANFlagAttribute) eaaMEMCAPACITYUNITS;
-				                    if (!fa.isSelected(strMEMCAPACITYUNITS)) {
-				                        identical = false;
-				                    }
-				                }
-				                else {
-				                    identical = false;
-				                }
-				            }
-				            // at this point we have the last eaaMEMCAPACITYUNITS and they should all be itentical
-				            if (identical) {
-				                //      For each OFMEM, OF-SBBMEM, VAR-SBBMEM relator
-				                itMEM = egMEM.getEntityItem().values().iterator();
-				                int iMEMCAPACITY = 0;
-				                while (itMEM.hasNext()) {
-				                    EntityItem eiMEM = (EntityItem) itMEM.next();
-				                    EANAttribute eaaMEMCAPACITY = eiMEM.getAttribute("MEMCAPACITY");
-				                    int tmp = Integer.parseInt(eaaMEMCAPACITY.get().toString());
-				                    tmp *= getSBBQTY(eiMEM);
-				                    iMEMCAPACITY += tmp;
-				                    //  If any related thru VARSBB/OFSBB and VARSBBQTY/OFSBBQTY >1
-				                    //      DD.MEMRAMSTD = OF-MEM.MEMCAPACITY +
-				                    //      SBB-MEM.MEMCAPACITY (where QTY<=1) +
-				                    //      (xx.xxSBBQTY) x (MEM.MEMCAPACITY) where QTY>1
-				                    //  Else
-				                    //      DD.MEMRAMSTD = Sum(MEM.MEMCAPACITY)
-				                    //Else Log Problems to Error Report
-				                }
-				                String strMEMCAPACITY = Integer.toString(iMEMCAPACITY);
-				                //If DD.MEMRAMSTD > 1000 and DD.MEMRAMSTDUNITS = ‘MB’
-				                if (iMEMCAPACITY > 1000 && strMEMCAPACITYUNITS.equals("0010")) {
-				                    //  DD.MEMRAMSTD = DD.MEMRAMSTD/1000 (truncated to 1 decimal)
-				                    strMEMCAPACITY = Double.toString(iMEMCAPACITY / 1000.0);
-				                    int point = strMEMCAPACITY.indexOf('.');
-				                    if (point > 0) {
-				                        if (strMEMCAPACITY.charAt(point + 1) == '0') {
-				                            // Remove decimal point and trailing digits
-				                            strMEMCAPACITY = strMEMCAPACITY.substring(0, point);
-				                        }
-				                        else {
-				                            // Remove trailing digits after the tenths place.
-				                            strMEMCAPACITY = strMEMCAPACITY.substring(0, point + 2);
-				                        }
-				                    }
-				                    //  DD.MEMRAMSTDUNITS = ‘GB’
-				                    setFlagByCode(eiDD, "MEMRAMSTDUNITS", "0040");
-				                }
-				                else {
-				                    // DD.MEMRAMSTDUNITS = MEM.MEMCAPACITYUNITS
-				                    setFlagByDescription(eiDD, "MEMRAMSTDUNITS", strDesc);
-				                }
-				
-				                setText(eiDD, "MEMRAMSTD", strMEMCAPACITY);
-				            }
-				            else {
-				                setReturnCode(FAIL);
-				                mfOut = new MessageFormat(msgs.getString("MEM_CAP_ERR"));
-				                rpt.append(mfOut.format(mfParms));
-				            }
-				// to here.. comment this out for CR5701
-				*/
-				//Log any problems to Error Report
-			}
-			//
-			//Error Report:
-			//  Concatenate errors and produce Error Report in Entity Structure Report Format:
-			//OF+DD+MEM+SBBMEM
-			//-or-  VAR+DD+SBBMEM
-			//Message: This system has more than one memory element attached and the Memory Capacity Units do not match.  Please correct and re-run this business rule to validate your changes.
-			//  Mapping: RptCat:WWDERDATA, Fail, PR:BRANDCODE
-		} catch (Exception e) {
-			setReturnCode(FAIL);
-			mfOut = new MessageFormat(msgs.getString("Execption01")); //$NON-NLS-1$
-			mfParms[0] = e.getMessage();
-			rpt.append(mfOut.format(mfParms));
-		}
-	}
-
-	/** CR0702045701
-	 * Calculations must be able to add MEM.MEMCAPACITY with different MEM.MEMCAPACITYUNITS. There are three
-	 * MB values for MEMCAPACITY: 128, 256, 512. There is only one GB value for MEMCAPACITY: 1. MB values
-	 * can be added and then converted to GB values. Basic conversion (rounded to tenth decimal if necessary):
-	 *  1024MB = 1GB
-	 *  1152MB (1GB + 128MB) = 1.1GB
-	 *  1280MB (1GB + 256MB) = 1.2GB
-	 *  1536MB (1GB + 512MB) = 1.5GB
-	 *  2048MB = 2GB
-	 * Common examples:
-	 *  1GB + 1GB + 512MB + 512MB = 3GB
-	 *  512MB + 512MB = 1GB
-	 * Other factors to keep in mind:
-	 *  If total is 1024 or greater, MEMRAMSTD should be entered as GB value.
-	 *  If MEMRAMSTD is a whole number, do not include any decimal.
-	 *  Most often, MEMRAMSTD ends up as whole GB or with half (1.5, 2.5, 3.5, etc).
-    From Amy:
-	1. MEM.MEMCAPACITYUNITS can be kB, MB or GB Don't include kB in the calculations. Will never be used on a system unit.
-	2. DD.MEMRAMSTDUNITS doesn't have a kB value, only MB or GB kB will never be used on a system unit. It's an option-only data.
-	3. Some of our legacy data does not MEM capacity and units blank. If this MEM is used today, the DD Memory is set to 0MB
-	 */
-	private void setMemoryStandardCR5701(EntityItem eiDD, EntityGroup egMEM) {
-		//DD.MEMRAMSTDUNITS     0030 MB, 0040 GB
-		//MEM.MEMCAPACITYUNITS  0010 MB, 0020 kB, 0030 GB
-
-		String strMEMCAPACITYUNITS = ""; //$NON-NLS-1$
-		int iMEMCAPACITY = 0;
-		String strMEMCAPACITY = ""; //$NON-NLS-1$
-		try {
-			// get all capacity and calculate units
-			Iterator itMEM = egMEM.getEntityItem().values().iterator();
-			while (itMEM.hasNext()) {
-				EntityItem memItem = (EntityItem) itMEM.next();
-				// get units
-				String units = getAttributeFlagEnabledValue(memItem, "MEMCAPACITYUNITS"); //$NON-NLS-1$
-				EANAttribute capAttr;
-				int capacity;
-				int qty;
-				// if units not set
-				if (units == null) {
-					units = "0010"; //$NON-NLS-1$
-				} // def to MB
-				if (units.equals("0020")) // amy says can't get kb, but log and skip it!!  //$NON-NLS-1$
-                {
-					traceSb.append(memItem.getEntityType() + ":" + memItem.getEntityID() + " MEMCAPACITYUNITS is kB, so skipping\n"); //$NON-NLS-2$  //$NON-NLS-1$
-					continue;
-				}
-				// get capacity
-				capAttr = memItem.getAttribute("MEMCAPACITY"); //$NON-NLS-1$
-				if (capAttr == null) // like 0 so skip
-                {
-					traceSb.append(memItem.getEntityType() + ":" + memItem.getEntityID() + " MEMCAPACITY was not set\n"); //$NON-NLS-2$  //$NON-NLS-1$
-					continue;
-				}
-				capacity = Integer.parseInt(capAttr.get().toString());
-				qty = getSBBQTY(memItem);
-				//  If any related thru VARSBB/OFSBB and VARSBBQTY/OFSBBQTY >1
-				//      DD.MEMRAMSTD = OF-MEM.MEMCAPACITY +
-				//      SBB-MEM.MEMCAPACITY (where QTY<=1) +
-				//      (xx.xxSBBQTY) x (MEM.MEMCAPACITY) where QTY>1
-				//  Else
-				//      DD.MEMRAMSTD = Sum(MEM.MEMCAPACITY)
-
-				traceSb.append(memItem.getEntityType() + ":" + memItem.getEntityID() + " MEMCAPACITYUNITS = [" + units + "] " + //$NON-NLS-1$  //$NON-NLS-3$  //$NON-NLS-2$
-                    getAttributeValue(memItem.getEntityType(), memItem.getEntityID(), "MEMCAPACITYUNITS", "") + //$NON-NLS-2$  //$NON-NLS-1$
-                    " MEMCAPACITY: " + capacity + " SBBQTY: " + qty + "\n"); //$NON-NLS-3$  //$NON-NLS-2$  //$NON-NLS-1$
-				capacity *= qty;
-
-				if ("0030".equals(units)) { // is GB  //$NON-NLS-1$
-					capacity *= GB_VALUE;
-				}
-
-				iMEMCAPACITY += capacity; // accum all
-			}
-			traceSb.append("Total capacity " + iMEMCAPACITY + " (mb) \n"); //$NON-NLS-2$  //$NON-NLS-1$
-
-			if (iMEMCAPACITY < GB_VALUE) //
-            {
-				strMEMCAPACITYUNITS = "MB"; //$NON-NLS-1$
-				strMEMCAPACITY = "" + iMEMCAPACITY; //$NON-NLS-1$
-			} else {
-				float flMEMCAPACITY = ((float) iMEMCAPACITY) / GB_VALUE;
-				// go from MB to GB 1280mb to 1.280gb, 1024mb to 1.024gb
-				strMEMCAPACITYUNITS = "GB"; //$NON-NLS-1$
-				iMEMCAPACITY = (int) (flMEMCAPACITY * 10.0);
-				// drop trailing digits to 12gb, 10gb
-				if (iMEMCAPACITY % 10 == 0) // ends with 0
-                {
-					strMEMCAPACITY = "" + (iMEMCAPACITY / 10); // remove trailing 0, won't have decimal pt as int to 1gb  //$NON-NLS-1$
-				} else {
-					flMEMCAPACITY = iMEMCAPACITY / (float) 10.0;
-					// add decimal pt to 1.2gb
-					strMEMCAPACITY = Float.toString(flMEMCAPACITY);
-				}
-			}
-
-			traceSb.append("Setting MEMRAMSTD to " + strMEMCAPACITY + " and MEMRAMSTDUNITS to " + strMEMCAPACITYUNITS + "\n"); //$NON-NLS-3$  //$NON-NLS-2$  //$NON-NLS-1$
-
-			// DD.MEMRAMSTDUNITS = MEM.MEMCAPACITYUNITS
-			setFlagByDescription(eiDD, "MEMRAMSTDUNITS", strMEMCAPACITYUNITS); //$NON-NLS-1$
-			setText(eiDD, "MEMRAMSTD", strMEMCAPACITY); //$NON-NLS-1$
-		} catch (Exception e) {
-			setReturnCode(FAIL);
-			mfOut = new MessageFormat(msgs.getString("Execption01")); //$NON-NLS-1$
-			mfParms[0] = e.getMessage();
-			rpt.append(mfOut.format(mfParms));
-		}
-	}
-
-	/**
-	 * DD:TOT_L2_CACHE_STD=PRC:INTL2CACHESIZE*(OFSBB:OFSBBQTY or VARSBB:VARSBBQTY)
-	 * DD:TOTL2CACHESTDUNITS=PRC:INTL2CACHESIZEUNIT
-	 */
-	private void setTotalL2CacheStandard(EntityItem eiDD)
-		throws
-    COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-    COM.ibm.eannounce.objects.EANBusinessRuleException {
-		EANFlagAttribute fa;
-		BigDecimal tmp;
-		BigDecimal bdINTL2CACHESIZE;
-		MetaFlag[] mfa;
-		String strDesc = null;
-		try {
-			//Rules:
-			//If [entityType=VAR] or [If entityType=OF and OF.OFFERINGTYPE = SYSTEM(0080)]
-			EntityGroup egPRC = m_elist.getEntityGroup("PRC"); //$NON-NLS-1$
-			if (egPRC.getEntityItemCount() == 1) {
-				//  If OF/VAR has only 1 PRC attached through OFPRC, OF-SBBPRC, or VAR-SBBPRC
-				EntityItem eiPRC = egPRC.getEntityItem(0);
-				// DD.TOTL2CACHESTDUNITS = PRC.INTL2CACHESIZEUNIT
-				EANAttribute eaaINTL2CACHESIZE = eiPRC.getAttribute("INTL2CACHESIZE"); //$NON-NLS-1$
-				if (eaaINTL2CACHESIZE != null
-					&& eaaINTL2CACHESIZE instanceof EANFlagAttribute) {
-					fa = (EANFlagAttribute) eaaINTL2CACHESIZE;
-					strDesc =
-						fa.getFlagLongDescription(fa.getFirstActiveFlagCode());
-					bdINTL2CACHESIZE = new BigDecimal(strDesc);
-					EANAttribute eaaINTL2CACHESIZEUNIT;
-					bdINTL2CACHESIZE =
-						bdINTL2CACHESIZE.multiply(
-							new BigDecimal(getSBBQTY(eiPRC)));
-					//      If related through VARSBB or OFSBB and VARSBBQTY or OFSBBQTY > 1
-					//          DD. TOT_L2_CACHE_STD = (xx.xxSBBQTY) x (PRC.INTL2CACHESIZE)
-					//      Else
-					//          DD.TOT_L2_CACHE_STD = PRC.INTL2CACHESIZE
-					eaaINTL2CACHESIZEUNIT = eiPRC.getAttribute("INTL2CACHESIZEUNIT"); //$NON-NLS-1$
-					if (eaaINTL2CACHESIZEUNIT != null
-						&& eaaINTL2CACHESIZEUNIT instanceof EANFlagAttribute) {
-						EANFlagAttribute efaINTL2CACHESIZEUNIT =
-							(EANFlagAttribute) eaaINTL2CACHESIZEUNIT;
-						String strINTL2CACHESIZEUNIT =
-							efaINTL2CACHESIZEUNIT.getFirstActiveFlagCode();
-						//String strDesc = efaINTL2CACHESIZEUNIT.getFlagLongDescription(strINTL2CACHESIZEUNIT);
-						//If DD.TOT_L2_CACHE_STD > 1000 and DD.TOTL2CACHESTDUNITS = ‘KB’
-						if (bdINTL2CACHESIZE.compareTo(ONETHOUSAND) > 0 && strINTL2CACHESIZEUNIT.equals("0010")) { //$NON-NLS-1$
-							//  DD.TOT_L2_CACHE_STD = DD.TOT_L2_CACHE_STD /1000 (truncated to 1 decimal)
-							bdINTL2CACHESIZE =
-								bdINTL2CACHESIZE.divide(
-									ONETHOUSAND,
-									BigDecimal.ROUND_HALF_UP);
-							//  DD.TOTL2CACHESTDUNITS = ‘MB’
-							setFlagByCode(eiDD, "TOTL2CACHESTDUNITS", "0020"); //$NON-NLS-2$  //$NON-NLS-1$
-						} else {
-							// DD.TOTL2CACHESTDUNITS = PRC.INTL2CACHESIZEUNIT
-							setFlagByCode(eiDD, "TOTL2CACHESTDUNITS", strINTL2CACHESIZEUNIT); //$NON-NLS-1$
-						}
-					}
-					setFlagToClosestNumericalMatch(eiDD, "TOT_L2_CACHE_STD", bdINTL2CACHESIZE); //$NON-NLS-1$
-					//  Else Log Problems to Error Report
-				}
-			} else if (egPRC.getEntityItemCount() == 0) {
-				//  If OF/VAR has 0 MB attached through OFPRC, OF-SBBPRC, or VAR-SBBPRC
-				//      Set DD.TOTL2CACHESTDUNITS= KB (0010)
-				setFlagByCode(eiDD, "TOTL2CACHESTDUNITS", "0010"); //$NON-NLS-2$  //$NON-NLS-1$
-				//      Set DD.TOT_L2_CACHE_STD = 0
-				setFlagByCode(eiDD, "TOT_L2_CACHE_STD", "0010"); //$NON-NLS-2$  //$NON-NLS-1$
-				//  Else Log Problems to Error Report
-			} else if (egPRC.getEntityItemCount() > 1) {
-				//  If OF/VAR/SBB has >1 PRC attached through OFPRC, OF-SBBPRC, or VAR-SBBPRC
-				//      For each OFPRC, OF-SBBPRC, VAR-SBBPRC relator:
-				//      If all PRC.INTL2CACHESIZEUNIT are identical
-				String strINTL2CACHESIZEUNIT = ""; //$NON-NLS-1$
-				boolean identical = true; // Assume they are
-				Iterator itPRC = egPRC.getEntityItem().values().iterator();
-				// Get the string value of the first one
-				EANAttribute eaaINTL2CACHESIZEUNIT = ((EntityItem) itPRC.next()).getAttribute("INTL2CACHESIZEUNIT"); //$NON-NLS-1$
-				if (eaaINTL2CACHESIZEUNIT != null
-					&& eaaINTL2CACHESIZEUNIT instanceof EANFlagAttribute) {
-					fa =
-						(EANFlagAttribute) eaaINTL2CACHESIZEUNIT;
-					mfa = (MetaFlag[]) fa.get();
-					for (int i = 0; i < mfa.length; i++) {
-						if (mfa[i].isSelected()) {
-							strINTL2CACHESIZEUNIT = mfa[i].getFlagCode();
-						}
-					}
-				} else {
-					identical = false;
-				}
-				// Test that the rest have the same value
-				while (itPRC.hasNext()) {
-					eaaINTL2CACHESIZEUNIT = ((EntityItem) itPRC.next()).getAttribute("INTL2CACHESIZEUNIT"); //$NON-NLS-1$
-					if (eaaINTL2CACHESIZEUNIT != null
-						&& eaaINTL2CACHESIZEUNIT instanceof EANFlagAttribute) {
-						fa =
-							(EANFlagAttribute) eaaINTL2CACHESIZEUNIT;
-						if (!fa.isSelected(strINTL2CACHESIZEUNIT)) {
-							identical = false;
-						}
-					} else {
-						identical = false;
-					}
-				}
-				// at this point we have the last eaaINTL2CACHESIZEUNIT and they should all be itentical
-				if (identical) {
-					// DD.TOTL2CACHESTDUNITS = PRC.INTL2CACHESIZEUNIT
-					bdINTL2CACHESIZE = new BigDecimal("0"); //$NON-NLS-1$
-					itPRC = egPRC.getEntityItem().values().iterator();
-					while (itPRC.hasNext()) {
-						EntityItem eiPRC = (EntityItem) itPRC.next();
-						EANAttribute eaaINTL2CACHESIZE = eiPRC.getAttribute("INTL2CACHESIZE"); //$NON-NLS-1$
-						if (eaaINTL2CACHESIZE != null
-							&& eaaINTL2CACHESIZE instanceof EANFlagAttribute) {
-							logMessage("eaaINTL2CACHESIZE: " + eaaINTL2CACHESIZE); //$NON-NLS-1$
-							fa =
-								(EANFlagAttribute) eaaINTL2CACHESIZE;
-							logMessage("fa: " + fa); //$NON-NLS-1$
-							tmp =
-								new BigDecimal(
-									fa.getFlagLongDescription(
-										fa.getFirstActiveFlagCode()));
-							tmp.multiply(new BigDecimal(getSBBQTY(eiPRC)));
-							logMessage("tmp: " + tmp); //$NON-NLS-1$
-							bdINTL2CACHESIZE = bdINTL2CACHESIZE.add(tmp);
-							logMessage("bdINTL2CACHESIZE: " + bdINTL2CACHESIZE); //$NON-NLS-1$
-							// If any related thru VARSBB/OFSBB and VARSBBQTY/OFSBBQTY >1
-							//      DD.TOT_L2_CACHE_STD = OF-PRC.INTL2CACHESIZE +
-							//      SBB- PRC.INTL2CACHESIZE (where QTY<=1) +
-							//      (xx.xxSBBQTY) x (PRC.INTL2CACHESIZE) where QTY>1
-							// Else
-							//      DD.TOT_L2_CACHE_STD = Sum(PRC.INTL2CACHESIZE)
-							// Else Log Problems to Error Report
-						}
-					}
-					//If DD.TOT_L2_CACHE_STD > 1000 and DD.TOTL2CACHESTDUNITS = ‘KB’
-					if (bdINTL2CACHESIZE.compareTo(ONETHOUSAND) > 0 && strINTL2CACHESIZEUNIT.equals("0010")) { //$NON-NLS-1$
-						//  DD.TOT_L2_CACHE_STD = DD.TOT_L2_CACHE_STD /1000 (truncated to 1 decimal)
-						bdINTL2CACHESIZE =
-							bdINTL2CACHESIZE.divide(
-								ONETHOUSAND,
-								BigDecimal.ROUND_HALF_UP);
-						//  DD.TOTL2CACHESTDUNITS = ‘MB’
-						setFlagByCode(eiDD, "TOTL2CACHESTDUNITS", "0020"); //$NON-NLS-2$  //$NON-NLS-1$
-					} else {
-						// DD.TOTL2CACHESTDUNITS = PRC.INTL2CACHESIZEUNIT
-						setFlagByCode(eiDD, "TOTL2CACHESTDUNITS", strINTL2CACHESIZEUNIT); //$NON-NLS-1$
-					}
-					setFlagToClosestNumericalMatch(eiDD, "TOT_L2_CACHE_STD", bdINTL2CACHESIZE); //$NON-NLS-1$
-				} else {
-					//Log any problems to Error Report
-					setReturnCode(FAIL);
-					mfOut = new MessageFormat(msgs.getString("L2_UNIT_ERR")); //$NON-NLS-1$
-					rpt.append(mfOut.format(mfParms));
-				}
-			}
-			//
-			//
-			//Error Report
-			//  Concatenate errors and produce Error Report in Entity Structure Report Format:
-			//OF+DD+PRC+SBBPRC
-			//-or-  VAR+DD+SBBPRC
-			//Message: This system has more than one processor element attached and the Internal L2 Cache Units on these processors do not match.  Please correct and re-run this business rule to validate your changes.
-			//  Mapping: RptCat:WWDERDATA, Fail, PR:BRANDCODE
-		} catch (Exception e) {
-			logMessage("Exception e" + e); //$NON-NLS-1$
-			setReturnCode(FAIL);
-			mfOut = new MessageFormat(msgs.getString("Execption07")); //$NON-NLS-1$
-			logMessage("mfOut" + mfOut); //$NON-NLS-1$
-			mfParms[0] = e.getMessage();
-			logMessage("mfParms[0]" + mfParms[0]); //$NON-NLS-1$
-			rpt.append(mfOut.format(mfParms));
-		}
-	}
-
-	/**
-	 * Postponed DD:RAMSLOTSAVAIL=MB:RAMSLOTSTOT + (OFSBB:OFSBBQTY or VARSBB:VARSBBQTY)
-	private void setRAMSocketsAvailable(EntityItem eiDD)
-	throws
-	    COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-	    COM.ibm.eannounce.objects.EANBusinessRuleException
-	{
-	    try {
-	    //Rules:
-	    //If [entityType=VAR] or [If entityType=OF and OF.OFFERINGTYPE = SYSTEM(0080)]
-	    //  If OF/VAR/SBB has >1 MEM attached through OFMEM, OF-SBBMEM, or VAR-SBBMEM
-	    //      For each OFMEM, OF-SBBMEM, VAR-SBBMEM relator:
-	    int iRAMSLOTSAVAIL = m_elist.getEntityGroup("OFMEM").getEntityItemCount();
-	    EntityGroup egSBBMEM = m_elist.getEntityGroup("SBBMEM");
-	    Iterator itSBBMEM = egSBBMEM.getEntityItem().values().iterator();
-	    while (itSBBMEM.hasNext()) {
-	        EntityItem eiSBBMEM = (EntityItem) itSBBMEM.next();
-	        EntityItem eiMEM = (EntityItem) eiSBBMEM.getDownLink(0);
-	        iRAMSLOTSAVAIL += getSBBQTY(eiMEM);
-	        // If any related thru VARSBB/OFSBB and VARSBBQTY/OFSBBQTY >1
-	        //      DD.RAMSLOTSAVAIL = Count(OFMEM) +
-	        //      Count(SBBMEM) (where QTY<=1) +
-	        //      (xxMEM.xxSBBQTY) where QTY>1
-	        // Else
-	        //      DD.RAMSLOTSAVAIL = Count(OFMEM) + Count(SBBMEM)
-	        // Else Log Problems to Error Report
-	    }
-	    //  If DD.RAMSLOTSAVAIL calculation > MB.RAMSLOTSTOT
-	    EntityGroup egMB = m_elist.getEntityGroup("MB");
-	    if (egMB.getEntityItemCount() == 1) {
-	        EntityItem eiMB = egMB.getEntityItem(0);
-	        EANAttribute eaaRAMSLOTSTOT = eiMB.getAttribute("RAMSLOTSTOT");
-	        if (eaaRAMSLOTSTOT != null && eaaRAMSLOTSTOT instanceof EANFlagAttribute) {
-	            EANFlagAttribute fa = (EANFlagAttribute) eaaRAMSLOTSTOT;
-	            // grab leading digits from selected flag
-	            String strDesc = fa.getFlagLongDescription(fa.getFirstActiveFlagCode());
-	            int iLen = strDesc.length();
-	            int i = 0;
-	            while (i < iLen && Character.isDigit(strDesc.charAt(i))) {
-	                i++;
-	            }
-	            if (i == iLen) {
-	                i = Integer.parseInt(strDesc);
-	            }
-	            else {
-	                i = Integer.parseInt(strDesc.substring(0,i));
-	            }
-	            if (iRAMSLOTSAVAIL > i) {
-	                // Do not write value, Present Error to User
-	                setReturnCode(FAIL);
-	                mfOut = new MessageFormat(msgs.getString("MB_MEM_ERR"));
-	                rpt.append(mfOut.format(mfParms));
-	            }
-	            else {
-	                setFlagByDescription(eiDD, "RAMSLOTSAVAIL", fa.getFlagLongDescription(fa.getFirstActiveFlagCode()));
-	            }
-	        }
-	    }
-	    //
-	    //Error Report
-	    //  Concatenate errors and produce Error Report in Entity Structure Report Format:
-	    //OF+DD+MB+SBBMB+MEM+SBBMEM
-	    //-or-  VAR+DD+SBBMB+SBBMEM
-	    //Message: The total number of memory elements attached through to the Offering, Variant, and SBB exceeds the Total RAM Sockets allowed for this system (as defined on the planar).  Please correct and re-run this business rule to validate your changes.
-	    //  Mapping: RptCat:WWDERDATA, Fail, PR:BRANDCODE
-	    }
-	    catch (Exception e) {
-	        setReturnCode(FAIL);
-	        mfOut = new MessageFormat(msgs.getString("Execption04"));
-	        mfParms[0] = e.getMessage();
-	        rpt.append(mfOut.format(mfParms));
-	    }
-	}
-	 */
-
-	/**
-	 * DD:NUMPROCSTD=MB:NUMPROCMAX (OFSBB:OFSBBQTY or VARSBB:VARSBBQTY)
-	 */
-	private void setNumberOfProcessorsStandard(EntityItem eiDD)
-		throws
-    COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-    COM.ibm.eannounce.objects.EANBusinessRuleException {
-		try {
-			//Rules:
-			//If [entityType=VAR] or [If entityType=OF and OF.OFFERINGTYPE = SYSTEM(0080)]
-			//  If OF/VAR/SBB has >1 PRC attached through OFPRC, OF-SBBPRC, or VAR-SBBPRC
-			//      For each OFPRC, OF-SBBPRC, VAR-SBBPRC relator:
-			int iNUMPROCSTD = 0;
-			EntityGroup egPRC = m_elist.getEntityGroup("PRC"); //$NON-NLS-1$
-			Iterator itPRC;
-			EntityGroup egMB;
-			// CR0702045701 If there is not a PRC, populate NUMPROCSTD with 0 (zero).
-			if (egPRC.getEntityItemCount() == 0) {
-				setText(eiDD, "NUMPROCSTD", Integer.toString(iNUMPROCSTD)); //$NON-NLS-1$
-				return; // nothing else to check, no PRC
-			}
-			itPRC = egPRC.getEntityItem().values().iterator();
-			while (itPRC.hasNext()) {
-				EntityItem eiPRC = (EntityItem) itPRC.next();
-				// If any related thru VARSBB/OFSBB and VARSBBQTY/OFSBBQTY >1
-				//      DD.NUMPROCSTD = Count(OFPRC) +
-				//      Count(SBBPRC) (where QTY<=1) +
-				//      (xxPRC.xxSBBQTY) where QTY>1
-				//  Else
-				//      DD.NUMPROCSTD = Count(OFPRC) + Count(SBBPRC)
-				iNUMPROCSTD += getSBBQTY(eiPRC);
-				//Else Log Problems to Error Report
-			}
-			//  If DD.NUMPROCSTD calculation > MB.NUMPROCMAX
-			egMB = m_elist.getEntityGroup("MB"); //$NON-NLS-1$
-			if (egMB.getEntityItemCount() == 1) {
-				EntityItem eiMB = egMB.getEntityItem(0);
-				EANAttribute eaaNUMPROCMAX = eiMB.getAttribute("NUMPROCMAX"); //$NON-NLS-1$
-				int iNUMPROCMAX = 1; // assume 1 per feedback 53508:6585EE
-				if (eaaNUMPROCMAX != null
-					&& eaaNUMPROCMAX instanceof EANTextAttribute) {
-					iNUMPROCMAX =
-						Integer.parseInt(eaaNUMPROCMAX.get().toString());
-				}
-				if (iNUMPROCSTD > iNUMPROCMAX) {
-					// Do not write value, Present Error to User
-					setReturnCode(FAIL);
-					mfOut = new MessageFormat(msgs.getString("MAX_PRC_ERR")); //$NON-NLS-1$
-					rpt.append(mfOut.format(mfParms));
-				} else {
-					setText(eiDD, "NUMPROCSTD", Integer.toString(iNUMPROCSTD)); //$NON-NLS-1$
-				}
-			} else {
-				setReturnCode(FAIL);
-				mfParms[0] = egMB.getLongDescription();
-				if (egMB.getEntityItemCount() == 0) {
-					mfOut = new MessageFormat(msgs.getString("MISSING_MSG")); //$NON-NLS-1$
-				} else {
-					mfOut = new MessageFormat(msgs.getString("TOO_MANY_MSG")); //$NON-NLS-1$
-				}
-				rpt.append(mfOut.format(mfParms));
-			}
-			//
-			//Error Report
-			//  Concatenate errors and produce Error Report in Entity Structure Report Format:
-			//OF+DD+MB+SBBMB+PRC+SBBPRC
-			//-or-  VAR+DD+SBBMB+SBBPRC
-			//Message: The total number of processor elements attached through to the Offering, Variant, and SBB exceeds the Maximum Number of Processors allowed for this system (as defined on the planar).  Please correct and re-run this business rule to validate your changes.
-			//  Mapping: RptCat:WWDERDATA, Fail, PR:BRANDCODE
-		} catch (Exception e) {
-			setReturnCode(FAIL);
-			mfOut = new MessageFormat(msgs.getString("Execption03")); //$NON-NLS-1$
-			mfParms[0] = e.getMessage();
-			rpt.append(mfOut.format(mfParms));
-		}
-	}
-
-	/**
-	 * DD:NUMINSTHD=HD:HDDCAPACITY (OFSBB:OFSBBQTY or VARSBB:VARSBBQTY)
-	 */
-	private void setNumberOfInstalledHardDrives(EntityItem eiDD)
-		throws
-    COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-    COM.ibm.eannounce.objects.EANBusinessRuleException {
-		try {
-			//Rules:
-			//If [entityType=VAR] or [If entityType=OF and OF.OFFERINGTYPE = SYSTEM(0080)]
-			//	If OF/VAR/SBB has >1 HD attached through OFHD, OF-SBBHD, or VAR-SBBHD
-			//	For each OFHD, OF-SBBHD, VAR-SBBHD relator:
-			//		If no related HD.HDDCAPACITY > 0 then
-			//			DD.NUMINSTHD = 0       Note: zero “0” is a valid count
-			//		If 1+ related HD.HDDCAPACITY > 0 then
-			//			If any related thru VARSBB/OFSBB and VARSBBQTY/OFSBBQTY >1
-			//				DD.NUMINSTHD = Count(OFHD) +
-			//				Count(SBBHD) (where QTY<=1) +
-			//				(xxHD.xxSBBQTY) where QTY>1
-			//			Else
-			//				DD.NUMINSTHD = Count(OFHD) + Count(SBBHD)
-			int iNUMINSTHD = 0;
-			EntityGroup egHD = m_elist.getEntityGroup("HD"); //$NON-NLS-1$
-			//EntityGroup egSBBHD;
-			Iterator itHD;
-			// Only look at HD (MN25744163)
-			//if (egOFHD != null) {
-			//	Iterator itOFHD = egOFHD.getEntityItem().values().iterator();
-			//	while (itOFHD.hasNext()) {
-			//		EntityItem eiOFHD = (EntityItem) itOFHD.next();
-			//		EntityItem eiHD = (EntityItem) eiOFHD.getDownLink(0);
-			//		EANAttribute eaaHDDCAPACITY = eiHD.getAttribute("HDDCAPACITY");  //$NON-NLS-1$
-			//		if (eaaHDDCAPACITY != null && eaaHDDCAPACITY instanceof EANTextAttribute) {
-			//			if (Double.parseDouble(eaaHDDCAPACITY.get().toString()) > 0) {
-			//				iNUMINSTHD++;
-			//			}
-			//		}
-			//	}
-			//}
-			//egSBBHD = m_elist.getEntityGroup("SBBHD");  //$NON-NLS-1$
-			itHD = egHD.getEntityItem().values().iterator();
-			while (itHD.hasNext()) {
-				EntityItem eiHD = (EntityItem) itHD.next();
-				//EntityItem eiHD = (EntityItem) eiSBBHD.getDownLink(0);
-				EANAttribute eaaHDDCAPACITY = eiHD.getAttribute("HDDCAPACITY"); //$NON-NLS-1$
-				if (eaaHDDCAPACITY != null
-					&& eaaHDDCAPACITY instanceof EANTextAttribute) {
-					if (Double.parseDouble(eaaHDDCAPACITY.get().toString())
-						> 0) {
-						iNUMINSTHD += getSBBQTY(eiHD);
-					}
-				}
-			}
-
-			// CR0702045701 If there is not a HD, populate NUMINSTHD with 0 (zero).
-			//if (m_elist.getEntityGroup("HD").getEntityItemCount() > 0) {
-			if (!setText(eiDD, "NUMINSTHD", Integer.toString(iNUMINSTHD))) { //$NON-NLS-1$
-				setReturnCode(FAIL);
-				mfOut = new MessageFormat(msgs.getString("HD_ERR")); //$NON-NLS-1$
-				rpt.append(mfOut.format(mfParms));
-			}
-			//}
-			//Else Log Problems to Error Report
-			//
-			//Error Report
-			//  Concatenate errors and produce Error Report in Entity Structure Report Format:
-			//OF+DD+HD+SBBHD
-			//-or-  VAR+DD+SBBHD
-			//Message: There was an error calculating the total number of installed hard drives.  Please validate the Hard Drive elements attached to the OF or SBB and re-run this business rule to validate your changes.
-			//  Mapping: RptCat:WWDERDATA, Fail, PR:BRANDCODE
-		} catch (Exception e) {
-			setReturnCode(FAIL);
-			mfOut = new MessageFormat(msgs.getString("Execption02")); //$NON-NLS-1$
-			mfParms[0] = e.getMessage();
-			rpt.append(mfOut.format(mfParms));
-		}
-	}
-
-	/**
-	 * Implements CR0514046924
-	 * DD.WEIGHT_METRIC = Sum(SBB.WEIGHT_METRIC_SBB * (OFSBB:OFSBBQTY or VARSBB:VARSBBQTY))
-	 * DD.WEIGHT_METRICUNITS = SBB.WEIGHT_METRICUNITS_SBB (all units must match)
-	 * DD.WEIGHT_US = Sum(SBB.WEIGHT_US_SBB * (OFSBB:OFSBBQTY or VARSBB:VARSBBQTY))
-	 * DD.WEIGHT_USUNITS = SBB.WEIGHT_USUNITS_SBB (all units must match)
-	 */
-	private void setWeight(EntityItem eiDD)
-		throws
-    COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-    COM.ibm.eannounce.objects.EANBusinessRuleException {
-		//Source attributes:
-		//SBB.WEIGHT_METRIC_SBB
-		//SBB.WEIGHT_METRICUNITS_SBB
-		//SBB.WEIGHT_US_SBB
-		//SBB.WEIGHT_USUNITS_SBB
-
-		//New DD weight attributes should be based on the SBB linked to the VAR or OF.
-		//Not all SBBs will have a weight populated.
-		BigDecimal weightMetric = new BigDecimal("0"); //$NON-NLS-1$
-		BigDecimal weightUS = new BigDecimal("0"); //$NON-NLS-1$
-		String unitsMetric = null;
-		String unitsUS = null;
-		boolean error = false;
-		Iterator itSBB = m_elist.getEntityGroup("SBB").getEntityItem().values().iterator(); //$NON-NLS-1$
-		if (!itSBB.hasNext()) {
-			mfOut = new MessageFormat(msgs.getString("NO_SBB")); //$NON-NLS-1$
-			rpt.append(mfOut.format(mfParms));
-		} else {
-			while (itSBB.hasNext()) {
-				EntityItem eiSBB = (EntityItem) itSBB.next();
-				EANAttribute attWEIGHT_METRIC_SBB = eiSBB.getAttribute("WEIGHT_METRIC_SBB"); //$NON-NLS-1$
-				EANAttribute attWEIGHT_METUNITS_SBB = eiSBB.getAttribute("WEIGHT_METUNITS_SBB"); //$NON-NLS-1$
-				EANAttribute attWEIGHT_US_SBB = eiSBB.getAttribute("WEIGHT_US_SBB"); //$NON-NLS-1$
-				EANAttribute attWEIGHT_USUNITS_SBB = eiSBB.getAttribute("WEIGHT_USUNITS_SBB"); //$NON-NLS-1$
-				// Get the SBB quantity from the relator to the root entity type
-				EntityItem eiXXXSBB = (EntityItem) eiSBB.getUpLink(0);
-				// VARSBB or OFSBB
-				EANAttribute eaaSBBQTY = eiXXXSBB.getAttribute(getRootEntityType() + "SBBQTY"); //$NON-NLS-1$
-				BigDecimal qty = new BigDecimal("1"); //$NON-NLS-1$
-				if (eaaSBBQTY != null
-					&& eaaSBBQTY instanceof EANTextAttribute) {
-					qty = new BigDecimal(eaaSBBQTY.get().toString());
-				}
-				// null weight values are assumed to be 0
-				if (attWEIGHT_METUNITS_SBB != null
-					&& attWEIGHT_USUNITS_SBB != null) {
-					String unitsMetricTMP = null;
-					String unitsUSTMP = null;
-					if (attWEIGHT_METUNITS_SBB instanceof EANFlagAttribute) {
-						unitsMetricTMP =
-							((EANFlagAttribute) attWEIGHT_METUNITS_SBB)
-                        .getFirstActiveFlagCode();
-					}
-					if (attWEIGHT_USUNITS_SBB instanceof EANFlagAttribute) {
-						unitsUSTMP =
-							((EANFlagAttribute) attWEIGHT_USUNITS_SBB)
-						.getFirstActiveFlagCode();
-					}
-					if (unitsMetric == null) {
-						// Initialize metric an US units
-						unitsMetric = unitsMetricTMP;
-						unitsUS = unitsUSTMP;
-					}
-					// check metric units against the initial metric units (all must match)
-					if (unitsMetric.equals(unitsMetricTMP)) {
-						if (attWEIGHT_METRIC_SBB != null) {
-							weightMetric =
-								weightMetric.add(
-									(
-										new BigDecimal(
-											attWEIGHT_METRIC_SBB
-                                        .toString()))
-                                .multiply(
-										qty));
-						}
-					} else {
-						error = true;
-						mfParms[0] =
-							eiSBB.getEntityGroup().getLongDescription();
-						mfParms[1] = eiSBB.getEntityGroup().getMetaAttribute("WEIGHT_METUNITS_SBB").getLongDescription(); //$NON-NLS-1$
-						mfOut = new MessageFormat(msgs.getString("UNITS_MISMATCH_ERR")); //$NON-NLS-1$
-						rpt.append(mfOut.format(mfParms));
-					}
-					// check US units against the initial US units (all must match)
-					if (unitsUS.equals(unitsUSTMP)) {
-						if (attWEIGHT_US_SBB != null) {
-							weightUS =
-								weightUS.add(
-									(
-										new BigDecimal(
-											attWEIGHT_US_SBB
-                                        .toString()))
-                                .multiply(
-										qty));
-						}
-					} else {
-						error = true;
-						mfParms[0] =
-							eiSBB.getEntityGroup().getLongDescription();
-						mfParms[1] = eiSBB.getEntityGroup().getMetaAttribute("WEIGHT_USUNITS_SBB").getLongDescription(); //$NON-NLS-1$
-						mfOut = new MessageFormat(msgs.getString("UNITS_MISMATCH_ERR")); //$NON-NLS-1$
-						rpt.append(mfOut.format(mfParms));
-					}
-				} else if (
-					attWEIGHT_METUNITS_SBB == null
-                    && attWEIGHT_USUNITS_SBB == null
-					&& attWEIGHT_METRIC_SBB == null
-					&& attWEIGHT_US_SBB == null) {
-					// nothing is ok
-				} else {
-					error = true;
-					mfParms[0] = eiSBB.getEntityGroup().getLongDescription();
-					mfOut = new MessageFormat(msgs.getString("UNITS_POP_ERR")); //$NON-NLS-1$
-					rpt.append(mfOut.format(mfParms));
-				}
-			}
-
-			if (!error) {
-				if (unitsMetric != null) {
-					// It's possible none of the ABB entities has populated weight attributes
-					//Destination attributes:
-					//DD.WEIGHT_US
-					String usSum = weightUS.toString();
-					//DD.WEIGHT_METRIC
-					String metricSum = weightMetric.toString();
-					if (metricSum.indexOf('.') < 0) {
-						metricSum += ".0";
-					} //$NON-NLS-1$
-					setText(eiDD, "WEIGHT_METRIC", metricSum); //$NON-NLS-1$
-					//DD.WEIGHT_METRICUNITS
-					setFlagByCode(eiDD, "WEIGHT_METRICUNITS", unitsMetric); //$NON-NLS-1$
-					if (usSum.indexOf('.') < 0) {
-						usSum += ".0";
-					}
-					setText(eiDD, "WEIGHT_US", usSum); //$NON-NLS-1$
-					//DD.WEIGHT_USUNITS
-					setFlagByCode(eiDD, "WEIGHT_USUNITS", unitsUS); //$NON-NLS-1$
-				} else {
-					mfOut = new MessageFormat(msgs.getString("NO_DATA")); //$NON-NLS-1$
-					rpt.append(mfOut.format(mfParms));
-				}
-			} else {
-				setReturnCode(FAIL);
-			}
-		}
-
-		//Rules:
-		//1. Only applies to entityType VAR and OF when OF.OFFERINGTYPE = SYSTEM(0080)
-		//2. Workflow should add the weight values on the SBBs linked to the OF or VAR to populate the cooresponding DD attribute.
-		//3. A blank SBB weight attribute should be treated as a zero value.
-		//4. If there are no SBBs linked to an OF, the workflow would not calculate any value, leaving the fields blank in the DD element.
-		//5. If a calculated DD weight is a whole number, value should be entered with a decimal to the tenth (x.0).
-		//6. The units attributes are not a summary, but should be based on the SBB units. Ex. DD.WEIGHT_USUNITS = SBB.WEIGHT_USUNITS_SBB
-
-		//Things that would generate an error:
-		//1. For the unit attributes, if SBBs have different unit attributes - this would be an error and no data would be populated. Ex. on VAR, there are 2 SBBs. SBB1 has WEIGHT_USUNITS_SBB = "lbs". SBB2 has WEIGHT_USUNITS_SBB = "Lbs" - this would be an error.
-		//2. If SBB metric attributes are populated but the US attributes are not. And if the SBB US attributes are populated but the metric attributes are not.
-	}
-
-	private boolean setText(EntityItem ei, String attributeCode, String value)
-		throws
-    COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-    COM.ibm.eannounce.objects.EANBusinessRuleException {
-		boolean set = false;
-		EANMetaAttribute mAttr =
-			ei.getEntityGroup().getMetaAttribute(attributeCode);
-		if (mAttr != null && mAttr instanceof MetaTextAttribute) {
-			EANTextAttribute tAttr =
-				new TextAttribute(ei, m_prof, (MetaTextAttribute) mAttr);
-			tAttr.put(value);
-			ei.putAttribute(tAttr);
-			set = true;
-			mfParms[0] = mAttr.getLongDescription();
-			mfParms[1] = value;
-			mfOut = new MessageFormat(msgs.getString("SET_MSG")); //$NON-NLS-1$
-			rpt.append(mfOut.format(mfParms));
-		} else {
-			setReturnCode(FAIL);
-			mfParms[0] = attributeCode;
-			if (mAttr == null) {
-				mfOut = new MessageFormat(msgs.getString("CODE_ERR")); //$NON-NLS-1$
-				mfParms[1] = ei.getLongDescription();
-			} else {
-				mfOut = new MessageFormat(msgs.getString("TEXT_ERR")); //$NON-NLS-1$
-			}
-			rpt.append(mfOut.format(mfParms));
-		}
-		return set;
-	}
-
-	/**
-	 * Find the Flag Code whose long description is lessthan or equal to desiredValue
-	 * @param ei
-	 * @param attributeCode
-	 * @param desiredValue
-	 * @return
-	 * @throws COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-	 * @throws COM.ibm.eannounce.objects.EANBusinessRuleException
-	 */
-	private boolean setFlagToClosestNumericalMatch(
-		EntityItem ei,
-		String attributeCode,
-		BigDecimal desiredValue)
-		throws
-    COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-    COM.ibm.eannounce.objects.EANBusinessRuleException {
-		SortedMap possibleMatches = new TreeMap();
-		EANMetaAttribute mAttr =
-			ei.getEntityGroup().getMetaAttribute(attributeCode);
-		if (mAttr != null && mAttr instanceof MetaSingleFlagAttribute) {
-			EANFlagAttribute efa =
-				new SingleFlagAttribute(
-					ei,
-					m_prof,
-					(MetaSingleFlagAttribute) mAttr);
-			MetaFlag[] mfa = (MetaFlag[]) efa.get();
-			MetaFlag match;
-			for (int i = 0; i < mfa.length; i++) {
-				possibleMatches.put(
-					new BigDecimal(mfa[i].getLongDescription()),
-					mfa[i]);
-			}
-			match = (MetaFlag) possibleMatches.get(desiredValue);
-			if (match == null) {
-				// no exact match
-				// If we put the desired value in with the others in sorted order
-				// The one before it will be the closest match
-				ArrayList al;
-				int index;
-				possibleMatches.put(desiredValue, desiredValue);
-				// get the values as an array
-				al = new ArrayList(possibleMatches.keySet());
-				// index of the desired value minus 1 is the closest match
-				index = al.indexOf(desiredValue) - 1;
-				if (index < 0) {
-					setReturnCode(FAIL);
-					mfOut = new MessageFormat(msgs.getString("VALUE_ERR")); //$NON-NLS-1$
-					mfParms[0] = desiredValue.toString();
-					mfParms[1] = mAttr.getLongDescription();
-					rpt.append(mfOut.format(mfParms));
-					return false;
-				}
-				match = (MetaFlag) possibleMatches.get(al.get(index));
-			}
-			match.setSelected(true);
-			efa.put(mfa);
-			ei.putAttribute(efa);
-			mfParms[0] = mAttr.getLongDescription();
-			mfParms[1] = match.getLongDescription();
-			mfOut = new MessageFormat(msgs.getString("SET_MSG")); //$NON-NLS-1$
-			rpt.append(mfOut.format(mfParms));
-			return true;
-		}
-		setReturnCode(FAIL);
-		mfParms[0] = attributeCode;
-		if (mAttr == null) {
-			mfOut = new MessageFormat(msgs.getString("CODE_ERR")); //$NON-NLS-1$
-			mfParms[1] = ei.getLongDescription();
-		} else {
-			mfOut = new MessageFormat(msgs.getString("FLAG_ERR")); //$NON-NLS-1$
-		}
-		rpt.append(mfOut.format(mfParms));
-		return false;
-	}
-
-	private boolean setFlagByDescription(
-		EntityItem ei,
-		String attributeCode,
-		String strDesc)
-		throws
-    COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-    COM.ibm.eannounce.objects.EANBusinessRuleException {
-		boolean set = false;
-		EANMetaAttribute mAttr =
-			ei.getEntityGroup().getMetaAttribute(attributeCode);
-		if (mAttr != null && mAttr instanceof MetaSingleFlagAttribute) {
-			EANFlagAttribute efa =
-				new SingleFlagAttribute(
-					ei,
-					m_prof,
-					(MetaSingleFlagAttribute) mAttr);
-			MetaFlag[] mfa = (MetaFlag[]) efa.get();
-			for (int i = 0; i < mfa.length; i++) {
-				if (mfa[i].getLongDescription().equals(strDesc)) {
-					set = true;
-					mfa[i].setSelected(true);
-					mfParms[0] = mAttr.getLongDescription();
-					mfParms[1] = strDesc;
-					mfOut = new MessageFormat(msgs.getString("SET_MSG")); //$NON-NLS-1$
-					rpt.append(mfOut.format(mfParms));
-				}
-			}
-			if (set) {
-				efa.put(mfa);
-				ei.putAttribute(efa);
-			} else {
-				setReturnCode(FAIL);
-				mfOut = new MessageFormat(msgs.getString("VALUE_ERR")); //$NON-NLS-1$
-				mfParms[0] = strDesc;
-				mfParms[1] = mAttr.getLongDescription();
-				rpt.append(mfOut.format(mfParms));
-			}
-		} else {
-			setReturnCode(FAIL);
-			mfParms[0] = attributeCode;
-			if (mAttr == null) {
-				mfOut = new MessageFormat(msgs.getString("CODE_ERR")); //$NON-NLS-1$
-				mfParms[1] = ei.getLongDescription();
-			} else {
-				mfOut = new MessageFormat(msgs.getString("FLAG_ERR")); //$NON-NLS-1$
-			}
-			rpt.append(mfOut.format(mfParms));
-		}
-		return set;
-	}
-
-	private boolean setFlagByCode(
-		EntityItem ei,
-		String attributeCode,
-		String strFlagCode)
-		throws
-    COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-    COM.ibm.eannounce.objects.EANBusinessRuleException {
-		boolean set = false;
-		EANMetaAttribute mAttr =
-			ei.getEntityGroup().getMetaAttribute(attributeCode);
-		if (mAttr != null && mAttr instanceof MetaSingleFlagAttribute) {
-			EANFlagAttribute efa =
-				new SingleFlagAttribute(
-					ei,
-					m_prof,
-					(MetaSingleFlagAttribute) mAttr);
-			MetaFlag[] mfa = (MetaFlag[]) efa.get();
-			for (int i = 0; i < mfa.length; i++) {
-				if (mfa[i].getFlagCode().equals(strFlagCode)) {
-					set = true;
-					mfa[i].setSelected(true);
-					mfParms[0] = mAttr.getLongDescription();
-					mfParms[1] = mfa[i].getLongDescription();
-					mfOut = new MessageFormat(msgs.getString("SET_MSG")); //$NON-NLS-1$
-					rpt.append(mfOut.format(mfParms));
-				}
-			}
-			if (set) {
-				efa.put(mfa);
-				ei.putAttribute(efa);
-			} else {
-				setReturnCode(FAIL);
-				mfOut = new MessageFormat(msgs.getString("VALUE_ERR")); //$NON-NLS-1$
-				mfParms[0] = strFlagCode;
-				mfParms[1] = mAttr.getLongDescription();
-				rpt.append(mfOut.format(mfParms));
-			}
-		} else {
-			mfParms[0] = attributeCode;
-			setReturnCode(FAIL);
-			if (mAttr == null) {
-				mfOut = new MessageFormat(msgs.getString("CODE_ERR")); //$NON-NLS-1$
-				mfParms[1] = ei.getLongDescription();
-			} else {
-				mfOut = new MessageFormat(msgs.getString("FLAG_ERR")); //$NON-NLS-1$
-			}
-			rpt.append(mfOut.format(mfParms));
-		}
-		return set;
-	}
-
-	/**
-	 * Method getSBBQTY counts each relator to OF or VAR as 1
-	 * if related to SBB it adds in the SBB quantity if populated or 1 otherwize.
-	 * @param ei EntityItem to check
-	 * @return int Count of relators and SBB Quandity
-	 */
-	private int getSBBQTY(EntityItem ei) {
-		int qty = 0;
-		for (int i = 0; i < ei.getUpLinkCount(); i++) {
-			EntityItem eiRelator = (EntityItem) ei.getUpLink(i);
-			if (eiRelator.getUpLink(0).getEntityType().equals("SBB")) { //$NON-NLS-1$
-				EntityItem eiSBB = (EntityItem) eiRelator.getUpLink(0);
-				EntityItem eiXXXSBB = (EntityItem) eiSBB.getUpLink(0);
-				// VARSBB or OFSBB
-				EANAttribute eaaSBBQTY = eiXXXSBB.getAttribute(getRootEntityType() + "SBBQTY"); //$NON-NLS-1$
-				if (eaaSBBQTY != null
-					&& eaaSBBQTY instanceof EANTextAttribute) {
-					qty += Integer.parseInt(eaaSBBQTY.get().toString());
-				} else {
-					qty += 1;
-				}
-			} else {
-				qty += 1;
-			}
-		}
-		return qty;
-	}
-	/**
-	 *  Get ABR description
-	 *
-	 *@return    java.lang.String
-	 */
-	public String getDescription() {
-		return msgs.getString("DESCRIPTION"); //$NON-NLS-1$
-	}
-
-	/**
-	 *  Get the version
-	 *
-	 *@return    java.lang.String
-	 */
-	public String getABRVersion() {
-		return "$Revision: 1.17 $"; //$NON-NLS-1$
-	}
-	private Locale getLocale(int nlsID) {
-		Locale locale = null;
-		switch (nlsID) {
-		case 1 :
-			locale = Locale.US;
-		case 2 :
-			locale = Locale.GERMAN;
-			break;
-		case 3 :
-			locale = Locale.ITALIAN;
-			break;
-		case 4 :
-			locale = Locale.JAPANESE;
-			break;
-		case 5 :
-			locale = Locale.FRENCH;
-			break;
-		case 6 :
-			locale = new Locale("es", "ES"); //$NON-NLS-2$  //$NON-NLS-1$
-			break;
-		case 7 :
-			locale = Locale.UK;
-			break;
-		default :
-			locale = Locale.US;
-		}
-		return locale;
-	}
-}

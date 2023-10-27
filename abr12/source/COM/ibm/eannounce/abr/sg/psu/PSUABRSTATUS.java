@@ -1,1441 +1,1447 @@
-//Licensed Materials -- Property of IBM
+/*      */ package COM.ibm.eannounce.abr.sg.psu;
+/*      */ 
+/*      */ import COM.ibm.eannounce.abr.util.ABRUtil;
+/*      */ import COM.ibm.eannounce.abr.util.EACustom;
+/*      */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*      */ import COM.ibm.eannounce.objects.DeleteActionItem;
+/*      */ import COM.ibm.eannounce.objects.EANActionItem;
+/*      */ import COM.ibm.eannounce.objects.EANAttribute;
+/*      */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*      */ import COM.ibm.eannounce.objects.EANList;
+/*      */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*      */ import COM.ibm.eannounce.objects.EANMetaFoundation;
+/*      */ import COM.ibm.eannounce.objects.EntityGroup;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.EntityList;
+/*      */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*      */ import COM.ibm.eannounce.objects.LinkActionItem;
+/*      */ import COM.ibm.eannounce.objects.WorkflowException;
+/*      */ import COM.ibm.opicmpdh.middleware.D;
+/*      */ import COM.ibm.opicmpdh.middleware.Database;
+/*      */ import COM.ibm.opicmpdh.middleware.LockException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*      */ import COM.ibm.opicmpdh.middleware.Profile;
+/*      */ import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
+/*      */ import COM.ibm.opicmpdh.middleware.ReturnRelatorKey;
+/*      */ import COM.ibm.opicmpdh.middleware.Stopwatch;
+/*      */ import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+/*      */ import COM.ibm.opicmpdh.objects.Attribute;
+/*      */ import COM.ibm.opicmpdh.objects.ControlBlock;
+/*      */ import COM.ibm.opicmpdh.objects.SingleFlag;
+/*      */ import COM.ibm.opicmpdh.objects.Text;
+/*      */ import COM.ibm.opicmpdh.transactions.OPICMList;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.io.BufferedInputStream;
+/*      */ import java.io.BufferedReader;
+/*      */ import java.io.File;
+/*      */ import java.io.FileInputStream;
+/*      */ import java.io.FileOutputStream;
+/*      */ import java.io.InputStreamReader;
+/*      */ import java.io.OutputStreamWriter;
+/*      */ import java.io.PrintWriter;
+/*      */ import java.io.StringWriter;
+/*      */ import java.rmi.RemoteException;
+/*      */ import java.sql.SQLException;
+/*      */ import java.text.MessageFormat;
+/*      */ import java.util.Collections;
+/*      */ import java.util.Comparator;
+/*      */ import java.util.Enumeration;
+/*      */ import java.util.HashSet;
+/*      */ import java.util.Hashtable;
+/*      */ import java.util.ResourceBundle;
+/*      */ import java.util.StringTokenizer;
+/*      */ import java.util.Vector;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public class PSUABRSTATUS
+/*      */   extends PokBaseABR
+/*      */ {
+/*      */   private static final int MAXFILE_SIZE = 5000000;
+/*  185 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/*      */ 
+/*      */   
+/*  188 */   static final int UPDATE_SIZE = Integer.parseInt(ABRServerProperties.getValue("PSUABRSTATUS", "_UpdateSize", "200"));
+/*      */   
+/*      */   static final String UPDATE_CLASS = "Update Class";
+/*      */   
+/*      */   static final String UPDATE_ENTITYTYPE = "Entity Type";
+/*      */   
+/*      */   static final String UPDATE_ENTITYID = "Entity ID";
+/*      */   
+/*      */   static final String UPDATE_ATTRCODE = "Update Attribute Code";
+/*      */   
+/*      */   static final String UPDATE_ATTRTYPE = "Attribute Type";
+/*      */   
+/*      */   static final String UPDATE_ATTRACT = "Attribute Update Action";
+/*      */   
+/*      */   static final String UPDATE_ATTRVAL = "Update Attribute Value";
+/*      */   
+/*      */   static final String UPDATE_REF_ENTITYTYPE = "Entity Type Referenced";
+/*      */   
+/*      */   static final String UPDATE_REF_ENTITYID = "Entity ID Referenced";
+/*      */   
+/*      */   static final String UPDATE_RELTYPE = "Relator";
+/*      */   
+/*      */   static final String UPDATE_RELACT = "Relator Action";
+/*      */   
+/*      */   private static final String PSUPROGRESS_Chunking = "PSUPRG2";
+/*      */   
+/*      */   private static final String PSUPROGRESS_Complete = "PSUPRG3";
+/*      */   
+/*      */   private static final String PSUCRITERIA_View = "VIEW";
+/*      */   
+/*      */   private static final String PSUCRITERIA_List = "LIST";
+/*      */   static final String PSUCLASS_Reference = "PSUC2";
+/*      */   static final String PSUCLASS_Update = "PSUC1";
+/*      */   static final String PSUATTRACTION_N = "N";
+/*      */   static final String PSUATTRACTION_D = "D";
+/*  223 */   private static final String[] PDHUPDATE_ATTRS = new String[] { "PSUDESCRIPTION", "CAT2", "PSUCRITERIA", "PSUVIEW", "PSUDBTYPE", "PSULAST", "PSUMAX", "PSUHIGHENTITYTYPE", "PSUHIGHENTITYID", "PSUPROGRESS", "PDHDOMAIN" };
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*  229 */   static final String NEWLINE = new String(FOOL_JTEST);
+/*      */   
+/*  231 */   private StringBuffer rptSb = new StringBuffer();
+/*  232 */   private Object[] args = (Object[])new String[10];
+/*      */   
+/*  234 */   private ResourceBundle rsBundle = null;
+/*  235 */   private Hashtable navMetaTbl = new Hashtable<>();
+/*  236 */   private StringBuffer updatedSB = new StringBuffer();
+/*  237 */   private String navName = "";
+/*  238 */   private String cat2 = null;
+/*  239 */   private PrintWriter dbgPw = null;
+/*  240 */   private String dbgfn = null;
+/*  241 */   private String psucriteria = "";
+/*  242 */   private int dbgLen = 0;
+/*  243 */   private int abr_debuglvl = 0;
+/*  244 */   private ControlBlock cbOff = null;
+/*  245 */   private Vector vctReturnsEntityKeys = new Vector();
+/*  246 */   private Hashtable m_typeTbl = new Hashtable<>();
+/*  247 */   private Hashtable actionItemTbl = null;
+/*      */   private String currentPSUHIGHENTITYTYPE;
+/*      */   private String currentPSUPROGRESS;
+/*      */   private int currentPSUHIGHENTITYID;
+/*  251 */   private Profile poweruserProf = null;
+/*  252 */   private Hashtable updatedRootTbl = new Hashtable<>();
+/*  253 */   private ExtractActionItem xai = null;
+/*  254 */   private int psuLast = 0;
+/*  255 */   private AttrComparator attrComp = new AttrComparator();
+/*      */   
+/*      */   private void setupPrintWriter() {
+/*  258 */     String str = this.m_abri.getFileName();
+/*  259 */     int i = str.lastIndexOf(".");
+/*  260 */     this.dbgfn = str.substring(0, i + 1) + "dbg";
+/*      */     try {
+/*  262 */       this.dbgPw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.dbgfn, true), "UTF-8"));
+/*  263 */     } catch (Exception exception) {
+/*  264 */       this.dbgfn = null;
+/*  265 */       D.ebug(0, "trouble creating debug PrintWriter " + exception);
+/*      */     } 
+/*      */   }
+/*      */   private void closePrintWriter() {
+/*  269 */     if (this.dbgPw != null) {
+/*  270 */       this.dbgPw.flush();
+/*  271 */       this.dbgPw.close();
+/*  272 */       this.dbgPw = null;
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void execute_run() {
+/*  337 */     String str1 = "<head>" + EACustom.getMetaTags(getDescription()) + NEWLINE + EACustom.getCSS() + NEWLINE + EACustom.getTitle("{0} {1}") + NEWLINE + "</head>" + NEWLINE + "<body id=\"ibm-com\">" + EACustom.getMastheadDiv() + NEWLINE + "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
+/*      */     
+/*  339 */     String str2 = "<table>" + NEWLINE + "<tr><th>Userid: </th><td>{0}</td></tr>" + NEWLINE + "<tr><th>Role: </th><td>{1}</td></tr>" + NEWLINE + "<tr><th>Workgroup: </th><td>{2}</td></tr>" + NEWLINE + "<tr><th>Date: </th><td>{3}</td></tr>" + NEWLINE + "<tr><th>Description: </th><td>{4}</td></tr>" + NEWLINE + "<tr><th>Return code: </th><td>{5}</td></tr>" + NEWLINE + "</table>" + NEWLINE + "<!-- {6} -->" + NEWLINE;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  350 */     String str3 = "";
+/*  351 */     EntityItem entityItem = null;
+/*      */     
+/*  353 */     println(EACustom.getDocTypeHtml());
+/*      */     
+/*      */     try {
+/*  356 */       long l = System.currentTimeMillis();
+/*  357 */       start_ABRBuild();
+/*      */       
+/*  359 */       this.abr_debuglvl = ABRServerProperties.getABRDebugLevel(this.m_abri.getABRCode());
+/*      */       
+/*  361 */       setupPrintWriter();
+/*      */       
+/*  363 */       this.m_prof.setReadLanguage(Profile.ENGLISH_LANGUAGE);
+/*      */ 
+/*      */       
+/*  366 */       this.rsBundle = ResourceBundle.getBundle(getClass().getName(), ABRUtil.getLocale(this.m_prof.getReadLanguage().getNLSID()));
+/*      */       
+/*  368 */       entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*      */       
+/*  370 */       addDebug("DEBUG: " + getShortClassName(getClass()) + " entered for " + entityItem.getKey() + " extract: " + this.m_abri
+/*  371 */           .getVEName() + " using DTS: " + this.m_prof.getValOn() + NEWLINE + PokUtils.outputList(this.m_elist));
+/*      */ 
+/*      */       
+/*  374 */       this.navName = getNavigationName(entityItem);
+/*      */       
+/*  376 */       this.cat2 = PokUtils.getAttributeValue(entityItem, "CAT2", ",", null, false);
+/*      */       
+/*  378 */       this.psuLast = Integer.parseInt(PokUtils.getAttributeValue(entityItem, "PSULAST", "", "0", false));
+/*      */ 
+/*      */       
+/*  381 */       setReturnCode(0);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  386 */       this.currentPSUHIGHENTITYTYPE = PokUtils.getAttributeValue(entityItem, "PSUHIGHENTITYTYPE", "", null, false);
+/*  387 */       this.currentPSUPROGRESS = PokUtils.getAttributeFlagValue(entityItem, "PSUPROGRESS");
+/*  388 */       this.currentPSUHIGHENTITYID = Integer.parseInt(PokUtils.getAttributeValue(entityItem, "PSUHIGHENTITYID", "", "-1", false));
+/*      */ 
+/*      */       
+/*  391 */       addDebug(entityItem.getKey() + " PSUPROGRESS: " + this.currentPSUPROGRESS + " PSUHIGHENTITYTYPE: " + this.currentPSUHIGHENTITYTYPE + " PSUHIGHENTITYID: " + this.currentPSUHIGHENTITYID + " CAT2: " + this.cat2 + " psuLast " + this.psuLast);
+/*      */ 
+/*      */ 
+/*      */       
+/*  395 */       if ("PSUPRG3".equals(this.currentPSUPROGRESS)) {
+/*      */ 
+/*      */         
+/*  398 */         this.args[0] = getLD_Value(entityItem, "PSUPROGRESS");
+/*  399 */         addMessage("", "COMPLETED_ERR", this.args);
+/*      */       } else {
+/*      */         
+/*  402 */         this.psucriteria = PokUtils.getAttributeFlagValue(entityItem, "PSUCRITERIA");
+/*  403 */         addDebug(entityItem.getKey() + " PSUCRITERIA: " + this.psucriteria);
+/*  404 */         if (this.psucriteria == null) {
+/*      */           
+/*  406 */           this.args[0] = entityItem.getEntityGroup().getLongDescription();
+/*  407 */           this.args[1] = PokUtils.getAttributeDescription(entityItem.getEntityGroup(), "PSUCRITERIA", "PSUCRITERIA");
+/*  408 */           addError("REQ_NOTPOPULATED_ERR", this.args);
+/*      */         
+/*      */         }
+/*  411 */         else if ("VIEW".equals(this.psucriteria)) {
+/*      */           
+/*  413 */           PSUView pSUView = new PSUView(this, entityItem);
+/*  414 */           pSUView.execute(this.m_elist.getEntityGroup("PDHUPDATEACT"));
+/*  415 */           pSUView.dereference();
+/*  416 */         } else if ("LIST".equals(this.psucriteria)) {
+/*      */           
+/*  418 */           PSUList pSUList = new PSUList(this, entityItem);
+/*  419 */           pSUList.execute(this.m_elist.getEntityGroup("PDHUPDATEACT"));
+/*  420 */           pSUList.dereference();
+/*      */         } else {
+/*      */           
+/*  423 */           this.args[0] = getLD_Value(entityItem, "PSUCRITERIA");
+/*  424 */           addError("CRITERIA_NOTSUPP_ERR", this.args);
+/*      */         } 
+/*      */       } 
+/*      */ 
+/*      */       
+/*  429 */       addDebug("Total Time: " + Stopwatch.format(System.currentTimeMillis() - l));
+/*      */     }
+/*  431 */     catch (Throwable throwable) {
+/*  432 */       StringWriter stringWriter = new StringWriter();
+/*  433 */       String str5 = "<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
+/*  434 */       String str6 = "<pre>{0}</pre>";
+/*  435 */       MessageFormat messageFormat1 = new MessageFormat(str5);
+/*  436 */       setReturnCode(-3);
+/*  437 */       throwable.printStackTrace(new PrintWriter(stringWriter));
+/*      */       
+/*  439 */       this.args[0] = throwable.getMessage();
+/*  440 */       this.rptSb.append(messageFormat1.format(this.args) + NEWLINE);
+/*  441 */       messageFormat1 = new MessageFormat(str6);
+/*  442 */       this.args[0] = stringWriter.getBuffer().toString();
+/*      */       
+/*  444 */       this.rptSb.append(getAllUpdateInfo());
+/*      */       
+/*  446 */       this.rptSb.append(messageFormat1.format(this.args) + NEWLINE);
+/*  447 */       logError("Exception: " + throwable.getMessage());
+/*  448 */       logError(stringWriter.getBuffer().toString());
+/*      */     } finally {
+/*      */       
+/*  451 */       setDGTitle(this.navName);
+/*  452 */       setDGRptName(getShortClassName(getClass()));
+/*  453 */       setDGRptClass(getABRCode());
+/*      */       
+/*  455 */       if (this.cat2 != null) {
+/*      */         
+/*  457 */         StringTokenizer stringTokenizer = new StringTokenizer(this.cat2, ",");
+/*  458 */         String[] arrayOfString = new String[stringTokenizer.countTokens()];
+/*  459 */         boolean bool = false;
+/*  460 */         while (stringTokenizer.hasMoreTokens()) {
+/*  461 */           arrayOfString[bool] = stringTokenizer.nextToken();
+/*      */         }
+/*  463 */         setDGCat2(arrayOfString);
+/*      */       } 
+/*      */       
+/*  466 */       if (!isReadOnly()) {
+/*  467 */         clearSoftLock();
+/*      */       }
+/*  469 */       closePrintWriter();
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/*  474 */     MessageFormat messageFormat = new MessageFormat(str1);
+/*  475 */     this.args[0] = getDescription();
+/*  476 */     this.args[1] = this.navName;
+/*  477 */     String str4 = messageFormat.format(this.args);
+/*  478 */     messageFormat = new MessageFormat(str2);
+/*  479 */     this.args[0] = this.m_prof.getOPName();
+/*  480 */     this.args[1] = this.m_prof.getRoleDescription();
+/*  481 */     this.args[2] = this.m_prof.getWGName();
+/*  482 */     this.args[3] = getNow();
+/*  483 */     this.args[4] = this.navName;
+/*  484 */     this.args[5] = (getReturnCode() == 0) ? "Passed" : "Failed";
+/*  485 */     this.args[6] = str3 + " " + getABRVersion();
+/*      */     
+/*  487 */     this.rptSb.append(getAllUpdateInfo());
+/*      */     
+/*  489 */     restoreXtraContent();
+/*      */     
+/*  491 */     this.rptSb.insert(0, str4 + messageFormat.format(this.args) + NEWLINE + getRequestInfo(entityItem));
+/*      */     
+/*  493 */     println(this.rptSb.toString());
+/*  494 */     printDGSubmitString();
+/*  495 */     println(EACustom.getTOUDiv());
+/*  496 */     buildReportFooter();
+/*      */     
+/*  498 */     this.navMetaTbl.clear();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getRequestInfo(EntityItem paramEntityItem) {
+/*  509 */     if (paramEntityItem == null) {
+/*  510 */       return "";
+/*      */     }
+/*  512 */     StringBuffer stringBuffer = new StringBuffer("<table width='600'>" + NEWLINE);
+/*  513 */     stringBuffer.append("<tr><th>Attribute</th><th>Entry Value</th><th>Exit Value</th></tr>" + NEWLINE);
+/*  514 */     stringBuffer.append("<tr><td colspan='3'><b>" + paramEntityItem.getEntityGroup().getLongDescription() + ": " + this.navName + "</b></td></tr>" + NEWLINE);
+/*      */ 
+/*      */     
+/*  517 */     for (byte b = 0; b < PDHUPDATE_ATTRS.length; b++) {
+/*  518 */       String str1 = PDHUPDATE_ATTRS[b];
+/*  519 */       String str2 = PokUtils.getAttributeValue(paramEntityItem, str1, ", ", "<em>** Not Populated **</em>");
+/*  520 */       stringBuffer.append("<tr><td>" + 
+/*  521 */           PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), str1, str1) + ": </td><td>" + str2 + "</td><td>" + 
+/*  522 */           getExitValue(str2, str1) + "</td></tr>" + NEWLINE);
+/*      */     } 
+/*      */ 
+/*      */     
+/*  526 */     stringBuffer.append("</table><br />" + NEWLINE);
+/*      */     
+/*  528 */     return stringBuffer.toString();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   void addUpdateInfo(Hashtable paramHashtable) {
+/*  548 */     this.updatedSB.append("<tr><td>" + getUpdateValue(paramHashtable, "Update Class") + "</td><td>" + 
+/*  549 */         getUpdateValue(paramHashtable, "Entity Type") + "</td><td>" + 
+/*  550 */         getUpdateValue(paramHashtable, "Entity ID") + "</td><td>" + 
+/*  551 */         getUpdateValue(paramHashtable, "Update Attribute Code") + "</td>");
+/*  552 */     this.updatedSB.append("<td>" + getUpdateValue(paramHashtable, "Attribute Type") + "</td><td>" + 
+/*  553 */         getUpdateValue(paramHashtable, "Attribute Update Action") + "</td><td>" + 
+/*  554 */         getUpdateValue(paramHashtable, "Update Attribute Value") + "</td>");
+/*  555 */     this.updatedSB.append("<td>" + getUpdateValue(paramHashtable, "Entity Type Referenced") + "</td><td>" + 
+/*  556 */         getUpdateValue(paramHashtable, "Entity ID Referenced") + "</td><td>" + 
+/*  557 */         getUpdateValue(paramHashtable, "Relator") + "</td><td>" + 
+/*  558 */         getUpdateValue(paramHashtable, "Relator Action") + "</td></tr>" + NEWLINE);
+/*  559 */     paramHashtable.clear();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getUpdateValue(Hashtable paramHashtable, String paramString) {
+/*  568 */     String str = "&nbsp;";
+/*  569 */     if (paramHashtable.containsKey(paramString)) {
+/*  570 */       String str1 = paramHashtable.get(paramString).toString();
+/*  571 */       if (str1.trim().length() > 0) {
+/*  572 */         str = str1;
+/*      */       }
+/*      */     } 
+/*      */     
+/*  576 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getExitValue(String paramString1, String paramString2) {
+/*  585 */     String str = paramString1;
+/*  586 */     if (this.updatedRootTbl.containsKey(paramString2)) {
+/*  587 */       String str1 = this.updatedRootTbl.get(paramString2).toString();
+/*  588 */       if (str1.trim().length() > 0) {
+/*  589 */         str = str1;
+/*      */       }
+/*      */     } 
+/*      */     
+/*  593 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getAllUpdateInfo() {
+/*  600 */     StringBuffer stringBuffer = new StringBuffer();
+/*  601 */     if (this.updatedSB.length() > 0) {
+/*      */       
+/*  603 */       stringBuffer.append("<table><tr><th>Update Class</th><th>Entity Type</th><th>Entity ID</th><th>Update Attribute Code</th>");
+/*  604 */       stringBuffer.append("<th>Attribute Type</th><th>Attribute Update Action</th><th>Update Attribute Value</th>");
+/*  605 */       stringBuffer.append("<th>Entity Type Referenced</th><th>Entity ID Referenced</th><th>Relator</th><th>Relator Action</th></tr>" + NEWLINE);
+/*      */       
+/*  607 */       stringBuffer.append(this.updatedSB.toString());
+/*      */       
+/*  609 */       stringBuffer.append("</table>" + NEWLINE);
+/*  610 */       this.updatedSB.setLength(0);
+/*      */     } 
+/*      */     
+/*  613 */     return stringBuffer.toString();
+/*      */   }
+/*      */   
+/*      */   private void restoreXtraContent() {
+/*  617 */     if (this.dbgfn != null && this.dbgLen + this.rptSb.length() < 5000000) {
+/*      */       
+/*  619 */       BufferedInputStream bufferedInputStream = null;
+/*  620 */       FileInputStream fileInputStream = null;
+/*  621 */       BufferedReader bufferedReader = null;
+/*      */       try {
+/*  623 */         fileInputStream = new FileInputStream(this.dbgfn);
+/*  624 */         bufferedInputStream = new BufferedInputStream(fileInputStream);
+/*      */         
+/*  626 */         String str = null;
+/*  627 */         StringBuffer stringBuffer = new StringBuffer();
+/*  628 */         bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream, "UTF-8"));
+/*      */         
+/*  630 */         while ((str = bufferedReader.readLine()) != null) {
+/*  631 */           stringBuffer.append(str + NEWLINE);
+/*      */         }
+/*  633 */         this.rptSb.append("<!-- " + stringBuffer.toString() + " -->" + NEWLINE);
+/*      */ 
+/*      */         
+/*  636 */         File file = new File(this.dbgfn);
+/*  637 */         if (file.exists()) {
+/*  638 */           file.delete();
+/*      */         }
+/*  640 */       } catch (Exception exception) {
+/*  641 */         exception.printStackTrace();
+/*      */       } finally {
+/*  643 */         if (bufferedInputStream != null) {
+/*      */           try {
+/*  645 */             bufferedInputStream.close();
+/*  646 */           } catch (Exception exception) {
+/*  647 */             exception.printStackTrace();
+/*      */           } 
+/*      */         }
+/*  650 */         if (fileInputStream != null) {
+/*      */           try {
+/*  652 */             fileInputStream.close();
+/*  653 */           } catch (Exception exception) {
+/*  654 */             exception.printStackTrace();
+/*      */           } 
+/*      */         }
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   void doUpdates(EntityItem paramEntityItem, OPICMList paramOPICMList, boolean paramBoolean) throws RemoteException, SQLException, MiddlewareException, MiddlewareShutdownInProgressException, EANBusinessRuleException, LockException, WorkflowException {
+/*  676 */     int i = 0;
+/*      */     
+/*  678 */     for (byte b = 0; b < paramOPICMList.size(); b++) {
+/*  679 */       PSUUpdateData pSUUpdateData = (PSUUpdateData)paramOPICMList.getAt(b);
+/*  680 */       addDebug(3, "doUpdates[" + b + "]: " + pSUUpdateData.hashkey());
+/*      */       
+/*  682 */       if (pSUUpdateData instanceof PSUDeleteData) {
+/*  683 */         i += deleteData((PSUDeleteData)pSUUpdateData);
+/*  684 */         pSUUpdateData.outputUserInfo();
+/*  685 */       } else if (pSUUpdateData instanceof PSULinkData) {
+/*  686 */         pSUUpdateData.outputUserInfo();
+/*  687 */         createLinks((PSULinkData)pSUUpdateData);
+/*      */       } else {
+/*  689 */         pSUUpdateData.outputUserInfo();
+/*  690 */         pSUUpdateData.removeAttrs();
+/*  691 */         if (pSUUpdateData.rek.m_vctAttributes != null && pSUUpdateData.rek.m_vctAttributes.size() > 0) {
+/*      */           
+/*  693 */           Collections.sort(pSUUpdateData.rek.m_vctAttributes, this.attrComp);
+/*      */ 
+/*      */           
+/*  696 */           this.vctReturnsEntityKeys.addElement(pSUUpdateData.rek);
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */     
+/*  701 */     String str = null;
+/*  702 */     int j = 0;
+/*  703 */     if (paramOPICMList.size() > 0) {
+/*  704 */       PSUUpdateData pSUUpdateData = (PSUUpdateData)paramOPICMList.getAt(paramOPICMList.size() - 1);
+/*  705 */       str = pSUUpdateData.getEntityType();
+/*  706 */       j = pSUUpdateData.getHighEntityId();
+/*      */     } 
+/*      */ 
+/*      */     
+/*  710 */     saveHighEntity(paramEntityItem, str, j, paramBoolean, paramOPICMList
+/*  711 */         .size() + i);
+/*      */     
+/*  713 */     updatePDH();
+/*      */ 
+/*      */     
+/*  716 */     while (paramOPICMList.size() > 0) {
+/*  717 */       PSUUpdateData pSUUpdateData = (PSUUpdateData)paramOPICMList.remove(0);
+/*  718 */       pSUUpdateData.dereference();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createLinks(PSULinkData paramPSULinkData) throws MiddlewareRequestException, SQLException, MiddlewareException, LockException, MiddlewareShutdownInProgressException, EANBusinessRuleException, WorkflowException, RemoteException {
+/*  738 */     addDebug(4, "createLinks: entered psulink: " + paramPSULinkData);
+/*      */     
+/*  740 */     if (this.actionItemTbl == null) {
+/*  741 */       this.actionItemTbl = new Hashtable<>();
+/*      */     }
+/*      */     
+/*  744 */     EntityItem[] arrayOfEntityItem = { new EntityItem(null, this.m_prof, paramPSULinkData.getEntityType(), paramPSULinkData.getEntityId()) };
+/*      */ 
+/*      */     
+/*  747 */     for (byte b = 0; b < paramPSULinkData.getChildrenList().size(); b++) {
+/*  748 */       PSUChildList pSUChildList = (PSUChildList)paramPSULinkData.getChildrenList().getAt(b);
+/*  749 */       LinkActionItem linkActionItem = (LinkActionItem)this.actionItemTbl.get(pSUChildList.getActionName());
+/*  750 */       if (linkActionItem == null) {
+/*  751 */         linkActionItem = new LinkActionItem(null, this.m_db, this.m_prof, pSUChildList.getActionName());
+/*  752 */         if (linkActionItem.getMetaLink() == null)
+/*      */         {
+/*  754 */           throw new MiddlewareException("Linkaction " + pSUChildList.getActionName() + " is undefined.");
+/*      */         }
+/*  756 */         this.actionItemTbl.put(pSUChildList.getActionName(), linkActionItem);
+/*      */       } 
+/*      */       
+/*  759 */       EntityItem[] arrayOfEntityItem1 = new EntityItem[pSUChildList.getChildrenList().size()];
+/*      */ 
+/*      */       
+/*  762 */       for (byte b1 = 0; b1 < pSUChildList.getChildrenList().size(); b1++) {
+/*  763 */         PSUUpdateData pSUUpdateData = (PSUUpdateData)pSUChildList.getChildrenList().getAt(b1);
+/*  764 */         arrayOfEntityItem1[b1] = new EntityItem(null, this.m_prof, pSUUpdateData.getEntityType(), pSUUpdateData.getEntityId());
+/*  765 */         addDebug(4, "createLinks: psuchild: " + pSUUpdateData + " psuRelatorAct: " + pSUChildList
+/*  766 */             .getActionName());
+/*      */       } 
+/*      */ 
+/*      */       
+/*  770 */       if (linkActionItem.isOppSelect()) {
+/*  771 */         linkActionItem.setParentEntityItems(arrayOfEntityItem1);
+/*  772 */         linkActionItem.setChildEntityItems(arrayOfEntityItem);
+/*      */       } else {
+/*  774 */         linkActionItem.setParentEntityItems(arrayOfEntityItem);
+/*  775 */         linkActionItem.setChildEntityItems(arrayOfEntityItem1);
+/*      */       } 
+/*  777 */       Vector<OPICMList> vector = linkActionItem.executeLink(this.m_db, this.m_prof);
+/*  778 */       OPICMList oPICMList = vector.elementAt(1);
+/*  779 */       for (byte b2 = 0; b2 < oPICMList.size(); b2++) {
+/*  780 */         ReturnRelatorKey returnRelatorKey = (ReturnRelatorKey)oPICMList.getAt(b2);
+/*  781 */         addDebug(4, "createLinks:  ReturnRelatorKey[" + b2 + "]: " + returnRelatorKey);
+/*  782 */         String str = returnRelatorKey.m_strEntity2Type + returnRelatorKey.m_iEntity2ID;
+/*  783 */         if (linkActionItem.isOppSelect()) {
+/*  784 */           str = returnRelatorKey.m_strEntity1Type + returnRelatorKey.m_iEntity1ID;
+/*      */         }
+/*  786 */         PSUUpdateData pSUUpdateData = (PSUUpdateData)pSUChildList.getChildrenList().get(str);
+/*  787 */         if (pSUUpdateData.rek != null && pSUUpdateData.rek.m_vctAttributes != null) {
+/*      */           
+/*  789 */           pSUUpdateData.rek.m_iEntityID = returnRelatorKey.getReturnID();
+/*  790 */           pSUUpdateData.rek.m_strEntityType = returnRelatorKey.getEntityType();
+/*  791 */           pSUUpdateData.setRelatorKey(returnRelatorKey.getEntityType() + returnRelatorKey.getReturnID());
+/*  792 */           for (byte b3 = 0; b3 < pSUUpdateData.rek.m_vctAttributes.size(); b3++) {
+/*  793 */             Attribute attribute = pSUUpdateData.rek.m_vctAttributes.elementAt(b3);
+/*  794 */             attribute.m_iEntityID = returnRelatorKey.getReturnID();
+/*  795 */             attribute.m_strEntityType = returnRelatorKey.getEntityType();
+/*      */           } 
+/*      */           
+/*  798 */           if (pSUUpdateData.rek.m_vctAttributes.size() > 0) {
+/*  799 */             Collections.sort(pSUUpdateData.rek.m_vctAttributes, this.attrComp);
+/*      */           }
+/*  801 */           addDebug(4, "createLinks: new relator: " + pSUUpdateData);
+/*  802 */           this.vctReturnsEntityKeys.addElement(pSUUpdateData.rek);
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*  806 */     paramPSULinkData.outputUserInfoWithRelator();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private int deleteData(PSUDeleteData paramPSUDeleteData) throws MiddlewareRequestException, SQLException, MiddlewareException, LockException, MiddlewareShutdownInProgressException, EANBusinessRuleException {
+/*  831 */     addDebug(4, "deleteData: entered psudelete: " + paramPSUDeleteData);
+/*      */     
+/*  833 */     if (this.actionItemTbl == null) {
+/*  834 */       this.actionItemTbl = new Hashtable<>();
+/*      */     }
+/*  836 */     DeleteActionItem deleteActionItem = (DeleteActionItem)this.actionItemTbl.get(paramPSUDeleteData.actionName);
+/*  837 */     if (deleteActionItem == null) {
+/*  838 */       deleteActionItem = new DeleteActionItem(null, this.m_db, this.m_prof, paramPSUDeleteData.actionName);
+/*  839 */       if (deleteActionItem.getEntityType() == null)
+/*      */       {
+/*  841 */         throw new MiddlewareException("Deleteaction " + paramPSUDeleteData.actionName + " is undefined.");
+/*      */       }
+/*      */       
+/*  844 */       this.actionItemTbl.put(paramPSUDeleteData.actionName, deleteActionItem);
+/*      */     } 
+/*  846 */     EntityItem[] arrayOfEntityItem = new EntityItem[paramPSUDeleteData.idVct.size()];
+/*  847 */     for (byte b = 0; b < paramPSUDeleteData.idVct.size(); b++) {
+/*  848 */       arrayOfEntityItem[b] = new EntityItem(null, this.m_prof, paramPSUDeleteData.getEntityType(), ((Integer)paramPSUDeleteData.idVct
+/*  849 */           .elementAt(b)).intValue());
+/*      */     }
+/*      */     
+/*      */     try {
+/*  853 */       deleteActionItem.setEntityItems(arrayOfEntityItem);
+/*      */       
+/*  855 */       deleteActionItem.executeAction(this.m_db, this.m_prof);
+/*      */     } finally {
+/*      */       
+/*  858 */       this.m_db.commit();
+/*  859 */       this.m_db.freeStatement();
+/*  860 */       this.m_db.isPending("finally after deleteData");
+/*      */     } 
+/*      */     
+/*  863 */     return paramPSUDeleteData.idVct.size() - 1;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void saveHighEntity(EntityItem paramEntityItem, String paramString, int paramInt1, boolean paramBoolean, int paramInt2) {
+/*  879 */     addDebug(3, "saveHighEntity: highEntityType: " + paramString + " highEntityId: " + paramInt1 + " numProcessed: " + paramInt2 + " allProcessed: " + paramBoolean);
+/*      */ 
+/*      */     
+/*  882 */     if (this.m_cbOn == null) {
+/*  883 */       setControlBlock();
+/*      */     }
+/*      */     
+/*  886 */     if (paramString != null && !paramString.equals(this.currentPSUHIGHENTITYTYPE)) {
+/*  887 */       setTextValue(paramEntityItem, "PSUHIGHENTITYTYPE", paramString);
+/*  888 */       this.updatedRootTbl.put("PSUHIGHENTITYTYPE", paramString);
+/*      */       
+/*  890 */       this.currentPSUHIGHENTITYTYPE = paramString;
+/*      */     } 
+/*      */     
+/*  893 */     if (paramInt1 > 0) {
+/*  894 */       setTextValue(paramEntityItem, "PSUHIGHENTITYID", "" + paramInt1);
+/*  895 */       this.updatedRootTbl.put("PSUHIGHENTITYID", "" + paramInt1);
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/*  900 */     String str = paramBoolean ? "PSUPRG3" : "PSUPRG2";
+/*  901 */     if (!str.equals(this.currentPSUPROGRESS)) {
+/*  902 */       setUniqueFlagValue(paramEntityItem, "PSUPROGRESS", str);
+/*  903 */       this.currentPSUPROGRESS = str;
+/*  904 */       this.updatedRootTbl.put("PSUPROGRESS", paramBoolean ? "Complete" : "Chunking");
+/*      */     } 
+/*      */ 
+/*      */     
+/*  908 */     if (paramInt2 > 0) {
+/*  909 */       addDebug(3, "saveHighEntity: before psuLast: " + this.psuLast);
+/*      */       
+/*  911 */       this.psuLast += paramInt2;
+/*      */       
+/*  913 */       setTextValue(paramEntityItem, "PSULAST", "" + this.psuLast);
+/*  914 */       this.updatedRootTbl.put("PSULAST", "" + this.psuLast);
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   boolean wasPreviouslyProcessed(String paramString, int paramInt) {
+/*  929 */     if (this.currentPSUHIGHENTITYTYPE == null) {
+/*  930 */       return false;
+/*      */     }
+/*      */ 
+/*      */     
+/*  934 */     if (paramString.compareTo(this.currentPSUHIGHENTITYTYPE) < 0) {
+/*  935 */       addDebug(4, "wasPreviouslyProcessed psuEntityType: " + paramString + " is before highEntityType: " + this.currentPSUHIGHENTITYTYPE);
+/*  936 */       return true;
+/*      */     } 
+/*  938 */     if (paramString.equals(this.currentPSUHIGHENTITYTYPE) && paramInt <= this.currentPSUHIGHENTITYID) {
+/*  939 */       addDebug(4, "wasPreviouslyProcessed psuEntityId: " + paramInt + " is before or equal highEntityId: " + this.currentPSUHIGHENTITYID);
+/*  940 */       return true;
+/*      */     } 
+/*      */     
+/*  943 */     return false;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   String getAttrType(String paramString) {
+/*  952 */     return (String)this.m_typeTbl.get(paramString);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   String getAttrAction(ControlBlock paramControlBlock) {
+/*  961 */     return (paramControlBlock == this.m_cbOn) ? "N" : "D";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   void getCurrentValues(OPICMList paramOPICMList) throws MiddlewareRequestException, SQLException, MiddlewareException {
+/*  974 */     Vector<EntityItem> vector = new Vector();
+/*      */     
+/*  976 */     Profile profile = this.m_prof;
+/*  977 */     if (this.poweruserProf == null) {
+/*  978 */       getPowerUserRole();
+/*      */     }
+/*  980 */     if (this.poweruserProf != null) {
+/*  981 */       profile = this.poweruserProf;
+/*      */     }
+/*      */     
+/*  984 */     if (this.xai == null) {
+/*  985 */       this.xai = new ExtractActionItem(null, this.m_db, profile, "dummy") { private static final long serialVersionUID = 1L;
+/*      */           
+/*      */           public String getPurpose() {
+/*  988 */             return "Edit";
+/*      */           } }
+/*      */         ;
+/*      */     }
+/*  992 */     for (byte b1 = 0; b1 < paramOPICMList.size(); b1++) {
+/*  993 */       PSUUpdateData pSUUpdateData = (PSUUpdateData)paramOPICMList.getAt(b1);
+/*  994 */       addDebug(3, "getCurrentValues: needed[" + b1 + "] " + pSUUpdateData);
+/*  995 */       vector.add(new EntityItem(null, profile, pSUUpdateData.getEntityType(), pSUUpdateData.getEntityId()));
+/*      */     } 
+/*      */     
+/*  998 */     EntityItem[] arrayOfEntityItem = new EntityItem[vector.size()];
+/*  999 */     vector.copyInto((Object[])arrayOfEntityItem);
+/*      */     
+/* 1001 */     EntityList entityList = this.m_db.getEntityList(profile, this.xai, arrayOfEntityItem);
+/* 1002 */     EntityGroup entityGroup = entityList.getParentEntityGroup();
+/*      */ 
+/*      */     
+/* 1005 */     for (byte b2 = 0; b2 < paramOPICMList.size(); b2++) {
+/* 1006 */       PSUUpdateData pSUUpdateData = (PSUUpdateData)paramOPICMList.getAt(b2);
+/* 1007 */       EntityItem entityItem = entityGroup.getEntityItem(pSUUpdateData.getEntityType() + pSUUpdateData.getEntityId());
+/*      */       
+/* 1009 */       for (byte b = 0; b < pSUUpdateData.rek.m_vctAttributes.size(); b++) {
+/* 1010 */         Attribute attribute = pSUUpdateData.rek.m_vctAttributes.elementAt(b);
+/* 1011 */         if (attribute.m_cbControlBlock == this.cbOff) {
+/* 1012 */           HashSet<String> hashSet; EANAttribute eANAttribute; String str1 = attribute.getAttributeCode();
+/* 1013 */           String str2 = getAttrType(str1);
+/*      */           
+/* 1015 */           String str3 = null;
+/* 1016 */           char c = str2.toUpperCase().charAt(0);
+/* 1017 */           switch (c) {
+/*      */             case 'A':
+/*      */             case 'S':
+/*      */             case 'U':
+/* 1021 */               str3 = PokUtils.getAttributeFlagValue(entityItem, str1);
+/*      */               break;
+/*      */             case 'F':
+/* 1024 */               hashSet = new HashSet();
+/* 1025 */               hashSet.add(attribute.getAttributeValue());
+/* 1026 */               if (PokUtils.contains(entityItem, str1, hashSet)) {
+/* 1027 */                 str3 = attribute.getAttributeValue();
+/*      */               } else {
+/* 1029 */                 str3 = null;
+/*      */               } 
+/* 1031 */               hashSet.clear();
+/*      */               break;
+/*      */             case 'T':
+/* 1034 */               eANAttribute = entityItem.getAttribute(str1);
+/* 1035 */               if (eANAttribute != null) {
+/* 1036 */                 str3 = eANAttribute.get().toString();
+/*      */               }
+/*      */               break;
+/*      */           } 
+/*      */           
+/* 1041 */           if (str3 == null) {
+/* 1042 */             EANMetaAttribute eANMetaAttribute = entityItem.getEntityGroup().getMetaAttribute(str1);
+/* 1043 */             if (eANMetaAttribute == null) {
+/* 1044 */               str3 = "Not found in " + pSUUpdateData.getEntityType() + " meta";
+/*      */             } else {
+/* 1046 */               str3 = "Not populated";
+/*      */             } 
+/* 1048 */             pSUUpdateData.addRemoveAttr(attribute);
+/*      */           } 
+/*      */           
+/* 1051 */           attribute.m_strAttributeValue = str3;
+/* 1052 */           addDebug(3, "getCurrentValues: psuEntityType: " + pSUUpdateData
+/* 1053 */               .getEntityType() + " psuEntityId: " + pSUUpdateData.getEntityId() + " psuAttr: " + str1 + " psuAttrType: " + str2 + " curValue: " + str3);
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1060 */     entityList.dereference();
+/* 1061 */     entityList = null;
+/* 1062 */     vector.clear();
+/* 1063 */     vector = null;
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private void getPowerUserRole() {
+/* 1068 */     String str = "POWERUSER";
+/*      */     try {
+/* 1070 */       this.poweruserProf = this.m_prof.getProfileForRoleCode(this.m_db, str, str, 1);
+/* 1071 */       if (this.poweruserProf == null) {
+/*      */         
+/* 1073 */         this.args[0] = str;
+/* 1074 */         addError("ROLE_ERR", this.args);
+/*      */       } else {
+/* 1076 */         addDebug("Switched role from " + this.m_prof.getRoleCode() + " to " + this.poweruserProf.getRoleCode());
+/* 1077 */         this.poweruserProf.setReadLanguage(0);
+/*      */       } 
+/* 1079 */     } catch (Exception exception) {
+/* 1080 */       exception.printStackTrace();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   void setAttribute(String paramString1, PSUUpdateData paramPSUUpdateData, String paramString2, String paramString3) {
+/* 1093 */     if (this.m_cbOn == null) {
+/* 1094 */       setControlBlock();
+/*      */     }
+/* 1096 */     setAttribute(paramString1, paramPSUUpdateData, paramString2, paramString3, this.m_cbOn);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   void deactivateAttribute(String paramString1, PSUUpdateData paramPSUUpdateData, String paramString2, String paramString3) {
+/* 1108 */     if (this.cbOff == null) {
+/* 1109 */       this.cbOff = new ControlBlock("1980-01-01-00.00.00.000000", "1980-01-01-00.00.00.000000", "1980-01-01-00.00.00.000000", "1980-01-01-00.00.00.000000", this.m_prof.getOPWGID());
+/*      */     }
+/* 1111 */     setAttribute(paramString1, paramPSUUpdateData, paramString2, paramString3, this.cbOff);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setAttribute(String paramString1, PSUUpdateData paramPSUUpdateData, String paramString2, String paramString3, ControlBlock paramControlBlock) {
+/* 1124 */     this.m_typeTbl.put(paramString2, paramString1);
+/*      */     
+/* 1126 */     char c = paramString1.toUpperCase().charAt(0);
+/* 1127 */     switch (c) {
+/*      */       case 'A':
+/*      */       case 'S':
+/*      */       case 'U':
+/* 1131 */         paramPSUUpdateData.setUniqueFlagValue(paramString2, paramString3, paramControlBlock);
+/*      */         break;
+/*      */       
+/*      */       case 'F':
+/* 1135 */         paramPSUUpdateData.setMultiFlagValue(paramString2, paramString3, paramControlBlock);
+/*      */         break;
+/*      */       case 'T':
+/* 1138 */         paramPSUUpdateData.setTextValue(paramString2, paramString3, paramControlBlock);
+/*      */         break;
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setTextValue(EntityItem paramEntityItem, String paramString1, String paramString2) {
+/* 1151 */     addDebug(4, "setTextValue entered for " + paramEntityItem.getKey() + " " + paramString1 + " set to: " + paramString2);
+/*      */ 
+/*      */ 
+/*      */     
+/* 1155 */     String str = PokUtils.getAttributeValue(paramEntityItem, paramString1, "", "", false);
+/* 1156 */     if (paramString2.equalsIgnoreCase(str)) {
+/* 1157 */       addDebug("setTextValue: " + paramString1 + " was already set to " + str + " for " + paramEntityItem.getKey() + ", nothing to do");
+/* 1158 */       logMessage("setTextValue: " + paramString1 + " was already set to " + str + " for " + paramEntityItem.getKey() + ", nothing to do");
+/*      */       
+/*      */       return;
+/*      */     } 
+/* 1162 */     Vector<Text> vector = null;
+/*      */     
+/* 1164 */     for (byte b = 0; b < this.vctReturnsEntityKeys.size(); b++) {
+/* 1165 */       ReturnEntityKey returnEntityKey = this.vctReturnsEntityKeys.elementAt(b);
+/* 1166 */       if (returnEntityKey.getEntityID() == paramEntityItem.getEntityID() && returnEntityKey
+/* 1167 */         .getEntityType().equals(paramEntityItem.getEntityType())) {
+/* 1168 */         vector = returnEntityKey.m_vctAttributes;
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/* 1172 */     if (vector == null) {
+/* 1173 */       ReturnEntityKey returnEntityKey = new ReturnEntityKey(paramEntityItem.getEntityType(), paramEntityItem.getEntityID(), true);
+/* 1174 */       vector = new Vector();
+/* 1175 */       returnEntityKey.m_vctAttributes = vector;
+/* 1176 */       this.vctReturnsEntityKeys.addElement(returnEntityKey);
+/*      */     } 
+/*      */ 
+/*      */     
+/* 1180 */     Text text = new Text(this.m_prof.getEnterprise(), paramEntityItem.getEntityType(), paramEntityItem.getEntityID(), paramString1, paramString2, 1, this.m_cbOn);
+/* 1181 */     vector.addElement(text);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setUniqueFlagValue(EntityItem paramEntityItem, String paramString1, String paramString2) {
+/* 1193 */     addDebug(4, "setUniqueFlagValue entered for " + paramEntityItem.getKey() + " " + paramString1 + " set to: " + paramString2);
+/*      */ 
+/*      */ 
+/*      */     
+/* 1197 */     String str = PokUtils.getAttributeFlagValue(paramEntityItem, paramString1);
+/* 1198 */     if (paramString2.equalsIgnoreCase(str)) {
+/* 1199 */       addDebug("setUniqueFlagValue: " + paramString1 + " was already set to " + str + " for " + paramEntityItem.getKey() + ", nothing to do");
+/* 1200 */       logMessage("setUniqueFlagValue: " + paramString1 + " was already set to " + str + " for " + paramEntityItem.getKey() + ", nothing to do");
+/*      */       
+/*      */       return;
+/*      */     } 
+/* 1204 */     Vector<SingleFlag> vector = null;
+/*      */     
+/* 1206 */     for (byte b = 0; b < this.vctReturnsEntityKeys.size(); b++) {
+/* 1207 */       ReturnEntityKey returnEntityKey = this.vctReturnsEntityKeys.elementAt(b);
+/* 1208 */       if (returnEntityKey.getEntityID() == paramEntityItem.getEntityID() && returnEntityKey
+/* 1209 */         .getEntityType().equals(paramEntityItem.getEntityType())) {
+/* 1210 */         vector = returnEntityKey.m_vctAttributes;
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/* 1214 */     if (vector == null) {
+/* 1215 */       ReturnEntityKey returnEntityKey = new ReturnEntityKey(paramEntityItem.getEntityType(), paramEntityItem.getEntityID(), true);
+/* 1216 */       vector = new Vector();
+/* 1217 */       returnEntityKey.m_vctAttributes = vector;
+/* 1218 */       this.vctReturnsEntityKeys.addElement(returnEntityKey);
+/*      */     } 
+/*      */     
+/* 1221 */     SingleFlag singleFlag = new SingleFlag(this.m_prof.getEnterprise(), paramEntityItem.getEntityType(), paramEntityItem.getEntityID(), paramString1, paramString2, 1, this.m_cbOn);
+/*      */ 
+/*      */     
+/* 1224 */     vector.addElement(singleFlag);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   void updatePDH() throws SQLException, MiddlewareException, RemoteException, MiddlewareShutdownInProgressException, EANBusinessRuleException {
+/* 1238 */     logMessage(getDescription() + " updating PDH");
+/* 1239 */     addDebug(4, "updatePDH entered for vctReturnsEntityKeys: " + this.vctReturnsEntityKeys.size());
+/*      */     
+/* 1241 */     if (this.vctReturnsEntityKeys.size() > 0) {
+/*      */       try {
+/* 1243 */         this.m_db.update(this.m_prof, this.vctReturnsEntityKeys, false, false);
+/*      */       } finally {
+/*      */         
+/* 1246 */         this.vctReturnsEntityKeys.clear();
+/* 1247 */         this.m_db.commit();
+/* 1248 */         this.m_db.freeStatement();
+/* 1249 */         this.m_db.isPending("finally after updatePDH");
+/*      */       } 
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void dereference() {
+/* 1258 */     super.dereference();
+/*      */     
+/* 1260 */     if (this.xai != null) {
+/* 1261 */       this.xai.dereference();
+/* 1262 */       this.xai = null;
+/*      */     } 
+/*      */     
+/* 1265 */     this.attrComp = null;
+/* 1266 */     this.poweruserProf = null;
+/* 1267 */     this.rsBundle = null;
+/* 1268 */     this.rptSb = null;
+/* 1269 */     this.args = null;
+/*      */     
+/* 1271 */     this.cbOff = null;
+/* 1272 */     this.navMetaTbl = null;
+/* 1273 */     this.navName = null;
+/* 1274 */     this.psucriteria = null;
+/* 1275 */     this.currentPSUHIGHENTITYTYPE = null;
+/* 1276 */     this.currentPSUPROGRESS = null;
+/*      */     
+/* 1278 */     this.updatedRootTbl.clear();
+/* 1279 */     this.updatedRootTbl = null;
+/*      */     
+/* 1281 */     if (this.actionItemTbl != null) {
+/* 1282 */       for (Enumeration enumeration = this.actionItemTbl.keys(); enumeration.hasMoreElements(); ) {
+/* 1283 */         EANActionItem eANActionItem = (EANActionItem)this.actionItemTbl.get(enumeration.nextElement());
+/* 1284 */         if (eANActionItem instanceof LinkActionItem) {
+/* 1285 */           LinkActionItem linkActionItem = (LinkActionItem)eANActionItem;
+/* 1286 */           linkActionItem.dereference(); continue;
+/* 1287 */         }  if (eANActionItem instanceof DeleteActionItem) {
+/* 1288 */           DeleteActionItem deleteActionItem = (DeleteActionItem)eANActionItem;
+/* 1289 */           deleteActionItem.dereference();
+/*      */         } 
+/*      */       } 
+/* 1292 */       this.actionItemTbl.clear();
+/* 1293 */       this.actionItemTbl = null;
+/*      */     } 
+/* 1295 */     this.m_typeTbl.clear();
+/* 1296 */     this.m_typeTbl = null;
+/*      */     
+/* 1298 */     this.vctReturnsEntityKeys.clear();
+/* 1299 */     this.vctReturnsEntityKeys = null;
+/*      */     
+/* 1301 */     this.dbgPw = null;
+/* 1302 */     this.dbgfn = null;
+/* 1303 */     this.updatedSB = null;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getABRVersion() {
+/* 1309 */     return "$Revision: 1.2 $";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getDescription() {
+/* 1316 */     return "PSUABRSTATUS";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   String getLD_Value(EntityItem paramEntityItem, String paramString) {
+/* 1324 */     return PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), paramString, paramString) + ": " + 
+/* 1325 */       PokUtils.getAttributeValue(paramEntityItem, paramString, ",", "<em>** Not Populated **</em>", false);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addOutput(String paramString) {
+/* 1331 */     this.rptSb.append("<p>" + paramString + "</p>" + NEWLINE);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   void addDebug(int paramInt, String paramString) {
+/* 1339 */     if (paramInt <= this.abr_debuglvl) {
+/* 1340 */       addDebug(paramString);
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   void addDebug(String paramString) {
+/* 1348 */     if (this.dbgPw != null) {
+/* 1349 */       this.dbgLen += paramString.length();
+/* 1350 */       this.dbgPw.println(paramString);
+/* 1351 */       this.dbgPw.flush();
+/*      */     } else {
+/* 1353 */       this.rptSb.append("<!-- " + paramString + " -->" + NEWLINE);
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   void addError(String paramString, Object[] paramArrayOfObject) {
+/* 1367 */     setReturnCode(-1);
+/*      */ 
+/*      */     
+/* 1370 */     addMessage(this.rsBundle.getString("ERROR_PREFIX"), paramString, paramArrayOfObject);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   void addMessage(String paramString1, String paramString2, Object[] paramArrayOfObject) {
+/* 1379 */     String str = this.rsBundle.getString(paramString2);
+/*      */     
+/* 1381 */     if (paramArrayOfObject != null) {
+/* 1382 */       MessageFormat messageFormat = new MessageFormat(str);
+/* 1383 */       str = messageFormat.format(paramArrayOfObject);
+/*      */     } 
+/*      */     
+/* 1386 */     addOutput(paramString1 + " " + str);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   String getNavigationName(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 1396 */     StringBuffer stringBuffer = new StringBuffer();
+/*      */ 
+/*      */ 
+/*      */     
+/* 1400 */     EANList eANList = (EANList)this.navMetaTbl.get(paramEntityItem.getEntityType());
+/* 1401 */     if (eANList == null) {
+/* 1402 */       EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, paramEntityItem.getEntityType(), "Navigate");
+/* 1403 */       eANList = entityGroup.getMetaAttribute();
+/* 1404 */       this.navMetaTbl.put(paramEntityItem.getEntityType(), eANList);
+/*      */     } 
+/* 1406 */     for (byte b = 0; b < eANList.size(); b++) {
+/* 1407 */       EANMetaAttribute eANMetaAttribute = (EANMetaAttribute)eANList.getAt(b);
+/* 1408 */       stringBuffer.append(PokUtils.getAttributeValue(paramEntityItem, eANMetaAttribute.getAttributeCode(), ", ", "", false));
+/* 1409 */       if (b + 1 < eANList.size()) {
+/* 1410 */         stringBuffer.append(" ");
+/*      */       }
+/*      */     } 
+/*      */     
+/* 1414 */     return stringBuffer.toString().trim();
+/*      */   }
+/*      */   
+/*      */   private class AttrComparator
+/*      */     implements Comparator {
+/*      */     private AttrComparator() {}
+/*      */     
+/*      */     public int compare(Object param1Object1, Object param1Object2) {
+/* 1422 */       Attribute attribute1 = (Attribute)param1Object1;
+/* 1423 */       Attribute attribute2 = (Attribute)param1Object2;
+/* 1424 */       String str1 = (String)PSUABRSTATUS.this.m_typeTbl.get(attribute1.getAttributeCode());
+/* 1425 */       String str2 = (String)PSUABRSTATUS.this.m_typeTbl.get(attribute2.getAttributeCode());
+/* 1426 */       if (str1.charAt(0) == 'A') {
+/* 1427 */         str1 = "Z";
+/*      */       }
+/* 1429 */       if (str2.charAt(0) == 'A') {
+/* 1430 */         str2 = "Z";
+/*      */       }
+/* 1432 */       if (str1.charAt(0) == 'S') {
+/* 1433 */         str1 = "Y";
+/*      */       }
+/* 1435 */       if (str2.charAt(0) == 'S') {
+/* 1436 */         str2 = "Y";
+/*      */       }
+/* 1438 */       return str1.compareTo(str2);
+/*      */     }
+/*      */   }
+/*      */ }
 
-//(C) Copyright IBM Corp. 2013  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
 
-package COM.ibm.eannounce.abr.sg.psu;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.rmi.RemoteException;
-import java.sql.SQLException;
-import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.Vector;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
-import COM.ibm.eannounce.abr.util.ABRUtil;
-import COM.ibm.eannounce.abr.util.EACustom;
-import COM.ibm.eannounce.abr.util.PokBaseABR;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.opicmpdh.objects.*;
-import COM.ibm.opicmpdh.transactions.OPICMList;
-
-/****
- * BH FS ABR PDH Update 20130225.doc
- *
- * V.	Design Considerations
- * Middleware will be used to make all updates to the PDH. Middleware will also be used to obtain data 
- * from the PDH and there will be a need to access an Operational Data Store (ODS - price schema).
- * 
- * It is also necessary to provide a method of limiting the amount of churn (e.g. XML sent downstream) created 
- * for a single invocation of the ABR. Chunking updates (e.g. 1,000 limit per invocation) will be used to 
- * control this by specifying the maximum number of updates per invocation.
- * 
- * VI.	SETUP Data
-
-A new entity type "PDH Update" (PDHUPDATE) will be used to define the requirements of the update 
-and to track the new ABR. Another new entity type "PDH Update Action" (PDHUPDATEACT), a child of 
-"PDH Update" will specify update actions.
-
-“PDH Update” (PDHUPDATE)
-
-AttributeCode	Type	LongDescription
-PSUDESCRIPTION	T	Description of Update
-CAT2			F	Subscription / Notification CAT2
-PSUDBTYPE		U	Database Type
-PSUCRITERIA		U	Criteria
-PSUVIEW			T	DB2 VIEW
-PSULAST			T	Last Processed
-PSUMAX			T	Maximum # per Pass
-PSUHIGHENTITYTYPE	T	High Entity Type Processed
-PSUHIGHENTITYID	T	High Entity ID Processed
-PSUPROGRESS		U	The status of this request
-PSUABRSTATUS	A	PDH Update ABR
-PDHDOMAIN		F	Domains
-
-The attributes are used as follows:
-1.	PSUDESCRIPTION – used only by the user as a reminder of the purpose of this setup data.
-2.	CAT2 – if specified in PDHUPDATE, then it is used as the value for CAT2 in subscription / notification.
-3.	PSUDBTYPE – type “U”, Required (EXIST), values = “PDH” | “ODS”
-4.	PSUCRITERIA – Required - indicates the form of the criteria (children)
-•	LIST – the children specify everything required to define the update. There may be one more children of entity type “PDH Update Action” (PDHUPDATEACT). The list will support PSUCLASS IN {Update | Reference}.
-•	VIEW – there may be one or more children of entity type “PDH Update Action” (PDHUPDATEACT). There will be exactly one where PSUCLASS IN {Update | Reference}. In this case, the values are the column names that have the values. 
-5.	PSUVIEW – applicable only if PSUCRITERIA = VIEW. It is the name of the DB2 VIEW including the name of the schema.
-e.g. schema.nameofview
-6.	PSULAST – Integer: the default value is zero. It is updated by this ABR to be the number of root entities updated (i.e. PSUENTITYTYPE in “PDH Update Action” (PDHUPDATEACT). Each pass will add to this value. For example (1650 updates required), if the first invocation is limited to 1,000 then at the completion of the 1,000 entity updates, this is set to 1,000. The second invocation would update 650 (the rest) and the ABR would add this to the current value giving a new value of 1,650.
-7.	PSUMAX – Integer: is the maximum number of PSUENTITYTYPEs updated in a single invocation of this ABR. If empty, then there is not limit (Maximum).
-8.	PSUHIGHENTITYTYPE – This is the last entity type processed.
-9.	PSUHIGHENTITYID – Integer saved as TEXT: this is the last entity id processed
-10.	PSUPROGRESS – indicates the status or progress of this request.
-•	Not Started – default value - the ABR has never ran
-•	Chunking – the ABR ran but did not process all requests due to PSUMAX limit
-•	Complete – the ABR completed all requests specified by the VIEW (or LIST)
-11.	PSUABRSTATUS – defaults to “Untried” (0010). It is set via a Workflow action to “Queued” (0020). Taskmaster and the ABR update this attribute to reflect the state of the ABR.
-12.	PDHDOMAIN – used for instance based security
-
-
-“PDH Update Action” (PDHUPDATEACT)
-
-AttributeCode	Type	LongDescription		Applicable
-PSUCLASS		U	Update Class			A		
-PSUENTITYTYPE	T	Entity Type				U R D
-PSUENTITYID		T	Entity ID				U R D
-PSUATTRIBUTE	T	Update Attribute Code	U R
-PSUATTRTYPE		T	Attribute Type			U R
-PSUATTRACTION	T	Attribute Update Action	U R D
-PSUATTRVALUE	T	Update Attribute Value	U R
-PSUENTITYTYPEREF	T	Entity Type Referenced	R
-PSUENTITYIDREF	T	Entity ID Referenced	R
-PSURELATORTYPE	T	Relator Type			R
-PSURELATORACTION	T	Relator Action		R D
-PDHDOMAIN		F	Domains					A
-
-Applicable:
-•	A : Always
-•	U : when PSUCLASS = Update
-•	R : when PSUCLASS = Reference and PSUATTRACTION = N
-•	D : when PSUCLASS = Reference and PSUATTRACTION = D
-
-The attributes are used as follows:
-1.	PSUCLASS
-•	Update – a DB2 view is used to apply the criteria and identify the data that needs to be updated
-•	Reference - a DB2 view is used to apply the criteria and identify the data that needs to be related 
-•	Other values (function) will be specified (developed) over time.
-
-Note: 
-The following columns are based on the value of PSUCRITERIA.
-•	LIST – the contents specify the value.
-•	VIEW – the contents are the name of the column in the view that specifies the value.
-
-2.	PSUENTITYTYPE – The PDH Entity Type that will be updated or the relator entitytype being deactivated. 
-3.	PSUENTITYID – The PDH Entity ID that will be updated or the relator id being deactivated.
-4.	PSUATTRIBUTE – The PDH Attribute Code that will be updated.
-5.	PSUATTRTYPE – The attribute type being updated
-•	T – Text
-•	U – Unique Flag
-•	F – Multi-Value Flag
-•	A – ABR Flag
-•	S – Status Flag
-or column name
-6.	PSUATTRACTION – The requested action
-•	N – add this New value
-•	D - Deactivate this value
-or column name
-7.	PSUATTRVALUE – The PDH Attribute Value that will be used for the update. 
-If PSUATTRACTION = D, then this column is not applicable.
-•	For PSUATTRTYPE “T”, this is a text string
-•	For all other types, it is text specifying the Description Class (Flag Code) for the FLAG.
-8.	PSUENTITYTYPEREF – The target entity type of the reference (relator) being created. 
-9.	PSURELATORENTITYID - The entityid of entity being referenced.
-10.	PSURELATORTYPE – The Relator Entity Type used to create the reference.
-12.	PSURELATORACTION – This is the name of the action defined in the PDH via Meta Data to create or deactivate the relator. 
-13.	PDHDOMAIN – used for instance based security
-
-
-VIII.	User Interface
-The Java User Interface will be updated via meta data for the ROLE = SYSFEEDADMIN and available in the 
-WORKGROUP = ISG.
-An authorized user will be able to create the setup data and queue the ABR.
-Development needs to create the DB2 VIEW based on the data required to be updated prior to the ABR being invoked.
-There is a 1 hour delay before the ODS is updated for the SETUP Entity and the updated data. It is recommended that 
-the user wait 2 hours after the data is setup and / between invocations of the ABR (chunking).
-
-The subscription information for the Reports will be:
-CAT1= PDHUPDATE
-CAT2= CAT2 from PDHUPDATE if specified
-CAT3= TASKSTATUS
-SUBSCRVE= PDHABR
-
-PSUABRSTATUS_class=COM.ibm.eannounce.abr.sg.psu.PSUABRSTATUS
-PSUABRSTATUS_enabled=true
-PSUABRSTATUS_idler_class=D
-PSUABRSTATUS_keepfile=true
-PSUABRSTATUS_read_only=false
-PSUABRSTATUS_vename=EXTPSUVE
-PSUABRSTATUS_debugLevel=0
-PSUABRSTATUS_CAT1=PDHUPDATE
-PSUABRSTATUS_CAT3=TASKSTATUS
-PSUABRSTATUS_SUBSCRVE=PDHABR
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\psu\PSUABRSTATUS.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-//$Log: PSUABRSTATUS.java,v $
-//Revision 1.2  2014/01/13 13:53:48  wendy
-//migration to V17
-//
-//Revision 1.1  2013/04/19 19:28:44  wendy
-//Add PSUABRSTATUS
-//
-public class PSUABRSTATUS extends PokBaseABR {
-	private static final int MAXFILE_SIZE=5000000;
-	private static final char[] FOOL_JTEST = {'\n'};
-
-	static final int UPDATE_SIZE =
-		Integer.parseInt(COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue("PSUABRSTATUS" ,
-				"_UpdateSize","200"));
-
-	static final String UPDATE_CLASS = "Update Class";
-	static final String UPDATE_ENTITYTYPE = "Entity Type";
-	static final String UPDATE_ENTITYID = "Entity ID";
-	static final String UPDATE_ATTRCODE = "Update Attribute Code";
-	static final String UPDATE_ATTRTYPE = "Attribute Type";
-	static final String UPDATE_ATTRACT = "Attribute Update Action";
-	static final String UPDATE_ATTRVAL = "Update Attribute Value";
-	static final String UPDATE_REF_ENTITYTYPE = "Entity Type Referenced";
-	static final String UPDATE_REF_ENTITYID = "Entity ID Referenced";
-	static final String UPDATE_RELTYPE = "Relator";
-	static final String UPDATE_RELACT = "Relator Action";
-
-
-	//PSUPROGRESS	PSUPRG1		Not Started 
-	//PSUPROGRESS	PSUPRG2		Chunking
-	//PSUPROGRESS	PSUPRG3		Complete
-	private static final String PSUPROGRESS_Chunking = "PSUPRG2";
-	private static final String PSUPROGRESS_Complete = "PSUPRG3";
-
-	//PSUCRITERIA	LIST		List
-	//PSUCRITERIA	VIEW		View
-	private static final String PSUCRITERIA_View = "VIEW";
-	private static final String PSUCRITERIA_List = "LIST";
-
-	//PSUCLASS	PSUC1		Update
-	//PSUCLASS	PSUC2		Reference
-	static final String PSUCLASS_Reference = "PSUC2";
-	static final String PSUCLASS_Update = "PSUC1";
-
-	static final String PSUATTRACTION_N = "N";  //add this New value or create relator
-	static final String PSUATTRACTION_D = "D";  //Deactivate this value or relator
-
-	private static final String[] PDHUPDATE_ATTRS = new String[]{
-		"PSUDESCRIPTION","CAT2","PSUCRITERIA","PSUVIEW","PSUDBTYPE",
-		"PSULAST","PSUMAX",	"PSUHIGHENTITYTYPE",
-		"PSUHIGHENTITYID","PSUPROGRESS","PDHDOMAIN"};
-
-
-	static final String NEWLINE = new String(FOOL_JTEST);
-
-	private StringBuffer rptSb = new StringBuffer();
-	private Object[] args = new String[10];
-
-	private ResourceBundle rsBundle = null;
-	private Hashtable navMetaTbl = new Hashtable();
-	private StringBuffer updatedSB = new StringBuffer();
-	private String navName = "";
-	private String cat2 = null;
-	private PrintWriter dbgPw=null;
-	private String dbgfn = null;
-	private String psucriteria ="";
-	private int dbgLen=0;
-	private int abr_debuglvl=D.EBUG_ERR;
-	private ControlBlock cbOff = null;
-	private Vector vctReturnsEntityKeys = new Vector();
-	private Hashtable m_typeTbl = new Hashtable();// need attr type for user msg and comparator
-	private Hashtable actionItemTbl = null;
-	private String currentPSUHIGHENTITYTYPE; // dont set same value over and over
-	private String currentPSUPROGRESS;
-	private int currentPSUHIGHENTITYID;
-	private Profile poweruserProf = null;
-	private Hashtable updatedRootTbl = new Hashtable();
-	private ExtractActionItem xai = null;
-	private int psuLast = 0;
-	private AttrComparator attrComp = new AttrComparator();
-
-	private void setupPrintWriter(){
-		String fn = m_abri.getFileName();
-		int extid = fn.lastIndexOf(".");
-		dbgfn = fn.substring(0,extid+1)+"dbg";
-		try {
-			dbgPw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(dbgfn, true), "UTF-8"));
-		} catch (Exception x) {
-			dbgfn = null;
-			D.ebug(D.EBUG_ERR, "trouble creating debug PrintWriter " + x);
-		}
-	}
-	private void closePrintWriter() {
-		if (dbgPw != null){
-			dbgPw.flush();
-			dbgPw.close();
-			dbgPw = null;
-		}
-	}
-
-	/**********************************
-	 *  Execute ABR.
-	 *  
-	 *  VII.	Processor
-	 *  The ABR is invoked for the root entity "PDH Update" (PDHUPDATE). The ABR will obtain the children 
-	 *  "PDH Update Action" (PDHUPDATEACT) via an extract action.
-	 *  
-	 *  The Select from the DB2 VIEW will need to be sorted (ordered by) in ascending order by Entity Type and 
-	 *  Entity ID. 
-	 *  
-	 *  The LIST will be sorted (ordered by) in ascending order by Entity Type and Entity ID.
-	 *  
-	 *  The "Maximum # per Pass" (PSUMAX) specifies the maximum number of entities (Entity Type / Entity ID) 
-	 *  that should be updated per invocation of this ABR. Note that this is not the number of rows since the 
-	 *  same Entity type / Entity ID) may have multiple rows (updates).
-	 *  
-	 *  Since there may be multiple instances of "PDH Update Action" (PDHUPDATEACT) for the same entity, all 
-	 *  instances should be processed together. In other words, all updates to a specific Entity Type Entity ID 
-	 *  will be made in a single pass. 
-	 *  
-	 *  The first time this ABR runs, it will set PSUPROGRESS to "Chunking". However, if all rows in the VIEW 
-	 *  are complete, then PSUPROGRESS is set to "Complete". If at startup, this value is "Complete", then the 
-	 *  ABR should not run.
-	 *  
-	 *  The ABR should count the number of Entity Type / Entity IDs (instances of the entity type) updated and 
-	 *  add this to the initial PSULAST value when the ABR has finished processing.
-	 *  
-	 *  The ABR should update PSUHIGHENTITYTYPE and PSUHIGHENTITYID for the last instance of the entity processed. 
-	 *  For subsequent invocations, the ABR will start with the next row in the LIST or VIEW.
-	 *  
-	 *  The ABR will always add relators. If duplicate relators are not desired, the LIST and VIEW must ensure 
-	 *  that duplicates are not requested
-	 *  
-	 */
-	public void execute_run()
-	{
-		/*
-		 The Report should contain the following information:
-			"PDH Update" (PDHUPDATE)
-			For all attributes
-			-	Long Description
-			-	Attribute Value(s)
-
-			A list of the updates:
-			Entity Type
-			Entity ID
-			Update Attribute Code
-			Attribute Type
-			Attribute Update Action
-			Update Attribute Value
-			Entity Type Referenced
-			Entity ID Referenced
-			Relator Type
-			Relator Action
-		 */
-		// must split because too many arguments for messageformat, max of 10.. this was 11
-		String HEADER = "<head>"+
-		EACustom.getMetaTags(getDescription()) + NEWLINE +
-		EACustom.getCSS() + NEWLINE +
-		EACustom.getTitle("{0} {1}") + NEWLINE +
-		"</head>" + NEWLINE + "<body id=\"ibm-com\">" +
-		EACustom.getMastheadDiv() + NEWLINE +
-		"<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
-		String HEADER2 = "<table>"+NEWLINE +
-		"<tr><th>Userid: </th><td>{0}</td></tr>"+NEWLINE +
-		"<tr><th>Role: </th><td>{1}</td></tr>"+NEWLINE +
-		"<tr><th>Workgroup: </th><td>{2}</td></tr>"+NEWLINE +
-		"<tr><th>Date: </th><td>{3}</td></tr>"+NEWLINE +
-		"<tr><th>Description: </th><td>{4}</td></tr>"+NEWLINE +
-		"<tr><th>Return code: </th><td>{5}</td></tr>"+NEWLINE +
-		"</table>"+NEWLINE+
-		"<!-- {6} -->" + NEWLINE;
-
-		MessageFormat msgf;
-		String abrversion="";
-		EntityItem rootEntity=null;
-
-		println(EACustom.getDocTypeHtml()); //Output the doctype and html
-
-		try	{
-			long startTime = System.currentTimeMillis();
-			start_ABRBuild(); // pull VE
-
-			abr_debuglvl = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getABRDebugLevel(m_abri.getABRCode());
-
-			setupPrintWriter();
-			// force nlsid=1
-			m_prof.setReadLanguage(Profile.ENGLISH_LANGUAGE);
-
-			//get properties file for the base class
-			rsBundle = ResourceBundle.getBundle(getClass().getName(), ABRUtil.getLocale(m_prof.getReadLanguage().getNLSID()));
-			// get root from VE
-			rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-			// debug display list of groups
-			addDebug("DEBUG: "+getShortClassName(getClass())+" entered for " +rootEntity.getKey()+
-					" extract: "+m_abri.getVEName()+" using DTS: "+m_prof.getValOn()+NEWLINE + PokUtils.outputList(m_elist));
-
-			//NAME is navigate attributes
-			navName = getNavigationName(rootEntity);
-			//2.	CAT2 – if specified in PDHUPDATE, then it is used as the value for CAT2 in subscription / notification.
-			cat2 = PokUtils.getAttributeValue(rootEntity, "CAT2", ",", null, false);
-
-			psuLast = Integer.parseInt(PokUtils.getAttributeValue(rootEntity, "PSULAST", "", "0", false));
-			
-			//Default set to pass
-			setReturnCode(PASS);
-
-//			FIXME remove this.. avoid msgs to userid for testing
-//			setCreateDGEntity(false);
-
-			currentPSUHIGHENTITYTYPE = PokUtils.getAttributeValue(rootEntity, "PSUHIGHENTITYTYPE", "", null, false);
-			currentPSUPROGRESS = PokUtils.getAttributeFlagValue(rootEntity, "PSUPROGRESS");
-			currentPSUHIGHENTITYID = Integer.parseInt(PokUtils.getAttributeValue(rootEntity, "PSUHIGHENTITYID", "", 
-					"-1", false));
-
-			addDebug(rootEntity.getKey()+" PSUPROGRESS: "+currentPSUPROGRESS+
-					" PSUHIGHENTITYTYPE: "+currentPSUHIGHENTITYTYPE+
-					" PSUHIGHENTITYID: "+currentPSUHIGHENTITYID+" CAT2: "+cat2+" psuLast "+psuLast);
-
-			if(PSUPROGRESS_Complete.equals(currentPSUPROGRESS)){
-				//If at startup, this value is "Complete", then the  ABR should not run.
-				//COMPLETED_ERR = Nothing to do. {0}
-				args[0] = getLD_Value(rootEntity, "PSUPROGRESS");
-				addMessage("","COMPLETED_ERR",args);
-			}else {
-				// is this getting updates from view or list?
-				psucriteria = PokUtils.getAttributeFlagValue(rootEntity, "PSUCRITERIA");
-				addDebug(rootEntity.getKey()+" PSUCRITERIA: "+psucriteria);
-				if(psucriteria==null){
-					//REQ_NOTPOPULATED_ERR = {0} {1} is required and does not have a value.
-					args[0] = rootEntity.getEntityGroup().getLongDescription();
-					args[1] = PokUtils.getAttributeDescription(rootEntity.getEntityGroup(), "PSUCRITERIA", "PSUCRITERIA");
-					addError("REQ_NOTPOPULATED_ERR",args);
-				} else{ 
-					// is this getting updates from view or list
-					if(PSUCRITERIA_View.equals(psucriteria)){
-						// get updates from view
-						PSUView psuView = new PSUView(this,rootEntity);
-						psuView.execute(m_elist.getEntityGroup("PDHUPDATEACT"));
-						psuView.dereference();
-					}else if(PSUCRITERIA_List.equals(psucriteria)){
-						// get updates from list
-						PSUList psuList = new PSUList(this,rootEntity);
-						psuList.execute(m_elist.getEntityGroup("PDHUPDATEACT"));
-						psuList.dereference();
-					}else{
-						//CRITERIA_NOTSUPP_ERR = {0} is not supported.
-						args[0] = getLD_Value(rootEntity, "PSUCRITERIA");
-						addError("CRITERIA_NOTSUPP_ERR",args);
-					}
-				}
-			}
-
-			addDebug("Total Time: "+Stopwatch.format(System.currentTimeMillis()-startTime));
-		}
-		catch(Throwable exc) {
-			java.io.StringWriter exBuf = new java.io.StringWriter();
-			String Error_EXCEPTION="<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
-			String Error_STACKTRACE="<pre>{0}</pre>";
-			msgf = new MessageFormat(Error_EXCEPTION);
-			setReturnCode(INTERNAL_ERROR);
-			exc.printStackTrace(new java.io.PrintWriter(exBuf));
-			// Put exception into document
-			args[0] = exc.getMessage();
-			rptSb.append(msgf.format(args) + NEWLINE);
-			msgf = new MessageFormat(Error_STACKTRACE);
-			args[0] = exBuf.getBuffer().toString();
-
-			rptSb.append(getAllUpdateInfo()); // put all updates before err msgs
-
-			rptSb.append(msgf.format(args) + NEWLINE);
-			logError("Exception: "+exc.getMessage());
-			logError(exBuf.getBuffer().toString());
-		}
-		finally	{
-			setDGTitle(navName);
-			setDGRptName(getShortClassName(getClass()));
-			setDGRptClass(getABRCode());
-			//2.	CAT2 – if specified in PDHUPDATE, then it is used as the value for CAT2 in subscription / notification.
-			if(cat2 !=null) {
-				// CAT2 is multiflag, parse it now
-				StringTokenizer st = new StringTokenizer(cat2,",");
-				String []cat2Array = new String[st.countTokens()];
-				int cnt=0;
-				while(st.hasMoreTokens()){
-					cat2Array[cnt] = st.nextToken();
-				}
-				setDGCat2(cat2Array);
-			}
-			// make sure the lock is released
-			if(!isReadOnly()) {
-				clearSoftLock();
-			}
-			closePrintWriter();
-		}
-
-		//Print everything up to </html>
-		//Insert Header into beginning of report
-		msgf = new MessageFormat(HEADER);
-		args[0] = getDescription();
-		args[1] = navName;
-		String header1 = msgf.format(args);
-		msgf = new MessageFormat(HEADER2);
-		args[0] = m_prof.getOPName();
-		args[1] = m_prof.getRoleDescription();
-		args[2] = m_prof.getWGName();
-		args[3] = getNow();
-		args[4] = navName;
-		args[5] = (this.getReturnCode()==PokBaseABR.PASS?"Passed":"Failed");
-		args[6] = abrversion+" "+getABRVersion();
-
-		rptSb.append(getAllUpdateInfo()); // put all updates after err msgs
-
-		restoreXtraContent();
-
-		rptSb.insert(0, header1+msgf.format(args) + NEWLINE+getRequestInfo(rootEntity));
-
-		println(rptSb.toString()); // Output the Report
-		printDGSubmitString();
-		println(EACustom.getTOUDiv());
-		buildReportFooter(); // Print </html>
-
-		navMetaTbl.clear();
-	}
-	/**
-	 * output the root entity info 
-	 * "PDH Update" (PDHUPDATE)
-	 * For all attributes
-	 * -	Long Description
-	 * -	Attribute Value(s)
-	 * @param rootEntity
-	 */
-	private String getRequestInfo(EntityItem rootEntity) {
-		if(rootEntity==null){
-			return "";
-		}
-		StringBuffer sb = new StringBuffer("<table width='600'>"+NEWLINE);
-		sb.append("<tr><th>Attribute</th><th>Entry Value</th><th>Exit Value</th></tr>"+NEWLINE);
-		sb.append("<tr><td colspan='3'><b>"+rootEntity.getEntityGroup().getLongDescription()+": "+
-				navName+"</b></td></tr>"+NEWLINE);
-		// add attributes
-		for (int i=0;i<PDHUPDATE_ATTRS.length;i++){
-			String attrcode = PDHUPDATE_ATTRS[i];
-			String b4Value = PokUtils.getAttributeValue(rootEntity, attrcode, ", ", PokUtils.DEFNOTPOPULATED);
-			sb.append("<tr><td>"+
-					PokUtils.getAttributeDescription(rootEntity.getEntityGroup(),attrcode , attrcode)+
-					": </td><td>"+b4Value+"</td><td>"+getExitValue(b4Value,attrcode)+
-					"</td></tr>"+NEWLINE);
-		}
-
-		sb.append("</table><br />"+NEWLINE);
-
-		return sb.toString();
-	}
-
-	/**
-	 * add one row for each set of updates
-	 * A list of the updates:
-Entity Type
-Entity ID
-Update Attribute Code
-Attribute Type
-Attribute Update Action
-Update Attribute Value
-Entity Type Referenced
-Entity ID Referenced
-Relator Type
-Relator Action
-	 * @param item
-	 */
-	void addUpdateInfo(Hashtable infoTbl){
-		// append a row for each update
-		updatedSB.append("<tr><td>"+getUpdateValue(infoTbl,UPDATE_CLASS)+
-				"</td><td>"+getUpdateValue(infoTbl,UPDATE_ENTITYTYPE)+
-				"</td><td>"+getUpdateValue(infoTbl,UPDATE_ENTITYID)+
-				"</td><td>"+getUpdateValue(infoTbl,UPDATE_ATTRCODE)+"</td>");
-		updatedSB.append("<td>"+getUpdateValue(infoTbl,UPDATE_ATTRTYPE)+
-				"</td><td>"+getUpdateValue(infoTbl,UPDATE_ATTRACT)+
-				"</td><td>"+getUpdateValue(infoTbl,UPDATE_ATTRVAL)+"</td>");
-		updatedSB.append("<td>"+getUpdateValue(infoTbl,UPDATE_REF_ENTITYTYPE)+
-				"</td><td>"+getUpdateValue(infoTbl,UPDATE_REF_ENTITYID)+
-				"</td><td>"+getUpdateValue(infoTbl,UPDATE_RELTYPE)+
-				"</td><td>"+getUpdateValue(infoTbl,UPDATE_RELACT)+"</td></tr>"+NEWLINE);
-		infoTbl.clear();
-	}
-	/**
-	 * get value for key, if null, return nbsp
-	 * @param infoTbl
-	 * @param key
-	 * @return
-	 */
-	private String getUpdateValue(Hashtable infoTbl, String key){
-		String val = "&nbsp;";
-		if(infoTbl.containsKey(key)){
-			String value = infoTbl.get(key).toString();
-			if(value.trim().length()>0){
-				val = value;
-			}  
-		}
-
-		return val;
-	}
-	/**
-	 * get value for attr, if null, return root value
-	 * @param defvalue
-	 * @param attrcode
-	 * @return
-	 */
-	private String getExitValue(String defvalue,String attrcode){
-		String val = defvalue;
-		if(updatedRootTbl.containsKey(attrcode)){
-			String value = updatedRootTbl.get(attrcode).toString();
-			if(value.trim().length()>0){
-				val = value;
-			}  
-		}
-
-		return val;
-	}
-	/**
-	 * get all updates made in this execution
-	 * @return
-	 */
-	private String getAllUpdateInfo(){
-		StringBuffer sb = new StringBuffer();
-		if(updatedSB.length()>0){
-			// build table
-			sb.append("<table><tr><th>"+UPDATE_CLASS+"</th><th>"+UPDATE_ENTITYTYPE+"</th><th>"+UPDATE_ENTITYID+"</th><th>"+UPDATE_ATTRCODE+"</th>");
-			sb.append("<th>"+UPDATE_ATTRTYPE+"</th><th>"+UPDATE_ATTRACT+"</th><th>"+UPDATE_ATTRVAL+"</th>");
-			sb.append("<th>"+UPDATE_REF_ENTITYTYPE+"</th><th>"+UPDATE_REF_ENTITYID+"</th><th>"+UPDATE_RELTYPE+"</th><th>"+UPDATE_RELACT+"</th></tr>"+NEWLINE);
-			// append a row for each update
-			sb.append(updatedSB.toString());
-			//end table
-			sb.append("</table>"+NEWLINE);
-			updatedSB.setLength(0);
-		}
-
-		return sb.toString();
-	}
-	private void restoreXtraContent(){
-		// if written to file and still small enough, restore debug to the abr rpt and delete the file
-		if (dbgfn !=null && dbgLen+rptSb.length()<MAXFILE_SIZE){
-			// read the file in and put into the stringbuffer
-			InputStream is = null;
-			FileInputStream fis = null;
-			BufferedReader rdr = null;
-			try{
-				fis = new FileInputStream(dbgfn);
-				is = new BufferedInputStream(fis);
-
-				String s=null;
-				StringBuffer sb = new StringBuffer();
-				rdr = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-				// append lines until done
-				while((s=rdr.readLine()) !=null){
-					sb.append(s+NEWLINE);
-				}
-				rptSb.append("<!-- "+sb.toString()+" -->"+NEWLINE);
-
-				// remove the file
-				File f1 = new File(dbgfn);
-				if (f1.exists()) {
-					f1.delete();
-				}
-			}catch(Exception e){
-				e.printStackTrace();
-			}finally{
-				if (is!=null){
-					try{
-						is.close();
-					}catch(Exception x){
-						x.printStackTrace();
-					}
-				}
-				if (fis!=null){
-					try{
-						fis.close();
-					}catch(Exception x){
-						x.printStackTrace();
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * do the actual updates in the pdh
-	 * @param rootEntity
-	 * @param allProcessed
-	 * @throws EANBusinessRuleException 
-	 * @throws MiddlewareShutdownInProgressException 
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 * @throws RemoteException 
-	 * @throws WorkflowException 
-	 * @throws LockException 
-	 */
-	void doUpdates(EntityItem rootEntity, OPICMList psuUpdateList, boolean allProcessed) throws RemoteException, SQLException, MiddlewareException, 
-	MiddlewareShutdownInProgressException, EANBusinessRuleException, LockException, WorkflowException
-	{
-		int delRelatorCnt =0; // deactivate relators of the same type are grouped together, keep total count
-
-		for (int i=0; i<psuUpdateList.size(); i++){
-			PSUUpdateData psuData = (PSUUpdateData)psuUpdateList.getAt(i);
-			addDebug(D.EBUG_DETAIL,"doUpdates["+i+"]: "+psuData.hashkey());
-
-			if(psuData instanceof PSUDeleteData){
-				delRelatorCnt += deleteData(((PSUDeleteData)psuData));
-				psuData.outputUserInfo();
-			}else if(psuData instanceof PSULinkData){
-				psuData.outputUserInfo(); // output first, newly created relator replaces child so attr can get updated
-				createLinks(((PSULinkData)psuData));
-			}else{
-				psuData.outputUserInfo();
-				psuData.removeAttrs();  // user info was output, remove invalid attrs now
-				if (psuData.rek.m_vctAttributes!=null && psuData.rek.m_vctAttributes.size()>0){
-					// sort the attributes so that S and A type are last
-					Collections.sort(psuData.rek.m_vctAttributes, attrComp);
-					
-					// update attributes
-					vctReturnsEntityKeys.addElement(psuData.rek);
-				}
-			}
-		}
-
-		String highType=null;
-		int highId = 0;
-		if(psuUpdateList.size()>0){
-			PSUUpdateData psuData = (PSUUpdateData)psuUpdateList.getAt(psuUpdateList.size()-1);
-			highType =psuData.getEntityType();
-			highId = psuData.getHighEntityId();
-		}
-		// update "PSUHIGHENTITYTYPE" with last processed type
-		// update "PSUHIGHENTITYID" with last processed id
-		saveHighEntity(rootEntity,highType,highId,
-				allProcessed,psuUpdateList.size()+delRelatorCnt);
-
-		updatePDH();
-
-		// these have been handled, remove them
-		while(psuUpdateList.size()>0){
-			PSUUpdateData psu = (PSUUpdateData)psuUpdateList.remove(0);
-			psu.dereference();
-		}
-	}
-
-	/**
-	 * link parent to children and set any attributes
-	 * @param psulink
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws LockException
-	 * @throws MiddlewareShutdownInProgressException
-	 * @throws EANBusinessRuleException
-	 * @throws WorkflowException
-	 * @throws RemoteException
-	 */
-	private void createLinks(PSULinkData psulink) 
-	throws MiddlewareRequestException, SQLException, MiddlewareException, LockException, 
-	MiddlewareShutdownInProgressException, EANBusinessRuleException, WorkflowException, RemoteException 	
-	{
-		addDebug(D.EBUG_SPEW,"createLinks: entered psulink: "+psulink);
-
-		if(actionItemTbl==null){
-			actionItemTbl = new Hashtable();
-		}
-		EntityItem parentArray[] = new EntityItem[]{
-				new EntityItem(null, m_prof, psulink.getEntityType(),psulink.getEntityId())};
-
-		// must loop and look at all sets of children, each set is the same entitytype and linkaction
-		for(int y=0;y<psulink.getChildrenList().size();y++){
-			PSUChildList psulist = (PSUChildList)psulink.getChildrenList().getAt(y);
-			LinkActionItem lai = (LinkActionItem)actionItemTbl.get(psulist.getActionName());
-			if (lai ==null){
-				lai = new LinkActionItem(null, m_db,m_prof,psulist.getActionName());
-				if(lai.getMetaLink()==null){
-					// this is an invalid link action, meta may be missing
-					throw new MiddlewareException("Linkaction "+psulist.getActionName()+" is undefined.");
-				}
-				actionItemTbl.put(psulist.getActionName(), lai);
-			}
-
-			EntityItem childArray[] = new EntityItem[psulist.getChildrenList().size()];
-
-			// create a new relator
-			for(int x=0;x<psulist.getChildrenList().size();x++){
-				PSUUpdateData psuchild = (PSUUpdateData)psulist.getChildrenList().getAt(x);
-				childArray[x] = new EntityItem(null, m_prof, psuchild.getEntityType(),psuchild.getEntityId());
-				addDebug(D.EBUG_SPEW,"createLinks: psuchild: "+psuchild+
-						" psuRelatorAct: "+psulist.getActionName());
-			}
-
-			// do the link	
-			if(lai.isOppSelect()){
-				lai.setParentEntityItems(childArray);
-				lai.setChildEntityItems(parentArray);
-			}else{
-				lai.setParentEntityItems(parentArray);     
-				lai.setChildEntityItems(childArray);
-			}
-			Vector result = lai.executeLink(m_db, m_prof);
-			OPICMList resultlist = (OPICMList)result.elementAt(1);
-			for(int i=0; i<resultlist.size(); i++){
-				ReturnRelatorKey rrk = (ReturnRelatorKey)resultlist.getAt(i);
-				addDebug(D.EBUG_SPEW,"createLinks:  ReturnRelatorKey["+i+"]: "+rrk);
-				String childkey = rrk.m_strEntity2Type+rrk.m_iEntity2ID;
-				if(lai.isOppSelect()){
-					childkey = rrk.m_strEntity1Type+rrk.m_iEntity1ID;
-				}
-				PSUUpdateData psuchild = (PSUUpdateData)psulist.getChildrenList().get(childkey);
-				if(psuchild.rek !=null && psuchild.rek.m_vctAttributes!=null){
-					// make the new relator the owner of the REK and its attrs
-					psuchild.rek.m_iEntityID = rrk.getReturnID();
-					psuchild.rek.m_strEntityType = rrk.getEntityType();
-					psuchild.setRelatorKey(rrk.getEntityType()+rrk.getReturnID());
-					for(int a=0;a<psuchild.rek.m_vctAttributes.size();a++){
-						Attribute attr = (Attribute)psuchild.rek.m_vctAttributes.elementAt(a);
-						attr.m_iEntityID = rrk.getReturnID();
-						attr.m_strEntityType = rrk.getEntityType();
-					}
-					// sort the attributes so that S and A type are last
-					if(psuchild.rek.m_vctAttributes.size()>0){
-						Collections.sort(psuchild.rek.m_vctAttributes, attrComp);
-					}
-					addDebug(D.EBUG_SPEW,"createLinks: new relator: "+psuchild);
-					this.vctReturnsEntityKeys.addElement(psuchild.rek);
-				}
-			}
-		}
-		psulink.outputUserInfoWithRelator();
-	}
-
-	/**
-	 * deactivate the relators
-	 * @param psudelete
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 * @throws MiddlewareRequestException 
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws EANBusinessRuleException 
-	 * @throws MiddlewareShutdownInProgressException 
-	 * @throws LockException 
-	 * @throws LockException
-	 * @throws MiddlewareShutdownInProgressException
-	 * @throws EANBusinessRuleException
-	 * @throws WorkflowException
-	 * @throws RemoteException
-	 */
-	private int deleteData(PSUDeleteData psudelete) throws MiddlewareRequestException, 
-	SQLException, MiddlewareException, LockException, MiddlewareShutdownInProgressException, 
-	EANBusinessRuleException	
-	{
-		addDebug(D.EBUG_SPEW,"deleteData: entered psudelete: "+psudelete);
-
-		if(actionItemTbl==null){
-			actionItemTbl = new Hashtable();
-		}
-		DeleteActionItem dai = (DeleteActionItem)actionItemTbl.get(psudelete.actionName);
-		if (dai ==null){
-			dai = new DeleteActionItem(null, m_db,m_prof,psudelete.actionName);
-			if(dai.getEntityType()==null){
-				// this is an invalid delete action, meta may be missing
-				throw new MiddlewareException("Deleteaction "+psudelete.actionName+" is undefined.");
-			}
-
-			actionItemTbl.put(psudelete.actionName, dai);
-		}
-		EntityItem eia[] = new EntityItem[psudelete.idVct.size()];
-		for(int i=0; i<psudelete.idVct.size(); i++){
-			eia[i]= new EntityItem(null, m_prof, psudelete.getEntityType(),	
-					((Integer)psudelete.idVct.elementAt(i)).intValue());
-		}
-
-		try{
-			dai.setEntityItems(eia);
-			// deactivate relators
-			dai.executeAction(m_db, m_prof);
-		} finally {
-			// do the commit here
-			m_db.commit();
-			m_db.freeStatement();
-			m_db.isPending("finally after deleteData");
-		}
-
-		return psudelete.idVct.size()-1; // minus 1 to account for this psudeletedata in the total count
-	}
-
-	/**
-	 * save highentity id and type
-	 * update PSUHIGHENTITYTYPE with last processed type
-	 * update PSUHIGHENTITYID with last processed id
-	 * update PSULAST with numProcessed
-	 * update PSUPROGRESS with completed or chunking if not all children were processed
-	 * @param root
-	 * @param prevType
-	 * @param prevId
-	 * @param allProcessed
-	 */
-	private void saveHighEntity(EntityItem root,String prevType,int prevId, 
-			boolean allProcessed, int numProcessed){
-		addDebug(D.EBUG_DETAIL,"saveHighEntity: highEntityType: "+
-				prevType+" highEntityId: "+prevId+" numProcessed: "+numProcessed+" allProcessed: "+allProcessed);
-
-		if(m_cbOn==null){
-			setControlBlock(); // needed for attribute updates
-		}
-
-		if(prevType != null && !prevType.equals(currentPSUHIGHENTITYTYPE)){
-			setTextValue(root,"PSUHIGHENTITYTYPE",prevType);
-			updatedRootTbl.put("PSUHIGHENTITYTYPE",prevType);
-			
-			currentPSUHIGHENTITYTYPE = prevType;
-		}
-		
-		if(prevId>0){
-			setTextValue(root,"PSUHIGHENTITYID",""+prevId);
-			updatedRootTbl.put("PSUHIGHENTITYID",""+prevId);
-		}
-
-		// The first time this ABR runs, it will set PSUPROGRESS to "Chunking". However, if all rows in the VIEW 
-		// are complete, then PSUPROGRESS is set to "Complete". 
-		String progress = allProcessed?PSUPROGRESS_Complete:PSUPROGRESS_Chunking;
-		if(!progress.equals(currentPSUPROGRESS)){
-			setUniqueFlagValue(root, "PSUPROGRESS", progress);
-			currentPSUPROGRESS = progress;
-			updatedRootTbl.put("PSUPROGRESS",allProcessed?"Complete":"Chunking");
-		}
-
-		//PSULAST is updated by this ABR to be the number of root entities updated. 
-		if(numProcessed>0){
-			addDebug(D.EBUG_DETAIL,"saveHighEntity: before psuLast: "+psuLast);
-
-			psuLast+=numProcessed;
-			
-			setTextValue(root,"PSULAST",""+psuLast);
-			updatedRootTbl.put("PSULAST",""+psuLast);
-
-		}
-	}
-
-	/**
-	 * The ABR should update PSUHIGHENTITYTYPE and PSUHIGHENTITYID for the last instance of the entity processed. 
-	 * For subsequent invocations, the ABR will start with the next row in the LIST or VIEW. Check to see if this
-	 * type and id were already processed
-	 * 
-	 * @param psuEntityType
-	 * @param psuEntityId
-	 * @return
-	 */
-	boolean wasPreviouslyProcessed(String psuEntityType, int psuEntityId){
-		if(currentPSUHIGHENTITYTYPE==null){
-			return false;
-		}
-
-		// check to see if these types and ids were already processed in a previous execution of the abr
-		if(psuEntityType.compareTo(currentPSUHIGHENTITYTYPE)<0){
-			addDebug(D.EBUG_SPEW,"wasPreviouslyProcessed psuEntityType: "+psuEntityType+" is before highEntityType: "+currentPSUHIGHENTITYTYPE);
-			return true;
-		}
-		if(psuEntityType.equals(currentPSUHIGHENTITYTYPE) && psuEntityId <=currentPSUHIGHENTITYID){
-			addDebug(D.EBUG_SPEW,"wasPreviouslyProcessed psuEntityId: "+psuEntityId+" is before or equal highEntityId: "+currentPSUHIGHENTITYID);
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * get attribute type
-	 * @param attrcode
-	 * @return
-	 */
-	String getAttrType(String attrcode){
-		return (String)m_typeTbl.get(attrcode);
-	}
-
-	/**
-	 * get the action for this attribute
-	 * @param cb
-	 * @return
-	 */
-	String getAttrAction(ControlBlock cb){
-		return cb==m_cbOn?PSUATTRACTION_N:PSUATTRACTION_D;
-	}
-	
-	/**
-	 * get the current values for these entitys - only needed when an attribute will be deactivated, 
-	 * otherwise the value will be specified, multiflag must specify the flag to turnoff
-	 * @param needValuesList - all will be the same entitytype
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	void getCurrentValues(OPICMList needValuesList) throws MiddlewareRequestException, SQLException, MiddlewareException{
-		
-		Vector tmp = new Vector();
-
-		Profile prof = m_prof;
-		if(poweruserProf==null){
-			getPowerUserRole();
-		}
-		if(poweruserProf!=null){
-			prof = poweruserProf;
-		}
-
-		if(xai==null){
-			xai = new ExtractActionItem(null, m_db, prof, "dummy"){//do once
-				private static final long serialVersionUID = 1L;
-				public String getPurpose() {
-					return "Edit"; // hack to prevent getting allnls, only need nlsid=1
-				}
-			}; 
-		}
-		for (int x=0;x<needValuesList.size(); x++){
-			PSUUpdateData psuUpdate = (PSUUpdateData)needValuesList.getAt(x);
-			addDebug(D.EBUG_DETAIL,"getCurrentValues: needed["+x+"] "+psuUpdate);
-			tmp.add(new EntityItem(null, prof, psuUpdate.getEntityType(),	psuUpdate.getEntityId()));
-		}
-
-		EntityItem[] eai = new EntityItem[tmp.size()];
-		tmp.copyInto(eai);
-
-		EntityList list = m_db.getEntityList(prof, xai, eai);
-		EntityGroup eg = list.getParentEntityGroup();
-		
-		// now get the current values and put them into the attr to turn off
-		for (int x=0;x<needValuesList.size(); x++){
-			PSUUpdateData currData = (PSUUpdateData)needValuesList.getAt(x);
-			EntityItem curItem = eg.getEntityItem(currData.getEntityType()+currData.getEntityId());
-
-			for(int a=0; a<currData.rek.m_vctAttributes.size();a++){
-				Attribute attr = (Attribute)currData.rek.m_vctAttributes.elementAt(a);
-				if(attr.m_cbControlBlock==cbOff){
-					String psuAttr = attr.getAttributeCode();
-					String psuAttrType = getAttrType(psuAttr);
-
-					String curValue = null;
-					char type = psuAttrType.toUpperCase().charAt(0);
-					switch(type){
-					case 'U':
-					case 'A':
-					case 'S':
-						curValue = PokUtils.getAttributeFlagValue(curItem, psuAttr);
-						break;
-					case 'F':
-						Set testSet = new HashSet();
-						testSet.add(attr.getAttributeValue());
-						if(PokUtils.contains(curItem, psuAttr, testSet)){
-							curValue = attr.getAttributeValue(); // just use the value, cant turn off others if this is wrong
-						}else{
-							curValue = null; // wasnt set so dont deactivate it					
-						}
-						testSet.clear();
-						break;
-					case 'T':
-			            EANAttribute eanattr = curItem.getAttribute(psuAttr);
-			            if (eanattr != null) {          
-			            	curValue = eanattr.get().toString();
-			            }
-						break;
-					}
-
-					if(curValue==null){
-						 EANMetaAttribute metaAttr = curItem.getEntityGroup().getMetaAttribute(psuAttr);
-						 if(metaAttr == null){
-							 curValue="Not found in "+currData.getEntityType()+" meta";
-						 }else{
-							 curValue="Not populated";
-						 }
-						 currData.addRemoveAttr(attr);
-					}
-					
-					attr.m_strAttributeValue = curValue;
-					addDebug(D.EBUG_DETAIL,"getCurrentValues: psuEntityType: "+
-							currData.getEntityType()+" psuEntityId: "+currData.getEntityId()+
-							" psuAttr: "+psuAttr+" psuAttrType: "+psuAttrType+
-							" curValue: "+curValue);
-				}
-			}
-		}
-
-		list.dereference();
-		list = null;
-		tmp.clear();
-		tmp = null;
-	}
-
-	// role must have access to all attributes
-	private void getPowerUserRole() {
-		String roleCode = "POWERUSER";
-		try{
-			poweruserProf = m_prof.getProfileForRoleCode(m_db, roleCode, roleCode, 1);
-			if (poweruserProf==null) {
-				//ROLE_ERR = Could not switch to {0} role
-				args[0] = roleCode;
-				addError("ROLE_ERR",args);
-			}else {
-				addDebug("Switched role from "+m_prof.getRoleCode()+" to "+poweruserProf.getRoleCode());
-				poweruserProf.setReadLanguage(0);
-			}
-		}catch(Exception ex){
-			ex.printStackTrace();
-		}
-	}
-	
-	/**
-	 * add this attribute to the current PSUUpdateData, set it
-	 * @param psuAttrType
-	 * @param currPSUdata
-	 * @param psuAttr
-	 * @param psuAttrValue
-	 */
-	void setAttribute(String psuAttrType,PSUUpdateData currPSUdata,String psuAttr,String psuAttrValue) 
-	{
-		if(m_cbOn==null){
-			setControlBlock(); // needed for attribute updates
-		}
-		setAttribute(psuAttrType,currPSUdata, psuAttr,psuAttrValue,	m_cbOn);
-	}
-	
-	/**
-	 * add this attribute to the current PSUUpdateData, deactivate it
-	 * @param psuAttrType
-	 * @param currPSUdata
-	 * @param psuAttr
-	 * @param psuAttrValue
-	 */
-	void deactivateAttribute(String psuAttrType,PSUUpdateData currPSUdata,String psuAttr,String psuAttrValue) 
-	{
-		if(cbOff==null){
-			cbOff = new ControlBlock(Profile.EPOCH, Profile.EPOCH, Profile.EPOCH, Profile.EPOCH, m_prof.getOPWGID());
-		}
-		setAttribute(psuAttrType,currPSUdata, psuAttr,psuAttrValue,	cbOff);
-	}
-	/**
-	 * add this attribute to the current PSUUpdateData
-	 * @param psuAttrType
-	 * @param currPSUdata
-	 * @param psuAttr
-	 * @param psuAttrValue
-	 * @param cb
-	 */ 
-	private void setAttribute(String psuAttrType,PSUUpdateData currPSUdata,String psuAttr,String psuAttrValue, 
-			ControlBlock cb) 
-	{
-		m_typeTbl.put(psuAttr, psuAttrType); // hang onto attr types for user msg and sort
-
-		char type = psuAttrType.toUpperCase().charAt(0);
-		switch(type){
-		case 'U':
-		case 'A':
-		case 'S':
-			currPSUdata.setUniqueFlagValue(psuAttr, psuAttrValue,cb);
-			break;
-		case 'F':
-			//assumes just turning a single flag on/off 
-			currPSUdata.setMultiFlagValue(psuAttr, psuAttrValue,cb);
-			break;
-		case 'T':
-			currPSUdata.setTextValue(psuAttr, psuAttrValue,cb);
-			break;
-		}
-	}
-	/***********************************************
-	 * Sets the specified Text Attribute on the specified entity
-	 *
-	 * @param item
-	 * @param attrcode
-	 * @param attrvalue
-	 */
-	private void setTextValue(EntityItem item,String attrcode, String attrvalue)
-	{
-		addDebug(D.EBUG_SPEW,"setTextValue entered for "+item.getKey()+" "+attrcode+
-				" set to: " + attrvalue);
-
-		//get the current value
-		String curval = PokUtils.getAttributeValue(item, attrcode, "", "", false);
-		if (attrvalue.equalsIgnoreCase(curval)){ 
-			addDebug("setTextValue: "+attrcode+" was already set to "+curval+" for "+item.getKey()+", nothing to do");
-			logMessage("setTextValue: "+attrcode+" was already set to "+curval+" for "+item.getKey()+", nothing to do");
-			return;
-		}
-
-		Vector vctAtts = null;
-		// look at each key to see if this item is there yet
-		for (int i=0; i<vctReturnsEntityKeys.size(); i++){
-			ReturnEntityKey rek = (ReturnEntityKey)vctReturnsEntityKeys.elementAt(i);
-			if (rek.getEntityID() == item.getEntityID() &&
-					rek.getEntityType().equals(item.getEntityType())){
-				vctAtts = rek.m_vctAttributes;
-				break;
-			}
-		}
-		if (vctAtts ==null){
-			ReturnEntityKey rek = new ReturnEntityKey(item.getEntityType(), item.getEntityID(), true);
-			vctAtts = new Vector();
-			rek.m_vctAttributes = vctAtts;
-			vctReturnsEntityKeys.addElement(rek);
-		}
-
-		COM.ibm.opicmpdh.objects.Text sf = new COM.ibm.opicmpdh.objects.Text(m_prof.getEnterprise(),
-				item.getEntityType(), item.getEntityID(), attrcode, attrvalue, 1, m_cbOn);
-		vctAtts.addElement(sf);
-	}
-
-	/***********************************************
-	 *  Sets the specified Unique Flag Attribute on the specified Entity
-	 *
-	 * @param item
-	 * @param attrcode
-	 * @param attrvalue
-	 */
-	private void setUniqueFlagValue(EntityItem item, String attrcode, String attrvalue)
-	{
-		addDebug(D.EBUG_SPEW,"setUniqueFlagValue entered for "+item.getKey()+" "+attrcode+
-				" set to: " + attrvalue);
-
-		//get the current value
-		String curval = PokUtils.getAttributeFlagValue(item,attrcode);
-		if (attrvalue.equalsIgnoreCase(curval)){ 
-			addDebug("setUniqueFlagValue: "+attrcode+" was already set to "+curval+" for "+item.getKey()+", nothing to do");
-			logMessage("setUniqueFlagValue: "+attrcode+" was already set to "+curval+" for "+item.getKey()+", nothing to do");
-			return;
-		}
-
-		Vector vctAtts = null;
-		// look at each key to see if root is there yet
-		for (int i=0; i<vctReturnsEntityKeys.size(); i++){
-			ReturnEntityKey rek = (ReturnEntityKey)vctReturnsEntityKeys.elementAt(i);
-			if (rek.getEntityID() == item.getEntityID() &&
-					rek.getEntityType().equals(item.getEntityType())){
-				vctAtts = rek.m_vctAttributes;
-				break;
-			}
-		}
-		if (vctAtts ==null){
-			ReturnEntityKey rek = new ReturnEntityKey(item.getEntityType(),item.getEntityID(), true);
-			vctAtts = new Vector();
-			rek.m_vctAttributes = vctAtts;
-			vctReturnsEntityKeys.addElement(rek);
-		}
-
-		SingleFlag sf = new SingleFlag (m_prof.getEnterprise(), item.getEntityType(), item.getEntityID(),
-				attrcode, attrvalue, 1, m_cbOn);
-
-		vctAtts.addElement(sf);
-	}
-
-	/***********************************************
-	 * Update the PDH with the values in the vector, do all at once
-	 *
-	 */
-	void updatePDH()
-	throws java.sql.SQLException,
-	COM.ibm.opicmpdh.middleware.MiddlewareException,
-	java.rmi.RemoteException,
-	COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-	COM.ibm.eannounce.objects.EANBusinessRuleException
-	{
-		logMessage(getDescription()+" updating PDH");
-		addDebug(D.EBUG_SPEW,"updatePDH entered for vctReturnsEntityKeys: "+vctReturnsEntityKeys.size());
-
-		if(vctReturnsEntityKeys.size()>0) {
-			try {
-				m_db.update(m_prof, vctReturnsEntityKeys, false, false);
-			}
-			finally {
-				vctReturnsEntityKeys.clear();
-				m_db.commit();
-				m_db.freeStatement();
-				m_db.isPending("finally after updatePDH");
-			}
-		}
-	}
-
-	/******
-	 * @see COM.ibm.eannounce.abr.util.PokBaseABR#dereference()
-	 */
-	public void dereference(){
-		super.dereference();
-
-		if(xai !=null){
-			xai.dereference();
-			xai = null;
-		}
-		
-		attrComp=null;
-		poweruserProf = null;
-		rsBundle = null;
-		rptSb = null;
-		args = null;
-
-		cbOff = null;
-		navMetaTbl = null;
-		navName = null;
-		psucriteria = null;
-		currentPSUHIGHENTITYTYPE = null;
-		currentPSUPROGRESS = null;
-
-		updatedRootTbl.clear();
-		updatedRootTbl=null;
-
-		if(actionItemTbl !=null){
-			for (Enumeration e = actionItemTbl.keys(); e.hasMoreElements();) {
-				EANActionItem item = (EANActionItem)actionItemTbl.get(e.nextElement());
-				if(item instanceof LinkActionItem){
-					LinkActionItem lai = (LinkActionItem)item;
-					lai.dereference();
-				}else if(item instanceof DeleteActionItem){
-					DeleteActionItem lai = (DeleteActionItem)item;
-					lai.dereference();
-				}
-			}
-			actionItemTbl.clear();
-			actionItemTbl = null;
-		}
-		m_typeTbl.clear();
-		m_typeTbl=null;
-
-		vctReturnsEntityKeys.clear();
-		vctReturnsEntityKeys = null;
-
-		dbgPw=null;
-		dbgfn = null;
-		updatedSB = null;
-	}
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.util.PokBaseABR#getABRVersion()
-	 */
-	public String getABRVersion() {
-		return "$Revision: 1.2 $";
-	}
-
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.util.PokBaseABR#getDescription()
-	 */
-	public String getDescription() {
-		return "PSUABRSTATUS";
-	}
-	/************************************
-	 * @param item
-	 * @param attrCode
-	 * @return
-	 */
-	String getLD_Value(EntityItem item, String attrCode)   {
-		return PokUtils.getAttributeDescription(item.getEntityGroup(), attrCode, attrCode)+": "+
-		PokUtils.getAttributeValue(item, attrCode, ",", PokUtils.DEFNOTPOPULATED, false);
-	}
-	/**********************************
-	 * add msg to report output
-	 * @param msg
-	 */
-	private void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
-
-	/**********************
-	 * support conditional msgs
-	 * @param level
-	 * @param msg
-	 */
-	void addDebug(int level,String msg) { 
-		if (level <= abr_debuglvl) {
-			addDebug(msg);
-		}
-	}
-	/**********************************
-	 * add debug info as html comment
-	 * @param msg 
-	 */
-	void addDebug(String msg) { 
-		if(dbgPw!=null){
-			dbgLen+=msg.length();
-			dbgPw.println(msg);
-			dbgPw.flush();
-		}else{
-			rptSb.append("<!-- "+msg+" -->"+NEWLINE);
-		}
-	}
-
-	/**********************************
-	 * used for error output
-	 * Prefix with LD(EntityType) NDN(EntityType) of the EntityType that the ABR is checking
-	 * (root EntityType)
-	 *
-	 * The entire message should be prefixed with 'Error: '
-	 *
-	 */
-	void addError(String errCode, Object args[])
-	{
-		setReturnCode(FAIL);
-
-		//ERROR_PREFIX = Error:  reduce size of output, do not prepend root info
-		addMessage(rsBundle.getString("ERROR_PREFIX"), errCode, args);
-	} 
-
-	/**********************************
-	 * used for warning or error output
-	 *
-	 */
-	void addMessage(String msgPrefix, String errCode, Object args[])
-	{
-		String msg = rsBundle.getString(errCode);
-		// get message to output
-		if (args!=null){
-			MessageFormat msgf = new MessageFormat(msg);
-			msg = msgf.format(args);
-		}
-
-		addOutput(msgPrefix+" "+msg);
-	}
-
-	/**********************************************************************************
-	 *  Get Name based on navigation attributes for specified entity
-	 *
-	 *@return java.lang.String
-	 */
-	String getNavigationName(EntityItem theItem) throws java.sql.SQLException, MiddlewareException
-	{
-		StringBuffer navName = new StringBuffer();
-
-		// NAME is navigate attributes
-		// check hashtable to see if we already got this meta
-		EANList metaList = (EANList)navMetaTbl.get(theItem.getEntityType());
-		if (metaList==null)	{
-			EntityGroup eg = new EntityGroup(null, m_db, m_prof, theItem.getEntityType(), "Navigate");
-			metaList = eg.getMetaAttribute();  // iterator does not maintain navigate order
-			navMetaTbl.put(theItem.getEntityType(), metaList);
-		}
-		for (int ii=0; ii<metaList.size(); ii++) {
-			EANMetaAttribute ma = (EANMetaAttribute)metaList.getAt(ii);
-			navName.append(PokUtils.getAttributeValue(theItem, ma.getAttributeCode(),", ", "", false));
-			if (ii+1<metaList.size()){
-				navName.append(" ");
-			}
-		}
-
-		return navName.toString().trim();
-	}
-    /**********************************************************************************
-     * This class is used to sort Attribute based on type - want A or S to be last
-     */
-    private class AttrComparator implements java.util.Comparator
-    {
-        public int compare(Object o1, Object o2) {
-            Attribute attr1 = (Attribute)o1;
-            Attribute attr2 = (Attribute)o2;
-            String type1 = (String)m_typeTbl.get(attr1.getAttributeCode());
-            String type2 = (String)m_typeTbl.get(attr2.getAttributeCode());
-            if(type1.charAt(0)=='A'){
-            	type1="Z"; // make it last
-            }
-            if(type2.charAt(0)=='A'){
-            	type2="Z"; // make it last
-            }
-            if(type1.charAt(0)=='S'){
-            	type1="Y"; // make it next to last
-            }
-            if(type2.charAt(0)=='S'){
-            	type2="Y"; // make it next to last
-            }
-            return type1.compareTo(type2); // in descending order
-        }
-    }
-}

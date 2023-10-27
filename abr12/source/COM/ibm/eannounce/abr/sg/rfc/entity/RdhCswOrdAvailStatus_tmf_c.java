@@ -1,223 +1,228 @@
-/* Copyright IBM Corp. 2021 */
-package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*     */ package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*     */ 
+/*     */ import com.google.gson.annotations.SerializedName;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class RdhCswOrdAvailStatus_tmf_c
+/*     */ {
+/*     */   @SerializedName("MACHTYPE")
+/*     */   private String machType;
+/*     */   @SerializedName("MODEL")
+/*     */   private String model;
+/*     */   @SerializedName("FEATURECODE")
+/*     */   private String featureCode;
+/*     */   @SerializedName("FEATUREENTITYTYPE")
+/*     */   private String featureEntityType;
+/*     */   @SerializedName("COUNTRY_FC")
+/*     */   private String country_fc;
+/*     */   @SerializedName("ANNDATE")
+/*     */   private String annDate;
+/*     */   @SerializedName("FIRSTORDER")
+/*     */   private String firstOrder;
+/*     */   @SerializedName("PLANNEDAVAILABILITY")
+/*     */   private String plannedAvailability;
+/*     */   @SerializedName("PUBFROM")
+/*     */   private String pubFrom;
+/*     */   @SerializedName("PUBTO")
+/*     */   private String pubTo;
+/*     */   @SerializedName("WDANNDATE")
+/*     */   private String wdAnnDate;
+/*     */   @SerializedName("LASTORDER")
+/*     */   private String lastOrder;
+/*     */   @SerializedName("SYSTEMMAX")
+/*     */   private String systemMax;
+/*     */   
+/*     */   public String getMachType() {
+/*  45 */     return this.machType;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setMachType(String paramString) {
+/*  52 */     this.machType = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getModel() {
+/*  59 */     return this.model;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setModel(String paramString) {
+/*  66 */     this.model = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getFeatureCode() {
+/*  73 */     return this.featureCode;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setFeatureCode(String paramString) {
+/*  80 */     this.featureCode = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getFeatureEntityType() {
+/*  87 */     return this.featureEntityType;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setFeatureEntityType(String paramString) {
+/*  94 */     this.featureEntityType = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getCountry_fc() {
+/* 101 */     return this.country_fc;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setCountry_fc(String paramString) {
+/* 108 */     this.country_fc = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getAnnDate() {
+/* 115 */     return this.annDate;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setAnnDate(String paramString) {
+/* 122 */     this.annDate = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getFirstOrder() {
+/* 129 */     return this.firstOrder;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setFirstOrder(String paramString) {
+/* 136 */     this.firstOrder = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getPlannedAvailability() {
+/* 143 */     return this.plannedAvailability;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setPlannedAvailability(String paramString) {
+/* 150 */     this.plannedAvailability = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getPubFrom() {
+/* 157 */     return this.pubFrom;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setPubFrom(String paramString) {
+/* 164 */     this.pubFrom = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getPubTo() {
+/* 171 */     return this.pubTo;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setPubTo(String paramString) {
+/* 178 */     this.pubTo = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getWdAnnDate() {
+/* 185 */     return this.wdAnnDate;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setWdAnnDate(String paramString) {
+/* 192 */     this.wdAnnDate = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getLastOrder() {
+/* 199 */     return this.lastOrder;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setLastOrder(String paramString) {
+/* 206 */     this.lastOrder = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getSystemMax() {
+/* 213 */     return this.systemMax;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setSystemMax(String paramString) {
+/* 220 */     this.systemMax = paramString;
+/*     */   }
+/*     */ }
 
-import com.google.gson.annotations.SerializedName;
 
-/**
- * the availability status for an orderable
- * @author will
- *
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\entity\RdhCswOrdAvailStatus_tmf_c.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class RdhCswOrdAvailStatus_tmf_c
-{
-    @SerializedName("MACHTYPE")
-    private String machType;
-    @SerializedName("MODEL")
-    private String model;
-    @SerializedName("FEATURECODE")
-    private String featureCode;
-    @SerializedName("FEATUREENTITYTYPE")
-    private String featureEntityType;
-    @SerializedName("COUNTRY_FC")
-    private String country_fc;
-    @SerializedName("ANNDATE")
-    private String annDate;
-    @SerializedName("FIRSTORDER")
-    private String firstOrder;
-    @SerializedName("PLANNEDAVAILABILITY")
-    private String plannedAvailability;
-    @SerializedName("PUBFROM")
-    private String pubFrom;
-    @SerializedName("PUBTO")
-    private String pubTo;
-    @SerializedName("WDANNDATE")
-    private String wdAnnDate;
-    @SerializedName("LASTORDER")
-    private String lastOrder;
-    @SerializedName("SYSTEMMAX")
-    private String systemMax;
-    
-    /**
-     * @return the machType
-     */
-    public String getMachType()
-    {
-        return machType;
-    }
-    /**
-     * @param machType the machType to set
-     */
-    public void setMachType(String machType)
-    {
-        this.machType = machType;
-    }
-    /**
-     * @return the model
-     */
-    public String getModel()
-    {
-        return model;
-    }
-    /**
-     * @param model the model to set
-     */
-    public void setModel(String model)
-    {
-        this.model = model;
-    }
-    /**
-     * @return the featureCode
-     */
-    public String getFeatureCode()
-    {
-        return featureCode;
-    }
-    /**
-     * @param featureCode the featureCode to set
-     */
-    public void setFeatureCode(String featureCode)
-    {
-        this.featureCode = featureCode;
-    }
-    /**
-     * @return the featureEntityType
-     */
-    public String getFeatureEntityType()
-    {
-        return featureEntityType;
-    }
-    /**
-     * @param featureEntityType the featureEntityType to set
-     */
-    public void setFeatureEntityType(String featureEntityType)
-    {
-        this.featureEntityType = featureEntityType;
-    }
-    /**
-     * @return the country_fc
-     */
-    public String getCountry_fc()
-    {
-        return country_fc;
-    }
-    /**
-     * @param country_fc the country_fc to set
-     */
-    public void setCountry_fc(String country_fc)
-    {
-        this.country_fc = country_fc;
-    }
-    /**
-     * @return the annDate
-     */
-    public String getAnnDate()
-    {
-        return annDate;
-    }
-    /**
-     * @param annDate the annDate to set
-     */
-    public void setAnnDate(String annDate)
-    {
-        this.annDate = annDate;
-    }
-    /**
-     * @return the firstOrder
-     */
-    public String getFirstOrder()
-    {
-        return firstOrder;
-    }
-    /**
-     * @param firstOrder the firstOrder to set
-     */
-    public void setFirstOrder(String firstOrder)
-    {
-        this.firstOrder = firstOrder;
-    }
-    /**
-     * @return the plannedAvailability
-     */
-    public String getPlannedAvailability()
-    {
-        return plannedAvailability;
-    }
-    /**
-     * @param plannedAvailability the plannedAvailability to set
-     */
-    public void setPlannedAvailability(String plannedAvailability)
-    {
-        this.plannedAvailability = plannedAvailability;
-    }
-    /**
-     * @return the pubFrom
-     */
-    public String getPubFrom()
-    {
-        return pubFrom;
-    }
-    /**
-     * @param pubFrom the pubFrom to set
-     */
-    public void setPubFrom(String pubFrom)
-    {
-        this.pubFrom = pubFrom;
-    }
-    /**
-     * @return the pubTo
-     */
-    public String getPubTo()
-    {
-        return pubTo;
-    }
-    /**
-     * @param pubTo the pubTo to set
-     */
-    public void setPubTo(String pubTo)
-    {
-        this.pubTo = pubTo;
-    }
-    /**
-     * @return the wdAnnDate
-     */
-    public String getWdAnnDate()
-    {
-        return wdAnnDate;
-    }
-    /**
-     * @param wdAnnDate the wdAnnDate to set
-     */
-    public void setWdAnnDate(String wdAnnDate)
-    {
-        this.wdAnnDate = wdAnnDate;
-    }
-    /**
-     * @return the lastOrder
-     */
-    public String getLastOrder()
-    {
-        return lastOrder;
-    }
-    /**
-     * @param lastOrder the lastOrder to set
-     */
-    public void setLastOrder(String lastOrder)
-    {
-        this.lastOrder = lastOrder;
-    }
-    /**
-     * @return the systemMax
-     */
-    public String getSystemMax()
-    {
-        return systemMax;
-    }
-    /**
-     * @param systemMax the systemMax to set
-     */
-    public void setSystemMax(String systemMax)
-    {
-        this.systemMax = systemMax;
-    }
-    
-}

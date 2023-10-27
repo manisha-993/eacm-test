@@ -1,231 +1,237 @@
-//  (c) Copyright International Business Machines Corporation, 2001
-//  All Rights Reserved.</pre>
-//
-//AFCOPYBILLING30AABR01.java,v
-//Revision 1.4  2006/03/03 19:23:24  bala
-//remove reference to Constants.CSS
-//
-//Revision 1.3  2006/01/24 16:35:30  yang
-//test
-//
-//Revision 1.2  2005/02/08 18:29:12  joan
-//changes for Jtest
-//
-//Revision 1.1  2004/09/11 00:22:51  joan
-//add file
-//
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.LockPDHEntityException;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.abr.util.UpdatePDHEntityException;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.SBRException;
+/*     */ import COM.ibm.eannounce.objects.SWCOPYBILLING30APDG;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class AFCOPYBILLING30AABR01
+/*     */   extends PokBaseABR
+/*     */ {
+/*  36 */   public static final String ABR = new String("AFCOPYBILLING30AABR01");
+/*     */   
+/*  38 */   private EntityGroup m_egParent = null;
+/*  39 */   private EntityItem m_ei = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/*  48 */     EntityGroup entityGroup = null;
+/*  49 */     SWCOPYBILLING30APDG sWCOPYBILLING30APDG = null;
+/*  50 */     StringBuffer stringBuffer = null;
+/*  51 */     String str1 = null;
+/*  52 */     String str2 = System.getProperty("line.separator");
+/*     */     
+/*     */     try {
+/*  55 */       start_ABRBuild();
+/*     */       
+/*  57 */       buildReportHeaderII();
+/*     */       
+/*  59 */       this.m_egParent = this.m_elist.getParentEntityGroup();
+/*  60 */       this.m_ei = this.m_egParent.getEntityItem(0);
+/*  61 */       println("<br><b>Model: " + this.m_ei.getKey() + "</b>");
+/*     */       
+/*  63 */       printNavigateAttributes(this.m_ei, this.m_egParent, true);
+/*  64 */       setReturnCode(0);
+/*     */ 
+/*     */       
+/*  67 */       entityGroup = this.m_elist.getEntityGroup("SWPRODSTRUCT");
+/*  68 */       if (entityGroup.getEntityItemCount() <= 0) {
+/*  69 */         println("<br /><font color=red>Failed. There is no SWPRODSTRUCT selected</font>");
+/*  70 */         setReturnCode(-1);
+/*     */       } 
+/*     */ 
+/*     */       
+/*  74 */       if (getReturnCode() == 0) {
+/*  75 */         log("AFCOPYBILLING30AABR01 generating data");
+/*  76 */         sWCOPYBILLING30APDG = new SWCOPYBILLING30APDG(null, this.m_db, this.m_prof, "SWCOPYBILLING30APDG");
+/*  77 */         sWCOPYBILLING30APDG.setEntityItem(this.m_ei);
+/*  78 */         sWCOPYBILLING30APDG.setABReList(this.m_elist);
+/*  79 */         sWCOPYBILLING30APDG.executeAction(this.m_db, this.m_prof);
+/*  80 */         stringBuffer = sWCOPYBILLING30APDG.getActivities();
+/*  81 */         println("</br></br/><b>Generated Data:</b>");
+/*  82 */         println("<br/>" + stringBuffer.toString());
+/*     */         
+/*  84 */         log("AFCOPYBILLING30AABR01 finish generating data");
+/*     */       } 
+/*  86 */     } catch (LockPDHEntityException lockPDHEntityException) {
+/*  87 */       setReturnCode(-2);
+/*  88 */       println("<h3><font color=red>IAB1007E: Could not get soft lock.  Rule execution is terminated.<br />" + lockPDHEntityException
+/*     */ 
+/*     */ 
+/*     */           
+/*  92 */           .getMessage() + "</font></h3>");
+/*     */       
+/*  94 */       logError(lockPDHEntityException.getMessage());
+/*  95 */     } catch (UpdatePDHEntityException updatePDHEntityException) {
+/*  96 */       setReturnCode(-2);
+/*  97 */       println("<h3><font color=red>UpdatePDH error: " + updatePDHEntityException
+/*     */           
+/*  99 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 101 */       logError(updatePDHEntityException.getMessage());
+/* 102 */     } catch (SBRException sBRException) {
+/* 103 */       String str = sBRException.toString();
+/* 104 */       int i = str.indexOf("(ok)");
+/* 105 */       if (i < 0) {
+/* 106 */         setReturnCode(-2);
+/* 107 */         println("<h3><font color=red>Generate Data error: " + replace(str, str2, "<br>") + "</font></h3>");
+/* 108 */         logError(sBRException.toString());
+/*     */       } else {
+/* 110 */         str = str.substring(0, i);
+/* 111 */         println(replace(str, str2, "<br>"));
+/*     */       } 
+/* 113 */     } catch (Exception exception) {
+/*     */       
+/* 115 */       println("Error in " + this.m_abri.getABRCode() + ":" + exception.getMessage());
+/* 116 */       println("" + exception);
+/* 117 */       exception.printStackTrace();
+/*     */       
+/* 119 */       if (getABRReturnCode() != -2) {
+/* 120 */         setReturnCode(-3);
+/*     */       }
+/*     */     } finally {
+/* 123 */       println("<br /><b>" + 
+/*     */           
+/* 125 */           buildMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 128 */               getABRDescription(), 
+/* 129 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }) + "</b>");
+/*     */       
+/* 132 */       log(
+/* 133 */           buildLogMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 136 */               getABRDescription(), 
+/* 137 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }));
+/*     */       
+/* 140 */       str1 = this.m_ei.toString();
+/* 141 */       if (str1.length() > 64) {
+/* 142 */         str1 = str1.substring(0, 64);
+/*     */       }
+/* 144 */       setDGTitle(str1);
+/* 145 */       setDGRptName(ABR);
+/*     */ 
+/*     */       
+/* 148 */       setDGString(getABRReturnCode());
+/* 149 */       printDGSubmitString();
+/*     */ 
+/*     */       
+/* 152 */       buildReportFooter();
+/*     */       
+/* 154 */       if (!isReadOnly()) {
+/* 155 */         clearSoftLock();
+/*     */       }
+/*     */     } 
+/*     */   }
+/*     */   
+/*     */   private String replace(String paramString1, String paramString2, String paramString3) {
+/* 161 */     String str = "";
+/* 162 */     int i = paramString1.indexOf(paramString2);
+/*     */     
+/* 164 */     while (paramString1.length() > 0 && i >= 0) {
+/* 165 */       str = str + paramString1.substring(0, i) + paramString3;
+/* 166 */       paramString1 = paramString1.substring(i + paramString2.length());
+/* 167 */       i = paramString1.indexOf(paramString2);
+/*     */     } 
+/* 169 */     str = str + paramString1;
+/* 170 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getABREntityDesc(String paramString, int paramInt) {
+/* 181 */     return null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 190 */     return "Software Copy Billing ABR.";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getStyle() {
+/* 201 */     return "";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getRevision() {
+/* 211 */     return new String("1.4");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String getVersion() {
+/* 221 */     return "AFCOPYBILLING30AABR01.java,v 1.4 2006/03/03 19:23:24 bala Exp";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 229 */     return "AFCOPYBILLING30AABR01.java";
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.sg;
 
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.eannounce.abr.util.*;
-
-/**
- * AFCOPYBILLING30AABR01
- *
- *@author     Administrator
- *@created    August 30, 2002
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\AFCOPYBILLING30AABR01.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class AFCOPYBILLING30AABR01 extends PokBaseABR {
-  /**
-  *  Execute ABR.
-  *
-  */
-
-  // Class constants
-  public final static String ABR = new String("AFCOPYBILLING30AABR01");
-
-  private EntityGroup m_egParent = null;
-  private EntityItem m_ei = null;
-  //private final EntityItem m_eiFUP = null;
-  //private final int m_iExeCount = 0;
-
-  /**
-     * @see COM.ibm.opicmpdh.middleware.taskmaster.AbstractTask#execute_run()
-     * @author Administrator
-     */
-    public void execute_run() {
-      EntityGroup egPROD = null;
-    SWCOPYBILLING30APDG pdg = null;
-    StringBuffer sb = null;
-    String strDgName = null;
-    String RETURN = System.getProperty("line.separator");
-      try {
-      // if it's the first time, build the report header
-      start_ABRBuild();
-      // Build the report header
-      buildReportHeaderII();
-
-      m_egParent = m_elist.getParentEntityGroup();
-      m_ei = m_egParent.getEntityItem(0);
-      println("<br><b>Model: " + m_ei.getKey() + "</b>");
-
-      printNavigateAttributes(m_ei, m_egParent, true);
-      setReturnCode(PASS);
-
-      // check if there're SWPRODSTRUCTs
-      egPROD = m_elist.getEntityGroup("SWPRODSTRUCT");
-      if (egPROD.getEntityItemCount() <= 0) {
-        println( "<br /><font color=red>Failed. There is no SWPRODSTRUCT selected</font>");
-        setReturnCode(FAIL);
-      }
-
-      //============= run the PDG to generate data ==========================================
-      if(getReturnCode() == PASS) {
-        log("AFCOPYBILLING30AABR01 generating data");
-        pdg = new SWCOPYBILLING30APDG(null, m_db, m_prof, "SWCOPYBILLING30APDG");
-        pdg.setEntityItem(m_ei);
-        pdg.setABReList(m_elist);
-        pdg.executeAction(m_db, m_prof);
-        sb = pdg.getActivities();
-        println("</br></br/><b>Generated Data:</b>");
-        println("<br/>" + sb.toString());
-
-        log("AFCOPYBILLING30AABR01 finish generating data");
-      }
-      } catch (LockPDHEntityException le) {
-        setReturnCode(UPDATE_ERROR);
-        println(
-                "<h3><font color=red>" +
-                ERR_IAB1007E +
-                "<br />" +
-                le.getMessage() +
-                "</font></h3>");
-            logError(le.getMessage());
-      } catch (UpdatePDHEntityException le) {
-        setReturnCode(UPDATE_ERROR);
-            println(
-                "<h3><font color=red>UpdatePDH error: " +
-                le.getMessage() +
-                "</font></h3>");
-            logError(le.getMessage());
-      } catch (SBRException _sbrex) {
-      String strError = _sbrex.toString();
-      int i = strError.indexOf("(ok)");
-      if (i < 0) {
-        setReturnCode(UPDATE_ERROR);
-        println("<h3><font color=red>Generate Data error: " + replace(strError, RETURN, "<br>") + "</font></h3>");
-                logError(_sbrex.toString());
-      } else {
-        strError = strError.substring(0,i);
-        println(replace(strError, RETURN, "<br>"));
-      }
-      } catch (Exception exc) {
-        // Report this error to both the datbase log and the PrintWriter
-        println("Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-        println("" + exc);
-        exc.printStackTrace();
-        // don't overwrite an update exception
-        if (getABRReturnCode() != UPDATE_ERROR) {
-            setReturnCode(INTERNAL_ERROR);
-        }
-      } finally {
-        println(
-                "<br /><b>" +
-                buildMessage(
-                    MSG_IAB2016I,
-                    new String[]{
-                        getABRDescription(),
-                        (getReturnCode() == PASS ? "Passed" : "Failed")}) +
-                "</b>");
-
-      log(
-                buildLogMessage(
-                    MSG_IAB2016I,
-                    new String[]{
-                        getABRDescription(),
-                        (getReturnCode() == PASS ? "Passed" : "Failed")}));
-
-          // set DG title
-            strDgName = m_ei.toString();
-            if (strDgName.length() > 64) {
-        strDgName = strDgName.substring(0,64);
-      }
-            setDGTitle(strDgName);
-            setDGRptName(ABR);
-
-        // set DG submit string
-        setDGString(getABRReturnCode());
-        printDGSubmitString();      //Stuff into report for subscription and notification
-
-          // Tack on the DGString
-            buildReportFooter();
-          // make sure the lock is released
-            if (!isReadOnly()) {
-            clearSoftLock();
-            }
-      }
-    }
-
-  private String replace(String _s, String _s1, String _s2) {
-    String sResult = "";
-    int iTab = _s.indexOf(_s1);
-
-    while (_s.length() > 0 && iTab >=0) {
-      sResult = sResult + _s.substring(0, iTab) + _s2;
-      _s = _s.substring(iTab+_s1.length());
-      iTab = _s.indexOf(_s1);
-    }
-    sResult = sResult + _s;
-    return sResult;
-  }
-
-  /**
-  *  Get the entity description to use in error messages
-  *
-  *@param  entityType  Description of the Parameter
-  *@param  entityId    Description of the Parameter
-  *@return             String
-  */
-  protected String getABREntityDesc(String entityType, int entityId) {
-      return null;
-  }
-
-    /**
-    *  Get ABR description
-    *
-    *@return    java.lang.String
-    */
-  public String getDescription() {
-      return "Software Copy Billing ABR.";
-  }
-
-    /**
-    *  Get any style that should be used for this page. Derived classes can
-    *  override this to set styles They must include the <style>...</style> tags
-    *
-    *@return    String
-    */
-  protected String getStyle() {
-      // Print out the PSG stylesheet
-      return "";
-  }
-
-  /**
-     * getRevision
-     *
-     * @return
-     * @author Administrator
-     */
-    public String getRevision() {
-      return new String("1.4");
-  }
-
-  /**
-     * getVersiion
-     *
-     * @return
-     * @author Administrator
-     */
-    public static String getVersion() {
-      return ("AFCOPYBILLING30AABR01.java,v 1.4 2006/03/03 19:23:24 bala Exp");
-  }
-
-  /**
-     * @see COM.ibm.eannounce.abr.util.PokBaseABR#getABRVersion()
-     * @author Administrator
-     */
-    public String getABRVersion() {
-      return "AFCOPYBILLING30AABR01.java";
-  }
-}

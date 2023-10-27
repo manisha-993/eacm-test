@@ -1,293 +1,299 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import com.ibm.transform.oim.eacm.diff.DiffEntity;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.Vector;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class XMLSVCMODPRCPTElem
+/*     */   extends XMLElem
+/*     */ {
+/*     */   public XMLSVCMODPRCPTElem() {
+/*  59 */     super("PRCPTELEMENT");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean hasChanges(Hashtable paramHashtable, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) {
+/*  65 */     boolean bool = false;
+/*  66 */     Vector<DiffEntity> vector = getPRCPTs(paramHashtable, paramDiffEntity, paramStringBuffer);
+/*  67 */     for (byte b = 0; b < vector.size(); b++) {
+/*  68 */       DiffEntity diffEntity = vector.elementAt(b);
+/*  69 */       if (diffEntity.isDeleted()) {
+/*  70 */         bool = true;
+/*  71 */       } else if (diffEntity.isNew()) {
+/*  72 */         bool = true;
+/*     */       } else {
+/*  74 */         EntityItem entityItem1 = diffEntity.getCurrentEntityItem();
+/*  75 */         EntityItem entityItem2 = diffEntity.getPriorEntityItem();
+/*  76 */         bool = hasChangedValue(bool, entityItem1, entityItem2, "PRCPTID");
+/*  77 */         if (bool)
+/*     */           break; 
+/*  79 */         EntityItem entityItem3 = getRelator(paramDiffEntity, entityItem1, paramStringBuffer);
+/*  80 */         EntityItem entityItem4 = getRelator(paramDiffEntity, entityItem2, paramStringBuffer);
+/*  81 */         bool = hasChangedValue(bool, entityItem3, entityItem4, "EFFECTIVEDATE");
+/*  82 */         if (bool)
+/*  83 */           break;  bool = hasChangedValue(bool, entityItem3, entityItem4, "ENDDATE");
+/*  84 */         if (bool)
+/*     */           break; 
+/*     */       } 
+/*     */     } 
+/*  88 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private boolean hasChangedValue(boolean paramBoolean, EntityItem paramEntityItem1, EntityItem paramEntityItem2, String paramString) {
+/*  98 */     String str1 = "";
+/*  99 */     String str2 = "";
+/* 100 */     if (paramEntityItem1 != null) {
+/* 101 */       str1 = PokUtils.getAttributeValue(paramEntityItem1, paramString, ", ", "@@", false);
+/*     */     }
+/* 103 */     if (paramEntityItem2 != null) {
+/* 104 */       str2 = PokUtils.getAttributeValue(paramEntityItem2, paramString, ", ", "@@", false);
+/*     */     }
+/* 106 */     if (!str1.equals(str2)) {
+/* 107 */       paramBoolean = true;
+/*     */     }
+/* 109 */     return paramBoolean;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addElements(Database paramDatabase, Hashtable paramHashtable, Document paramDocument, Element paramElement, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 141 */     ABRUtil.append(paramStringBuffer, "XMLSVCMODPRCPTElem:parentItem: " + paramDiffEntity.getKey() + NEWLINE);
+/* 142 */     Vector<DiffEntity> vector = getPRCPTs(paramHashtable, paramDiffEntity, paramStringBuffer);
+/* 143 */     for (byte b = 0; b < vector.size(); b++) {
+/* 144 */       DiffEntity diffEntity = vector.elementAt(b);
+/* 145 */       EntityItem entityItem1 = diffEntity.getCurrentEntityItem();
+/* 146 */       EntityItem entityItem2 = diffEntity.getPriorEntityItem();
+/* 147 */       String str = "";
+/* 148 */       if (diffEntity.isDeleted()) {
+/* 149 */         str = "Delete";
+/* 150 */         createNodeSet(paramHashtable, paramDocument, paramElement, paramDiffEntity, entityItem2, str, paramStringBuffer);
+/* 151 */       } else if (diffEntity.isNew()) {
+/* 152 */         str = "Update";
+/* 153 */         createNodeSet(paramHashtable, paramDocument, paramElement, paramDiffEntity, entityItem1, str, paramStringBuffer);
+/*     */       } else {
+/* 155 */         str = "Update";
+/* 156 */         createNodeSet(paramHashtable, paramDocument, paramElement, paramDiffEntity, entityItem1, str, paramStringBuffer);
+/*     */       } 
+/*     */     } 
+/* 159 */     vector.clear();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void createNodeSet(Hashtable paramHashtable, Document paramDocument, Element paramElement, DiffEntity paramDiffEntity, EntityItem paramEntityItem, String paramString, StringBuffer paramStringBuffer) {
+/* 173 */     Element element1 = paramDocument.createElement(this.nodeName);
+/* 174 */     addXMLAttrs(element1);
+/* 175 */     paramElement.appendChild(element1);
+/*     */ 
+/*     */ 
+/*     */     
+/* 179 */     Element element2 = paramDocument.createElement("ACTIVITY");
+/* 180 */     element2.appendChild(paramDocument.createTextNode("" + paramString));
+/* 181 */     element1.appendChild(element2);
+/*     */     
+/* 183 */     EntityItem entityItem = getRelator(paramDiffEntity, paramEntityItem, paramStringBuffer);
+/*     */     
+/* 185 */     element2 = paramDocument.createElement("EFFECTIVEDATE");
+/* 186 */     element2.appendChild(paramDocument.createTextNode("" + PokUtils.getAttributeValue(entityItem, "EFFECTIVEDATE", ", ", "@@", false)));
+/* 187 */     element1.appendChild(element2);
+/*     */ 
+/*     */     
+/* 190 */     element2 = paramDocument.createElement("ENDDATE");
+/* 191 */     element2.appendChild(paramDocument.createTextNode("" + PokUtils.getAttributeValue(entityItem, "ENDDATE", ", ", "@@", false)));
+/* 192 */     element1.appendChild(element2);
+/*     */     
+/* 194 */     element2 = paramDocument.createElement("ENTITYTYPE");
+/* 195 */     element2.appendChild(paramDocument.createTextNode("" + paramEntityItem.getEntityType()));
+/* 196 */     element1.appendChild(element2);
+/*     */     
+/* 198 */     element2 = paramDocument.createElement("ENTITYID");
+/* 199 */     element2.appendChild(paramDocument.createTextNode("" + paramEntityItem.getEntityID()));
+/* 200 */     element1.appendChild(element2);
+/*     */     
+/* 202 */     element2 = paramDocument.createElement("PRCPTID");
+/* 203 */     element2.appendChild(paramDocument.createTextNode("" + PokUtils.getAttributeValue(paramEntityItem, "PRCPTID", ", ", "@@", false)));
+/* 204 */     element1.appendChild(element2);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private EntityItem getRelator(DiffEntity paramDiffEntity, EntityItem paramEntityItem, StringBuffer paramStringBuffer) {
+/* 213 */     EntityItem entityItem = null;
+/* 214 */     Vector<EntityItem> vector = paramEntityItem.getUpLink();
+/* 215 */     for (byte b = 0; b < vector.size(); b++) {
+/* 216 */       EntityItem entityItem1 = vector.get(b);
+/* 217 */       if (entityItem1 != null && "SVCSEOPRCPT".equals(entityItem1.getEntityType())) {
+/* 218 */         EntityItem entityItem2 = (EntityItem)entityItem1.getUpLink(0);
+/* 219 */         if (entityItem2.getKey().equals(paramDiffEntity.getKey())) {
+/* 220 */           entityItem = entityItem1;
+/*     */           break;
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/* 225 */     return entityItem;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private Vector getPRCPTs(Hashtable paramHashtable, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) {
+/* 235 */     Vector<DiffEntity> vector1 = new Vector(1);
+/* 236 */     Vector<DiffEntity> vector2 = (Vector)paramHashtable.get("PRCPT");
+/* 237 */     if (vector2 == null) {
+/* 238 */       return vector1;
+/*     */     }
+/* 240 */     Vector<String> vector = new Vector();
+/* 241 */     for (byte b = 0; b < vector2.size(); b++) {
+/* 242 */       DiffEntity diffEntity = vector2.elementAt(b);
+/* 243 */       if (!vector.contains(diffEntity.getKey()))
+/*     */       {
+/*     */         
+/* 246 */         if (deriveTheSameEntry(diffEntity, paramDiffEntity, paramStringBuffer) && 
+/* 247 */           !vector.contains(diffEntity.getKey())) {
+/* 248 */           ABRUtil.append(paramStringBuffer, "XMLSVCMODPRCPTElem.getPRCPTs find PRCPT key=" + diffEntity.getKey() + NEWLINE);
+/* 249 */           vector1.add(diffEntity);
+/* 250 */           vector.add(diffEntity.getKey());
+/*     */         } 
+/*     */       }
+/*     */     } 
+/* 254 */     vector.clear();
+/* 255 */     return vector1;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private boolean deriveTheSameEntry(DiffEntity paramDiffEntity1, DiffEntity paramDiffEntity2, StringBuffer paramStringBuffer) {
+/* 265 */     boolean bool = false;
+/* 266 */     String str = "";
+/* 267 */     if (paramDiffEntity1 != null) {
+/* 268 */       str = paramDiffEntity1.toString();
+/* 269 */       if (str.indexOf("SVCSEOPRCPT") > -1) {
+/* 270 */         ABRUtil.append(paramStringBuffer, "XMLSVCMODPRCPTElem.deriveTheSameEntry path=" + str + NEWLINE);
+/* 271 */         EntityItem entityItem = null;
+/* 272 */         if (paramDiffEntity1.isDeleted()) {
+/* 273 */           entityItem = paramDiffEntity1.getPriorEntityItem();
+/*     */         } else {
+/* 275 */           entityItem = paramDiffEntity1.getCurrentEntityItem();
+/*     */         } 
+/* 277 */         Vector<EntityItem> vector = entityItem.getUpLink();
+/* 278 */         for (byte b = 0; b < vector.size(); b++) {
+/* 279 */           EntityItem entityItem1 = vector.get(b);
+/* 280 */           if (entityItem1 != null && "SVCSEOPRCPT".equals(entityItem1.getEntityType())) {
+/* 281 */             EntityItem entityItem2 = (EntityItem)entityItem1.getUpLink(0);
+/* 282 */             if (entityItem2.getKey().equals(paramDiffEntity2.getKey())) {
+/* 283 */               bool = true;
+/* 284 */               ABRUtil.append(paramStringBuffer, "XMLSVCMODPRCPTElem.deriveTheSameEntry is true and path=" + str + NEWLINE);
+/*     */               break;
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/* 291 */     return bool;
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.util;
 
-import java.util.Hashtable;
-import java.util.Vector;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.opicmpdh.middleware.Database;
-
-import com.ibm.transform.oim.eacm.diff.DiffEntity;
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-/**********************************************************************************
-* Class used to hold info and structure to be generated for the xml feed
-* for abrs.  Checks for deleted or updated entity
-*/
-// $Log: XMLSVCMODPRCPTElem.java,v $
-// Revision 1.3  2015/01/26 15:53:39  wangyul
-// fix the issue PR24222 -- SPF ADS abr string buffer
-//
-// Revision 1.2  2012/02/06 08:55:50  wangyulo
-// Change attribute tag name from PRCPTACTION to ACTIVITY for SVCMOD abr
-//
-// Revision 1.1  2012/01/18 15:58:36  guobin
-// Fix the issue 635138 for SVCMOD:
-// show EFFECTIVEDATE and ENDDATE once for each PRCPTELEMENT tag in SVCMOD xml
-//
-// Revision 1.1  2011/12/14 02:30:03  guobin
-// Update the Version V Mod M for the ADSABR
-//
-// -   CQ00003539-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC
-// -   CQ00005096-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Add Category MM and Images
-// -   CQ00005046-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Support CRAD in BHC
-// -   CQ00005045-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Upgrade/Conversion Support
-// -   CQ00006862-WI  - BHC 3.0 Support - Support for Services Data UI
-//
-//
-
-public class XMLSVCMODPRCPTElem extends XMLElem
-{
-    /**********************************************************************************
-    * Constructor for ACTIVITY elements
-    *
-    * <ACTIVITY>	</ACTIVITY>			2	MODEL	Activity "Delete":"Update"
-    *
-    *@param nname String with name of node to be created
-    */
-    public XMLSVCMODPRCPTElem()
-    {
-        super("PRCPTELEMENT");
-    }
-    /**
-     * Check the change of the PRCPT
-     */
-    protected boolean hasChanges(Hashtable table, DiffEntity parentItem, StringBuffer debugSb) {
-    	boolean changed = false;
-    	Vector prcptVct = getPRCPTs(table, parentItem, debugSb);
-    	for (int i = 0; i < prcptVct.size(); i++) {
-			DiffEntity prcptDiff = (DiffEntity) prcptVct.elementAt(i);			
-			if (prcptDiff.isDeleted()) { 
-				changed = true;				
-			}else if (prcptDiff.isNew()) {
-				changed = true;
-			}else{				
-				EntityItem curritem = prcptDiff.getCurrentEntityItem();	
-				EntityItem previtem = prcptDiff.getPriorEntityItem();
-				changed = hasChangedValue(changed, curritem, previtem, "PRCPTID");
-				if(changed) break;	
-				
-				EntityItem currReltorItem = getRelator(parentItem, curritem, debugSb);
-				EntityItem prevReltorItem = getRelator(parentItem, previtem, debugSb);				
-				changed = hasChangedValue(changed, currReltorItem, prevReltorItem, "EFFECTIVEDATE");
-				if(changed) break;				
-				changed = hasChangedValue(changed, currReltorItem, prevReltorItem, "ENDDATE");
-				if(changed) break;
-			}    		
-    	} 
-    	
-    	return changed;
-    }
-
-	/**
-	 * @param changed
-	 * @param curritem
-	 * @param previtem
-	 * @return check if there is some attriubte value that has changed
-	 */
-	private boolean hasChangedValue(boolean changed, EntityItem curritem, EntityItem previtem,String attributeCode) {
-		String currValue = "";
-		String prevValue = "";
-		if (curritem != null) {
-			currValue = PokUtils.getAttributeValue(curritem, attributeCode, ", ", CHEAT, false);
-		}
-		if (previtem != null) {
-			prevValue = PokUtils.getAttributeValue(previtem, attributeCode, ", ", CHEAT, false);
-		}
-		if (!currValue.equals(prevValue)) {
-			changed = true;
-		}
-		return changed;
-	}
-    
-    
-    
-    /**********************************************************************************
-    * Create a node for this element and add to the parent and any children this node has
-    *
-    *@param dbCurrent Database
-    *@param table Hashtable of Vectors of DiffEntity
-    *@param document Document needed to create nodes
-    *@param parent Element node to add this node too
-    *@param parentItem DiffEntity - parent to use if path is specified in XMLGroupElem, item to use otherwise
-    *@param debugSb StringBuffer for debug output
-    */
-    public void addElements(Database dbCurrent,Hashtable table, Document document, Element parent,
-        DiffEntity parentItem, StringBuffer debugSb)
-    throws
-        COM.ibm.eannounce.objects.EANBusinessRuleException,
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-        java.rmi.RemoteException,
-        java.io.IOException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {
-    	//get all the prcpt from the root of the SVCSEO
-    	// getPRCPTs();
-    	// prcpt.uplink get the SVCSEOPRCPT and get uplink to find the parent and the parent must the same prcpt
-    	// get the EFFECTIVEDATE,ENDDATE attribute value of the SVCSEOPRCPT entity
-    	// createNodeSet();
-    	ABRUtil.append(debugSb,"XMLSVCMODPRCPTElem:parentItem: " + parentItem.getKey() + NEWLINE);
-    	Vector prcptVct = getPRCPTs(table, parentItem, debugSb);
-    	for (int i = 0; i < prcptVct.size(); i++) {
-			DiffEntity prcptDiff = (DiffEntity) prcptVct.elementAt(i);
-			EntityItem curritem = prcptDiff.getCurrentEntityItem();	
-			EntityItem previtem = prcptDiff.getPriorEntityItem();	
-			String action = "";
-			if (prcptDiff.isDeleted()) { 
-				action = DELETE_ACTIVITY;
-				createNodeSet(table, document, parent, parentItem,previtem, action, debugSb);				
-			}else if (prcptDiff.isNew()) {
-				action = UPDATE_ACTIVITY;
-				createNodeSet(table, document, parent, parentItem,curritem, action, debugSb);
-			}else{
-				action = UPDATE_ACTIVITY;
-				createNodeSet(table, document, parent, parentItem,curritem, action, debugSb);
-			}    		
-    	}
-    	prcptVct.clear();
-    }
-    /**
-     * create the nodeset for the PRCPT entity
-     * @param table
-     * @param document
-     * @param parent
-     * @param parentItem
-     * @param prcptItem
-     * @param action
-     * @param debugSb
-     */
-	private void createNodeSet(Hashtable table, Document document, Element parent, DiffEntity parentItem,
-			EntityItem prcptItem, String action, StringBuffer debugSb) {
-		Element elem = (Element) document.createElement(nodeName);
-		addXMLAttrs(elem);
-		parent.appendChild(elem);
-		
-		//add child nodes
-		//change PRCPTACTION to ACTIVITY
-		Element child = (Element) document.createElement("ACTIVITY");
-		child.appendChild(document.createTextNode("" + action));
-		elem.appendChild(child);		
-		
-		EntityItem SVCSEOPRCPTItem = getRelator(parentItem, prcptItem,debugSb);
-		//add EFFECTIVEDATE of SVCSEOPRCPT
-		child = (Element) document.createElement("EFFECTIVEDATE");
-		child.appendChild(document.createTextNode("" + PokUtils.getAttributeValue(SVCSEOPRCPTItem, "EFFECTIVEDATE",", ", CHEAT, false)));
-		elem.appendChild(child);
-		
-		//add ENDDATE of SVCSEOPRCPT
-		child = (Element) document.createElement("ENDDATE");
-		child.appendChild(document.createTextNode("" + PokUtils.getAttributeValue(SVCSEOPRCPTItem, "ENDDATE",", ", CHEAT, false)));
-		elem.appendChild(child);
-		
-		child = (Element) document.createElement("ENTITYTYPE");
-		child.appendChild(document.createTextNode("" + prcptItem.getEntityType()));
-		elem.appendChild(child);
-		
-		child = (Element) document.createElement("ENTITYID");
-		child.appendChild(document.createTextNode("" + prcptItem.getEntityID()));
-		elem.appendChild(child);
-		
-		child = (Element) document.createElement("PRCPTID");
-		child.appendChild(document.createTextNode("" + PokUtils.getAttributeValue(prcptItem, "PRCPTID",", ", CHEAT, false)));
-		elem.appendChild(child);		
-	}
-
-	/**
-	 * @param parentItem
-	 * @param prctpItem
-	 * @return
-	 */
-	private EntityItem getRelator(DiffEntity parentItem, EntityItem prctpItem,StringBuffer debugSb) {
-		EntityItem relatorItem = null; 
-		Vector uplinksVct = prctpItem.getUpLink();
-		for (int i=0; i<uplinksVct.size(); i++){
-			EntityItem relator = (EntityItem)uplinksVct.get(i);
-			if (relator != null && "SVCSEOPRCPT".equals(relator.getEntityType())){
-				EntityItem svcseo= (EntityItem)relator.getUpLink(0);
-				if(svcseo.getKey().equals(parentItem.getKey())){
-					relatorItem = relator;
-					break;
-				}
-			}
-		}
-		return relatorItem;
-	}
-    /**
-     * get all the vaild prcpt of the parent the SVCSEO
-     * @param table
-     * @param parentItem
-     * @param debugSb
-     * @return
-     */
-	private Vector getPRCPTs(Hashtable table, DiffEntity parentItem, StringBuffer debugSb) {
-		Vector PRCTPVct = new Vector(1);
-		Vector allVct = (Vector) table.get("PRCPT");
-		if (allVct == null) {
-			return PRCTPVct;
-		}
-		Vector keyVct = new Vector();
-		for (int i = 0; i < allVct.size(); i++) {			
-			DiffEntity diffitem = (DiffEntity) allVct.elementAt(i);
-			if(keyVct.contains(diffitem.getKey())){
-				continue;
-			}				
-			if (deriveTheSameEntry(diffitem, parentItem, debugSb)) {				
-				if(!keyVct.contains(diffitem.getKey())){
-					ABRUtil.append(debugSb,"XMLSVCMODPRCPTElem.getPRCPTs find PRCPT key=" + diffitem.getKey() + NEWLINE);
-					PRCTPVct.add(diffitem);
-					keyVct.add(diffitem.getKey());
-				}			
-			}			
-		}	
-		keyVct.clear();
-		return PRCTPVct;
-	}
-	/**
-	 * the relator must relate to the parent
-	 * @param diffitem
-	 * @param parentItem
-	 * @param debugSb
-	 * @return
-	 */
-	private boolean deriveTheSameEntry(DiffEntity diffitem, DiffEntity parentItem, StringBuffer debugSb) {
-		boolean isFromTheParent = false;
-		String spath = "";
-		if (diffitem != null) {
-			spath = diffitem.toString();			
-			if(spath.indexOf("SVCSEOPRCPT")>-1){
-				ABRUtil.append(debugSb,"XMLSVCMODPRCPTElem.deriveTheSameEntry path="+ spath + NEWLINE);
-				EntityItem prctpItem = null;
-				if(diffitem.isDeleted()){
-					prctpItem = diffitem.getPriorEntityItem();
-				}else{
-					prctpItem = diffitem.getCurrentEntityItem();
-				}
-				Vector uplinksVct = prctpItem.getUpLink();
-				for (int i=0; i<uplinksVct.size(); i++){
-					EntityItem relator = (EntityItem)uplinksVct.get(i);
-					if (relator != null && "SVCSEOPRCPT".equals(relator.getEntityType())){
-						EntityItem svcseo= (EntityItem)relator.getUpLink(0);
-						if(svcseo.getKey().equals(parentItem.getKey())){
-							isFromTheParent = true;
-							ABRUtil.append(debugSb,"XMLSVCMODPRCPTElem.deriveTheSameEntry is true and path="+ spath + NEWLINE);
-							break;
-						}
-					}
-				}
-			}
-		}
-		return isFromTheParent;
-	}
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\XMLSVCMODPRCPTElem.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

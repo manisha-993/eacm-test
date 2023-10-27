@@ -1,195 +1,199 @@
-/* Copyright IBM Corp. 2021 */
-package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*     */ package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*     */ 
+/*     */ import com.google.gson.annotations.SerializedName;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class RdhCswOrdAvailStatus_feature
+/*     */ {
+/*     */   @SerializedName("MACHTYPE")
+/*     */   private String machType;
+/*     */   @SerializedName("MODEL")
+/*     */   private String model;
+/*     */   @SerializedName("FEATURECODE")
+/*     */   private String featureCode;
+/*     */   @SerializedName("FEATUREENTITYTYPE")
+/*     */   private String featureEntityType;
+/*     */   @SerializedName("MKTGDESC")
+/*     */   private String mktgDesc;
+/*     */   @SerializedName("FCTYPE")
+/*     */   private String fcType;
+/*     */   @SerializedName("FCSUBCAT")
+/*     */   private String fcSubCat;
+/*     */   @SerializedName("PRICEDFEATURE")
+/*     */   private String pricedFeature;
+/*     */   @SerializedName("CHARGEOPTION")
+/*     */   private String chargeOption;
+/*     */   @SerializedName("LCNSOPTTYPE")
+/*     */   private String lcnsOptType;
+/*     */   @SerializedName("FCCAT")
+/*     */   private String fcCat;
+/*     */   
+/*     */   public String getMachType() {
+/*  44 */     return this.machType;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setMachType(String paramString) {
+/*  51 */     this.machType = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getModel() {
+/*  58 */     return this.model;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setModel(String paramString) {
+/*  65 */     this.model = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getFeatureCode() {
+/*  72 */     return this.featureCode;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setFeatureCode(String paramString) {
+/*  79 */     this.featureCode = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getFeatureEntityType() {
+/*  86 */     return this.featureEntityType;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setFeatureEntityType(String paramString) {
+/*  93 */     this.featureEntityType = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getMktgDesc() {
+/* 100 */     return this.mktgDesc;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setMktgDesc(String paramString) {
+/* 107 */     this.mktgDesc = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getFcType() {
+/* 114 */     return this.fcType;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setFcType(String paramString) {
+/* 121 */     this.fcType = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getFcSubCat() {
+/* 128 */     return this.fcSubCat;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setFcSubCat(String paramString) {
+/* 135 */     this.fcSubCat = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getPricedFeature() {
+/* 142 */     return this.pricedFeature;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setPricedFeature(String paramString) {
+/* 149 */     this.pricedFeature = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getChargeOption() {
+/* 156 */     return this.chargeOption;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setChargeOption(String paramString) {
+/* 163 */     this.chargeOption = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getLcnsOptType() {
+/* 170 */     return this.lcnsOptType;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setLcnsOptType(String paramString) {
+/* 177 */     this.lcnsOptType = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getFcCat() {
+/* 184 */     return this.fcCat;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setFcCat(String paramString) {
+/* 191 */     this.fcCat = paramString;
+/*     */   }
+/*     */ }
 
-import com.google.gson.annotations.SerializedName;
 
-/**
- * 
- * an orderable's long description plus other attributes
- * @author will
- *
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\entity\RdhCswOrdAvailStatus_feature.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class RdhCswOrdAvailStatus_feature
-{
-    @SerializedName("MACHTYPE")
-    private String machType;
-    @SerializedName("MODEL")
-    private String model;
-    @SerializedName("FEATURECODE")
-    private String featureCode;
-    @SerializedName("FEATUREENTITYTYPE")
-    private String featureEntityType;
-    @SerializedName("MKTGDESC")
-    private String mktgDesc;
-    @SerializedName("FCTYPE")
-    private String fcType;
-    @SerializedName("FCSUBCAT")
-    private String fcSubCat;
-    @SerializedName("PRICEDFEATURE")
-    private String pricedFeature;
-    @SerializedName("CHARGEOPTION")
-    private String chargeOption;
-    
-    @SerializedName("LCNSOPTTYPE")
-    private String lcnsOptType;
-    
-    @SerializedName("FCCAT")
-    private String fcCat;
-    
-    /**
-     * @return the machType
-     */
-    public String getMachType()
-    {
-        return machType;
-    }
-    /**
-     * @param machType the machType to set
-     */
-    public void setMachType(String machType)
-    {
-        this.machType = machType;
-    }
-    /**
-     * @return the model
-     */
-    public String getModel()
-    {
-        return model;
-    }
-    /**
-     * @param model the model to set
-     */
-    public void setModel(String model)
-    {
-        this.model = model;
-    }
-    /**
-     * @return the featureCode
-     */
-    public String getFeatureCode()
-    {
-        return featureCode;
-    }
-    /**
-     * @param featureCode the featureCode to set
-     */
-    public void setFeatureCode(String featureCode)
-    {
-        this.featureCode = featureCode;
-    }
-    /**
-     * @return the featureEntityType
-     */
-    public String getFeatureEntityType()
-    {
-        return featureEntityType;
-    }
-    /**
-     * @param featureEntityType the featureEntityType to set
-     */
-    public void setFeatureEntityType(String featureEntityType)
-    {
-        this.featureEntityType = featureEntityType;
-    }
-    /**
-     * @return the mktgDesc
-     */
-    public String getMktgDesc()
-    {
-        return mktgDesc;
-    }
-    /**
-     * @param mktgDesc the mktgDesc to set
-     */
-    public void setMktgDesc(String mktgDesc)
-    {
-        this.mktgDesc = mktgDesc;
-    }
-    /**
-     * @return the fcType
-     */
-    public String getFcType()
-    {
-        return fcType;
-    }
-    /**
-     * @param fcType the fcType to set
-     */
-    public void setFcType(String fcType)
-    {
-        this.fcType = fcType;
-    }
-    /**
-     * @return the fcSubCat
-     */
-    public String getFcSubCat()
-    {
-        return fcSubCat;
-    }
-    /**
-     * @param fcSubCat the fcSubCat to set
-     */
-    public void setFcSubCat(String fcSubCat)
-    {
-        this.fcSubCat = fcSubCat;
-    }
-    /**
-     * @return the pricedFeature
-     */
-    public String getPricedFeature()
-    {
-        return pricedFeature;
-    }
-    /**
-     * @param pricedFeature the pricedFeature to set
-     */
-    public void setPricedFeature(String pricedFeature)
-    {
-        this.pricedFeature = pricedFeature;
-    }
-    /**
-     * @return the chargeOption
-     */
-    public String getChargeOption()
-    {
-        return chargeOption;
-    }
-    /**
-     * @param chargeOption the chargeOption to set
-     */
-    public void setChargeOption(String chargeOption)
-    {
-        this.chargeOption = chargeOption;
-    }
-    /**
-     * @return the lcnsOptType
-     */
-    public String getLcnsOptType()
-    {
-        return lcnsOptType;
-    }
-    /**
-     * @param lcnsOptType the lcnsOptType to set
-     */
-    public void setLcnsOptType(String lcnsOptType)
-    {
-        this.lcnsOptType = lcnsOptType;
-    }
-    /**
-     * @return the fcCat
-     */
-    public String getFcCat()
-    {
-        return fcCat;
-    }
-    /**
-     * @param fcCat the fcCat to set
-     */
-    public void setFcCat(String fcCat)
-    {
-        this.fcCat = fcCat;
-    }
-    
-    
-}

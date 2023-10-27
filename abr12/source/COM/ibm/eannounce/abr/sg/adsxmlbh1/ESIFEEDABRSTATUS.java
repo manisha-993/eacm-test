@@ -1,1240 +1,1245 @@
-package COM.ibm.eannounce.abr.sg.adsxmlbh1;
+/*      */ package COM.ibm.eannounce.abr.sg.adsxmlbh1;
+/*      */ 
+/*      */ import COM.ibm.eannounce.abr.util.EACustom;
+/*      */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*      */ import COM.ibm.eannounce.objects.EANList;
+/*      */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*      */ import COM.ibm.eannounce.objects.EntityGroup;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.EntityList;
+/*      */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*      */ import COM.ibm.opicmpdh.middleware.Database;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*      */ import COM.ibm.opicmpdh.middleware.Profile;
+/*      */ import COM.ibm.opicmpdh.middleware.Stopwatch;
+/*      */ import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.io.BufferedInputStream;
+/*      */ import java.io.BufferedReader;
+/*      */ import java.io.File;
+/*      */ import java.io.FileOutputStream;
+/*      */ import java.io.FileWriter;
+/*      */ import java.io.IOException;
+/*      */ import java.io.InputStreamReader;
+/*      */ import java.io.PrintWriter;
+/*      */ import java.io.StringWriter;
+/*      */ import java.sql.Connection;
+/*      */ import java.sql.PreparedStatement;
+/*      */ import java.sql.ResultSet;
+/*      */ import java.sql.SQLException;
+/*      */ import java.text.MessageFormat;
+/*      */ import java.text.NumberFormat;
+/*      */ import java.util.ArrayList;
+/*      */ import java.util.HashMap;
+/*      */ import java.util.HashSet;
+/*      */ import java.util.Iterator;
+/*      */ import java.util.List;
+/*      */ import java.util.Map;
+/*      */ import java.util.Set;
+/*      */ import java.util.StringTokenizer;
+/*      */ import java.util.Vector;
+/*      */ 
+/*      */ public class ESIFEEDABRSTATUS
+/*      */   extends PokBaseABR
+/*      */ {
+/*   46 */   private StringBuffer rptSb = new StringBuffer();
+/*   47 */   private StringBuffer xmlgenSb = new StringBuffer();
+/*   48 */   private StringBuffer userxmlSb = new StringBuffer();
+/*   49 */   private String t2DTS = "&nbsp;";
+/*   50 */   private Object[] args = (Object[])new String[10];
+/*   51 */   private String uniqueKey = String.valueOf(System.currentTimeMillis());
+/*      */   
+/*   53 */   private static int DEBUG_LVL = ABRServerProperties.getABRDebugLevel("ESIFEEDABRSTATUS");
+/*   54 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/*   55 */   protected static final String NEWLINE = new String(FOOL_JTEST);
+/*      */   
+/*      */   protected static final String OLDEFFECTDATE = "2010-03-01";
+/*      */   protected static final String STATUS_FINAL = "Final";
+/*      */   protected static final String CHEAT = "@@";
+/*      */   public static final String RPTPATH = "_rptpath";
+/*   61 */   private HashMap allRecords = new HashMap<>();
+/*   62 */   private String lineStr = "";
+/*      */   
+/*      */   private static final String INIPATH = "_inipath";
+/*      */   
+/*      */   private static final String FTPSCRPATH = "_script";
+/*      */   
+/*      */   private static final String TARGETFILENAME = "_targetfilename";
+/*      */   private static final String LOGPATH = "_logpath";
+/*      */   private static final String BACKUPPATH = "_backuppath";
+/*      */   private static final int MAXSIZE = 100000;
+/*   72 */   protected static final Set FCTYPE_SET = new HashSet(); static {
+/*   73 */     FCTYPE_SET.add("RPQ-ILISTED");
+/*   74 */     FCTYPE_SET.add("RPQ-PLISTED");
+/*   75 */     FCTYPE_SET.add("RPQ-RLISTED");
+/*      */   }
+/*      */   
+/*   78 */   protected static final String[][] country_convert_Array = new String[][] { { "1447", "624" }, { "1626", "838" }, { "1600", "822" }, { "1632", "846" }, { "1484", "678" }, { "1588", "806" }, { "1500", "702" }, { "1532", "756" }, { "1533", "758" }, { "1651", "866" }, { "1531", "754" }, { "1578", "788" }, { "1624", "864" } };
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void execute_run() {
+/*   96 */     String str1 = "";
+/*      */ 
+/*      */     
+/*      */     try {
+/*  100 */       long l = System.currentTimeMillis();
+/*      */       
+/*  102 */       start_ABRBuild(false);
+/*      */ 
+/*      */       
+/*  105 */       setReturnCode(0);
+/*      */ 
+/*      */ 
+/*      */       
+/*  109 */       this.m_elist = this.m_db.getEntityList(this.m_prof, new ExtractActionItem(null, this.m_db, this.m_prof, "dummy"), new EntityItem[] { new EntityItem(null, this.m_prof, 
+/*  110 */               getEntityType(), getEntityID()) });
+/*      */ 
+/*      */       
+/*  113 */       EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*      */       
+/*  115 */       if (isCanRun()) {
+/*  116 */         List<String> list = getMachtype();
+/*  117 */         for (byte b = 0; b < list.size(); b++) {
+/*  118 */           addDebug("Process MACHTYPE: " + list.get(b));
+/*      */ 
+/*      */           
+/*  121 */           if (getReturnCode() == 0)
+/*      */           {
+/*  123 */             processThis(list.get(b));
+/*      */           }
+/*      */           
+/*  126 */           Iterator<String> iterator = this.allRecords.keySet().iterator();
+/*  127 */           while (iterator.hasNext()) {
+/*  128 */             String str = iterator.next();
+/*  129 */             StringBuffer stringBuffer = (StringBuffer)this.allRecords.get(str);
+/*      */             
+/*  131 */             if (stringBuffer.length() >= 100000) {
+/*  132 */               String str6 = ABRServerProperties.getValue(this.m_abri.getABRCode(), "_rptpath", "/Dgq/ESI/");
+/*  133 */               if (!str6.endsWith("/")) {
+/*  134 */                 str6 = str6 + "/";
+/*      */               }
+/*  136 */               String str7 = getNow();
+/*  137 */               str7 = str7.replace(' ', '_');
+/*  138 */               String str8 = str6 + "MSM" + str + str7 + ".FULL";
+/*      */               try {
+/*  140 */                 generateFile(str8, stringBuffer);
+/*  141 */                 addDebug("Write to file " + str8);
+/*  142 */                 stringBuffer.setLength(0);
+/*  143 */               } catch (Exception exception) {
+/*      */                 
+/*  145 */                 exception.printStackTrace();
+/*      */               } 
+/*      */             } 
+/*      */           } 
+/*      */           
+/*  150 */           addDebug("Total Time: " + Stopwatch.format(System.currentTimeMillis() - l) + " for abr:" + getDescription());
+/*      */         } 
+/*      */         
+/*  153 */         Vector<String> vector = genOutputFile();
+/*      */         
+/*  155 */         if (vector != null) {
+/*  156 */           for (byte b1 = 0; b1 < vector.size(); b1++) {
+/*  157 */             String str = vector.get(b1);
+/*  158 */             exeFtpShell(str);
+/*      */           } 
+/*      */         }
+/*      */       } else {
+/*      */         
+/*  163 */         this.userxmlSb.append("Can not run at same time since one already run");
+/*      */       } 
+/*      */ 
+/*      */       
+/*  167 */       str1 = getNavigationName(entityItem);
+/*  168 */       addDebug("Total Time: " + Stopwatch.format(System.currentTimeMillis() - l));
+/*  169 */     } catch (Throwable throwable) {
+/*  170 */       StringWriter stringWriter = new StringWriter();
+/*  171 */       String str6 = "<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
+/*  172 */       String str7 = "<pre>{0}</pre>";
+/*  173 */       MessageFormat messageFormat1 = new MessageFormat(str6);
+/*  174 */       setReturnCode(-3);
+/*  175 */       throwable.printStackTrace(new PrintWriter(stringWriter));
+/*      */       
+/*  177 */       this.args[0] = throwable.getMessage();
+/*  178 */       this.rptSb.append(messageFormat1.format(this.args) + NEWLINE);
+/*  179 */       messageFormat1 = new MessageFormat(str7);
+/*  180 */       this.args[0] = stringWriter.getBuffer().toString();
+/*  181 */       this.rptSb.append(messageFormat1.format(this.args) + NEWLINE);
+/*  182 */       logError("Exception: " + throwable.getMessage());
+/*  183 */       logError(stringWriter.getBuffer().toString());
+/*      */     } finally {
+/*  185 */       if (this.t2DTS.equals("&nbsp;")) {
+/*  186 */         this.t2DTS = getNow();
+/*      */       }
+/*  188 */       setDGTitle(str1);
+/*  189 */       setDGRptName(getShortClassName(getClass()));
+/*  190 */       setDGRptClass(getABRCode());
+/*      */       
+/*  192 */       if (!isReadOnly()) {
+/*  193 */         clearSoftLock();
+/*      */       }
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/*  199 */     println(EACustom.getDocTypeHtml());
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  212 */     String str2 = "<head>" + EACustom.getMetaTags(getDescription()) + NEWLINE + EACustom.getCSS() + NEWLINE + EACustom.getTitle("{0} {1}") + NEWLINE + "</head>" + NEWLINE + "<body id=\"ibm-com\">" + EACustom.getMastheadDiv() + NEWLINE + "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
+/*      */ 
+/*      */ 
+/*      */     
+/*  216 */     MessageFormat messageFormat = new MessageFormat(str2);
+/*  217 */     this.args[0] = getShortClassName(getClass());
+/*  218 */     this.args[1] = str1;
+/*  219 */     String str3 = messageFormat.format(this.args);
+/*  220 */     String str4 = buildAitAbrHeader();
+/*      */     
+/*  222 */     String str5 = str3 + str4 + "<pre><br />" + this.userxmlSb.toString() + "</pre>" + NEWLINE;
+/*  223 */     this.rptSb.insert(0, str5);
+/*  224 */     println(this.rptSb.toString());
+/*  225 */     printDGSubmitString();
+/*  226 */     println(EACustom.getTOUDiv());
+/*  227 */     buildReportFooter();
+/*      */ 
+/*      */     
+/*  230 */     this.m_elist.dereference();
+/*  231 */     this.m_elist = null;
+/*  232 */     this.args = null;
+/*  233 */     messageFormat = null;
+/*  234 */     this.userxmlSb = null;
+/*  235 */     this.rptSb = null;
+/*  236 */     this.xmlgenSb = null;
+/*      */   }
+/*      */   
+/*      */   private boolean isCanRun() throws SQLException, MiddlewareException {
+/*  240 */     ResultSet resultSet = null;
+/*  241 */     PreparedStatement preparedStatement = null;
+/*  242 */     boolean bool = false;
+/*      */     
+/*      */     try {
+/*  245 */       Connection connection = this.m_db.getPDHConnection();
+/*      */       
+/*  247 */       String str = "select count(*) from opicm.flag where entitytype='ESIREPORT' and attributecode='ESIFEEDABRSTATUS' and attributevalue='0050' and valto>current timestamp and effto>current timestamp with ur";
+/*      */       
+/*  249 */       preparedStatement = connection.prepareStatement(str);
+/*  250 */       resultSet = preparedStatement.executeQuery();
+/*      */       
+/*  252 */       while (resultSet.next()) {
+/*      */         
+/*  254 */         int i = resultSet.getInt(1);
+/*      */         
+/*  256 */         if (i == 1) {
+/*  257 */           bool = true;
+/*      */         }
+/*      */       } 
+/*      */     } finally {
+/*  261 */       if (preparedStatement != null) {
+/*      */         try {
+/*  263 */           preparedStatement.close();
+/*  264 */         } catch (SQLException sQLException) {
+/*  265 */           sQLException.printStackTrace();
+/*      */         } 
+/*      */       }
+/*      */     } 
+/*  269 */     return bool;
+/*      */   }
+/*      */   
+/*      */   public double showMemory() {
+/*  273 */     System.gc();
+/*  274 */     Runtime runtime = Runtime.getRuntime();
+/*      */     
+/*  276 */     NumberFormat numberFormat = NumberFormat.getPercentInstance();
+/*  277 */     numberFormat.setMinimumFractionDigits(0);
+/*  278 */     double d = runtime.freeMemory() * 1.0D / runtime.totalMemory();
+/*  279 */     addDebug("Free percent: " + numberFormat.format(d));
+/*  280 */     return d;
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   public void processThis(String paramString) throws MiddlewareException, SQLException, InterruptedException {
+/*  285 */     if (paramString != null && !paramString.equals(null)) {
+/*  286 */       Iterator<Map.Entry> iterator = getDataList(paramString).entrySet().iterator();
+/*  287 */       while (iterator.hasNext()) {
+/*  288 */         Map.Entry entry = iterator.next();
+/*  289 */         String str1 = (String)entry.getKey();
+/*  290 */         String str2 = (String)entry.getValue();
+/*      */         
+/*  292 */         if (str2.equals("M")) {
+/*  293 */           Vector vector = extractMODCtry(str1);
+/*  294 */           for (byte b = 0; b < country_convert_Array.length; b++) {
+/*  295 */             if (vector.contains(country_convert_Array[b][0]))
+/*  296 */               genRecords(str1, country_convert_Array[b][1], "M"); 
+/*      */           }  continue;
+/*      */         } 
+/*  299 */         if (str2.equals("SF")) {
+/*  300 */           Vector vector = extractSTMFCtry(str1);
+/*  301 */           for (byte b = 0; b < country_convert_Array.length; b++) {
+/*  302 */             if (vector.contains(country_convert_Array[b][0]))
+/*  303 */               genRecords(str1, country_convert_Array[b][1], "SF"); 
+/*      */           }  continue;
+/*      */         } 
+/*  306 */         if (str2.equals("R")) {
+/*  307 */           Vector vector = extractRPQCtry(str1);
+/*  308 */           for (byte b = 0; b < country_convert_Array.length; b++) {
+/*  309 */             if (vector.contains(country_convert_Array[b][0]))
+/*  310 */               genRecords(str1, country_convert_Array[b][1], "R"); 
+/*      */           }  continue;
+/*      */         } 
+/*  313 */         if (str2.equals("HF")) {
+/*  314 */           Vector vector = extractTMFCtry(str1);
+/*  315 */           for (byte b = 0; b < country_convert_Array.length; b++) {
+/*  316 */             if (vector.contains(country_convert_Array[b][0])) {
+/*  317 */               genRecords(str1, country_convert_Array[b][1], "F");
+/*      */             }
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*  322 */       addDebug("Processing machtype: " + paramString);
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private Vector extractTMFCtry(String paramString) throws MiddlewareException, SQLException {
+/*  328 */     Vector vector = getTMFAvailCty(paramString);
+/*  329 */     if (vector.size() == 0) {
+/*  330 */       return extractRPQCtry(paramString);
+/*      */     }
+/*      */ 
+/*      */     
+/*  334 */     return vector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector extractRPQCtry(String paramString) throws MiddlewareException, SQLException {
+/*  340 */     Vector vector1 = new Vector();
+/*      */     
+/*  342 */     Vector vector2 = getTMFLMODAvailCty(paramString);
+/*  343 */     if (vector2.size() != 0) {
+/*      */ 
+/*      */ 
+/*      */       
+/*  347 */       Vector vector = getTMFLFEACty(paramString);
+/*  348 */       vector1 = genCtryList(vector, vector2);
+/*      */       
+/*  350 */       return vector1;
+/*      */     } 
+/*      */     
+/*  353 */     return getTMFLFEACty(paramString);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector genCtryList(Vector paramVector1, Vector<String> paramVector2) {
+/*  359 */     Vector<String> vector = new Vector();
+/*  360 */     for (byte b = 0; b < paramVector2.size(); b++) {
+/*  361 */       String str = paramVector2.get(b);
+/*  362 */       if (str != null && !str.equals(null) && 
+/*  363 */         paramVector1.contains(str)) {
+/*  364 */         vector.add(str);
+/*      */       }
+/*      */     } 
+/*      */     
+/*  368 */     return vector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector extractSTMFCtry(String paramString) throws MiddlewareException, SQLException {
+/*  374 */     Vector vector = getSTMFAvailCty(paramString);
+/*  375 */     if (vector.size() == 0) {
+/*      */       
+/*  377 */       Vector vector1 = getSTMFLMODAvailCty(paramString);
+/*  378 */       if (vector1.size() != 0)
+/*      */       {
+/*  380 */         return vector1;
+/*      */       }
+/*      */       
+/*  383 */       return genWorldWideCtryList();
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/*  388 */     return vector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector extractMODCtry(String paramString) throws MiddlewareException, SQLException {
+/*  395 */     Vector vector = getMODAvailCty(paramString);
+/*  396 */     if (vector.size() == 0)
+/*      */     {
+/*  398 */       return genWorldWideCtryList();
+/*      */     }
+/*      */ 
+/*      */     
+/*  402 */     return vector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private HashMap getDataList(String paramString) throws MiddlewareException, SQLException {
+/*  409 */     ResultSet resultSet = null;
+/*  410 */     PreparedStatement preparedStatement = null;
+/*  411 */     HashMap<Object, Object> hashMap = new HashMap<>();
+/*      */     
+/*      */     try {
+/*  414 */       Connection connection = this.m_db.getODS2Connection();
+/*      */       
+/*  416 */       String str = "select distinct M.entityid as MODID,  case when M.COFCAT='Hardware' then P.entityid end as TMFID, F.FCTYPE,  case when M.COFCAT='Software' then S.entityid end as STMFID  from opicm.machtype T  join opicm.model M on M.machtypeatr=T.machtypeatr and M.nlsid=1 and M.STATUS='Final' and M.COFCAT in ('Hardware','Software')  left join opicm.relator R1 on R1.entity2id=M.entityid and R1.entitytype='PRODSTRUCT'  left join opicm.relator R2 on R2.entity2id=M.entityid and R2.entitytype='SWPRODSTRUCT'  left join opicm.prodstruct P on P.entityid=R1.entityid and P.nlsid=1 and P.STATUS='Final'  left join opicm.feature F on F.entityid=R1.entity1id and F.nlsid=1 and F.STATUS='Final'  left join opicm.swprodstruct S on S.entityid=R2.entityid and S.nlsid=1 and S.STATUS='Final'  where T.machtypeatr='" + paramString + "' with ur";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  428 */       preparedStatement = connection.prepareStatement(str);
+/*  429 */       resultSet = preparedStatement.executeQuery();
+/*      */ 
+/*      */ 
+/*      */       
+/*  433 */       while (resultSet.next()) {
+/*      */         
+/*  435 */         if (resultSet.getString(1) != null && !resultSet.getString(1).equals(null)) {
+/*  436 */           String str1 = resultSet.getString(1);
+/*  437 */           hashMap.put(str1, "M");
+/*      */         } 
+/*  439 */         if (resultSet.getString(2) != null && !resultSet.getString(2).equals(null) && resultSet.getString(3) != null && !resultSet.getString(3).equals(null)) {
+/*  440 */           String str1 = resultSet.getString(2);
+/*  441 */           String str2 = resultSet.getString(3);
+/*  442 */           if (FCTYPE_SET.contains(str2)) {
+/*  443 */             hashMap.put(str1, "R"); continue;
+/*      */           } 
+/*  445 */           hashMap.put(str1, "HF"); continue;
+/*      */         } 
+/*  447 */         if (resultSet.getString(4) != null && !resultSet.getString(4).equals(null)) {
+/*  448 */           String str1 = resultSet.getString(4);
+/*  449 */           hashMap.put(str1, "SF");
+/*      */         } 
+/*      */       } 
+/*      */     } finally {
+/*  453 */       if (preparedStatement != null) {
+/*      */         try {
+/*  455 */           preparedStatement.close();
+/*  456 */         } catch (SQLException sQLException) {
+/*  457 */           sQLException.printStackTrace();
+/*      */         } 
+/*      */       }
+/*      */     } 
+/*  461 */     return hashMap;
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private Vector getTMFAvailCty(String paramString) throws MiddlewareException, SQLException {
+/*  466 */     ResultSet resultSet = null;
+/*  467 */     PreparedStatement preparedStatement = null;
+/*  468 */     Vector<String> vector = new Vector();
+/*      */     
+/*      */     try {
+/*  471 */       Connection connection = this.m_db.getODS2Connection();
+/*      */       
+/*  473 */       String str = "select  A1.entityid,dbms_lob.substr(replace(replace(xml2clob(xmlagg(xmlelement(NAME A, trim(F1.attributevalue)||','))),'<A>',''),'</A>','')) as country from opicm.prodstruct P join opicm.relator R1 on R1.entity1type = P.entitytype and R1.entity1id = P.entityid join opicm.AVAIL A1 on R1.entity2type = A1.entitytype and R1.entity2id = A1.entityid join opicm.flag F1 on F1.entitytype = A1.entitytype and F1.entityid = A1.entityid where P.entityid = " + paramString + " and P.nlsid = 1 and P.STATUS = 'Final' and R1.entitytype = 'OOFAVAIL' and A1.nlsid = 1 and A1.AVAILTYPE = 'Planned Availability'  and A1.STATUS in  ('Final','Ready for Review') and F1.attributecode = 'COUNTRYLIST' group by a1.entityid with ur";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  486 */       preparedStatement = connection.prepareStatement(str);
+/*  487 */       resultSet = preparedStatement.executeQuery();
+/*      */ 
+/*      */ 
+/*      */       
+/*  491 */       while (resultSet.next()) {
+/*  492 */         String str1 = resultSet.getString(2);
+/*  493 */         if (str1 != null && !str1.equals(null)) {
+/*  494 */           str1.replaceAll("<A>", "").replaceAll("</A>", "");
+/*  495 */           String[] arrayOfString = splitStr(str1, ",");
+/*  496 */           for (byte b = 0; b < arrayOfString.length; b++) {
+/*  497 */             if (!vector.contains(arrayOfString[b])) {
+/*  498 */               vector.add(arrayOfString[b]);
+/*      */             }
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } finally {
+/*      */       
+/*  505 */       if (preparedStatement != null) {
+/*      */         try {
+/*  507 */           preparedStatement.close();
+/*  508 */         } catch (SQLException sQLException) {
+/*  509 */           sQLException.printStackTrace();
+/*      */         } 
+/*      */       }
+/*      */     } 
+/*      */     
+/*  514 */     addDebug("TMF linked avail country: " + vector);
+/*      */     
+/*  516 */     return vector;
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private Vector getTMFLMODAvailCty(String paramString) throws MiddlewareException, SQLException {
+/*  521 */     ResultSet resultSet = null;
+/*  522 */     PreparedStatement preparedStatement = null;
+/*  523 */     Vector<String> vector = new Vector();
+/*      */     
+/*      */     try {
+/*  526 */       Connection connection = this.m_db.getODS2Connection();
+/*      */       
+/*  528 */       String str = "select A1.entityid,dbms_lob.substr(replace(replace(xml2clob(xmlagg(xmlelement(NAME A, trim(F1.attributevalue)||','))),'<A>',''),'</A>','')) as country from opicm.prodstruct P join opicm.relator R1 on R1.entitytype=P.entitytype and R1.entityid=P.entityid join opicm.model m on m.entitytype=R1.entity2type and m.entityid=R1.entity2id join opicm.relator R2 on R2.entitytype='MODELAVAIL' and R2.entity1id=m.entityid join opicm.AVAIL A1 on R2.entity2type = A1.entitytype and R2.entity2id = A1.entityid join opicm.flag F1 on F1.entitytype = A1.entitytype and F1.entityid = A1.entityid where p.entityid= " + paramString + " and P.nlsid = 1 and P.STATUS = 'Final' and m.nlsid = 1 and m.STATUS = 'Final' and A1.nlsid = 1 and A1.AVAILTYPE = 'Planned Availability' and A1.STATUS in ('Final','Ready for Review') and F1.attributecode = 'COUNTRYLIST' group by a1.entityid with ur";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  544 */       preparedStatement = connection.prepareStatement(str);
+/*  545 */       resultSet = preparedStatement.executeQuery();
+/*      */ 
+/*      */ 
+/*      */       
+/*  549 */       while (resultSet.next()) {
+/*  550 */         String str1 = resultSet.getString(2);
+/*  551 */         if (str1 != null && !str1.equals(null)) {
+/*  552 */           str1.replaceAll("<A>", "").replaceAll("</A>", "");
+/*  553 */           String[] arrayOfString = splitStr(str1, ",");
+/*  554 */           for (byte b = 0; b < arrayOfString.length; b++) {
+/*  555 */             if (!vector.contains(arrayOfString[b])) {
+/*  556 */               vector.add(arrayOfString[b]);
+/*      */             }
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } finally {
+/*      */       
+/*  563 */       if (preparedStatement != null) {
+/*      */         try {
+/*  565 */           preparedStatement.close();
+/*  566 */         } catch (SQLException sQLException) {
+/*  567 */           sQLException.printStackTrace();
+/*      */         } 
+/*      */       }
+/*      */     } 
+/*      */     
+/*  572 */     addDebug("TMF linked Model's avail country: " + vector);
+/*      */     
+/*  574 */     return vector;
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private Vector getTMFLFEACty(String paramString) throws MiddlewareException, SQLException {
+/*  579 */     ResultSet resultSet = null;
+/*  580 */     PreparedStatement preparedStatement = null;
+/*  581 */     Vector<String> vector = new Vector();
+/*      */     
+/*      */     try {
+/*  584 */       Connection connection = this.m_db.getODS2Connection();
+/*      */       
+/*  586 */       String str = "select F1.entityid,dbms_lob.substr(replace(replace(xml2clob(xmlagg(xmlelement(NAME A, trim(F1.attributevalue)||','))),'<A>',''),'</A>','')) as country from opicm.prodstruct P join opicm.relator R1 on R1.entitytype=P.entitytype and R1.entityid=P.entityid join opicm.feature F on F.entitytype=R1.entity1type and F.entityid=R1.entity1id and F.nlsid=1 join opicm.flag F1 on  F1.entitytype = F.entitytype and F1.entityid = F.entityid and F1.attributecode = 'COUNTRYLIST'  where p.entityid= " + paramString + " and P.nlsid = 1 and P.STATUS = 'Final' and F.nlsid=1 and F.STATUS='Final' group by F1.entityid with ur";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  593 */       preparedStatement = connection.prepareStatement(str);
+/*  594 */       resultSet = preparedStatement.executeQuery();
+/*      */ 
+/*      */ 
+/*      */       
+/*  598 */       while (resultSet.next()) {
+/*  599 */         String str1 = resultSet.getString(2);
+/*  600 */         if (str1 != null && !str1.equals(null)) {
+/*  601 */           str1.replaceAll("<A>", "").replaceAll("</A>", "");
+/*  602 */           String[] arrayOfString = splitStr(str1, ",");
+/*  603 */           for (byte b = 0; b < arrayOfString.length; b++) {
+/*  604 */             if (!vector.contains(arrayOfString[b])) {
+/*  605 */               vector.add(arrayOfString[b]);
+/*      */             }
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } finally {
+/*      */       
+/*  612 */       if (preparedStatement != null) {
+/*      */         try {
+/*  614 */           preparedStatement.close();
+/*  615 */         } catch (SQLException sQLException) {
+/*  616 */           sQLException.printStackTrace();
+/*      */         } 
+/*      */       }
+/*      */     } 
+/*      */     
+/*  621 */     addDebug("TMF linked Feature's country: " + vector);
+/*      */     
+/*  623 */     return vector;
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private Vector getSTMFAvailCty(String paramString) throws MiddlewareException, SQLException {
+/*  628 */     ResultSet resultSet = null;
+/*  629 */     PreparedStatement preparedStatement = null;
+/*  630 */     Vector<String> vector = new Vector();
+/*      */     
+/*      */     try {
+/*  633 */       Connection connection = this.m_db.getODS2Connection();
+/*      */       
+/*  635 */       String str = "select A1.entityid,dbms_lob.substr(replace(replace(xml2clob(xmlagg(xmlelement(NAME A, trim(F1.attributevalue)||','))),'<A>',''),'</A>','')) as country from opicm.swprodstruct P join opicm.relator R1 on R1.entity1type = P.entitytype and R1.entity1id = P.entityid join opicm.AVAIL A1 on R1.entity2type = A1.entitytype and R1.entity2id = A1.entityid join opicm.flag F1 on F1.entitytype = A1.entitytype and F1.entityid = A1.entityid where P.entityid = " + paramString + " and P.nlsid = 1 and P.STATUS = 'Final' and R1.entitytype = 'SWPRODSTRUCTAVAIL' and A1.nlsid = 1 and A1.AVAILTYPE = 'Planned Availability' and A1.STATUS in ('Final','Ready for Review') and F1.attributecode = 'COUNTRYLIST' group by a1.entityid with ur";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  648 */       preparedStatement = connection.prepareStatement(str);
+/*  649 */       resultSet = preparedStatement.executeQuery();
+/*      */ 
+/*      */ 
+/*      */       
+/*  653 */       while (resultSet.next()) {
+/*  654 */         String str1 = resultSet.getString(2);
+/*  655 */         if (str1 != null && !str1.equals(null)) {
+/*  656 */           str1.replaceAll("<A>", "").replaceAll("</A>", "");
+/*  657 */           String[] arrayOfString = splitStr(str1, ",");
+/*  658 */           for (byte b = 0; b < arrayOfString.length; b++) {
+/*  659 */             if (!vector.contains(arrayOfString[b])) {
+/*  660 */               vector.add(arrayOfString[b]);
+/*      */             }
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } finally {
+/*      */       
+/*  667 */       if (preparedStatement != null) {
+/*      */         try {
+/*  669 */           preparedStatement.close();
+/*  670 */         } catch (SQLException sQLException) {
+/*  671 */           sQLException.printStackTrace();
+/*      */         } 
+/*      */       }
+/*      */     } 
+/*      */     
+/*  676 */     addDebug("SWTMF linked avail country: " + vector);
+/*  677 */     return vector;
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private Vector getSTMFLMODAvailCty(String paramString) throws MiddlewareException, SQLException {
+/*  682 */     ResultSet resultSet = null;
+/*  683 */     PreparedStatement preparedStatement = null;
+/*  684 */     Vector<String> vector = new Vector();
+/*      */     
+/*      */     try {
+/*  687 */       Connection connection = this.m_db.getODS2Connection();
+/*      */       
+/*  689 */       String str = "select A1.entityid,dbms_lob.substr(replace(replace(xml2clob(xmlagg(xmlelement(NAME A, trim(F1.attributevalue)||','))),'<A>',''),'</A>','')) as country from opicm.swprodstruct P join opicm.relator R1 on R1.entitytype=P.entitytype and R1.entityid=P.entityid join opicm.model m on m.entitytype=R1.entity2type and m.entityid=R1.entity2id join opicm.relator R2 on R2.entitytype='MODELAVAIL' and R2.entity1id=m.entityid join opicm.AVAIL A1 on R2.entity2type = A1.entitytype and R2.entity2id = A1.entityid join opicm.flag F1 on F1.entitytype = A1.entitytype and F1.entityid = A1.entityid where p.entityid= " + paramString + " and P.nlsid = 1 and P.STATUS = 'Final' and m.nlsid = 1 and m.STATUS = 'Final' and A1.nlsid = 1 and A1.AVAILTYPE = 'Planned Availability' and A1.STATUS in ('Final','Ready for Review') and F1.attributecode = 'COUNTRYLIST' group by a1.entityid with ur";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  705 */       preparedStatement = connection.prepareStatement(str);
+/*  706 */       resultSet = preparedStatement.executeQuery();
+/*      */ 
+/*      */       
+/*  709 */       while (resultSet.next()) {
+/*  710 */         String str1 = resultSet.getString(2);
+/*  711 */         if (str1 != null && !str1.equals(null)) {
+/*  712 */           str1.replaceAll("<A>", "").replaceAll("</A>", "");
+/*  713 */           String[] arrayOfString = splitStr(str1, ",");
+/*  714 */           for (byte b = 0; b < arrayOfString.length; b++) {
+/*  715 */             if (!vector.contains(arrayOfString[b])) {
+/*  716 */               vector.add(arrayOfString[b]);
+/*      */             }
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } finally {
+/*      */       
+/*  723 */       if (preparedStatement != null) {
+/*      */         try {
+/*  725 */           preparedStatement.close();
+/*  726 */         } catch (SQLException sQLException) {
+/*  727 */           sQLException.printStackTrace();
+/*      */         } 
+/*      */       }
+/*      */     } 
+/*      */     
+/*  732 */     addDebug("SWTMF linked Model's avail country: " + vector);
+/*  733 */     return vector;
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private Vector getMODAvailCty(String paramString) throws MiddlewareException, SQLException {
+/*  738 */     ResultSet resultSet = null;
+/*  739 */     PreparedStatement preparedStatement = null;
+/*  740 */     Vector<String> vector = new Vector();
+/*      */     
+/*      */     try {
+/*  743 */       Connection connection = this.m_db.getODS2Connection();
+/*      */       
+/*  745 */       String str = "select A1.entityid,dbms_lob.substr(replace(replace(xml2clob(xmlagg(xmlelement(NAME A, trim(F1.attributevalue)||','))),'<A>',''),'</A>','')) as country from opicm.model m join opicm.relator R2 on R2.entitytype='MODELAVAIL' and R2.entity1id=m.entityid join opicm.AVAIL A1 on R2.entity2type = A1.entitytype and R2.entity2id = A1.entityid join opicm.flag F1 on F1.entitytype = A1.entitytype and F1.entityid = A1.entityid where m.entityid= " + paramString + " and m.nlsid = 1 and m.STATUS = 'Final' and A1.nlsid = 1 and A1.AVAILTYPE = 'Planned Availability' and A1.STATUS in ('Final','Ready for Review') and F1.attributecode = 'COUNTRYLIST' group by a1.entityid with ur";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  754 */       preparedStatement = connection.prepareStatement(str);
+/*  755 */       resultSet = preparedStatement.executeQuery();
+/*      */ 
+/*      */       
+/*  758 */       while (resultSet.next()) {
+/*  759 */         String str1 = resultSet.getString(2);
+/*  760 */         if (str1 != null && !str1.equals(null)) {
+/*  761 */           str1.replaceAll("<A>", "").replaceAll("</A>", "");
+/*  762 */           String[] arrayOfString = splitStr(str1, ",");
+/*  763 */           for (byte b = 0; b < arrayOfString.length; b++) {
+/*  764 */             if (!vector.contains(arrayOfString[b])) {
+/*  765 */               vector.add(arrayOfString[b]);
+/*      */             }
+/*      */           }
+/*      */         
+/*      */         } 
+/*      */       } 
+/*      */     } finally {
+/*      */       
+/*  773 */       if (preparedStatement != null) {
+/*      */         try {
+/*  775 */           preparedStatement.close();
+/*  776 */         } catch (SQLException sQLException) {
+/*  777 */           sQLException.printStackTrace();
+/*      */         } 
+/*      */       }
+/*      */     } 
+/*      */     
+/*  782 */     addDebug("Model's avail country: " + vector);
+/*  783 */     return vector;
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private List getMachtype() throws MiddlewareException, SQLException {
+/*  788 */     ResultSet resultSet = null;
+/*  789 */     PreparedStatement preparedStatement = null;
+/*  790 */     ArrayList<String> arrayList = new ArrayList();
+/*      */     
+/*      */     try {
+/*  793 */       Connection connection = this.m_db.getPDHConnection();
+/*      */       
+/*  795 */       String str = "select attributevalue from opicm.flag where entitytype='MACHTYPE' and attributecode='MACHTYPEATR' and valto>current timestamp and effto>current timestamp order by attributevalue with ur";
+/*      */ 
+/*      */       
+/*  798 */       preparedStatement = connection.prepareStatement(str);
+/*  799 */       resultSet = preparedStatement.executeQuery();
+/*      */       
+/*  801 */       while (resultSet.next()) {
+/*      */         
+/*  803 */         String str1 = resultSet.getString(1);
+/*  804 */         arrayList.add(str1.trim());
+/*      */       } 
+/*      */     } finally {
+/*  807 */       if (preparedStatement != null) {
+/*      */         try {
+/*  809 */           preparedStatement.close();
+/*  810 */         } catch (SQLException sQLException) {
+/*  811 */           sQLException.printStackTrace();
+/*      */         } 
+/*      */       }
+/*      */     } 
+/*      */     
+/*  816 */     addDebug("all machtype: " + arrayList.toString());
+/*  817 */     return arrayList;
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private Vector genOutputFile() {
+/*  822 */     if (this.allRecords.size() == 0) {
+/*  823 */       this.userxmlSb.append("File generate failed, for there is no qualified data related");
+/*  824 */       return null;
+/*      */     } 
+/*      */     
+/*      */     try {
+/*  828 */       Iterator<Map.Entry> iterator = this.allRecords.entrySet().iterator();
+/*  829 */       Vector<String> vector = new Vector(1);
+/*  830 */       while (iterator.hasNext()) {
+/*  831 */         Map.Entry entry = iterator.next();
+/*  832 */         StringBuffer stringBuffer = (StringBuffer)entry.getValue();
+/*      */         
+/*  834 */         String str1 = ABRServerProperties.getValue(this.m_abri.getABRCode(), "_rptpath", "/Dgq/ESI/");
+/*  835 */         if (!str1.endsWith("/")) {
+/*  836 */           str1 = str1 + "/";
+/*      */         }
+/*  838 */         String str2 = getNow();
+/*  839 */         str2 = str2.replace(' ', '_');
+/*  840 */         String str3 = str1 + "MSM" + entry.getKey() + str2 + ".FULL";
+/*  841 */         addDebug("filename:" + str3);
+/*  842 */         boolean bool1 = generateFile(str3, stringBuffer);
+/*  843 */         boolean bool2 = generatedummyRecords(str3, entry.getKey().toString());
+/*  844 */         if (bool1 && bool2) {
+/*  845 */           vector.add(str3);
+/*      */         }
+/*      */       } 
+/*      */       
+/*  849 */       return vector;
+/*      */     }
+/*  851 */     catch (Exception exception) {
+/*  852 */       exception.printStackTrace();
+/*  853 */       return null;
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private boolean generatedummyRecords(String paramString1, String paramString2) throws Exception {
+/*  859 */     File file = new File(paramString1);
+/*  860 */     if (file.exists()) {
+/*  861 */       FileWriter fileWriter = new FileWriter(file, true);
+/*  862 */       fileWriter.write(paramString2 + "SOFTADV   MSOFTWARE CONTRACT             2        ");
+/*  863 */       fileWriter.close();
+/*  864 */       return true;
+/*      */     } 
+/*  866 */     return false;
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private boolean generateFile(String paramString, StringBuffer paramStringBuffer) throws Exception {
+/*  871 */     File file = new File(paramString);
+/*  872 */     if (file.exists()) {
+/*  873 */       FileWriter fileWriter = new FileWriter(file, true);
+/*  874 */       fileWriter.write(paramStringBuffer.toString());
+/*  875 */       fileWriter.close();
+/*  876 */       return true;
+/*      */     } 
+/*  878 */     file.createNewFile();
+/*  879 */     FileOutputStream fileOutputStream = new FileOutputStream(file, true);
+/*      */     try {
+/*  881 */       fileOutputStream.write(paramStringBuffer.toString().getBytes("UTF-8"));
+/*  882 */       this.userxmlSb.append(paramString + " generate success \n");
+/*  883 */       return true;
+/*  884 */     } catch (IOException iOException) {
+/*  885 */       this.userxmlSb.append(iOException);
+/*  886 */       throw new Exception("File create failed " + paramString);
+/*      */     } finally {
+/*  888 */       fileOutputStream.flush();
+/*  889 */       fileOutputStream.close();
+/*      */       try {
+/*  891 */         if (fileOutputStream != null)
+/*  892 */           fileOutputStream.close(); 
+/*  893 */       } catch (Exception exception) {
+/*  894 */         throw new Exception("File create failed " + paramString);
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void genRecords(String paramString1, String paramString2, String paramString3) throws MiddlewareException, SQLException {
+/*  902 */     String str1 = null;
+/*  903 */     StringBuffer stringBuffer = new StringBuffer();
+/*  904 */     String str2 = paramString2;
+/*  905 */     String str3 = null;
+/*  906 */     String str4 = null;
+/*  907 */     String str5 = null;
+/*  908 */     String str6 = null;
+/*  909 */     String str7 = " ";
+/*  910 */     String str8 = " ";
+/*  911 */     String str9 = "      ";
+/*      */     
+/*  913 */     ResultSet resultSet = null;
+/*  914 */     PreparedStatement preparedStatement = null;
+/*      */     
+/*      */     try {
+/*  917 */       Connection connection = this.m_db.getODS2Connection();
+/*      */       
+/*  919 */       if ("F".equals(paramString3) || "R".equals(paramString3)) {
+/*      */         
+/*  921 */         str1 = "select M.machtypeatr, F.featurecode, F.invname from opicm.relator R join opicm.feature F on F.entitytype=R.entity1type and F.entityid=R.entity1id and F.nlsid=1 join opicm.model M on  M.entitytype = R.entity2type and M.entityid = R.entity2id and M.nlsid=1 where R.entityid=" + paramString1 + " and R.entitytype='PRODSTRUCT' and M.STATUS = 'Final' and F.STATUS='Final' with ur";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/*  927 */         preparedStatement = connection.prepareStatement(str1);
+/*  928 */         resultSet = preparedStatement.executeQuery();
+/*  929 */         while (resultSet.next()) {
+/*      */           
+/*  931 */           str3 = fixLength(resultSet.getString(1), 4);
+/*  932 */           str4 = fixLength(resultSet.getString(2), 6);
+/*  933 */           String str = resultSet.getString(3);
+/*  934 */           if (str != null && !str.equals(null))
+/*  935 */             str = str.replaceAll("\r|\n|\t", ""); 
+/*  936 */           str5 = fixLength(str, 30);
+/*      */         } 
+/*      */         
+/*  939 */         str6 = " ";
+/*      */       }
+/*  941 */       else if ("M".equals(paramString3)) {
+/*      */         
+/*  943 */         str1 = "select m.machtypeatr, m.modelatr,m.invname,m.cofcat from opicm.model m where m.entityid= " + paramString1 + " and m.nlsid=1 with ur";
+/*      */ 
+/*      */         
+/*  946 */         preparedStatement = connection.prepareStatement(str1);
+/*  947 */         resultSet = preparedStatement.executeQuery();
+/*  948 */         while (resultSet.next())
+/*      */         {
+/*  950 */           str3 = fixLength(resultSet.getString(1), 4);
+/*  951 */           str4 = fixLength(resultSet.getString(2), 6);
+/*  952 */           String str10 = resultSet.getString(3);
+/*  953 */           if (str10 != null && !str10.equals(null))
+/*  954 */             str10 = str10.replaceAll("\r|\n|\t", ""); 
+/*  955 */           str5 = fixLength(str10, 30);
+/*  956 */           String str11 = resultSet.getString(4);
+/*  957 */           if ("Software".equals(str11)) {
+/*  958 */             str6 = "2"; continue;
+/*  959 */           }  if ("Hardware".equals(str11)) {
+/*  960 */             str6 = "5";
+/*      */           }
+/*      */         }
+/*      */       
+/*  964 */       } else if ("SF".equals(paramString3)) {
+/*  965 */         str1 = "select M.machtypeatr, F.featurecode, F.invname from opicm.relator R join opicm.swfeature F on F.entitytype=R.entity1type and F.entityid=R.entity1id and F.nlsid=1 join opicm.model M on  M.entitytype = R.entity2type and M.entityid = R.entity2id and M.nlsid=1 where R.entityid= " + paramString1 + " and R.entitytype='SWPRODSTRUCT' and M.STATUS = 'Final' and F.STATUS='Final' with ur";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/*  971 */         preparedStatement = connection.prepareStatement(str1);
+/*  972 */         resultSet = preparedStatement.executeQuery();
+/*      */         
+/*  974 */         while (resultSet.next()) {
+/*      */           
+/*  976 */           str3 = fixLength(resultSet.getString(1), 4);
+/*  977 */           str4 = fixLength(resultSet.getString(2), 6);
+/*  978 */           String str = resultSet.getString(3);
+/*  979 */           if (str != null && !str.equals(null))
+/*  980 */             str = str.replaceAll("\r|\n|\t", ""); 
+/*  981 */           str5 = fixLength(str, 30);
+/*      */         } 
+/*  983 */         str6 = " ";
+/*  984 */         paramString3 = "F";
+/*      */       } 
+/*      */     } finally {
+/*  987 */       if (preparedStatement != null) {
+/*      */         try {
+/*  989 */           preparedStatement.close();
+/*  990 */         } catch (SQLException sQLException) {
+/*  991 */           sQLException.printStackTrace();
+/*      */         } 
+/*      */       }
+/*      */     } 
+/*      */     
+/*  996 */     if (str3 != null && !str3.equals(null)) {
+/*  997 */       stringBuffer.append(str2);
+/*  998 */       stringBuffer.append(str3);
+/*  999 */       stringBuffer.append(str4);
+/* 1000 */       stringBuffer.append(paramString3);
+/* 1001 */       stringBuffer.append(str5);
+/* 1002 */       stringBuffer.append(str6);
+/* 1003 */       stringBuffer.append(str7);
+/* 1004 */       stringBuffer.append(str8);
+/* 1005 */       stringBuffer.append(str9);
+/* 1006 */       stringBuffer.append(NEWLINE);
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1012 */     if (this.allRecords.get(paramString2) != null) {
+/* 1013 */       StringBuffer stringBuffer1 = (StringBuffer)this.allRecords.get(paramString2);
+/*      */       
+/* 1015 */       if (stringBuffer1.toString().indexOf(stringBuffer.toString()) <= -1) {
+/* 1016 */         stringBuffer1.append(stringBuffer);
+/*      */       }
+/*      */     }
+/*      */     else {
+/*      */       
+/* 1021 */       this.allRecords.put(paramString2, stringBuffer);
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private String fixLength(String paramString, int paramInt) {
+/* 1027 */     if (paramString == null) {
+/* 1028 */       paramString = "";
+/*      */     }
+/* 1030 */     if (paramString.length() >= paramInt) {
+/* 1031 */       return paramString.substring(0, paramInt);
+/*      */     }
+/* 1033 */     String str = "";
+/* 1034 */     for (byte b = 0; b < paramInt - paramString.length(); b++) {
+/* 1035 */       str = str + " ";
+/*      */     }
+/* 1037 */     paramString = paramString + str;
+/*      */     
+/* 1039 */     return paramString;
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private Vector genWorldWideCtryList() {
+/* 1044 */     Vector<String> vector = new Vector();
+/* 1045 */     for (byte b = 0; b < country_convert_Array.length; b++) {
+/* 1046 */       vector.add(country_convert_Array[b][0]);
+/*      */     }
+/* 1048 */     return vector;
+/*      */   }
+/*      */   
+/*      */   public String[] splitStr(String paramString1, String paramString2) {
+/* 1052 */     StringTokenizer stringTokenizer = new StringTokenizer(paramString1, paramString2);
+/* 1053 */     String[] arrayOfString = new String[stringTokenizer.countTokens()];
+/* 1054 */     byte b = 0;
+/* 1055 */     while (stringTokenizer.hasMoreTokens()) {
+/* 1056 */       arrayOfString[b] = stringTokenizer.nextToken();
+/* 1057 */       b++;
+/*      */     } 
+/* 1059 */     return arrayOfString;
+/*      */   }
+/*      */   
+/*      */   public String getDescription() {
+/* 1063 */     return "ESIFEEDABRSTATUS";
+/*      */   }
+/*      */   
+/*      */   public String getABRVersion() {
+/* 1067 */     return "1.0";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addError(String paramString) {
+/* 1074 */     addOutput(paramString);
+/* 1075 */     setReturnCode(-1);
+/*      */   }
+/*      */   
+/*      */   protected void addDebug(String paramString) {
+/* 1079 */     if (3 <= DEBUG_LVL) {
+/* 1080 */       this.rptSb.append("<!-- " + paramString + " -->" + NEWLINE);
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addDebugComment(int paramInt, String paramString) {
+/* 1090 */     if (paramInt <= DEBUG_LVL) {
+/* 1091 */       this.rptSb.append("<!-- " + paramString + " -->" + NEWLINE);
+/*      */     }
+/*      */   }
+/*      */   
+/*      */   protected EntityList getEntityList(Profile paramProfile, String paramString, EntityItem paramEntityItem) throws MiddlewareRequestException, SQLException, MiddlewareException {
+/* 1096 */     return this.m_db.getEntityList(paramProfile, new ExtractActionItem(null, this.m_db, paramProfile, paramString), new EntityItem[] { new EntityItem(null, paramProfile, paramEntityItem
+/* 1097 */             .getEntityType(), paramEntityItem.getEntityID()) });
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected Database getDB() {
+/* 1105 */     return this.m_db;
+/*      */   }
+/*      */   
+/*      */   protected String getABRTime() {
+/* 1109 */     return this.uniqueKey;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addError(String paramString, EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 1118 */     String str = getLD_NDN(paramEntityItem);
+/* 1119 */     addOutput(str + " " + paramString);
+/* 1120 */     setReturnCode(-1);
+/*      */   }
+/*      */   
+/*      */   protected String getLD_NDN(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 1124 */     return paramEntityItem.getEntityGroup().getLongDescription() + " &quot;" + getNavigationName(paramEntityItem) + "&quot;";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addOutput(String paramString) {
+/* 1130 */     this.rptSb.append("<p>" + paramString + "</p>" + NEWLINE);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String buildAitAbrHeader() {
+/* 1145 */     String str = "<table>" + NEWLINE + "<tr><th>Userid: </th><td>{0}</td></tr>" + NEWLINE + "<tr><th>Role: </th><td>{1}</td></tr>" + NEWLINE + "<tr><th>Workgroup: </th><td>{2}</td></tr>" + NEWLINE + "<tr><th>Date/Time: </th><td>{3}</td></tr>" + NEWLINE + "<tr><th>Action Taken: </th><td>{4}</td></tr>" + NEWLINE + "</table>" + NEWLINE + "<!-- {5} -->" + NEWLINE;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1153 */     MessageFormat messageFormat = new MessageFormat(str);
+/* 1154 */     this.args[0] = this.m_prof.getOPName();
+/* 1155 */     this.args[1] = this.m_prof.getRoleDescription();
+/* 1156 */     this.args[2] = this.m_prof.getWGName();
+/* 1157 */     this.args[3] = this.t2DTS;
+/* 1158 */     this.args[4] = "SOF feed trigger<br/>" + this.xmlgenSb.toString();
+/* 1159 */     this.args[5] = getABRVersion();
+/* 1160 */     return messageFormat.format(this.args);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getNavigationName(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 1169 */     StringBuffer stringBuffer = new StringBuffer();
+/*      */     
+/* 1171 */     EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, paramEntityItem.getEntityType(), "Navigate");
+/* 1172 */     EANList eANList = entityGroup.getMetaAttribute();
+/* 1173 */     for (byte b = 0; b < eANList.size(); b++) {
+/* 1174 */       EANMetaAttribute eANMetaAttribute = (EANMetaAttribute)eANList.getAt(b);
+/* 1175 */       stringBuffer.append(PokUtils.getAttributeValue(paramEntityItem, eANMetaAttribute.getAttributeCode(), ", ", "", false));
+/* 1176 */       stringBuffer.append(" ");
+/*      */     } 
+/* 1178 */     return stringBuffer.toString();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public boolean exeFtpShell(String paramString) {
+/* 1186 */     String str1 = ABRServerProperties.getValue(this.m_abri.getABRCode(), "/Dgq");
+/* 1187 */     String str2 = ABRServerProperties.getFilePrefix(this.m_abri.getABRCode());
+/* 1188 */     String str3 = ABRServerProperties.getValue(this.m_abri.getABRCode(), "_script", null) + " -f " + paramString;
+/* 1189 */     String str4 = ABRServerProperties.getValue(this.m_abri.getABRCode(), "_inipath", null);
+/*      */     
+/* 1191 */     if (str4 != null)
+/* 1192 */       str3 = str3 + " -i " + str4; 
+/* 1193 */     if (str1 != null)
+/* 1194 */       str3 = str3 + " -d " + str1; 
+/* 1195 */     if (str2 != null)
+/* 1196 */       str3 = str3 + " -p " + str2; 
+/* 1197 */     String str5 = ABRServerProperties.getValue(this.m_abri.getABRCode(), "_targetfilename", null);
+/* 1198 */     if (str5 != null)
+/* 1199 */       str3 = str3 + " -t " + str5; 
+/* 1200 */     String str6 = ABRServerProperties.getValue(this.m_abri.getABRCode(), "_logpath", null);
+/* 1201 */     if (str6 != null)
+/* 1202 */       str3 = str3 + " -l " + str6; 
+/* 1203 */     String str7 = ABRServerProperties.getValue(this.m_abri.getABRCode(), "_backuppath", null);
+/* 1204 */     if (str7 != null)
+/* 1205 */       str3 = str3 + " -b " + str7; 
+/* 1206 */     Runtime runtime = Runtime.getRuntime();
+/* 1207 */     String str8 = "";
+/* 1208 */     BufferedReader bufferedReader = null;
+/* 1209 */     BufferedInputStream bufferedInputStream = null;
+/*      */     
+/*      */     try {
+/* 1212 */       Process process = runtime.exec(str3);
+/* 1213 */       if (process.waitFor() != 0) {
+/* 1214 */         return false;
+/*      */       }
+/* 1216 */       bufferedInputStream = new BufferedInputStream(process.getInputStream());
+/* 1217 */       bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream));
+/* 1218 */       while ((this.lineStr = bufferedReader.readLine()) != null) {
+/* 1219 */         str8 = str8 + this.lineStr;
+/* 1220 */         if (this.lineStr.indexOf("FAILD") > -1) {
+/* 1221 */           return false;
+/*      */         }
+/*      */       } 
+/* 1224 */     } catch (Exception exception) {
+/* 1225 */       exception.printStackTrace();
+/* 1226 */       return false;
+/*      */     } finally {
+/* 1228 */       if (bufferedReader != null) {
+/*      */         try {
+/* 1230 */           bufferedReader.close();
+/* 1231 */           bufferedInputStream.close();
+/* 1232 */         } catch (IOException iOException) {
+/* 1233 */           iOException.printStackTrace();
+/*      */         } 
+/*      */       }
+/*      */     } 
+/* 1237 */     return !(str8 == null);
+/*      */   }
+/*      */ }
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.MessageFormat;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.Vector;
 
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-import COM.ibm.eannounce.abr.util.EACustom;
-import COM.ibm.eannounce.abr.util.PokBaseABR;
-import COM.ibm.eannounce.objects.EANList;
-import COM.ibm.eannounce.objects.EANMetaAttribute;
-import COM.ibm.eannounce.objects.EntityGroup;
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.eannounce.objects.EntityList;
-import COM.ibm.eannounce.objects.ExtractActionItem;
-import COM.ibm.opicmpdh.middleware.D;
-import COM.ibm.opicmpdh.middleware.Database;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
-import COM.ibm.opicmpdh.middleware.Profile;
-import COM.ibm.opicmpdh.middleware.Stopwatch;
-import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
-
-public class ESIFEEDABRSTATUS extends PokBaseABR{
-
-	private StringBuffer rptSb = new StringBuffer();
-	private StringBuffer xmlgenSb = new StringBuffer();
-	private StringBuffer userxmlSb= new StringBuffer();
-	private String t2DTS = "&nbsp;";  // T2
-	private Object[] args = new String[10];
-	private String uniqueKey = String.valueOf(System.currentTimeMillis());
-	
-	private static int DEBUG_LVL = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getABRDebugLevel("ESIFEEDABRSTATUS");
-	private static final char[] FOOL_JTEST = {'\n'};
-    protected static final String NEWLINE = new String(FOOL_JTEST);
-    protected static final String OLDEFFECTDATE = "2010-03-01";
-    protected static final String STATUS_FINAL = "Final";
-    protected static final String CHEAT = "@@";
-    public final static String RPTPATH = "_rptpath";
-    
-    private HashMap allRecords = new HashMap();
-    private String lineStr = "";
-    private static final String INIPATH = "_inipath";
-   	private static final String FTPSCRPATH = "_script";
-   	private static final String TARGETFILENAME = "_targetfilename";
-   	private static final String LOGPATH = "_logpath";
-   	private static final String BACKUPPATH = "_backuppath";
-   	//private static final String MAXSIZE = "_maxsize";
-   	private static final int MAXSIZE = 100000;
-	protected static final Set FCTYPE_SET;
-	static {
-		FCTYPE_SET = new HashSet();
-		FCTYPE_SET.add("RPQ-ILISTED");
-		FCTYPE_SET.add("RPQ-PLISTED");
-		FCTYPE_SET.add("RPQ-RLISTED");
-	}
-	
-	protected static final String[][] country_convert_Array = {
-//		{"1501", "706"},//France
-		{"1447", "624"},//Belgium
-		{"1626", "838"},//Spain
-		{"1600", "822"},//Portugal
-		{"1632", "846"},//Sweden
-		{"1484", "678"},//Denmark
-		{"1588", "806"},//Norway
-		{"1500", "702"},//Finland
-		{"1532", "756"},//Israel
-		{"1533", "758"},//Italy
-		{"1651", "866"},//UK
-		{"1531", "754"},//Ireland
-		{"1578", "788"},//Netherland
-		{"1624", "864"},//South Africa"
-	};
-	
-	public void execute_run() {
-		String navName = "";
-		MessageFormat msgf;
-		
-        try {
-        	long startTime = System.currentTimeMillis();
-        	
-			start_ABRBuild(false); // don't pull VE yet
-
-			// Default set to pass
-            setReturnCode(PASS);
-             
-            
-			// get the root entity using current timestamp, need this to get the timestamps or info for VE pulls
-			m_elist = m_db.getEntityList(m_prof, new ExtractActionItem(null, m_db, m_prof, "dummy"), 
-					new EntityItem[] { new EntityItem(null, m_prof, getEntityType(), getEntityID()) });
-			
-			// get root MACHTYPE from VE
-			EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-			
-			if(isCanRun()){
-				List allmachtype = getMachtype();
-				for(int i = 0;i < allmachtype.size(); i++){
-					addDebug("Process MACHTYPE: " + allmachtype.get(i)); 
-//					EntityItem mtEntity = new EntityItem(null, m_prof, "MACHTYPE" , (int)machtypeids.get(i));
-					
-				    if (getReturnCode() == PASS) {          	
-//						processThis(mtEntity);
-						processThis((String)allmachtype.get(i));
-				    }
-				    
-				    Iterator entrie1 = allRecords.keySet().iterator();
-					while(entrie1.hasNext()){
-						String ctryCode = (String) entrie1.next();
-						StringBuffer records = (StringBuffer) allRecords.get(ctryCode);
-				    	
-						if(records.length() >= MAXSIZE){
-							String dir = ABRServerProperties.getValue(m_abri.getABRCode(), RPTPATH, "/Dgq/ESI/");
-							if (!dir.endsWith("/")) {
-								dir = dir + "/";
-							}
-							String dts = getNow();
-							dts = dts.replace(' ', '_');
-							String filename = dir + "MSM" + ctryCode + dts + ".FULL";
-							try {
-								generateFile(filename, records);
-								addDebug("Write to file "+filename);
-								records.setLength(0);
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-				    }
-				    
-					addDebug("Total Time: " + Stopwatch.format(System.currentTimeMillis() - startTime) + " for abr:" + getDescription());
-				}
-	        			
-				Vector files = genOutputFile();				
-				
-				if(files!=null){
-					for(int i=0;i<files.size();i++){
-						String fileName = (String) files.get(i);
-						exeFtpShell(fileName);
-					}
-				}
-				
-			}else{
-				userxmlSb.append("Can not run at same time since one already run");
-			}
-											
-            //NAME is navigate attributes
-            navName = getNavigationName(rootEntity);
-            addDebug("Total Time: " + Stopwatch.format(System.currentTimeMillis() - startTime));
-		} catch (Throwable exc) {
-			java.io.StringWriter exBuf = new java.io.StringWriter();
-            String Error_EXCEPTION="<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
-            String Error_STACKTRACE="<pre>{0}</pre>";
-            msgf = new MessageFormat(Error_EXCEPTION);
-            setReturnCode(INTERNAL_ERROR);
-            exc.printStackTrace(new java.io.PrintWriter(exBuf));
-            // Put exception into document
-            args[0] = exc.getMessage();
-            rptSb.append(msgf.format(args) + NEWLINE);
-            msgf = new MessageFormat(Error_STACKTRACE);
-            args[0] = exBuf.getBuffer().toString();
-            rptSb.append(msgf.format(args) + NEWLINE);
-            logError("Exception: "+exc.getMessage());
-            logError(exBuf.getBuffer().toString());
-		} finally {
-			if (t2DTS.equals("&nbsp;")){
-            	t2DTS= getNow();
-            }
-			setDGTitle(navName);
-            setDGRptName(getShortClassName(getClass()));
-            setDGRptClass(getABRCode());
-            // make sure the lock is released
-            if (!isReadOnly()) {
-                clearSoftLock();
-            }
-		}
-        
-		// Print everything up to </html>
-		// Insert Header into beginning of report
-        println(EACustom.getDocTypeHtml());
-		// must split because too many arguments for messageformat, max of 10..
-		// this was 11
-		String HEADER = "<head>"
-				+ EACustom.getMetaTags(getDescription())
-				+ NEWLINE
-				+ EACustom.getCSS()
-				+ NEWLINE
-				+ EACustom.getTitle("{0} {1}")
-				+ NEWLINE
-				+ "</head>"
-				+ NEWLINE
-				+ "<body id=\"ibm-com\">"
-				+ EACustom.getMastheadDiv()
-				+ NEWLINE
-				+ "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>"
-				+ NEWLINE;
-		msgf = new MessageFormat(HEADER);
-		args[0] = getShortClassName(getClass());
-		args[1] = navName;
-		String header1 = msgf.format(args);
-		String header2 = buildAitAbrHeader();
-		String info = header1 + header2 + "<pre>"
-				+ "<br />" + userxmlSb.toString() + "</pre>" + NEWLINE;
-		rptSb.insert(0, info);
-		println(rptSb.toString());
-		printDGSubmitString();
-		println(EACustom.getTOUDiv());
-        buildReportFooter();
-		
-		// release memory
-		m_elist.dereference();
-		m_elist = null;
-		args = null;
-		msgf = null;
-		userxmlSb = null;
-		rptSb = null;
-		xmlgenSb = null;
-	}
-
-	private boolean isCanRun() throws SQLException, MiddlewareException {
-		ResultSet result = null;
-		PreparedStatement statement = null;
-		boolean isRun = false;
-		  
-		try {
-			Connection conn = m_db.getPDHConnection();
-				
-			String sql = "select count(*) from opicm.flag where entitytype='ESIREPORT' and attributecode='ESIFEEDABRSTATUS' and attributevalue='0050' and valto>current timestamp and effto>current timestamp with ur";
-			
-			statement = conn.prepareStatement(sql);
-			result = statement.executeQuery();		
-											
-			while(result.next()){
-							
-				int count = result.getInt(1);	
-				
-				if(count==1){
-					isRun = true;
-				}
-			}
-		}finally {
-			if (statement != null){
-				try {
-					statement.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return isRun;
-	}
-
-	public double showMemory() {
-		System.gc();
-		Runtime runtime = Runtime.getRuntime();
-//		addDebug("TotMem:" + runtime.totalMemory() + ", FreeMem:" + runtime.freeMemory() +", UsedMem:" + ( runtime.totalMemory() - runtime.freeMemory())/1000/1000 +"M" );
-		NumberFormat nf = NumberFormat.getPercentInstance();
-		nf.setMinimumFractionDigits(0);
-		double percent = runtime.freeMemory()*1.0/runtime.totalMemory();
-		addDebug("Free percent: "+nf.format(percent));
-		return percent;
-	}
-	
-	public void processThis(String machtype) throws MiddlewareException, SQLException, InterruptedException{
-		
-		if(machtype != null && !machtype.equals(null)){
-			Iterator iter = getDataList(machtype).entrySet().iterator();
-			while (iter.hasNext()) {
-				Map.Entry entry = (Map.Entry) iter.next();
-				String entityid = (String) entry.getKey();
-				String entitytype = (String) entry.getValue();
-				
-				if(entitytype.equals("M")){
-					Vector ctrylist = extractMODCtry(entityid);
-					for(int ii=0;ii<country_convert_Array.length;ii++){
-			        	if(ctrylist.contains(country_convert_Array[ii][0])){
-			        		genRecords(entityid, country_convert_Array[ii][1], "M");
-			        	}
-			        }
-				}else if(entitytype.equals("SF")){
-					Vector ctrylist = extractSTMFCtry(entityid);
-					for(int ii=0;ii<country_convert_Array.length;ii++){
-			        	if(ctrylist.contains(country_convert_Array[ii][0])){
-			        		genRecords(entityid, country_convert_Array[ii][1], "SF");
-			        	}
-			        }
-				}else if(entitytype.equals("R")){
-					Vector ctrylist = extractRPQCtry(entityid);
-					for(int ii=0;ii<country_convert_Array.length;ii++){
-			        	if(ctrylist.contains(country_convert_Array[ii][0])){
-			        		genRecords(entityid, country_convert_Array[ii][1], "R");
-			        	}
-			        }
-				}else if(entitytype.equals("HF")){
-					Vector ctrylist = extractTMFCtry(entityid);
-					for(int ii=0;ii<country_convert_Array.length;ii++){
-			        	if(ctrylist.contains(country_convert_Array[ii][0])){
-			        		genRecords(entityid, country_convert_Array[ii][1], "F");
-			        	}
-			        }
-				}
-			}
-		addDebug("Processing machtype: "+machtype);
-		}
-	}
-	
-	private Vector extractTMFCtry(String entityid) throws MiddlewareException, SQLException {
-		
-		Vector availVct = getTMFAvailCty(entityid);
-		if(availVct.size() == 0){
-			return extractRPQCtry(entityid);
-		}else{
-			//The aggregated (UNION) of the countries found for TMF linked Availability(AVAIL)Country List(COUNTRYLIST)for all Availability Type(AVAILTYPE)
-			//that matches the STATUS Final filtering criteria and type equals Plan Avail.
-			return availVct;
-		}		
-	}
-
-	private Vector extractRPQCtry(String entityid) throws MiddlewareException, SQLException {
-		
-		Vector countryList = new Vector();		
-		//case for the PRODSTRUCT that get the avail from the MODEL
-		Vector plnAvlVct = getTMFLMODAvailCty(entityid);
-		if(plnAvlVct.size() != 0){
-			//generate COUNTRYLIST for each country in the intersection of 
-			//1. MODEL: MODELAVAIL-d: AVAIL.COUNTRYLIST where AVAILTYPE = “Planned Availability”
-			//2. FEATURE.COUNTRYLIST.
-			Vector feaCtry = getTMFLFEACty(entityid);
-			countryList = genCtryList(feaCtry, plnAvlVct);
-
-			return countryList;		
-		}else{
-			// If the MODEL does not have an AVAIL of type “Planned Availability”, then use FEATURE.COUNTRYLIST.
-			return getTMFLFEACty(entityid);
-		}
-	}
-
-	private Vector genCtryList(Vector feaCtry, Vector plnAvlVct) {
-		
-		Vector ctry = new Vector();
-		for (int i = 0; i < plnAvlVct.size(); i++) {
-			String availCountry = (String) plnAvlVct.get(i);
-			if (availCountry != null && !availCountry.equals(null)) {
-				if (feaCtry.contains(availCountry)) {
-					ctry.add(availCountry);
-				} 
-			}
-		}
-		return ctry;
-	}
-
-
-	private Vector extractSTMFCtry(String entityid) throws MiddlewareException, SQLException {
-		
-		Vector availVct = getSTMFAvailCty(entityid);
-		if(availVct.size() == 0){
-			//case for the SWPRODSTRUCT that get the avail from the MODEL
-			Vector plnAvlVct = getSTMFLMODAvailCty(entityid);
-			if(plnAvlVct.size() != 0){
-				//SWPRODSTRUCT don't nedd to consider FEATURE.COUNTRYLIST.
-				return plnAvlVct;
-			}else{
-				// If the MODEL does not have an AVAIL of type “Planned Availability”, then use WorldWide COUNTRYLIST.
-				return genWorldWideCtryList();
-			}
-		}else{
-			//The aggregated (UNION) of the countries found for TMF linked Availability(AVAIL)Country List(COUNTRYLIST)for all Availability Type(AVAILTYPE)
-			//that matches the STATUS Final filtering criteria and type equals Plan Avail.
-			return availVct;
-		}	
-	}
-
-
-	private Vector extractMODCtry(String entityid) throws MiddlewareException, SQLException {
-		
-		Vector availVct = getMODAvailCty(entityid);
-		if(availVct.size() == 0){
-			// If the MODEL does not have an AVAIL of type “Planned Availability”, then use WorldWide COUNTRYLIST.
-			return genWorldWideCtryList();
-		}else{
-			//The aggregated (UNION) of the countries found for MODEL linked Availability(AVAIL)Country List(COUNTRYLIST)for all Availability Type(AVAILTYPE)
-			//that matches the STATUS Final filtering criteria and type equals Plan Avail.
-			return availVct;
-		}		
-	}
-
-
-	private HashMap getDataList(String machtype) throws MiddlewareException, SQLException {
-		
-		ResultSet result = null;
-		PreparedStatement statement = null;
-		HashMap entity = new HashMap();
-		  
-		try {
-			Connection conn = m_db.getODS2Connection();
-				
-			String sql = "select distinct M.entityid as MODID, "
-					+" case when M.COFCAT='Hardware' then P.entityid end as TMFID, F.FCTYPE, "
-					+" case when M.COFCAT='Software' then S.entityid end as STMFID "
-					+" from opicm.machtype T "
-					+" join opicm.model M on M.machtypeatr=T.machtypeatr and M.nlsid=1 and M.STATUS='Final' and M.COFCAT in ('Hardware','Software') "
-					+" left join opicm.relator R1 on R1.entity2id=M.entityid and R1.entitytype='PRODSTRUCT' "
-					+" left join opicm.relator R2 on R2.entity2id=M.entityid and R2.entitytype='SWPRODSTRUCT' " 
-					+" left join opicm.prodstruct P on P.entityid=R1.entityid and P.nlsid=1 and P.STATUS='Final' " 
-					+" left join opicm.feature F on F.entityid=R1.entity1id and F.nlsid=1 and F.STATUS='Final' "
-					+" left join opicm.swprodstruct S on S.entityid=R2.entityid and S.nlsid=1 and S.STATUS='Final' " 
-					+" where T.machtypeatr='"+ machtype +"' with ur";
-			
-			statement = conn.prepareStatement(sql);
-			result = statement.executeQuery();		
-			
-//			addDebug("getDataList:"+sql);
-
-			while(result.next()){				
-				
-				if(result.getString(1) != null && !result.getString(1).equals(null)){
-					String modelid = result.getString(1);
-					entity.put(modelid, "M");
-				}
-				if(result.getString(2) != null && !result.getString(2).equals(null) && result.getString(3) != null && !result.getString(3).equals(null)){
-					String tmfid = result.getString(2);
-					String fcType = result.getString(3);
-					if(FCTYPE_SET.contains(fcType)){
-						entity.put(tmfid, "R");
-					}else{
-						entity.put(tmfid, "HF");
-					}
-				}else if(result.getString(4) !=null && !result.getString(4).equals(null)){
-					String tmfid = result.getString(4);
-					entity.put(tmfid, "SF");
-				}						
-			}
-		}finally {
-			if (statement != null){
-				try {
-					statement.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}	
-		return entity;	
-	}
-	
-	private Vector getTMFAvailCty(String tmfid) throws MiddlewareException, SQLException {
-		
-		ResultSet result = null;
-		PreparedStatement statement = null;
-		Vector ctry = new Vector();	
-		
-		try {
-			Connection conn = m_db.getODS2Connection();
-			
-			String sql = "select  A1.entityid,dbms_lob.substr(replace(replace(xml2clob(xmlagg(xmlelement(NAME A, trim(F1.attributevalue)||','))),'<A>',''),'</A>','')) as country"
-					+" from opicm.prodstruct P join opicm.relator R1 on R1.entity1type = P.entitytype and R1.entity1id = P.entityid"
-					+" join opicm.AVAIL A1 on R1.entity2type = A1.entitytype and R1.entity2id = A1.entityid"
-					+" join opicm.flag F1 on F1.entitytype = A1.entitytype and F1.entityid = A1.entityid"
-					+" where P.entityid = " + tmfid + " and P.nlsid = 1 and P.STATUS = 'Final' and R1.entitytype = 'OOFAVAIL' and A1.nlsid = 1 and A1.AVAILTYPE = 'Planned Availability' "
-					+" and A1.STATUS in  ('Final','Ready for Review') and F1.attributecode = 'COUNTRYLIST'"
-//					+" AND 1=(case when exists(select  A.entityid, F.attributevalue "
-//					+" from opicm.relator R  join opicm.AVAIL A on R.entity2type = A.entitytype and R.entity2id = A.entityid"
-//					+" join opicm.flag F on F.entitytype = A.entitytype and F.entityid = A.entityid"
-//					+" where R.entity1type = P.entitytype and R.entity1id = P.entityid and F.attributecode = 'COUNTRYLIST'  and  R.entitytype = 'OOFAVAIL' and A.nlsid = 1 and A.AVAILTYPE = 'Planned Availability'" 
-//					+" and A.STATUS in  ('Final','Ready for Review')) then '1' else '0' end) "
-					+" group by a1.entityid with ur";
-			
-			statement = conn.prepareStatement(sql);
-			result = statement.executeQuery();		
-			
-//			addDebug("getTMFAvailCty:"+sql);
-
-			while(result.next()){			
-				String availCountry = result.getString(2);
-				if (availCountry != null && !availCountry.equals(null)) {
-					availCountry.replaceAll("<A>","").replaceAll("</A>", "");
-					String[] availCtry = splitStr(availCountry, ",");
-					for(int i=0;i<availCtry.length;i++){
-						if (!ctry.contains(availCtry[i])) {
-							ctry.add(availCtry[i]);
-						} 
-					}
-				}
-			}
-			
-		}finally {
-			if (statement != null){
-				try {
-					statement.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		
-		addDebug("TMF linked avail country: " + ctry);
-
-		return ctry;
-	}
-
-	private Vector getTMFLMODAvailCty(String tmfid) throws MiddlewareException, SQLException {
-		
-		ResultSet result = null;
-		PreparedStatement statement = null;
-		Vector ctry = new Vector();	
-		
-		try {
-			Connection conn = m_db.getODS2Connection();
-			
-			String sql = "select A1.entityid,dbms_lob.substr(replace(replace(xml2clob(xmlagg(xmlelement(NAME A, trim(F1.attributevalue)||','))),'<A>',''),'</A>','')) as country"
-					+" from opicm.prodstruct P"
-					+" join opicm.relator R1 on R1.entitytype=P.entitytype and R1.entityid=P.entityid"
-					+" join opicm.model m on m.entitytype=R1.entity2type and m.entityid=R1.entity2id"
-					+" join opicm.relator R2 on R2.entitytype='MODELAVAIL' and R2.entity1id=m.entityid"
-					+" join opicm.AVAIL A1 on R2.entity2type = A1.entitytype and R2.entity2id = A1.entityid"
-					+" join opicm.flag F1 on F1.entitytype = A1.entitytype and F1.entityid = A1.entityid"
-					+" where p.entityid= " + tmfid + " and P.nlsid = 1 and P.STATUS = 'Final' and m.nlsid = 1 and m.STATUS = 'Final'"
-					+" and A1.nlsid = 1 and A1.AVAILTYPE = 'Planned Availability' and A1.STATUS in ('Final','Ready for Review') and F1.attributecode = 'COUNTRYLIST'"
-//					+" AND 1=(case when exists(select  A.entityid, F.attributevalue" 
-//					+" from opicm.relator R  join opicm.AVAIL A on R.entity2type = A.entitytype and R.entity2id = A.entityid"
-//					+" join opicm.flag F on F.entitytype = A.entitytype and F.entityid = A.entityid"
-//					+" where R.entity1type = m.entitytype and R.entity1id = m.entityid and F.attributecode = 'COUNTRYLIST'  and  R.entitytype = 'MODELAVAIL' and A.nlsid = 1 and A.AVAILTYPE = 'Planned Availability'" 
-//					+" and A.STATUS in  ('Final','Ready for Review')) then '1' else '0' end)" 
-					+" group by a1.entityid with ur";
-			
-			statement = conn.prepareStatement(sql);
-			result = statement.executeQuery();		
-				
-//			addDebug("getTMFLinkMODAvailCty:"+sql);
-
-			while(result.next()){			
-				String availCountry = result.getString(2);
-				if (availCountry != null && !availCountry.equals(null)) {
-					availCountry.replaceAll("<A>","").replaceAll("</A>", "");
-					String[] availCtry = splitStr(availCountry, ",");
-					for(int i=0;i<availCtry.length;i++){
-						if (!ctry.contains(availCtry[i])) {
-							ctry.add(availCtry[i]);
-						} 
-					}
-				}
-			}
-			
-		}finally {
-			if (statement != null){
-				try {
-					statement.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		
-		addDebug("TMF linked Model's avail country: " + ctry);
-
-		return ctry;
-	}
-	
-	private Vector getTMFLFEACty(String tmfid) throws MiddlewareException, SQLException {
-		
-		ResultSet result = null;
-		PreparedStatement statement = null;
-		Vector feaCtry = new Vector();	
-		
-		try {
-			Connection conn = m_db.getODS2Connection();
-			
-			String sql = "select F1.entityid,dbms_lob.substr(replace(replace(xml2clob(xmlagg(xmlelement(NAME A, trim(F1.attributevalue)||','))),'<A>',''),'</A>','')) as country"
-					+" from opicm.prodstruct P"
-					+" join opicm.relator R1 on R1.entitytype=P.entitytype and R1.entityid=P.entityid"
-					+" join opicm.feature F on F.entitytype=R1.entity1type and F.entityid=R1.entity1id and F.nlsid=1"
-					+" join opicm.flag F1 on  F1.entitytype = F.entitytype and F1.entityid = F.entityid and F1.attributecode = 'COUNTRYLIST' "
-					+" where p.entityid= " + tmfid + " and P.nlsid = 1 and P.STATUS = 'Final' and F.nlsid=1 and F.STATUS='Final' group by F1.entityid with ur";
-			
-			statement = conn.prepareStatement(sql);
-			result = statement.executeQuery();		
-			
-//			addDebug("getTMFLinkFeatureCty:"+sql);
-
-			while(result.next()){			
-				String availCountry = result.getString(2);
-				if (availCountry != null && !availCountry.equals(null)) {
-					availCountry.replaceAll("<A>","").replaceAll("</A>", "");
-					String[] availCtry = splitStr(availCountry, ",");
-					for(int i=0;i<availCtry.length;i++){
-						if (!feaCtry.contains(availCtry[i])) {
-							feaCtry.add(availCtry[i]);
-						} 
-					}
-				}
-			}
-			
-		}finally {
-			if (statement != null){
-				try {
-					statement.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		
-		addDebug("TMF linked Feature's country: " + feaCtry);
-
-		return feaCtry;
-	}
-
-	private Vector getSTMFAvailCty(String tmfid) throws MiddlewareException, SQLException {
-		
-		ResultSet result = null;
-		PreparedStatement statement = null;
-		Vector ctry = new Vector();	
-		
-		try {
-			Connection conn = m_db.getODS2Connection();
-			
-			String sql = "select A1.entityid,dbms_lob.substr(replace(replace(xml2clob(xmlagg(xmlelement(NAME A, trim(F1.attributevalue)||','))),'<A>',''),'</A>','')) as country"
-					+" from opicm.swprodstruct P join opicm.relator R1 on R1.entity1type = P.entitytype and R1.entity1id = P.entityid"
-					+" join opicm.AVAIL A1 on R1.entity2type = A1.entitytype and R1.entity2id = A1.entityid"
-					+" join opicm.flag F1 on F1.entitytype = A1.entitytype and F1.entityid = A1.entityid"
-					+" where P.entityid = " + tmfid + " and P.nlsid = 1 and P.STATUS = 'Final' and R1.entitytype = 'SWPRODSTRUCTAVAIL' and A1.nlsid = 1 and A1.AVAILTYPE = 'Planned Availability'" 
-					+" and A1.STATUS in ('Final','Ready for Review') and F1.attributecode = 'COUNTRYLIST'"
-//					+" AND 1=(case when exists(select  A.entityid, F.attributevalue" 
-//					+" from opicm.relator R  join opicm.AVAIL A on R.entity2type = A.entitytype and R.entity2id = A.entityid"
-//					+" join opicm.flag F on F.entitytype = A.entitytype and F.entityid = A.entityid"
-//					+" where R.entity1type = P.entitytype and R.entity1id = P.entityid and F.attributecode = 'COUNTRYLIST'  and  R.entitytype = 'SWPRODSTRUCTAVAIL' and A.nlsid = 1 and A.AVAILTYPE = 'Planned Availability'" 
-//					+" and A.STATUS in ('Final','Ready for Review')) then '1' else '0' end)"
-					+" group by a1.entityid with ur";
-			
-			statement = conn.prepareStatement(sql);
-			result = statement.executeQuery();		
-				
-//			addDebug("getSTMFAvailCty:"+sql);
-
-			while(result.next()){			
-				String availCountry = result.getString(2);
-				if (availCountry != null && !availCountry.equals(null)) {
-					availCountry.replaceAll("<A>","").replaceAll("</A>", "");
-					String[] availCtry = splitStr(availCountry, ",");
-					for(int i=0;i<availCtry.length;i++){
-						if (!ctry.contains(availCtry[i])) {
-							ctry.add(availCtry[i]);
-						} 
-					}
-				}
-			}
-			
-		}finally {
-			if (statement != null){
-				try {
-					statement.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		
-		addDebug("SWTMF linked avail country: " + ctry);
-		return ctry;
-	}
-
-	private Vector getSTMFLMODAvailCty(String tmfid) throws MiddlewareException, SQLException {
-		
-		ResultSet result = null;
-		PreparedStatement statement = null;
-		Vector ctry = new Vector();	
-		
-		try {
-			Connection conn = m_db.getODS2Connection();
-			
-			String sql = "select A1.entityid,dbms_lob.substr(replace(replace(xml2clob(xmlagg(xmlelement(NAME A, trim(F1.attributevalue)||','))),'<A>',''),'</A>','')) as country"
-					+" from opicm.swprodstruct P"
-					+" join opicm.relator R1 on R1.entitytype=P.entitytype and R1.entityid=P.entityid"
-					+" join opicm.model m on m.entitytype=R1.entity2type and m.entityid=R1.entity2id"
-					+" join opicm.relator R2 on R2.entitytype='MODELAVAIL' and R2.entity1id=m.entityid"
-					+" join opicm.AVAIL A1 on R2.entity2type = A1.entitytype and R2.entity2id = A1.entityid"
-					+" join opicm.flag F1 on F1.entitytype = A1.entitytype and F1.entityid = A1.entityid"
-					+" where p.entityid= " + tmfid + " and P.nlsid = 1 and P.STATUS = 'Final' and m.nlsid = 1 and m.STATUS = 'Final'"
-					+" and A1.nlsid = 1 and A1.AVAILTYPE = 'Planned Availability' and A1.STATUS in ('Final','Ready for Review') and F1.attributecode = 'COUNTRYLIST'"
-//					+" AND 1=(case when exists(select  A.entityid, F.attributevalue "
-//					+" from opicm.relator R  join opicm.AVAIL A on R.entity2type = A.entitytype and R.entity2id = A.entityid"
-//					+" join opicm.flag F on F.entitytype = A.entitytype and F.entityid = A.entityid"
-//					+" where R.entity1type = m.entitytype and R.entity1id = m.entityid and F.attributecode = 'COUNTRYLIST'  and  R.entitytype = 'MODELAVAIL' and A.nlsid = 1 and A.AVAILTYPE = 'Planned Availability'" 
-//					+" and A.STATUS in ('Final','Ready for Review')) then '1' else '0' end) "
-					+" group by a1.entityid with ur";
-			
-			statement = conn.prepareStatement(sql);
-			result = statement.executeQuery();		
-				
-//			addDebug("getSTMFLinkMODAvailCty:"+sql);
-			while(result.next()){			
-				String availCountry = result.getString(2);
-				if (availCountry != null && !availCountry.equals(null)) {
-					availCountry.replaceAll("<A>","").replaceAll("</A>", "");
-					String[] availCtry = splitStr(availCountry, ",");
-					for(int i=0;i<availCtry.length;i++){
-						if (!ctry.contains(availCtry[i])) {
-							ctry.add(availCtry[i]);
-						} 
-					}
-				}
-			}
-			
-		}finally {
-			if (statement != null){
-				try {
-					statement.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		
-		addDebug("SWTMF linked Model's avail country: " + ctry);
-		return ctry;
-	}
-	
-	private Vector getMODAvailCty(String modelid) throws MiddlewareException, SQLException {
-		
-		ResultSet result = null;
-		PreparedStatement statement = null;
-		Vector ctry = new Vector();	
-		
-		try {
-			Connection conn = m_db.getODS2Connection();
-			
-			String sql = "select A1.entityid,dbms_lob.substr(replace(replace(xml2clob(xmlagg(xmlelement(NAME A, trim(F1.attributevalue)||','))),'<A>',''),'</A>','')) as country"
-					+" from opicm.model m" 
-					+" join opicm.relator R2 on R2.entitytype='MODELAVAIL' and R2.entity1id=m.entityid"
-					+" join opicm.AVAIL A1 on R2.entity2type = A1.entitytype and R2.entity2id = A1.entityid"
-					+" join opicm.flag F1 on F1.entitytype = A1.entitytype and F1.entityid = A1.entityid"
-					+" where m.entityid= " + modelid + " and m.nlsid = 1 and m.STATUS = 'Final'"
-					+" and A1.nlsid = 1 and A1.AVAILTYPE = 'Planned Availability' and A1.STATUS in ('Final','Ready for Review') and F1.attributecode = 'COUNTRYLIST'"
-					+" group by a1.entityid with ur";
-			
-			statement = conn.prepareStatement(sql);
-			result = statement.executeQuery();		
-				
-//			addDebug("getMODAvailCty:"+sql);
-			while(result.next()){			
-				String availCountry = result.getString(2);
-				if (availCountry != null && !availCountry.equals(null)) {
-					availCountry.replaceAll("<A>","").replaceAll("</A>", "");
-					String[] availCtry = splitStr(availCountry, ",");
-					for(int i=0;i<availCtry.length;i++){
-						if (!ctry.contains(availCtry[i])) {
-							ctry.add(availCtry[i]);
-						} 
-					}
-				}
-			}
-			
-			
-		}finally {
-			if (statement != null){
-				try {
-					statement.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		
-		addDebug("Model's avail country: " + ctry);
-		return ctry;
-	}
-
-	private List getMachtype() throws MiddlewareException, SQLException {
-	
-		ResultSet result = null;
-		PreparedStatement statement = null;
-		List machtypeInfo = new ArrayList();
-		  
-		try {
-			Connection conn = m_db.getPDHConnection();
-				
-			String sql = "select attributevalue from opicm.flag where entitytype='MACHTYPE' and attributecode='MACHTYPEATR' and valto>current timestamp and effto>current timestamp order by attributevalue with ur";
-//			String sql = "select attributevalue from opicm.flag where entitytype='MACHTYPE' and attributecode='MACHTYPEATR' and valto>current timestamp and effto>current timestamp and attributevalue in ('5639','5641','5663','5664','5722','5771','5799') with ur";
-			
-			statement = conn.prepareStatement(sql);
-			result = statement.executeQuery();		
-											
-			while(result.next()){
-							
-				String machtype = result.getString(1);										
-				machtypeInfo.add(machtype.trim());
-			}
-		}finally {
-			if (statement != null){
-				try {
-					statement.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		
-		addDebug("all machtype: " + machtypeInfo.toString());
-		return machtypeInfo;
-	
-	}
-	
-	private Vector genOutputFile(){
-		if(allRecords.size()==0){
-			userxmlSb.append("File generate failed, for there is no qualified data related");
-			return null;
-		}
-		else{	
-			try{
-				Iterator entrie1 = allRecords.entrySet().iterator();
-				Vector files = new Vector(1);
-				while(entrie1.hasNext()){
-					Map.Entry entry1 = (Map.Entry) entrie1.next();
-					StringBuffer records = (StringBuffer) entry1.getValue();					
-					//file name need change
-					String dir = ABRServerProperties.getValue(m_abri.getABRCode(), RPTPATH, "/Dgq/ESI/");
-					if (!dir.endsWith("/")) {
-						dir = dir + "/" ;
-					}
-					String dts = getNow();
-					dts = dts.replace(' ', '_');
-					String fileName = dir + "MSM" + entry1.getKey() + dts + ".FULL";					
-					addDebug("filename:"+fileName);
-					boolean createfile = generateFile(fileName, records);
-					boolean addDummy = generatedummyRecords(fileName, entry1.getKey().toString());
-					if (createfile && addDummy){
-						files.add(fileName);
-					}
-				}
-				
-				return files;
-				
-			}catch(Exception e){			
-				e.printStackTrace();
-				return null;
-			}
-		}	
-	}		
-
-	private boolean generatedummyRecords(String fileName, String ctry) throws Exception {
-		File file = new File(fileName);
-		if(file.exists()){
-			FileWriter writer = new FileWriter(file, true);
-			writer.write(ctry + "SOFTADV   MSOFTWARE CONTRACT             2        ");
-			writer.close();
-			return true;
-		}else{
-			return false;
-		}
-	}
-	
-	private boolean generateFile(String fileName, StringBuffer sb) throws Exception {
-		File file = new File(fileName);
-		if(file.exists()){
-			FileWriter writer = new FileWriter(file, true);
-			writer.write(sb.toString());
-			writer.close();
-			return true;
-		}else{
-			file.createNewFile();
-			FileOutputStream wOut=new FileOutputStream(file,true);
-			try{
-				wOut.write(sb.toString().getBytes("UTF-8"));
-				userxmlSb.append(fileName +" generate success \n");
-				return true;
-			}catch(IOException e){
-				userxmlSb.append(e);
-				throw new Exception("File create failed " + fileName);
-			}finally {
-				wOut.flush();
-				wOut.close();
-				try {
-					if (wOut != null)
-						wOut.close();					
-				} catch (Exception e) {
-					throw new Exception("File create failed " + fileName);
-				}	
-			}
-		}
-	}
-	
-	private void genRecords(String entityid, String ctryCode, String CHSIUTC) throws MiddlewareException, SQLException {
-		
-		String sql = null;
-		StringBuffer sb = new StringBuffer();
-		String IOPUCTY = ctryCode;
-		String CSLMTYP = null;
-		String IHSIKEY = null;
-		String TSLMDES = null;
-		String CMKTDEV = null;
-		String TSLMFLG = " ";
-		String FSLMSWI = " ";
-		String FILLER = "      ";
-				
-		ResultSet result = null;
-		PreparedStatement statement = null;
-		  
-		try {
-			Connection conn = m_db.getODS2Connection();
-				
-			if("F".equals(CHSIUTC)||"R".equals(CHSIUTC)){
-				
-				sql = "select M.machtypeatr, F.featurecode, F.invname"
-					+" from opicm.relator R"
-					+" join opicm.feature F on F.entitytype=R.entity1type and F.entityid=R.entity1id and F.nlsid=1"
-					+" join opicm.model M on  M.entitytype = R.entity2type and M.entityid = R.entity2id and M.nlsid=1"
-					+" where R.entityid=" + entityid + " and R.entitytype='PRODSTRUCT' and M.STATUS = 'Final' and F.STATUS='Final' with ur";
-				
-				statement = conn.prepareStatement(sql);
-				result = statement.executeQuery();
-				while(result.next()){
-					
-					CSLMTYP = fixLength(result.getString(1), 4);
-					IHSIKEY = fixLength(result.getString(2), 6);
-					String temp = result.getString(3);
-					if(temp!=null && !temp.equals(null))
-						temp = temp.replaceAll("\r|\n|\t", "");	
-					TSLMDES = fixLength(temp, 30);
-					
-				}
-				CMKTDEV = " ";
-				
-			}else if("M".equals(CHSIUTC)){
-				
-				sql = "select m.machtypeatr, m.modelatr,m.invname,m.cofcat from opicm.model m where m.entityid= "
-					+ entityid +" and m.nlsid=1 with ur";
-				
-				statement = conn.prepareStatement(sql);
-				result = statement.executeQuery();
-				while(result.next()){
-					
-					CSLMTYP = fixLength(result.getString(1), 4);
-					IHSIKEY = fixLength(result.getString(2), 6);
-					String temp = result.getString(3);
-					if(temp!= null && !temp.equals(null))
-						temp = temp.replaceAll("\r|\n|\t", "");	
-					TSLMDES = fixLength(temp, 30);
-					String modelType = result.getString(4);
-					if("Software".equals(modelType)){//software
-						CMKTDEV = "2";
-					}else if("Hardware".equals(modelType)){//hardware
-						CMKTDEV = "5";
-					}
-				}
-				
-			}else if("SF".equals(CHSIUTC)){
-				sql = "select M.machtypeatr, F.featurecode, F.invname"
-					+" from opicm.relator R"
-					+" join opicm.swfeature F on F.entitytype=R.entity1type and F.entityid=R.entity1id and F.nlsid=1"
-					+" join opicm.model M on  M.entitytype = R.entity2type and M.entityid = R.entity2id and M.nlsid=1"
-					+" where R.entityid= " + entityid + " and R.entitytype='SWPRODSTRUCT' and M.STATUS = 'Final' and F.STATUS='Final' with ur";
-			
-				statement = conn.prepareStatement(sql);
-				result = statement.executeQuery();		
-											
-				while(result.next()){
-					
-					CSLMTYP = fixLength(result.getString(1), 4);
-					IHSIKEY = fixLength(result.getString(2), 6);
-					String temp = result.getString(3);
-					if(temp!= null && !temp.equals(null))
-						temp = temp.replaceAll("\r|\n|\t", "");	
-					TSLMDES = fixLength(temp, 30);					
-				}
-				CMKTDEV = " ";
-				CHSIUTC = "F";
-			}
-		}finally {
-			if (statement != null){
-				try {
-					statement.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-			
-		if(CSLMTYP!=null && !CSLMTYP.equals(null)) {
-			sb.append(IOPUCTY);
-			sb.append(CSLMTYP);
-			sb.append(IHSIKEY);
-			sb.append(CHSIUTC);
-			sb.append(TSLMDES);
-			sb.append(CMKTDEV);
-			sb.append(TSLMFLG);
-			sb.append(FSLMSWI);
-			sb.append(FILLER);
-			sb.append(NEWLINE);
-		}
-		
-		
-//		addDebug("records: " + sb.toString());
-		
-		if(allRecords.get(ctryCode)!=null){
-			StringBuffer ar = (StringBuffer)allRecords.get(ctryCode);						
-			//if(ar.length()>=Integer.parseInt(MAXSIZE.trim())){		
-			if(ar.toString().indexOf(sb.toString())<=-1){
-				ar.append(sb);
-				//addDebug("generate records");
-			}
-			
-		}else{
-			allRecords.put(ctryCode, sb);
-		}
-		
-	}
-
-	private String fixLength(String text, int width) {
-		if(text == null){
-			text = "";
-		}
-		if(text.length() >= width){
-			return text.substring(0, width);
-		}else{
-			String term = "";
-			for(int i=0;i<width-text.length();i++){
-				term += " ";
-			}
-			text = text + term;
-		}		
-		return text;
-	}
-		
-	private Vector genWorldWideCtryList() {
-		//only need include EMEA country in this abr
-		Vector countrylist = new Vector();
-		for(int i=0;i<country_convert_Array.length;i++){
-			countrylist.add(country_convert_Array[i][0]);
-		}
-		return countrylist;
-	}
-
-	public String[] splitStr(String str, String delim) {
-        StringTokenizer stringTokenizer = new StringTokenizer( str, delim );
-        String[] strArr = new String[stringTokenizer.countTokens()];
-        int i = 0;
-        while( stringTokenizer.hasMoreTokens() ) {
-            strArr[i] = stringTokenizer.nextToken();
-            i++ ;
-        }
-        return strArr;
-    } 
-	
-	public String getDescription() {
-		return "ESIFEEDABRSTATUS";
-	}
-
-	public String getABRVersion() {
-		return "1.0";
-	}
-
-	/**
-     * add error info and fail abr
-     */
-    protected void addError(String msg) {
-        addOutput(msg);
-        setReturnCode(FAIL);
-    }
-    
-	protected void addDebug(String msg) {
-		if (D.EBUG_DETAIL <= DEBUG_LVL) {
-			rptSb.append("<!-- " + msg + " -->" + NEWLINE);
-		}
-	}
-    
-	/**
-	 * add msg as an html comment if meets debuglevel set in abr.server.properties
-	 * @param debuglvl
-	 * @param msg
-	 */
-	protected void addDebugComment(int debuglvl, String msg){
-		if (debuglvl <= DEBUG_LVL) {
-			rptSb.append("<!-- "+msg+" -->"+NEWLINE);
-		}
-	}
-    
-    protected EntityList getEntityList(Profile prof, String veName, EntityItem item) throws MiddlewareRequestException, SQLException, MiddlewareException {
-		EntityList list = m_db.getEntityList(prof, new ExtractActionItem(null, m_db, prof, veName), 
-				new EntityItem[] { new EntityItem(null, prof, item.getEntityType(), item.getEntityID()) });
-		return list;
-    }
-    
-	/**
-	 * get database
-	 */
-	protected Database getDB() {
-		return m_db;
-	}
-	
-	protected String getABRTime() {
-		return uniqueKey;
-	}
-	
-    /**********************************
-     * add error info and fail abr
-     * @throws MiddlewareException 
-     * @throws SQLException 
-     */
-    protected void addError(String msg, EntityItem item) throws SQLException, MiddlewareException {
-    	String headmsg = getLD_NDN(item); 
-        addOutput(headmsg + " " + msg);
-        setReturnCode(FAIL);
-    }
-    
-    protected String getLD_NDN(EntityItem item) throws SQLException, MiddlewareException    {
-		return item.getEntityGroup().getLongDescription()+" &quot;"+getNavigationName(item)+"&quot;";
-	}
-	/**
-	 * add msg to report output
-	 */
-	private void addOutput(String msg) {
-		rptSb.append("<p>" + msg + "</p>" + NEWLINE);
-	}
-
-	
-	/**
-	 * EACM to AIT Triggered ABRs
-	 *
-	 * The Report should identify: 
-	 * - USERID (USERTOKEN) 
-	 * - Role 
-	 * - Workgroup 
-	 * - Date/Time
-	 * - Action Taken
-	 */
-	private String buildAitAbrHeader() {
-		String HEADER2 = "<table>"+NEWLINE +
-		"<tr><th>Userid: </th><td>{0}</td></tr>"+NEWLINE +
-		"<tr><th>Role: </th><td>{1}</td></tr>"+NEWLINE +
-		"<tr><th>Workgroup: </th><td>{2}</td></tr>"+NEWLINE +
-		"<tr><th>Date/Time: </th><td>{3}</td></tr>"+NEWLINE +
-        "<tr><th>Action Taken: </th><td>{4}</td></tr>"+NEWLINE+
-        "</table>"+NEWLINE+
-        "<!-- {5} -->" + NEWLINE;
-        MessageFormat msgf = new MessageFormat(HEADER2);
-        args[0] = m_prof.getOPName();
-        args[1] = m_prof.getRoleDescription();
-        args[2] = m_prof.getWGName();
-        args[3] = t2DTS;
-        args[4] = "SOF feed trigger<br/>" + xmlgenSb.toString();
-        args[5] = getABRVersion();
-        return msgf.format(args);
-	}
-	
-	/**
-	 * Get Name based on navigation attributes
-	 *
-	 * @return java.lang.String
-	 */
-	private String getNavigationName(EntityItem theItem) throws java.sql.SQLException, MiddlewareException {
-		StringBuffer navName = new StringBuffer();
-		// NAME is navigate attributes
-		EntityGroup eg = new EntityGroup(null, m_db, m_prof, theItem.getEntityType(), "Navigate");
-		EANList metaList = eg.getMetaAttribute(); // iterator does not maintain navigate order
-		for (int ii = 0; ii < metaList.size(); ii++) {
-			EANMetaAttribute ma = (EANMetaAttribute) metaList.getAt(ii);
-			navName.append(PokUtils.getAttributeValue(theItem, ma.getAttributeCode(), ", ", "", false));
-			navName.append(" ");
-		}
-		return navName.toString();
-	}
-	
-	 public boolean exeFtpShell(String fileName) {
-			// String cmd =
-			// "/usr/bin/rsync -av /var/log/www.solive.kv/access_log
-			// testuser@10.0.1.219::store --password-file=/etc/client/rsync.pwd";
-
-		String dir = ABRServerProperties.getValue(m_abri.getABRCode(), "/Dgq");
-		String fileprefix = ABRServerProperties.getFilePrefix(m_abri.getABRCode());
-		String cmd = ABRServerProperties.getValue(m_abri.getABRCode(), FTPSCRPATH, null) + " -f " + fileName;
-		String inipath = ABRServerProperties.getValue(m_abri.getABRCode(), INIPATH, null);
-		
-		if (inipath != null)
-			cmd += " -i " + inipath;
-		if (dir != null)
-			cmd += " -d " + dir;
-		if (fileprefix != null)
-			cmd += " -p " + fileprefix;
-		String targetFilePath = ABRServerProperties.getValue(m_abri.getABRCode(), TARGETFILENAME, null);
-		if(targetFilePath!=null)
-			cmd += " -t " + targetFilePath;
-		String logPath = ABRServerProperties.getValue(m_abri.getABRCode(), LOGPATH, null);
-		if(logPath!=null)
-			cmd += " -l " + logPath;
-		String backupPath = ABRServerProperties.getValue(m_abri.getABRCode(), BACKUPPATH, null);
-		if(backupPath!=null)
-			cmd += " -b " + backupPath;
-		Runtime run = Runtime.getRuntime();
-		String result = "";
-		BufferedReader br = null;
-		BufferedInputStream in = null;
-		//addDebug("cmd:"+cmd);
-		try {
-			Process p = run.exec(cmd);
-			if (p.waitFor() != 0) {
-				return false;
-			}
-			in = new BufferedInputStream(p.getInputStream());
-			br = new BufferedReader(new InputStreamReader(in));
-			while ((lineStr = br.readLine()) != null) {
-				result += lineStr;
-				if (lineStr.indexOf("FAILD") > -1) {
-					return false;
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-					in.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return result == null ? false : true;
-	}
-}
-
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\adsxmlbh1\ESIFEEDABRSTATUS.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

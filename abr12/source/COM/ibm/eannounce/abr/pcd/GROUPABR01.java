@@ -1,323 +1,329 @@
-//  (c) Copyright International Business Machines Corporation, 2001
-//  All Rights Reserved.</pre>
-//
-//$Log: GROUPABR01.java,v $
-//Revision 1.6  2006/03/03 19:24:11  bala
-//remove reference to Constants.CSS
-//
-//Revision 1.5  2006/01/25 17:45:31  yang
-//Jtest changes
-//
-//Revision 1.4  2005/01/31 16:30:05  joan
-//make changes for Jtest
-//
-//Revision 1.3  2005/01/27 16:39:54  joan
-//changes for Jtest
-//
-//Revision 1.2  2004/05/13 18:11:09  bala
-//checkin for Joan
-//
-//Revision 1.1.2.1  2004/05/12 22:26:26  joan
-//initial load
-//
+/*     */ package COM.ibm.eannounce.abr.pcd;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.LockPDHEntityException;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.abr.util.UpdatePDHEntityException;
+/*     */ import COM.ibm.eannounce.objects.EANList;
+/*     */ import COM.ibm.eannounce.objects.EANObject;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.PDGUtility;
+/*     */ import COM.ibm.eannounce.objects.SBRException;
+/*     */ import COM.ibm.opicmpdh.transactions.OPICMList;
+/*     */ import java.util.Vector;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class GROUPABR01
+/*     */   extends PokBaseABR
+/*     */ {
+/*  46 */   public static final String ABR = new String("GROUPABR01");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*  51 */   public static final String YES = new String("0010");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*  56 */   public static final String SYSTEM = new String("0080");
+/*     */   
+/*  58 */   private EntityGroup m_egParent = null;
+/*  59 */   private EntityItem m_ei = null;
+/*  60 */   private EANList m_elGOA = new EANList();
+/*  61 */   private StringBuffer m_sbMTDESC = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/*     */     try {
+/*  73 */       start_ABRBuild();
+/*  74 */       this.m_sbMTDESC = new StringBuffer();
+/*  75 */       buildReportHeaderII();
+/*  76 */       this.m_egParent = this.m_elist.getParentEntityGroup();
+/*  77 */       this.m_ei = this.m_egParent.getEntityItem(0);
+/*  78 */       println("<br><b>Order Offering: " + this.m_ei.getKey() + "</b>");
+/*     */       
+/*  80 */       printNavigateAttributes(this.m_ei, this.m_egParent, true);
+/*     */       
+/*  82 */       setReturnCode(0);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/*  91 */       String str1 = getAttributeFlagEnabledValue(this.m_elist, this.m_ei.getEntityType(), this.m_ei.getEntityID(), "OFFERINGTYPE").trim();
+/*  92 */       if (str1.equals(SYSTEM)) {
+/*  93 */         println("<br /><font color=red>Failed. OF TYPE = SYSTEM</font>");
+/*  94 */         setReturnCode(-1);
+/*     */       } 
+/*     */ 
+/*     */       
+/*  98 */       log("GROUPABR01 checking GOA");
+/*  99 */       EntityGroup entityGroup = this.m_elist.getEntityGroup("GOA");
+/*     */ 
+/*     */       
+/* 102 */       Vector<Integer> vector = getChildrenEntityIds(this.m_elist, this.m_ei
+/*     */           
+/* 104 */           .getEntityType(), this.m_ei
+/* 105 */           .getEntityID(), "GOA", "OFGOA");
+/*     */ 
+/*     */       
+/* 108 */       if (vector.size() <= 0) {
+/* 109 */         println("<br /><font color=red>Failed. There is no GOA</font>");
+/* 110 */         setReturnCode(-1);
+/*     */       } 
+/*     */       byte b;
+/* 113 */       for (b = 0; b < vector.size(); b++) {
+/* 114 */         int i = ((Integer)vector.elementAt(b)).intValue();
+/* 115 */         EntityItem entityItem = entityGroup.getEntityItem("GOA" + i);
+/* 116 */         this.m_elGOA.put((EANObject)entityItem);
+/*     */         
+/* 118 */         Vector vector1 = getParentEntityIds(entityItem
+/* 119 */             .getEntityType(), entityItem
+/* 120 */             .getEntityID(), "OF", "OFGOA");
+/*     */ 
+/*     */         
+/* 123 */         if (vector1.size() > 1) {
+/* 124 */           println("<br /><font color=red>Failed. GOA links to more than one OF.</font>");
+/* 125 */           setReturnCode(-1);
+/*     */         } 
+/*     */       } 
+/*     */ 
+/*     */       
+/* 130 */       if (getReturnCode() == 0) {
+/* 131 */         log("GROUPABR01 checking check attribute COMPUB of relators OFCPGOS");
+/* 132 */         for (b = 0; b < this.m_ei.getDownLinkCount(); b++) {
+/* 133 */           EntityItem entityItem = (EntityItem)this.m_ei.getDownLink(b);
+/* 134 */           if (entityItem.getEntityType().equals("OFCPGOS")) {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */             
+/* 141 */             String str = getAttributeFlagEnabledValue(this.m_elist, entityItem.getEntityType(), entityItem.getEntityID(), "COMPUB").trim();
+/* 142 */             if (str.equals(YES)) {
+/*     */ 
+/*     */               
+/* 145 */               EntityItem entityItem1 = (EntityItem)entityItem.getDownLink(0);
+/* 146 */               EntityGroup entityGroup1 = this.m_elist.getEntityGroup("CPG");
+/*     */               
+/* 148 */               Vector<Integer> vector1 = getParentEntityIds(entityItem1
+/* 149 */                   .getEntityType(), entityItem1
+/* 150 */                   .getEntityID(), "CPG", "CPGCPGOS");
+/*     */ 
+/*     */ 
+/*     */               
+/* 154 */               for (byte b1 = 0; b1 < vector1.size(); b1++) {
+/*     */                 
+/* 156 */                 int i = ((Integer)vector1.elementAt(b1)).intValue();
+/*     */                 
+/* 158 */                 EntityItem entityItem2 = entityGroup1.getEntityItem("CPG" + i);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */                 
+/* 165 */                 String str5 = getAttributeFlagEnabledValue(this.m_elist, entityItem2.getEntityType(), entityItem2.getEntityID(), "MTPUB").trim();
+/* 166 */                 if (str5.equals(YES)) {
+/*     */                   
+/* 168 */                   String str6 = getAttributeValue(this.m_elist, entityItem2
+/*     */                       
+/* 170 */                       .getEntityType(), entityItem2
+/* 171 */                       .getEntityID(), "MACHTYPEDESC");
+/*     */                   
+/* 173 */                   this.m_sbMTDESC.append(str6 + "<br>");
+/*     */                 } 
+/*     */               } 
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */       
+/* 181 */       if (getReturnCode() == 0) {
+/* 182 */         if (this.m_sbMTDESC.toString().length() > 0) {
+/* 183 */           PDGUtility pDGUtility = new PDGUtility();
+/* 184 */           for (byte b1 = 0; b1 < this.m_elGOA.size(); b1++) {
+/* 185 */             EntityItem entityItem = (EntityItem)this.m_elGOA.getAt(b1);
+/* 186 */             OPICMList oPICMList = new OPICMList();
+/* 187 */             oPICMList.put("GOASYSUNITPREQ_LT", "GOASYSUNITPREQ_LT=" + this.m_sbMTDESC
+/*     */                 
+/* 189 */                 .toString());
+/* 190 */             pDGUtility.updateAttribute(this.m_db, this.m_prof, entityItem, oPICMList);
+/*     */           } 
+/*     */         } else {
+/* 193 */           log("MACHTYPEDESC is blank.");
+/*     */         } 
+/*     */       }
+/*     */       
+/* 197 */       println("<br/><br /><b>" + 
+/*     */           
+/* 199 */           buildMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 202 */               getABRDescription(), 
+/* 203 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }) + "</b>");
+/*     */       
+/* 206 */       log(
+/* 207 */           buildLogMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 210 */               getABRDescription(), 
+/* 211 */               (getReturnCode() == 0) ? "Passed" : "Failed" }));
+/* 212 */     } catch (LockPDHEntityException lockPDHEntityException) {
+/* 213 */       setReturnCode(-2);
+/* 214 */       println("<h3><font color=red>IAB1007E: Could not get soft lock.  Rule execution is terminated.<br />" + lockPDHEntityException
+/*     */ 
+/*     */ 
+/*     */           
+/* 218 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 220 */       logError(lockPDHEntityException.getMessage());
+/* 221 */     } catch (UpdatePDHEntityException updatePDHEntityException) {
+/* 222 */       setReturnCode(-2);
+/* 223 */       println("<h3><font color=red>UpdatePDH error: " + updatePDHEntityException
+/*     */           
+/* 225 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 227 */       logError(updatePDHEntityException.getMessage());
+/* 228 */     } catch (SBRException sBRException) {
+/* 229 */       setReturnCode(-2);
+/* 230 */       println("<h3><font color=red>Generate Data error: " + sBRException
+/*     */           
+/* 232 */           .toString() + "</font></h3>");
+/*     */       
+/* 234 */       logError(sBRException.toString());
+/* 235 */     } catch (Exception exception) {
+/*     */       
+/* 237 */       println("<br/>Error in " + this.m_abri
+/*     */           
+/* 239 */           .getABRCode() + ":" + exception
+/*     */           
+/* 241 */           .getMessage());
+/* 242 */       println("" + exception);
+/* 243 */       exception.printStackTrace();
+/*     */       
+/* 245 */       if (getABRReturnCode() != -2) {
+/* 246 */         setReturnCode(-3);
+/*     */       }
+/*     */     }
+/*     */     finally {
+/*     */       
+/* 251 */       String str1 = getABREntityDesc(this.m_ei.getEntityType(), this.m_ei.getEntityID());
+/* 252 */       String str2 = getMetaAttributeDescription(this.m_ei, ABR);
+/*     */       
+/* 254 */       String str3 = str2 + " for " + str1;
+/* 255 */       if (str3.length() > 64) {
+/* 256 */         str3 = str3.substring(0, 64);
+/*     */       }
+/*     */       
+/* 259 */       setDGTitle(str3);
+/*     */ 
+/*     */       
+/* 262 */       setDGString(getABRReturnCode());
+/* 263 */       setDGRptName(ABR);
+/* 264 */       printDGSubmitString();
+/*     */ 
+/*     */ 
+/*     */       
+/* 268 */       buildReportFooter();
+/*     */       
+/* 270 */       if (!isReadOnly()) {
+/* 271 */         clearSoftLock();
+/*     */       }
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 282 */     return "The purpose of this ABR is to set GOA's GOASYSUNITPREQ_LT";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getStyle() {
+/* 293 */     return "";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getRevision() {
+/* 303 */     return new String("$Revision: 1.6 $");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String getVersion() {
+/* 313 */     return "$Id: GROUPABR01.java,v 1.6 2006/03/03 19:24:11 bala Exp $";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 321 */     return "GROUPABR01.java,v 1.2";
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.pcd;
 
-//import COM.ibm.opicmpdh.middleware.*;
-//import COM.ibm.opicmpdh.objects.*;
-import COM.ibm.opicmpdh.transactions.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.eannounce.abr.util.*;
-import java.util.*;
-//import java.io.*;
-
-/**
- * Javadoc header
- *
- *@author     Administrator
- *@created    August 30, 2002
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\pcd\GROUPABR01.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class GROUPABR01 extends PokBaseABR {
-  // Class constants
-  /**
-     * ABR
-     *
-     */
-  public final static String ABR = new String("GROUPABR01");
-  /**
-     * YES
-     *
-     */
-  public final static String YES = new String("0010");
-  /**
-     * SYSTEM
-     *
-     */
-  public final static String SYSTEM = new String("0080");
-
-  private EntityGroup m_egParent = null;
-  private EntityItem m_ei = null;
-  private EANList m_elGOA = new EANList();
-  private StringBuffer m_sbMTDESC = null;
-
-  /**
-   * @see COM.ibm.opicmpdh.middleware.taskmaster.AbstractTask#execute_run()
-   * @author Administrator
-   */
-  public void execute_run() {
-    String strOFTYPE;
-    EntityGroup egGOA;
-    Vector vGOA;
-    try {
-
-      start_ABRBuild();
-      m_sbMTDESC = new StringBuffer();
-      buildReportHeaderII();
-      m_egParent = m_elist.getParentEntityGroup();
-      m_ei = m_egParent.getEntityItem(0);
-      println("<br><b>Order Offering: " + m_ei.getKey() + "</b>");
-
-      printNavigateAttributes(m_ei, m_egParent, true);
-
-      setReturnCode(PASS);
-
-      //==== check OF entities =================
-      strOFTYPE =
-        getAttributeFlagEnabledValue(
-          m_elist,
-          m_ei.getEntityType(),
-          m_ei.getEntityID(),
-          "OFFERINGTYPE")
-        .trim();
-      if (strOFTYPE.equals(SYSTEM)) {
-        println("<br /><font color=red>Failed. OF TYPE = SYSTEM</font>");
-        setReturnCode(FAIL);
-      }
-
-      //==== check GOA entities =================
-      log("GROUPABR01 checking GOA");
-      egGOA = m_elist.getEntityGroup("GOA");
-
-      vGOA =
-        getChildrenEntityIds(
-          m_elist,
-          m_ei.getEntityType(),
-          m_ei.getEntityID(),
-          "GOA",
-          "OFGOA");
-      if (vGOA.size() <= 0) {
-        println("<br /><font color=red>Failed. There is no GOA</font>");
-        setReturnCode(FAIL);
-      }
-
-      for (int j = 0; j < vGOA.size(); j++) {
-        int iID = ((Integer) vGOA.elementAt(j)).intValue();
-        EntityItem eiGOA = egGOA.getEntityItem("GOA" + iID);
-        m_elGOA.put(eiGOA);
-        Vector vOF =
-          getParentEntityIds(
-            eiGOA.getEntityType(),
-            eiGOA.getEntityID(),
-            "OF",
-            "OFGOA");
-        if (vOF.size() > 1) {
-          println("<br /><font color=red>Failed. GOA links to more than one OF.</font>");
-          setReturnCode(FAIL);
-        }
-      }
-
-      //==== check attribute COMPUB of relators OFCPGOS  =================
-      if (getReturnCode() == PASS) {
-        log("GROUPABR01 checking check attribute COMPUB of relators OFCPGOS");
-        for (int i = 0; i < m_ei.getDownLinkCount(); i++) {
-          EntityItem eiOFCPGOS = (EntityItem) m_ei.getDownLink(i);
-          if (eiOFCPGOS.getEntityType().equals("OFCPGOS")) {
-            String strCOMPUB =
-              getAttributeFlagEnabledValue(
-                m_elist,
-                eiOFCPGOS.getEntityType(),
-                eiOFCPGOS.getEntityID(),
-                "COMPUB")
-              .trim();
-            if (strCOMPUB.equals(YES)) {
-              // go down to CPGOS
-              EntityItem eiCPGOS =
-                (EntityItem) eiOFCPGOS.getDownLink(0);
-              EntityGroup egCPG = m_elist.getEntityGroup("CPG");
-              Vector vCPG =
-                getParentEntityIds(
-                  eiCPGOS.getEntityType(),
-                  eiCPGOS.getEntityID(),
-                  "CPG",
-                  "CPGCPGOS");
-
-              for (int j = 0; j < vCPG.size(); j++) {
-                int iID =
-                  ((Integer) vCPG.elementAt(j)).intValue();
-                EntityItem eiCPG =
-                  egCPG.getEntityItem("CPG" + iID);
-                String strMTPUB =
-                  getAttributeFlagEnabledValue(
-                    m_elist,
-                    eiCPG.getEntityType(),
-                    eiCPG.getEntityID(),
-                    "MTPUB")
-                  .trim();
-                if (strMTPUB.equals(YES)) {
-                  String strMTDESC =
-                    getAttributeValue(
-                      m_elist,
-                      eiCPG.getEntityType(),
-                      eiCPG.getEntityID(),
-                      "MACHTYPEDESC");
-                  m_sbMTDESC.append(strMTDESC + "<br>");
-                }
-              }
-            }
-          }
-        }
-      }
-
-      if (getReturnCode() == PASS) {
-        if (m_sbMTDESC.toString().length() > 0) {
-          PDGUtility util = new PDGUtility();
-          for (int l = 0; l < m_elGOA.size(); l++) {
-            EntityItem eiGOA = (EntityItem) m_elGOA.getAt(l);
-            OPICMList attList = new OPICMList();
-            attList.put(
-              "GOASYSUNITPREQ_LT",
-              "GOASYSUNITPREQ_LT=" + m_sbMTDESC.toString());
-            util.updateAttribute(m_db, m_prof, eiGOA, attList);
-          }
-        } else {
-          log("MACHTYPEDESC is blank.");
-        }
-      }
-
-      println(
-        "<br/><br /><b>"
-          + buildMessage(
-            MSG_IAB2016I,
-            new String[] {
-              getABRDescription(),
-              (getReturnCode() == PASS ? "Passed" : "Failed")})
-          + "</b>");
-
-      log(
-        buildLogMessage(
-          MSG_IAB2016I,
-          new String[] {
-            getABRDescription(),
-            (getReturnCode() == PASS ? "Passed" : "Failed")}));
-    } catch (LockPDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>"
-          + ERR_IAB1007E
-          + "<br />"
-          + le.getMessage()
-          + "</font></h3>");
-      logError(le.getMessage());
-    } catch (UpdatePDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>UpdatePDH error: "
-          + le.getMessage()
-          + "</font></h3>");
-      logError(le.getMessage());
-    } catch (SBRException _sbrex) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>Generate Data error: "
-          + _sbrex.toString()
-          + "</font></h3>");
-      logError(_sbrex.toString());
-    } catch (Exception exc) {
-      // Report this error to both the datbase log and the PrintWriter
-      println(
-        "<br/>Error in "
-          + m_abri.getABRCode()
-          + ":"
-          + exc.getMessage());
-      println("" + exc);
-      exc.printStackTrace();
-      // don't overwrite an update exception
-      if (getABRReturnCode() != UPDATE_ERROR) {
-        setReturnCode(INTERNAL_ERROR);
-      }
-    } finally {
-      // set DG title
-      String strNavName =
-        getABREntityDesc(m_ei.getEntityType(), m_ei.getEntityID());
-      String strABRAttrDesc = getMetaAttributeDescription(m_ei, ABR);
-
-      String strDgName = strABRAttrDesc + " for " + strNavName;
-      if (strDgName.length() > 64) {
-        strDgName = strDgName.substring(0, 64);
-      }
-
-      setDGTitle(strDgName);
-
-      // set DG submit string
-      setDGString(getABRReturnCode());
-      setDGRptName(ABR);
-      printDGSubmitString();
-      //Stuff into report for subscription and notification
-
-      // Tack on the DGString
-      buildReportFooter();
-      // make sure the lock is released
-      if (!isReadOnly()) {
-        clearSoftLock();
-      }
-    }
-  }
-
-  /**
-   *  Get ABR description
-   *
-   *@return    java.lang.String
-   */
-  public String getDescription() {
-    return "The purpose of this ABR is to set GOA's GOASYSUNITPREQ_LT";
-  }
-
-  /**
-   *  Get any style that should be used for this page. Derived classes can
-   *  override this to set styles They must include the <style>...</style> tags
-   *
-   *@return    String
-   */
-  protected String getStyle() {
-    // Print out the PSG stylesheet
-    return "";
-  }
-
-  /**
-   * getRevision
-   *
-   * @return
-   * @author Administrator
-   */
-  public String getRevision() {
-    return new String("$Revision: 1.6 $");
-  }
-
-  /**
-   * getVersion
-   *
-   * @return
-   * @author Administrator
-   */
-  public static String getVersion() {
-    return ("$Id: GROUPABR01.java,v 1.6 2006/03/03 19:24:11 bala Exp $");
-  }
-
-  /**
-   * @see COM.ibm.eannounce.abr.util.PokBaseABR#getABRVersion()
-   * @author Administrator
-   */
-  public String getABRVersion() {
-    return ("GROUPABR01.java,v 1.2");
-  }
-}

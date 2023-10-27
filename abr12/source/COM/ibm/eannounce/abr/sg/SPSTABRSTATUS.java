@@ -1,864 +1,868 @@
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *   Module Name: SPSTABRSTATUS.java
- *
- *   Copyright  : COPYRIGHT IBM CORPORATION, 2013
- *                LICENSED MATERIAL - PROGRAM PROPERTY OF IBM
- *                REFER TO COPYRIGHT INSTRUCTION FORM#G120-2083
- *                RESTRICTED MATERIALS OF IBM
- *                IBM CONFIDENTIAL
- *
- *   Version: 1.0
- *
- *   Functional Description: 
- *
- *   Component : 
- *   Author(s) Name(s): Will
- *   Date of Creation: Nov 22, 2013
- *   Languages/APIs Used: Java
- *   Compiler/JDK Used: JDK 1.3, 1.4
- *   Production Operating System: AIX 4.x, Windows
- *   Production Dependencies: JDK 1.3 or greater
- *
- *   Change History:
- *   Author(s)     Date	        Change #    Description
- *   -----------   ----------   ---------   ---------------------------------------------
- *   Will   Nov 22, 2013     RQ          Initial code 
- *   
- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.ABRUtil;
+/*     */ import COM.ibm.eannounce.abr.util.EACustom;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.objects.EANAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
+/*     */ import COM.ibm.opicmpdh.objects.Attribute;
+/*     */ import COM.ibm.opicmpdh.objects.Blob;
+/*     */ import COM.ibm.opicmpdh.objects.ControlBlock;
+/*     */ import COM.ibm.opicmpdh.objects.SingleFlag;
+/*     */ import COM.ibm.opicmpdh.objects.Text;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.BufferedInputStream;
+/*     */ import java.io.ByteArrayInputStream;
+/*     */ import java.io.IOException;
+/*     */ import java.io.ObjectInputStream;
+/*     */ import java.io.PrintWriter;
+/*     */ import java.io.StringReader;
+/*     */ import java.io.StringWriter;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.text.MessageFormat;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.ResourceBundle;
+/*     */ import java.util.Vector;
+/*     */ import javax.xml.parsers.DocumentBuilder;
+/*     */ import javax.xml.parsers.DocumentBuilderFactory;
+/*     */ import javax.xml.transform.Transformer;
+/*     */ import javax.xml.transform.TransformerFactory;
+/*     */ import javax.xml.transform.dom.DOMSource;
+/*     */ import javax.xml.transform.stream.StreamResult;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ import org.w3c.dom.Node;
+/*     */ import org.w3c.dom.NodeList;
+/*     */ import org.xml.sax.InputSource;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class SPSTABRSTATUS
+/*     */   extends PokBaseABR
+/*     */ {
+/*  94 */   private static final Hashtable ABR_TBL = new Hashtable<>(); static {
+/*  95 */     ABR_TBL.put("SPSTAVAILMODEL", "COM.ibm.eannounce.abr.sg.SPSTAVAILMODELABR");
+/*  96 */     ABR_TBL.put("SPSTAVAILBUNDLE", "COM.ibm.eannounce.abr.sg.SPSTAVAILBUNDLEABR");
+/*  97 */     ABR_TBL.put("SPSTWDAVAIL", "COM.ibm.eannounce.abr.sg.SPSTWDAVAILABR");
+/*     */   }
+/*  99 */   private StringBuffer rptSb = new StringBuffer();
+/* 100 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/* 101 */   static final String NEWLINE = new String(FOOL_JTEST);
+/*     */   
+/*     */   public static final String TITLE = "Service Pacs from SPST";
+/* 104 */   private ResourceBundle rsBundle = null;
+/* 105 */   private String navName = "Service Pacs from SPST";
+/* 106 */   private SPSTABR spstAbr = null;
+/* 107 */   private Vector vctReturnsEntityKeys = new Vector();
+/* 108 */   private Hashtable updatedTbl = new Hashtable<>();
+/*     */   
+/*     */   protected static final String PROJCDNAM_ATTR = "PROJCDNAM";
+/*     */   
+/* 112 */   private String projcdname = null; protected String getPROJCDNAME() {
+/* 113 */     return this.projcdname;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void dereference() {
+/* 119 */     super.dereference();
+/* 120 */     this.rptSb = null;
+/*     */     
+/* 122 */     this.rsBundle = null;
+/* 123 */     this.navName = null;
+/* 124 */     if (this.spstAbr != null) {
+/* 125 */       this.spstAbr.dereference();
+/* 126 */       this.spstAbr = null;
+/*     */     } 
+/* 128 */     this.vctReturnsEntityKeys.clear();
+/* 129 */     this.vctReturnsEntityKeys = null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private ResourceBundle getBundle() {
+/* 136 */     return this.rsBundle;
+/*     */   }
+/*     */   
+/*     */   private String getBlobAttr(EntityItem paramEntityItem, String paramString) throws SQLException, MiddlewareException, Exception {
+/* 140 */     String str1 = paramEntityItem.getKey();
+/* 141 */     Blob blob = getDatabase().getBlob(getProfile(), paramEntityItem.getEntityType(), paramEntityItem.getEntityID(), paramString);
+/* 142 */     String str2 = "";
+/* 143 */     byte[] arrayOfByte = blob.getBAAttributeValue();
+/* 144 */     if (arrayOfByte == null || arrayOfByte.length == 0) {
+/* 145 */       addDebug("getBlobAttr ** No  Object Found for " + str1 + " **");
+/* 146 */       return null;
+/*     */     } 
+/*     */     
+/* 149 */     ByteArrayInputStream byteArrayInputStream = null;
+/* 150 */     ObjectInputStream objectInputStream = null;
+/* 151 */     BufferedInputStream bufferedInputStream = null;
+/*     */     try {
+/* 153 */       byteArrayInputStream = new ByteArrayInputStream(arrayOfByte);
+/* 154 */       bufferedInputStream = new BufferedInputStream(byteArrayInputStream);
+/* 155 */       objectInputStream = new ObjectInputStream(bufferedInputStream);
+/* 156 */       str2 = (String)objectInputStream.readObject();
+/* 157 */       return str2;
+/*     */     }
+/* 159 */     catch (Exception exception) {
+/* 160 */       addError("getBlobAttr " + str1 + " ERROR " + exception.getMessage());
+/* 161 */       exception.printStackTrace();
+/*     */     } finally {
+/*     */       
+/* 164 */       if (objectInputStream != null) {
+/*     */         try {
+/* 166 */           objectInputStream.close();
+/* 167 */         } catch (IOException iOException) {
+/* 168 */           addDebug("getBlobAttr: " + str1 + " ERROR failure closing ObjectInputStream " + iOException);
+/*     */         } 
+/* 170 */         objectInputStream = null;
+/*     */       } 
+/* 172 */       if (bufferedInputStream != null) {
+/*     */         try {
+/* 174 */           bufferedInputStream.close();
+/* 175 */         } catch (IOException iOException) {
+/* 176 */           addDebug("getBlobAttr: " + str1 + " ERROR failure closing BufferedInputStream " + iOException);
+/*     */         } 
+/* 178 */         bufferedInputStream = null;
+/*     */       } 
+/* 180 */       if (byteArrayInputStream != null) {
+/*     */         try {
+/* 182 */           byteArrayInputStream.close();
+/* 183 */         } catch (IOException iOException) {
+/* 184 */           addDebug("getBlobAttr: " + str1 + " ERROR failure closing ByteArrayInputStream " + iOException);
+/*     */         } 
+/* 186 */         byteArrayInputStream = null;
+/*     */       } 
+/* 188 */       arrayOfByte = null;
+/*     */     } 
+/* 190 */     return str2;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/* 214 */     String str1 = "<head>" + EACustom.getMetaTags(getDescription()) + NEWLINE + EACustom.getCSS() + NEWLINE + EACustom.getTitle("{0} {1}") + NEWLINE + "</head>" + NEWLINE + "<body id=\"ibm-com\">" + EACustom.getMastheadDiv() + NEWLINE + "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
+/*     */     
+/* 216 */     String str2 = "<table>" + NEWLINE + "<tr><th>Userid: </th><td>{0}</td></tr>" + NEWLINE + "<tr><th>Role: </th><td>{1}</td></tr>" + NEWLINE + "<tr><th>Workgroup: </th><td>{2}</td></tr>" + NEWLINE + "<tr><th>Date: </th><td>{3}</td></tr>" + NEWLINE + "<tr><th>Description: </th><td>{4}</td></tr>" + NEWLINE + "<tr><th>Return code: </th><td>{5}</td></tr>" + NEWLINE + "</table>" + NEWLINE + "<!-- {6} -->" + NEWLINE;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 227 */     String str3 = "";
+/*     */     
+/* 229 */     String[] arrayOfString = new String[10];
+/* 230 */     Document document = null;
+/* 231 */     EntityItem entityItem = null;
+/* 232 */     Element element = null;
+/*     */ 
+/*     */     
+/*     */     try {
+/* 236 */       setReturnCode(0);
+/*     */       
+/* 238 */       start_ABRBuild();
+/*     */ 
+/*     */       
+/* 241 */       this.rsBundle = ResourceBundle.getBundle(getClass().getName(), ABRUtil.getLocale(this.m_prof.getReadLanguage().getNLSID()));
+/*     */       
+/* 243 */       setControlBlock();
+/*     */       
+/* 245 */       entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*     */       
+/* 247 */       addDebug("execute: " + entityItem.getKey());
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 252 */       String str5 = "SPSTMSG";
+/*     */ 
+/*     */       
+/* 255 */       String str6 = getBlobAttr(entityItem, str5);
+/* 256 */       addDebug(str5 + " : " + str6);
+/*     */ 
+/*     */ 
+/*     */       
+/* 260 */       DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+/*     */       
+/* 262 */       DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+/* 263 */       StringReader stringReader = new StringReader(str6);
+/* 264 */       InputSource inputSource = new InputSource(stringReader);
+/*     */       
+/* 266 */       document = documentBuilder.parse(inputSource);
+/* 267 */       element = document.getDocumentElement();
+/* 268 */       String str7 = element.getNodeName();
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 274 */       String str8 = (String)ABR_TBL.get(str7);
+/* 275 */       addDebug("creating instance of SPSTABR  = '" + str8 + "'");
+/* 276 */       if (str8 != null) {
+/*     */ 
+/*     */ 
+/*     */         
+/* 280 */         this.spstAbr = (SPSTABR)Class.forName(str8).newInstance();
+/* 281 */         str3 = getShortClassName(this.spstAbr.getClass()) + " " + this.spstAbr.getVersion();
+/*     */         
+/* 283 */         this.spstAbr.validateData(this, element);
+/*     */ 
+/*     */         
+/* 286 */         if (getReturnCode() == 0) {
+/* 287 */           this.spstAbr.execute();
+/*     */         }
+/*     */       } else {
+/* 290 */         addError(getShortClassName(getClass()) + " does not support " + str7);
+/*     */       }
+/*     */     
+/* 293 */     } catch (Throwable throwable) {
+/*     */       try {
+/* 295 */         if (document != null)
+/*     */         {
+/* 297 */           TransformerFactory transformerFactory = TransformerFactory.newInstance();
+/* 298 */           Transformer transformer = transformerFactory.newTransformer();
+/* 299 */           transformer.setOutputProperty("omit-xml-declaration", "yes");
+/* 300 */           transformer.setOutputProperty("indent", "yes");
+/* 301 */           transformer.setOutputProperty("method", "xml");
+/* 302 */           transformer.setOutputProperty("encoding", "UTF-8");
+/*     */ 
+/*     */           
+/* 305 */           StringWriter stringWriter1 = new StringWriter();
+/* 306 */           StreamResult streamResult = new StreamResult(stringWriter1);
+/* 307 */           DOMSource dOMSource = new DOMSource(document);
+/* 308 */           transformer.transform(dOMSource, streamResult);
+/* 309 */           this.rptSb.append("<pre>Error executing: <br />" + 
+/* 310 */               PokUtils.convertToHTML(stringWriter1.toString()) + "</pre>");
+/*     */         }
+/*     */       
+/* 313 */       } catch (Exception exception) {}
+/*     */ 
+/*     */       
+/* 316 */       StringWriter stringWriter = new StringWriter();
+/* 317 */       String str5 = "<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
+/* 318 */       String str6 = "<pre>{0}</pre>";
+/* 319 */       MessageFormat messageFormat1 = new MessageFormat(str5);
+/* 320 */       setReturnCode(-3);
+/* 321 */       throwable.printStackTrace(new PrintWriter(stringWriter));
+/*     */       
+/* 323 */       arrayOfString[0] = throwable.getMessage();
+/* 324 */       this.rptSb.append(messageFormat1.format(arrayOfString) + NEWLINE);
+/* 325 */       messageFormat1 = new MessageFormat(str6);
+/* 326 */       arrayOfString[0] = stringWriter.getBuffer().toString();
+/* 327 */       this.rptSb.append(messageFormat1.format(arrayOfString) + NEWLINE);
+/* 328 */       logError("Exception: " + throwable.getMessage());
+/* 329 */       logError(stringWriter.getBuffer().toString());
+/*     */     } finally {
+/*     */ 
+/*     */       
+/*     */       try {
+/* 334 */         if (entityItem != null && element != null) {
+/* 335 */           String str = getNodeValue(element, "SPSTSHEETNUM", (String)null);
+/* 336 */           if (str != null) {
+/* 337 */             String str5 = PokUtils.getAttributeValue(entityItem, "SPSTSHEETNUM", "", "", false);
+/* 338 */             if (!str5.equals(str)) {
+/* 339 */               setTextValue(this.m_prof, "SPSTSHEETNUM", str, entityItem);
+/*     */             } else {
+/* 341 */               addDebug("SPSTSHEETNUM already set to " + str + " for " + entityItem.getKey());
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */         
+/* 346 */         updatePDH(this.m_prof);
+/* 347 */       } catch (Exception exception) {
+/* 348 */         exception.printStackTrace();
+/*     */       } 
+/* 350 */       setDGTitle(this.navName);
+/* 351 */       setDGRptName(getShortClassName(getClass()));
+/* 352 */       setDGRptClass(getABRCode());
+/*     */       
+/* 354 */       if (!isReadOnly()) {
+/* 355 */         clearSoftLock();
+/*     */       }
+/*     */     } 
+/*     */ 
+/*     */     
+/* 360 */     MessageFormat messageFormat = new MessageFormat(str1);
+/* 361 */     if (this.spstAbr != null) {
+/* 362 */       arrayOfString[0] = getShortClassName(this.spstAbr.getClass());
+/* 363 */       this.navName = this.spstAbr.getTitle();
+/* 364 */       String str = this.spstAbr.getHeader();
+/* 365 */       if (str != null && str.length() > 0) {
+/* 366 */         this.rptSb.insert(0, "<p>" + str + "</p>\n");
+/*     */       }
+/*     */     } else {
+/* 369 */       arrayOfString[0] = getShortClassName(getClass());
+/*     */     } 
+/* 371 */     arrayOfString[1] = this.navName;
+/* 372 */     String str4 = messageFormat.format(arrayOfString);
+/*     */     
+/* 374 */     messageFormat = new MessageFormat(str2);
+/* 375 */     arrayOfString[0] = this.m_prof.getOPName();
+/* 376 */     arrayOfString[1] = this.m_prof.getRoleDescription();
+/* 377 */     arrayOfString[2] = this.m_prof.getWGName();
+/* 378 */     arrayOfString[3] = getNow();
+/* 379 */     if (this.spstAbr != null) {
+/* 380 */       arrayOfString[4] = this.spstAbr.getDescription();
+/*     */     } else {
+/* 382 */       arrayOfString[4] = "";
+/*     */     } 
+/* 384 */     arrayOfString[5] = (getReturnCode() == 0) ? "Passed" : "Failed";
+/* 385 */     arrayOfString[6] = str3 + " " + getABRVersion();
+/*     */     
+/* 387 */     this.rptSb.insert(0, str4 + messageFormat.format(arrayOfString) + NEWLINE);
+/*     */     
+/* 389 */     println(EACustom.getDocTypeHtml());
+/* 390 */     println(this.rptSb.toString());
+/* 391 */     printDGSubmitString();
+/*     */     
+/* 393 */     println(EACustom.getTOUDiv());
+/* 394 */     buildReportFooter();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getNodeValue(Element paramElement, String paramString, boolean paramBoolean) {
+/* 477 */     String str = null;
+/* 478 */     Node node = null;
+/* 479 */     byte b = 0;
+/* 480 */     if (!paramString.equals(paramElement.getTagName())) {
+/* 481 */       NodeList nodeList = paramElement.getElementsByTagName(paramString);
+/* 482 */       if (nodeList != null) {
+/* 483 */         for (byte b1 = 0; b1 < nodeList.getLength(); b1++) {
+/* 484 */           Node node1 = nodeList.item(b1);
+/* 485 */           if (node1.getParentNode() == paramElement) {
+/* 486 */             node = node1;
+/* 487 */             b++;
+/*     */           } 
+/*     */         } 
+/*     */       }
+/*     */       
+/* 492 */       if (nodeList == null || b != 1) {
+/* 493 */         addError("ERROR_INVALIDXML", paramString);
+/*     */       }
+/*     */     } else {
+/* 496 */       node = paramElement;
+/*     */     } 
+/* 498 */     if (node != null && node.hasChildNodes()) {
+/* 499 */       str = node.getFirstChild().getNodeValue();
+/*     */     } else {
+/* 501 */       addDebug("getNodeValue: " + paramString + " has no child nodes");
+/*     */     } 
+/*     */     
+/* 504 */     addDebug("getNodeValue: " + paramString + " " + str);
+/* 505 */     if (str == null) {
+/* 506 */       if (paramBoolean)
+/*     */       {
+/* 508 */         addError("ERROR_MISSINGXML", paramString);
+/*     */       }
+/* 510 */       addDebug("getNodeValue: " + paramString + " is null");
+/* 511 */       str = "";
+/*     */     } 
+/* 513 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void verifyChildNodes(Element paramElement, String paramString1, String paramString2, int paramInt) {
+/* 523 */     NodeList nodeList = paramElement.getElementsByTagName(paramString1);
+/* 524 */     byte b = 0;
+/* 525 */     if (nodeList != null) {
+/* 526 */       for (byte b1 = 0; b1 < nodeList.getLength(); b1++) {
+/* 527 */         Node node = nodeList.item(b1);
+/* 528 */         if (node.getParentNode() == paramElement) {
+/* 529 */           NodeList nodeList1 = ((Element)node).getElementsByTagName(paramString2);
+/* 530 */           addDebug("childlist length = " + nodeList1.getLength());
+/*     */           
+/* 532 */           if (nodeList1.getLength() < paramInt) {
+/* 533 */             addError("ERROR_INVALIDXMLSTRUCTURE", new Object[] { paramString1, "" + paramInt, paramString2 });
+/*     */           } else {
+/* 535 */             addDebug("item.getchildnodes.item[0] = " + node.getChildNodes().item(0).getNodeName());
+/*     */           } 
+/* 537 */           b++;
+/*     */         } else {
+/* 539 */           addDebug("this tag is not correct one because of the parent is not elem: " + node.getParentNode().getNodeName() + " : " + node.getNodeName());
+/*     */         } 
+/*     */       } 
+/*     */     }
+/* 543 */     if (nodeList == null || b != 1) {
+/* 544 */       addError("ERROR_INVALIDXML", paramString1);
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getNodeValue(Element paramElement, String paramString1, String paramString2) {
+/* 555 */     String str = paramString2;
+/*     */     
+/* 557 */     NodeList nodeList = paramElement.getElementsByTagName(paramString1);
+/* 558 */     if (nodeList != null && nodeList.getLength() == 1) {
+/*     */       
+/* 560 */       Node node = nodeList.item(0);
+/* 561 */       if (node.hasChildNodes()) {
+/* 562 */         str = node.getFirstChild().getNodeValue();
+/*     */       } else {
+/* 564 */         addDebug("getNodeValue: " + paramString1 + " has no child nodes");
+/*     */       } 
+/* 566 */       addDebug("getNodeValue: " + paramString1 + " " + str);
+/* 567 */       if (str == null) {
+/* 568 */         str = paramString2;
+/*     */       }
+/*     */     } 
+/*     */     
+/* 572 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addOutput(String paramString) {
+/* 578 */     this.rptSb.append("<p>" + paramString + "</p>" + NEWLINE);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addOutput(String paramString, Object[] paramArrayOfObject) {
+/* 588 */     String str = getBundle().getString(paramString);
+/* 589 */     if (paramArrayOfObject != null) {
+/* 590 */       MessageFormat messageFormat = new MessageFormat(str);
+/* 591 */       str = messageFormat.format(paramArrayOfObject);
+/*     */     } 
+/*     */     
+/* 594 */     addOutput(str);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getResourceMsg(String paramString, Object[] paramArrayOfObject) {
+/* 605 */     String str = getBundle().getString(paramString);
+/* 606 */     if (paramArrayOfObject != null) {
+/* 607 */       MessageFormat messageFormat = new MessageFormat(str);
+/* 608 */       str = messageFormat.format(paramArrayOfObject);
+/*     */     } 
+/*     */     
+/* 611 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addDebug(String paramString) {
+/* 617 */     this.rptSb.append("<!-- " + paramString + " -->" + NEWLINE);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addError(String paramString) {
+/* 624 */     addOutput(paramString);
+/* 625 */     setReturnCode(-1);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addError(String paramString, Object paramObject) {
+/* 635 */     addError(paramString, new Object[] { paramObject });
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addError(String paramString, Object[] paramArrayOfObject) {
+/* 644 */     setReturnCode(-1);
+/* 645 */     String str = getBundle().getString(paramString);
+/*     */     
+/* 647 */     if (paramArrayOfObject != null) {
+/* 648 */       MessageFormat messageFormat = new MessageFormat(str);
+/* 649 */       str = messageFormat.format(paramArrayOfObject);
+/*     */     } 
+/* 651 */     addOutput(str);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 661 */     return "1.10";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 670 */     return "LXABRSTATUS";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setTextValue(Profile paramProfile, String paramString1, String paramString2, EntityItem paramEntityItem) {
+/* 684 */     logMessage(getDescription() + " ***** " + paramEntityItem.getKey() + " " + paramString1 + " set to: " + paramString2);
+/* 685 */     addDebug("setTextValue entered for " + paramEntityItem.getKey() + " " + paramString1 + " set to: " + paramString2);
+/*     */ 
+/*     */     
+/* 688 */     EANMetaAttribute eANMetaAttribute = paramEntityItem.getEntityGroup().getMetaAttribute(paramString1);
+/* 689 */     if (eANMetaAttribute == null) {
+/* 690 */       addDebug("setTextValue: " + paramString1 + " was not in meta for " + paramEntityItem.getEntityType() + ", nothing to do");
+/* 691 */       logMessage(getDescription() + " ***** " + paramString1 + " was not in meta for " + paramEntityItem
+/* 692 */           .getEntityType() + ", nothing to do");
+/*     */       
+/*     */       return;
+/*     */     } 
+/* 696 */     if (paramString2 != null) {
+/* 697 */       if (this.m_cbOn == null) {
+/* 698 */         setControlBlock();
+/*     */       }
+/* 700 */       ControlBlock controlBlock = this.m_cbOn;
+/* 701 */       if (paramString2.length() == 0) {
+/* 702 */         EANAttribute eANAttribute = paramEntityItem.getAttribute(paramString1);
+/* 703 */         String str = eANAttribute.getEffFrom();
+/* 704 */         controlBlock = new ControlBlock(str, str, str, str, paramProfile.getOPWGID());
+/* 705 */         paramString2 = eANAttribute.toString();
+/* 706 */         addDebug("setTextValue deactivating " + paramString1);
+/*     */       } 
+/* 708 */       Vector<Text> vector = null;
+/*     */       
+/* 710 */       for (byte b = 0; b < this.vctReturnsEntityKeys.size(); b++) {
+/* 711 */         ReturnEntityKey returnEntityKey = this.vctReturnsEntityKeys.elementAt(b);
+/* 712 */         if (returnEntityKey.getEntityID() == paramEntityItem.getEntityID() && returnEntityKey
+/* 713 */           .getEntityType().equals(paramEntityItem.getEntityType())) {
+/* 714 */           vector = returnEntityKey.m_vctAttributes;
+/*     */           break;
+/*     */         } 
+/*     */       } 
+/* 718 */       if (vector == null) {
+/*     */         
+/* 720 */         ReturnEntityKey returnEntityKey = new ReturnEntityKey(paramEntityItem.getEntityType(), paramEntityItem.getEntityID(), true);
+/* 721 */         vector = new Vector();
+/* 722 */         returnEntityKey.m_vctAttributes = vector;
+/* 723 */         this.vctReturnsEntityKeys.addElement(returnEntityKey);
+/* 724 */         this.updatedTbl.put(returnEntityKey.getEntityType() + returnEntityKey.getEntityID(), paramEntityItem);
+/*     */       } 
+/*     */       
+/* 727 */       Text text = new Text(paramProfile.getEnterprise(), paramEntityItem.getEntityType(), paramEntityItem.getEntityID(), paramString1, paramString2, 1, controlBlock);
+/* 728 */       vector.addElement(text);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setFlagValue(Profile paramProfile, String paramString1, String paramString2, EntityItem paramEntityItem) {
+/* 741 */     logMessage(getDescription() + " ***** " + paramEntityItem.getKey() + " " + paramString1 + " set to: " + paramString2);
+/* 742 */     addDebug("setFlagValue entered " + paramEntityItem.getKey() + " for " + paramString1 + " set to: " + paramString2);
+/*     */ 
+/*     */     
+/* 745 */     if (paramString2 != null && paramString2.trim().length() == 0) {
+/* 746 */       addDebug("setFlagValue: " + paramString1 + " was blank for " + paramEntityItem.getKey() + ", it will be ignored");
+/*     */       
+/*     */       return;
+/*     */     } 
+/*     */     
+/* 751 */     EANMetaAttribute eANMetaAttribute = paramEntityItem.getEntityGroup().getMetaAttribute(paramString1);
+/* 752 */     if (eANMetaAttribute == null) {
+/* 753 */       addDebug("setFlagValue: " + paramString1 + " was not in meta for " + paramEntityItem.getEntityType() + ", nothing to do");
+/* 754 */       logMessage(getDescription() + " ***** " + paramString1 + " was not in meta for " + paramEntityItem
+/* 755 */           .getEntityType() + ", nothing to do");
+/*     */       
+/*     */       return;
+/*     */     } 
+/* 759 */     if (paramString2 != null) {
+/*     */ 
+/*     */       
+/* 762 */       String str = PokUtils.getAttributeFlagValue(paramEntityItem, paramString1);
+/* 763 */       if (paramString2.equals(str)) {
+/* 764 */         addDebug("setFlagValue: " + paramString1 + " was already set to " + str + " for " + paramEntityItem.getKey() + ", nothing to do");
+/* 765 */         logMessage("setFlagValue: " + paramString1 + " was already set to " + str + " for " + paramEntityItem.getKey() + ", nothing to do");
+/*     */         
+/*     */         return;
+/*     */       } 
+/* 769 */       if (this.m_cbOn == null) {
+/* 770 */         setControlBlock();
+/*     */       }
+/* 772 */       Vector<Attribute> vector = null;
+/*     */       
+/* 774 */       for (byte b1 = 0; b1 < this.vctReturnsEntityKeys.size(); b1++) {
+/* 775 */         ReturnEntityKey returnEntityKey = this.vctReturnsEntityKeys.elementAt(b1);
+/* 776 */         if (returnEntityKey.getEntityID() == paramEntityItem.getEntityID() && returnEntityKey
+/* 777 */           .getEntityType().equals(paramEntityItem.getEntityType())) {
+/* 778 */           vector = returnEntityKey.m_vctAttributes;
+/*     */           break;
+/*     */         } 
+/*     */       } 
+/* 782 */       if (vector == null) {
+/* 783 */         ReturnEntityKey returnEntityKey = new ReturnEntityKey(paramEntityItem.getEntityType(), paramEntityItem.getEntityID(), true);
+/* 784 */         vector = new Vector();
+/* 785 */         returnEntityKey.m_vctAttributes = vector;
+/* 786 */         this.vctReturnsEntityKeys.addElement(returnEntityKey);
+/* 787 */         this.updatedTbl.put(returnEntityKey.getEntityType() + returnEntityKey.getEntityID(), paramEntityItem);
+/*     */       } 
+/*     */       
+/* 790 */       SingleFlag singleFlag = new SingleFlag(paramProfile.getEnterprise(), paramEntityItem.getEntityType(), paramEntityItem.getEntityID(), paramString1, paramString2, 1, this.m_cbOn);
+/*     */ 
+/*     */ 
+/*     */       
+/* 794 */       for (byte b2 = 0; b2 < vector.size(); b2++) {
+/* 795 */         Attribute attribute = vector.elementAt(b2);
+/* 796 */         if (attribute.getAttributeCode().equals(paramString1)) {
+/* 797 */           singleFlag = null;
+/*     */           break;
+/*     */         } 
+/*     */       } 
+/* 801 */       if (singleFlag != null) {
+/* 802 */         vector.addElement(singleFlag);
+/*     */       } else {
+/* 804 */         addDebug("setFlagValue:  " + paramEntityItem.getKey() + " " + paramString1 + " was already added for updates ");
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void updatePDH(Profile paramProfile) throws SQLException, MiddlewareException, RemoteException, MiddlewareShutdownInProgressException, EANBusinessRuleException {
+/* 821 */     logMessage(getDescription() + " updating PDH");
+/* 822 */     addDebug("updatePDH entered for vctReturnsEntityKeys: " + this.vctReturnsEntityKeys);
+/* 823 */     if (this.vctReturnsEntityKeys.size() > 0)
+/*     */       
+/*     */       try {
+/*     */         
+/* 827 */         this.m_db.update(paramProfile, this.vctReturnsEntityKeys, false, false);
+/*     */         
+/* 829 */         for (byte b = 0; b < this.vctReturnsEntityKeys.size(); b++) {
+/* 830 */           ReturnEntityKey returnEntityKey = this.vctReturnsEntityKeys.elementAt(b);
+/*     */           
+/* 832 */           for (byte b1 = 0; b1 < returnEntityKey.m_vctAttributes.size(); b1++) {
+/* 833 */             Attribute attribute = returnEntityKey.m_vctAttributes.elementAt(b1);
+/* 834 */             if (attribute instanceof Text) {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */               
+/* 847 */               EntityItem entityItem = (EntityItem)this.updatedTbl.get(returnEntityKey.getEntityType() + returnEntityKey.getEntityID());
+/* 848 */               addDebug("update entity: " + returnEntityKey.getEntityType() + returnEntityKey.getEntityID());
+/* 849 */               entityItem.commit(this.m_db, null);
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */       } finally {
+/*     */         
+/* 855 */         this.vctReturnsEntityKeys.clear();
+/* 856 */         this.updatedTbl.clear();
+/* 857 */         this.m_db.commit();
+/* 858 */         this.m_db.freeStatement();
+/* 859 */         this.m_db.isPending("finally after updatePDH");
+/*     */       }  
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.sg;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ObjectInputStream;
-import java.io.StringReader;
-import java.sql.SQLException;
-import java.text.MessageFormat;
-import java.util.Hashtable;
-import java.util.ResourceBundle;
-import java.util.Vector;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-
-import COM.ibm.eannounce.abr.util.ABRUtil;
-import COM.ibm.eannounce.abr.util.EACustom;
-import COM.ibm.eannounce.abr.util.PokBaseABR;
-import COM.ibm.eannounce.objects.EANAttribute;
-import COM.ibm.eannounce.objects.EANMetaAttribute;
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-import COM.ibm.opicmpdh.middleware.Profile;
-import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
-import COM.ibm.opicmpdh.objects.Attribute;
-import COM.ibm.opicmpdh.objects.Blob;
-import COM.ibm.opicmpdh.objects.ControlBlock;
-import COM.ibm.opicmpdh.objects.SingleFlag;
-import COM.ibm.opicmpdh.objects.Text;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-//$Log: SPSTABRSTATUS.java,v $
-//Revision 1.4  2014/02/18 07:48:59  liuweimi
-//change based on BH FS Inbound Feed SPST20140120.doc.
-//Mapping updates for a few items and default values.
-//Add TAXCATG relator to service pacs.Check mapping for more details.
-//Create new AVAIL existing SEOs/MODELs for the different set of countries.
-//Check if a LSEO exists for the incoming bundle SEOID. If it does, fail the xml for that particular SEOID.
-//Set LSEOQTY attribute on LSEOBUNDLELSEO relator. When creating LSEOBUNDLELSEO relator, set LSEOQTY attribute to 1
-//
-//Revision 1.3  2014/01/17 11:17:45  wangyulo
-//the ABR changes needed to comply with V17 standards
-//
-//Revision 1.2  2014/01/07 14:55:15  liuweimi
-//3 Open issues - 1. If the first avail fails, continue to process other avails in the xml. This doesn't refer to invalid flag codes or invalid xml format
-//2. Check if a LSEO exists for the incoming bundle SEOID. If it does, fail the xml for that particular SEOID
-//3. Set LSEOQTY attribute on LSEOBUNDLELSEO relator. When creating LSEOBUNDLELSEO relator, set LSEOQTY attribute to 1
-//
-
-public class SPSTABRSTATUS extends PokBaseABR {
-
-	private static final Hashtable ABR_TBL;
-	static{
-		ABR_TBL = new Hashtable();
-		ABR_TBL.put("SPSTAVAILMODEL", "COM.ibm.eannounce.abr.sg.SPSTAVAILMODELABR");
-		ABR_TBL.put("SPSTAVAILBUNDLE", "COM.ibm.eannounce.abr.sg.SPSTAVAILBUNDLEABR");
-		ABR_TBL.put("SPSTWDAVAIL", "COM.ibm.eannounce.abr.sg.SPSTWDAVAILABR");
-	}
-	private StringBuffer rptSb = new StringBuffer();
-	private static final char[] FOOL_JTEST = {'\n'};
-	static final String NEWLINE = new String(FOOL_JTEST);
-	public static final String TITLE="Service Pacs from SPST";
-
-	private ResourceBundle rsBundle = null;
-	private String navName = TITLE;
-	private SPSTABR spstAbr=null;
-	private Vector vctReturnsEntityKeys = new Vector();
-	private Hashtable updatedTbl = new Hashtable();
-	
-	protected static final String PROJCDNAM_ATTR = "PROJCDNAM";
-	
-	private String projcdname = null;//expanded to support Blue Harmony (BH) IDLs
-	protected String getPROJCDNAME(){ return projcdname;}
-	
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.util.PokBaseABR#dereference()
-	 */
-	public void dereference(){
-		super.dereference();
-		rptSb = null;
-
-		rsBundle = null;
-		navName = null;
-		if (spstAbr != null){
-			spstAbr.dereference();
-			spstAbr = null;
-		}
-		vctReturnsEntityKeys.clear();
-		vctReturnsEntityKeys = null;
-	}
-	
-	/**********************************
-	 * get the resource bundle
-	 */
-	private ResourceBundle getBundle() {
-		return rsBundle;
-	}
-	
-	private String getBlobAttr(EntityItem item,String attrCode) throws SQLException, MiddlewareException, Exception{
-        String strKey = item.getKey();
-        Blob b = getDatabase().getBlob(getProfile(),item.getEntityType(),item.getEntityID(),attrCode);
-        String val = "";
-	    byte[] ba = b.getBAAttributeValue();
-	    if (ba == null || ba.length == 0) {
-            addDebug("getBlobAttr ** No  Object Found for "+strKey+" **");
-            return null;
-        }
-	    
-	    ByteArrayInputStream baisObject = null;
-	    ObjectInputStream oisObject = null;
-	    BufferedInputStream bis = null;
-	    try {
-	        baisObject = new ByteArrayInputStream(ba);
-	        bis = new BufferedInputStream(baisObject);
-	        oisObject = new ObjectInputStream(bis);
-	        val = (String) oisObject.readObject(); 
-	        return val;
-	    }
-	    catch (Exception x) {
-	        addError("getBlobAttr "+strKey+" ERROR "+x.getMessage());
-	        x.printStackTrace();
-	    }
-	    finally {
-	    	if(oisObject!=null){
-	    		try{
-	    			oisObject.close();
-	    		} catch (java.io.IOException x) {
-	    			addDebug( "getBlobAttr: "+strKey+" ERROR failure closing ObjectInputStream "+x);
-	    		} 
-	    		oisObject=null;
-	    	}
-	       	if(bis!=null){
-	    		try{
-	    			bis.close();
-	    		} catch (java.io.IOException x) {
-	    			addDebug( "getBlobAttr: "+strKey+" ERROR failure closing BufferedInputStream "+x);
-	    		} 
-	    		bis=null;
-	    	}
-	    	if(baisObject!=null){
-	    		try{
-	    			baisObject.close();
-	    		} catch (java.io.IOException x) {
-	    			addDebug( "getBlobAttr: "+strKey+" ERROR failure closing ByteArrayInputStream "+x);
-	    		} 
-	    		baisObject=null;
-	    	}
-	        ba = null;
-	    }
-        return val;
-	}
-
-	/**********************************
-	 *  Execute ABR.
-	 *
-	 */
-	public void execute_run()
-	{
-		/* 
-         The Report should identify:
-            Userid:
-			Role:
-			Workgroup:
-			Date:
-			Description: 
-			Return code:
-		 */
-		// must split because too many arguments for messageformat, max of 10.. this was 11
-		String HEADER = "<head>"+
-		EACustom.getMetaTags(getDescription()) + NEWLINE +
-		EACustom.getCSS() + NEWLINE +
-		EACustom.getTitle("{0} {1}") + NEWLINE +
-		"</head>" + NEWLINE + "<body id=\"ibm-com\">" +
-		EACustom.getMastheadDiv() + NEWLINE +
-		"<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
-		String HEADER2 = "<table>"+NEWLINE +
-		"<tr><th>Userid: </th><td>{0}</td></tr>"+NEWLINE +
-		"<tr><th>Role: </th><td>{1}</td></tr>"+NEWLINE +
-		"<tr><th>Workgroup: </th><td>{2}</td></tr>"+NEWLINE +
-		"<tr><th>Date: </th><td>{3}</td></tr>"+NEWLINE +
-		"<tr><th>Description: </th><td>{4}</td></tr>"+NEWLINE +
-		"<tr><th>Return code: </th><td>{5}</td></tr>"+NEWLINE +
-		"</table>"+NEWLINE+
-		"<!-- {6} -->" + NEWLINE;
-
-		MessageFormat msgf;
-		String abrversion="";
-
-		Object[] args = new String[10];
-		Document document = null;
-		EntityItem rootEntity = null;
-		Element rootElem = null;
-
-		try {
-			//Default set to pass
-			setReturnCode(PASS);
-
-			start_ABRBuild(); // pull VE 
-		
-			// get properties file for the base class
-			rsBundle = ResourceBundle.getBundle(getClass().getName(), ABRUtil.getLocale(m_prof.getReadLanguage().getNLSID()));
-
-			setControlBlock(); // needed for attribute updates
-
-			rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-
-			addDebug("execute: "+rootEntity.getKey());
-
-//fixme remove this.. avoid msgs to userid for testing
-//			setCreateDGEntity(false);
-
-			String attCode = "SPSTMSG";
-			// get the xml from the entity
-//			String xml = PokUtils.getAttributeValue(rootEntity, attCode, "", "", false);
-			String xml = getBlobAttr(rootEntity,attCode);
-			addDebug(attCode+" : "+xml);			
-			
-			// parse it to determine what type of LEADS XML msg we are loading
-			DocumentBuilderFactory factory =
-				DocumentBuilderFactory.newInstance();
-
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			StringReader sr = new StringReader(xml);
-			InputSource is = new InputSource(sr);
-			
-			document = builder.parse( is );
-			rootElem = document.getDocumentElement();
-			String spsttype = rootElem.getNodeName();
-			
-//			findPrjcdnam(rootEntity, rootElem);
-			
-			// find class to instantiate based on xml
-			// Load the specified ABR class in preparation for execution
-			String clsname = (String) ABR_TBL.get(spsttype);
-			addDebug("creating instance of SPSTABR  = '" + clsname + "'");				
-			if (clsname!=null){
-//				// list domains, search is reliant on it
-//				listDomains();
-				
-				spstAbr = (SPSTABR) Class.forName(clsname).newInstance();
-				abrversion = getShortClassName(spstAbr.getClass())+" "+spstAbr.getVersion();
-				// pass the root element to class and check the data
-				spstAbr.validateData(this, rootElem);
-				
-				// execute and create entities
-				if (getReturnCode()==PASS){
-					spstAbr.execute();
-				}
-			}else{
-				addError(getShortClassName(getClass())+" does not support "+spsttype);
-			}			
-		}
-		catch(Throwable exc)  {
-			try{
-				if (document != null){
-					// set up a transformer
-					TransformerFactory transfac = TransformerFactory.newInstance();
-					Transformer trans = transfac.newTransformer();
-					trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-					trans.setOutputProperty(OutputKeys.INDENT, "yes");		
-					trans.setOutputProperty(OutputKeys.METHOD, "xml");
-					trans.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-
-					//create string from xml tree
-					java.io.StringWriter sw = new java.io.StringWriter();
-					StreamResult result = new StreamResult(sw);
-					DOMSource source = new DOMSource(document);
-					trans.transform(source, result);
-					rptSb.append("<pre>Error executing: <br />"+
-							PokUtils.convertToHTML(sw.toString())
-							+"</pre>");
-				}
-			}catch(Exception e){				
-			}
-
-			java.io.StringWriter exBuf = new java.io.StringWriter();
-			String Error_EXCEPTION="<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
-			String Error_STACKTRACE="<pre>{0}</pre>";
-			msgf = new MessageFormat(Error_EXCEPTION);
-			setReturnCode(INTERNAL_ERROR);
-			exc.printStackTrace(new java.io.PrintWriter(exBuf));
-			// Put exception into document
-			args[0] = exc.getMessage();
-			rptSb.append(msgf.format(args) + NEWLINE);
-			msgf = new MessageFormat(Error_STACKTRACE);
-			args[0] = exBuf.getBuffer().toString();
-			rptSb.append(msgf.format(args) + NEWLINE);
-			logError("Exception: "+exc.getMessage());
-			logError(exBuf.getBuffer().toString());
-		}
-		finally {	
-			try{
-				// copy the FACTSHEETNUM into the root entity so user can search on it
-				if (rootEntity!=null && rootElem!=null){
-					String factSheetNum = getNodeValue(rootElem,"SPSTSHEETNUM", null);
-					if (factSheetNum!=null){
-						String curval = PokUtils.getAttributeValue(rootEntity, "SPSTSHEETNUM", "", "", false);
-						if (!curval.equals(factSheetNum)){
-							setTextValue(m_prof, "SPSTSHEETNUM", factSheetNum,rootEntity);
-						}else{
-							addDebug("SPSTSHEETNUM already set to "+factSheetNum+" for "+rootEntity.getKey());
-						}
-					}
-				}
-				//may have flag value in here too, so update here
-				updatePDH(m_prof);
-			}catch(Exception e){
-				e.printStackTrace();
-			}
-			setDGTitle(navName);
-			setDGRptName(getShortClassName(getClass()));
-			setDGRptClass(getABRCode());
-			// make sure the lock is released
-			if(!isReadOnly()) {
-				clearSoftLock();
-			}
-		}
-		//Print everything up to </html>
-		//Insert Header into beginning of report
-		msgf = new MessageFormat(HEADER);
-		if (spstAbr!=null){
-			args[0] = getShortClassName(spstAbr.getClass());
-			navName = spstAbr.getTitle();
-			String spstheader = spstAbr.getHeader();
-			if (spstheader!=null &&spstheader.length()>0){
-				rptSb.insert(0,"<p>"+spstheader+"</p>\n");
-			}
-		}else{
-			args[0] = getShortClassName(getClass());
-		}
-		args[1] = navName;
-		String header1 = msgf.format(args);
-		
-		msgf = new MessageFormat(HEADER2);
-		args[0] = m_prof.getOPName();
-		args[1] = m_prof.getRoleDescription();
-		args[2] = m_prof.getWGName();
-		args[3] = getNow();
-		if (spstAbr!=null){
-			args[4] = spstAbr.getDescription();
-		}else{
-			args[4] = "";
-		}
-		args[5] = (this.getReturnCode()==PokBaseABR.PASS?"Passed":"Failed");
-		args[6] = abrversion+" "+getABRVersion();
-
-		rptSb.insert(0, header1+msgf.format(args) + NEWLINE);
-
-		println(EACustom.getDocTypeHtml()); //Output the doctype and html
-		println(rptSb.toString()); // Output the Report
-		printDGSubmitString();        
-
-		println(EACustom.getTOUDiv());
-		buildReportFooter(); // Print </html>
-	}
-
-//	/**
-//	 * Wayne Kehrli: 1) if in XML and not in LEADSXML - take value from XML and put it in LEADSXML
-// 					 2) if after step 1, if LEADSXML is not empty, use it - otherwise, use default
-//	 * @param rootEntity
-//	 * @param rootElem
-//	 * @throws MiddlewareException 
-//	 * @throws SQLException 
-//	 */
-//	private void findPrjcdnam(EntityItem rootEntity, Element rootElem) throws SQLException, MiddlewareException{//TODO check if it was used
-//		// get the PROJCDNAM - expanded to support Blue Harmony (BH) IDLs.
-//		projcdname = PokUtils.getAttributeFlagValue(rootEntity, PROJCDNAM_ATTR);
-//		addDebug("findPrjcdnam from "+rootEntity.getKey()+" "+PROJCDNAM_ATTR+" : "+projcdname);
-//
-//		if (projcdname==null){ // was not in the SPSTXML entity
-//			String projcdnameDesc = getNodeValue(rootElem,PROJCDNAM_ATTR, null); // get it from the XML 
-//			 
-//			addDebug("findPrjcdnam from XML "+PROJCDNAM_ATTR+" desc : "+projcdnameDesc);
-//			if (projcdnameDesc!=null){
-//				PDGUtility m_utility = new PDGUtility();
-//				// find flag code corresponding to the xml PROJCDNAM desc
-//				String[] flagArray = m_utility.getFlagCodeForExactDesc(m_db, m_prof, PROJCDNAM_ATTR, projcdnameDesc);
-//				if (flagArray != null && flagArray.length > 0) {
-//					projcdname = flagArray[0];
-//					addDebug("findPrjcdnam "+PROJCDNAM_ATTR+" desc : "+projcdnameDesc+" flagcode "+projcdname);
-//					// save it in the SPSTXML entity
-//					setFlagValue(m_prof, PROJCDNAM_ATTR, projcdname,rootEntity);
-//				}else{
-//					addDebug("findPrjcdnam NO match found for "+PROJCDNAM_ATTR+" desc : "+projcdnameDesc);
-//				}
-//				m_utility.dereference();
-//			}
-//		}
-//	}
-//	/**
-//	 * domains are key to search and create, list them for debug
-//	 */
-//	private void listDomains(){
-//		try{
-//			EntityGroup eg = m_db.getEntityGroup(m_prof, "WG", "Edit");
-//			EntityItem wgItem = new EntityItem(eg, m_prof, "WG", m_prof.getWGID());
-//			java.sql.ResultSet rs = null;
-//			StringBuffer sb = new StringBuffer();
-//			try {
-//				ReturnStatus returnStatus = new ReturnStatus( -1);
-//	            ReturnDataResultSet rdrs = null;
-//			
-//                rs = m_db.callGBL7065(returnStatus, m_prof.getEnterprise(), m_prof.getWGID(), 
-//                		m_prof.getValOn(), m_prof.getEffOn());
-//                rdrs = new ReturnDataResultSet(rs);
-//                for (int ii = 0; ii < rdrs.size(); ii++) {
-//                	// This is the AttributeCode
-//                	String strAttributeCode = rdrs.getColumn(ii, 0);
-//                	if ("PDHDOMAIN".equals(strAttributeCode)){
-//                		sb.append(rdrs.getColumn(ii, 1)+"|");// get the value
-//                	}
-//                }
-//            }
-//            finally {
-//				if (rs !=null){
-//                	rs.close();
-//                	rs = null;
-//				}
-//                m_db.commit();
-//                m_db.freeStatement();
-//                m_db.isPending();
-//            }
-//            
-//			addDebug("Running with "+wgItem.getKey()+" for domains "+sb.toString());
-//		}catch(Exception e){
-//			e.printStackTrace();
-//		}
-//	}
-	/******************************************************************************
-	 * Check for one and only one tag for this element
-	 * @param elem
-	 * @param tagName
-	 * @param isRequired TODO
-	 * @return
-	 */
-	public String getNodeValue(Element elem, String tagName, boolean isRequired){
-		String value = null;
-		Node node = null;
-		int count = 0;
-		if(!tagName.equals(elem.getTagName())){//parent tag
-			NodeList nlist = elem.getElementsByTagName(tagName);
-			if(nlist!=null){
-				for(int i=0;i<nlist.getLength();i++){
-					Node tempNode = nlist.item(i);
-					if(tempNode.getParentNode() == elem){//must do this checking, some elements have same node name in different level
-						node = tempNode;
-						count++;
-					}
-				}
-			}
-			//ERROR_INVALIDXML = Invalid xml tag {0}.
-			if (nlist==null || count!=1){
-				addError("ERROR_INVALIDXML", tagName);
-			}
-		}else{//not parent
-			node = elem;
-		}
-		if (node!=null && node.hasChildNodes()){
-			value = node.getFirstChild().getNodeValue();
-		}else{
-			addDebug("getNodeValue: "+tagName+" has no child nodes");
-		}					
-	
-		addDebug("getNodeValue: "+tagName+" "+value);
-		if (value==null){
-			if(isRequired){
-	//			ERROR_MISSINGXML = Missing xml tag {0}.
-				addError("ERROR_MISSINGXML", tagName);			
-			}
-			addDebug("getNodeValue: "+tagName+" is null");
-			value = "";
-		}		
-		return value;
-	}
-	/******************************************************************************
-	 * Check for one parent and minNum children
-	 * @param nlist
-	 * @param tagName
-	 * @param childTagName
-	 * @param minNum
-	 */
-	public void verifyChildNodes(Element elem, String tagName, String childTagName, int minNum){
-		NodeList nlist = elem.getElementsByTagName(tagName);
-		int count = 0;
-		if(nlist!=null){
-			for (int x=0; x<nlist.getLength(); x++){
-				Node item = nlist.item(x);
-				if(item.getParentNode() == elem){//need to think about same tag in different level
-					NodeList childlist = ((Element)item).getElementsByTagName(childTagName); 
-					addDebug("childlist length = " + childlist.getLength());
-					//ERROR_INVALIDXMLSTRUCTURE = Invalid XML. Tag {0} must have {1} or more {2} tags.
-					if (childlist.getLength()<minNum){ // must have at least minNum
-						addError("ERROR_INVALIDXMLSTRUCTURE", new Object[]{tagName,""+minNum, childTagName});
-					}else{
-						addDebug("item.getchildnodes.item[0] = " +item.getChildNodes().item(0).getNodeName());
-					}
-					count++;
-				}else{			
-					addDebug("this tag is not correct one because of the parent is not elem: " + item.getParentNode().getNodeName()+" : "+item.getNodeName());
-				}
-			}	
-		}	
-		if (nlist==null || count!=1){//parent should be only 1
-			addError("ERROR_INVALIDXML", tagName);
-		}
-	}
-	/******************************************************************************
-	 * Get tag value, if doesnt exist use default
-	 * @param elem
-	 * @param tagName
-	 * @param defaultVal
-	 * @return
-	 */
-	public String getNodeValue(Element elem, String tagName, String defaultVal){
-		String value = defaultVal;
-		
-		NodeList nlist = elem.getElementsByTagName(tagName);
-		if (nlist==null || nlist.getLength()!=1){
-		}else {
-			Node node = nlist.item(0);
-			if (node.hasChildNodes()){
-				value = node.getFirstChild().getNodeValue();
-			}else{
-				addDebug("getNodeValue: "+tagName+" has no child nodes");
-			}
-			addDebug("getNodeValue: "+tagName+" "+value);
-			if (value==null){
-				value = defaultVal;
-			}	
-		}
-		
-		return value;
-	}
-	/**********************************
-	 * add msg to report output
-	 * @param msg
-	 */
-	public void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
-
-	/**********************************
-	 * used for output
-	 *
-	 * @param resrcCode
-	 * @param args
-	 */
-	public void addOutput(String resrcCode, Object args[])
-	{
-		String msg = getBundle().getString(resrcCode);
-		if (args != null){
-			MessageFormat msgf = new MessageFormat(msg);
-			msg = msgf.format(args);
-		}
-
-		addOutput(msg);
-	}
-	/**********************************
-	 * get message using resource
-	 *
-	 * @param resrcCode
-	 * @param args
-	 * @return
-	 */
-	public String getResourceMsg(String resrcCode, Object args[])
-	{
-		String msg = getBundle().getString(resrcCode);
-		if (args != null){
-			MessageFormat msgf = new MessageFormat(msg);
-			msg = msgf.format(args);
-		}
-
-		return msg;
-	}
-	/**********************************
-	 * add debug info as html comment
-	 * @param msg
-	 */
-	public void addDebug(String msg) { rptSb.append("<!-- "+msg+" -->"+NEWLINE);}
-
-	/**********************************
-	 * add error info and fail abr
-	 * @param msg
-	 */
-	public void addError(String msg) {
-		addOutput(msg);
-		setReturnCode(FAIL);
-	}
-
-	/**********************************
-	 * used for error output
-	 * @param errCode
-	 * @param arg
-	 */
-	public void addError(String errCode, Object arg)
-	{
-		addError(errCode, new Object[]{arg});
-	}
-	/**********************************
-	 * used for error output
-	 * @param errCode
-	 * @param args
-	 */
-	public void addError(String errCode, Object args[])
-	{
-		setReturnCode(FAIL);
-		String msg = getBundle().getString(errCode);
-		// get message to output
-		if (args!=null){
-			MessageFormat msgf = new MessageFormat(msg);
-			msg = msgf.format(args);
-		}
-		addOutput(msg);
-	}
-
-	/***********************************************
-	 *  Get the version
-	 *
-	 *@return java.lang.String
-	 */
-	public String getABRVersion()
-	{
-		return "1.10";
-	}
-	/***********************************************
-	 *  Get ABR description
-	 *
-	 *@return java.lang.String
-	 */
-	public String getDescription()
-	{
-		return "LXABRSTATUS";
-	}
-
-	/***********************************************
-	 * Sets the specified Text Attribute on the specified entity
-	 *
-	 *@param    profile Profile
-	 *@param _sAttributeCode
-	 *@param _sAttributeValue
-	 *@param eitem
-	 */
-	public void setTextValue(Profile profile, String _sAttributeCode, String _sAttributeValue,
-			EntityItem eitem)
-	{
-		logMessage(getDescription()+" ***** "+eitem.getKey()+" "+_sAttributeCode+" set to: " + _sAttributeValue);
-		addDebug("setTextValue entered for "+eitem.getKey()+" "+_sAttributeCode+" set to: " + _sAttributeValue);
-
-		// if meta does not have this attribute, there is nothing to do
-		EANMetaAttribute metaAttr = eitem.getEntityGroup().getMetaAttribute(_sAttributeCode);
-		if (metaAttr==null) {
-			addDebug("setTextValue: "+_sAttributeCode+" was not in meta for "+eitem.getEntityType()+", nothing to do");
-			logMessage(getDescription()+" ***** "+_sAttributeCode+" was not in meta for "+
-					eitem.getEntityType()+", nothing to do");
-			return;
-		}
-
-		if( _sAttributeValue != null ) {
-			if (m_cbOn==null){
-				setControlBlock(); // needed for attribute updates
-			}
-			ControlBlock cb = m_cbOn;
-			if (_sAttributeValue.length()==0){ // deactivation is now needed
-				EANAttribute att = eitem.getAttribute(_sAttributeCode);
-				String efffrom = att.getEffFrom();
-				cb = new ControlBlock(efffrom, efffrom, efffrom, efffrom, profile.getOPWGID());
-				_sAttributeValue = att.toString();
-				addDebug("setTextValue deactivating "+_sAttributeCode);
-			}
-			Vector vctAtts = null;
-			// look at each key to see if this item is there yet
-			for (int i=0; i<vctReturnsEntityKeys.size(); i++){
-				ReturnEntityKey rek = (ReturnEntityKey)vctReturnsEntityKeys.elementAt(i);
-				if (rek.getEntityID() == eitem.getEntityID() &&
-						rek.getEntityType().equals(eitem.getEntityType())){
-					vctAtts = rek.m_vctAttributes;
-					break;
-				}
-			}
-			if (vctAtts ==null){
-				ReturnEntityKey rek = new ReturnEntityKey(eitem.getEntityType(),
-						eitem.getEntityID(), true);
-				vctAtts = new Vector();
-				rek.m_vctAttributes = vctAtts;
-				vctReturnsEntityKeys.addElement(rek);
-				updatedTbl.put(rek.getEntityType()+rek.getEntityID(),eitem);
-			}
-			COM.ibm.opicmpdh.objects.Text sf = new COM.ibm.opicmpdh.objects.Text(profile.getEnterprise(),
-					eitem.getEntityType(), eitem.getEntityID(), _sAttributeCode, _sAttributeValue, 1, cb);
-			vctAtts.addElement(sf);
-		}
-	}
-	/***********************************************
-	 *  Sets the specified Flag Attribute on the specified Entity
-	 *
-	 *@param    profile Profile
-	 *@param    strAttributeCode The Flag Attribute Code
-	 *@param    strAttributeValue The Flag Attribute Value
-	 */
-	public void setFlagValue(Profile profile, String strAttributeCode, String strAttributeValue,
-			EntityItem item)
-	{
-		logMessage(getDescription()+" ***** "+item.getKey()+" "+strAttributeCode+" set to: " + strAttributeValue);
-		addDebug("setFlagValue entered "+item.getKey()+" for "+strAttributeCode+" set to: " +
-				strAttributeValue);
-
-		if (strAttributeValue!=null && strAttributeValue.trim().length()==0) {
-			addDebug("setFlagValue: "+strAttributeCode+" was blank for "+item.getKey()+", it will be ignored");
-			return;
-		}
-
-		// if meta does not have this attribute, there is nothing to do
-		EANMetaAttribute metaAttr = item.getEntityGroup().getMetaAttribute(strAttributeCode);
-		if (metaAttr==null) {
-			addDebug("setFlagValue: "+strAttributeCode+" was not in meta for "+item.getEntityType()+", nothing to do");
-			logMessage(getDescription()+" ***** "+strAttributeCode+" was not in meta for "+
-					item.getEntityType()+", nothing to do");
-			return;
-		}
-
-		if(strAttributeValue != null)
-		{
-			//get the current value
-			String curval = PokUtils.getAttributeFlagValue(item,strAttributeCode);
-			if (strAttributeValue.equals(curval)){ 
-				addDebug("setFlagValue: "+strAttributeCode+" was already set to "+curval+" for "+item.getKey()+", nothing to do");
-				logMessage("setFlagValue: "+strAttributeCode+" was already set to "+curval+" for "+item.getKey()+", nothing to do");
-				return;
-			}
-
-			if (m_cbOn==null){
-				setControlBlock(); // needed for attribute updates
-			}
-			Vector vctAtts = null;
-			// look at each key to see if root is there yet
-			for (int i=0; i<vctReturnsEntityKeys.size(); i++){
-				ReturnEntityKey rek = (ReturnEntityKey)vctReturnsEntityKeys.elementAt(i);
-				if (rek.getEntityID() == item.getEntityID() &&
-						rek.getEntityType().equals(item.getEntityType())){
-					vctAtts = rek.m_vctAttributes;
-					break;
-				}
-			}
-			if (vctAtts ==null){
-				ReturnEntityKey rek = new ReturnEntityKey(item.getEntityType(),item.getEntityID(), true);
-				vctAtts = new Vector();
-				rek.m_vctAttributes = vctAtts;
-				vctReturnsEntityKeys.addElement(rek);
-				updatedTbl.put(rek.getEntityType()+rek.getEntityID(),item);
-			}
-
-			SingleFlag sf = new SingleFlag (profile.getEnterprise(), item.getEntityType(), item.getEntityID(),
-					strAttributeCode, strAttributeValue, 1, m_cbOn);
-
-			// look at each attr to see if this is there yet
-			for (int i=0; i<vctAtts.size(); i++){
-				Attribute attr = (Attribute)vctAtts.elementAt(i);
-				if (attr.getAttributeCode().equals(strAttributeCode)){
-					sf = null;
-					break;
-				}
-			}
-			if(sf != null){
-				vctAtts.addElement(sf);
-			}else{
-				addDebug("setFlagValue:  "+item.getKey()+" "+strAttributeCode+" was already added for updates ");
-			}
-		}
-	}
-
-	/***********************************************
-	 * Update the PDH with the values in the vector, do all at once
-	 *
-	 *@param    profile Profile
-	 */
-	public void updatePDH(Profile profile)
-	throws java.sql.SQLException,
-	COM.ibm.opicmpdh.middleware.MiddlewareException,
-	java.rmi.RemoteException,
-	COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-	COM.ibm.eannounce.objects.EANBusinessRuleException
-	{
-		logMessage(getDescription()+" updating PDH");
-		addDebug("updatePDH entered for vctReturnsEntityKeys: "+vctReturnsEntityKeys);
-		if(vctReturnsEntityKeys.size()>0)
-		{
-			try
-			{
-				m_db.update(profile, vctReturnsEntityKeys, false, false);
-
-				for (int i=0; i<vctReturnsEntityKeys.size(); i++){
-					ReturnEntityKey rek = (ReturnEntityKey)vctReturnsEntityKeys.elementAt(i);
-					// must commit text chgs.. not sure why
-					for (int ii=0; ii<rek.m_vctAttributes.size(); ii++){
-						Attribute attr = (Attribute)rek.m_vctAttributes.elementAt(ii);
-						if (attr instanceof Text){
-//							EntityGroup egrp = null;
-//							if (rek.getEntityType().equals(getEntityType())){ // is root
-//								egrp = m_elist.getParentEntityGroup();
-//							}
-//							else{
-//								EntityItem item = (EntityItem)updatedTbl.get(rek.getEntityType()+rek.getEntityID());
-//								egrp = m_elist.getEntityGroup(rek.getEntityType());
-//							}
-//							addDebug("entitygroup is " + egrp);
-//							addDebug("entitygroup entitytype: " +rek.getEntityType());
-//							EntityItem item = egrp.getEntityItem(rek.getEntityType()+rek.getEntityID());
-//							// must commit changes, not really sure why though
-							EntityItem item = (EntityItem)updatedTbl.get(rek.getEntityType()+rek.getEntityID());
-							addDebug("update entity: " + rek.getEntityType()+rek.getEntityID());
-							item.commit(m_db, null);
-						}
-					}
-				}
-			}
-			finally {
-				vctReturnsEntityKeys.clear();
-				updatedTbl.clear();
-				m_db.commit();
-				m_db.freeStatement();
-				m_db.isPending("finally after updatePDH");
-			}
-		}
-	}	
-
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\SPSTABRSTATUS.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

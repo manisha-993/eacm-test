@@ -1,109 +1,115 @@
-//Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2010  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//<?xml version="1.0" encoding="UTF-8" ?>	
-/**********************************************************************************
-*/
-package COM.ibm.eannounce.abr.sg.adsxmlbh1;
+/*     */ package COM.ibm.eannounce.abr.sg.adsxmlbh1;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.XMLActivityElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLGroupElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLNotificationElem;
+/*     */ import COM.ibm.eannounce.abr.util.XMLVMElem;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class ADSGBTABR
+/*     */   extends XMLMQRoot
+/*     */ {
+/*  38 */   private static final XMLElem XMLMAP = (XMLElem)new XMLGroupElem("GBT_UPDATE"); static {
+/*  39 */     XMLMAP.addChild((XMLElem)new XMLVMElem("GBT_UPDATE", "1"));
+/*     */     
+/*  41 */     XMLMAP.addChild((XMLElem)new XMLNotificationElem("DTSOFMSG"));
+/*  42 */     XMLMAP.addChild((XMLElem)new XMLActivityElem("ACTIVITY"));
+/*     */     
+/*  44 */     XMLMAP.addChild(new XMLElem("ENTITYTYPE", "ENTITYTYPE"));
+/*  45 */     XMLMAP.addChild(new XMLElem("ENTITYID", "ENTITYID"));
+/*     */     
+/*  47 */     XMLMAP.addChild(new XMLElem("SIEBELPRODLEV", "SIEBELPRODLEV"));
+/*  48 */     XMLMAP.addChild(new XMLElem("SAPPRIMBRANDCD", "SAPPRIMBRANDCD"));
+/*  49 */     XMLMAP.addChild(new XMLElem("SAPPRODFMLYCD", "SAPPRODFMLYCD"));
+/*  50 */     XMLMAP.addChild(new XMLElem("LEVEL17", "LEVEL17"));
+/*  51 */     XMLMAP.addChild(new XMLElem("WWOCPARNTS", "WWOCPARNTS"));
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*  59 */     XMLMAP.addChild(new XMLElem("WWOCCODE", "WWOCCODE"));
+/*  60 */     XMLMAP.addChild(new XMLElem("STATUS", "STATUS", 1));
+/*  61 */     XMLMAP.addChild(new XMLElem("GBTDESC", "GBTDESC"));
+/*  62 */     XMLMAP.addChild(new XMLElem("RECTYPE", "RECTYPE"));
+/*  63 */     XMLMAP.addChild(new XMLElem("PRODTYPE", "PRODTYPE"));
+/*  64 */     XMLMAP.addChild(new XMLElem("EFFECTIVEDATE", "EFFECTIVEDATE"));
+/*  65 */     XMLMAP.addChild(new XMLElem("DELDATE", "DELDATE"));
+/*  66 */     XMLMAP.addChild(new XMLElem("MAPTOCD", "MAPTOCD"));
+/*  67 */     XMLMAP.addChild(new XMLElem("OMBRANDCD", "OMBRANDCD"));
+/*  68 */     XMLMAP.addChild(new XMLElem("OMPRODFMLYCD", "OMPRODFMLYCD"));
+/*  69 */     XMLMAP.addChild(new XMLElem("BPDBBRANDCD", "BPDBBRANDCD"));
+/*  70 */     XMLMAP.addChild(new XMLElem("MKTGRPTCD", "MKTGRPTCD"));
+/*  71 */     XMLMAP.addChild(new XMLElem("IGSSHADOWLOB", "IGSSHADOWLOB"));
+/*  72 */     XMLMAP.addChild(new XMLElem("TPRSSREVDIV", "TPRSSREVDIV"));
+/*  73 */     XMLMAP.addChild(new XMLElem("INTERNALNOTES", "INTERNALNOTES"));
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public XMLElem getXMLMap() {
+/*  81 */     return XMLMAP;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVeName() {
+/*  87 */     return "dummy";
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public String getStatusAttr() {
+/*  92 */     return "STATUS";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getMQCID() {
+/*  98 */     return "GBT_UPDATE";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVersion() {
+/* 107 */     return "$Revision: 1.10 $";
+/*     */   }
+/*     */ }
 
-import COM.ibm.eannounce.abr.util.*;
 
-//$Log: ADSGBTABR.java,v $
-//Revision 1.10  2017/03/07 09:29:49  wangyul
-//Story 1660265 - EACM- GBT XML update to add LEVEL17
-//
-//Revision 1.9  2015/04/27 09:29:04  wangyul
-//GBT updates to add STATUS. This change is for IBM EACM and it requires an update to our  XSD for SS "EACM IBM FS ABR XML System Feed Mapping 20150422.xls"
-//
-//Revision 1.8  2011/12/14 02:21:25  guobin
-//Update the Version V Mod M for the ADSABR
-//
-//Revision 1.7  2011/07/13 12:16:06  guobin
-// change WWOCBRAND to WWOCCODE in GBT_UPDATE
-//
-//Revision 1.6  2011/04/14 06:12:23  guobin
-//change the WWOCBRAND attribute to WWOCCODE
-//
-//Revision 1.5  2011/01/21 12:27:13  guobin
-//add comments log
-//
-
-public class ADSGBTABR extends XMLMQRoot
-{
-    private static final XMLElem XMLMAP;
-
-    static {
-        XMLMAP = new XMLGroupElem("GBT_UPDATE");
-        XMLMAP.addChild(new XMLVMElem("GBT_UPDATE","1"));
-         // level2
-        XMLMAP.addChild(new XMLNotificationElem("DTSOFMSG")); // pull from profile.endofday
-        XMLMAP.addChild(new XMLActivityElem("ACTIVITY"));
-        //XMLMAP.addChild(new XMLElem("STATUS","STATUS",XMLElem.FLAGVAL));
-        XMLMAP.addChild(new XMLElem("ENTITYTYPE","ENTITYTYPE"));
-        XMLMAP.addChild(new XMLElem("ENTITYID","ENTITYID"));
-
-        XMLMAP.addChild(new XMLElem("SIEBELPRODLEV","SIEBELPRODLEV"));
-        XMLMAP.addChild(new XMLElem("SAPPRIMBRANDCD","SAPPRIMBRANDCD"));
-        XMLMAP.addChild(new XMLElem("SAPPRODFMLYCD","SAPPRODFMLYCD"));
-        XMLMAP.addChild(new XMLElem("LEVEL17","LEVEL17"));
-        XMLMAP.addChild(new XMLElem("WWOCPARNTS","WWOCPARNTS"));
-        /**
-         * Carol - no, I didn't know that WWOCBRAND has been replaced by WWOCCODE.  
-         * Yes, the <WWOCBRAND> attribute should be derived from WWOCCODE - 
-         * I will update the mapping spreadsheet accordingly,
-         * -- Dave
-         */
-        //XMLMAP.addChild(new XMLElem("WWOCBRAND","WWOCBRAND"));
-        XMLMAP.addChild(new XMLElem("WWOCCODE","WWOCCODE"));
-        XMLMAP.addChild(new XMLElem("STATUS","STATUS",XMLElem.FLAGVAL));
-        XMLMAP.addChild(new XMLElem("GBTDESC","GBTDESC"));
-        XMLMAP.addChild(new XMLElem("RECTYPE","RECTYPE"));
-        XMLMAP.addChild(new XMLElem("PRODTYPE","PRODTYPE"));
-        XMLMAP.addChild(new XMLElem("EFFECTIVEDATE","EFFECTIVEDATE"));
-        XMLMAP.addChild(new XMLElem("DELDATE","DELDATE"));
-        XMLMAP.addChild(new XMLElem("MAPTOCD","MAPTOCD"));
-        XMLMAP.addChild(new XMLElem("OMBRANDCD","OMBRANDCD"));
-        XMLMAP.addChild(new XMLElem("OMPRODFMLYCD","OMPRODFMLYCD"));
-        XMLMAP.addChild(new XMLElem("BPDBBRANDCD","BPDBBRANDCD"));
-        XMLMAP.addChild(new XMLElem("MKTGRPTCD","MKTGRPTCD"));
-        XMLMAP.addChild(new XMLElem("IGSSHADOWLOB","IGSSHADOWLOB"));
-        XMLMAP.addChild(new XMLElem("TPRSSREVDIV","TPRSSREVDIV"));
-        XMLMAP.addChild(new XMLElem("INTERNALNOTES","INTERNALNOTES"));
-        
-    }
-
-    /**********************************
-    * get xml object mapping
-    */
-    public XMLElem getXMLMap() {
-        return XMLMAP;
-    }
-
-    /**********************************
-    * get the name of the VE to use
-    */
-    public String getVeName() { return "dummy";}
-
-    /**********************************
-    * get the status attribute to use for this ABR
-    */
-    public String getStatusAttr() { return "STATUS";}
-
-    /**********************************
-    *
-	A.	MQ-Series CID
-    */
-    public String getMQCID() { return "GBT_UPDATE"; }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getVersion()
-    {
-        return "$Revision: 1.10 $";
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\adsxmlbh1\ADSGBTABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

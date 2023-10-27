@@ -1,133 +1,139 @@
-package COM.ibm.eannounce.abr.sg;
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import java.sql.SQLException;
+/*     */ 
+/*     */ public class SWSPRODSTRUCTABRSTATUS extends DQABRSTATUS {
+/*   6 */   private Object[] args = new Object[3];
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean isVEneeded(String paramString) {
+/*  12 */     return true;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void completeNowR4RProcessing() throws SQLException, MiddlewareException, MiddlewareRequestException {}
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void completeNowFinalProcessing() throws SQLException, MiddlewareException, MiddlewareRequestException {
+/*  41 */     setFlagValue(this.m_elist.getProfile(), "ADSABRSTATUS", "0020");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void doDQChecking(EntityItem paramEntityItem, String paramString) throws Exception {
+/*  62 */     if ("0010".equals(paramString) || "0050".equals(paramString)) {
+/*     */       
+/*  64 */       EntityItem entityItem1 = this.m_elist.getEntityGroup("SVCMOD").getEntityItem(0);
+/*  65 */       EntityItem entityItem2 = this.m_elist.getEntityGroup("SWSFEATURE").getEntityItem(0);
+/*     */ 
+/*     */ 
+/*     */       
+/*  69 */       String str = getAttributeFlagEnabledValue(entityItem1, "STATUS");
+/*  70 */       addDebug(entityItem1.getKey() + " check status " + str);
+/*  71 */       if (str == null) {
+/*  72 */         str = "0020";
+/*     */       }
+/*     */       
+/*  75 */       if (!"0020".equals(str) && !"0040".equals(str)) {
+/*  76 */         addDebug(entityItem1.getKey() + " is not Final or R4R");
+/*     */         
+/*  78 */         this.args[0] = entityItem1.getEntityGroup().getLongDescription();
+/*  79 */         this.args[1] = getNavigationName(entityItem1);
+/*  80 */         addError("NOT_R4R_FINAL_ERR", this.args);
+/*     */       } 
+/*     */ 
+/*     */       
+/*  84 */       str = getAttributeFlagEnabledValue(entityItem2, "STATUS");
+/*  85 */       addDebug(entityItem2.getKey() + " check status " + str);
+/*  86 */       if (str == null) {
+/*  87 */         str = "0020";
+/*     */       }
+/*     */       
+/*  90 */       if (!"0020".equals(str) && !"0040".equals(str)) {
+/*  91 */         addDebug(entityItem2.getKey() + " is not Final or R4R");
+/*     */         
+/*  93 */         this.args[0] = entityItem2.getEntityGroup().getLongDescription();
+/*  94 */         this.args[1] = getNavigationName(entityItem2);
+/*  95 */         addError("NOT_R4R_FINAL_ERR", this.args);
+/*     */       } 
+/*     */     } 
+/*     */     
+/*  99 */     if ("0040".equals(paramString)) {
+/*     */ 
+/*     */ 
+/*     */       
+/* 103 */       checkStatus("SVCMOD");
+/*     */ 
+/*     */ 
+/*     */       
+/* 107 */       checkStatus("SWSFEATURE");
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 120 */     return "SWSPRODSTRUCT ABR";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 131 */     return "1.0";
+/*     */   }
+/*     */ }
 
-import COM.ibm.eannounce.objects.EntityItem;
 
-public class SWSPRODSTRUCTABRSTATUS extends DQABRSTATUS{
-	private Object args[] = new Object[3];
-
-	/**********************************
-	* always check if not final, but need navigation name from model and fc
-	*/
-	protected boolean isVEneeded(String statusFlag) {
-		return true;
-	}
-
-    /**********************************
-    * complete abr processing after status moved to readyForReview; (status was chgreq)
-	* C.	Status changed to Ready for Review
-	1.	Set ADSABRSTATUS = 0020 (Queued)
-    */
-    protected void completeNowR4RProcessing() throws
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-    {
-//         setFlagValue(m_elist.getProfile(),"ADSABRSTATUS", ABR_QUEUED);
-    }
-
-	/**********************************
-	* complete abr processing after status moved to final; (status was r4r)
-	D.	STATUS changed to Final
-
-	1.	Set ADSABRSTATUS = 0020 (Queued)
-
-	*
-	*/
-	protected void completeNowFinalProcessing() throws
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-	{
-        setFlagValue(m_elist.getProfile(),"ADSABRSTATUS", ABR_QUEUED);
-	}
-
-    /**********************************
-	A.  STATUS = Draft | Change Request
-	1.	CompareAll(MAINTPRODSTRUCT-d: SVCMOD.STATUS) = 0020 (Final) or 0040 (Ready for Review)
-	ErrorMessage LD(SVCMOD) 'Status is not Ready for Review or Final'
-	2.	CompareAll(MAINTPRODSTRUCT-u: MAINTFEATURE.STATUS) = 0020 (Final) or 0040 (Ready for Review)
-	ErrorMessage LD(MAINTFEATURE) 'Status is not Ready for Review or Final'
-
-	B.  STATUS = Ready for Review
-
-	1.  All checks from 'STATUS = Draft | Change Request'
-	2.  CompareAll(MAINTPRODSTRUCT-d: SVCMOD.STATUS) = 0020 (Final)
-	ErrorMessage LD(SVCMOD) 'Status is not Final'
-	3.  CompareAll(MAINTPRODSTRUCT-u: MAINTFEATURE.STATUS) = 0020 (Final)
-	ErrorMessage LD(MAINTFEATURE) 'Status is not Final'
-	
-	*/
-    protected void doDQChecking(EntityItem rootEntity, String statusFlag) throws Exception
-    {
-		if(STATUS_DRAFT.equals(statusFlag) || STATUS_CHGREQ.equals(statusFlag)) // 'Draft or Ready for Review'
-		{
-	        EntityItem mdlItem = m_elist.getEntityGroup("SVCMOD").getEntityItem(0); // has to exist
-	        EntityItem fcItem = m_elist.getEntityGroup("SWSFEATURE").getEntityItem(0); // has to exist
-
-			//3.	CompareAll(MAINTPRODSTRUCT-d: SVCMOD.STATUS) = 0020 (Final) or 0040 (Ready for Review)
-			//ErrorMessage LD(SVCMOD) 'Status is not Ready for Review or Final'
-			String status = getAttributeFlagEnabledValue(mdlItem , "STATUS");
-			addDebug(mdlItem.getKey()+" check status "+status);
-			if (status==null){
-				status = STATUS_FINAL;
-			}
-
-			if (!STATUS_FINAL.equals(status) && !STATUS_R4REVIEW.equals(status)){
-				addDebug(mdlItem.getKey()+" is not Final or R4R");
-				//NOT_R4R_FINAL_ERR = {0} {1} is not Ready for Review or Final.
-				args[0] = mdlItem.getEntityGroup().getLongDescription();
-				args[1] = getNavigationName(mdlItem);
-				addError("NOT_R4R_FINAL_ERR",args);
-			}
-			//4.	CompareAll(MAINTPRODSTRUCT-u: MAINTFEATURE.STATUS) = 0020 (Final) or 0040 (Ready for Review)
-			//ErrorMessage LD(MAINTFEATURE 'Status is not Ready for Review or Final'
-			status = getAttributeFlagEnabledValue(fcItem , "STATUS");
-			addDebug(fcItem.getKey()+" check status "+status);
-			if (status==null){
-				status = STATUS_FINAL;
-			}
-
-			if (!STATUS_FINAL.equals(status) && !STATUS_R4REVIEW.equals(status)){
-				addDebug(fcItem.getKey()+" is not Final or R4R");
-				//NOT_R4R_FINAL_ERR = {0} {1} is not Ready for Review or Final.
-				args[0] = fcItem.getEntityGroup().getLongDescription();
-				args[1] = getNavigationName(fcItem);
-				addError("NOT_R4R_FINAL_ERR",args);
-			}
-		}
-
-		if(STATUS_R4REVIEW.equals(statusFlag)) // 'Ready for Review to Final'
-		{
-			//2.CompareAll(SVCPRODSTRUCT-d: MODEL.STATUS) = 0020 (Final)
-			//ErrorMessage LD(MODEL) ' is not Final'
-			checkStatus("SVCMOD");
-
-			//3.CompareAll(SVCPRODSTRUCT-d: SVCFEATURE.STATUS) = 0020 (Final)
-			//ErrorMessage LD(SVCFEATURE) ' is not Final'
-			checkStatus("SWSFEATURE");
-			
-		}
-	}
-
-
-    /***********************************************
-    *  Get ABR description
-    *
-    *@return java.lang.String
-    */
-    public String getDescription()
-    {
-        String desc =  "SWSPRODSTRUCT ABR";
-        return desc;
-    }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getABRVersion()
-    {
-        return "1.0";
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\SWSPRODSTRUCTABRSTATUS.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

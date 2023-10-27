@@ -1,1719 +1,1725 @@
-//Licensed Materials -- Property of IBM
+/*      */ package COM.ibm.eannounce.abr.sg.bh;
+/*      */ 
+/*      */ import COM.ibm.eannounce.abr.util.ABRUtil;
+/*      */ import COM.ibm.eannounce.abr.util.EACustom;
+/*      */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*      */ import COM.ibm.eannounce.objects.AttributeChangeHistoryGroup;
+/*      */ import COM.ibm.eannounce.objects.EANAttribute;
+/*      */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*      */ import COM.ibm.eannounce.objects.EANList;
+/*      */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*      */ import COM.ibm.eannounce.objects.EANTableWrapper;
+/*      */ import COM.ibm.eannounce.objects.EntityGroup;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.EntityList;
+/*      */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*      */ import COM.ibm.eannounce.objects.RowSelectableTable;
+/*      */ import COM.ibm.eannounce.objects.SBRException;
+/*      */ import COM.ibm.opicmpdh.middleware.D;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*      */ import COM.ibm.opicmpdh.middleware.Profile;
+/*      */ import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
+/*      */ import COM.ibm.opicmpdh.middleware.Stopwatch;
+/*      */ import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+/*      */ import COM.ibm.opicmpdh.objects.Attribute;
+/*      */ import COM.ibm.opicmpdh.objects.SingleFlag;
+/*      */ import COM.ibm.opicmpdh.objects.Text;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.io.BufferedInputStream;
+/*      */ import java.io.BufferedReader;
+/*      */ import java.io.File;
+/*      */ import java.io.FileInputStream;
+/*      */ import java.io.FileOutputStream;
+/*      */ import java.io.InputStreamReader;
+/*      */ import java.io.OutputStreamWriter;
+/*      */ import java.io.PrintWriter;
+/*      */ import java.io.StringWriter;
+/*      */ import java.rmi.RemoteException;
+/*      */ import java.sql.PreparedStatement;
+/*      */ import java.sql.ResultSet;
+/*      */ import java.sql.SQLException;
+/*      */ import java.text.MessageFormat;
+/*      */ import java.util.HashSet;
+/*      */ import java.util.Hashtable;
+/*      */ import java.util.Iterator;
+/*      */ import java.util.ResourceBundle;
+/*      */ import java.util.Set;
+/*      */ import java.util.Vector;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public class BHINVNAMABRSTATUS
+/*      */   extends PokBaseABR
+/*      */ {
+/*      */   private static final int MAXFILE_SIZE = 5000000;
+/*  112 */   private StringBuffer rptSb = new StringBuffer();
+/*  113 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/*      */   
+/*      */   private static final int MAX_LEN = 30;
+/*      */   private static final int UPDATE_SIZE = 200;
+/*  117 */   static final String NEWLINE = new String(FOOL_JTEST);
+/*  118 */   private Object[] args = (Object[])new String[10];
+/*      */   
+/*  120 */   private ResourceBundle rsBundle = null;
+/*  121 */   private Hashtable metaTbl = new Hashtable<>();
+/*  122 */   private String navName = "";
+/*  123 */   private PrintWriter dbgPw = null;
+/*  124 */   private String dbgfn = null;
+/*  125 */   private int dbgLen = 0;
+/*  126 */   private int abr_debuglvl = 0;
+/*      */   
+/*  128 */   private HashSet swfeatSet = new HashSet();
+/*      */   
+/*  130 */   private Set dupelistedSet = new HashSet();
+/*  131 */   private Hashtable invGrpInvnameTbl = new Hashtable<>();
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private static final String WG_SRCHACTION_NAME = "SRDWG";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private static final String STATUS_FINAL = "0020";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private static final String STATUS_RFR = "0040";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private static final String STATUS_CHGREQ = "0050";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private static final String DQ_CHGREQ = "0050";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private static final String BHVINVNAME_SQL = "select tf.entityid as entityid, tf.entitytype as entitytype, t.attributevalue as INVNAME, f1.attributevalue as INVENTORYGROUP, RTRIM(tf.attributevalue) as FEATURECODE,  f2.attributevalue as STATUS from opicm.text tf join opicm.flag p on tf.entitytype=p.entitytype and tf.entityid=p.entityid join opicm.flag f1 on tf.entitytype=f1.entitytype and tf.entityid=f1.entityid left join opicm.flag f2 on tf.entitytype=f2.entitytype and tf.entityid=f2.entityid and f2.attributecode='STATUS' and f2.enterprise=? and f2.valto>current timestamp and f2.effto>current timestamp left join opicm.text t on tf.entitytype=t.entitytype and tf.entityid=t.entityid and t.attributecode='INVNAME' and t.enterprise=? and t.valto>current timestamp and t.effto>current timestamp and t.nlsid=1 where tf.entitytype='FEATURE' and tf.attributecode ='FEATURECODE' and tf.enterprise=? and p.attributecode = 'PDHDOMAIN' and p.attributevalue=? and p.enterprise=? and f1.attributecode='INVENTORYGROUP' and f1.enterprise=? and tf.valto>current timestamp and tf.effto>current timestamp and p.valto>current timestamp and p.effto>current timestamp and f1.valto>current timestamp and f1.effto>current timestamp and not exists( select tbh.attributevalue from opicm.text tbh where tbh.entitytype=tf.entitytype and tbh.entityid=tf.entityid and tbh.attributecode='BHINVNAME' and tbh.valto>current timestamp and tbh.effto>current timestamp and tbh.nlsid=1) UNION select tf.entityid as entityid, tf.entitytype as entitytype, t.attributevalue as INVNAME, f1.attributevalue as INVENTORYGROUP, RTRIM(tf.attributevalue) as FEATURECODE, f2.attributevalue as STATUS from opicm.text tf join opicm.flag p on tf.entitytype=p.entitytype and tf.entityid=p.entityid join opicm.flag f1 on tf.entitytype=f1.entitytype and tf.entityid=f1.entityid join opicm.text t on tf.entitytype=t.entitytype and tf.entityid=t.entityid join opicm.text tbh on tf.entitytype=tbh.entitytype and tf.entityid=tbh.entityid left join opicm.flag f2 on tf.entitytype=f2.entitytype and tf.entityid=f2.entityid and f2.attributecode='STATUS' and f2.enterprise=? and f2.valto>current timestamp and f2.effto>current timestamp where tf.entitytype='FEATURE' and tf.attributecode ='FEATURECODE' and tf.enterprise=? and tf.nlsid=1 and p.attributecode = 'PDHDOMAIN' and p.attributevalue=? and p.enterprise=? and t.attributecode='INVNAME' and t.enterprise=? and t.nlsid=1 and f1.attributecode='INVENTORYGROUP' and f1.enterprise=? and tbh.attributecode='BHINVNAME' and tbh.enterprise=? and tbh.nlsid=1 and tf.valto>current timestamp and tf.effto>current timestamp and p.valto>current timestamp and p.effto>current timestamp and t.valto>current timestamp and t.effto>current timestamp and f1.valto>current timestamp and f1.effto>current timestamp and tbh.valto>current timestamp and tbh.effto>current timestamp and t.valfrom > tbh.valfrom order by featurecode asc with ur; ";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private static final String INVGRP_INVNAME_SQL = "select tf.entityid as entityid, tf.entitytype as entitytype, t.attributevalue as INVNAME, f1.attributevalue as INVENTORYGROUP, RTRIM(tf.attributevalue) as FEATURECODE  from opicm.text tf join opicm.flag f1 on tf.entitytype=f1.entitytype and tf.entityid=f1.entityid left join opicm.text t on tf.entitytype=t.entitytype and tf.entityid=t.entityid and tf.nlsid=t.nlsid and t.attributecode='INVNAME' and t.enterprise=? and t.valto>current timestamp and t.effto>current timestamp where tf.entitytype='FEATURE' and tf.attributecode ='FEATURECODE' and tf.enterprise=? and tf.nlsid=1 and f1.attributecode='INVENTORYGROUP' and f1.attributevalue=? and f1.enterprise=? and tf.valto>current timestamp and tf.effto>current timestamp and f1.valto>current timestamp and f1.effto>current timestamp order by featurecode asc with ur";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private static final int MW_VENTITY_LIMIT;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private PreparedStatement invgrpPs;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private PreparedStatement bhinvnameStatement;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   static {
+/*  257 */     String str = ABRServerProperties.getValue("BHINVNAMABRSTATUS", "_velimit", "5");
+/*      */     
+/*  259 */     MW_VENTITY_LIMIT = Integer.parseInt(str);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*  264 */   private Vector vctReturnsEntityKeys = new Vector();
+/*      */   
+/*  266 */   private EntityGroup featureGroup = null;
+/*  267 */   private Hashtable setInvNameTbl = new Hashtable<>();
+/*  268 */   private StringBuffer updatedSB = new StringBuffer();
+/*      */   
+/*      */   private void setupPrintWriter() {
+/*  271 */     String str = this.m_abri.getFileName();
+/*  272 */     int i = str.lastIndexOf(".");
+/*  273 */     this.dbgfn = str.substring(0, i + 1) + "dbg";
+/*      */     try {
+/*  275 */       this.dbgPw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.dbgfn, true), "UTF-8"));
+/*  276 */     } catch (Exception exception) {
+/*  277 */       this.dbgfn = null;
+/*  278 */       D.ebug(0, "trouble creating debug PrintWriter " + exception);
+/*      */     } 
+/*      */   }
+/*      */   private void closePrintWriter() {
+/*  282 */     if (this.dbgPw != null) {
+/*  283 */       this.dbgPw.flush();
+/*  284 */       this.dbgPw.close();
+/*  285 */       this.dbgPw = null;
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void execute_run() {
+/*  314 */     String str1 = "<head>" + EACustom.getMetaTags(getDescription()) + NEWLINE + EACustom.getCSS() + NEWLINE + EACustom.getTitle("{0} {1}") + NEWLINE + "</head>" + NEWLINE + "<body id=\"ibm-com\">" + EACustom.getMastheadDiv() + NEWLINE + "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
+/*      */     
+/*  316 */     String str2 = "<table>" + NEWLINE + "<tr><th>Userid: </th><td>{0}</td></tr>" + NEWLINE + "<tr><th>Role: </th><td>{1}</td></tr>" + NEWLINE + "<tr><th>Workgroup: </th><td>{2}</td></tr>" + NEWLINE + "<tr><th>Date: </th><td>{3}</td></tr>" + NEWLINE + "<tr><th>Description: </th><td>{4}</td></tr>" + NEWLINE + "<tr><th>Return code: </th><td>{5}</td></tr>" + NEWLINE + "</table>" + NEWLINE + "<!-- {6} -->" + NEWLINE;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  327 */     String str3 = "";
+/*      */     
+/*  329 */     println(EACustom.getDocTypeHtml());
+/*      */ 
+/*      */     
+/*      */     try {
+/*  333 */       long l = System.currentTimeMillis();
+/*  334 */       start_ABRBuild();
+/*      */       
+/*  336 */       this.abr_debuglvl = ABRServerProperties.getABRDebugLevel(this.m_abri.getABRCode());
+/*      */       
+/*  338 */       setupPrintWriter();
+/*      */       
+/*  340 */       this.m_prof.setReadLanguage(Profile.ENGLISH_LANGUAGE);
+/*      */ 
+/*      */       
+/*  343 */       this.rsBundle = ResourceBundle.getBundle(getClass().getName(), ABRUtil.getLocale(this.m_prof.getReadLanguage().getNLSID()));
+/*      */       
+/*  345 */       EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*      */       
+/*  347 */       addDebug("DEBUG: " + getShortClassName(getClass()) + " entered for " + entityItem.getKey() + " extract: " + this.m_abri
+/*  348 */           .getVEName() + " using DTS: " + this.m_prof.getValOn() + NEWLINE + PokUtils.outputList(this.m_elist));
+/*      */ 
+/*      */       
+/*  351 */       setReturnCode(0);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  357 */       this.navName = getNavigationName(entityItem);
+/*      */       
+/*  359 */       String str = PokUtils.getAttributeFlagValue(entityItem, "PDHDOMAIN");
+/*  360 */       addDebug(entityItem.getKey() + " pdhdomain: " + str);
+/*  361 */       if (str != null) {
+/*      */         
+/*  363 */         String[] arrayOfString = PokUtils.convertToArray(str);
+/*  364 */         if (arrayOfString.length > 1) {
+/*      */           
+/*  366 */           this.args[0] = getLD_Value(entityItem, "PDHDOMAIN");
+/*  367 */           addError("INVALID_DOMAIN_ERR", this.args);
+/*      */         } else {
+/*  369 */           str = arrayOfString[0];
+/*      */         } 
+/*      */       } else {
+/*      */         
+/*  373 */         this.args[0] = getLD_Value(entityItem, "PDHDOMAIN");
+/*  374 */         addError("INVALID_DOMAIN_ERR", this.args);
+/*      */       } 
+/*      */       
+/*  377 */       if (getReturnCode() == 0) {
+/*      */         
+/*  379 */         this.bhinvnameStatement = this.m_db.getPDHConnection().prepareStatement("select tf.entityid as entityid, tf.entitytype as entitytype, t.attributevalue as INVNAME, f1.attributevalue as INVENTORYGROUP, RTRIM(tf.attributevalue) as FEATURECODE,  f2.attributevalue as STATUS from opicm.text tf join opicm.flag p on tf.entitytype=p.entitytype and tf.entityid=p.entityid join opicm.flag f1 on tf.entitytype=f1.entitytype and tf.entityid=f1.entityid left join opicm.flag f2 on tf.entitytype=f2.entitytype and tf.entityid=f2.entityid and f2.attributecode='STATUS' and f2.enterprise=? and f2.valto>current timestamp and f2.effto>current timestamp left join opicm.text t on tf.entitytype=t.entitytype and tf.entityid=t.entityid and t.attributecode='INVNAME' and t.enterprise=? and t.valto>current timestamp and t.effto>current timestamp and t.nlsid=1 where tf.entitytype='FEATURE' and tf.attributecode ='FEATURECODE' and tf.enterprise=? and p.attributecode = 'PDHDOMAIN' and p.attributevalue=? and p.enterprise=? and f1.attributecode='INVENTORYGROUP' and f1.enterprise=? and tf.valto>current timestamp and tf.effto>current timestamp and p.valto>current timestamp and p.effto>current timestamp and f1.valto>current timestamp and f1.effto>current timestamp and not exists( select tbh.attributevalue from opicm.text tbh where tbh.entitytype=tf.entitytype and tbh.entityid=tf.entityid and tbh.attributecode='BHINVNAME' and tbh.valto>current timestamp and tbh.effto>current timestamp and tbh.nlsid=1) UNION select tf.entityid as entityid, tf.entitytype as entitytype, t.attributevalue as INVNAME, f1.attributevalue as INVENTORYGROUP, RTRIM(tf.attributevalue) as FEATURECODE, f2.attributevalue as STATUS from opicm.text tf join opicm.flag p on tf.entitytype=p.entitytype and tf.entityid=p.entityid join opicm.flag f1 on tf.entitytype=f1.entitytype and tf.entityid=f1.entityid join opicm.text t on tf.entitytype=t.entitytype and tf.entityid=t.entityid join opicm.text tbh on tf.entitytype=tbh.entitytype and tf.entityid=tbh.entityid left join opicm.flag f2 on tf.entitytype=f2.entitytype and tf.entityid=f2.entityid and f2.attributecode='STATUS' and f2.enterprise=? and f2.valto>current timestamp and f2.effto>current timestamp where tf.entitytype='FEATURE' and tf.attributecode ='FEATURECODE' and tf.enterprise=? and tf.nlsid=1 and p.attributecode = 'PDHDOMAIN' and p.attributevalue=? and p.enterprise=? and t.attributecode='INVNAME' and t.enterprise=? and t.nlsid=1 and f1.attributecode='INVENTORYGROUP' and f1.enterprise=? and tbh.attributecode='BHINVNAME' and tbh.enterprise=? and tbh.nlsid=1 and tf.valto>current timestamp and tf.effto>current timestamp and p.valto>current timestamp and p.effto>current timestamp and t.valto>current timestamp and t.effto>current timestamp and f1.valto>current timestamp and f1.effto>current timestamp and tbh.valto>current timestamp and tbh.effto>current timestamp and t.valfrom > tbh.valfrom order by featurecode asc with ur; ");
+/*  380 */         this.invgrpPs = this.m_db.getPDHConnection().prepareStatement("select tf.entityid as entityid, tf.entitytype as entitytype, t.attributevalue as INVNAME, f1.attributevalue as INVENTORYGROUP, RTRIM(tf.attributevalue) as FEATURECODE  from opicm.text tf join opicm.flag f1 on tf.entitytype=f1.entitytype and tf.entityid=f1.entityid left join opicm.text t on tf.entitytype=t.entitytype and tf.entityid=t.entityid and tf.nlsid=t.nlsid and t.attributecode='INVNAME' and t.enterprise=? and t.valto>current timestamp and t.effto>current timestamp where tf.entitytype='FEATURE' and tf.attributecode ='FEATURECODE' and tf.enterprise=? and tf.nlsid=1 and f1.attributecode='INVENTORYGROUP' and f1.attributevalue=? and f1.enterprise=? and tf.valto>current timestamp and tf.effto>current timestamp and f1.valto>current timestamp and f1.effto>current timestamp order by featurecode asc with ur");
+/*      */         
+/*  382 */         processFeature(str);
+/*      */         
+/*  384 */         this.rptSb.append(this.updatedSB.toString());
+/*  385 */         long l1 = System.currentTimeMillis();
+/*  386 */         addDebug("Time to process FEATUREs: " + Stopwatch.format(l1 - l));
+/*      */         
+/*  388 */         this.updatedSB.setLength(0);
+/*  389 */         processSWFeature(entityItem, str);
+/*  390 */         addDebug("Time to process SWFEATUREs: " + Stopwatch.format(System.currentTimeMillis() - l1));
+/*      */       } 
+/*      */       
+/*  393 */       addDebug("Total Time: " + Stopwatch.format(System.currentTimeMillis() - l));
+/*      */     }
+/*  395 */     catch (Throwable throwable) {
+/*  396 */       StringWriter stringWriter = new StringWriter();
+/*  397 */       String str5 = "<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
+/*  398 */       String str6 = "<pre>{0}</pre>";
+/*  399 */       MessageFormat messageFormat1 = new MessageFormat(str5);
+/*  400 */       setReturnCode(-3);
+/*  401 */       throwable.printStackTrace(new PrintWriter(stringWriter));
+/*      */       
+/*  403 */       this.args[0] = throwable.getMessage();
+/*  404 */       this.rptSb.append(messageFormat1.format(this.args) + NEWLINE);
+/*  405 */       messageFormat1 = new MessageFormat(str6);
+/*  406 */       this.args[0] = stringWriter.getBuffer().toString();
+/*      */       
+/*  408 */       this.rptSb.append(this.updatedSB.toString());
+/*  409 */       this.updatedSB.setLength(0);
+/*      */       
+/*  411 */       this.rptSb.append(messageFormat1.format(this.args) + NEWLINE);
+/*  412 */       logError("Exception: " + throwable.getMessage());
+/*  413 */       logError(stringWriter.getBuffer().toString());
+/*      */     } finally {
+/*      */       
+/*  416 */       closeStatements();
+/*      */       
+/*  418 */       setDGTitle(this.navName);
+/*  419 */       setDGRptName(getShortClassName(getClass()));
+/*  420 */       setDGRptClass(getABRCode());
+/*      */       
+/*  422 */       if (!isReadOnly()) {
+/*  423 */         clearSoftLock();
+/*      */       }
+/*  425 */       closePrintWriter();
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/*  430 */     MessageFormat messageFormat = new MessageFormat(str1);
+/*  431 */     this.args[0] = getDescription();
+/*  432 */     this.args[1] = this.navName;
+/*  433 */     String str4 = messageFormat.format(this.args);
+/*  434 */     messageFormat = new MessageFormat(str2);
+/*  435 */     this.args[0] = this.m_prof.getOPName();
+/*  436 */     this.args[1] = this.m_prof.getRoleDescription();
+/*  437 */     this.args[2] = this.m_prof.getWGName();
+/*  438 */     this.args[3] = getNow();
+/*  439 */     this.args[4] = this.navName;
+/*  440 */     this.args[5] = (getReturnCode() == 0) ? "Passed" : "Failed";
+/*  441 */     this.args[6] = str3 + " " + getABRVersion();
+/*      */     
+/*  443 */     this.rptSb.append(this.updatedSB.toString());
+/*      */     
+/*  445 */     restoreXtraContent();
+/*      */     
+/*  447 */     this.rptSb.insert(0, str4 + messageFormat.format(this.args) + NEWLINE);
+/*      */     
+/*  449 */     println(this.rptSb.toString());
+/*  450 */     printDGSubmitString();
+/*  451 */     println(EACustom.getTOUDiv());
+/*  452 */     buildReportFooter();
+/*      */     
+/*  454 */     this.metaTbl.clear();
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private void restoreXtraContent() {
+/*  459 */     if (this.dbgfn != null && this.dbgLen + this.rptSb.length() < 5000000) {
+/*      */       
+/*  461 */       BufferedInputStream bufferedInputStream = null;
+/*  462 */       FileInputStream fileInputStream = null;
+/*  463 */       BufferedReader bufferedReader = null;
+/*      */       try {
+/*  465 */         fileInputStream = new FileInputStream(this.dbgfn);
+/*  466 */         bufferedInputStream = new BufferedInputStream(fileInputStream);
+/*      */         
+/*  468 */         String str = null;
+/*  469 */         StringBuffer stringBuffer = new StringBuffer();
+/*  470 */         bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream, "UTF-8"));
+/*      */         
+/*  472 */         while ((str = bufferedReader.readLine()) != null) {
+/*  473 */           stringBuffer.append(str + NEWLINE);
+/*      */         }
+/*  475 */         this.rptSb.append("<!-- " + stringBuffer.toString() + " -->" + NEWLINE);
+/*      */ 
+/*      */         
+/*  478 */         File file = new File(this.dbgfn);
+/*  479 */         if (file.exists()) {
+/*  480 */           file.delete();
+/*      */         }
+/*  482 */       } catch (Exception exception) {
+/*  483 */         exception.printStackTrace();
+/*      */       } finally {
+/*  485 */         if (bufferedInputStream != null) {
+/*      */           try {
+/*  487 */             bufferedInputStream.close();
+/*  488 */           } catch (Exception exception) {
+/*  489 */             exception.printStackTrace();
+/*      */           } 
+/*      */         }
+/*  492 */         if (fileInputStream != null) {
+/*      */           try {
+/*  494 */             fileInputStream.close();
+/*  495 */           } catch (Exception exception) {
+/*  496 */             exception.printStackTrace();
+/*      */           } 
+/*      */         }
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void processFeature(String paramString) throws SQLException, MiddlewareRequestException, MiddlewareException, MiddlewareShutdownInProgressException, RemoteException, EANBusinessRuleException {
+/*  539 */     addDebug("processFeature for pdhdomain " + paramString);
+/*  540 */     this.featureGroup = new EntityGroup(null, this.m_db, this.m_prof, "FEATURE", "Edit", false);
+/*      */     
+/*  542 */     addHeading(3, this.featureGroup.getLongDescription() + " Checks:");
+/*      */ 
+/*      */     
+/*  545 */     EANMetaAttribute eANMetaAttribute = this.featureGroup.getMetaAttribute("BHINVNAME");
+/*  546 */     if (eANMetaAttribute == null) {
+/*      */ 
+/*      */       
+/*  549 */       this.args[0] = "BHINVNAME";
+/*  550 */       this.args[1] = this.featureGroup.getEntityType();
+/*  551 */       addError("META_ERR", this.args);
+/*      */       
+/*      */       return;
+/*      */     } 
+/*  555 */     long l1 = System.currentTimeMillis();
+/*      */     
+/*  557 */     Vector<EntityInfo> vector = getHWEntities(paramString);
+/*  558 */     long l2 = System.currentTimeMillis();
+/*  559 */     addDebug("Time to get FEATUREs: " + Stopwatch.format(l2 - l1) + " fcvct.size " + vector.size()); int i;
+/*  560 */     for (i = 0; i < vector.size(); i++) {
+/*  561 */       EntityInfo entityInfo = vector.elementAt(i);
+/*  562 */       setBHInvnameHW(entityInfo);
+/*  563 */       entityInfo.dereference();
+/*  564 */       if (this.vctReturnsEntityKeys.size() >= 200) {
+/*      */         
+/*  566 */         updatePDH();
+/*  567 */         this.vctReturnsEntityKeys.clear();
+/*  568 */         long l = System.currentTimeMillis();
+/*  569 */         addDebug("Time to update 200 features: " + Stopwatch.format(l - l2));
+/*  570 */         l2 = l;
+/*      */       } 
+/*      */     } 
+/*  573 */     vector.clear();
+/*      */     
+/*  575 */     if (this.vctReturnsEntityKeys.size() > 0) {
+/*      */       
+/*  577 */       i = this.vctReturnsEntityKeys.size();
+/*  578 */       updatePDH();
+/*  579 */       addDebug("Time to update " + i + " features: " + 
+/*  580 */           Stopwatch.format(System.currentTimeMillis() - l2));
+/*  581 */       this.vctReturnsEntityKeys.clear();
+/*      */     } 
+/*      */ 
+/*      */     
+/*  585 */     Iterator<String> iterator = this.invGrpInvnameTbl.keySet().iterator();
+/*  586 */     while (iterator.hasNext()) {
+/*  587 */       String str = iterator.next();
+/*  588 */       Hashtable hashtable = (Hashtable)this.invGrpInvnameTbl.get(str);
+/*  589 */       Iterator<String> iterator1 = hashtable.keySet().iterator();
+/*  590 */       while (iterator1.hasNext()) {
+/*  591 */         String str1 = iterator1.next();
+/*  592 */         InvnameInfo invnameInfo = (InvnameInfo)hashtable.get(str1);
+/*  593 */         invnameInfo.dereference();
+/*      */       } 
+/*  595 */       hashtable.clear();
+/*      */     } 
+/*      */     
+/*  598 */     this.invGrpInvnameTbl.clear();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setBHInvnameHW(EntityInfo paramEntityInfo) throws MiddlewareRequestException, SQLException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  625 */     String str1 = paramEntityInfo.fcode;
+/*  626 */     String str2 = null;
+/*  627 */     String str3 = paramEntityInfo.invname;
+/*  628 */     String str4 = paramEntityInfo.invGrp;
+/*  629 */     addDebug(4, "setBHInvnameHW checking " + paramEntityInfo);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  638 */     if (!checkDuplicateHWInvname(str4, str3)) {
+/*  639 */       str2 = str3;
+/*      */     } else {
+/*  641 */       str2 = str1 + "-" + str3;
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/*  646 */     if (str2.length() > 254) {
+/*  647 */       addDebug(4, "setBHInvnameHW ERROR " + paramEntityInfo + " bhinvname exceeds text limit " + str2);
+/*  648 */       str2 = str2.substring(0, 253);
+/*      */     } 
+/*      */ 
+/*      */     
+/*  652 */     setTextValue("BHINVNAME", str2, paramEntityInfo);
+/*      */ 
+/*      */     
+/*  655 */     if (str2.length() > 30) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  660 */       EntityItem entityItem = new EntityItem(this.featureGroup, this.m_prof, this.m_db, paramEntityInfo.entityType, paramEntityInfo.entityid);
+/*  661 */       this.args[0] = getLD_NDN(entityItem);
+/*  662 */       this.args[1] = PokUtils.getAttributeDescription(this.featureGroup, "BHINVNAME", "BHINVNAME");
+/*  663 */       this.args[2] = str2;
+/*  664 */       addError("DERIVED_LEN_ERR", this.args);
+/*      */       
+/*  666 */       this.featureGroup.removeEntityItem(entityItem);
+/*  667 */       for (int i = entityItem.getAttributeCount() - 1; i >= 0; i--) {
+/*  668 */         EANAttribute eANAttribute = entityItem.getAttribute(i);
+/*  669 */         entityItem.removeAttribute(eANAttribute);
+/*      */       } 
+/*  671 */       entityItem.setParent(null);
+/*      */ 
+/*      */       
+/*  674 */       if ("0020".equals(paramEntityInfo.status) || "0040".equals(paramEntityInfo.status)) {
+/*  675 */         setStatusAndDQ(paramEntityInfo);
+/*      */       }
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean checkDuplicateHWInvname(String paramString1, String paramString2) throws SQLException {
+/*  691 */     ResultSet resultSet = null;
+/*  692 */     Hashtable<Object, Object> hashtable = (Hashtable)this.invGrpInvnameTbl.get(paramString1);
+/*  693 */     if (hashtable != null) {
+/*  694 */       InvnameInfo invnameInfo = (InvnameInfo)hashtable.get(paramString2);
+/*  695 */       if (invnameInfo != null && 
+/*  696 */         invnameInfo.count > 1) {
+/*  697 */         String str1 = paramString1 + paramString2;
+/*  698 */         if (!this.dupelistedSet.contains(str1)) {
+/*  699 */           this.dupelistedSet.add(str1);
+/*  700 */           addDebug(4, "found dupe: " + paramString1 + ": " + paramString2 + ": " + invnameInfo);
+/*      */         } 
+/*  702 */         return true;
+/*      */       } 
+/*      */       
+/*  705 */       return false;
+/*      */     } 
+/*      */     
+/*  708 */     String str = this.m_prof.getEnterprise();
+/*  709 */     long l = System.currentTimeMillis();
+/*      */     try {
+/*  711 */       this.invgrpPs.clearParameters();
+/*  712 */       this.invgrpPs.setString(1, str);
+/*  713 */       this.invgrpPs.setString(2, str);
+/*  714 */       this.invgrpPs.setString(3, paramString1);
+/*  715 */       this.invgrpPs.setString(4, str);
+/*      */       
+/*  717 */       resultSet = this.invgrpPs.executeQuery();
+/*  718 */       while (resultSet.next()) {
+/*  719 */         int i = resultSet.getInt(1);
+/*      */         
+/*  721 */         String str1 = resultSet.getString(3);
+/*  722 */         String str2 = resultSet.getString(4);
+/*  723 */         String str3 = resultSet.getString(5);
+/*      */ 
+/*      */         
+/*  726 */         if (str1 == null) {
+/*      */           continue;
+/*      */         }
+/*      */         
+/*  730 */         hashtable = (Hashtable)this.invGrpInvnameTbl.get(str2);
+/*  731 */         if (hashtable == null) {
+/*  732 */           hashtable = new Hashtable<>();
+/*  733 */           this.invGrpInvnameTbl.put(str2, hashtable);
+/*  734 */           hashtable.put(str1, new InvnameInfo(i, str3)); continue;
+/*      */         } 
+/*  736 */         InvnameInfo invnameInfo = (InvnameInfo)hashtable.get(str1);
+/*  737 */         if (invnameInfo == null) {
+/*  738 */           invnameInfo = new InvnameInfo(i, str3);
+/*  739 */           hashtable.put(str1, invnameInfo); continue;
+/*      */         } 
+/*  741 */         invnameInfo.addId(i, str3);
+/*      */       
+/*      */       }
+/*      */ 
+/*      */     
+/*      */     }
+/*  747 */     catch (SQLException sQLException) {
+/*  748 */       throw sQLException;
+/*      */     } finally {
+/*      */       
+/*  751 */       if (resultSet != null) {
+/*  752 */         resultSet.close();
+/*  753 */         resultSet = null;
+/*      */       } 
+/*  755 */       this.m_db.commit();
+/*  756 */       this.m_db.freeStatement();
+/*  757 */       this.m_db.isPending();
+/*      */     } 
+/*  759 */     addDebug(4, "Time to get INVNAMEs for " + paramString1 + " : " + Stopwatch.format(System.currentTimeMillis() - l));
+/*      */     
+/*  761 */     hashtable = (Hashtable<Object, Object>)this.invGrpInvnameTbl.get(paramString1);
+/*  762 */     if (hashtable != null) {
+/*  763 */       InvnameInfo invnameInfo = (InvnameInfo)hashtable.get(paramString2);
+/*  764 */       if (invnameInfo != null && 
+/*  765 */         invnameInfo.count > 1) {
+/*  766 */         return true;
+/*      */       }
+/*      */     } 
+/*      */     
+/*  770 */     return false;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void processSWFeature(EntityItem paramEntityItem, String paramString) throws Exception {
+/*  819 */     addDebug("processSWFeature for pdhdomain " + paramString);
+/*  820 */     this.featureGroup = new EntityGroup(null, this.m_db, this.m_prof, "SWFEATURE", "Edit", false);
+/*      */     
+/*  822 */     addHeading(3, this.featureGroup.getLongDescription() + " Checks:");
+/*      */ 
+/*      */     
+/*  825 */     EANMetaAttribute eANMetaAttribute = this.featureGroup.getMetaAttribute("BHINVNAME");
+/*  826 */     if (eANMetaAttribute == null) {
+/*      */ 
+/*      */       
+/*  829 */       this.args[0] = "BHINVNAME";
+/*  830 */       this.args[1] = this.featureGroup.getEntityType();
+/*  831 */       addError("META_ERR", this.args);
+/*      */       
+/*      */       return;
+/*      */     } 
+/*      */     
+/*  836 */     EntityItem entityItem = searchForWG(paramString);
+/*  837 */     if (entityItem == null) {
+/*      */       
+/*  839 */       this.args[0] = getLD_Value(paramEntityItem, "PDHDOMAIN");
+/*  840 */       addError("WG_NOTFND", this.args);
+/*      */       
+/*      */       return;
+/*      */     } 
+/*      */     
+/*  845 */     String str = "BHINVNAMEXT";
+/*      */     
+/*  847 */     EntityList entityList = this.m_db.getEntityList(this.m_prof, new ExtractActionItem(null, this.m_db, this.m_prof, str), new EntityItem[] { entityItem });
+/*      */ 
+/*      */     
+/*  850 */     addDebug("processSWFeature: Extract " + str + NEWLINE + PokUtils.outputList(entityList));
+/*      */ 
+/*      */     
+/*  853 */     EntityGroup entityGroup = entityList.getEntityGroup("MODEL");
+/*      */     
+/*  855 */     if (entityGroup.getEntityItemCount() > MW_VENTITY_LIMIT) {
+/*  856 */       int i = entityGroup.getEntityItemCount() / MW_VENTITY_LIMIT;
+/*  857 */       byte b1 = 0;
+/*  858 */       Vector<EntityItem> vector = new Vector(1);
+/*  859 */       for (byte b2 = 0; b2 <= i; b2++) {
+/*  860 */         vector.clear();
+/*  861 */         for (byte b = 0; b < MW_VENTITY_LIMIT && 
+/*  862 */           b1 != entityGroup.getEntityItemCount(); b++)
+/*      */         {
+/*      */           
+/*  865 */           vector.addElement(entityGroup.getEntityItem(b1++));
+/*      */         }
+/*  867 */         if (vector.size() > 0) {
+/*      */           
+/*  869 */           Vector vector1 = new Vector();
+/*  870 */           EntityList entityList1 = pullSWModelInfo(vector, vector1);
+/*  871 */           setBHInvnameSW(entityList1, vector1);
+/*  872 */           entityList1.dereference();
+/*  873 */           vector1.clear();
+/*      */         } 
+/*      */       } 
+/*  876 */       vector.clear();
+/*  877 */       vector = null;
+/*      */     }
+/*  879 */     else if (entityGroup.getEntityItemCount() > 0) {
+/*  880 */       Vector<EntityItem> vector = new Vector(1);
+/*  881 */       for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/*  882 */         vector.addElement(entityGroup.getEntityItem(b));
+/*      */       }
+/*      */       
+/*  885 */       Vector vector1 = new Vector();
+/*  886 */       EntityList entityList1 = pullSWModelInfo(vector, vector1);
+/*  887 */       setBHInvnameSW(entityList1, vector1);
+/*  888 */       entityList1.dereference();
+/*  889 */       vector1.clear();
+/*  890 */       vector.clear();
+/*  891 */       vector = null;
+/*      */     } 
+/*      */ 
+/*      */     
+/*  895 */     entityList.dereference();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityList pullSWModelInfo(Vector paramVector1, Vector<EntityInfo> paramVector2) throws Exception {
+/*  909 */     String str = "BHINVNAMEXT2";
+/*  910 */     EntityItem[] arrayOfEntityItem = new EntityItem[paramVector1.size()];
+/*  911 */     paramVector1.copyInto((Object[])arrayOfEntityItem);
+/*      */     
+/*  913 */     EntityList entityList = this.m_db.getEntityList(this.m_prof, new ExtractActionItem(null, this.m_db, this.m_prof, str), arrayOfEntityItem);
+/*      */ 
+/*      */     
+/*  916 */     addDebug(2, "pullSWModelInfo: Extract " + str + NEWLINE + PokUtils.outputList(entityList));
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  922 */     EntityGroup entityGroup = entityList.getParentEntityGroup();
+/*  923 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/*  924 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/*  925 */       Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(entityItem, "SWPRODSTRUCT", "SWFEATURE");
+/*  926 */       for (byte b1 = 0; b1 < vector.size(); b1++) {
+/*  927 */         EntityItem entityItem1 = vector.elementAt(b1);
+/*  928 */         if (this.swfeatSet.contains(entityItem1.getKey())) {
+/*  929 */           addDebug(4, "pullSWModelInfo: already handled " + entityItem1.getKey());
+/*      */         }
+/*      */         else {
+/*      */           
+/*  933 */           this.swfeatSet.add(entityItem1.getKey());
+/*  934 */           String str1 = PokUtils.getAttributeValue(entityItem1, "INVNAME", "", null, false);
+/*  935 */           if (str1 == null) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */             
+/*  942 */             EntityItem entityItem2 = (EntityItem)entityItem1.getDownLink(0);
+/*  943 */             String str2 = PokUtils.getAttributeValue(entityItem2, "INVNAME", "", null, false);
+/*  944 */             addDebug(2, "pullSWModelInfo: " + entityItem.getKey() + " " + entityItem1.getKey() + " invname " + str1 + " " + entityItem2
+/*  945 */                 .getKey() + " swpsinvname " + str2);
+/*  946 */             if (str2 != null) {
+/*      */               
+/*  948 */               EntityInfo entityInfo = new EntityInfo(entityItem1);
+/*  949 */               paramVector2.add(entityInfo);
+/*  950 */               setTextValue("INVNAME", str2, entityInfo);
+/*  951 */               entityInfo.invname = str2;
+/*  952 */               this.setInvNameTbl.put(entityItem1.getKey(), str2);
+/*      */             } else {
+/*      */               
+/*  955 */               this.args[0] = getLD_NDN(entityItem1);
+/*  956 */               this.args[1] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "INVNAME", "INVNAME");
+/*  957 */               addError("REQ_NOTPOPULATED_ERR", this.args);
+/*      */             
+/*      */             }
+/*      */           
+/*      */           }
+/*      */           else {
+/*      */             
+/*  964 */             String str2 = PokUtils.getAttributeValue(entityItem1, "BHINVNAME", ", ", null, false);
+/*  965 */             boolean bool = true;
+/*  966 */             if (str2 != null) {
+/*  967 */               addDebug(4, "pullSWModelInfo: " + entityItem.getKey() + " " + entityItem1.getKey() + " invname " + str1 + " bhinvname " + str2);
+/*      */               
+/*  969 */               String str3 = getTimestamp(entityItem1, "INVNAME");
+/*      */               
+/*  971 */               String str4 = getTimestamp(entityItem1, "BHINVNAME");
+/*  972 */               addDebug(4, "pullSWModelInfo:         invnameDts: " + str3 + " bhinvnameDts: " + str4);
+/*  973 */               bool = (str4.compareTo(str3) < 0) ? true : false;
+/*      */             } 
+/*  975 */             if (bool) {
+/*  976 */               EntityInfo entityInfo = new EntityInfo(entityItem1);
+/*  977 */               paramVector2.add(entityInfo);
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*  981 */       }  vector.clear();
+/*      */     } 
+/*      */     
+/*  984 */     return entityList;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityItem searchForWG(String paramString) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  998 */     Vector<String> vector1 = new Vector(1);
+/*  999 */     Vector<String> vector2 = new Vector(1);
+/* 1000 */     vector1.addElement("PDHDOMAIN");
+/* 1001 */     vector2.addElement(paramString);
+/* 1002 */     EntityItem entityItem = null;
+/* 1003 */     EntityItem[] arrayOfEntityItem = null;
+/*      */     try {
+/* 1005 */       StringBuffer stringBuffer = new StringBuffer();
+/* 1006 */       addDebug("searchForWG using attrs: " + vector1 + " values: " + vector2);
+/* 1007 */       arrayOfEntityItem = ABRUtil.doSearch(getDatabase(), this.m_prof, "SRDWG", "WG", false, vector1, vector2, stringBuffer);
+/*      */       
+/* 1009 */       if (stringBuffer.length() > 0) {
+/* 1010 */         addDebug(stringBuffer.toString());
+/*      */       }
+/* 1012 */     } catch (SBRException sBRException) {
+/*      */       
+/* 1014 */       StringWriter stringWriter = new StringWriter();
+/* 1015 */       sBRException.printStackTrace(new PrintWriter(stringWriter));
+/* 1016 */       addDebug("searchForWG SBRException: " + stringWriter.getBuffer().toString());
+/*      */     } 
+/*      */     
+/* 1019 */     if (arrayOfEntityItem != null) {
+/* 1020 */       for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/* 1021 */         String str = PokUtils.getAttributeFlagValue(arrayOfEntityItem[b], "PDHDOMAIN");
+/* 1022 */         addDebug("searchForWG found " + arrayOfEntityItem[b].getKey() + " wgdomain " + str);
+/* 1023 */         if (paramString.equals(str)) {
+/* 1024 */           entityItem = arrayOfEntityItem[b];
+/*      */           
+/*      */           break;
+/*      */         } 
+/*      */       } 
+/*      */     }
+/* 1030 */     vector1.clear();
+/* 1031 */     vector2.clear();
+/* 1032 */     return entityItem;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setBHInvnameSW(EntityList paramEntityList, Vector<EntityInfo> paramVector) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException, RemoteException, EANBusinessRuleException {
+/* 1076 */     EntityGroup entityGroup = paramEntityList.getEntityGroup("SWFEATURE");
+/* 1077 */     for (byte b = 0; b < paramVector.size(); b++) {
+/* 1078 */       EntityInfo entityInfo = paramVector.elementAt(b);
+/* 1079 */       EntityItem entityItem = entityGroup.getEntityItem(entityInfo.entityType + entityInfo.entityid);
+/*      */       
+/* 1081 */       String str1 = entityInfo.fcode;
+/* 1082 */       String str2 = PokUtils.getAttributeValue(entityItem, "BHINVNAME", ", ", null, false);
+/* 1083 */       String str3 = entityInfo.invname;
+/* 1084 */       addDebug(4, "setBHInvnameSW checking " + entityItem.getKey() + " fcode: " + str1 + " invname: " + str3 + " bhinvname " + str2 + " swps.count " + entityItem
+/* 1085 */           .getDownLinkCount());
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1098 */       if (uniqueSWPS(entityItem, str3)) {
+/* 1099 */         str2 = str3;
+/*      */       } else {
+/* 1101 */         str2 = str1 + "-" + str3;
+/*      */       } 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1106 */       if (str2.length() > 254) {
+/* 1107 */         addDebug(4, "setBHInvnameSW ERROR " + entityItem.getKey() + " bhinvname exceeds text limit " + str2);
+/* 1108 */         str2 = str2.substring(0, 253);
+/*      */       } 
+/*      */ 
+/*      */       
+/* 1112 */       setTextValue("BHINVNAME", str2, entityInfo);
+/*      */ 
+/*      */       
+/* 1115 */       if (str2.length() > 30) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1121 */         this.args[0] = getLD_NDN(entityItem);
+/* 1122 */         this.args[1] = PokUtils.getAttributeDescription(entityItem.getEntityGroup(), "BHINVNAME", "BHINVNAME");
+/* 1123 */         this.args[2] = str2;
+/* 1124 */         addError("DERIVED_LEN_ERR", this.args);
+/*      */ 
+/*      */         
+/* 1127 */         if ("0020".equals(entityInfo.status) || "0040".equals(entityInfo.status)) {
+/* 1128 */           setStatusAndDQ(entityInfo);
+/*      */         }
+/*      */       } 
+/*      */       
+/* 1132 */       entityInfo.dereference();
+/*      */     } 
+/*      */     
+/* 1135 */     if (this.vctReturnsEntityKeys.size() > 0) {
+/*      */       
+/* 1137 */       updatePDH();
+/* 1138 */       this.vctReturnsEntityKeys.clear();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean uniqueSWPS(EntityItem paramEntityItem, String paramString) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 1160 */     boolean bool = true;
+/*      */     
+/* 1162 */     Vector<EntityItem> vector1 = PokUtils.getAllLinkedEntities(paramEntityItem, "SWPRODSTRUCT", "MODEL");
+/* 1163 */     StringBuffer stringBuffer = new StringBuffer();
+/* 1164 */     for (byte b1 = 0; b1 < vector1.size(); b1++) {
+/* 1165 */       stringBuffer.append(" " + ((EntityItem)vector1.elementAt(b1)).getKey());
+/*      */     }
+/*      */ 
+/*      */     
+/* 1169 */     Vector<EntityItem> vector2 = PokUtils.getAllLinkedEntities(vector1, "SWPRODSTRUCT", "SWFEATURE");
+/* 1170 */     addDebug(4, "uniqueSWPS entered  " + paramEntityItem.getKey() + " invname " + paramString + " with " + stringBuffer.toString() + " swfcVct.size " + vector2
+/* 1171 */         .size());
+/* 1172 */     for (byte b2 = 0; b2 < vector2.size(); b2++) {
+/* 1173 */       EntityItem entityItem = vector2.elementAt(b2);
+/* 1174 */       String str = PokUtils.getAttributeValue(entityItem, "INVNAME", ", ", null, false);
+/* 1175 */       if (str == null)
+/*      */       {
+/* 1177 */         str = (String)this.setInvNameTbl.get(entityItem.getKey());
+/*      */       }
+/* 1179 */       if (!entityItem.getKey().equals(paramEntityItem.getKey())) {
+/*      */ 
+/*      */         
+/* 1182 */         addDebug(4, "uniqueSWPS checking " + entityItem.getKey() + " swfcInvname " + str);
+/* 1183 */         if (paramString.equals(str)) {
+/* 1184 */           bool = false;
+/*      */           
+/*      */           break;
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/* 1190 */     vector2.clear();
+/* 1191 */     vector2 = null;
+/* 1192 */     vector1.clear();
+/* 1193 */     vector1 = null;
+/* 1194 */     return bool;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getLD_Value(EntityItem paramEntityItem, String paramString) {
+/* 1203 */     return PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), paramString, paramString) + ": " + 
+/* 1204 */       PokUtils.getAttributeValue(paramEntityItem, paramString, ",", "<em>** Not Populated **</em>", false);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getLD_NDN(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 1214 */     return paramEntityItem.getEntityGroup().getLongDescription() + " &quot;" + getNavigationName(paramEntityItem) + "&quot;";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void dereference() {
+/* 1221 */     super.dereference();
+/*      */     
+/* 1223 */     this.rsBundle = null;
+/* 1224 */     this.rptSb = null;
+/* 1225 */     this.args = null;
+/*      */     
+/* 1227 */     this.metaTbl = null;
+/* 1228 */     this.navName = null;
+/* 1229 */     this.vctReturnsEntityKeys.clear();
+/* 1230 */     this.vctReturnsEntityKeys = null;
+/*      */     
+/* 1232 */     this.featureGroup = null;
+/*      */     
+/* 1234 */     this.swfeatSet.clear();
+/* 1235 */     this.swfeatSet = null;
+/*      */     
+/* 1237 */     this.dupelistedSet.clear();
+/* 1238 */     this.dupelistedSet = null;
+/*      */     
+/* 1240 */     this.setInvNameTbl.clear();
+/* 1241 */     this.setInvNameTbl = null;
+/*      */     
+/* 1243 */     Iterator<String> iterator = this.invGrpInvnameTbl.keySet().iterator();
+/* 1244 */     while (iterator.hasNext()) {
+/* 1245 */       String str = iterator.next();
+/* 1246 */       Hashtable hashtable = (Hashtable)this.invGrpInvnameTbl.get(str);
+/* 1247 */       Iterator<String> iterator1 = hashtable.keySet().iterator();
+/* 1248 */       while (iterator1.hasNext()) {
+/* 1249 */         String str1 = iterator1.next();
+/* 1250 */         InvnameInfo invnameInfo = (InvnameInfo)hashtable.get(str1);
+/* 1251 */         invnameInfo.dereference();
+/*      */       } 
+/* 1253 */       hashtable.clear();
+/*      */     } 
+/*      */     
+/* 1256 */     this.invGrpInvnameTbl.clear();
+/* 1257 */     this.invGrpInvnameTbl = null;
+/*      */     
+/* 1259 */     this.dbgPw = null;
+/* 1260 */     this.dbgfn = null;
+/* 1261 */     this.updatedSB = null;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getABRVersion() {
+/* 1267 */     return "$Revision: 1.10 $";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getDescription() {
+/* 1274 */     return "BHINVNAMABRSTATUS";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addOutput(String paramString) {
+/* 1280 */     this.rptSb.append("<p>" + paramString + "</p>" + NEWLINE);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addDebug(int paramInt, String paramString) {
+/* 1288 */     if (paramInt <= this.abr_debuglvl) {
+/* 1289 */       addDebug(paramString);
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addDebug(String paramString) {
+/* 1297 */     if (this.dbgPw != null) {
+/* 1298 */       this.dbgLen += paramString.length();
+/* 1299 */       this.dbgPw.println(paramString);
+/* 1300 */       this.dbgPw.flush();
+/*      */     } else {
+/* 1302 */       this.rptSb.append("<!-- " + paramString + " -->" + NEWLINE);
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private void addHeading(int paramInt, String paramString) {
+/* 1308 */     this.rptSb.append("<h" + paramInt + ">" + paramString + "</h" + paramInt + ">" + NEWLINE);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addError(String paramString, Object[] paramArrayOfObject) {
+/* 1320 */     setReturnCode(-1);
+/*      */ 
+/*      */     
+/* 1323 */     addMessage(this.rsBundle.getString("ERROR_PREFIX"), paramString, paramArrayOfObject);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addMessage(String paramString1, String paramString2, Object[] paramArrayOfObject) {
+/* 1332 */     String str = this.rsBundle.getString(paramString2);
+/*      */     
+/* 1334 */     if (paramArrayOfObject != null) {
+/* 1335 */       MessageFormat messageFormat = new MessageFormat(str);
+/* 1336 */       str = messageFormat.format(paramArrayOfObject);
+/*      */     } 
+/*      */     
+/* 1339 */     addOutput(paramString1 + " " + str);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getNavigationName(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 1349 */     StringBuffer stringBuffer = new StringBuffer();
+/*      */ 
+/*      */ 
+/*      */     
+/* 1353 */     EANList eANList = (EANList)this.metaTbl.get(paramEntityItem.getEntityType());
+/* 1354 */     if (eANList == null) {
+/*      */       
+/* 1356 */       EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, paramEntityItem.getEntityType(), "Navigate");
+/* 1357 */       eANList = entityGroup.getMetaAttribute();
+/* 1358 */       this.metaTbl.put(paramEntityItem.getEntityType(), eANList);
+/*      */     } 
+/* 1360 */     for (byte b = 0; b < eANList.size(); b++) {
+/*      */       
+/* 1362 */       EANMetaAttribute eANMetaAttribute = (EANMetaAttribute)eANList.getAt(b);
+/* 1363 */       stringBuffer.append(PokUtils.getAttributeValue(paramEntityItem, eANMetaAttribute.getAttributeCode(), ", ", "", false));
+/* 1364 */       if (b + 1 < eANList.size()) {
+/* 1365 */         stringBuffer.append(" ");
+/*      */       }
+/*      */     } 
+/*      */     
+/* 1369 */     return stringBuffer.toString().trim();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setTextValue(String paramString1, String paramString2, EntityInfo paramEntityInfo) {
+/* 1383 */     if (this.m_cbOn == null) {
+/* 1384 */       setControlBlock();
+/*      */     }
+/*      */     
+/* 1387 */     Vector<Text> vector = null;
+/*      */     
+/* 1389 */     for (byte b = 0; b < this.vctReturnsEntityKeys.size(); b++) {
+/* 1390 */       ReturnEntityKey returnEntityKey = this.vctReturnsEntityKeys.elementAt(b);
+/* 1391 */       if (returnEntityKey.getEntityID() == paramEntityInfo.entityid && returnEntityKey
+/* 1392 */         .getEntityType().equals(paramEntityInfo.entityType)) {
+/* 1393 */         vector = returnEntityKey.m_vctAttributes;
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/* 1397 */     if (vector == null) {
+/* 1398 */       ReturnEntityKey returnEntityKey = new ReturnEntityKey(paramEntityInfo.entityType, paramEntityInfo.entityid, true);
+/* 1399 */       vector = new Vector();
+/* 1400 */       returnEntityKey.m_vctAttributes = vector;
+/* 1401 */       this.vctReturnsEntityKeys.addElement(returnEntityKey);
+/*      */     } 
+/*      */ 
+/*      */     
+/* 1405 */     Text text = new Text(this.m_prof.getEnterprise(), paramEntityInfo.entityType, paramEntityInfo.entityid, paramString1, paramString2, 1, this.m_cbOn);
+/* 1406 */     vector.addElement(text);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setStatusAndDQ(EntityInfo paramEntityInfo) {
+/* 1415 */     addDebug(4, "setStatusAndDQ for " + paramEntityInfo.entityType + paramEntityInfo.entityid);
+/*      */     
+/* 1417 */     if (this.m_cbOn == null) {
+/* 1418 */       setControlBlock();
+/*      */     }
+/*      */     
+/* 1421 */     Vector<SingleFlag> vector = null;
+/*      */     
+/* 1423 */     for (byte b = 0; b < this.vctReturnsEntityKeys.size(); b++) {
+/* 1424 */       ReturnEntityKey returnEntityKey = this.vctReturnsEntityKeys.elementAt(b);
+/* 1425 */       if (returnEntityKey.getEntityID() == paramEntityInfo.entityid && returnEntityKey
+/* 1426 */         .getEntityType().equals(paramEntityInfo.entityType)) {
+/* 1427 */         vector = returnEntityKey.m_vctAttributes;
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/* 1431 */     if (vector == null) {
+/* 1432 */       ReturnEntityKey returnEntityKey = new ReturnEntityKey(paramEntityInfo.entityType, paramEntityInfo.entityid, true);
+/* 1433 */       vector = new Vector();
+/* 1434 */       returnEntityKey.m_vctAttributes = vector;
+/* 1435 */       this.vctReturnsEntityKeys.addElement(returnEntityKey);
+/*      */     } 
+/*      */ 
+/*      */     
+/* 1439 */     SingleFlag singleFlag = new SingleFlag(this.m_prof.getEnterprise(), paramEntityInfo.entityType, paramEntityInfo.entityid, "STATUS", "0050", 1, this.m_cbOn);
+/*      */ 
+/*      */     
+/* 1442 */     vector.addElement(singleFlag);
+/*      */ 
+/*      */     
+/* 1445 */     singleFlag = new SingleFlag(this.m_prof.getEnterprise(), paramEntityInfo.entityType, paramEntityInfo.entityid, "DATAQUALITY", "0050", 1, this.m_cbOn);
+/*      */ 
+/*      */     
+/* 1448 */     vector.addElement(singleFlag);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void updatePDH() throws SQLException, MiddlewareException, RemoteException, MiddlewareShutdownInProgressException, EANBusinessRuleException {
+/* 1462 */     logMessage(getDescription() + " updating PDH");
+/* 1463 */     addDebug(4, "updatePDH entered for vctReturnsEntityKeys: " + this.vctReturnsEntityKeys.size());
+/*      */     
+/* 1465 */     if (this.vctReturnsEntityKeys.size() > 0) {
+/*      */       
+/*      */       try {
+/* 1468 */         this.m_db.update(this.m_prof, this.vctReturnsEntityKeys, false, false);
+/*      */ 
+/*      */         
+/*      */         try {
+/* 1472 */           for (byte b = 0; b < this.vctReturnsEntityKeys.size(); b++) {
+/* 1473 */             ReturnEntityKey returnEntityKey = this.vctReturnsEntityKeys.elementAt(b);
+/* 1474 */             for (byte b1 = 0; b1 < returnEntityKey.m_vctAttributes.size(); b1++) {
+/* 1475 */               Attribute attribute = returnEntityKey.m_vctAttributes.elementAt(b1);
+/* 1476 */               String str = attribute.getAttributeCode();
+/* 1477 */               if (str.equals("BHINVNAME") && attribute.getAttributeValue().length() <= 30) {
+/*      */                 
+/* 1479 */                 MessageFormat messageFormat = new MessageFormat(this.rsBundle.getString("ATTR_SET"));
+/* 1480 */                 this.args[0] = PokUtils.getAttributeDescription(this.featureGroup, str, str);
+/* 1481 */                 this.args[1] = attribute.getAttributeValue();
+/* 1482 */                 this.args[2] = this.featureGroup.getLongDescription();
+/* 1483 */                 this.args[3] = returnEntityKey.getEntityType() + returnEntityKey.getEntityID();
+/*      */ 
+/*      */                 
+/* 1486 */                 this.updatedSB.append("<p>" + messageFormat.format(this.args) + "</p>" + NEWLINE);
+/*      */                 break;
+/*      */               } 
+/*      */             } 
+/*      */           } 
+/* 1491 */         } catch (Exception exception) {
+/* 1492 */           exception.printStackTrace();
+/* 1493 */           addDebug("exception trying to output msg " + exception);
+/*      */         } 
+/*      */       } finally {
+/*      */         
+/* 1497 */         this.vctReturnsEntityKeys.clear();
+/* 1498 */         this.m_db.commit();
+/* 1499 */         this.m_db.freeStatement();
+/* 1500 */         this.m_db.isPending("finally after updatePDH");
+/*      */       } 
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getTimestamp(EntityItem paramEntityItem, String paramString) throws Exception {
+/* 1512 */     RowSelectableTable rowSelectableTable = new RowSelectableTable((EANTableWrapper)paramEntityItem, paramEntityItem.getLongDescription());
+/*      */     
+/* 1514 */     String str1 = "";
+/* 1515 */     String str2 = paramEntityItem.getEntityType() + ":" + paramString;
+/* 1516 */     int i = rowSelectableTable.getRowIndex(str2);
+/* 1517 */     if (i < 0) {
+/* 1518 */       i = rowSelectableTable.getRowIndex(str2 + ":C");
+/*      */     }
+/* 1520 */     if (i < 0) {
+/* 1521 */       i = rowSelectableTable.getRowIndex(str2 + ":R");
+/*      */     }
+/* 1523 */     if (i != -1) {
+/*      */       
+/* 1525 */       EANAttribute eANAttribute = (EANAttribute)rowSelectableTable.getEANObject(i, 1);
+/* 1526 */       if (eANAttribute != null) {
+/*      */         
+/* 1528 */         AttributeChangeHistoryGroup attributeChangeHistoryGroup = this.m_db.getAttributeChangeHistoryGroup(this.m_prof, eANAttribute);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1545 */         if (attributeChangeHistoryGroup.getChangeHistoryItemCount() > 0) {
+/* 1546 */           int j = attributeChangeHistoryGroup.getChangeHistoryItemCount() - 1;
+/* 1547 */           str1 = attributeChangeHistoryGroup.getChangeHistoryItem(j).getChangeDate();
+/*      */         } 
+/*      */       } else {
+/*      */         
+/* 1551 */         addDebug(4, "EANAttribute was null for " + paramString + " in " + paramEntityItem.getKey());
+/*      */       } 
+/*      */     } else {
+/*      */       
+/* 1555 */       addDebug("Row for " + paramString + " was not found for " + paramEntityItem.getKey());
+/*      */     } 
+/*      */     
+/* 1558 */     return str1;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector getHWEntities(String paramString) throws SQLException {
+/* 1571 */     ResultSet resultSet = null;
+/* 1572 */     Vector<EntityInfo> vector = new Vector();
+/* 1573 */     String str = this.m_prof.getEnterprise();
+/*      */     
+/*      */     try {
+/* 1576 */       this.bhinvnameStatement.clearParameters();
+/* 1577 */       this.bhinvnameStatement.setString(1, str);
+/* 1578 */       this.bhinvnameStatement.setString(2, str);
+/* 1579 */       this.bhinvnameStatement.setString(3, str);
+/* 1580 */       this.bhinvnameStatement.setString(4, paramString);
+/* 1581 */       this.bhinvnameStatement.setString(5, str);
+/* 1582 */       this.bhinvnameStatement.setString(6, str);
+/* 1583 */       this.bhinvnameStatement.setString(7, str);
+/* 1584 */       this.bhinvnameStatement.setString(8, str);
+/* 1585 */       this.bhinvnameStatement.setString(9, paramString);
+/* 1586 */       this.bhinvnameStatement.setString(10, str);
+/* 1587 */       this.bhinvnameStatement.setString(11, str);
+/* 1588 */       this.bhinvnameStatement.setString(12, str);
+/* 1589 */       this.bhinvnameStatement.setString(13, str);
+/*      */       
+/* 1591 */       resultSet = this.bhinvnameStatement.executeQuery();
+/* 1592 */       while (resultSet.next()) {
+/* 1593 */         int i = resultSet.getInt(1);
+/* 1594 */         String str1 = resultSet.getString(2);
+/* 1595 */         String str2 = resultSet.getString(3);
+/* 1596 */         String str3 = resultSet.getString(4);
+/* 1597 */         String str4 = resultSet.getString(5);
+/* 1598 */         String str5 = resultSet.getString(6);
+/* 1599 */         if (str2 == null || str3 == null) {
+/* 1600 */           addDebug(4, "getEntities: skipping " + str1 + i + " with invname " + str2 + " invgrp " + str3 + " fcode " + str4);
+/*      */           continue;
+/*      */         } 
+/* 1603 */         EntityInfo entityInfo = new EntityInfo(i, str1, str2, str3, str4, str5);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 1609 */         vector.add(entityInfo);
+/*      */       }
+/*      */     
+/*      */     }
+/* 1613 */     catch (SQLException sQLException) {
+/* 1614 */       throw sQLException;
+/*      */     } finally {
+/*      */       
+/* 1617 */       if (resultSet != null) {
+/* 1618 */         resultSet.close();
+/* 1619 */         resultSet = null;
+/*      */       } 
+/* 1621 */       this.m_db.commit();
+/* 1622 */       this.m_db.freeStatement();
+/* 1623 */       this.m_db.isPending();
+/*      */     } 
+/* 1625 */     return vector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void closeStatements() {
+/*      */     try {
+/* 1634 */       if (this.invgrpPs != null) {
+/* 1635 */         this.invgrpPs.close();
+/* 1636 */         this.invgrpPs = null;
+/*      */       } 
+/* 1638 */     } catch (Exception exception) {
+/* 1639 */       System.err.println("closeStatements(), unable to close invgrpPs. " + exception);
+/*      */     } 
+/*      */     try {
+/* 1642 */       if (this.bhinvnameStatement != null) {
+/* 1643 */         this.bhinvnameStatement.close();
+/* 1644 */         this.bhinvnameStatement = null;
+/*      */       } 
+/* 1646 */     } catch (Exception exception) {
+/* 1647 */       System.err.println("closeStatements(), unable to close bhinvnameStatement. " + exception);
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private class EntityInfo
+/*      */   {
+/* 1656 */     private String invname = null;
+/* 1657 */     private int entityid = 0;
+/* 1658 */     private String entityType = null;
+/* 1659 */     private String invGrp = null;
+/* 1660 */     private String fcode = null;
+/* 1661 */     private String status = null;
+/*      */     
+/*      */     EntityInfo(EntityItem param1EntityItem) {
+/* 1664 */       this.invname = PokUtils.getAttributeValue(param1EntityItem, "INVNAME", "", null, false);
+/* 1665 */       this.entityid = param1EntityItem.getEntityID();
+/* 1666 */       this.entityType = param1EntityItem.getEntityType();
+/* 1667 */       this.invGrp = PokUtils.getAttributeFlagValue(param1EntityItem, "INVENTORYGROUP");
+/* 1668 */       this.fcode = PokUtils.getAttributeValue(param1EntityItem, "FEATURECODE", "", null, false);
+/* 1669 */       this.status = PokUtils.getAttributeFlagValue(param1EntityItem, "STATUS");
+/*      */     }
+/*      */     EntityInfo(int param1Int, String param1String1, String param1String2, String param1String3, String param1String4, String param1String5) {
+/* 1672 */       this.invname = param1String2;
+/* 1673 */       this.entityid = param1Int;
+/* 1674 */       this.entityType = param1String1;
+/* 1675 */       this.invGrp = param1String3;
+/* 1676 */       this.fcode = param1String4;
+/* 1677 */       this.status = param1String5;
+/*      */     }
+/*      */     
+/*      */     public String toString() {
+/* 1681 */       return this.entityType + this.entityid + " fcode " + this.fcode + " invGrp " + this.invGrp + " invname " + this.invname + " status " + this.status;
+/*      */     }
+/*      */     
+/*      */     void dereference() {
+/* 1685 */       this.invname = null;
+/* 1686 */       this.invGrp = null;
+/* 1687 */       this.fcode = null;
+/* 1688 */       this.entityType = null;
+/* 1689 */       this.status = null;
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private class InvnameInfo
+/*      */   {
+/* 1697 */     private String entityids = "";
+/* 1698 */     private String fcodes = "";
+/* 1699 */     private int count = 0;
+/*      */     
+/*      */     InvnameInfo(int param1Int, String param1String) {
+/* 1702 */       addId(param1Int, param1String);
+/*      */     }
+/*      */     void addId(int param1Int, String param1String) {
+/* 1705 */       this.entityids += " " + param1Int;
+/* 1706 */       this.fcodes += " " + param1String;
+/* 1707 */       this.count++;
+/*      */     }
+/*      */     
+/*      */     public String toString() {
+/* 1711 */       return "entityids: " + this.entityids + " fcodes: " + this.fcodes;
+/*      */     }
+/*      */     
+/*      */     void dereference() {
+/* 1715 */       this.entityids = null;
+/* 1716 */       this.fcodes = null;
+/*      */     }
+/*      */   }
+/*      */ }
 
-//(C) Copyright IBM Corp. 2010  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
 
-package COM.ibm.eannounce.abr.sg.bh;
-
-import java.io.*;
-import java.rmi.RemoteException;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.MessageFormat;
-import java.util.*;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.opicmpdh.objects.Attribute;
-import COM.ibm.opicmpdh.objects.SingleFlag;
-
-/****
- * BH FS ABR BHINVNAME IDL 20101116.doc
- * filter on nlsid, set status to chgreq if len>30, always set value
- * 
- * BH FS ABR BHINVNAME IDL 20100810b.doc
- * needs meta for BHINVNAMSETUP entity
- * 			  for BHINVNAMABRSTATUS and PDHDOMAIN attr
- * needs workflow action to queue abr - WFBHINVNAMSETUP
- * needs actions to create/edit this entity
- * 2 new VEs BHINVNAMEXT, BHINVNAMEXT2
- * needs SRDWG action
- * 
- * The following function is required for R1.0
- * The Business Requirements (BUS880 and BUS881) are identified within the document.
- * 
- * IV.	Overall Design
- * 
- * There are two parts to meeting these business requirements:
- *  - 	The IDL of BHINVNAME
- *  - 	The on-going generation of BHINVNAME
- *  
- *  The on-going support is provided via the Data Quality ABR which will generate a unique BHINVNAME for a 
- *  FEATURE within an INVENTORYGROUP. For a SW FEATURE, BHINVNAME will be unique within a PID (MODEL). 
- *  If the generated BHINVNAME is greater than 30 characters in length, the ABR will fail and STATUS 
- *  will not advance. Furthermore, the XML generation for the feed to SAP will not be queued.
- *  
- *  The IDL will be triggered by an authorized user with in the ISG Workgroup for all the MODELs within 
- *  a specified PDHDOMAIN (i.e. Workgroup). There are a couple of significant differences between the IDL 
- *  and the on-going support. If the generated BHINVNAME is greater than 30 characters, the ABR will create 
- *  BHINVNAME and may set STATUS and DATAQUALILTY. It will report an error. It will not flow downstream to 
- *  SAP. STATUS (and DATAQUALITY) may be modified by this IDL so that BHINVNAME will not flow downstream 
- *  if it is greater than 30 characters.. A user will be able to correct these failures via the User Interface 
- *  and by using the Data Quality ABR.
- *  
- *  This ABR does not need to worry about locks. The ABR should just update BHINVNAME which is not 
- *  currently maintained by users.
- *  
- *  V.	User Interface
- *  
- *  The user interface is via the JUI which allows an authorized user in the ISG workgroup to queue this ABRs 
- *  for a PDHDOMAIN. This allows for an orderly IDL of subsets of data. The SYSFEEDADMIN Role will be used for 
- *  this functionality.
- *  
-BHINVNAMABRSTATUS_class=COM.ibm.eannounce.abr.sg.bh.BHINVNAMABRSTATUS
-BHINVNAMABRSTATUS_enabled=true
-BHINVNAMABRSTATUS_idler_class=D
-BHINVNAMABRSTATUS_keepfile=true
-BHINVNAMABRSTATUS_read_only=false
-BHINVNAMABRSTATUS_vename=dummy
-BHINVNAMABRSTATUS_debugLevel=0
-#BHINVNAMABRSTATUS_velimit=2
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\bh\BHINVNAMABRSTATUS.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-//$Log: BHINVNAMABRSTATUS.java,v $
-//Revision 1.10  2014/01/13 13:53:29  wendy
-//migration to V17
-//
-//Revision 1.9  2011/08/25 20:52:29  wendy
-//Check for null printwriter
-//
-//Revision 1.8  2011/03/24 21:15:01  wendy
-//correct update feature cnt msg
-//
-//Revision 1.7  2011/03/09 18:12:59  wendy
-//add debug level support
-//
-//Revision 1.6  2010/12/16 17:10:38  wendy
-//find FEATURE with STATUS=null
-//
-//Revision 1.5  2010/12/15 22:36:09  wendy
-//Add more debug
-//
-//Revision 1.4  2010/12/02 21:53:07  wendy
-//Trim featurecode, some have trailing blanks
-//
-//Revision 1.3  2010/12/02 18:13:08  wendy
-//prevent exceeding 254 text limit
-//
-//Revision 1.2  2010/12/01 16:51:44  wendy
-//updates for BH FS ABR BHINVNAME IDL 20101116.doc
-//
-//Revision 1.1  2010/09/07 16:07:58  wendy
-//Init for BH FS ABR BHINVNAME IDL 20100810b.doc
-//
-
-public class BHINVNAMABRSTATUS extends PokBaseABR {
-	private static final int MAXFILE_SIZE=5000000;
-	private StringBuffer rptSb = new StringBuffer();
-	private static final char[] FOOL_JTEST = {'\n'};
-	private static final int MAX_LEN = 30;
-	private static final int UPDATE_SIZE = 200;
-	
-	static final String NEWLINE = new String(FOOL_JTEST);
-	private Object[] args = new String[10];
-
-	private ResourceBundle rsBundle = null;
-	private Hashtable metaTbl = new Hashtable();
-	private String navName = "";
-	private PrintWriter dbgPw=null;
-	private String dbgfn = null;
-	private int dbgLen=0;
-	private int abr_debuglvl=D.EBUG_ERR;
-	  
-	private HashSet swfeatSet = new HashSet();
-
-	private Set dupelistedSet = new HashSet();
-	private Hashtable invGrpInvnameTbl = new Hashtable(); 
-	//key is invgrp, value is hashtable with key = invname  and value =integer count
-
-	private static final String WG_SRCHACTION_NAME = "SRDWG"; 
-	//STATUS	0020	Final
-	//STATUS	0040	Ready for Review
-	//STATUS	0050	Change Request
-	private static final String STATUS_FINAL = "0020"; 
-	private static final String STATUS_RFR = "0040"; 
-	private static final String STATUS_CHGREQ = "0050"; 
-	
-	//DATAQUALITY	0050	Change Request
-	private static final String DQ_CHGREQ = "0050"; 
-
-	//find entities where Value of (BHINVNAME) is Empty (aka Null) or VALFROM(INVNAME) > VALFROM(BHINVNAME)
-	/*
-	private static final String BHVINVNAME_SQL = 
-		"select tf.entityid as entityid, tf.entitytype as entitytype, t.attributevalue as INVNAME, "+
-		"f1.attributevalue as INVENTORYGROUP, tf.attributevalue as FEATURECODE  "+
-		"from opicm.text tf join "+
-		"opicm.flag p on tf.entitytype=p.entitytype and tf.entityid=p.entityid join "+ 
-		"opicm.flag f1 on tf.entitytype=f1.entitytype and tf.entityid=f1.entityid left join "+
-		"opicm.text t on tf.entitytype=t.entitytype and tf.entityid=t.entityid and "+ 
-		"t.attributecode='INVNAME' and t.enterprise=? and t.valto>current timestamp and t.effto>current timestamp "+   
-		"where "+ 
-		"tf.entitytype='FEATURE' and tf.attributecode ='FEATURECODE' and tf.enterprise=? and "+ 
-		"p.attributecode = 'PDHDOMAIN' and p.attributevalue=? and p.enterprise=? and "+ 
-		"f1.attributecode='INVENTORYGROUP' and f1.enterprise=? and "+
-		"tf.valto>current timestamp and tf.effto>current timestamp and "+
-		"p.valto>current timestamp and p.effto>current timestamp and "+
-		"f1.valto>current timestamp and f1.effto>current timestamp "+
-		"and "+ 
-		"not exists( "+
-		"select tbh.attributevalue from opicm.text tbh where tbh.entitytype=tf.entitytype and tbh.entityid=tf.entityid and "+ 
-		"tbh.attributecode='BHINVNAME' and tbh.valto>current timestamp and tbh.effto>current timestamp) "+
-		"UNION "+ 
-		"select tf.entityid as entityid, tf.entitytype as entitytype, t.attributevalue as INVNAME, "+ 
-		"f1.attributevalue as INVENTORYGROUP, tf.attributevalue as FEATURECODE "+ 
-		"from opicm.text tf join "+
-		"opicm.flag p on tf.entitytype=p.entitytype and tf.entityid=p.entityid join "+ 
-		"opicm.flag f1 on tf.entitytype=f1.entitytype and tf.entityid=f1.entityid join "+
-		"opicm.text t on tf.entitytype=t.entitytype and tf.entityid=t.entityid join "+
-		"opicm.text tbh on tf.entitytype=tbh.entitytype and tf.entityid=tbh.entityid "+ 
-		"where "+ 
-		"tf.entitytype='FEATURE' and tf.attributecode ='FEATURECODE' and tf.enterprise=? and "+ 
-		"p.attributecode = 'PDHDOMAIN' and p.attributevalue=? and p.enterprise=? and "+ 
-		"t.attributecode='INVNAME' and t.enterprise=? and "+ 
-		"f1.attributecode='INVENTORYGROUP' and f1.enterprise=? and "+
-		"tbh.attributecode='BHINVNAME' and tbh.enterprise=? and "+
-		"tf.valto>current timestamp and tf.effto>current timestamp and "+
-		"p.valto>current timestamp and p.effto>current timestamp and "+
-		"t.valto>current timestamp and t.effto>current timestamp and "+    
-		"f1.valto>current timestamp and f1.effto>current timestamp and "+
-		"tbh.valto>current timestamp and tbh.effto>current timestamp and t.valfrom > tbh.valfrom "+  
-		"order by featurecode asc with ur; ";
-*/
-	//needed nlsid=1 filtering and return status
-	private static final String BHVINVNAME_SQL = 
-		"select tf.entityid as entityid, tf.entitytype as entitytype, t.attributevalue as INVNAME, "+
-		"f1.attributevalue as INVENTORYGROUP, RTRIM(tf.attributevalue) as FEATURECODE,  "+
-		"f2.attributevalue as STATUS "+
-		"from opicm.text tf join "+
-		"opicm.flag p on tf.entitytype=p.entitytype and tf.entityid=p.entityid join "+                
-		"opicm.flag f1 on tf.entitytype=f1.entitytype and tf.entityid=f1.entityid left join "+
-		//"opicm.flag f2 on tf.entitytype=f2.entitytype and tf.entityid=f2.entityid left join "+ 
-        "opicm.flag f2 on tf.entitytype=f2.entitytype and tf.entityid=f2.entityid and "+
-        "f2.attributecode='STATUS' and f2.enterprise=? and "+
-        "f2.valto>current timestamp and f2.effto>current timestamp left join "+
-		"opicm.text t on tf.entitytype=t.entitytype and tf.entityid=t.entityid and "+ 
-		"t.attributecode='INVNAME' and t.enterprise=? and t.valto>current timestamp and t.effto>current timestamp and "+ 
-		"t.nlsid=1 "+  
-		"where "+ 
-		"tf.entitytype='FEATURE' and tf.attributecode ='FEATURECODE' and tf.enterprise=? and "+ 
-		"p.attributecode = 'PDHDOMAIN' and p.attributevalue=? and p.enterprise=? and "+ 
-		"f1.attributecode='INVENTORYGROUP' and f1.enterprise=? and "+
-		//"f2.attributecode='STATUS' and f2.enterprise=? and "+
-		"tf.valto>current timestamp and tf.effto>current timestamp and "+
-		"p.valto>current timestamp and p.effto>current timestamp and "+
-		"f1.valto>current timestamp and f1.effto>current timestamp and "+
-		//"f2.valto>current timestamp and f2.effto>current timestamp and "+
-		"not exists( "+
-		"select tbh.attributevalue from opicm.text tbh where tbh.entitytype=tf.entitytype and tbh.entityid=tf.entityid and "+ 
-		"tbh.attributecode='BHINVNAME' and tbh.valto>current timestamp and tbh.effto>current timestamp and tbh.nlsid=1) "+
-		"UNION "+ 
-		"select tf.entityid as entityid, tf.entitytype as entitytype, t.attributevalue as INVNAME, "+ 
-		"f1.attributevalue as INVENTORYGROUP, RTRIM(tf.attributevalue) as FEATURECODE, f2.attributevalue as STATUS "+ 
-		"from opicm.text tf join "+
-		"opicm.flag p on tf.entitytype=p.entitytype and tf.entityid=p.entityid join "+ 
-		"opicm.flag f1 on tf.entitytype=f1.entitytype and tf.entityid=f1.entityid join "+
-		"opicm.text t on tf.entitytype=t.entitytype and tf.entityid=t.entityid join "+
-		"opicm.text tbh on tf.entitytype=tbh.entitytype and tf.entityid=tbh.entityid left join "+
-		//"opicm.flag f2 on tf.entitytype=f2.entitytype and tf.entityid=f2.entityid "+ 
-        "opicm.flag f2 on tf.entitytype=f2.entitytype and tf.entityid=f2.entityid and "+
-        "f2.attributecode='STATUS' and f2.enterprise=? and "+
-        "f2.valto>current timestamp and f2.effto>current timestamp "+
-		"where "+ 
-		"tf.entitytype='FEATURE' and tf.attributecode ='FEATURECODE' and tf.enterprise=? and tf.nlsid=1 and "+ 
-		"p.attributecode = 'PDHDOMAIN' and p.attributevalue=? and p.enterprise=? and "+ 
-		"t.attributecode='INVNAME' and t.enterprise=? and t.nlsid=1 and "+ 
-		"f1.attributecode='INVENTORYGROUP' and f1.enterprise=? and "+
-		//"f2.attributecode='STATUS' and f2.enterprise=? and "+
-		"tbh.attributecode='BHINVNAME' and tbh.enterprise=? and tbh.nlsid=1 and "+
-		"tf.valto>current timestamp and tf.effto>current timestamp and "+
-		"p.valto>current timestamp and p.effto>current timestamp and "+
-		"t.valto>current timestamp and t.effto>current timestamp and "+    
-		"f1.valto>current timestamp and f1.effto>current timestamp and "+
-		//"f2.valto>current timestamp and f2.effto>current timestamp and "+
-		"tbh.valto>current timestamp and tbh.effto>current timestamp and t.valfrom > tbh.valfrom "+  
-		"order by featurecode asc with ur; ";
-	
-	//find all invname for specified invgrp across all domains
-	private static final String INVGRP_INVNAME_SQL = 
-		"select tf.entityid as entityid, tf.entitytype as entitytype, t.attributevalue as INVNAME, "+
-		"f1.attributevalue as INVENTORYGROUP, RTRIM(tf.attributevalue) as FEATURECODE  "+
-		"from opicm.text tf join "+
-		"opicm.flag f1 on tf.entitytype=f1.entitytype and tf.entityid=f1.entityid left join "+
-		"opicm.text t on tf.entitytype=t.entitytype and tf.entityid=t.entityid and tf.nlsid=t.nlsid and "+ 
-		"t.attributecode='INVNAME' and t.enterprise=? and t.valto>current timestamp and t.effto>current timestamp "+   
-		"where "+ 
-		"tf.entitytype='FEATURE' and tf.attributecode ='FEATURECODE' and tf.enterprise=? and tf.nlsid=1 and "+
-		"f1.attributecode='INVENTORYGROUP' and f1.attributevalue=? and f1.enterprise=? and "+
-		"tf.valto>current timestamp and tf.effto>current timestamp and "+
-		"f1.valto>current timestamp and f1.effto>current timestamp order by featurecode asc with ur";
-
-	private static final int MW_VENTITY_LIMIT;// get this from properties
-	static{
-		String velimit = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue(
-				"BHINVNAMABRSTATUS","_velimit","5");
-		MW_VENTITY_LIMIT = Integer.parseInt(velimit);
-	}
-
-	//PreparedStatements for repeated operations
-	private PreparedStatement invgrpPs, bhinvnameStatement;
-	private Vector vctReturnsEntityKeys = new Vector();
-
-	private EntityGroup featureGroup = null;
-	private Hashtable setInvNameTbl = new Hashtable();
-	private StringBuffer updatedSB = new StringBuffer();
-
-	private void setupPrintWriter(){
-		String fn = m_abri.getFileName();
-		int extid = fn.lastIndexOf(".");
-		dbgfn = fn.substring(0,extid+1)+"dbg";
-		try {
-			dbgPw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(dbgfn, true), "UTF-8"));
-		} catch (Exception x) {
-			dbgfn = null;
-			D.ebug(D.EBUG_ERR, "trouble creating debug PrintWriter " + x);
-		}
-	}
-	private void closePrintWriter() {
-		if (dbgPw != null){
-			dbgPw.flush();
-			dbgPw.close();
-			dbgPw = null;
-		}
-	}
-	/**********************************
-	 *  Execute ABR.
-	 *  VII.	ABR
-	 *  
-	 *  A user creates an instance of the setup entity BHINVNAMSETUP. The user must specify a single value 
-	 *  for PDHDOMAIN.  The user will then use a workflow action to queue the ABR.
-	 *  
-	 *  The ABR will process NLSID = 1 only.
-	 */
-	public void execute_run()
-	{
-		/*
-        The Report should identify:
-            USERID (USERTOKEN)
-            Role
-            Workgroup
-            Date/Time
-            EntityType LongDescription
-			Any errors or list LSEO created or changed
-		 */
-		// must split because too many arguments for messageformat, max of 10.. this was 11
-		String HEADER = "<head>"+
-		EACustom.getMetaTags(getDescription()) + NEWLINE +
-		EACustom.getCSS() + NEWLINE +
-		EACustom.getTitle("{0} {1}") + NEWLINE +
-		"</head>" + NEWLINE + "<body id=\"ibm-com\">" +
-		EACustom.getMastheadDiv() + NEWLINE +
-		"<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
-		String HEADER2 = "<table>"+NEWLINE +
-		"<tr><th>Userid: </th><td>{0}</td></tr>"+NEWLINE +
-		"<tr><th>Role: </th><td>{1}</td></tr>"+NEWLINE +
-		"<tr><th>Workgroup: </th><td>{2}</td></tr>"+NEWLINE +
-		"<tr><th>Date: </th><td>{3}</td></tr>"+NEWLINE +
-		"<tr><th>Description: </th><td>{4}</td></tr>"+NEWLINE +
-		"<tr><th>Return code: </th><td>{5}</td></tr>"+NEWLINE +
-		"</table>"+NEWLINE+
-		"<!-- {6} -->" + NEWLINE;
-
-		MessageFormat msgf;
-		String abrversion="";
-
-		println(EACustom.getDocTypeHtml()); //Output the doctype and html
-
-		try
-		{
-			long startTime = System.currentTimeMillis();
-			start_ABRBuild(); // pull dummy VE
-
-            abr_debuglvl = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getABRDebugLevel(m_abri.getABRCode());
-
-			setupPrintWriter();
-			// force nlsid=1
-	        m_prof.setReadLanguage(Profile.ENGLISH_LANGUAGE);
-	        
-			//get properties file for the base class
-			rsBundle = ResourceBundle.getBundle(getClass().getName(), ABRUtil.getLocale(m_prof.getReadLanguage().getNLSID()));
-			// get root from VE
-			EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-			// debug display list of groups
-			addDebug("DEBUG: "+getShortClassName(getClass())+" entered for " +rootEntity.getKey()+
-					" extract: "+m_abri.getVEName()+" using DTS: "+m_prof.getValOn()+NEWLINE + PokUtils.outputList(m_elist));
-
-			//Default set to pass
-			setReturnCode(PASS);
-	        
-//			fixme remove this.. avoid msgs to userid for testing
-//			setCreateDGEntity(false);
-
-			//NAME is navigate attributes
-			navName = getNavigationName(rootEntity);
-
-			String pdhdomain = PokUtils.getAttributeFlagValue(rootEntity, "PDHDOMAIN");
-			addDebug(rootEntity.getKey()+" pdhdomain: "+pdhdomain);
-			if(pdhdomain!=null){
-				//The user must specify a single value for PDHDOMAIN. 
-				String domains[] = PokUtils.convertToArray(pdhdomain);
-				if (domains.length>1){
-					//INVALID_DOMAIN_ERR = Invalid {0} specified. Only one must be selected.
-					args[0] = getLD_Value(rootEntity, "PDHDOMAIN");
-					addError("INVALID_DOMAIN_ERR",args);
-				}else{
-					pdhdomain = domains[0]; 
-				}
-			}else{
-				//INVALID_DOMAIN_ERR = Invalid {0} specified. Only one must be selected.
-				args[0] = getLD_Value(rootEntity, "PDHDOMAIN");
-				addError("INVALID_DOMAIN_ERR",args);
-			}
-
-			if(getReturnCode()== PokBaseABR.PASS){  
-				// reuse these statements for feature
-				bhinvnameStatement = m_db.getPDHConnection().prepareStatement(BHVINVNAME_SQL);
-				invgrpPs = m_db.getPDHConnection().prepareStatement(INVGRP_INVNAME_SQL);
-
-				processFeature(pdhdomain); 
-		
-				rptSb.append(updatedSB.toString()); // put all updates after err msgs
-				long curtime = System.currentTimeMillis();
-				addDebug("Time to process FEATUREs: "+Stopwatch.format(curtime-startTime));
-
-				updatedSB.setLength(0);
-				processSWFeature(rootEntity,pdhdomain); 
-				addDebug("Time to process SWFEATUREs: "+Stopwatch.format(System.currentTimeMillis()-curtime));
-			}
-
-			addDebug("Total Time: "+Stopwatch.format(System.currentTimeMillis()-startTime));
-		}
-		catch(Throwable exc) {
-			java.io.StringWriter exBuf = new java.io.StringWriter();
-			String Error_EXCEPTION="<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
-			String Error_STACKTRACE="<pre>{0}</pre>";
-			msgf = new MessageFormat(Error_EXCEPTION);
-			setReturnCode(INTERNAL_ERROR);
-			exc.printStackTrace(new java.io.PrintWriter(exBuf));
-			// Put exception into document
-			args[0] = exc.getMessage();
-			rptSb.append(msgf.format(args) + NEWLINE);
-			msgf = new MessageFormat(Error_STACKTRACE);
-			args[0] = exBuf.getBuffer().toString();
-			
-			rptSb.append(updatedSB.toString()); // put all updates before err msgs
-			updatedSB.setLength(0);
-			
-			rptSb.append(msgf.format(args) + NEWLINE);
-			logError("Exception: "+exc.getMessage());
-			logError(exBuf.getBuffer().toString());
-		}
-		finally	{
-			closeStatements();
-
-			setDGTitle(navName);
-			setDGRptName(getShortClassName(getClass()));
-			setDGRptClass(getABRCode());
-			// make sure the lock is released
-			if(!isReadOnly()) {
-				clearSoftLock();
-			}
-			closePrintWriter();
-		}
-
-		//Print everything up to </html>
-		//Insert Header into beginning of report
-		msgf = new MessageFormat(HEADER);
-		args[0] = getDescription();
-		args[1] = navName;
-		String header1 = msgf.format(args);
-		msgf = new MessageFormat(HEADER2);
-		args[0] = m_prof.getOPName();
-		args[1] = m_prof.getRoleDescription();
-		args[2] = m_prof.getWGName();
-		args[3] = getNow();
-		args[4] = navName;
-		args[5] = (this.getReturnCode()==PokBaseABR.PASS?"Passed":"Failed");
-		args[6] = abrversion+" "+getABRVersion();
-
-		rptSb.append(updatedSB.toString()); // put all updates after err msgs
-
-		restoreXtraContent();
-
-		rptSb.insert(0, header1+msgf.format(args) + NEWLINE);
-
-		println(rptSb.toString()); // Output the Report
-		printDGSubmitString();
-		println(EACustom.getTOUDiv());
-		buildReportFooter(); // Print </html>
-
-		metaTbl.clear();
-	}
-
-	private void restoreXtraContent(){
-		// if written to file and still small enough, restore debug to the abr rpt and delete the file
-		if (dbgfn !=null && dbgLen+rptSb.length()<MAXFILE_SIZE){
-			// read the file in and put into the stringbuffer
-			InputStream is = null;
-			FileInputStream fis = null;
-			BufferedReader rdr = null;
-			try{
-				fis = new FileInputStream(dbgfn);
-				is = new BufferedInputStream(fis);
-
-				String s=null;
-				StringBuffer sb = new StringBuffer();
-				rdr = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-				// append lines until done
-				while((s=rdr.readLine()) !=null){
-					sb.append(s+NEWLINE);
-				}
-				rptSb.append("<!-- "+sb.toString()+" -->"+NEWLINE);
-
-				// remove the file
-				File f1 = new File(dbgfn);
-				if (f1.exists()) {
-					f1.delete();
-				}
-			}catch(Exception e){
-				e.printStackTrace();
-			}finally{
-				if (is!=null){
-					try{
-						is.close();
-					}catch(Exception x){
-						x.printStackTrace();
-					}
-				}
-				if (fis!=null){
-					try{
-						fis.close();
-					}catch(Exception x){
-						x.printStackTrace();
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * A.	Processing FEATURE
-	 * 
-	 * For each FEATURE in the specified PDHDOMAIN, perform the following.
-	 * If Value of (BHINVNAME) is Empty (aka Null)
-	 * OR
-	 * if VALFROM(INVNAME) > VALFROM(BHINVNAME)
-	 * then Derive New Value for BHINVNAME
-	 * 
-	 * Derive New Value for BHINVNAME as follows:
-	 * SEARCH FEATURE not restricted by PDHDOMAIN based on
-	 * •	INVNAME
-	 * •	INVENTORYGROUP
-	 * 
-	 * If the search only finds one FEATURE (i.e. itself),
-	 * then
-	 * 		BHINVNAME = INVNAME
-	 * else
-	 * 		BHINVNAME = FEATURECODE & “-“ & INVNAME
-	 * 
-	 * If length (NewValue) > 30, then set ABR Return Code = Fail and leave BHINVNAME empty.
-	 * ErrorMessage LD(FEATURE) NDN(FEATURE) LD(BHINVNAME) (derived value from above for BHINVNAME)
-	 * 'has a derived value longer than 30 characters.'
-	 * 
-	 * @param pdhdomain
-	 * @throws SQLException
-	 * @throws MiddlewareRequestException
-	 * @throws MiddlewareException
-	 * @throws MiddlewareShutdownInProgressException
-	 * @throws EANBusinessRuleException 
-	 * @throws RemoteException 
-	 */
-	private void processFeature(String pdhdomain) throws SQLException, 
-	MiddlewareRequestException, MiddlewareException, MiddlewareShutdownInProgressException,
-	RemoteException, EANBusinessRuleException 
-	{	
-		addDebug("processFeature for pdhdomain "+pdhdomain);
-		featureGroup = new EntityGroup(null,m_db, m_prof, "FEATURE", "Edit", false);// needed for meta info
-		
-		addHeading(3,featureGroup.getLongDescription()+" Checks:");
-
-		// if meta does not have this attribute, there is nothing to do
-		EANMetaAttribute metaAttr = featureGroup.getMetaAttribute("BHINVNAME");
-		if (metaAttr==null) {
-			// add error, this should not happen
-			//META_ERR = {0} was not found in {1} meta.
-			args[0] = "BHINVNAME";
-			args[1] = featureGroup.getEntityType();
-			addError("META_ERR",args);
-			return;
-		}
-		
-		long startTime = System.currentTimeMillis();
-		// search for null BHINVNAME and VALFROM(INVNAME) > VALFROM(BHINVNAME)
-		Vector fcvct = getHWEntities(pdhdomain);
-		long curtime = System.currentTimeMillis();
-		addDebug("Time to get FEATUREs: "+Stopwatch.format(curtime-startTime)+" fcvct.size "+fcvct.size());
-		for (int i=0; i<fcvct.size(); i++){
-			EntityInfo einf = (EntityInfo)fcvct.elementAt(i);
-			setBHInvnameHW(einf);
-			einf.dereference();
-			if(vctReturnsEntityKeys.size()>=UPDATE_SIZE){
-				// update the pdh with features
-				updatePDH();
-				vctReturnsEntityKeys.clear();
-				long curtime2 = System.currentTimeMillis();
-				addDebug("Time to update "+UPDATE_SIZE+" features: "+Stopwatch.format(curtime2-curtime));
-				curtime = curtime2;
-			}
-		}
-		fcvct.clear();
-		
-		if(vctReturnsEntityKeys.size()>0){
-			// update the pdh with features
-			int size = vctReturnsEntityKeys.size();
-			updatePDH();
-			addDebug("Time to update "+size+
-					" features: "+Stopwatch.format(System.currentTimeMillis()-curtime));
-			vctReturnsEntityKeys.clear();
-		}
-		
-		// release memory now
-		Iterator itr = invGrpInvnameTbl.keySet().iterator();
-		while(itr.hasNext()) {
-			String invGrp = (String) itr.next();
-			Hashtable infotbl = (Hashtable)invGrpInvnameTbl.get(invGrp);
-			Iterator infoitr = infotbl.keySet().iterator();
-			while(infoitr.hasNext()) {
-				String invname = (String) infoitr.next();
-				InvnameInfo info = (InvnameInfo)infotbl.get(invname);
-				info.dereference();
-			}
-			infotbl.clear();
-		}
-		
-		invGrpInvnameTbl.clear();
-	}
-
-	/**
-	 * Derive New Value for BHINVNAME as follows:
-	 * SEARCH FEATURE not restricted by PDHDOMAIN based on
-	 * •	INVNAME
-	 * •	INVENTORYGROUP
-	 * 
-	 * If the search only finds one FEATURE (i.e. itself),then
-	 * 		BHINVNAME = INVNAME
-	 * else
-	 * 		BHINVNAME = FEATURECODE & “-“ & INVNAME
-	 * 
-	 * If length (NewValue) > 30, then set ABR Return Code = Fail and leave BHINVNAME empty.
-	 * ErrorMessage LD(FEATURE) NDN(FEATURE) LD(BHINVNAME) (derived value from above for BHINVNAME)
-	 * 'has a derived value longer than 30 characters.'
-	 * 
-	 * @param einf
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws MiddlewareShutdownInProgressException
-	 */
-	private void setBHInvnameHW(EntityInfo einf) throws 
-	MiddlewareRequestException, SQLException, MiddlewareException, MiddlewareShutdownInProgressException
-	{
-		String fcode = einf.fcode;
-		String bhinvname = null;
-		String invname = einf.invname;
-		String invgrp = einf.invGrp;
-		addDebug(D.EBUG_SPEW,"setBHInvnameHW checking "+einf);
-
-		// search for FEATUREs with same INVNAME and INVENTORYGROUP
-		//If the search only finds one FEATURE (i.e. itself), 
-		//then 
-		//	BHINVNAME = INVNAME
-		//else
-		//	BHINVNAME = FEATURECODE & "-" & INVNAME
-
-		if(!checkDuplicateHWInvname(invgrp, invname)){
-			bhinvname = invname;
-		}else{
-			bhinvname = fcode+"-"+invname;
-		}
-		
-		// protect against exceeding text limit
-		//EANMetaAttribute.java(659): public static final int TEXT_MAX_LEN =254
-		if(bhinvname.length()>EANMetaAttribute.TEXT_MAX_LEN){
-			addDebug(D.EBUG_SPEW,"setBHInvnameHW ERROR "+einf+" bhinvname exceeds text limit "+bhinvname);
-			bhinvname = bhinvname.substring(0, EANMetaAttribute.TEXT_MAX_LEN-1);
-		}
-		
-		//always set this now
-		setTextValue("BHINVNAME", bhinvname, einf);
-
-		//addDebug("setBHInvnameHW derived bhinvname: "+bhinvname);
-		if (bhinvname.length()>MAX_LEN){
-			//If length (NewValue) > 30, then set ABR Return Code = Fail
-			//ErrorMessage LD(FEATURE) NDN(FEATURE) LD(BHINVNAME) (derived value from above for BHINVNAME) 
-			//'has a derived value longer than 30 characters.'
-			//DERIVED_LEN_ERR = {0} {1} &quot;{2}&quot; has a derived value longer than 30 characters.
-			EntityItem item = new EntityItem(featureGroup, m_prof, m_db, einf.entityType, einf.entityid);
-			args[0]=this.getLD_NDN(item);
-			args[1] = PokUtils.getAttributeDescription(featureGroup, "BHINVNAME", "BHINVNAME");
-			args[2] = bhinvname;
-			addError("DERIVED_LEN_ERR",args);
-			// release memory but keep the group
-			featureGroup.removeEntityItem(item);
-			for (int z = item.getAttributeCount() - 1; z >= 0; z--) {
-				EANAttribute att = item.getAttribute(z);
-				item.removeAttribute(att);
-			}
-			item.setParent(null);
-
-			//If STATUS = “Ready for Review” (0040) or “Final” (0020), the ABR will set STATUS = “Change Request” (0050) and DATAQUALITY = “Change Request” (0050) .
-			if(STATUS_FINAL.equals(einf.status) || STATUS_RFR.equals(einf.status)){
-				setStatusAndDQ(einf);
-			}
-		}
-	}    
-
-	/**
-	 * get all invnames for invgrp, check if a duplicate was found across all domains
-	 * @param invgrp
-	 * @param invname
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	private boolean checkDuplicateHWInvname(String invgrp, String invname)
-	throws java.sql.SQLException
-	{
-		//addDebug("checkDuplicateInvname: entered invgrp "+invgrp+" invname "+invname);
-		ResultSet result=null;
-		Hashtable invnameTbl = (Hashtable)invGrpInvnameTbl.get(invgrp);
-		if (invnameTbl !=null){
-			InvnameInfo info = (InvnameInfo)invnameTbl.get(invname);
-			if (info !=null){
-				if(info.count>1){
-					String key = invgrp+invname;
-					if(!dupelistedSet.contains(key)){ // decrease debug output, just list once
-						dupelistedSet.add(key);
-						addDebug(D.EBUG_SPEW,"found dupe: "+invgrp+": "+invname+": "+info);
-					}
-					return true;
-				}
-			}
-			return false;
-		}
-
-		String enterprise = m_prof.getEnterprise();
-		long startTime = System.currentTimeMillis();
-		try{
-			invgrpPs.clearParameters();
-			invgrpPs.setString(1, enterprise);
-			invgrpPs.setString(2, enterprise);
-			invgrpPs.setString(3, invgrp);
-			invgrpPs.setString(4, enterprise);
-
-			result = invgrpPs.executeQuery();
-			while(result.next()) {	
-				int eid = result.getInt(1);
-				//String type = result.getString(2);
-				String invname2 = result.getString(3);
-				String invgrp2 = result.getString(4);
-				String fc = result.getString(5);
-				
-			//	addDebug("checkDuplicateInvname: Query found "+invgrp2+" "+invname2+" for fc "+fc+" "+type+eid);
-				if(invname2==null){
-					continue;
-				}
-				
-				invnameTbl = (Hashtable)invGrpInvnameTbl.get(invgrp2);
-				if (invnameTbl ==null){
-					invnameTbl = new Hashtable();
-					invGrpInvnameTbl.put(invgrp2, invnameTbl);
-					invnameTbl.put(invname2, new InvnameInfo(eid,fc));
-				}else{
-					InvnameInfo info = (InvnameInfo)invnameTbl.get(invname2);
-					if (info ==null){
-						info = new InvnameInfo(eid,fc);
-						invnameTbl.put(invname2, info);
-					}else{
-						info.addId(eid, fc);
-						//addDebug("found dupe "+invgrp2+" "+invname2+" "+info);
-					}
-				}
-			}
-		}
-		catch(SQLException t) {
-			throw(t);
-		}
-		finally{
-			if (result!=null){
-				result.close();
-				result=null;
-			}
-			m_db.commit();
-		    m_db.freeStatement();
-		    m_db.isPending();
-		}
-		addDebug(D.EBUG_SPEW,"Time to get INVNAMEs for "+invgrp+" : "+Stopwatch.format(System.currentTimeMillis()-startTime));
-		
-		invnameTbl = (Hashtable)invGrpInvnameTbl.get(invgrp);
-		if (invnameTbl !=null){
-			InvnameInfo info = (InvnameInfo)invnameTbl.get(invname);
-			if (info !=null){
-				if(info.count>1){
-					return true;
-				}
-			}
-		}
-		return false;
-	}	   
-
-	/**
-	 * B.	Processing SW Feature
-	 * 
-	 * For each SW Feature in the specified PDHDOMAIN, perform the following.
-	 * 
-	 * If Value of (BHINVNAME) is Empty (aka Null) 
-	 * OR
-	 * if VALFROM(SWFEATURE.INVNAME) > VALFROM(BHINVNAME)
-	 * then Derive New Value for BHINVNAME
-	 * 
-	 * If SWFEATURE.INVNAME is empty, then 
-	 * IF SWPRODSTRUCT.INVNAME (SWPRODSTRUCT for the SWFEATURE if multiple, choose the first SWPRODSTRUCT) is not empty
-	 * SWFEATURE.INVNAME = SWPRODSTRUCT.INVNAME
-	 * Else
-	 * Set the ABR Return Code = Fail with the following:
-	 * ErrorMessage LD(SWFEATURE) NDN(SWFEATURE) does not have a LD(INVNAME).
-	 * 
-	 * Derive New Value for BHINVNAME as follows:
-	 * If the SWFEATURE is related to a MODEL(filtered by the COFGRP = “Base”) via SWPRODSTRUCT, then 
-	 * Search for SWPRODSTRUCT that is not restricted by PDHDOMAIN) using:
-	 * •	MACHTYPEATR
-	 * •	MODELATR
-	 * •	SWFEATURE.INVNAME
-	 * •	COFGRP = “Base” (150)
-	 * If only one is found (i.e. itself),
-	 * then BHINVNAME = SWFEATURE.INVNAME
-	 * else BHINVNAME = FEATURECODE & “-“ & SWFEATUE.INVNAME
-	 * else
-	 * BHINVNAME = SWFEATURE.INVNAME
-	 * 
-	 * If length (NewValue) > 30, then set ABR Return Code = Fail and leave BHINVNAME empty.
-	 * ErrorMessage LD(SWFEATURE) NDN(SWFEATURE) LD(BHINVNAME) (derived value from above for BHINVNAME) “has a derived value longer than 30 characters.”
-	 * 
-	 * 
-	 * An alternative is to use an extract action with the Software Models for the Workgroup using 
-	 * PDHDOMAIN and a filter of COFCAT = “Software” and COFGRP = “Base”. Then for each Software Model 
-	 * as the root of a VE that pulls SWPRODSTRUCT and SWFEATURE. Then you have a list of SWFEATUREs to 
-	 * check and can search the result of the extract for SWFEATURE.INVNAME.
-	 * 
-	 * @param rootEntity
-	 * @param pdhdomain
-	 * @throws Exception 
-	 */
-	private void processSWFeature(EntityItem rootEntity, String pdhdomain) throws 
-	Exception 
-	{
-		addDebug("processSWFeature for pdhdomain "+pdhdomain);
-		featureGroup = new EntityGroup(null,m_db, m_prof, "SWFEATURE", "Edit", false);// needed for meta info and msgs
-
-		addHeading(3,featureGroup.getLongDescription()+" Checks:");
-		
-		// if meta does not have this attribute, there is nothing to do
-		EANMetaAttribute metaAttr = featureGroup.getMetaAttribute("BHINVNAME");
-		if (metaAttr==null) {
-			// add error, this should not happen
-			//META_ERR = {0} was not found in {1} meta.
-			args[0] = "BHINVNAME";
-			args[1] = featureGroup.getEntityType();
-			addError("META_ERR",args);
-			return;
-		}
-
-		// search for WG with this domain
-		EntityItem wgitem = searchForWG(pdhdomain);
-		if (wgitem==null){
-			//WG_NOTFND = WorkGroup was not found for {0}. - should never happen
-			args[0] = this.getLD_Value(rootEntity, "PDHDOMAIN");
-			addError("WG_NOTFND",args);
-			return;
-		}
-
-		// pull extract from WG to MODEL where COFCAT = “Software” and COFGRP = “Base”
-		String VeName = "BHINVNAMEXT";//go from wg to model where cofgrp=base (150)
-
-		EntityList mdllist = m_db.getEntityList(m_prof,
-				new ExtractActionItem(null, m_db, m_prof, VeName),
-				new EntityItem[] {wgitem});
-		addDebug("processSWFeature: Extract "+VeName+NEWLINE+PokUtils.outputList(mdllist));
-
-		// pull extract for groups of xx MODEL at a time to SWFEATURE
-		EntityGroup mdlGrp = mdllist.getEntityGroup("MODEL");
-		// mw has a limit of xx for entity ids.. must break into groups of xx or less
-		if (mdlGrp.getEntityItemCount()>MW_VENTITY_LIMIT) {
-			int numGrps = mdlGrp.getEntityItemCount()/MW_VENTITY_LIMIT;
-			int numUsed=0;
-			Vector tmpVct = new Vector(1);
-			for (int i=0; i<=numGrps; i++)	{
-				tmpVct.clear();
-				for (int x=0; x<MW_VENTITY_LIMIT; x++) {
-					if (numUsed == mdlGrp.getEntityItemCount()){
-						break;
-					}
-					tmpVct.addElement(mdlGrp.getEntityItem(numUsed++));
-				}
-				if (tmpVct.size()>0) { // could be 0 if num entities is multiple of limit
-					//pull extract to get SWFEATUREs and SWPRODSTRUCTs
-					Vector einfVct = new Vector();
-					EntityList swfclist = pullSWModelInfo(tmpVct, einfVct);
-					setBHInvnameSW(swfclist, einfVct);
-					swfclist.dereference();
-					einfVct.clear();
-				}
-			}
-			tmpVct.clear();
-			tmpVct = null;
-		} else {
-			if(mdlGrp.getEntityItemCount()>0){
-				Vector tmpVct = new Vector(1);
-				for (int i=0; i<mdlGrp.getEntityItemCount(); i++)	{
-					tmpVct.addElement(mdlGrp.getEntityItem(i));
-				}
-				// pull extract to get SWFEATUREs and SWPRODSTRUCTs
-				Vector einfVct = new Vector();
-				EntityList swfclist = pullSWModelInfo(tmpVct, einfVct);
-				setBHInvnameSW(swfclist, einfVct);
-				swfclist.dereference();
-				einfVct.clear();
-				tmpVct.clear();
-				tmpVct = null;
-			}
-		}
-
-		mdllist.dereference();
-	}
-
-	/**
-	 * pull all SWFEATURE for these MODELs
-	 * set SWFEATURE.INVNAME if needed, determine if derivation is needed
-	 * 
-	 * @param mdlvct - Vector of EntityItem
-	 * @param einfVct
-	 * @return
-	 * @throws Exception 
-	 */
-	private EntityList pullSWModelInfo(Vector mdlvct,Vector einfVct) throws Exception
-	{
-		String VeName = "BHINVNAMEXT2";//go from model to swfeature
-		EntityItem ei[] = new EntityItem[mdlvct.size()];
-		mdlvct.copyInto(ei);
-		
-		EntityList mdllist = m_db.getEntityList(m_prof,
-				new ExtractActionItem(null, m_db, m_prof, VeName),
-				ei);
-		addDebug(D.EBUG_INFO,"pullSWModelInfo: Extract "+VeName+NEWLINE+PokUtils.outputList(mdllist));
-
-		// set INVNAME here if needed
-		//If SWFEATURE.INVNAME is empty, then 
-		//IF SWPRODSTRUCT.INVNAME (SWPRODSTRUCT for the SWFEATURE if multiple, choose the first SWPRODSTRUCT) is not empty
-		//SWFEATURE.INVNAME = SWPRODSTRUCT.INVNAME
-		EntityGroup mdlGrp = mdllist.getParentEntityGroup();
-		for (int x=0; x<mdlGrp.getEntityItemCount(); x++){
-			EntityItem mdlitem = mdlGrp.getEntityItem(x);
-			Vector swfcVct = PokUtils.getAllLinkedEntities(mdlitem, "SWPRODSTRUCT", "SWFEATURE");
-			for (int f=0; f<swfcVct.size(); f++){
-				EntityItem swfcitem = (EntityItem)swfcVct.elementAt(f);
-				if(swfeatSet.contains(swfcitem.getKey())){
-					addDebug(D.EBUG_SPEW,"pullSWModelInfo: already handled "+swfcitem.getKey());
-					continue;
-				}
-		
-				swfeatSet.add(swfcitem.getKey());
-				String invname = PokUtils.getAttributeValue(swfcitem, "INVNAME", "", null, false);
-				if (invname==null){
-					//If SWFEATURE.INVNAME is empty, then 
-					//IF SWPRODSTRUCT.INVNAME (SWPRODSTRUCT for the SWFEATURE if multiple, choose the first SWPRODSTRUCT) is not empty
-					//SWFEATURE.INVNAME = SWPRODSTRUCT.INVNAME 
-					//Else
-					//Set the ABR Return Code = Fail with the following:
-					//ErrorMessage LD(SWFEATURE) NDN(SWFEATURE) does not have a LD(INVNAME).
-					EntityItem swpsitem = (EntityItem)swfcitem.getDownLink(0);
-					String swpsinvname = PokUtils.getAttributeValue(swpsitem, "INVNAME", "", null, false);
-					addDebug(D.EBUG_INFO,"pullSWModelInfo: "+mdlitem.getKey()+" "+swfcitem.getKey()+
-							" invname "+invname+" "+swpsitem.getKey()+" swpsinvname "+swpsinvname);
-					if(swpsinvname!=null){
-						// derivation will be needed
-						EntityInfo einf = new EntityInfo(swfcitem);
-						einfVct.add(einf);
-						setTextValue("INVNAME", swpsinvname, einf);
-						einf.invname = swpsinvname;
-						setInvNameTbl.put(swfcitem.getKey(), swpsinvname);
-					}else{
-						//REQ_NOTPOPULATED_ERR = {0} {1} is required and does not have a value.
-						args[0]=getLD_NDN(swfcitem);
-						args[1]=PokUtils.getAttributeDescription(swfcitem.getEntityGroup(), "INVNAME", "INVNAME");
-						addError("REQ_NOTPOPULATED_ERR",args); 
-					}
-				}else{
-			    	//If Value of (BHINVNAME) is Empty (aka Null) 
-			    	//OR
-			    	//if VALFROM(INVNAME) > VALFROM(BHINVNAME)
-			    	//then Derive New Value for BHINVNAME
-					String bhinvname = PokUtils.getAttributeValue(swfcitem, "BHINVNAME",", ", null, false);
-					boolean derive = true;
-					if(bhinvname!=null){
-						addDebug(D.EBUG_SPEW,"pullSWModelInfo: "+mdlitem.getKey()+" "+swfcitem.getKey()+" invname "+invname+" bhinvname "+bhinvname);
-						// get the attributehistory for INVNAME
-						String invnameDts = getTimestamp(swfcitem, "INVNAME");
-						// get the attributehistory for BHINVNAME
-						String bhinvnameDts = getTimestamp(swfcitem, "BHINVNAME");
-						addDebug(D.EBUG_SPEW,"pullSWModelInfo:         invnameDts: "+invnameDts+" bhinvnameDts: "+bhinvnameDts);
-						derive = bhinvnameDts.compareTo(invnameDts)<0;
-					}
-					if(derive){
-						EntityInfo einf = new EntityInfo(swfcitem);
-						einfVct.add(einf);
-					}
-				}
-			}
-			swfcVct.clear();
-		}
-
-		return mdllist;
-	}
-	/**
-	 *  SEARCH WG  not restricted by PDHDOMAIN based on 
-	 *      •	PDHDOMAIN
-	 * @param pdhdomain
-	 * @return
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws MiddlewareShutdownInProgressException
-	 */
-	private EntityItem searchForWG(String pdhdomain) 
-	throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException
-	{
-		Vector attrVct = new Vector(1);
-		Vector valVct = new Vector(1);
-		attrVct.addElement("PDHDOMAIN");
-		valVct.addElement(pdhdomain);
-		EntityItem wgitem = null;
-		EntityItem eia[]= null;
-		try{
-			StringBuffer debugSb = new StringBuffer();
-			addDebug("searchForWG using attrs: "+attrVct+" values: "+valVct);
-			eia= ABRUtil.doSearch(getDatabase(), m_prof, 
-					WG_SRCHACTION_NAME, "WG", false, attrVct, valVct, debugSb);
-			if (debugSb.length()>0){
-				addDebug(debugSb.toString());
-			}
-		}catch(SBRException exc){
-			// these exceptions are for missing flagcodes or failed business rules, dont pass back
-			java.io.StringWriter exBuf = new java.io.StringWriter();
-			exc.printStackTrace(new java.io.PrintWriter(exBuf));
-			addDebug("searchForWG SBRException: "+exBuf.getBuffer().toString());
-		}
-
-		if(eia!=null){
-			for (int i=0; i<eia.length; i++){
-				String wgdomain = PokUtils.getAttributeFlagValue(eia[i], "PDHDOMAIN");
-				addDebug("searchForWG found "+eia[i].getKey()+" wgdomain "+wgdomain);
-				if (pdhdomain.equals(wgdomain)){ // look for the WG that is an exact match
-					wgitem = eia[i];
-					break;
-				}
-			}
-		}
-
-		attrVct.clear();
-		valVct.clear();
-		return wgitem;
-	}
-
-	/*****
-	 * SetBHInvnameSW
-	 * 
-	 * If SWFEATURE.INVNAME is empty, then
-	 * IF SWPRODSTRUCT.INVNAME (SWPRODSTRUCT for the SWFEATURE if multiple, choose the first SWPRODSTRUCT) is not empty
-	 * 		SWFEATURE.INVNAME = SWPRODSTRUCT.INVNAME
-	 * Else
-	 * 		Set the ABR Return Code = Fail with the following:
-	 * 		ErrorMessage LD(SWFEATURE) NDN(SWFEATURE) does not have a LD(INVNAME).
-	 * 
-	 * Derive New Value for BHINVNAME as follows:
-	 * If the SWFEATURE is related to a MODEL(filtered by the COFGRP = “Base”) via SWPRODSTRUCT, then 
-	 * 		Search for SWPRODSTRUCT that is not restricted by PDHDOMAIN) using:
-	 * 		•	MACHTYPEATR
-	 * 		•	MODELATR
-	 * 		•	SWFEATURE.INVNAME
-	 * 		•	COFGRP = “Base” (150)
-	 * 		If only one is found (i.e. itself) then 
-	 * 			BHINVNAME = SWFEATURE.INVNAME
-	 * 		else 
-	 * 			BHINVNAME = FEATURECODE & “-“ & SWFEATURE.INVNAME
-	 * else
-	 * 		BHINVNAME = SWFEATURE.INVNAME
-	 * 
-	 * If length (NewValue) > 30, then set ABR Return Code = Fail and leave BHINVNAME empty.
-	 * ErrorMessage LD(SWFEATURE) NDN(SWFEATURE) LD(BHINVNAME) (derived value from above for BHINVNAME) “has a derived value longer than 30 characters.”
-	 * 
-	 *
-	 * @param list
-	 * @param einfVct
-	 * @throws MiddlewareShutdownInProgressException 
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 * @throws EANBusinessRuleException 
-	 * @throws RemoteException 
-	 * @throws Exception 
-	 */
-	private void setBHInvnameSW(EntityList swfclist, Vector einfVct) throws 
-	SQLException, MiddlewareException, MiddlewareShutdownInProgressException, 
-	RemoteException, EANBusinessRuleException 
-	{
-		EntityGroup swfcGrp = swfclist.getEntityGroup("SWFEATURE");
-		for (int i=0; i<einfVct.size(); i++){ // this is the set of SWFEATURE info that need derivation
-			EntityInfo einf = (EntityInfo)einfVct.elementAt(i);
-			EntityItem swfcitem = swfcGrp.getEntityItem(einf.entityType+einf.entityid);
-
-			String fcode = einf.fcode;
-			String bhinvname = PokUtils.getAttributeValue(swfcitem, "BHINVNAME",", ", null, false);
-			String invname = einf.invname; // may have a value now if pulled from SWPRODSTRUCT
-			addDebug(D.EBUG_SPEW,"setBHInvnameSW checking "+swfcitem.getKey()+" fcode: "+fcode+
-					" invname: "+invname+" bhinvname "+bhinvname+" swps.count "+swfcitem.getDownLinkCount());
-
-			//If the SWFEATURE is related to a MODEL(filtered by the COFGRP = “Base”) via SWPRODSTRUCT, then 
-			//Search for SWPRODSTRUCT that is not restricted by PDHDOMAIN) using:
-			//•	MACHTYPEATR
-			//•	MODELATR
-			//•	SWFEATURE.INVNAME
-			//•	COFGRP = “Base” (150)
-
-			//If only one is found (i.e. itself) then 
-			//	BHINVNAME = SWFEATURE.INVNAME
-			//else 
-			//	BHINVNAME = FEATURECODE & “-“ & SWFEATURE.INVNAME
-			if(uniqueSWPS(swfcitem,invname)){
-				bhinvname = invname;
-			}else{
-				bhinvname = fcode+"-"+invname;
-			}
-			
-			// protect against exceeding text limit
-			//EANMetaAttribute.java(659): public static final int TEXT_MAX_LEN =254
-			if(bhinvname.length()>EANMetaAttribute.TEXT_MAX_LEN){
-				addDebug(D.EBUG_SPEW,"setBHInvnameSW ERROR "+swfcitem.getKey()+" bhinvname exceeds text limit "+bhinvname);
-				bhinvname = bhinvname.substring(0, EANMetaAttribute.TEXT_MAX_LEN-1);
-			}
-			
-			//always set this now
-			setTextValue("BHINVNAME", bhinvname, einf);
-			
-			//addDebug("setBHInvnameSW derived "+swfcitem.getKey()+" bhinvname: "+bhinvname);
-			if (bhinvname.length()>MAX_LEN){
-				//If length (NewValue) > 30, then set ABR Return Code = Fail and will set BHINVNAME to the new value. 
-				//ErrorMessage LD(SWFEATURE) NDN(SWFEATURE) LD(BHINVNAME) (derived value from above for BHINVNAME) 
-				//“has a derived value longer than 30 characters.”
-
-				//DERIVED_LEN_ERR = {0} {1} &quot;{2}&quot; has a derived value longer than 30 characters.
-				args[0]=this.getLD_NDN(swfcitem);
-				args[1] = PokUtils.getAttributeDescription(swfcitem.getEntityGroup(), "BHINVNAME", "BHINVNAME");
-				args[2] = bhinvname;
-				addError("DERIVED_LEN_ERR",args);
-				
-				//If STATUS = “Ready for Review” (0040) or “Final” (0020), the ABR will set STATUS = “Change Request” (0050) and DATAQUALITY = “Change Request” (0050) .
-				if(STATUS_FINAL.equals(einf.status) || STATUS_RFR.equals(einf.status)){
-					setStatusAndDQ(einf);
-				}
-			}
-
-			einf.dereference();
-		}
-
-		if(vctReturnsEntityKeys.size()>0){
-			// update the pdh with swfeatures
-			updatePDH();
-			vctReturnsEntityKeys.clear();
-		}
-	}
-
-	/**
-	 * using extract to improve performance
-	 * 	If the SWFEATURE is related to a MODEL(filtered by the COFGRP = 'Base') via SWPRODSTRUCT, then 
-	 *		Search for SWPRODSTRUCT that is not restricted by PDHDOMAIN) using:
-	 *		•	MACHTYPEATR
-	 *		•	MODELATR
-	 *		•	SWFEATURE.INVNAME
-	 *		•	COFGRP = 'Base' (150)
-	 * @param swfeatItem
-	 * @param invname
-	 * @return
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws MiddlewareShutdownInProgressException
-	 */
-	private boolean uniqueSWPS(EntityItem swfeatItem, String invname) 
-	throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException
-	{
-		boolean unique = true;
-		// get all the models for this SWFEATURE
-		Vector mdlVct = PokUtils.getAllLinkedEntities(swfeatItem, "SWPRODSTRUCT", "MODEL");
-		StringBuffer sb = new StringBuffer();
-		for (int m=0; m<mdlVct.size(); m++){
-			sb.append(" "+((EntityItem)mdlVct.elementAt(m)).getKey());
-		}
-
-		// get all the swfeatures for these models
-		Vector swfcVct = PokUtils.getAllLinkedEntities(mdlVct, "SWPRODSTRUCT", "SWFEATURE");
-		addDebug(D.EBUG_SPEW,"uniqueSWPS entered  "+swfeatItem.getKey()+" invname "+invname+" with "+sb.toString()+
-				" swfcVct.size "+swfcVct.size());
-		for(int p=0; p<swfcVct.size(); p++){
-			EntityItem swfcitem = (EntityItem)swfcVct.elementAt(p);
-			String swfcInvname = PokUtils.getAttributeValue(swfcitem, "INVNAME",", ", null, false);
-			if (swfcInvname ==null){
-				// was it set earlier?
-				swfcInvname = (String)setInvNameTbl.get(swfcitem.getKey());
-			}
-			if (swfcitem.getKey().equals(swfeatItem.getKey())){ // skip this one
-				continue;
-			}
-			addDebug(D.EBUG_SPEW,"uniqueSWPS checking "+swfcitem.getKey()+" swfcInvname "+swfcInvname);
-			if (invname.equals(swfcInvname)){
-				unique = false;
-				break;
-			}
-		}
-
-		// release memory
-		swfcVct.clear();
-		swfcVct= null;
-		mdlVct.clear();
-		mdlVct = null;
-		return unique;
-	}
-	
-	/************************************
-	 * @param item
-	 * @param attrCode
-	 * @return
-	 */
-	private String getLD_Value(EntityItem item, String attrCode)   {
-		return PokUtils.getAttributeDescription(item.getEntityGroup(), attrCode, attrCode)+": "+
-		PokUtils.getAttributeValue(item, attrCode, ",", PokUtils.DEFNOTPOPULATED, false);
-	}
-	/**************************************
-	 * Get long description and navigation name for specified entity
-	 * @param item
-	 * @return
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	private String getLD_NDN(EntityItem item) throws SQLException, MiddlewareException    {
-		return item.getEntityGroup().getLongDescription()+" &quot;"+getNavigationName(item)+"&quot;";
-	}
-
-	/******
-	 * @see COM.ibm.eannounce.abr.util.PokBaseABR#dereference()
-	 */
-	public void dereference(){
-		super.dereference();
-
-		rsBundle = null;
-		rptSb = null;
-		args = null;
-
-		metaTbl = null;
-		navName = null;
-		vctReturnsEntityKeys.clear();
-		vctReturnsEntityKeys = null;
-
-		featureGroup = null;
-		
-		swfeatSet.clear();
-		swfeatSet = null;
-		
-		dupelistedSet.clear();
-		dupelistedSet = null;
-
-		setInvNameTbl.clear();
-		setInvNameTbl = null;
-
-		Iterator itr = invGrpInvnameTbl.keySet().iterator();
-		while(itr.hasNext()) {
-			String invGrp = (String) itr.next();
-			Hashtable infotbl = (Hashtable)invGrpInvnameTbl.get(invGrp);
-			Iterator infoitr = infotbl.keySet().iterator();
-			while(infoitr.hasNext()) {
-				String invname = (String) infoitr.next();
-				InvnameInfo info = (InvnameInfo)infotbl.get(invname);
-				info.dereference();
-			}
-			infotbl.clear();
-		}
-		
-		invGrpInvnameTbl.clear();
-		invGrpInvnameTbl = null;
-		
-		dbgPw=null;
-		dbgfn = null;
-		updatedSB = null;
-	}
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.util.PokBaseABR#getABRVersion()
-	 */
-	public String getABRVersion() {
-		return "$Revision: 1.10 $";
-	}
-
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.util.PokBaseABR#getDescription()
-	 */
-	public String getDescription() {
-		return "BHINVNAMABRSTATUS";
-	}
-	/**********************************
-	 * add msg to report output
-	 * @param msg
-	 */
-	private void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
-
-	/**********************
-	 * support conditional msgs
-	 * @param level
-	 * @param msg
-	 */
-	private void addDebug(int level,String msg) { 
-		if (level <= abr_debuglvl) {
-			addDebug(msg);
-		}
-	}
-	/**********************************
-	 * add debug info as html comment
-	 * @param msg 
-	 */
-	private void addDebug(String msg) { 
-		if(dbgPw!=null){
-			dbgLen+=msg.length();
-			dbgPw.println(msg);
-			dbgPw.flush();
-		}else{
-			rptSb.append("<!-- "+msg+" -->"+NEWLINE);
-		}
-	}
-	/**********************************
-	 * stringbuffer used for report output
-	 */
-	private void addHeading(int level, String msg) { rptSb.append("<h"+level+">"+msg+"</h"+level+">"+NEWLINE);}
-
-	/**********************************
-	 * used for error output
-	 * Prefix with LD(EntityType) NDN(EntityType) of the EntityType that the ABR is checking
-	 * (root EntityType)
-	 *
-	 * The entire message should be prefixed with 'Error: '
-	 *
-	 */
-	private void addError(String errCode, Object args[])
-	{
-		setReturnCode(FAIL);
-
-		//ERROR_PREFIX = Error:  reduce size of output, do not prepend root info
-		addMessage(rsBundle.getString("ERROR_PREFIX"), errCode, args);
-	} 
-
-	/**********************************
-	 * used for warning or error output
-	 *
-	 */
-	private void addMessage(String msgPrefix, String errCode, Object args[])
-	{
-		String msg = rsBundle.getString(errCode);
-		// get message to output
-		if (args!=null){
-			MessageFormat msgf = new MessageFormat(msg);
-			msg = msgf.format(args);
-		}
-
-		addOutput(msgPrefix+" "+msg);
-	}
-
-	/**********************************************************************************
-	 *  Get Name based on navigation attributes for specified entity
-	 *
-	 *@return java.lang.String
-	 */
-	private String getNavigationName(EntityItem theItem) throws java.sql.SQLException, MiddlewareException
-	{
-		StringBuffer navName = new StringBuffer();
-
-		// NAME is navigate attributes
-		// check hashtable to see if we already got this meta
-		EANList metaList = (EANList)metaTbl.get(theItem.getEntityType());
-		if (metaList==null)
-		{
-			EntityGroup eg = new EntityGroup(null, m_db, m_prof, theItem.getEntityType(), "Navigate");
-			metaList = eg.getMetaAttribute();  // iterator does not maintain navigate order
-			metaTbl.put(theItem.getEntityType(), metaList);
-		}
-		for (int ii=0; ii<metaList.size(); ii++)
-		{
-			EANMetaAttribute ma = (EANMetaAttribute)metaList.getAt(ii);
-			navName.append(PokUtils.getAttributeValue(theItem, ma.getAttributeCode(),", ", "", false));
-			if (ii+1<metaList.size()){
-				navName.append(" ");
-			}
-		}
-
-		return navName.toString().trim();
-	}
-
-	/***********************************************
-	 * Sets the specified Text Attribute on the specified entity
-	 *
-	 * @param _sAttributeCode
-	 * @param _sAttributeValue
-	 * @param einf
-	 */
-	private void setTextValue(String _sAttributeCode, String _sAttributeValue,	EntityInfo einf)
-	{
-		//addDebug("setTextValue entered for "+einf.entityType+einf.entityid+" "+_sAttributeCode+" set to: " + _sAttributeValue);
-
-		if (m_cbOn==null){
-			setControlBlock(); // needed for attribute updates
-		}
-
-		Vector vctAtts = null;
-		// look at each key to see if this item is there yet
-		for (int i=0; i<vctReturnsEntityKeys.size(); i++){
-			ReturnEntityKey rek = (ReturnEntityKey)vctReturnsEntityKeys.elementAt(i);
-			if (rek.getEntityID() == einf.entityid &&
-					rek.getEntityType().equals(einf.entityType)){
-				vctAtts = rek.m_vctAttributes;
-				break;
-			}
-		}
-		if (vctAtts ==null){
-			ReturnEntityKey rek = new ReturnEntityKey(einf.entityType, einf.entityid, true);
-			vctAtts = new Vector();
-			rek.m_vctAttributes = vctAtts;
-			vctReturnsEntityKeys.addElement(rek);
-		}
-
-		COM.ibm.opicmpdh.objects.Text sf = new COM.ibm.opicmpdh.objects.Text(m_prof.getEnterprise(),
-				einf.entityType, einf.entityid, _sAttributeCode, _sAttributeValue, 1, m_cbOn);
-		vctAtts.addElement(sf);
-	}
-	/***********************************************
-	 *  Sets the status and dq to chg req
-	 *
-	 * @param einf
-	 */
-	private void setStatusAndDQ(EntityInfo einf)
-	{
-		addDebug(D.EBUG_SPEW,"setStatusAndDQ for "+einf.entityType+einf.entityid);
-
-		if (m_cbOn==null){
-			setControlBlock(); // needed for attribute updates
-		}
-
-		Vector vctAtts = null;
-		// look at each key to see if root is there yet
-		for (int i=0; i<vctReturnsEntityKeys.size(); i++){
-			ReturnEntityKey rek = (ReturnEntityKey)vctReturnsEntityKeys.elementAt(i);
-			if (rek.getEntityID() == einf.entityid &&
-					rek.getEntityType().equals(einf.entityType)){
-				vctAtts = rek.m_vctAttributes;
-				break;
-			}
-		}
-		if (vctAtts ==null){
-			ReturnEntityKey rek = new ReturnEntityKey(einf.entityType,einf.entityid , true);
-			vctAtts = new Vector();
-			rek.m_vctAttributes = vctAtts;
-			vctReturnsEntityKeys.addElement(rek);
-		}
-
-		// update status
-		SingleFlag sf = new SingleFlag (m_prof.getEnterprise(), einf.entityType, einf.entityid ,
-				"STATUS", STATUS_CHGREQ, 1, m_cbOn);
-
-		vctAtts.addElement(sf);
-
-		// update dq
-		sf = new SingleFlag (m_prof.getEnterprise(), einf.entityType, einf.entityid ,
-				"DATAQUALITY", DQ_CHGREQ, 1, m_cbOn);
-
-		vctAtts.addElement(sf);
-	}
-
-	/***********************************************
-	 * Update the PDH with the values in the vector, do all at once
-	 *
-	 */
-	private void updatePDH()
-	throws java.sql.SQLException,
-	COM.ibm.opicmpdh.middleware.MiddlewareException,
-	java.rmi.RemoteException,
-	COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-	COM.ibm.eannounce.objects.EANBusinessRuleException
-	{
-		logMessage(getDescription()+" updating PDH");
-		addDebug(D.EBUG_SPEW,"updatePDH entered for vctReturnsEntityKeys: "+vctReturnsEntityKeys.size());
-
-		if(vctReturnsEntityKeys.size()>0) {
-			MessageFormat msgf;
-			try {
-				m_db.update(m_prof, vctReturnsEntityKeys, false, false);
-
-				try{  
-					// output a message for each thing set
-					for (int i=0; i<vctReturnsEntityKeys.size(); i++){
-						ReturnEntityKey rek = (ReturnEntityKey)vctReturnsEntityKeys.elementAt(i);
-						for (int ii=0; ii<rek.m_vctAttributes.size(); ii++){
-							Attribute attr = (Attribute)rek.m_vctAttributes.elementAt(ii);
-							String attrCode = attr.getAttributeCode();
-							if(attrCode.equals("BHINVNAME") && attr.getAttributeValue().length()<=MAX_LEN){
-								//ATTR_SET = {0} was set to {1} for {2} {3}
-								msgf = new MessageFormat(rsBundle.getString("ATTR_SET"));
-								args[0] = PokUtils.getAttributeDescription(featureGroup, attrCode, attrCode);
-								args[1] = attr.getAttributeValue();
-								args[2] = featureGroup.getLongDescription();
-								args[3] = rek.getEntityType()+rek.getEntityID();
-
-								//addOutput(msgf.format(args));
-								updatedSB.append("<p>"+msgf.format(args)+"</p>"+NEWLINE); // group all updates
-			 					break; // dont output status and dq updates
-							}
-						}// end all rek attributes
-					}
-				}catch(Exception exc){
-					exc.printStackTrace();
-					addDebug("exception trying to output msg "+exc);
-				}
-			}
-			finally {
-				vctReturnsEntityKeys.clear();
-				m_db.commit();
-				m_db.freeStatement();
-				m_db.isPending("finally after updatePDH");
-			}
-		}
-	}
-
-	/**********************************
-	 * get last timestamp for specified attribute
-	 */
-	private String getTimestamp(EntityItem theItem, String attrCode) throws Exception
-	{
-		RowSelectableTable itemTable = //theItem.getEntityItemTable(); cant use this because
-			// prodstruct can edit parent model and the model isnt in this small extract, so bypass item chks
-			new RowSelectableTable(theItem, theItem.getLongDescription());
-
-		String dts = "";
-		String keyStr = theItem.getEntityType() + ":" + attrCode;
-		int row = itemTable.getRowIndex(keyStr);
-		if (row < 0) {
-			row = itemTable.getRowIndex(keyStr + ":C");
-		}
-		if (row < 0) {
-			row = itemTable.getRowIndex(keyStr + ":R");
-		}
-		if (row != -1)
-		{
-			EANAttribute attStatus = (EANAttribute) itemTable.getEANObject(row, 1);
-			if (attStatus != null)
-			{	
-				AttributeChangeHistoryGroup ahistGrp = m_db.getAttributeChangeHistoryGroup(m_prof, attStatus);
-				/*  int cnt = 0;
-			  	rptSb.append("<!--"+theItem.getKey()+" "+attrCode+" change history ");
-				for (int ci= ahistGrp.getChangeHistoryItemCount()-1; ci>=0; ci--) // go from most recent to earliest
-				{
-					ChangeHistoryItem chi = ahistGrp.getChangeHistoryItem(ci);
-					rptSb.append(NEWLINE+"AttrChangeHistoryItem["+ci+"] chgDate: "+chi.getChangeDate()+
-							" value: "+
-							chi.get("ATTVAL",true).toString()+
-							" flagcode: "+chi.getFlagCode()+
-							" user: "+chi.getUser());
-					cnt++;
-					if (cnt>3) {  // just last 3 is enough to look at
-						break;
-					}
-				} // each history item
-				rptSb.append(" -->"+NEWLINE);*/
-				if (ahistGrp.getChangeHistoryItemCount()>0){
-					int last = ahistGrp.getChangeHistoryItemCount()-1;
-					dts = ahistGrp.getChangeHistoryItem(last).getChangeDate();
-				}
-			}
-			else {
-				addDebug(D.EBUG_SPEW,"EANAttribute was null for "+attrCode+" in "+theItem.getKey());
-			}
-		}
-		else {
-			addDebug("Row for "+attrCode+" was not found for "+theItem.getKey());
-		}
-
-		return dts;
-	}
-	/********************************************************************************
-	 * this is used to find FEATURE with matching PDHDOMAIN
-	 * extract is used for SWFEATUREs
-	 * 
-	 * @param pdhdomain
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	private Vector getHWEntities(String pdhdomain)
-	throws java.sql.SQLException
-	{
-		ResultSet result=null;
-		Vector vct = new Vector();
-		String enterprise = m_prof.getEnterprise();
-
-		try{
-			bhinvnameStatement.clearParameters();
-			bhinvnameStatement.setString(1, enterprise);
-			bhinvnameStatement.setString(2, enterprise);
-			bhinvnameStatement.setString(3, enterprise);
-			bhinvnameStatement.setString(4, pdhdomain);
-			bhinvnameStatement.setString(5, enterprise);
-			bhinvnameStatement.setString(6, enterprise);
-			bhinvnameStatement.setString(7, enterprise);
-			bhinvnameStatement.setString(8, enterprise);
-			bhinvnameStatement.setString(9, pdhdomain);
-			bhinvnameStatement.setString(10, enterprise);
-			bhinvnameStatement.setString(11, enterprise);
-			bhinvnameStatement.setString(12, enterprise);
-			bhinvnameStatement.setString(13, enterprise);
-
-			result = bhinvnameStatement.executeQuery();
-			while(result.next()) {					
-				int eid = result.getInt(1);
-				String type = result.getString(2);
-				String invname = result.getString(3);
-				String invgrp = result.getString(4);
-				String fcode = result.getString(5);
-				String status = result.getString(6);
-				if(invname==null || invgrp==null){
-					addDebug(D.EBUG_SPEW,"getEntities: skipping "+type+eid+" with invname "+invname+" invgrp "+invgrp+" fcode "+fcode);
-					continue;
-				}
-				EntityInfo einf = new EntityInfo(eid,//int eid, 
-						type,//String etype, 
-						invname,//String invnm, 
-						invgrp,//String invgrp, 
-						fcode, //String fc
-						status);//String status
-				vct.add(einf);	
-				//addDebug("getEntities: Query found "+einf);
-			}
-		}
-		catch(SQLException t) {
-			throw(t);
-		}
-		finally{
-			if (result!=null){
-				result.close();
-				result=null;
-			}
-			m_db.commit();
-		    m_db.freeStatement();
-		    m_db.isPending();
-		}
-		return vct;
-	}	
-
-	/********************************************************************************
-	 * close the preparedstatements
-	 */
-	private void closeStatements() 
-	{
-		try {
-			if (invgrpPs !=null) {
-				invgrpPs.close();
-				invgrpPs=null;
-			}
-		}catch(Exception e){
-			System.err.println("closeStatements(), unable to close invgrpPs. "+ e);
-		}
-		try {
-			if (bhinvnameStatement!=null) {
-				bhinvnameStatement.close();
-				bhinvnameStatement=null;
-			}
-		}catch(Exception e){
-			System.err.println("closeStatements(), unable to close bhinvnameStatement. "+ e);
-		}
-	}
-
-	/***********
-	 * this class holds the entity id, INVNAME, INVENTORYGROUP and FEATURECODE returned from the queries
-	 *
-	 */
-	private class EntityInfo{
-		private String invname = null;
-		private int entityid = 0;
-		private String entityType=null;
-		private String invGrp = null;
-		private String fcode = null;
-		private String status = null;
-
-		EntityInfo(EntityItem swfcitem){
-			invname = PokUtils.getAttributeValue(swfcitem, "INVNAME", "", null, false);
-			entityid = swfcitem.getEntityID();
-			entityType = swfcitem.getEntityType();
-			invGrp = PokUtils.getAttributeFlagValue(swfcitem, "INVENTORYGROUP");
-			fcode = PokUtils.getAttributeValue(swfcitem, "FEATURECODE", "", null, false);
-			status = PokUtils.getAttributeFlagValue(swfcitem, "STATUS");
-		}
-		EntityInfo(int eid, String etype, String invnm, String invgrp, String fc, String st){ 
-			invname = invnm;
-			entityid = eid;
-			entityType = etype;
-			invGrp = invgrp;
-			fcode = fc;
-			status = st;
-		}
-
-		public String toString(){
-			return entityType+entityid+" fcode "+fcode+" invGrp "+invGrp+" invname "+invname+" status "+status;
-		}
-		void dereference(){
-			// release memory
-			invname = null;
-			invGrp = null;
-			fcode = null;
-			entityType=null;
-			status = null;
-		}
-	}
-	/***********
-	 * this class holds the entity id, featurecode,INVNAME from query by invgrp
-	 *
-	 */
-	private class InvnameInfo{
-		private String entityids = "";
-		private String fcodes = "";
-		private int count = 0;
-
-		InvnameInfo(int eid, String fc){ 
-			addId(eid, fc);
-		}
-		void addId(int eid, String fc){ 
-			entityids += " "+eid;
-			fcodes += " "+fc;
-			count++;
-		}
-
-		public String toString(){
-			return "entityids: "+entityids+" fcodes: "+fcodes;
-		}
-		void dereference(){
-			// release memory
-			entityids = null;
-			fcodes = null;
-		}
-	}
-}

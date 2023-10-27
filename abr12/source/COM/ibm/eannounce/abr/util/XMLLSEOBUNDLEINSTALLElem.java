@@ -1,219 +1,224 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.MetaFlag;
+/*     */ import COM.ibm.opicmpdh.middleware.D;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import com.ibm.transform.oim.eacm.diff.DiffEntity;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.Vector;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class XMLLSEOBUNDLEINSTALLElem
+/*     */   extends XMLElem
+/*     */ {
+/*     */   public XMLLSEOBUNDLEINSTALLElem() {
+/*  48 */     super(null);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getAttributeLongFlagDesc(EntityItem paramEntityItem, String paramString) {
+/*     */     MetaFlag[] arrayOfMetaFlag;
+/*     */     byte b;
+/*  57 */     String str1 = null;
+/*  58 */     String str2 = "";
+/*  59 */     EANAttribute eANAttribute = paramEntityItem.getAttribute(paramString);
+/*     */     
+/*  61 */     if (eANAttribute == null) {
+/*  62 */       D.ebug(0, "getAttributeLongFlagDesc:entityattribute is null");
+/*  63 */       return null;
+/*     */     } 
+/*  65 */     str1 = eANAttribute.toString();
+/*  66 */     EntityGroup entityGroup = paramEntityItem.getEntityGroup();
+/*     */     
+/*  68 */     EANMetaAttribute eANMetaAttribute = entityGroup.getMetaAttribute(paramString);
+/*  69 */     switch (eANMetaAttribute.getAttributeType().charAt(0)) {
+/*     */       case 'F':
+/*     */       case 'S':
+/*     */       case 'U':
+/*  73 */         arrayOfMetaFlag = (MetaFlag[])eANAttribute.get();
+/*  74 */         for (b = 0; b < arrayOfMetaFlag.length; b++) {
+/*  75 */           if (arrayOfMetaFlag[b].isSelected()) {
+/*  76 */             if (arrayOfMetaFlag[b].getShortDescription() != null) {
+/*  77 */               if (str2.trim().length() > 0) {
+/*  78 */                 str2 = str2 + "|" + arrayOfMetaFlag[b].getLongDescription();
+/*     */               } else {
+/*  80 */                 str2 = arrayOfMetaFlag[b].getLongDescription();
+/*     */               } 
+/*     */             } else {
+/*  83 */               D.ebug(0, "getAttributeLongFlagDesc:NULL returned for " + arrayOfMetaFlag[b].getFlagCode());
+/*     */             } 
+/*     */           }
+/*     */         } 
+/*  87 */         str1 = str2;
+/*     */         break;
+/*     */     } 
+/*     */ 
+/*     */     
+/*  92 */     D.ebug(4, "getAttributeLongFlagDesc:Attribute values are " + str2);
+/*     */     
+/*  94 */     return str1;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addElements(Database paramDatabase, Hashtable paramHashtable, Document paramDocument, Element paramElement, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 127 */     String str1 = "";
+/* 128 */     boolean bool = false;
+/* 129 */     EntityItem entityItem = paramDiffEntity.getCurrentEntityItem();
+/* 130 */     if (paramDiffEntity.isDeleted()) {
+/* 131 */       entityItem = paramDiffEntity.getPriorEntityItem();
+/*     */     }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 141 */     String str2 = "BUNDLETYPE";
+/* 142 */     String str3 = getAttributeLongFlagDesc(entityItem, str2);
+/* 143 */     ABRUtil.append(paramStringBuffer, "LSEOBUNDLE BUNDLETYPE=" + str3 + NEWLINE);
+/* 144 */     if (str3 == null) {
+/* 145 */       ABRUtil.append(paramStringBuffer, "LSEOBUNDLE is null." + NEWLINE);
+/* 146 */       str1 = "";
+/* 147 */     } else if (str3.indexOf("Hardware") > -1) {
+/* 148 */       ABRUtil.append(paramStringBuffer, "LSEOBUNDLE is Hardware ." + NEWLINE);
+/* 149 */       bool = true;
+/*     */     } else {
+/* 151 */       ABRUtil.append(paramStringBuffer, "LSEOBUNDLE is not Hardware ." + NEWLINE);
+/* 152 */       str1 = "";
+/*     */     } 
+/*     */ 
+/*     */     
+/* 156 */     if (bool) {
+/* 157 */       str1 = getModelOfINSTALL(entityItem, paramStringBuffer);
+/*     */     } else {
+/* 159 */       str1 = "";
+/*     */     } 
+/* 161 */     if (str1 == null) str1 = ""; 
+/* 162 */     createNodeSet(paramDocument, paramElement, str1, paramStringBuffer);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String getModelOfINSTALL(EntityItem paramEntityItem, StringBuffer paramStringBuffer) {
+/* 171 */     String str = "";
+/* 172 */     Vector<EntityItem> vector = paramEntityItem.getDownLink(); byte b;
+/* 173 */     label31: for (b = 0; b < vector.size(); b++) {
+/* 174 */       EntityItem entityItem = vector.get(b);
+/* 175 */       if (entityItem != null && "LSEOBUNDLELSEO".equals(entityItem.getEntityType())) {
+/* 176 */         EntityItem entityItem1 = (EntityItem)entityItem.getDownLink(0);
+/* 177 */         Vector<EntityItem> vector1 = entityItem1.getUpLink();
+/* 178 */         for (byte b1 = 0; b1 < vector1.size(); b1++) {
+/* 179 */           EntityItem entityItem2 = vector1.get(b1);
+/* 180 */           if (entityItem2 != null && "WWSEOLSEO".equals(entityItem2.getEntityType())) {
+/* 181 */             EntityItem entityItem3 = (EntityItem)entityItem2.getUpLink(0);
+/* 182 */             Vector<EntityItem> vector2 = entityItem3.getUpLink();
+/* 183 */             for (byte b2 = 0; b2 < vector2.size(); b2++) {
+/* 184 */               EntityItem entityItem4 = vector2.get(b2);
+/* 185 */               if (entityItem4 != null && "MODELWWSEO".equals(entityItem4.getEntityType())) {
+/* 186 */                 EntityItem entityItem5 = (EntityItem)entityItem4.getUpLink(0);
+/* 187 */                 String str1 = getAttributeLongFlagDesc(entityItem5, "COFCAT");
+/* 188 */                 ABRUtil.append(paramStringBuffer, "MODEL COFCAT=" + str1 + NEWLINE);
+/* 189 */                 if (str1 != null && 
+/* 190 */                   str1.indexOf("Hardware") > -1) {
+/* 191 */                   str = getAttributeLongFlagDesc(entityItem5, "INSTALL");
+/*     */                   
+/*     */                   break label31;
+/*     */                 } 
+/*     */               } 
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 202 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void createNodeSet(Document paramDocument, Element paramElement, String paramString, StringBuffer paramStringBuffer) {
+/* 214 */     Element element = paramDocument.createElement("INSTALL");
+/* 215 */     element.appendChild(paramDocument.createTextNode("" + paramString));
+/* 216 */     paramElement.appendChild(element);
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.util;
 
-import java.util.Hashtable;
-import java.util.Vector;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import COM.ibm.eannounce.objects.EANAttribute;
-import COM.ibm.eannounce.objects.EANMetaAttribute;
-import COM.ibm.eannounce.objects.EntityGroup;
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.eannounce.objects.MetaFlag;
-import COM.ibm.opicmpdh.middleware.D;
-import COM.ibm.opicmpdh.middleware.Database;
-
-import com.ibm.transform.oim.eacm.diff.DiffEntity;
-
-/*******************************************************************************
- * Class used to hold info and structure to be generated for the xml feed for
- * abrs. Checks for deleted or updated entity
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\XMLLSEOBUNDLEINSTALLElem.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-// $Log: XMLLSEOBUNDLEINSTALLElem.java,v $
-// Revision 1.2  2015/01/26 15:53:39  wangyul
-// fix the issue PR24222 -- SPF ADS abr string buffer
-//
-// Revision 1.1  2011/12/14 02:29:11  guobin
-// update the install attribute for the LSEOBUNDLEI
-//
-// - BH FS ABR Data Transformation System Feed 20110916.doc
-//<INSTALL>
-// If BUNDLETYPE=’Hardware’ exists, then derive INSTALL as follows:
-//	  Navigate each LSEOBUNDLELSEO –d, WWSEOLSEO –u and MODELWWSEO –u to find parent MODEL.
-//	  If MODEL.COFCAT = “Hardware” (100), set <INSTALL> to MODEL.INSTALL Long Description 
-//    for NLSID=1 if it exists (else set to null)
-// Else <INSTALL> is null 
-//
-//
-public class XMLLSEOBUNDLEINSTALLElem extends XMLElem {
-	public XMLLSEOBUNDLEINSTALLElem() {
-		super(null);
-	}
-	/**
-	 * get long flag description
-	 * @param _ei
-	 * @param _strAttrCode
-	 * @return
-	 */
-	public String getAttributeLongFlagDesc(EntityItem _ei, String _strAttrCode) {
-	    String strRetValue = null;
-	    String strFlagValues = "";
-	    EANAttribute EANAttr = _ei.getAttribute(_strAttrCode);
-
-	    if (EANAttr == null) {
-	    	D.ebug(D.EBUG_ERR,"getAttributeLongFlagDesc:entityattribute is null");
-	      return null;
-	    }
-	    strRetValue = EANAttr.toString();
-	    EntityGroup eg= _ei.getEntityGroup();
-
-	    EANMetaAttribute eanMetaAtt = eg.getMetaAttribute(_strAttrCode);
-	    switch (eanMetaAtt.getAttributeType().charAt(0)) {
-	        case 'F':
-	        case 'U':
-	        case 'S':
-	          MetaFlag[] mfAttr = (MetaFlag[]) EANAttr.get();
-	          for (int i = 0; i < mfAttr.length; i++) {
-	            if (mfAttr[i].isSelected()) {
-	              if (mfAttr[i].getShortDescription()!=null)  {
-	                if (strFlagValues.trim().length() > 0 ) {
-	                  strFlagValues += "|" + mfAttr[i].getLongDescription();
-	                } else {
-	                strFlagValues = mfAttr[i].getLongDescription();
-	                }
-	              }else {
-	            	  D.ebug(D.EBUG_ERR,"getAttributeLongFlagDesc:NULL returned for "+mfAttr[i].getFlagCode());
-	              }
-	            }
-	          }
-	          strRetValue = strFlagValues;
-	          break;
-	        default:
-
-	    }
-	    D.ebug(D.EBUG_SPEW,"getAttributeLongFlagDesc:Attribute values are " + strFlagValues);
-
-	    return strRetValue;
-
-	  }
-
-	/***************************************************************************
-	 * Create a node for this element and add to the parent and any children
-	 * this node has
-	 * 
-	 * @param dbCurrent
-	 *            Database
-	 * @param table
-	 *            Hashtable of Vectors of DiffEntity
-	 * @param document
-	 *            Document needed to create nodes
-	 * @param parent
-	 *            Element node to add this node too
-	 * @param parentItem
-	 *            DiffEntity - parent to use if path is specified in
-	 *            XMLGroupElem, item to use otherwise
-	 * @param debugSb
-	 *            StringBuffer for debug output
-	 */
-	public void addElements(Database dbCurrent, Hashtable table,
-			Document document, Element parent, DiffEntity parentItem,
-			StringBuffer debugSb)
-			throws COM.ibm.eannounce.objects.EANBusinessRuleException,
-			java.sql.SQLException,
-			COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-			COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-			java.rmi.RemoteException, java.io.IOException,
-			COM.ibm.opicmpdh.middleware.MiddlewareException,
-			COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException {
-		
-		String strINSTALL = "";
-		boolean isHardware = false;
-		EntityItem item = parentItem.getCurrentEntityItem();
-		if (parentItem.isDeleted()) {
-			item = parentItem.getPriorEntityItem();
-		}
-		
-//		<INSTALL>
-//		 If BUNDLETYPE=’Hardware’ exists, then derive INSTALL as follows:
-//			  Navigate each LSEOBUNDLELSEO –d, WWSEOLSEO –u and MODELWWSEO –u to find parent MODEL.
-//			  If MODEL.COFCAT = “Hardware” (100), set <INSTALL> to MODEL.INSTALL Long Description 
-//		    for NLSID=1 if it exists (else set to null)
-//		 Else <INSTALL> is null 
-		//1. check the BUNDLETYPE=’Hardware’
-		String attrcode = "BUNDLETYPE";
-		String sBUNDLETYPE = getAttributeLongFlagDesc(item, attrcode);
-		ABRUtil.append(debugSb,"LSEOBUNDLE BUNDLETYPE="+ sBUNDLETYPE + NEWLINE);
-		if(sBUNDLETYPE ==null){
-			ABRUtil.append(debugSb,"LSEOBUNDLE is null." + NEWLINE);
-			strINSTALL = "";
-		}else if(sBUNDLETYPE.indexOf("Hardware")>-1){
-			ABRUtil.append(debugSb,"LSEOBUNDLE is Hardware ." + NEWLINE);
-			isHardware = true;
-		}else{
-			ABRUtil.append(debugSb,"LSEOBUNDLE is not Hardware ." + NEWLINE);
-			strINSTALL = "";
-		}
-		
-		//2. if true, find INSTALL attributevalue of MODEL 
-		if(isHardware){
-			strINSTALL = getModelOfINSTALL(item,debugSb);
-		}else{
-			strINSTALL = "";
-		}
-		if(strINSTALL ==null) strINSTALL ="";		
-		createNodeSet(document, parent, strINSTALL, debugSb);
-	}
-	/**
-	 * @param item
-	 * LSEOBUNDLELSEO –d, WWSEOLSEO –u and MODELWWSEO –u to find parent MODEL
-	 * only one hardware MODEL
-	 */
-	private String getModelOfINSTALL(EntityItem item,StringBuffer debugSb) {
-		//1. get MODEL
-		String sINSTALL="";
-		Vector relatorsV1 = item.getDownLink();
-		TT: for (int i=0; i<relatorsV1.size(); i++){
-			EntityItem relator1 = (EntityItem)relatorsV1.get(i);
-			if (relator1 != null && "LSEOBUNDLELSEO".equals(relator1.getEntityType())){
-				EntityItem LSEO= (EntityItem)relator1.getDownLink(0);
-				Vector relatorsV2 = LSEO.getUpLink();
-				for(int j=0;j<relatorsV2.size();j++){
-					EntityItem relator2= (EntityItem)relatorsV2.get(j);
-					if (relator2 != null && "WWSEOLSEO".equals(relator2.getEntityType())){
-						EntityItem WWSEO= (EntityItem)relator2.getUpLink(0);
-						Vector relatorsV3 = WWSEO.getUpLink();
-						for(int k=0;k<relatorsV3.size();k++){
-							EntityItem relator3= (EntityItem)relatorsV3.get(k);
-							if (relator3 != null && "MODELWWSEO".equals(relator3.getEntityType())){
-								EntityItem MODEL= (EntityItem)relator3.getUpLink(0);
-								String COFCAT = getAttributeLongFlagDesc(MODEL, "COFCAT");
-								ABRUtil.append(debugSb,"MODEL COFCAT="+ COFCAT+ NEWLINE);
-								if(COFCAT!=null){
-									if(COFCAT.indexOf("Hardware")>-1){
-										sINSTALL = getAttributeLongFlagDesc(MODEL, "INSTALL");
-										break TT;
-									}
-								}								
-							}							
-						}						
-					}        					
-				}   			 
-			}
-		}
-		//end TT
-		return sINSTALL;
-	}
-	
-	/**
-	 * create nodeset of LSEOBUNDLE INSTALL
-	 * 
-	 * @param document
-	 * @param parent
-	 * @param debugSb
-	 */
-	private void createNodeSet(Document document, Element parent,
-			String strINSTALL, StringBuffer debugSb) {
-		Element child = (Element) document.createElement("INSTALL"); // create
-		child.appendChild(document.createTextNode("" + strINSTALL));
-		parent.appendChild(child);
-	}	
-
-}

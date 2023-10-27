@@ -1,41 +1,46 @@
-package COM.ibm.eannounce.abr.sg.rfc;
+/*    */ package COM.ibm.eannounce.abr.sg.rfc;
+/*    */ 
+/*    */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*    */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*    */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*    */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*    */ import java.io.IOException;
+/*    */ import java.rmi.RemoteException;
+/*    */ import java.sql.SQLException;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class RfcAbrFactory
+/*    */ {
+/*    */   private RFCABRSTATUS rfcAbrStatus;
+/*    */   
+/*    */   public RfcAbr getRfcTypeAbr(String paramString) throws RfcAbrException, MiddlewareRequestException, SQLException, MiddlewareException, RemoteException, EANBusinessRuleException, IOException, MiddlewareShutdownInProgressException {
+/* 18 */     if (this.rfcAbrStatus == null)
+/* 19 */       throw new RfcAbrException("Did not set RFCABRSTATUS instance to RfcAbrFactory"); 
+/* 20 */     if ("MODEL".equals(paramString))
+/* 21 */       return new RFCMODELABR(this.rfcAbrStatus); 
+/* 22 */     if ("PRODSTRUCT".equals(paramString))
+/* 23 */       return new RFCPRODSTRUCTABR(this.rfcAbrStatus); 
+/* 24 */     if ("FCTRANSACTION".equals(paramString))
+/* 25 */       return new RFCFCTRANSACTIONABR(this.rfcAbrStatus); 
+/* 26 */     if ("MODELCONVERT".equals(paramString))
+/* 27 */       return new RFCMODELCONVERTABR(this.rfcAbrStatus); 
+/* 28 */     if ("AUOMTRL".equals(paramString))
+/* 29 */       return new RFCAUOMTRLABR(this.rfcAbrStatus); 
+/* 30 */     if ("SWPRODSTRUCT".equals(paramString)) {
+/* 31 */       return new RFCSWPRODSTRUCTABR(this.rfcAbrStatus);
+/*    */     }
+/* 33 */     throw new RfcAbrException("Can not get instance for entity type:" + paramString);
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public void setRfcAbrStatus(RFCABRSTATUS paramRFCABRSTATUS) {
+/* 38 */     this.rfcAbrStatus = paramRFCABRSTATUS;
+/*    */   }
+/*    */ }
 
-import java.io.IOException;
-import java.rmi.RemoteException;
-import java.sql.SQLException;
 
-import COM.ibm.eannounce.objects.EANBusinessRuleException;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
-import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
-
-
-public class RfcAbrFactory {
-	
-	private RFCABRSTATUS rfcAbrStatus;
-	
-	public RfcAbr getRfcTypeAbr(String entityType) throws RfcAbrException, MiddlewareRequestException, SQLException, MiddlewareException, RemoteException, EANBusinessRuleException, IOException, MiddlewareShutdownInProgressException {
-		if (rfcAbrStatus == null) {
-			throw new RfcAbrException("Did not set RFCABRSTATUS instance to RfcAbrFactory");
-		} else if("MODEL".equals(entityType)) {
-			return new RFCMODELABR(rfcAbrStatus);
-		} else if("PRODSTRUCT".equals(entityType)) {
-			return new RFCPRODSTRUCTABR(rfcAbrStatus);
-		} else if("FCTRANSACTION".equals(entityType)) {
-			return new RFCFCTRANSACTIONABR(rfcAbrStatus);
-		} else if("MODELCONVERT".equals(entityType)) {
-			return new RFCMODELCONVERTABR(rfcAbrStatus);
-		} else if("AUOMTRL".equals(entityType)) {
-			return new RFCAUOMTRLABR(rfcAbrStatus);
-		} else if ("SWPRODSTRUCT".equals(entityType)) {
-			return new RFCSWPRODSTRUCTABR(rfcAbrStatus);
-		} else {
-			throw new RfcAbrException("Can not get instance for entity type:" + entityType);
-		}
-	}
-
-	public void setRfcAbrStatus(RFCABRSTATUS rfcAbrStatus) {
-		this.rfcAbrStatus = rfcAbrStatus;
-	}
-	
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\RfcAbrFactory.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

@@ -1,469 +1,475 @@
-//  (c) Copyright International Business Machines Corporation, 2001
-//  All Rights Reserved.</pre>
-//
-//$Log: ECCMCATLGPUBABR02.java,v $
-//Revision 1.13  2008/01/30 19:27:19  wendy
-//Cleanup RSA warnings
-//
-//Revision 1.12  2006/06/06 15:34:17  joan
-//fixes
-//
-//Revision 1.11  2006/06/06 15:07:50  joan
-//fixes
-//
-//Revision 1.10  2006/05/22 16:59:13  joan
-//changes
-//
-//Revision 1.9  2006/05/22 16:40:42  joan
-//fixes
-//
-//Revision 1.8  2006/05/22 15:39:26  joan
-//add method
-//
-//Revision 1.7  2006/05/21 20:36:51  joan
-//changes
-//
-//Revision 1.6  2006/05/18 00:09:27  joan
-//change
-//
-//Revision 1.5  2006/05/17 22:04:03  joan
-//changes
-//
-//Revision 1.4  2006/05/17 00:07:40  joan
-//changes
-//
-//Revision 1.3  2006/04/24 22:35:01  joan
-//fixes
-//
-//Revision 1.2  2006/04/20 17:56:14  joan
-//changes
-//
-//Revision 1.1  2006/04/20 17:53:35  joan
-//change directory
-//
+/*     */ package COM.ibm.eannounce.abr.pcd;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.LockPDHEntityException;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.abr.util.UpdatePDHEntityException;
+/*     */ import COM.ibm.eannounce.objects.ChangeHistoryGroup;
+/*     */ import COM.ibm.eannounce.objects.EANUtility;
+/*     */ import COM.ibm.eannounce.objects.EntityChangeHistoryGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityChangeHistoryItem;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.PDGUtility;
+/*     */ import COM.ibm.eannounce.objects.SBRException;
+/*     */ import COM.ibm.opicmpdh.middleware.D;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.DatePackage;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import COM.ibm.opicmpdh.transactions.OPICMList;
+/*     */ import java.sql.Connection;
+/*     */ import java.sql.PreparedStatement;
+/*     */ import java.sql.ResultSet;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.StringTokenizer;
+/*     */ import java.util.Vector;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class ECCMCATLGPUBABR02
+/*     */   extends PokBaseABR
+/*     */ {
+/*  71 */   public static final String ABR = new String("ECCMCATLGPUBABR02");
+/*  72 */   private static final String ATT_LASTRUN = new String("CATLGCSOLPUBLASTRUN");
+/*  73 */   private static final String ATT_OFFCOUNTRY = new String("OFFCOUNTRY");
+/*  74 */   private static final String QUEUE = new String("ECCMCATLGPUBABR05");
+/*  75 */   private PDGUtility m_utility = new PDGUtility();
+/*  76 */   private EntityItem m_ei = null;
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static final String STARTDATE = "1980-01-01-00.00.00.000000";
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static final String FOREVER = "9999-12-31-00.00.00.000000";
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/*  89 */     DatePackage datePackage = null;
+/*  90 */     String str1 = null;
+/*     */     
+/*  92 */     EntityGroup entityGroup = null;
+/*  93 */     String str2 = null;
+/*  94 */     String str3 = null;
+/*  95 */     String str4 = null;
+/*  96 */     String str5 = System.getProperty("line.separator");
+/*     */     try {
+/*  98 */       start_ABRBuild(false);
+/*  99 */       setReturnCode(0);
+/* 100 */       buildReportHeaderII();
+/*     */       
+/* 102 */       datePackage = this.m_db.getDates();
+/* 103 */       str1 = datePackage.getNow();
+/*     */       
+/* 105 */       entityGroup = new EntityGroup(null, this.m_db, this.m_prof, this.m_abri.getEntityType(), "Edit", false);
+/* 106 */       this.m_ei = new EntityItem(entityGroup, this.m_prof, this.m_db, this.m_abri.getEntityType(), this.m_abri.getEntityID());
+/*     */       
+/* 108 */       println("<br><b>Catalog Country: " + this.m_ei.getKey() + "</b>");
+/* 109 */       printNavigateAttributes(this.m_ei, entityGroup, true);
+/*     */ 
+/*     */       
+/* 112 */       str4 = this.m_utility.getAttrValue(this.m_ei, ATT_LASTRUN);
+/* 113 */       if (str4 == null || str4.length() <= 0) {
+/* 114 */         OPICMList oPICMList = new OPICMList();
+/* 115 */         oPICMList.put(ATT_LASTRUN, ATT_LASTRUN + "=" + "1980-01-01-00.00.00.000000");
+/* 116 */         this.m_utility.updateAttribute(this.m_db, this.m_prof, this.m_ei, oPICMList);
+/*     */       }
+/* 118 */       else if (!this.m_utility.isDateFormat(str4)) {
+/* 119 */         println(ATT_LASTRUN + " is not in date format 1980-01-01 or 1980-01-01-00.00.00.000000");
+/* 120 */         setReturnCode(-1);
+/*     */       }
+/* 122 */       else if (str4.length() == 10) {
+/* 123 */         OPICMList oPICMList = new OPICMList();
+/* 124 */         oPICMList.put(ATT_LASTRUN, ATT_LASTRUN + "=" + str4 + "-00.00.00.000000");
+/* 125 */         this.m_utility.updateAttribute(this.m_db, this.m_prof, this.m_ei, oPICMList);
+/*     */       } 
+/*     */ 
+/*     */       
+/* 129 */       this.m_prof = this.m_utility.setProfValOnEffOn(this.m_db, this.m_prof);
+/* 130 */       this.m_ei = new EntityItem(entityGroup, this.m_prof, this.m_db, this.m_abri.getEntityType(), this.m_abri.getEntityID());
+/* 131 */       str2 = this.m_utility.getAttrValue(this.m_ei, "OFFCOUNTRY");
+/* 132 */       if (str2 == null || str2.length() <= 0) {
+/* 133 */         println("OFFCOUNTRY is blank.");
+/* 134 */         setReturnCode(-1);
+/*     */       } 
+/*     */       
+/* 137 */       String str = this.m_utility.getAttrValueDesc(this.m_ei, ATT_OFFCOUNTRY);
+/*     */       
+/* 139 */       String[] arrayOfString = this.m_utility.getFlagCodeForExactDesc(this.m_db, this.m_prof, "GENAREANAME", str);
+/* 140 */       if (arrayOfString == null || arrayOfString.length <= 0) {
+/* 141 */         D.ebug(4, getABRVersion() + " unable to find GENAREANAME for desc: " + str);
+/* 142 */         println("Unable to find GENAREANAME for desc: " + str);
+/* 143 */         setReturnCode(-1);
+/*     */       } 
+/*     */       
+/* 146 */       if (getReturnCode() == 0) {
+/* 147 */         String str6 = arrayOfString[0];
+/*     */         
+/* 149 */         String[] arrayOfString1 = getCSOLs(this.m_db, this.m_prof, str6);
+/*     */         
+/* 151 */         for (byte b = 0; b < arrayOfString1.length; b++) {
+/* 152 */           String str7 = arrayOfString1[b];
+/* 153 */           StringTokenizer stringTokenizer = new StringTokenizer(str7, ":");
+/* 154 */           if (stringTokenizer.countTokens() == 2) {
+/* 155 */             String str8 = stringTokenizer.nextToken();
+/* 156 */             int i = Integer.parseInt(stringTokenizer.nextToken().trim());
+/* 157 */             this.m_utility.queueEI(this.m_db, this.m_prof, str8, i, QUEUE);
+/*     */           } 
+/*     */         } 
+/*     */         
+/* 161 */         removeCATCSOL(this.m_db, this.m_prof, "CATCSOL");
+/* 162 */         OPICMList oPICMList = new OPICMList();
+/* 163 */         oPICMList.put(ATT_LASTRUN, ATT_LASTRUN + "=" + str1);
+/* 164 */         this.m_utility.updateAttribute(this.m_db, this.m_prof, this.m_ei, oPICMList);
+/*     */       } 
+/* 166 */     } catch (LockPDHEntityException lockPDHEntityException) {
+/* 167 */       setReturnCode(-2);
+/* 168 */       println("<h3><font color=red>IAB1007E: Could not get soft lock.  Rule execution is terminated.<br />" + lockPDHEntityException
+/*     */ 
+/*     */ 
+/*     */           
+/* 172 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 174 */       logError(lockPDHEntityException.getMessage());
+/* 175 */     } catch (UpdatePDHEntityException updatePDHEntityException) {
+/* 176 */       setReturnCode(-2);
+/* 177 */       println("<h3><font color=red>UpdatePDH error: " + updatePDHEntityException
+/*     */           
+/* 179 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 181 */       logError(updatePDHEntityException.getMessage());
+/* 182 */     } catch (SBRException sBRException) {
+/* 183 */       String str = sBRException.toString();
+/* 184 */       int i = str.indexOf("(ok)");
+/* 185 */       if (i < 0) {
+/* 186 */         setReturnCode(-2);
+/* 187 */         println("<h3><font color=red>Generate Data error: " + 
+/*     */             
+/* 189 */             replace(str, str5, "<br>") + "</font></h3>");
+/*     */         
+/* 191 */         logError(sBRException.toString());
+/*     */       } else {
+/* 193 */         str = str.substring(0, i);
+/* 194 */         println(replace(str, str5, "<br>"));
+/*     */       } 
+/* 196 */     } catch (Exception exception) {
+/*     */       
+/* 198 */       println("Error in " + this.m_abri.getABRCode() + ":" + exception.getMessage());
+/* 199 */       println("" + exception);
+/* 200 */       exception.printStackTrace();
+/*     */       
+/* 202 */       if (getABRReturnCode() != -2) {
+/* 203 */         setReturnCode(-3);
+/*     */       }
+/*     */     } finally {
+/* 206 */       println("<br /><b>" + 
+/*     */           
+/* 208 */           buildMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 211 */               getABRDescription(), 
+/* 212 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }) + "</b>");
+/*     */       
+/* 215 */       log(buildLogMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 218 */               getABRDescription(), 
+/* 219 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }));
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 226 */       str3 = getABRDescription() + ":" + this.m_abri.getEntityType() + ":" + this.m_abri.getEntityID();
+/* 227 */       if (str3.length() > 64) {
+/* 228 */         str3 = str3.substring(0, 64);
+/*     */       }
+/* 230 */       setDGTitle(str3);
+/* 231 */       setDGRptName(ABR);
+/*     */ 
+/*     */       
+/* 234 */       setDGString(getABRReturnCode());
+/* 235 */       printDGSubmitString();
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 241 */       if (!isReadOnly()) {
+/* 242 */         clearSoftLock();
+/*     */       }
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   private String[] getCSOLs(Database paramDatabase, Profile paramProfile, String paramString) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException, SBRException {
+/* 249 */     String str1 = " ECCMCATLGPUBPDG getCSOLs method";
+/* 250 */     ResultSet resultSet = null;
+/*     */ 
+/*     */     
+/* 253 */     String str2 = paramProfile.getEnterprise();
+/*     */     
+/* 255 */     DatePackage datePackage = paramDatabase.getDates();
+/* 256 */     String str3 = datePackage.getNow();
+/* 257 */     Hashtable<Object, Object> hashtable = new Hashtable<>();
+/* 258 */     Vector<String> vector = new Vector();
+/* 259 */     String[] arrayOfString = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 267 */     String str4 = "SELECT  RTRIM(F.EntityType)  as EntityType ,F.EntityID  as EntityID FROM opicm.FLAG F INNER JOIN opicm.Entity E ON     E.Enterprise= ? AND E.EntityType = F.EntityType AND E.EntityID = F.entityID AND E.ValFrom >= ? AND E.ValTo > current timestamp AND E.EffFrom >= ? AND E.EffTo > current timestamp WHERE F.Enterprise = ? AND F.EntityType = 'CSOL' AND F.AttributeCode = 'GENAREANAME' AND F.AttributeValue = ? AND F.ValFrom <= current timestamp AND  current timestamp < F.ValTo AND F.EffFrom <= current timestamp AND current timestamp < F.EffTo ";
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 287 */     PreparedStatement preparedStatement = null;
+/*     */     
+/* 289 */     Connection connection = paramDatabase.getPDHConnection();
+/* 290 */     String str5 = this.m_utility.getDate(str3.substring(0, 10), 15);
+/* 291 */     String str6 = this.m_utility.getAttrValue(this.m_ei, "CATLGCSOLPUBLASTRUN");
+/*     */     try {
+/* 293 */       D.ebug(3, str1 + " setting:" + str2 + ":" + str5 + ":" + paramString + ":" + str6);
+/* 294 */       D.ebug(3, str1 + " strSQL1:" + str4);
+/* 295 */       connection = paramDatabase.getPDHConnection();
+/* 296 */       preparedStatement = connection.prepareStatement(str4);
+/*     */ 
+/*     */       
+/* 299 */       preparedStatement.setString(1, str2);
+/* 300 */       preparedStatement.setString(2, str6);
+/* 301 */       preparedStatement.setString(3, str6);
+/* 302 */       preparedStatement.setString(4, str2);
+/* 303 */       preparedStatement.setString(5, paramString);
+/*     */       
+/* 305 */       resultSet = preparedStatement.executeQuery();
+/*     */       
+/* 307 */       D.ebug(3, str1 + " executed SQL1.");
+/*     */       
+/* 309 */       while (resultSet.next()) {
+/* 310 */         String str7 = resultSet.getString(1).trim();
+/* 311 */         int i = resultSet.getInt(2);
+/*     */         
+/* 313 */         String str8 = str7 + ":" + i;
+/* 314 */         if (hashtable.get(str8) == null) {
+/* 315 */           hashtable.put(str8, str8);
+/* 316 */           vector.addElement(str8);
+/*     */         } 
+/*     */       } 
+/* 319 */       D.ebug(3, str1 + " vReturn 1 size: " + vector.size());
+/*     */     } finally {
+/*     */       
+/* 322 */       if (resultSet != null) {
+/* 323 */         resultSet.close();
+/* 324 */         resultSet = null;
+/*     */       } 
+/* 326 */       if (preparedStatement != null) {
+/* 327 */         preparedStatement.close();
+/* 328 */         preparedStatement = null;
+/*     */       } 
+/* 330 */       paramDatabase.commit();
+/* 331 */       paramDatabase.freeStatement();
+/* 332 */       paramDatabase.isPending();
+/*     */     } 
+/*     */ 
+/*     */     
+/* 336 */     arrayOfString = new String[vector.size()];
+/* 337 */     vector.toArray(arrayOfString);
+/* 338 */     return arrayOfString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void removeCATCSOL(Database paramDatabase, Profile paramProfile, String paramString) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException, SBRException {
+/* 347 */     String str1 = "ECCMCATLGPUBPDG removeCATCSOL method " + paramString;
+/* 348 */     DatePackage datePackage = paramDatabase.getDates();
+/* 349 */     String str2 = datePackage.getNow();
+/* 350 */     String str3 = str2.substring(0, 10);
+/*     */ 
+/*     */     
+/* 353 */     StringBuffer stringBuffer = new StringBuffer();
+/* 354 */     String str4 = this.m_utility.getAttrValueDesc(this.m_ei, ATT_OFFCOUNTRY);
+/*     */     
+/* 356 */     String[] arrayOfString = this.m_utility.getFlagCodeForExactDesc(paramDatabase, paramProfile, "GENAREANAME", str4);
+/* 357 */     if (arrayOfString == null || arrayOfString.length <= 0) {
+/* 358 */       D.ebug(4, str1 + " unable to find GENAREANAME for desc: " + str4);
+/*     */       
+/*     */       return;
+/*     */     } 
+/* 362 */     String str5 = arrayOfString[0];
+/*     */     
+/* 364 */     stringBuffer.append("map_GENAREANAME=" + str5);
+/*     */     
+/* 366 */     String str6 = "SRDCATCSOL1";
+/* 367 */     EntityItem[] arrayOfEntityItem = this.m_utility.dynaSearch(paramDatabase, paramProfile, null, str6, paramString, stringBuffer.toString());
+/* 368 */     if (arrayOfEntityItem != null) {
+/* 369 */       for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/* 370 */         EntityItem entityItem = arrayOfEntityItem[b];
+/*     */         
+/* 372 */         String str = this.m_utility.getAttrValue(entityItem, "PUBTO");
+/* 373 */         if (str.length() > 0) {
+/* 374 */           int i = this.m_utility.dateCompare(str, this.m_utility.getDate(str3, 30));
+/* 375 */           if (i == 2) {
+/* 376 */             paramProfile = this.m_utility.setProfValOnEffOn(paramDatabase, paramProfile);
+/*     */             
+/* 378 */             EntityChangeHistoryGroup entityChangeHistoryGroup = new EntityChangeHistoryGroup(paramDatabase, paramProfile, entityItem);
+/* 379 */             EntityChangeHistoryItem entityChangeHistoryItem = (EntityChangeHistoryItem)this.m_utility.getCurrentChangeItem((ChangeHistoryGroup)entityChangeHistoryGroup);
+/* 380 */             String str7 = entityChangeHistoryItem.getChangeDate();
+/*     */             
+/* 382 */             D.ebug(4, str1 + " checking last update CAT: " + entityItem.getKey());
+/* 383 */             int j = this.m_utility.dateCompare(this.m_utility.getDate(str7.substring(0, 10), 30), str3);
+/* 384 */             if (j == 2) {
+/* 385 */               D.ebug(4, str1 + " deactivate : " + entityItem.getKey());
+/* 386 */               paramProfile = this.m_utility.setProfValOnEffOn(paramDatabase, paramProfile);
+/* 387 */               EANUtility.deactivateEntity(paramDatabase, paramProfile, entityItem);
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   private String replace(String paramString1, String paramString2, String paramString3) {
+/* 397 */     String str = "";
+/* 398 */     int i = paramString1.indexOf(paramString2);
+/*     */     
+/* 400 */     while (paramString1.length() > 0 && i >= 0) {
+/* 401 */       str = str + paramString1.substring(0, i) + paramString3;
+/* 402 */       paramString1 = paramString1.substring(i + paramString2.length());
+/* 403 */       i = paramString1.indexOf(paramString2);
+/*     */     } 
+/* 405 */     str = str + paramString1;
+/* 406 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getABREntityDesc(String paramString, int paramInt) {
+/* 417 */     return null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 426 */     return "Catalog Offering Publication For CSOL ABR";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getStyle() {
+/* 437 */     return "";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getRevision() {
+/* 447 */     return new String("$Revision: 1.13 $");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String getVersion() {
+/* 457 */     return "$Id: ECCMCATLGPUBABR02.java,v 1.13 2008/01/30 19:27:19 wendy Exp $";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 467 */     return "ECCMCATLGPUBABR02.java";
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.pcd;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.PreparedStatement;
-import java.sql.Connection;
-import java.util.*;
-
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.opicmpdh.transactions.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.eannounce.abr.util.*;
-
-/**
- * ECCMCATLGPUBABR02
- *
- *@author     Administrator
- *@created    August 30, 2002
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\pcd\ECCMCATLGPUBABR02.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class ECCMCATLGPUBABR02 extends PokBaseABR {
-    /**
-    *  Execute ABR.
-    *
-    */
-
-    // Class constants
-    public final static String ABR = new String("ECCMCATLGPUBABR02");
-    private final static String ATT_LASTRUN = new String("CATLGCSOLPUBLASTRUN");
-    private final static String ATT_OFFCOUNTRY = new String("OFFCOUNTRY");
-    private final static String QUEUE = new String("ECCMCATLGPUBABR05");
-    private PDGUtility m_utility = new PDGUtility();
-    private EntityItem m_ei = null;
-    /**
-     * STARTDATE
-     *
-     */
-      public final static String STARTDATE = "1980-01-01-00.00.00.000000";
-      public final static String FOREVER = "9999-12-31-00.00.00.000000";
-    /**
-     * execute_run
-     *
-     * @author Owner
-     */
-    public void execute_run() {
-        DatePackage dp = null;
-        String strNow = null;
-        //String strCurrentDate = null;
-        EntityGroup eg = null;
-        String strOFFCOUNTRY = null;
-        String strDgName = null;
-        String strLASTRUN = null;
-        String RETURN = System.getProperty("line.separator");
-        try {
-            start_ABRBuild(false);
-            setReturnCode(PASS);
-            buildReportHeaderII();
-
-            dp = m_db.getDates();
-            strNow = dp.getNow();
-            //strCurrentDate = strNow.substring(0, 10);
-            eg = new EntityGroup(null, m_db, m_prof, m_abri.getEntityType(), "Edit", false);
-            m_ei = new EntityItem(eg, m_prof, m_db, m_abri.getEntityType(), m_abri.getEntityID());
-
-            println("<br><b>Catalog Country: " + m_ei.getKey() + "</b>");
-            printNavigateAttributes(m_ei, eg, true);
-
-            // check CATLGCNTRY attributes
-            strLASTRUN = m_utility.getAttrValue(m_ei, ATT_LASTRUN);
-            if (strLASTRUN == null || strLASTRUN.length() <= 0) {
-                OPICMList attList = new OPICMList();
-                attList.put(ATT_LASTRUN,ATT_LASTRUN + "=" + STARTDATE);
-                m_utility.updateAttribute(m_db, m_prof, m_ei, attList);
-            } else {
-                if (!m_utility.isDateFormat(strLASTRUN)) {
-                    println(ATT_LASTRUN + " is not in date format 1980-01-01 or 1980-01-01-00.00.00.000000");
-                    setReturnCode(FAIL);
-                } else {
-                if (strLASTRUN.length() == 10) {
-                    OPICMList attList = new OPICMList();
-                    attList.put(ATT_LASTRUN, ATT_LASTRUN + "=" + strLASTRUN + "-00.00.00.000000");
-                    m_utility.updateAttribute(m_db, m_prof, m_ei, attList);
-                }
-            }
-        }
-        m_prof = m_utility.setProfValOnEffOn(m_db, m_prof);
-		m_ei = new EntityItem(eg, m_prof, m_db, m_abri.getEntityType(), m_abri.getEntityID());
-        strOFFCOUNTRY = m_utility.getAttrValue(m_ei, "OFFCOUNTRY");
-        if (strOFFCOUNTRY == null || strOFFCOUNTRY.length() <= 0) {
-            println("OFFCOUNTRY is blank.");
-            setReturnCode(FAIL);
-        }
-
-		String strOFFCOUNTRY1 = m_utility.getAttrValueDesc(m_ei, ATT_OFFCOUNTRY);
-
-		String[] aGA = m_utility.getFlagCodeForExactDesc(m_db, m_prof, "GENAREANAME", strOFFCOUNTRY1);
-		if (aGA == null || aGA.length <= 0) {
-			D.ebug(D.EBUG_SPEW,getABRVersion() + " unable to find GENAREANAME for desc: " + strOFFCOUNTRY1);
-            println("Unable to find GENAREANAME for desc: " + strOFFCOUNTRY1);
-            setReturnCode(FAIL);
-		}
-
-        if (getReturnCode() == PASS) {
-			String strGA = aGA[0];
-
-	       	String[] aeiCSOL = getCSOLs(m_db, m_prof, strGA);
-
-			for (int i=0; i < aeiCSOL.length; i++) {
-				String strEI = aeiCSOL[i];
-				StringTokenizer st = new StringTokenizer(strEI, ":");
-				if (st.countTokens() == 2) {
-					String strEntityType = st.nextToken();
-					int iEntityID = Integer.parseInt(st.nextToken().trim());
-					m_utility.queueEI(m_db, m_prof, strEntityType, iEntityID, QUEUE);
-				}
-			}
-
-			removeCATCSOL (m_db, m_prof, "CATCSOL") ;
-            OPICMList attList = new OPICMList();
-            attList.put(ATT_LASTRUN,ATT_LASTRUN + "=" + strNow);
-            m_utility.updateAttribute(m_db, m_prof, m_ei, attList);
-        }
-    } catch (LockPDHEntityException le) {
-        setReturnCode(UPDATE_ERROR);
-        println(
-        "<h3><font color=red>"
-          + ERR_IAB1007E
-          + "<br />"
-          + le.getMessage()
-          + "</font></h3>");
-        logError(le.getMessage());
-    } catch (UpdatePDHEntityException le) {
-        setReturnCode(UPDATE_ERROR);
-        println(
-        "<h3><font color=red>UpdatePDH error: "
-          + le.getMessage()
-          + "</font></h3>");
-        logError(le.getMessage());
-    } catch (SBRException _sbrex) {
-        String strError = _sbrex.toString();
-        int i = strError.indexOf("(ok)");
-        if (i < 0) {
-            setReturnCode(UPDATE_ERROR);
-            println(
-              "<h3><font color=red>Generate Data error: "
-                + replace(strError, RETURN, "<br>")
-                + "</font></h3>");
-            logError(_sbrex.toString());
-        } else {
-            strError = strError.substring(0, i);
-            println(replace(strError, RETURN, "<br>"));
-        }
-    } catch (Exception exc) {
-      // Report this error to both the datbase log and the PrintWriter
-        println("Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-        println("" + exc);
-        exc.printStackTrace();
-      // don't overwrite an update exception
-        if (getABRReturnCode() != UPDATE_ERROR) {
-            setReturnCode(INTERNAL_ERROR);
-        }
-    } finally {
-        println(
-        "<br /><b>"
-          + buildMessage(
-            MSG_IAB2016I,
-            new String[] {
-              getABRDescription(),
-              (getReturnCode() == PASS ? "Passed" : "Failed")})
-          + "</b>");
-
-        log(buildLogMessage(
-          MSG_IAB2016I,
-          new String[] {
-            getABRDescription(),
-            (getReturnCode() == PASS ? "Passed" : "Failed")}));
-
-      // set DG title
-        strDgName = getABRDescription()
-                + ":"
-                + m_abri.getEntityType()
-                + ":"
-                + m_abri.getEntityID();
-        if (strDgName.length() > 64) {
-            strDgName = strDgName.substring(0, 64);
-        }
-        setDGTitle(strDgName);
-        setDGRptName(ABR);
-
-      // set DG submit string
-        setDGString(getABRReturnCode());
-        printDGSubmitString();
-        //Stuff into report for subscription and notification
-
-        // Tack on the DGString
-
-        // make sure the lock is released
-        if (!isReadOnly()) {
-            clearSoftLock();
-        }
-    }
-  }
-
-	private String[] getCSOLs(Database _db, Profile _prof, String _strGA) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException, SBRException {
-		// Initialize some SP specific objects needed in this method
-		String strTraceBase = " ECCMCATLGPUBPDG getCSOLs method";
-		ResultSet rs = null;
-
-		// Pull some profile info...
-		String strEnterprise = _prof.getEnterprise();
-
-		DatePackage dpNow = _db.getDates();
-		String strNow = dpNow.getNow();
-		Hashtable returnList = new Hashtable();
-		Vector vReturn = new Vector();
-		String[] aeiReturn = null;
-
-		/*
-		CSOL was last updated since the last run for this CATLGCNTRY.CATLGCSOLPUBLASTRUN
-		TARG_ANN_DATE_CT < NOW() + 15 Days “logical OR” CSOLSTATUS = Ready for Review (0040)
-		“logical OR” CSOLSTATUS = Final (0020)
-
-		*/
-		String strSQL1 =
-			"SELECT " +
-			" RTRIM(F.EntityType)  as EntityType " +
-			",F.EntityID  as EntityID " +
-			"FROM opicm.FLAG F " +
-			"INNER JOIN opicm.Entity E ON " +
-			"    E.Enterprise= ? " +
-			"AND E.EntityType = F.EntityType " +
-			"AND E.EntityID = F.entityID " +
-			"AND E.ValFrom >= ? " +
-			"AND E.ValTo > current timestamp " +
-			"AND E.EffFrom >= ? " +
-			"AND E.EffTo > current timestamp " +
-			"WHERE F.Enterprise = ? " +
-			"AND F.EntityType = 'CSOL' " +
-			"AND F.AttributeCode = 'GENAREANAME' " +
-			"AND F.AttributeValue = ? " +
-			"AND F.ValFrom <= current timestamp AND  current timestamp < F.ValTo " +
-			"AND F.EffFrom <= current timestamp AND current timestamp < F.EffTo ";
-
-		PreparedStatement ps = null;
-
-		Connection con = _db.getPDHConnection();
-		String strDate = m_utility.getDate(strNow.substring(0, 10), 15);
-		String strLastRun = m_utility.getAttrValue(m_ei, "CATLGCSOLPUBLASTRUN");
-        try {
-			D.ebug(D.EBUG_DETAIL, strTraceBase + " setting:" + strEnterprise + ":" + strDate + ":" + _strGA + ":" + strLastRun);
-			D.ebug(D.EBUG_DETAIL, strTraceBase + " strSQL1:" + strSQL1);
-            con = _db.getPDHConnection();
-            ps = con.prepareStatement(strSQL1);
-
-            //MyETs
-            ps.setString(1,strEnterprise);
-            ps.setString(2,strLastRun);
-            ps.setString(3,strLastRun);
-            ps.setString(4,strEnterprise);
-			ps.setString(5,_strGA);
-
-            rs = ps.executeQuery();
-
-            D.ebug(D.EBUG_DETAIL, strTraceBase + " executed SQL1.");
-
-			while(rs.next()) {
-				String strEntityType = rs.getString(1).trim();
-				int iEntityID = rs.getInt(2);
-				//D.ebug(D.EBUG_DETAIL,strTraceBase + " answer 1: " + strEntityType  + ":" + iEntityID + ":");
-				String strEIKey = strEntityType + ":" + iEntityID;
-				if (returnList.get(strEIKey) == null) {
-					returnList.put(strEIKey, strEIKey);
-					vReturn.addElement(strEIKey);
-				}
-			}
-			D.ebug(D.EBUG_DETAIL, strTraceBase + " vReturn 1 size: " + vReturn.size());
-
-		} finally {
-			if(rs != null) {
-				rs.close();
-				rs = null;
-			}
-			if (ps != null) {
-				ps.close();
-				ps = null;
-			}
-			_db.commit();
-		    _db.freeStatement();
-		    _db.isPending();
-
-		}
-
-		aeiReturn = new String[vReturn.size()];
-		vReturn.toArray(aeiReturn);
-		return aeiReturn;
-	}
-
-	private void removeCATCSOL (Database _db, Profile _prof, String _strEntityType) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException, SBRException {
-		/*
-		Instances of CATCSOL should be removed whenever the instance has:
-		not been updated for the past 30 days
-		and PUBTO < NOW() + 30 days
-		*/
-		String strTraceBase = "ECCMCATLGPUBPDG removeCATCSOL method " + _strEntityType;
-		DatePackage dp = _db.getDates();
-		String strNow = dp.getNow();
-		String strCurrentDate = strNow.substring(0, 10);
-		//String strDate = m_utility.getDate(strCurrentDate, 30);
-
-		StringBuffer sb = new StringBuffer();
-		String strOFFCOUNTRY1 = m_utility.getAttrValueDesc(m_ei, ATT_OFFCOUNTRY);
-
-		String[] aGA = m_utility.getFlagCodeForExactDesc(_db, _prof, "GENAREANAME", strOFFCOUNTRY1);
-		if (aGA == null || aGA.length <= 0) {
-			D.ebug(D.EBUG_SPEW,strTraceBase + " unable to find GENAREANAME for desc: " + strOFFCOUNTRY1);
-			return;
-		}
-
-		String strGA = aGA[0];
-
-		sb.append("map_GENAREANAME=" +  strGA);
-
-        String strSai =  "SRDCATCSOL1";
-		EntityItem[] aeiCAT = m_utility.dynaSearch(_db, _prof, null, strSai, _strEntityType, sb.toString());
-		if (aeiCAT != null) {
-			for (int i=0; i < aeiCAT.length; i++) {
-				EntityItem eiCAT = aeiCAT[i];
-
-				String strPT = m_utility.getAttrValue(eiCAT, "PUBTO");
-				if (strPT.length() > 0) {
-					int iDCPT = m_utility.dateCompare(strPT, m_utility.getDate(strCurrentDate, 30));
-					if (iDCPT == PDGUtility.EARLIER) {
-						_prof = m_utility.setProfValOnEffOn(_db, _prof);
-						// check for last update
-						EntityChangeHistoryGroup echg = new EntityChangeHistoryGroup(_db,_prof, eiCAT);
-						EntityChangeHistoryItem echi = (EntityChangeHistoryItem)m_utility.getCurrentChangeItem(echg);
-						String strChangeDate = echi.getChangeDate();
-
-						D.ebug(D.EBUG_SPEW,strTraceBase + " checking last update CAT: " + eiCAT.getKey());
-						int iDate1 = m_utility.dateCompare(m_utility.getDate(strChangeDate.substring(0,10), 30), strCurrentDate);
-						if (iDate1 == PDGUtility.EARLIER) {
-							D.ebug(D.EBUG_SPEW,strTraceBase + " deactivate : " + eiCAT.getKey());
-							_prof = m_utility.setProfValOnEffOn(_db, _prof);
-							EANUtility.deactivateEntity(_db, _prof, eiCAT);
-
-						}
-					}
-				}
-			}
-		}
-	}
-
-  private String replace(String _s, String _s1, String _s2) {
-    String sResult = "";
-    int iTab = _s.indexOf(_s1);
-
-    while (_s.length() > 0 && iTab >= 0) {
-      sResult = sResult + _s.substring(0, iTab) + _s2;
-      _s = _s.substring(iTab + _s1.length());
-      iTab = _s.indexOf(_s1);
-    }
-    sResult = sResult + _s;
-    return sResult;
-  }
-
-  /**
-  *  Get the entity description to use in error messages
-  *
-  *@param  entityType  Description of the Parameter
-  *@param  entityId    Description of the Parameter
-  *@return             String
-  */
-  protected String getABREntityDesc(String entityType, int entityId) {
-    return null;
-  }
-
-  /**
-   *  Get ABR description
-   *
-   *@return    java.lang.String
-   */
-  public String getDescription() {
-    return "Catalog Offering Publication For CSOL ABR";
-  }
-
-  /**
-   *  Get any style that should be used for this page. Derived classes can
-   *  override this to set styles They must include the <style>...</style> tags
-   *
-   *@return    String
-   */
-  protected String getStyle() {
-    // Print out the PSG stylesheet
-    return "";
-  }
-
-  /**
-     * getRevision
-     *
-     * @return
-     * @author Owner
-     */
-    public String getRevision() {
-    return new String("$Revision: 1.13 $");
-  }
-
-  /**
-     * getVersion
-     *
-     * @return
-     * @author Owner
-     */
-    public static String getVersion() {
-    return ("$Id: ECCMCATLGPUBABR02.java,v 1.13 2008/01/30 19:27:19 wendy Exp $");
-  }
-
-  /**
-     * getABRVersion
-     *
-     * @return
-     * @author Owner
-     */
-    public String getABRVersion() {
-    return "ECCMCATLGPUBABR02.java";
-  }
-}

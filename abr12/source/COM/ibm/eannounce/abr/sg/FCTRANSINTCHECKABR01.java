@@ -1,358 +1,364 @@
-//  (c) Copyright International Business Machines Corporation, 2001
-//  All Rights Reserved.</pre>
-//
-//FCTRANSINTCHECKABR01.java,v
-//Revision 1.6  2006/03/03 19:23:28  bala
-//remove reference to Constants.CSS
-//
-//Revision 1.5  2006/01/24 16:50:57  yang
-//Jtest Changes
-//
-//Revision 1.4  2004/12/09 21:32:46  joan
-//fixes
-//
-//Revision 1.3  2004/12/03 22:36:31  joan
-//fixes for search
-//
-//Revision 1.2  2004/11/04 23:35:30  joan
-//adjust messages
-//
-//Revision 1.1  2004/09/21 00:31:25  joan
-//add abr
-//
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.LockPDHEntityException;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.abr.util.UpdatePDHEntityException;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.PDGUtility;
+/*     */ import COM.ibm.eannounce.objects.SBRException;
+/*     */ import COM.ibm.opicmpdh.transactions.OPICMList;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class FCTRANSINTCHECKABR01
+/*     */   extends PokBaseABR
+/*     */ {
+/*  47 */   public static final String ABR = new String("FCTRANSINTCHECKABR01");
+/*     */   
+/*  49 */   private EntityGroup m_egParent = null;
+/*  50 */   private EntityItem m_ei = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/*  61 */     String str1 = null;
+/*  62 */     String str2 = null;
+/*  63 */     String str3 = null;
+/*  64 */     String str4 = null;
+/*  65 */     String str5 = null;
+/*  66 */     String str6 = null;
+/*  67 */     String str7 = null;
+/*  68 */     String str8 = System.getProperty("line.separator");
+/*     */     
+/*     */     try {
+/*  71 */       StringBuffer stringBuffer = new StringBuffer();
+/*  72 */       PDGUtility pDGUtility = new PDGUtility();
+/*  73 */       start_ABRBuild();
+/*     */       
+/*  75 */       buildReportHeaderII();
+/*     */       
+/*  77 */       this.m_egParent = this.m_elist.getParentEntityGroup();
+/*  78 */       this.m_ei = this.m_egParent.getEntityItem(0);
+/*  79 */       println("<br><b>Feature Transaction: " + this.m_ei.getKey() + "</b>");
+/*     */       
+/*  81 */       printNavigateAttributes(this.m_ei, this.m_egParent, true);
+/*  82 */       setReturnCode(0);
+/*     */       
+/*  84 */       str1 = getAttributeValue(this.m_elist, this.m_ei
+/*     */           
+/*  86 */           .getEntityType(), this.m_ei
+/*  87 */           .getEntityID(), "FROMMACHTYPE");
+/*     */ 
+/*     */       
+/*  90 */       str2 = getAttributeValue(this.m_elist, this.m_ei
+/*     */           
+/*  92 */           .getEntityType(), this.m_ei
+/*  93 */           .getEntityID(), "FROMMODEL");
+/*     */ 
+/*     */       
+/*  96 */       str3 = getAttributeValue(this.m_elist, this.m_ei
+/*     */           
+/*  98 */           .getEntityType(), this.m_ei
+/*  99 */           .getEntityID(), "FROMFEATURECODE");
+/*     */ 
+/*     */       
+/* 102 */       str4 = getAttributeValue(this.m_elist, this.m_ei
+/*     */           
+/* 104 */           .getEntityType(), this.m_ei
+/* 105 */           .getEntityID(), "TOMACHTYPE");
+/*     */ 
+/*     */       
+/* 108 */       str5 = getAttributeValue(this.m_elist, this.m_ei
+/*     */           
+/* 110 */           .getEntityType(), this.m_ei
+/* 111 */           .getEntityID(), "TOMODEL");
+/*     */ 
+/*     */       
+/* 114 */       str6 = getAttributeValue(this.m_elist, this.m_ei
+/*     */           
+/* 116 */           .getEntityType(), this.m_ei
+/* 117 */           .getEntityID(), "TOFEATURECODE");
+/*     */ 
+/*     */       
+/* 120 */       if (str1 == null || str2 == null || str3 == null || str4 == null || str5 == null || str6 == null) {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 126 */         setReturnCode(-1);
+/* 127 */         stringBuffer.append("Error:From machine type, model, feature code and To Machine type, model, feature code can not be empty.");
+/*     */       } 
+/*     */ 
+/*     */ 
+/*     */       
+/* 132 */       if (getReturnCode() == 0) {
+/*     */ 
+/*     */         
+/* 135 */         if (str3.equals(str6) && str2
+/* 136 */           .equals(str5)) {
+/* 137 */           setReturnCode(-1);
+/* 138 */           stringBuffer.append("Error:From Model and Feature Code are the same with To Model and Feature Code.\n");
+/*     */         } 
+/*     */ 
+/*     */ 
+/*     */         
+/* 143 */         StringBuffer stringBuffer1 = new StringBuffer();
+/* 144 */         stringBuffer1.append("map_MODEL:MACHTYPEATR=" + str1 + ";");
+/* 145 */         stringBuffer1.append("map_MODEL:MODELATR=" + str2 + ";");
+/* 146 */         stringBuffer1.append("map_FEATURE:FEATURECODE=" + str3);
+/*     */         
+/* 148 */         EntityItem[] arrayOfEntityItem1 = pDGUtility.dynaSearchII(this.m_db, this.m_prof, this.m_ei, "SRDPRODSTRUCT03", "PRODSTRUCT", stringBuffer1
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */             
+/* 154 */             .toString());
+/*     */         
+/* 156 */         if (arrayOfEntityItem1 == null || arrayOfEntityItem1.length <= 0) {
+/* 157 */           setReturnCode(-1);
+/* 158 */           stringBuffer.append("Error:There's no PRODUCTSTRUCT with a MODEL with machine type " + str1 + " and model " + str2 + " and FEATURE with feature code " + str3 + str8);
+/*     */         } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 169 */         stringBuffer1 = new StringBuffer();
+/* 170 */         stringBuffer1.append("map_MODEL:MACHTYPEATR=" + str4 + ";");
+/* 171 */         stringBuffer1.append("map_MODEL:MODELATR=" + str5 + ";");
+/* 172 */         stringBuffer1.append("map_FEATURE:FEATURECODE=" + str6);
+/*     */         
+/* 174 */         EntityItem[] arrayOfEntityItem2 = pDGUtility.dynaSearchII(this.m_db, this.m_prof, this.m_ei, "SRDPRODSTRUCT03", "PRODSTRUCT", stringBuffer1
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */             
+/* 180 */             .toString());
+/*     */         
+/* 182 */         if (arrayOfEntityItem2 == null || arrayOfEntityItem2.length <= 0) {
+/* 183 */           setReturnCode(-1);
+/* 184 */           stringBuffer.append("Error:There's no PRODUCTSTRUCT with a MODEL with machine type " + str4 + " and model " + str5 + " and FEATURE with feature code " + str6 + str8);
+/*     */         } 
+/*     */       } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 195 */       if (getReturnCode() == -1 && stringBuffer.toString().length() > 0) {
+/* 196 */         println("<h3><font color=red>" + stringBuffer.toString() + "</h3>");
+/* 197 */         OPICMList oPICMList = new OPICMList();
+/* 198 */         oPICMList.put("ABRRESULTS", "ABRRESULTS=" + stringBuffer.toString());
+/* 199 */         pDGUtility.updateAttribute(this.m_db, this.m_prof, this.m_ei, oPICMList);
+/* 200 */       } else if (getReturnCode() == 0) {
+/* 201 */         println("<h3><font color=red>" + stringBuffer.toString() + "</h3>");
+/* 202 */         OPICMList oPICMList = new OPICMList();
+/* 203 */         oPICMList.put("ABRRESULTS", "ABRRESULTS=Passed:OK");
+/* 204 */         pDGUtility.updateAttribute(this.m_db, this.m_prof, this.m_ei, oPICMList);
+/*     */       }
+/*     */     
+/* 207 */     } catch (LockPDHEntityException lockPDHEntityException) {
+/* 208 */       setReturnCode(-2);
+/* 209 */       println("<h3><font color=red>IAB1007E: Could not get soft lock.  Rule execution is terminated.<br />" + lockPDHEntityException
+/*     */ 
+/*     */ 
+/*     */           
+/* 213 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 215 */       logError(lockPDHEntityException.getMessage());
+/* 216 */     } catch (UpdatePDHEntityException updatePDHEntityException) {
+/* 217 */       setReturnCode(-2);
+/* 218 */       println("<h3><font color=red>UpdatePDH error: " + updatePDHEntityException
+/*     */           
+/* 220 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 222 */       logError(updatePDHEntityException.getMessage());
+/* 223 */     } catch (SBRException sBRException) {
+/* 224 */       String str = sBRException.toString();
+/* 225 */       int i = str.indexOf("(ok)");
+/* 226 */       if (i < 0) {
+/* 227 */         setReturnCode(-2);
+/* 228 */         println("<h3><font color=red>Generate Data error: " + 
+/*     */             
+/* 230 */             replace(str, str8, "<br>") + "</font></h3>");
+/*     */         
+/* 232 */         logError(sBRException.toString());
+/*     */       } else {
+/* 234 */         str = str.substring(0, i);
+/* 235 */         println(replace(str, str8, "<br>"));
+/*     */       } 
+/* 237 */     } catch (Exception exception) {
+/*     */       
+/* 239 */       println("Error in " + this.m_abri.getABRCode() + ":" + exception.getMessage());
+/* 240 */       println("" + exception);
+/* 241 */       exception.printStackTrace();
+/*     */       
+/* 243 */       if (getABRReturnCode() != -2) {
+/* 244 */         setReturnCode(-3);
+/*     */       }
+/*     */     } finally {
+/* 247 */       println("<br /><b>" + 
+/*     */           
+/* 249 */           buildMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 252 */               getABRDescription(), 
+/* 253 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }) + "</b>");
+/*     */       
+/* 256 */       log(
+/* 257 */           buildLogMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 260 */               getABRDescription(), 
+/* 261 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }));
+/*     */       
+/* 264 */       str7 = this.m_ei.toString();
+/* 265 */       if (str7.length() > 64) {
+/* 266 */         str7 = str7.substring(0, 64);
+/*     */       }
+/* 268 */       setDGTitle(str7);
+/* 269 */       setDGRptName(ABR);
+/*     */ 
+/*     */       
+/* 272 */       setDGString(getABRReturnCode());
+/* 273 */       printDGSubmitString();
+/*     */ 
+/*     */ 
+/*     */       
+/* 277 */       buildReportFooter();
+/*     */       
+/* 279 */       if (!isReadOnly()) {
+/* 280 */         clearSoftLock();
+/*     */       }
+/*     */     } 
+/*     */   }
+/*     */   
+/*     */   private String replace(String paramString1, String paramString2, String paramString3) {
+/* 286 */     String str = "";
+/* 287 */     int i = paramString1.indexOf(paramString2);
+/*     */     
+/* 289 */     while (paramString1.length() > 0 && i >= 0) {
+/* 290 */       str = str + paramString1.substring(0, i) + paramString3;
+/* 291 */       paramString1 = paramString1.substring(i + paramString2.length());
+/* 292 */       i = paramString1.indexOf(paramString2);
+/*     */     } 
+/* 294 */     str = str + paramString1;
+/* 295 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getABREntityDesc(String paramString, int paramInt) {
+/* 306 */     return null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 315 */     return "Feature Transaction Integrity Check ABR.";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getStyle() {
+/* 326 */     return "";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getRevision() {
+/* 336 */     return new String("1.6");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String getVersion() {
+/* 346 */     return "FCTRANSINTCHECKABR01.java,v 1.6 2006/03/03 19:23:28 bala Exp";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 356 */     return "FCTRANSINTCHECKABR01.java";
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.sg;
 
-//import COM.ibm.opicmpdh.middleware.*;
-//import COM.ibm.opicmpdh.objects.*;
-import COM.ibm.opicmpdh.transactions.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.eannounce.abr.util.*;
-//import java.util.*;
-//import java.io.*;
-
-/**
- * FCTRANSINTCHECKABR01
- *
- *@author     Administrator
- *@created    August 30, 2002
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\FCTRANSINTCHECKABR01.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class FCTRANSINTCHECKABR01 extends PokBaseABR {
-  /**
-  *  Execute ABR.
-  *
-  */
-
-  // Class constants
-  public final static String ABR = new String("FCTRANSINTCHECKABR01");
-
-  private EntityGroup m_egParent = null;
-  private EntityItem m_ei = null;
-
-  /**
-     * execute_run
-     *
-     * @author Owner
-     */
-    public void execute_run() {
-    EntityItem[] aeiFrom;
-    StringBuffer sb;
-    EntityItem[] aeiTo;
-    String strFromMT = null;
-    String strFromModel = null;
-    String strFromFeature = null;
-    String strMT = null;
-    String strModel = null;
-    String strToFeature = null;
-    String strDgName = null;
-    String RETURN = System.getProperty("line.separator");
-    try {
-      // if it's the first time, build the report header
-      StringBuffer sbError = new StringBuffer();
-      PDGUtility utility = new PDGUtility();
-      start_ABRBuild();
-      // Build the report header
-      buildReportHeaderII();
-
-      m_egParent = m_elist.getParentEntityGroup();
-      m_ei = m_egParent.getEntityItem(0);
-      println("<br><b>Feature Transaction: " + m_ei.getKey() + "</b>");
-
-      printNavigateAttributes(m_ei, m_egParent, true);
-      setReturnCode(PASS);
-      strFromMT =
-        getAttributeValue(
-          m_elist,
-          m_ei.getEntityType(),
-          m_ei.getEntityID(),
-          "FROMMACHTYPE");
-      strFromModel =
-        getAttributeValue(
-          m_elist,
-          m_ei.getEntityType(),
-          m_ei.getEntityID(),
-          "FROMMODEL");
-      strFromFeature =
-        getAttributeValue(
-          m_elist,
-          m_ei.getEntityType(),
-          m_ei.getEntityID(),
-          "FROMFEATURECODE");
-      strMT =
-        getAttributeValue(
-          m_elist,
-          m_ei.getEntityType(),
-          m_ei.getEntityID(),
-          "TOMACHTYPE");
-      strModel =
-        getAttributeValue(
-          m_elist,
-          m_ei.getEntityType(),
-          m_ei.getEntityID(),
-          "TOMODEL");
-      strToFeature =
-        getAttributeValue(
-          m_elist,
-          m_ei.getEntityType(),
-          m_ei.getEntityID(),
-          "TOFEATURECODE");
-
-      if (strFromMT == null
-        || strFromModel == null
-        || strFromFeature == null
-        || strMT == null
-        || strModel == null
-        || strToFeature == null) {
-        setReturnCode(FAIL);
-        sbError.append(
-          "Error:From machine type, model, feature code and To Machine type, model, feature code can not be empty.");
-
-      }
-
-      if (getReturnCode() == PASS) {
-        //For the FCTRANSACTION, check that FROMMODEL & FROMFEATURECODE does not equal TOMODEL & TOFEATURECODE
-
-        if (strFromFeature.equals(strToFeature)
-          && strFromModel.equals(strModel)) {
-          setReturnCode(FAIL);
-          sbError.append(
-            "Error:From Model and Feature Code are the same with To Model and Feature Code.\n");
-        }
-        //There must exist a PRODSTRUCT with a from MODEL and From FEATURE
-
-        sb = new StringBuffer();
-        sb.append("map_MODEL:MACHTYPEATR=" + strFromMT + ";");
-        sb.append("map_MODEL:MODELATR=" + strFromModel + ";");
-        sb.append("map_FEATURE:FEATURECODE=" + strFromFeature);
-        aeiFrom =
-          utility.dynaSearchII(
-            m_db,
-            m_prof,
-            m_ei,
-            "SRDPRODSTRUCT03",
-            "PRODSTRUCT",
-            sb.toString());
-
-        if (aeiFrom == null || aeiFrom.length <= 0) {
-          setReturnCode(FAIL);
-          sbError.append(
-            "Error:There's no PRODUCTSTRUCT with a MODEL with machine type "
-              + strFromMT
-              + " and model "
-              + strFromModel
-              + " and FEATURE with feature code "
-              + strFromFeature
-              + RETURN);
-        }
-
-        //There must exist a PRODSTRUCT with a To MODEL and To FEATURE
-        sb = new StringBuffer();
-        sb.append("map_MODEL:MACHTYPEATR=" + strMT + ";");
-        sb.append("map_MODEL:MODELATR=" + strModel + ";");
-        sb.append("map_FEATURE:FEATURECODE=" + strToFeature);
-        aeiTo =
-          utility.dynaSearchII(
-            m_db,
-            m_prof,
-            m_ei,
-            "SRDPRODSTRUCT03",
-            "PRODSTRUCT",
-            sb.toString());
-
-        if (aeiTo == null || aeiTo.length <= 0) {
-          setReturnCode(FAIL);
-          sbError.append(
-            "Error:There's no PRODUCTSTRUCT with a MODEL with machine type "
-              + strMT
-              + " and model "
-              + strModel
-              + " and FEATURE with feature code "
-              + strToFeature
-              + RETURN);
-        }
-      }
-
-      if (getReturnCode() == FAIL && sbError.toString().length() > 0) {
-        println("<h3><font color=red>" + sbError.toString() + "</h3>");
-        OPICMList list = new OPICMList();
-        list.put("ABRRESULTS", "ABRRESULTS=" + sbError.toString());
-        utility.updateAttribute(m_db, m_prof, m_ei, list);
-      } else if (getReturnCode() == PASS) {
-        println("<h3><font color=red>" + sbError.toString() + "</h3>");
-        OPICMList list = new OPICMList();
-        list.put("ABRRESULTS", "ABRRESULTS=Passed:OK");
-        utility.updateAttribute(m_db, m_prof, m_ei, list);
-      }
-
-    } catch (LockPDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>"
-          + ERR_IAB1007E
-          + "<br />"
-          + le.getMessage()
-          + "</font></h3>");
-      logError(le.getMessage());
-    } catch (UpdatePDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>UpdatePDH error: "
-          + le.getMessage()
-          + "</font></h3>");
-      logError(le.getMessage());
-    } catch (SBRException _sbrex) {
-      String strError = _sbrex.toString();
-      int i = strError.indexOf("(ok)");
-      if (i < 0) {
-        setReturnCode(UPDATE_ERROR);
-        println(
-          "<h3><font color=red>Generate Data error: "
-            + replace(strError, RETURN, "<br>")
-            + "</font></h3>");
-        logError(_sbrex.toString());
-      } else {
-        strError = strError.substring(0, i);
-        println(replace(strError, RETURN, "<br>"));
-      }
-    } catch (Exception exc) {
-      // Report this error to both the datbase log and the PrintWriter
-      println("Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-      println("" + exc);
-      exc.printStackTrace();
-      // don't overwrite an update exception
-      if (getABRReturnCode() != UPDATE_ERROR) {
-        setReturnCode(INTERNAL_ERROR);
-      }
-    } finally {
-      println(
-        "<br /><b>"
-          + buildMessage(
-            MSG_IAB2016I,
-            new String[] {
-              getABRDescription(),
-              (getReturnCode() == PASS ? "Passed" : "Failed")})
-          + "</b>");
-
-      log(
-        buildLogMessage(
-          MSG_IAB2016I,
-          new String[] {
-            getABRDescription(),
-            (getReturnCode() == PASS ? "Passed" : "Failed")}));
-
-      // set DG title
-      strDgName = m_ei.toString();
-      if (strDgName.length() > 64) {
-        strDgName = strDgName.substring(0, 64);
-      }
-      setDGTitle(strDgName);
-      setDGRptName(ABR);
-
-      // set DG submit string
-      setDGString(getABRReturnCode());
-      printDGSubmitString();
-      //Stuff into report for subscription and notification
-
-      // Tack on the DGString
-      buildReportFooter();
-      // make sure the lock is released
-      if (!isReadOnly()) {
-        clearSoftLock();
-      }
-    }
-  }
-
-  private String replace(String _s, String _s1, String _s2) {
-    String sResult = "";
-    int iTab = _s.indexOf(_s1);
-
-    while (_s.length() > 0 && iTab >= 0) {
-      sResult = sResult + _s.substring(0, iTab) + _s2;
-      _s = _s.substring(iTab + _s1.length());
-      iTab = _s.indexOf(_s1);
-    }
-    sResult = sResult + _s;
-    return sResult;
-  }
-
-  /**
-  *  Get the entity description to use in error messages
-  *
-  *@param  entityType  Description of the Parameter
-  *@param  entityId    Description of the Parameter
-  *@return             String
-  */
-  protected String getABREntityDesc(String entityType, int entityId) {
-    return null;
-  }
-
-  /**
-   *  Get ABR description
-   *
-   *@return    java.lang.String
-   */
-  public String getDescription() {
-    return "Feature Transaction Integrity Check ABR.";
-  }
-
-  /**
-   *  Get any style that should be used for this page. Derived classes can
-   *  override this to set styles They must include the <style>...</style> tags
-   *
-   *@return    String
-   */
-  protected String getStyle() {
-    // Print out the PSG stylesheet
-    return "";
-  }
-
-  /**
-     * getRevision
-     *
-     * @return
-     * @author Owner
-     */
-    public String getRevision() {
-    return new String("1.6");
-  }
-
-  /**
-     * getVersion
-     *
-     * @return
-     * @author Owner
-     */
-    public static String getVersion() {
-    return ("FCTRANSINTCHECKABR01.java,v 1.6 2006/03/03 19:23:28 bala Exp");
-  }
-
-  /**
-     * getABRVersion
-     *
-     * @return
-     * @author Owner
-     */
-    public String getABRVersion() {
-    return "FCTRANSINTCHECKABR01.java";
-  }
-}

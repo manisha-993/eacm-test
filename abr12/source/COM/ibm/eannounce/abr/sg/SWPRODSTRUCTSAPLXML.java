@@ -1,557 +1,563 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2007  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.abr.sg;
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.SAPLCHQISOElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLFixedElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLGEOAnnElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLGEOAvailElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLGEOElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLGEOFilteredElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLIdElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLItemElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLMessageIDElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLNLSElem;
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EANEntity;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Vector;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class SWPRODSTRUCTSAPLXML
+/*     */   extends SAPLXMLBase
+/*     */ {
+/*     */   private static final String SAPVE_NAME = "SAPLVESWPRODSTRUCT";
+/* 205 */   private static final Vector SAPLXMLMAP_VCT = new Vector(); static {
+/* 206 */     SAPLElem sAPLElem1 = new SAPLElem("wsnt:Notify");
+/* 207 */     sAPLElem1.addXMLAttribute("xmlns:wsnt", "http://docs.oasis-open.org/wsn/2004/06/wsn-WS-BaseNotification-1.2-draft-01.xsd");
+/* 208 */     sAPLElem1.addXMLAttribute("xmlns:ebi", "http://ibm.com/esh/ebi");
+/* 209 */     SAPLXMLMAP_VCT.addElement(sAPLElem1);
+/*     */     
+/* 211 */     SAPLElem sAPLElem2 = new SAPLElem("wsnt:NotificationMessage");
+/* 212 */     sAPLElem1.addChild(sAPLElem2);
+/*     */     
+/* 214 */     sAPLElem2.addChild(new SAPLTopicElem());
+/* 215 */     SAPLElem sAPLElem3 = new SAPLElem("wsnt:Message");
+/* 216 */     sAPLElem2.addChild(sAPLElem3);
+/*     */     
+/* 218 */     sAPLElem3.addChild((SAPLElem)new SAPLMessageIDElem());
+/* 219 */     sAPLElem3.addChild((SAPLElem)new SAPLFixedElem("ebi:priority", "Normal"));
+/* 220 */     sAPLElem3.addChild((SAPLElem)new SAPLFixedElem("PayloadFormat", "EACM_Material"));
+/* 221 */     sAPLElem3.addChild((SAPLElem)new SAPLFixedElem("NativeCodePage", "1208"));
+/*     */     
+/* 223 */     SAPLElem sAPLElem4 = new SAPLElem("body");
+/* 224 */     sAPLElem3.addChild(sAPLElem4);
+/*     */     
+/* 226 */     SAPLElem sAPLElem5 = new SAPLElem("Material");
+/* 227 */     sAPLElem4.addChild(sAPLElem5);
+/*     */ 
+/*     */     
+/* 230 */     sAPLElem5.addChild((SAPLElem)new SAPLFixedElem("EACMEntityType", "SWPRODSTRUCT"));
+/* 231 */     sAPLElem5.addChild((SAPLElem)new SAPLIdElem("EACMEntityId"));
+/* 232 */     sAPLElem5.addChild(new SAPLElem("CableSpecsRequiredFlag", "MODEL", "CBLSPECSREQ"));
+/* 233 */     sAPLElem5.addChild(new SAPLElem("CustomerSetupAllowanceDays", "MODEL", "CUSTSETUPALLOW"));
+/* 234 */     sAPLElem5.addChild(new SAPLElem("Division", "PROJ", "DIV", 1));
+/* 235 */     sAPLElem5.addChild(new SAPLElem("EAEligibility", "MODEL", "EAELIG"));
+/* 236 */     sAPLElem5.addChild(new SAPLElem("GSAProductionStatus", "MODEL", "PRODCD"));
+/* 237 */     sAPLElem5.addChild(new SAPLElem("HourlyServiceRate", "MODEL", "HRLYSVCRATECLSCD"));
+/* 238 */     sAPLElem5.addChild(new SAPLElem("IBMCreditCorp", "MODEL", "IBMCREDCORP"));
+/* 239 */     sAPLElem5.addChild(new SAPLElem("LicensedInternalCode", "MODEL", "LICNSINTERCD"));
+/* 240 */     sAPLElem5.addChild(new SAPLElem("LineOfBusiness", "PROJ", "LINEOFBUS"));
+/* 241 */     sAPLElem5.addChild(new SAPLElem("LowEndIndicator", "MODEL", "LOWENDFLG"));
+/* 242 */     sAPLElem5.addChild(new SAPLElem("MachineMaintenanceGroupCode", "MODEL", "MACHMAINTGRPCD", 1));
+/* 243 */     sAPLElem5.addChild(new SAPLElem("MidrangeSystemOption", "MODEL", "MIDRNGESYSOPT"));
+/* 244 */     sAPLElem5.addChild(new SAPLElem("OEMIndicator", "MODEL", "OEMINDC"));
+/* 245 */     sAPLElem5.addChild(new SAPLElem("PlantOfManufacture", "MODEL", "PLNTOFMFR", 1));
+/* 246 */     sAPLElem5.addChild((SAPLElem)new SAPLGEOFilteredElem("InterplantPlantCode", "GEOMOD", "INTERPLNTCD", "COUNTRYLIST", "1652", 1));
+/*     */ 
+/*     */     
+/* 249 */     sAPLElem5.addChild(new SAPLElem("ProductTypeCategory", "MODEL", "PRODTYPECATG", 1));
+/* 250 */     sAPLElem5.addChild(new SAPLElem("ProductID", "MODEL", "MACHTYPEATR|MODELATR"));
+/* 251 */     sAPLElem5.addChild(new SAPLElem("ProfitCenter", "MODEL", "PRFTCTR", 1));
+/* 252 */     sAPLElem5.addChild(new SAPLElem("SalesManualIndicator", "MODEL", "SLEMANLVIEWABL"));
+/* 253 */     sAPLElem5.addChild(new SAPLElem("VendorNumber", "MODEL", "VENDID"));
+/* 254 */     sAPLElem5.addChild(new SAPLElem("VolumeDiscount", "MODEL", "VOLDISCNT"));
+/* 255 */     sAPLElem5.addChild(new SAPLElem("ESAServiceLevelCategory", "MODEL", "ESASVCLEVCATG"));
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 308 */     SAPLNLSElem sAPLNLSElem1 = new SAPLNLSElem("DescriptionData");
+/*     */     
+/* 310 */     sAPLNLSElem1.addChild(new SAPLElem("MaterialDescription", "MODEL", "MKTGNAME"));
+/* 311 */     sAPLNLSElem1.addChild((SAPLElem)new SAPLCHQISOElem("DescriptionLanguage"));
+/* 312 */     SAPLElem sAPLElem7 = new SAPLElem("DescriptionDataList");
+/*     */     
+/* 314 */     sAPLElem7.addChild((SAPLElem)sAPLNLSElem1);
+/*     */     
+/* 316 */     sAPLElem5.addChild(sAPLElem7);
+/*     */     
+/* 318 */     sAPLElem7 = new SAPLElem("GeographyList");
+/* 319 */     sAPLElem5.addChild(sAPLElem7);
+/*     */     
+/* 321 */     SAPLGEOElem sAPLGEOElem = new SAPLGEOElem("Geography", "AVAIL", "AVAILGAA");
+/* 322 */     sAPLElem7.addChild((SAPLElem)sAPLGEOElem);
+/* 323 */     sAPLGEOElem.addChild((SAPLElem)new SAPLItemElem("RFAGEO", "GENERALAREA", "RFAGEO"));
+/* 324 */     sAPLGEOElem.addChild((SAPLElem)new SAPLItemElem("Country", "GENERALAREA", "GENAREANAME"));
+/* 325 */     sAPLGEOElem.addChild((SAPLElem)new SAPLItemElem("SalesOrg", "GENERALAREA", "SLEORG"));
+/* 326 */     sAPLGEOElem.addChild((SAPLElem)new SAPLItemElem("SalesOffice", "GENERALAREA", "SLEOFFC"));
+/* 327 */     sAPLGEOElem.addChild((SAPLElem)new SAPLGEOAvailElem("AASOrderIndicator", "ORDERSYSNAME"));
+/* 328 */     sAPLGEOElem.addChild((SAPLElem)new SAPLGEOAvailElem("AASViewableIndicator", "AASVIEWABL"));
+/* 329 */     sAPLGEOElem.addChild((SAPLElem)new SAPLGEOFilteredElem("LeaseRentalWithrawalDate", "AVAIL", "EFFECTIVEDATE", "AVAILTYPE", "AVT220"));
+/*     */     
+/* 331 */     sAPLGEOElem.addChild((SAPLElem)new SAPLGEOAnnElem("PackageName", "ANNNUMBER"));
+/* 332 */     sAPLGEOElem.addChild((SAPLElem)new SAPLGEOAnnElem("AnnouncementType", "ANNTYPE"));
+/* 333 */     sAPLGEOElem.addChild((SAPLElem)new SAPLGEOAnnElem("ProductAnnounceDateCountry", "ANNDATE"));
+/* 334 */     sAPLGEOElem.addChild((SAPLElem)new SAPLGEOFilteredElem("ProductWithdrawalDate", "AVAIL", "EFFECTIVEDATE", "AVAILTYPE", "149"));
+/*     */ 
+/*     */     
+/* 337 */     sAPLElem7 = new SAPLElem("FeatureList");
+/* 338 */     sAPLElem5.addChild(sAPLElem7);
+/* 339 */     SAPLElem sAPLElem6 = new SAPLElem("Feature");
+/* 340 */     sAPLElem7.addChild(sAPLElem6);
+/* 341 */     sAPLElem6.addChild(new SAPLElem("LicensedInternalCode", "SWFEATURE", "LICNSINTERCD"));
+/* 342 */     sAPLElem6.addChild(new SAPLElem("ProductID", "SWFEATURE", "FEATURECODE"));
+/* 343 */     sAPLElem6.addChild(new SAPLElem("MOSPEligible", "SWFEATURE", "MOSPELIG"));
+/* 344 */     sAPLElem6.addChild(new SAPLElem("VolumeDiscount", "SWFEATURE", "VOLDISCNT"));
+/* 345 */     sAPLElem6.addChild(new SAPLElem("SalesManualIndicator", "SWFEATURE", "SLEMANLVIEWABL"));
+/* 346 */     sAPLElem6.addChild(new SAPLElem("ProfitCenter", "SWFEATURE", "PRFTCTR", 1));
+/*     */     
+/* 348 */     sAPLElem7 = new SAPLElem("FeatureDescriptionDataList");
+/*     */     
+/* 350 */     sAPLElem6.addChild(sAPLElem7);
+/*     */     
+/* 352 */     SAPLNLSElem sAPLNLSElem2 = new SAPLNLSElem("FeatureDescriptionData");
+/*     */     
+/* 354 */     sAPLNLSElem2.addChild(new SAPLElem("FeatureDescription", "SWPRODSTRUCT", "MKTGNAME", true));
+/* 355 */     sAPLNLSElem2.addChild((SAPLElem)new SAPLCHQISOElem("FeatureDescriptionLanguage"));
+/*     */     
+/* 357 */     sAPLElem7.addChild((SAPLElem)sAPLNLSElem2);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected Vector getMQPropertiesFN() {
+/* 369 */     Vector<String> vector = new Vector(1);
+/*     */     
+/* 371 */     vector.add("ESHMQSERIES");
+/* 372 */     return vector;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getSaplVeName() {
+/* 378 */     return "SAPLVESWPRODSTRUCT";
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   protected Vector getSAPLXMLMap() {
+/* 383 */     return SAPLXMLMAP_VCT;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void mergeLists(EntityList paramEntityList) throws SQLException, MiddlewareException, MiddlewareRequestException, MiddlewareShutdownInProgressException {
+/* 400 */     Profile profile = paramEntityList.getProfile();
+/* 401 */     String str = "MODELPROJVE";
+/*     */     
+/* 403 */     EntityItem entityItem1 = paramEntityList.getEntityGroup("MODEL").getEntityItem(0);
+/*     */ 
+/*     */     
+/* 406 */     EntityList entityList = this.saplAbr.getDB().getEntityList(profile, new ExtractActionItem(null, this.saplAbr
+/* 407 */           .getDB(), profile, str), new EntityItem[] { new EntityItem(null, profile, "MODEL", entityItem1
+/* 408 */             .getEntityID()) });
+/* 409 */     addDebug("mergeLists:: Extract " + str + NEWLINE + PokUtils.outputList(entityList));
+/*     */     
+/* 411 */     EntityItem entityItem2 = entityList.getParentEntityGroup().getEntityItem(0);
+/*     */ 
+/*     */     
+/* 414 */     EntityGroup entityGroup1 = paramEntityList.getEntityGroup("MODELPROJA");
+/* 415 */     EntityGroup entityGroup2 = entityList.getEntityGroup("MODELPROJA");
+/*     */     
+/* 417 */     EntityItem[] arrayOfEntityItem = entityGroup2.getEntityItemsAsArray();
+/* 418 */     for (byte b1 = 0; b1 < arrayOfEntityItem.length; b1++) {
+/*     */       
+/* 420 */       EntityItem entityItem = arrayOfEntityItem[b1];
+/*     */       
+/* 422 */       entityItem.removeUpLink((EANEntity)entityItem2);
+/*     */       
+/* 424 */       entityItem.putUpLink((EANEntity)entityItem1);
+/*     */       
+/* 426 */       entityGroup1.putEntityItem(entityItem);
+/*     */       
+/* 428 */       entityItem.reassign(entityGroup1);
+/*     */       
+/* 430 */       entityGroup2.removeEntityItem(entityItem);
+/*     */     } 
+/*     */ 
+/*     */     
+/* 434 */     EntityGroup entityGroup3 = paramEntityList.getEntityGroup("PROJ");
+/* 435 */     EntityGroup entityGroup4 = entityList.getEntityGroup("PROJ");
+/* 436 */     arrayOfEntityItem = entityGroup4.getEntityItemsAsArray(); byte b2;
+/* 437 */     for (b2 = 0; b2 < arrayOfEntityItem.length; b2++) {
+/*     */       
+/* 439 */       EntityItem entityItem = arrayOfEntityItem[b2];
+/*     */       
+/* 441 */       entityGroup3.putEntityItem(entityItem);
+/*     */       
+/* 443 */       entityItem.reassign(entityGroup3);
+/*     */       
+/* 445 */       entityGroup4.removeEntityItem(entityItem);
+/*     */     } 
+/*     */ 
+/*     */     
+/* 449 */     entityGroup1 = paramEntityList.getEntityGroup("MODELGEOMOD");
+/* 450 */     entityGroup2 = entityList.getEntityGroup("MODELGEOMOD");
+/*     */     
+/* 452 */     arrayOfEntityItem = entityGroup2.getEntityItemsAsArray();
+/* 453 */     for (b2 = 0; b2 < arrayOfEntityItem.length; b2++) {
+/*     */       
+/* 455 */       EntityItem entityItem = arrayOfEntityItem[b2];
+/*     */       
+/* 457 */       entityItem.removeUpLink((EANEntity)entityItem2);
+/*     */       
+/* 459 */       entityItem.putUpLink((EANEntity)entityItem1);
+/*     */       
+/* 461 */       entityGroup1.putEntityItem(entityItem);
+/*     */       
+/* 463 */       entityItem.reassign(entityGroup1);
+/*     */       
+/* 465 */       entityGroup2.removeEntityItem(entityItem);
+/*     */     } 
+/*     */ 
+/*     */     
+/* 469 */     entityGroup3 = paramEntityList.getEntityGroup("GEOMOD");
+/* 470 */     entityGroup4 = entityList.getEntityGroup("GEOMOD");
+/* 471 */     arrayOfEntityItem = entityGroup4.getEntityItemsAsArray();
+/* 472 */     for (b2 = 0; b2 < arrayOfEntityItem.length; b2++) {
+/*     */       
+/* 474 */       EntityItem entityItem = arrayOfEntityItem[b2];
+/*     */       
+/* 476 */       entityGroup3.putEntityItem(entityItem);
+/*     */       
+/* 478 */       entityItem.reassign(entityGroup3);
+/*     */       
+/* 480 */       entityGroup4.removeEntityItem(entityItem);
+/*     */       
+/* 482 */       entityGroup4.removeEntityItem(entityItem);
+/*     */     } 
+/*     */ 
+/*     */     
+/* 486 */     entityList.dereference();
+/*     */     
+/* 488 */     addDebug("mergeLists:: after merge Extract " + NEWLINE + PokUtils.outputList(paramEntityList));
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVersion() {
+/* 498 */     return "1.6";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   static class SAPLTopicElem
+/*     */     extends SAPLElem
+/*     */   {
+/*     */     SAPLTopicElem() {
+/* 516 */       super("wsnt:Topic", null, null, false);
+/* 517 */       addXMLAttribute("Dialect", "http://docs.oasis-open.org/wsn/t-1/TopicExpression/Concrete");
+/*     */     }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*     */     public void addElements(Database param1Database, EntityList param1EntityList, Document param1Document, Element param1Element, StringBuffer param1StringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 540 */       Element element = param1Document.createElement(this.nodeName);
+/* 541 */       addXMLAttrs(element);
+/*     */ 
+/*     */       
+/* 544 */       Vector vector = SAPLGEOElem.getAvailEntities(param1EntityList.getEntityGroup("AVAIL"));
+/* 545 */       String str1 = getCountryCodes(param1EntityList, vector, "AVAILGAA", param1StringBuffer);
+/* 546 */       String str2 = "esh:MaterialLegacy/Nomenclature/SWPRODSTRUCT/Country" + str1 + "/EndCountry";
+/* 547 */       element.appendChild(param1Document.createTextNode(str2));
+/* 548 */       param1Element.appendChild(element);
+/*     */ 
+/*     */       
+/* 551 */       for (byte b = 0; b < this.childVct.size(); b++) {
+/* 552 */         SAPLElem sAPLElem = this.childVct.elementAt(b);
+/* 553 */         sAPLElem.addElements(param1Database, param1EntityList, param1Document, element, param1StringBuffer);
+/*     */       } 
+/*     */     }
+/*     */   }
+/*     */ }
 
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-import com.ibm.transform.oim.eacm.util.*;
 
-import java.util.*;
-import org.w3c.dom.*;
-
-/**********************************************************************************
-* SWPRODSTRUCTSAPLXML class
-*
-* From "SG FS ABR SAPL 20070830.doc"
-*
-* The SW Product Structure (SWPRODSTRUCT) is part of a complex data structure and
-* hence a Virtual Entity (VE) is used to describe the applicable structure for the
-* Data Quality checks.
-*
-*/
-// SWPRODSTRUCTSAPLXML.java,v
-// Revision 1.6  2011/03/22 11:20:24  wendy
-// Reassign attr meta to diff group
-//
-// Revision 1.5  2008/01/30 19:39:15  wendy
-// Cleanup RSA warnings
-//
-// Revision 1.4  2007/12/12 17:23:48  wendy
-// CR1113074218 updates
-//
-// Revision 1.3  2007/12/06 20:59:47  wendy
-// TIR79LNMS restored dropped FeatureDescriptionDataList element
-//
-// Revision 1.2  2007/10/18 11:54:46  wendy
-// correct mergelists()
-//
-// Revision 1.1  2007/09/13 12:40:28  wendy
-// Init for RQ0426071527 - XCC GX
-//
-//
-public class SWPRODSTRUCTSAPLXML extends SAPLXMLBase
-{
-    private static final String SAPVE_NAME = "SAPLVESWPRODSTRUCT";  // extract to use for xml
-/*
-SAPLVESWPRODSTRUCT  0   SWFEATURE   Relator SWPRODSTRUCT    MODEL
-SAPLVESWPRODSTRUCT  0   SWPRODSTRUCT    Relator SWPRODSTRUCTAVAIL   AVAIL
-SAPLVESWPRODSTRUCT  1   AVAIL   Association AVAILGAA    GENERALAREA
-SAPLVESWPRODSTRUCT  1   AVAIL   Association AVAILANNA   ANNOUNCEMENT
-SAPLVESWPRODSTRUCT  1   MODEL   Association MODELPROJA  PROJ
-*/
-    private static final Vector SAPLXMLMAP_VCT;
-
-/*
-1   <wsnt:Notify xmlns:wsnt="http://docs.oasis-open.org/wsn/2004/06/wsn-WS-BaseNotification-1.2-draft-01.xsd" xmlns:ebi="http://ibm.com/esh/ebi">
-2   <wsnt:NotificationMessage>
-3   <wsnt:Topic Dialect="http://docs.oasis-open.org/wsn/t-1/TopicExpression/Concrete">
-    For Model, Prodstruct, Orderable
-        Type/Legacy/Nomenclature/?1/Country/?2/?2/.../EndCountry/
-    For AccountingUse
-        Type/Manual/Scope/?3/
-3   </wsnt:Topic>
-3   <wsnt:Message>
-4   <ebi:MessageID> EA00000000  <ebi:MessageID> increment as a number
-4   <ebi:priority>  "Normal"    <ebi:priority>  constant
-4   <PayloadFormat  EACM_Material   </PayloadFormat
-4   <NativeCodePage>    0   </NativeCodePage>
-4   <body>
-    insert EACM PayLoad here
-4   </body>
-3   </wsnt:Message>
-2   </wsnt:NotificationMessage>
-1   </wsnt:Notify>
-
-    ?1 = MTM for Model or Prodstruct
-    ?1 = PN for OrderablePartnumber
-    ?2 = Country Code like US, CA
-    ?3 = ACCTGUSEONLYMATRL.PRODTYPE
-*/
-/*
-1   <Material>
-2   <CableSpecsRequiredFlag>    MODEL.CBLSPECSREQ
-2   <CustomerSetupAllowanceDays>    MODEL.CUSTSETUPALLOW
-2   <Division>  PROJ.ClassOf(DIV)
-2   <EAEligibility> MODEL.EAELIG
-2   <GSAProductionStatus>   MODEL.PRODCD
-2   <HourlyServiceRate> MODEL.HRLYSVCRATECLSCD
-2   <IBMCreditCorp> MODEL.IBMCREDCORP
-2   <LicensedInternalCode>  MODEL.LICNSINTERCD
-2   <LineOfBusiness>    PROJ.LINEOFBUS
-2   <LowEndIndicator>   MODEL.LOWENDFLG
-2	<MachineMaintenanceGroupCode>	MODEL.ClassOf(MACHMAINTGRPCD) //CR1113074218
-2   <MidrangeSystemOption>  MODEL.MIDRNGESYSOPT
-2   <OEMIndicator>  MODEL.OEMINDC
-2   <PlantOfManufacture>    MODEL.ClassOf(PLNTOFMFR)
-2	<InterplantPlantCode>	GEOMOD.ClassOf(INTERPLNTCD) where GEOMOD.COUNTRYLIST = 1652 (US) //CR1113074218
-
-TIR73RS77
-2   <ProductTypeCategory>   MODEL.ClassOf(PRODTYPECATG)
-2orig   <ProductGroupingCode>   MODEL.ClassOf(PRODTYPECATG)
-end TIR73RS77
-2   <ProductID> MODEL.MACHTYPEATR + MODEL.MODELATR
-2   <ProfitCenter>  MODEL.ClassOf(PRFTCTR)
-2   <SalesManualIndicator>  MODEL.SLEMANLVIEWABL
-2   <VendorNumber>  MODEL.VENDID
-2   <VolumeDiscount>    MODEL.VOLDISCNT
-2   <ESAServiceLevelCategory>   MODEL.ESASVCLEVCATG
-all deleted from here down
-2   <AutomaticMaintenanceContract>  MODEL.AUTOMAINTCONTRCT
-2   <BulkOrder> MODEL.BULKORD
-2   <CountryIdleControl>    MODEL.CNTRYIDLECNTRL
-2   <ColorSpecificationIndicator>   MODEL.COLRSPECINDC
-2   <ComputerSystemCompoment>   MODEL.COMPUTSYSCOMPOMENT
-2   <ComputerSystemStandalone>  MODEL.COMPUTSYSSTNDALONE
-2   <CorporateServiceOption>    MODEL.CORPSVCOPT
-2   <DPInstallProgram>  MODEL.DPINSTPGM
-2   <EducationAllowance-HighSchool> MODEL.EDUCALLOWMHGHSCH
-2   <EducationAllowance-SecondarySchool>    MODEL.EDUCALLOWMSECONDRYSCH
-2   <EducationAllowance-University> MODEL.EDUCALLOWMUNVRSTY
-2   <ESAOnSite> MODEL.ESAONSITE
-2   <FrozenZonePeriod-months>   MODEL.FROZENZONEPRIODMMO
-2   <InitialPeriodMaintenance>  MODEL.INITPRIODMAINT
-2   <LowEndFlag>    MODEL.LOWENDFLG
-2   <LPSEffectiveDate>  MODEL.LPSEFFCTVDATE
-2   <MaintenanceGroup>  MODEL.MAINTGRP
-2   <MaintenanceGroup-RentalPlanD>  MODEL.MAINTGRPMRENTPLAND
-2   <MATPass>   MODEL.MATPASS
-2   <MaximumMCSforPPRTTest> MODEL.MAXMCSFORPPRTTST
-2   <MandatoryMAT>  MODEL.MNATORYMAT
-2   <MOSPEligible>  MODEL.MOSPELIG
-2   <NormalDeliveryTime-months> MODEL.NORMALDELIVTMEMMO
-2   <NormalMaintenanceBilling-months>   MODEL.NORMALMAINTBILLMMO
-2   <NormalTypeofMaintenace>    MODEL.NORMALTYPEOFMAINT
-2   <OCTFactor-weeks>   MODEL.OCTFACTRMWK
-2   <OrdersRejected>    MODEL.ORDREJCTED
-2   <PerCallClass>  MODEL.PERCALLCLS
-2   <PostOrderReview>   MODEL.POSTORDREVU
-2   <PPTPAgreementPeriod>   MODEL.PPTPAGRMTPRIOD
-2   <PPTPEligibility>   MODEL.PPTPELIG
-2   <PPTPTestPeriod>    MODEL.PPTPTSTPRIOD
-2   <PrimarySource-50hz>    MODEL.PRIMSRCM50HZ
-2   <PrimarySource-60hz>    MODEL.PRIMSRCM60HZ
-2   <ProductionAllotment>   MODEL.PRODALLOTMENT
-2   <ProductIdentification> MODEL.PRODID
-2   <PurchaseOnly>  MODEL.PURCHONLY
-2   <RentalPlanType>    MODEL.RENTPLANTYPE
-2   <ReturnedPartsMES>  MODEL.RETURNEDPARTS
-2   <RMSEligible>   MODEL.RMSELIG
-2   <RPQmachine>    MODEL.RPQMACH
-2   <SalesManualViewable>   MODEL.SLEMANLVIEWABL
-2   <SSTPEligibility>   MODEL.SSTPELIG
-2   <SystemRentalPlanCharge>    MODEL.SYSRENTPLANCHRG
-2   <TAPEligibility>    MODEL.TAPELIG
-2   <TLPEligibility>    MODEL.TLPELIG
-2   <TimeandMaterials>  MODEL.TMENMATRLS
-2   <TradeinMachine>    MODEL.TRDINMACH
-2   <Voltage>   MODEL.VOLT
-end of all deleted
-2   <DescriptionDataList>
-3   <DescriptionData>
-4   <MaterialDescription>   MODEL.MKTGNAME
-4   <DescriptionLanguage>   NLSID ==> CHQISONLSIDMAP.CHQNLSID : CHQISONLSID.CHQISOLANG
-3   </DescriptionData>
-2   </DescriptionDataList>
-2   <GeographyList> The AVAILs from here down are related to PRODSTRUCT (not MODEL)
-3   <Geography> use AVAIL.COUNTRYLIST to GENERALAREA where GENERALAREA.GENAREATYPE=2452 (Country)
-4   <RFAGEO>    GENERALAREA.RFAGEO
-4   <Country>   GENERALAREA.GENAREANAME
-4   <SalesOrg>  GENERALAREA.SLEORG
-4   <SalesOffice>   GENERALAREA.SLEOFFC
-4   <AASOrderIndicator> AVAIL.ORDERSYSNAME
-4   <AASViewableIndicator>  AVAIL.AASVIEWABL
-4   <LeaseRentalWithrawalDate>  AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE= xxx (Lease Rental Withdrawal)
-4   <PackageName>   ANNOUNCEMENT.ANNNUMBER
-	<AnnouncementType>	ANNOUNCEMENT.ANNTYPE //CR1113074218
-4   <ProductAnnounceDateCountry>    ANNOUNCEMENT.ANNDATE
-4   <ProductWithdrawalDate> AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE= 149 (LastOrder)
-3   </Geography>
-2   </GeographyList>
-2   <FeatureList>
-3   <Feature>
-4   <LicensedInternalCode>  SWFEATURE.LICNSINTERCD
-4   <ProductID> SWFEATURE.FEATURECODE
-4   <MOSPEligible>  SWFEATURE.MOSPELIG
-4   <VolumeDiscount>    SWFEATURE.VOLDISCNT
-4   <SalesManualIndicator>  SWFEATURE.SLEMANLVIEWABL
-4   <ProfitCenter>  SWFEATURE.PRFTCTR
-4   <FeatureDescriptionDataList>
-5   <FeatureDescriptionData>
-6   <FeatureDescription>    SWPRODSTRUCT.MKTGNAME
-6   <FeatureDescriptionLanguage>    NLSID ==> CHQISONLSIDMAP.CHQNLSID : CHQISONLSID.CHQISOLANG
-5   </FeatureDescriptionData>
-4   </FeatureDescriptionDataList>
-3   </Feature
-2   </FeatureList>
-1   </Material>
-
-*/
-    static {
-        SAPLXMLMAP_VCT = new Vector();  // set of elements
-        SAPLElem topElem = new SAPLElem("wsnt:Notify");
-        topElem.addXMLAttribute("xmlns:wsnt",XMLNS_WSNT);
-        topElem.addXMLAttribute("xmlns:ebi",XMLNS_EBI);
-        SAPLXMLMAP_VCT.addElement(topElem);
-         // level2
-        SAPLElem level2Elem = new SAPLElem("wsnt:NotificationMessage");
-        topElem.addChild(level2Elem);
-        //level 3
-        level2Elem.addChild(new SAPLTopicElem());
-        SAPLElem messageElem = new SAPLElem("wsnt:Message");
-        level2Elem.addChild(messageElem);
-        // level4
-        messageElem.addChild(new SAPLMessageIDElem());
-        messageElem.addChild(new SAPLFixedElem("ebi:priority","Normal"));
-        messageElem.addChild(new SAPLFixedElem("PayloadFormat","EACM_Material"));
-        messageElem.addChild(new SAPLFixedElem("NativeCodePage","1208"));
-
-        SAPLElem bodyElem = new SAPLElem("body");
-        messageElem.addChild(bodyElem);
-
-        SAPLElem materialElem = new SAPLElem("Material"); // add EACM payload level1
-        bodyElem.addChild(materialElem);
-
-        // add EACM payload level2(s)
-        materialElem.addChild(new SAPLFixedElem("EACMEntityType","SWPRODSTRUCT"));
-        materialElem.addChild(new SAPLIdElem("EACMEntityId"));
-        materialElem.addChild(new SAPLElem("CableSpecsRequiredFlag","MODEL","CBLSPECSREQ"));
-        materialElem.addChild(new SAPLElem("CustomerSetupAllowanceDays","MODEL","CUSTSETUPALLOW"));
-        materialElem.addChild(new SAPLElem("Division","PROJ","DIV",SAPLElem.FLAGVAL));
-        materialElem.addChild(new SAPLElem("EAEligibility","MODEL","EAELIG"));
-        materialElem.addChild(new SAPLElem("GSAProductionStatus","MODEL","PRODCD"));
-        materialElem.addChild(new SAPLElem("HourlyServiceRate","MODEL","HRLYSVCRATECLSCD"));
-        materialElem.addChild(new SAPLElem("IBMCreditCorp","MODEL","IBMCREDCORP"));
-        materialElem.addChild(new SAPLElem("LicensedInternalCode","MODEL","LICNSINTERCD"));
-        materialElem.addChild(new SAPLElem("LineOfBusiness","PROJ","LINEOFBUS"));
-        materialElem.addChild(new SAPLElem("LowEndIndicator","MODEL","LOWENDFLG"));
-        materialElem.addChild(new SAPLElem("MachineMaintenanceGroupCode","MODEL","MACHMAINTGRPCD",SAPLElem.FLAGVAL)); //CR1113074218
-        materialElem.addChild(new SAPLElem("MidrangeSystemOption","MODEL","MIDRNGESYSOPT"));
-        materialElem.addChild(new SAPLElem("OEMIndicator","MODEL","OEMINDC"));
-        materialElem.addChild(new SAPLElem("PlantOfManufacture","MODEL","PLNTOFMFR",SAPLElem.FLAGVAL));
-  		materialElem.addChild(new SAPLGEOFilteredElem("InterplantPlantCode","GEOMOD", //CR1113074218
-            "INTERPLNTCD", "COUNTRYLIST","1652",SAPLElem.FLAGVAL));
-//TIR73RS77     materialElem.addChild(new SAPLElem("ProductGroupingCode","MODEL","PRODTYPECATG",SAPLElem.FLAGVAL));
-        materialElem.addChild(new SAPLElem("ProductTypeCategory","MODEL","PRODTYPECATG",SAPLElem.FLAGVAL)); // TIR73RS77
-        materialElem.addChild(new SAPLElem("ProductID","MODEL","MACHTYPEATR|MODELATR"));
-        materialElem.addChild(new SAPLElem("ProfitCenter","MODEL","PRFTCTR",SAPLElem.FLAGVAL));
-        materialElem.addChild(new SAPLElem("SalesManualIndicator","MODEL","SLEMANLVIEWABL"));
-        materialElem.addChild(new SAPLElem("VendorNumber","MODEL","VENDID"));
-        materialElem.addChild(new SAPLElem("VolumeDiscount","MODEL","VOLDISCNT"));
-        materialElem.addChild(new SAPLElem("ESAServiceLevelCategory","MODEL","ESASVCLEVCATG"));
-/* all deleted on 04/19/07 spec
-        materialElem.addChild(new SAPLElem("AutomaticMaintenanceContract","MODEL","AUTOMAINTCONTRCT"));
-        materialElem.addChild(new SAPLElem("BulkOrder","MODEL","BULKORD"));
-        materialElem.addChild(new SAPLElem("CountryIdleControl","MODEL","CNTRYIDLECNTRL"));
-        materialElem.addChild(new SAPLElem("ColorSpecificationIndicator","MODEL","COLRSPECINDC"));
-        materialElem.addChild(new SAPLElem("ComputerSystemCompoment","MODEL","COMPUTSYSCOMPOMENT"));
-        materialElem.addChild(new SAPLElem("ComputerSystemStandalone","MODEL","COMPUTSYSSTNDALONE"));
-        materialElem.addChild(new SAPLElem("CorporateServiceOption","MODEL","CORPSVCOPT"));
-        materialElem.addChild(new SAPLElem("DPInstallProgram","MODEL","DPINSTPGM"));
-        materialElem.addChild(new SAPLElem("EducationAllowance-HighSchool","MODEL","EDUCALLOWMHGHSCH"));
-        materialElem.addChild(new SAPLElem("EducationAllowance-SecondarySchool","MODEL","EDUCALLOWMSECONDRYSCH"));
-        materialElem.addChild(new SAPLElem("EducationAllowance-University","MODEL","EDUCALLOWMUNVRSTY"));
-        materialElem.addChild(new SAPLElem("ESAOnSite","MODEL","ESAONSITE"));
-        materialElem.addChild(new SAPLElem("FrozenZonePeriod-months","MODEL","FROZENZONEPRIODMMO"));
-        materialElem.addChild(new SAPLElem("InitialPeriodMaintenance","MODEL","INITPRIODMAINT"));
-        materialElem.addChild(new SAPLElem("LowEndFlag","MODEL","LOWENDFLG"));
-        materialElem.addChild(new SAPLElem("LPSEffectiveDate","MODEL","LPSEFFCTVDATE"));
-        materialElem.addChild(new SAPLElem("MaintenanceGroup","MODEL","MAINTGRP"));
-        materialElem.addChild(new SAPLElem("MaintenanceGroup-RentalPlanD","MODEL","MAINTGRPMRENTPLAND"));
-        materialElem.addChild(new SAPLElem("MATPass","MODEL","MATPASS"));
-        materialElem.addChild(new SAPLElem("MaximumMCSforPPRTTest","MODEL","MAXMCSFORPPRTTST"));
-        materialElem.addChild(new SAPLElem("MandatoryMAT","MODEL","MNATORYMAT"));
-        materialElem.addChild(new SAPLElem("MOSPEligible","MODEL","MOSPELIG"));
-        materialElem.addChild(new SAPLElem("NormalDeliveryTime-months","MODEL","NORMALDELIVTMEMMO"));
-        materialElem.addChild(new SAPLElem("NormalMaintenanceBilling-months","MODEL","NORMALMAINTBILLMMO"));
-        materialElem.addChild(new SAPLElem("NormalTypeofMaintenace","MODEL","NORMALTYPEOFMAINT"));
-        materialElem.addChild(new SAPLElem("OCTFactor-weeks","MODEL","OCTFACTRMWK"));
-        materialElem.addChild(new SAPLElem("OrdersRejected","MODEL","ORDREJCTED"));
-        materialElem.addChild(new SAPLElem("PerCallClass","MODEL","PERCALLCLS"));
-        materialElem.addChild(new SAPLElem("PostOrderReview","MODEL","POSTORDREVU"));
-        materialElem.addChild(new SAPLElem("PPTPAgreementPeriod","MODEL","PPTPAGRMTPRIOD"));
-        materialElem.addChild(new SAPLElem("PPTPEligibility","MODEL","PPTPELIG"));
-        materialElem.addChild(new SAPLElem("PPTPTestPeriod","MODEL","PPTPTSTPRIOD"));
-        materialElem.addChild(new SAPLElem("PrimarySource-50hz","MODEL","PRIMSRCM50HZ"));
-        materialElem.addChild(new SAPLElem("PrimarySource-60hz","MODEL","PRIMSRCM60HZ"));
-        materialElem.addChild(new SAPLElem("ProductionAllotment","MODEL","PRODALLOTMENT"));
-        materialElem.addChild(new SAPLElem("ProductIdentification","MODEL","PRODID"));
-        materialElem.addChild(new SAPLElem("PurchaseOnly","MODEL","PURCHONLY"));
-        materialElem.addChild(new SAPLElem("RentalPlanType","MODEL","RENTPLANTYPE"));
-        materialElem.addChild(new SAPLElem("ReturnedPartsMES","MODEL","RETURNEDPARTS"));
-        materialElem.addChild(new SAPLElem("RMSEligible","MODEL","RMSELIG"));
-        materialElem.addChild(new SAPLElem("RPQmachine","MODEL","RPQMACH"));
-        materialElem.addChild(new SAPLElem("SalesManualViewable","MODEL","SLEMANLVIEWABL"));
-        materialElem.addChild(new SAPLElem("SSTPEligibility","MODEL","SSTPELIG"));
-        materialElem.addChild(new SAPLElem("SystemRentalPlanCharge","MODEL","SYSRENTPLANCHRG"));
-        materialElem.addChild(new SAPLElem("TAPEligibility","MODEL","TAPELIG"));
-        materialElem.addChild(new SAPLElem("TLPEligibility","MODEL","TLPELIG"));
-        materialElem.addChild(new SAPLElem("TimeandMaterials","MODEL","TMENMATRLS"));
-        materialElem.addChild(new SAPLElem("TradeinMachine","MODEL","TRDINMACH"));
-        materialElem.addChild(new SAPLElem("Voltage","MODEL","VOLT"));
-        */
-
-        SAPLElem elem3 = new SAPLNLSElem("DescriptionData");
-        // add level4
-        elem3.addChild(new SAPLElem("MaterialDescription","MODEL","MKTGNAME"));
-        elem3.addChild(new SAPLCHQISOElem("DescriptionLanguage"));
-        SAPLElem listElem = new SAPLElem("DescriptionDataList");
-        // add level3
-        listElem.addChild(elem3);
-        // add level2(s)
-        materialElem.addChild(listElem);
-
-        listElem = new SAPLElem("GeographyList"); // level2 TIR74BL5E
-        materialElem.addChild(listElem); // TIR74BL5E
-
-        elem3 = new SAPLGEOElem("Geography","AVAIL","AVAILGAA");        // level3
-        listElem.addChild(elem3);
-        elem3.addChild(new SAPLItemElem("RFAGEO","GENERALAREA","RFAGEO"));
-        elem3.addChild(new SAPLItemElem("Country","GENERALAREA","GENAREANAME"));
-        elem3.addChild(new SAPLItemElem("SalesOrg","GENERALAREA","SLEORG"));
-        elem3.addChild(new SAPLItemElem("SalesOffice","GENERALAREA","SLEOFFC"));
-        elem3.addChild(new SAPLGEOAvailElem("AASOrderIndicator","ORDERSYSNAME"));
-        elem3.addChild(new SAPLGEOAvailElem("AASViewableIndicator","AASVIEWABL"));
-        elem3.addChild(new SAPLGEOFilteredElem("LeaseRentalWithrawalDate","AVAIL",
-            "EFFECTIVEDATE", "AVAILTYPE","AVT220"));
-        elem3.addChild(new SAPLGEOAnnElem("PackageName","ANNNUMBER"));
-        elem3.addChild(new SAPLGEOAnnElem("AnnouncementType","ANNTYPE")); //CR1113074218
-        elem3.addChild(new SAPLGEOAnnElem("ProductAnnounceDateCountry","ANNDATE"));
-        elem3.addChild(new SAPLGEOFilteredElem("ProductWithdrawalDate","AVAIL",
-            "EFFECTIVEDATE", "AVAILTYPE","149"));
-
-        listElem = new SAPLElem("FeatureList"); // level2
-        materialElem.addChild(listElem);
-        elem3 = new SAPLElem("Feature");        // level3
-        listElem.addChild(elem3);
-        elem3.addChild(new SAPLElem("LicensedInternalCode","SWFEATURE","LICNSINTERCD"));
-        elem3.addChild(new SAPLElem("ProductID","SWFEATURE","FEATURECODE"));
-        elem3.addChild(new SAPLElem("MOSPEligible","SWFEATURE","MOSPELIG"));
-        elem3.addChild(new SAPLElem("VolumeDiscount","SWFEATURE","VOLDISCNT"));
-        elem3.addChild(new SAPLElem("SalesManualIndicator","SWFEATURE","SLEMANLVIEWABL"));
-        elem3.addChild(new SAPLElem("ProfitCenter","SWFEATURE","PRFTCTR",SAPLElem.FLAGVAL));
-
-        listElem = new SAPLElem("FeatureDescriptionDataList");
-
-		elem3.addChild(listElem); //TIR79LNMS
-
-        SAPLElem elem4 = new SAPLNLSElem("FeatureDescriptionData");
-        // add level4
-        elem4.addChild(new SAPLElem("FeatureDescription","SWPRODSTRUCT","MKTGNAME",true));
-        elem4.addChild(new SAPLCHQISOElem("FeatureDescriptionLanguage"));
-        // add level3
-        listElem.addChild(elem4);
-    }
-
-    /**********************************
-    * get the name(s) of the MQ properties file to use, could be more than one
-    * There may be a SAPL XML Feed to OIDH (LEDGER) of this data which is determined after
-    * the data quality checks (if any) are complete.
-Wayne Kehrli
-ESH = all but ACCGUSEONLYMATRL
-OIDH = all but PRODSTRUCT & SWPRODSTRUCT
-    */
-    protected Vector getMQPropertiesFN() {
-        Vector vct = new Vector(1);
-//      vct.add(OIDHMQSERIES);
-        vct.add(ESHMQSERIES);
-        return vct;
-    }
-
-    /**********************************
-    * get the name of the VE to use for the feed
-    */
-    protected String getSaplVeName() { return SAPVE_NAME;}
-
-    /**********************************
-    * get SAPL xml objects
-    */
-    protected Vector getSAPLXMLMap() { return SAPLXMLMAP_VCT;}
-
-    /**********************************
-    * SWPRODSTRUCTSAPLXML needs to pull 2 VEs.  MODELPROJA->PROJ is not returned when PRODSTRUCT is root
-    * TIR72PGQ9
-Wendy   i think u can pull things tied to a feature when prodstruct is root..
-bnair@us.ibm.c...   right, u can
-Wendy   but seems like u cant pull things tied to a model when prodstruct is root
-bnair@us.ibm.c...   right, because the entry which seeds the trsnavigate always says root is 'UP' when the root entity is a relator
-bnair@us.ibm.c...   so thats a limitation with gbl8000
-    */
-    protected void mergeLists(EntityList theList) throws
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-        COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {
-        Profile profile = theList.getProfile();
-        String VeName = "MODELPROJVE";
-
-        EntityItem origmdlItem = theList.getEntityGroup("MODEL").getEntityItem(0); // has to exist
-
-        // entityitem passed in is adjusted in extract, we don't want that so create new one
-        EntityList mdlList = saplAbr.getDB().getEntityList(profile,
-                new ExtractActionItem(null, saplAbr.getDB(), profile, VeName),
-                new EntityItem[] { new EntityItem(null, profile, "MODEL", origmdlItem.getEntityID()) });
-        addDebug("mergeLists:: Extract "+VeName+NEWLINE+PokUtils.outputList(mdlList));
-
-        EntityItem mdlItem = mdlList.getParentEntityGroup().getEntityItem(0);
-
-        // add all modelproja from new mdllist to first pull
-        EntityGroup origmdlprjaGrp = theList.getEntityGroup("MODELPROJA");
-        EntityGroup mdlprjaGrp = mdlList.getEntityGroup("MODELPROJA");
-
-        EntityItem eiArray[] = mdlprjaGrp.getEntityItemsAsArray();
-        for (int i=0;i<eiArray.length; i++)
-        {
-            EntityItem mdlprojaItem = eiArray[i];
-            // remove assoc from new model item
-            mdlprojaItem.removeUpLink(mdlItem);
-            // add assoc to orig model item
-            mdlprojaItem.putUpLink(origmdlItem);
-            // put it in the orig list group
-            origmdlprjaGrp.putEntityItem(mdlprojaItem);
-            // must move metaattr to new group too
-            mdlprojaItem.reassign(origmdlprjaGrp); 
-            // remove it from new list
-            mdlprjaGrp.removeEntityItem(mdlprojaItem);
-        }
-
-        // add all proj from new mdllist to first pull
-        EntityGroup origprojGrp = theList.getEntityGroup("PROJ");
-        EntityGroup projGrp = mdlList.getEntityGroup("PROJ");
-        eiArray = projGrp.getEntityItemsAsArray();
-        for (int i=0;i<eiArray.length; i++)
-        {
-            EntityItem projItem = eiArray[i];
-            // put it in the orig list group
-            origprojGrp.putEntityItem(projItem);
-            // must move metaattr to new group too
-            projItem.reassign(origprojGrp); 
-            // remove it from new list
-            projGrp.removeEntityItem(projItem);
-        }
-
-        // add all modelgeomod from new mdllist to first pull
-        origmdlprjaGrp = theList.getEntityGroup("MODELGEOMOD");
-        mdlprjaGrp = mdlList.getEntityGroup("MODELGEOMOD");
-
-        eiArray = mdlprjaGrp.getEntityItemsAsArray();
-        for (int i=0;i<eiArray.length; i++)
-        {
-            EntityItem mdlprojaItem = eiArray[i];
-            // remove assoc from new model item
-            mdlprojaItem.removeUpLink(mdlItem);
-            // add assoc to orig model item
-            mdlprojaItem.putUpLink(origmdlItem);
-            // put it in the orig list group
-            origmdlprjaGrp.putEntityItem(mdlprojaItem);
-            // must move metaattr to new group too
-            mdlprojaItem.reassign(origmdlprjaGrp); 
-            // remove it from new list
-            mdlprjaGrp.removeEntityItem(mdlprojaItem);
-        }
-
-        // add all geomod from new mdllist to first pull
-        origprojGrp = theList.getEntityGroup("GEOMOD");
-        projGrp = mdlList.getEntityGroup("GEOMOD");
-        eiArray = projGrp.getEntityItemsAsArray();
-        for (int i=0;i<eiArray.length; i++)
-        {
-            EntityItem projItem = eiArray[i];
-            // put it in the orig list group
-            origprojGrp.putEntityItem(projItem);
-            // must move metaattr to new group too
-            projItem.reassign(origprojGrp); 
-            // remove it from new list
-            projGrp.removeEntityItem(projItem);
-            // remove it from new list
-            projGrp.removeEntityItem(projItem);
-        }
-
-        // release memory
-        mdlList.dereference();
-
-        addDebug("mergeLists:: after merge Extract "+NEWLINE+PokUtils.outputList(theList));
-    }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getVersion()
-    {
-        return "1.6";
-    }
-
-    static class SAPLTopicElem extends SAPLElem
-    {
-        /**********************************************************************************
-        * Constructor for Topic element
-        *
-        *3  <wsnt:Topic Dialect="http://docs.oasis-open.org/wsn/t-1/TopicExpression/Concrete">
-        *   For MODEL, PRODSTRUCT, SWPRODSTRUCT, ORDABLEPARTNO
-        *       esh:MaterialLegacy/Nomenclature/{MODEL | PRODSTRUCT | SWPRODSTRUCT | ORDABLEPARTNO}/Country/?2/?2/EndCountry
-        *3  </wsnt:Topic>
-        *
-        *?1 = MTM for Model or Prodstruct
-        *?2 = Country Code like US, CA
-        */
-        SAPLTopicElem()
-        {
-            super("wsnt:Topic",null,null,false);
-            addXMLAttribute("Dialect", "http://docs.oasis-open.org/wsn/t-1/TopicExpression/Concrete");
-        }
-
-        /**********************************************************************************
-        * Create a node for this element and add to the parent and any children this node has
-        *
-        *@param list EntityList
-        *@param document Document needed to create nodes
-        *@param parent Element node to add this node too
-        *@param debugSb StringBuffer for debug output
-        */
-        public void addElements(Database dbCurrent,EntityList list, Document document, Element parent,
-            StringBuffer debugSb)
-        throws
-            COM.ibm.eannounce.objects.EANBusinessRuleException,
-            java.sql.SQLException,
-            COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-            COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-            java.rmi.RemoteException,
-            java.io.IOException,
-            COM.ibm.opicmpdh.middleware.MiddlewareException,
-            COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-        {
-            Element elem = (Element) document.createElement(nodeName);
-            addXMLAttrs(elem);
-           // EntityItem item = list.getParentEntityGroup().getEntityItem(0);
-
-            Vector itemVct = SAPLGEOElem.getAvailEntities(list.getEntityGroup("AVAIL")); // find particular
-            String ctrys = getCountryCodes(list, itemVct, "AVAILGAA", debugSb);
-            String value = "esh:MaterialLegacy/Nomenclature/SWPRODSTRUCT/Country"+ctrys+"/EndCountry";
-            elem.appendChild(document.createTextNode(value));
-            parent.appendChild(elem);
-
-            // add any children
-            for (int c=0; c<childVct.size(); c++){
-                SAPLElem childElem = (SAPLElem)childVct.elementAt(c);
-                childElem.addElements(dbCurrent,list, document,elem,debugSb);
-            }
-        }
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\SWPRODSTRUCTSAPLXML.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

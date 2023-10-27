@@ -1,2097 +1,2101 @@
-//Licensed Materials -- Property of IBM
-// 
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*      */ package COM.ibm.eannounce.abr.util;
+/*      */ 
+/*      */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*      */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.MetaFlag;
+/*      */ import COM.ibm.opicmpdh.middleware.Database;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*      */ import com.ibm.transform.oim.eacm.diff.DiffEntity;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.io.IOException;
+/*      */ import java.rmi.RemoteException;
+/*      */ import java.sql.SQLException;
+/*      */ import java.util.Collection;
+/*      */ import java.util.HashSet;
+/*      */ import java.util.Hashtable;
+/*      */ import java.util.Iterator;
+/*      */ import java.util.TreeMap;
+/*      */ import java.util.Vector;
+/*      */ import org.w3c.dom.Document;
+/*      */ import org.w3c.dom.Element;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public class XMLLSEOBUNDELAVAILElembh1
+/*      */   extends XMLElem
+/*      */ {
+/*  205 */   private static XMLSLEORGGRPElem SLEORGGRP = new XMLSLEORGGRPElem();
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public XMLLSEOBUNDELAVAILElembh1() {
+/*  225 */     super("AVAILABILITYELEMENT");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void addElements(Database paramDatabase, Hashtable paramHashtable, Document paramDocument, Element paramElement, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  242 */     String str1 = null;
+/*      */     
+/*  244 */     EntityItem entityItem = null;
+/*  245 */     entityItem = paramDiffEntity.getCurrentEntityItem();
+/*  246 */     str1 = "D:LSEOBUNDLEAVAIL:D:AVAIL:D:AVAILSLEORGA:D";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  251 */     String str2 = "@@";
+/*  252 */     boolean bool = false;
+/*  253 */     boolean bool1 = false;
+/*  254 */     bool = AvailUtil.iscompatmodel();
+/*      */     
+/*  256 */     if (!bool) {
+/*      */       
+/*  258 */       String str = null;
+/*  259 */       str = (String)paramHashtable.get("_chSTATUS");
+/*  260 */       ABRUtil.append(paramStringBuffer, "the status is" + str + NEWLINE);
+/*  261 */       if ("0020".equals(str)) {
+/*  262 */         bool1 = true;
+/*      */       } else {
+/*  264 */         bool1 = false;
+/*      */       } 
+/*      */     } 
+/*      */     
+/*  268 */     if (isDerivefromLSEOBUNDLE(paramDiffEntity, paramStringBuffer)) {
+/*  269 */       str1 = "D:LSEOBUNDLESLEORGA:D";
+/*  270 */       str2 = "LSEOBUNDLESPECBID";
+/*  271 */       createNodeFromLSEOBUNDLE(paramHashtable, str2, paramDocument, paramElement, paramDiffEntity, entityItem, str1, bool1, bool, paramStringBuffer);
+/*      */     
+/*      */     }
+/*      */     else {
+/*      */ 
+/*      */       
+/*  277 */       str2 = "LSEOBUNDLE";
+/*      */       
+/*  279 */       Vector<DiffEntity> vector = getPlannedAvails(paramHashtable, str2, paramStringBuffer);
+/*      */       
+/*  281 */       if (vector.size() > 0) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/*  287 */         TreeMap<Object, Object> treeMap = new TreeMap<>(); byte b;
+/*  288 */         for (b = 0; b < vector.size(); b++) {
+/*  289 */           DiffEntity diffEntity = vector.elementAt(b);
+/*  290 */           buildCtryAudRecs(treeMap, diffEntity, true, paramStringBuffer);
+/*      */         } 
+/*      */ 
+/*      */         
+/*  294 */         for (b = 0; b < vector.size(); b++) {
+/*  295 */           DiffEntity diffEntity = vector.elementAt(b);
+/*  296 */           buildCtryAudRecs(treeMap, diffEntity, false, paramStringBuffer);
+/*      */         } 
+/*      */ 
+/*      */ 
+/*      */         
+/*  301 */         Vector[] arrayOfVector = getModelAudience(paramDiffEntity, paramStringBuffer);
+/*  302 */         Collection collection = treeMap.values();
+/*  303 */         Iterator<CtryAudRecord> iterator = collection.iterator();
+/*  304 */         StringBuffer stringBuffer = new StringBuffer();
+/*  305 */         while (iterator.hasNext()) {
+/*      */           
+/*  307 */           CtryAudRecord ctryAudRecord = iterator.next();
+/*  308 */           if ("LSEO".equals(str2)) {
+/*  309 */             if (stringBuffer.length() == 0) {
+/*  310 */               stringBuffer.append(ctryAudRecord.getCountry());
+/*      */             } else {
+/*  312 */               stringBuffer.append("|" + ctryAudRecord.getCountry());
+/*      */             } 
+/*      */           }
+/*      */ 
+/*      */ 
+/*      */           
+/*  318 */           DiffEntity diffEntity1 = getEntityForAttrs(paramHashtable, str2, "AVAIL", "AVAILTYPE", "143", "COUNTRYLIST", ctryAudRecord
+/*  319 */               .getCountry(), paramStringBuffer);
+/*      */           
+/*  321 */           DiffEntity diffEntity2 = getEntityForAttrs(paramHashtable, str2, "AVAIL", "AVAILTYPE", "149", "COUNTRYLIST", ctryAudRecord
+/*  322 */               .getCountry(), paramStringBuffer);
+/*  323 */           DiffEntity diffEntity3 = getEntityForAttrs(paramHashtable, str2, "AVAIL", "AVAILTYPE", "151", "COUNTRYLIST", ctryAudRecord
+/*  324 */               .getCountry(), paramStringBuffer);
+/*  325 */           DiffEntity diffEntity4 = getEntityForAttrs(paramHashtable, str2, "AVAIL", "AVAILTYPE", "200", "COUNTRYLIST", ctryAudRecord
+/*  326 */               .getCountry(), paramStringBuffer);
+/*  327 */           DiffEntity diffEntity5 = getCatlgor(paramHashtable, str2, arrayOfVector, ctryAudRecord.getCountry(), paramStringBuffer);
+/*      */           
+/*  329 */           ctryAudRecord.setAllFields(paramDiffEntity, diffEntity5, diffEntity1, diffEntity2, diffEntity3, diffEntity4, paramHashtable, entityItem, ctryAudRecord.availDiff, str1, bool1, bool, paramStringBuffer);
+/*      */           
+/*  331 */           if (ctryAudRecord.isDisplayable() || ctryAudRecord.isrfrDisplayable()) {
+/*  332 */             createNodeSet(paramHashtable, paramDocument, paramElement, entityItem, ctryAudRecord.availDiff, ctryAudRecord, str1, str2, paramStringBuffer);
+/*      */           } else {
+/*  334 */             ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.addElements no changes found for " + ctryAudRecord + NEWLINE);
+/*      */           } 
+/*  336 */           ctryAudRecord.dereference();
+/*      */         } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/*  342 */         treeMap.clear();
+/*      */       
+/*      */       }
+/*      */       else {
+/*      */ 
+/*      */         
+/*  348 */         ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.addElements no planned AVAILs found" + NEWLINE);
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector getSeoAndLseobundleAvail(Hashtable paramHashtable, String paramString, StringBuffer paramStringBuffer) {
+/*  367 */     Vector<DiffEntity> vector1 = (Vector)paramHashtable.get("AVAIL");
+/*      */     
+/*  369 */     Vector<DiffEntity> vector2 = new Vector(1);
+/*  370 */     if (vector1 != null) {
+/*  371 */       if (paramString.equals("LSEOBUNDLE") || paramString.equals("LSEOBUNDLESPECBID")) {
+/*  372 */         vector2 = vector1;
+/*      */       } else {
+/*  374 */         for (byte b = 0; b < vector1.size(); b++) {
+/*  375 */           DiffEntity diffEntity = vector1.elementAt(b);
+/*  376 */           if (diffEntity.toString().indexOf("MODELAVAIL") > -1) {
+/*  377 */             if (paramString.equals("LSEOSPECBID"))
+/*      */             {
+/*  379 */               vector2.add(diffEntity);
+/*      */             }
+/*  381 */           } else if (diffEntity.toString().indexOf("LSEOAVAIL") > -1 && 
+/*  382 */             paramString.equals("LSEO")) {
+/*  383 */             vector2.add(diffEntity);
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     }
+/*      */     
+/*  389 */     return vector2;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector getLseoAndLseobundleCatlgor(Hashtable paramHashtable, String paramString, StringBuffer paramStringBuffer) {
+/*  407 */     Vector<DiffEntity> vector1 = (Vector)paramHashtable.get("BHCATLGOR");
+/*  408 */     Vector<DiffEntity> vector2 = new Vector(1);
+/*  409 */     DiffEntity diffEntity = null;
+/*  410 */     EntityItem entityItem = null;
+/*  411 */     String str = "";
+/*      */     
+/*  413 */     if (vector1 != null) {
+/*  414 */       if (paramString.equals("LSEOBUNDLE") || paramString.equals("LSEOBUNDLESPECBID")) {
+/*  415 */         for (byte b = 0; b < vector1.size(); b++) {
+/*  416 */           diffEntity = vector1.elementAt(b);
+/*  417 */           entityItem = diffEntity.getCurrentEntityItem();
+/*  418 */           str = PokUtils.getAttributeFlagValue(entityItem, "STATUS");
+/*  419 */           if ("0020".equals(str)) {
+/*  420 */             vector2.add(diffEntity);
+/*      */           }
+/*      */         } 
+/*      */       } else {
+/*  424 */         for (byte b = 0; b < vector1.size(); b++) {
+/*  425 */           diffEntity = vector1.elementAt(b);
+/*  426 */           entityItem = diffEntity.getCurrentEntityItem();
+/*  427 */           str = PokUtils.getAttributeFlagValue(entityItem, "STATUS");
+/*  428 */           if ("0020".equals(str) && 
+/*  429 */             !diffEntity.getKey().equals("BHCATLGOR") && 
+/*  430 */             diffEntity.toString().indexOf("LSEOBHCATLGOR") > -1) {
+/*  431 */             vector2.add(diffEntity);
+/*      */           }
+/*      */         } 
+/*      */       } 
+/*      */     }
+/*      */ 
+/*      */     
+/*  438 */     return vector2;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createNodeFromLSEOBUNDLE(Hashtable paramHashtable, String paramString1, Document paramDocument, Element paramElement, DiffEntity paramDiffEntity, EntityItem paramEntityItem, String paramString2, boolean paramBoolean1, boolean paramBoolean2, StringBuffer paramStringBuffer) throws SQLException, MiddlewareException {
+/*  623 */     EntityItem entityItem1 = paramDiffEntity.getCurrentEntityItem();
+/*  624 */     EntityItem entityItem2 = paramDiffEntity.getPriorEntityItem();
+/*  625 */     TreeMap<Object, Object> treeMap = new TreeMap<>();
+/*      */     
+/*  627 */     if (paramDiffEntity.isNew()) {
+/*      */       
+/*  629 */       EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute("COUNTRYLIST");
+/*  630 */       ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.buildCtryAudRecs for new lseo: ctryAtt " + 
+/*  631 */           PokUtils.getAttributeFlagValue(entityItem1, "COUNTRYLIST") + NEWLINE);
+/*  632 */       if (eANFlagAttribute != null) {
+/*  633 */         MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/*  634 */         for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/*      */           
+/*  636 */           if (arrayOfMetaFlag[b].isSelected()) {
+/*  637 */             String str1 = arrayOfMetaFlag[b].getFlagCode();
+/*  638 */             String str2 = str1;
+/*  639 */             if (treeMap.containsKey(str2)) {
+/*      */               
+/*  641 */               CtryAudRecord ctryAudRecord = (CtryAudRecord)treeMap.get(str2);
+/*  642 */               ABRUtil.append(paramStringBuffer, "WARNING buildCtryAudRecs for New " + paramDiffEntity.getKey() + " " + str2 + " already exists, keeping orig " + ctryAudRecord + NEWLINE);
+/*      */             } else {
+/*      */               
+/*  645 */               CtryAudRecord ctryAudRecord = new CtryAudRecord(null, str1);
+/*  646 */               ctryAudRecord.setAction("Update");
+/*  647 */               treeMap.put(ctryAudRecord.getKey(), ctryAudRecord);
+/*  648 */               ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.buildCtryAudRecs for New:" + paramDiffEntity.getKey() + " rec: " + ctryAudRecord
+/*  649 */                   .getKey() + NEWLINE);
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*  654 */     } else if (!paramDiffEntity.isDeleted()) {
+/*  655 */       HashSet<String> hashSet1 = new HashSet();
+/*  656 */       HashSet<String> hashSet2 = new HashSet();
+/*      */       
+/*  658 */       EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute("COUNTRYLIST");
+/*  659 */       ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.buildCtryAudRecs for current lseo: ctryAtt " + 
+/*  660 */           PokUtils.getAttributeFlagValue(entityItem1, "COUNTRYLIST") + NEWLINE);
+/*  661 */       if (eANFlagAttribute != null) {
+/*  662 */         MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/*  663 */         for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/*      */           
+/*  665 */           if (arrayOfMetaFlag[b].isSelected()) {
+/*  666 */             String str = arrayOfMetaFlag[b].getFlagCode();
+/*  667 */             hashSet2.add(str);
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */ 
+/*      */       
+/*  673 */       eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute("COUNTRYLIST");
+/*  674 */       ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.buildCtryAudRecs for prior lseo: ctryAtt " + 
+/*  675 */           PokUtils.getAttributeFlagValue(entityItem2, "COUNTRYLIST") + NEWLINE);
+/*  676 */       if (eANFlagAttribute != null) {
+/*  677 */         MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/*  678 */         for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/*      */           
+/*  680 */           if (arrayOfMetaFlag[b].isSelected()) {
+/*  681 */             String str = arrayOfMetaFlag[b].getFlagCode();
+/*  682 */             hashSet1.add(str);
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */       
+/*  687 */       Iterator<String> iterator1 = hashSet2.iterator();
+/*  688 */       while (iterator1.hasNext()) {
+/*  689 */         String str = iterator1.next();
+/*  690 */         if (!hashSet1.contains(str)) {
+/*      */           
+/*  692 */           if (treeMap.containsKey(str)) {
+/*  693 */             CtryAudRecord ctryAudRecord2 = (CtryAudRecord)treeMap.get(str);
+/*  694 */             ABRUtil.append(paramStringBuffer, "WARNING buildCtryAudRecs for added ctry on " + paramDiffEntity.getKey() + " " + str + " already exists, replacing orig " + ctryAudRecord2 + NEWLINE);
+/*      */             continue;
+/*      */           } 
+/*  697 */           CtryAudRecord ctryAudRecord1 = new CtryAudRecord(null, str);
+/*  698 */           ctryAudRecord1.setAction("Update");
+/*  699 */           treeMap.put(ctryAudRecord1.getKey(), ctryAudRecord1);
+/*  700 */           ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.buildCtryAudRecs for added ctry:" + paramDiffEntity.getKey() + " rec: " + ctryAudRecord1
+/*  701 */               .getKey() + NEWLINE);
+/*      */           
+/*      */           continue;
+/*      */         } 
+/*  705 */         if (treeMap.containsKey(str)) {
+/*  706 */           CtryAudRecord ctryAudRecord1 = (CtryAudRecord)treeMap.get(str);
+/*  707 */           ABRUtil.append(paramStringBuffer, "WARNING buildCtryAudRecs for existing ctry on " + paramDiffEntity.getKey() + " " + str + " already exists, keeping orig " + ctryAudRecord1 + NEWLINE);
+/*      */           continue;
+/*      */         } 
+/*  710 */         CtryAudRecord ctryAudRecord = new CtryAudRecord(null, str);
+/*  711 */         treeMap.put(ctryAudRecord.getKey(), ctryAudRecord);
+/*  712 */         ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.buildCtryAudRecs for existing ctry:" + paramDiffEntity.getKey() + " rec: " + ctryAudRecord
+/*  713 */             .getKey() + NEWLINE);
+/*      */       } 
+/*      */ 
+/*      */ 
+/*      */       
+/*  718 */       iterator1 = hashSet1.iterator();
+/*  719 */       while (iterator1.hasNext()) {
+/*  720 */         String str = iterator1.next();
+/*  721 */         if (!hashSet2.contains(str)) {
+/*      */           
+/*  723 */           if (treeMap.containsKey(str)) {
+/*  724 */             CtryAudRecord ctryAudRecord1 = (CtryAudRecord)treeMap.get(str);
+/*  725 */             ABRUtil.append(paramStringBuffer, "WARNING buildCtryAudRecs for delete ctry on " + paramDiffEntity.getKey() + " " + str + " already exists, keeping orig " + ctryAudRecord1 + NEWLINE);
+/*      */             continue;
+/*      */           } 
+/*  728 */           CtryAudRecord ctryAudRecord = new CtryAudRecord(null, str);
+/*  729 */           ctryAudRecord.setAction("Delete");
+/*  730 */           treeMap.put(ctryAudRecord.getKey(), ctryAudRecord);
+/*  731 */           ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.buildCtryAudRecs for deleted ctry:" + paramDiffEntity.getKey() + " rec: " + ctryAudRecord
+/*  732 */               .getKey() + NEWLINE);
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */     
+/*  738 */     Vector[] arrayOfVector = getModelAudience(paramDiffEntity, paramStringBuffer);
+/*  739 */     Collection collection = treeMap.values();
+/*  740 */     Iterator<CtryAudRecord> iterator = collection.iterator();
+/*  741 */     while (iterator.hasNext()) {
+/*      */       
+/*  743 */       CtryAudRecord ctryAudRecord = iterator.next();
+/*      */ 
+/*      */       
+/*  746 */       DiffEntity diffEntity = getCatlgor(paramHashtable, paramString1, arrayOfVector, ctryAudRecord.getCountry(), paramStringBuffer);
+/*      */ 
+/*      */ 
+/*      */       
+/*  750 */       ctryAudRecord.setAllLSEOFields(paramDiffEntity, diffEntity, paramBoolean1, paramBoolean2, paramStringBuffer);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  757 */       if (ctryAudRecord.isDisplayable() || ctryAudRecord.isrfrDisplayable()) {
+/*  758 */         createNodeSet(paramHashtable, paramDocument, paramElement, paramEntityItem, paramDiffEntity, ctryAudRecord, paramString2, paramString1, paramStringBuffer);
+/*      */       } else {
+/*  760 */         ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.addElements no changes found for " + ctryAudRecord.country + NEWLINE);
+/*      */       } 
+/*  762 */       ctryAudRecord.dereference();
+/*      */     } 
+/*  764 */     treeMap.clear();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createNodeSet(Hashtable paramHashtable, Document paramDocument, Element paramElement, EntityItem paramEntityItem, DiffEntity paramDiffEntity, CtryAudRecord paramCtryAudRecord, String paramString1, String paramString2, StringBuffer paramStringBuffer) {
+/*  773 */     if (paramCtryAudRecord.isDisplayable()) {
+/*  774 */       Element element1 = paramDocument.createElement(this.nodeName);
+/*  775 */       addXMLAttrs(element1);
+/*  776 */       paramElement.appendChild(element1);
+/*      */ 
+/*      */       
+/*  779 */       Element element2 = paramDocument.createElement("AVAILABILITYACTION");
+/*  780 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getAction()));
+/*  781 */       element1.appendChild(element2);
+/*  782 */       element2 = paramDocument.createElement("STATUS");
+/*  783 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getAvailStatus()));
+/*  784 */       element1.appendChild(element2);
+/*  785 */       element2 = paramDocument.createElement("COUNTRY_FC");
+/*  786 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getCountry()));
+/*  787 */       element1.appendChild(element2);
+/*  788 */       element2 = paramDocument.createElement("ANNDATE");
+/*  789 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getAnndate()));
+/*  790 */       element1.appendChild(element2);
+/*  791 */       element2 = paramDocument.createElement("ANNNUMBER");
+/*  792 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getAnnnumber()));
+/*  793 */       element1.appendChild(element2);
+/*  794 */       element2 = paramDocument.createElement("FIRSTORDER");
+/*  795 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getFirstorder()));
+/*  796 */       element1.appendChild(element2);
+/*  797 */       element2 = paramDocument.createElement("PLANNEDAVAILABILITY");
+/*  798 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getPlannedavailability()));
+/*  799 */       element1.appendChild(element2);
+/*  800 */       element2 = paramDocument.createElement("PUBFROM");
+/*  801 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getPubFrom()));
+/*  802 */       element1.appendChild(element2);
+/*  803 */       element2 = paramDocument.createElement("PUBTO");
+/*  804 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getPubTo()));
+/*  805 */       element1.appendChild(element2);
+/*  806 */       element2 = paramDocument.createElement("WDANNDATE");
+/*  807 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getWdanndate()));
+/*  808 */       element1.appendChild(element2);
+/*  809 */       element2 = paramDocument.createElement("LASTORDER");
+/*  810 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getLastorder()));
+/*  811 */       element1.appendChild(element2);
+/*  812 */       element2 = paramDocument.createElement("EOSANNDATE");
+/*  813 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getEosanndate()));
+/*  814 */       element1.appendChild(element2);
+/*  815 */       element2 = paramDocument.createElement("ENDOFSERVICEDATE");
+/*  816 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getEndOfService()));
+/*  817 */       element1.appendChild(element2);
+/*      */       
+/*  819 */       if (paramString2.equals("LSEO")) {
+/*  820 */         SLEORGGRP.displayAVAILSLEORGLSEO(paramHashtable, paramDocument, element1, paramEntityItem, paramDiffEntity, paramString1, paramCtryAudRecord.country, paramCtryAudRecord
+/*  821 */             .getAction(), paramString2, paramStringBuffer);
+/*      */       } else {
+/*  823 */         SLEORGGRP.displayAVAILSLEORG(paramHashtable, paramDocument, element1, paramEntityItem, paramDiffEntity, paramString1, paramCtryAudRecord.country, paramCtryAudRecord
+/*  824 */             .getAction(), paramStringBuffer);
+/*      */       } 
+/*      */     } 
+/*  827 */     if (paramCtryAudRecord.isrfrDisplayable()) {
+/*  828 */       Element element1 = paramDocument.createElement(this.nodeName);
+/*      */       
+/*  830 */       addXMLAttrs(element1);
+/*  831 */       paramElement.appendChild(element1);
+/*      */ 
+/*      */       
+/*  834 */       Element element2 = paramDocument.createElement("AVAILABILITYACTION");
+/*  835 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfraction()));
+/*  836 */       element1.appendChild(element2);
+/*  837 */       element2 = paramDocument.createElement("STATUS");
+/*  838 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfravailStatus()));
+/*  839 */       element1.appendChild(element2);
+/*  840 */       element2 = paramDocument.createElement("COUNTRY_FC");
+/*  841 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getCountry()));
+/*  842 */       element1.appendChild(element2);
+/*  843 */       element2 = paramDocument.createElement("ANNDATE");
+/*  844 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfranndate()));
+/*  845 */       element1.appendChild(element2);
+/*  846 */       element2 = paramDocument.createElement("ANNNUMBER");
+/*  847 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrannnumber()));
+/*  848 */       element1.appendChild(element2);
+/*  849 */       element2 = paramDocument.createElement("FIRSTORDER");
+/*  850 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrfirstorder()));
+/*  851 */       element1.appendChild(element2);
+/*  852 */       element2 = paramDocument.createElement("PLANNEDAVAILABILITY");
+/*  853 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrplannedavailability()));
+/*  854 */       element1.appendChild(element2);
+/*  855 */       element2 = paramDocument.createElement("PUBFROM");
+/*  856 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrpubfrom()));
+/*  857 */       element1.appendChild(element2);
+/*  858 */       element2 = paramDocument.createElement("PUBTO");
+/*  859 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrpubto()));
+/*  860 */       element1.appendChild(element2);
+/*  861 */       element2 = paramDocument.createElement("WDANNDATE");
+/*  862 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrwdanndate()));
+/*  863 */       element1.appendChild(element2);
+/*  864 */       element2 = paramDocument.createElement("LASTORDER");
+/*  865 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrlastorder()));
+/*  866 */       element1.appendChild(element2);
+/*  867 */       element2 = paramDocument.createElement("EOSANNDATE");
+/*  868 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfreosanndate()));
+/*  869 */       element1.appendChild(element2);
+/*  870 */       element2 = paramDocument.createElement("ENDOFSERVICEDATE");
+/*  871 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrendofservice()));
+/*  872 */       element1.appendChild(element2);
+/*      */       
+/*  874 */       if (paramString2.equals("LSEO")) {
+/*  875 */         SLEORGGRP.displayAVAILSLEORGLSEO(paramHashtable, paramDocument, element1, paramEntityItem, paramDiffEntity, paramString1, paramCtryAudRecord.country, paramCtryAudRecord
+/*  876 */             .getAction(), paramString2, paramStringBuffer);
+/*      */       } else {
+/*  878 */         SLEORGGRP.displayAVAILSLEORG(paramHashtable, paramDocument, element1, paramEntityItem, paramDiffEntity, paramString1, paramCtryAudRecord.country, paramCtryAudRecord
+/*  879 */             .getAction(), paramStringBuffer);
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector[] getModelAudience(DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) {
+/*  901 */     ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.getModelAudience for " + paramDiffEntity.getKey() + NEWLINE);
+/*      */     
+/*  903 */     EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)paramDiffEntity.getCurrentEntityItem().getAttribute("AUDIEN");
+/*  904 */     Vector<String> vector1 = new Vector(1);
+/*  905 */     Vector<String> vector2 = new Vector(1);
+/*  906 */     Vector[] arrayOfVector = new Vector[2];
+/*  907 */     arrayOfVector[0] = vector1;
+/*  908 */     arrayOfVector[1] = vector2;
+/*  909 */     ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.getModelAudience cur audienceAtt " + eANFlagAttribute + NEWLINE);
+/*  910 */     if (eANFlagAttribute != null) {
+/*  911 */       MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/*  912 */       for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/*      */         
+/*  914 */         if (arrayOfMetaFlag[b].isSelected()) {
+/*  915 */           vector1.addElement(arrayOfMetaFlag[b].toString());
+/*      */         }
+/*      */       } 
+/*      */     } 
+/*      */     
+/*  920 */     if (!paramDiffEntity.isNew()) {
+/*  921 */       eANFlagAttribute = (EANFlagAttribute)paramDiffEntity.getPriorEntityItem().getAttribute("AUDIEN");
+/*  922 */       ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.getModelAudience new audienceAtt " + eANFlagAttribute + NEWLINE);
+/*  923 */       if (eANFlagAttribute != null) {
+/*  924 */         MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/*  925 */         for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/*      */           
+/*  927 */           if (arrayOfMetaFlag[b].isSelected()) {
+/*  928 */             vector2.addElement(arrayOfMetaFlag[b].toString());
+/*      */           }
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */     
+/*  934 */     return arrayOfVector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void buildCtryAudRecs(TreeMap<String, CtryAudRecord> paramTreeMap, DiffEntity paramDiffEntity, boolean paramBoolean, StringBuffer paramStringBuffer) {
+/* 1104 */     ABRUtil.append(paramStringBuffer, "XMLAVAILElem.buildCtryAudRecs build T1 country list " + paramBoolean + " " + paramDiffEntity.getKey() + NEWLINE);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1110 */     EntityItem entityItem1 = paramDiffEntity.getCurrentEntityItem();
+/* 1111 */     EntityItem entityItem2 = paramDiffEntity.getPriorEntityItem();
+/* 1112 */     if (paramBoolean) {
+/* 1113 */       if (!paramDiffEntity.isNew()) {
+/*      */         
+/* 1115 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute("COUNTRYLIST");
+/* 1116 */         ABRUtil.append(paramStringBuffer, "XMLAVAILElem.buildCtryAudRecs for deleted / update avail at T1: ctryAtt " + 
+/* 1117 */             PokUtils.getAttributeFlagValue(entityItem2, "COUNTRYLIST") + NEWLINE);
+/* 1118 */         if (eANFlagAttribute != null) {
+/* 1119 */           MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 1120 */           for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/*      */             
+/* 1122 */             if (arrayOfMetaFlag[b].isSelected()) {
+/* 1123 */               String str1 = arrayOfMetaFlag[b].getFlagCode();
+/* 1124 */               String str2 = str1;
+/* 1125 */               if (paramTreeMap.containsKey(str2)) {
+/*      */                 
+/* 1127 */                 CtryAudRecord ctryAudRecord = (CtryAudRecord)paramTreeMap.get(str2);
+/* 1128 */                 ABRUtil.append(paramStringBuffer, "WARNING buildCtryAudRecs for deleted / update " + paramDiffEntity.getKey() + " " + str2 + " already exists, keeping orig " + ctryAudRecord + NEWLINE);
+/*      */               } else {
+/*      */                 
+/* 1131 */                 CtryAudRecord ctryAudRecord = new CtryAudRecord(paramDiffEntity, str1);
+/* 1132 */                 ctryAudRecord.setAction("Delete");
+/* 1133 */                 paramTreeMap.put(ctryAudRecord.getKey(), ctryAudRecord);
+/*      */               }
+/*      */             
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/* 1140 */     } else if (!paramDiffEntity.isDeleted()) {
+/*      */       
+/* 1142 */       EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute("COUNTRYLIST");
+/* 1143 */       ABRUtil.append(paramStringBuffer, "XMLAVAILElem.buildCtryAudRecs for new /update avail:  ctryAtt and anncodeAtt " + 
+/* 1144 */           PokUtils.getAttributeFlagValue(entityItem1, "COUNTRYLIST") + 
+/* 1145 */           PokUtils.getAttributeFlagValue(entityItem1, "ANNCODENAME") + NEWLINE);
+/* 1146 */       if (eANFlagAttribute != null) {
+/* 1147 */         MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 1148 */         for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/*      */           
+/* 1150 */           if (arrayOfMetaFlag[b].isSelected()) {
+/* 1151 */             String str1 = arrayOfMetaFlag[b].getFlagCode();
+/* 1152 */             String str2 = str1;
+/* 1153 */             if (paramTreeMap.containsKey(str2)) {
+/* 1154 */               CtryAudRecord ctryAudRecord = paramTreeMap.get(str2);
+/* 1155 */               if ("Delete".equals(ctryAudRecord.action)) {
+/* 1156 */                 ABRUtil.append(paramStringBuffer, "WARNING buildCtryAudRecs for new /udpate" + paramDiffEntity.getKey() + " " + str2 + " already exists, replacing orig " + ctryAudRecord + NEWLINE);
+/*      */                 
+/* 1158 */                 ctryAudRecord.setUpdateAvail(paramDiffEntity);
+/* 1159 */                 ctryAudRecord.setAction("@@");
+/*      */               } 
+/*      */             } else {
+/* 1162 */               CtryAudRecord ctryAudRecord = new CtryAudRecord(paramDiffEntity, str1);
+/* 1163 */               ctryAudRecord.setAction("Update");
+/* 1164 */               paramTreeMap.put(ctryAudRecord.getKey(), ctryAudRecord);
+/* 1165 */               ABRUtil.append(paramStringBuffer, "XMLAVAILElem.buildCtryAudRecs for new:" + paramDiffEntity.getKey() + " rec: " + ctryAudRecord
+/* 1166 */                   .getKey() + NEWLINE);
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector getPlannedAvails(Hashtable paramHashtable, String paramString, StringBuffer paramStringBuffer) {
+/* 1178 */     Vector<DiffEntity> vector1 = new Vector(1);
+/*      */     
+/* 1180 */     Vector<DiffEntity> vector2 = getSeoAndLseobundleAvail(paramHashtable, paramString, paramStringBuffer);
+/*      */     
+/* 1182 */     ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.getPlannedAvails looking for AVAILTYPE:146 in AVAIL allVct.size:" + ((vector2 == null) ? "null" : ("" + vector2
+/* 1183 */         .size())) + NEWLINE);
+/* 1184 */     if (vector2 == null) {
+/* 1185 */       return vector1;
+/*      */     }
+/*      */ 
+/*      */     
+/* 1189 */     for (byte b = 0; b < vector2.size(); b++) {
+/* 1190 */       DiffEntity diffEntity = vector2.elementAt(b);
+/* 1191 */       EntityItem entityItem1 = diffEntity.getCurrentEntityItem();
+/* 1192 */       EntityItem entityItem2 = diffEntity.getPriorEntityItem();
+/* 1193 */       if (diffEntity.isDeleted()) {
+/* 1194 */         ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.getPlannedAvails checking[" + b + "]: deleted " + diffEntity.getKey() + " AVAILTYPE: " + 
+/* 1195 */             PokUtils.getAttributeFlagValue(entityItem2, "AVAILTYPE") + NEWLINE);
+/* 1196 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute("AVAILTYPE");
+/* 1197 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected("146")) {
+/* 1198 */           vector1.add(diffEntity);
+/*      */         }
+/*      */       } else {
+/* 1201 */         ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.getPlannedAvails checking[" + b + "]:" + diffEntity.getKey() + " AVAILTYPE: " + 
+/* 1202 */             PokUtils.getAttributeFlagValue(entityItem1, "AVAILTYPE") + NEWLINE);
+/* 1203 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute("AVAILTYPE");
+/* 1204 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected("146")) {
+/* 1205 */           vector1.add(diffEntity);
+/*      */         }
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 1210 */     return vector1;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private DiffEntity getEntityForAttrs(Hashtable paramHashtable, String paramString1, String paramString2, String paramString3, String paramString4, String paramString5, String paramString6, StringBuffer paramStringBuffer) {
+/* 1224 */     DiffEntity diffEntity = null;
+/*      */     
+/* 1226 */     Vector<DiffEntity> vector = getSeoAndLseobundleAvail(paramHashtable, paramString1, paramStringBuffer);
+/*      */     
+/* 1228 */     ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.getEntityForAttrs looking for " + paramString3 + ":" + paramString4 + " and " + paramString5 + ":" + paramString6 + " in " + paramString2 + " allVct.size:" + ((vector == null) ? "null" : ("" + vector
+/* 1229 */         .size())) + NEWLINE);
+/* 1230 */     if (vector == null) {
+/* 1231 */       return diffEntity;
+/*      */     }
+/*      */     
+/* 1234 */     for (byte b = 0; b < vector.size(); b++) {
+/* 1235 */       DiffEntity diffEntity1 = vector.elementAt(b);
+/* 1236 */       EntityItem entityItem1 = diffEntity1.getCurrentEntityItem();
+/* 1237 */       EntityItem entityItem2 = diffEntity1.getPriorEntityItem();
+/* 1238 */       if (diffEntity1.isDeleted()) {
+/* 1239 */         ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.getEntityForAttrs checking[" + b + "]: deleted " + diffEntity1.getKey() + " " + paramString3 + ":" + 
+/* 1240 */             PokUtils.getAttributeFlagValue(entityItem2, paramString3) + " " + paramString5 + ":" + 
+/* 1241 */             PokUtils.getAttributeFlagValue(entityItem2, paramString5) + NEWLINE);
+/* 1242 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute(paramString3);
+/* 1243 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString4)) {
+/* 1244 */           eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute(paramString5);
+/* 1245 */           if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString6)) {
+/* 1246 */             diffEntity = diffEntity1;
+/*      */           }
+/*      */         }
+/*      */       
+/* 1250 */       } else if (diffEntity1.isNew()) {
+/* 1251 */         ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.getEntityForAttrs checking[" + b + "]: new " + diffEntity1.getKey() + " " + paramString3 + ":" + 
+/* 1252 */             PokUtils.getAttributeFlagValue(entityItem1, paramString3) + " " + paramString5 + ":" + 
+/* 1253 */             PokUtils.getAttributeFlagValue(entityItem1, paramString5) + NEWLINE);
+/* 1254 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute(paramString3);
+/* 1255 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString4)) {
+/* 1256 */           eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute(paramString5);
+/* 1257 */           if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString6)) {
+/* 1258 */             diffEntity = diffEntity1;
+/*      */             
+/*      */             break;
+/*      */           } 
+/*      */         } 
+/*      */       } else {
+/* 1264 */         ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.getEntityForAttrs checking[" + b + "]: current " + diffEntity1.getKey() + " " + paramString3 + ":" + 
+/* 1265 */             PokUtils.getAttributeFlagValue(entityItem1, paramString3) + " " + paramString5 + ":" + 
+/* 1266 */             PokUtils.getAttributeFlagValue(entityItem1, paramString5) + NEWLINE);
+/* 1267 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute(paramString3);
+/* 1268 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString4)) {
+/* 1269 */           eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute(paramString5);
+/* 1270 */           if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString6)) {
+/* 1271 */             diffEntity = diffEntity1;
+/*      */             break;
+/*      */           } 
+/*      */         } 
+/* 1275 */         ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.getEntityForAttrs checking[" + b + "]: prior " + diffEntity1.getKey() + " " + paramString3 + ":" + 
+/* 1276 */             PokUtils.getAttributeFlagValue(entityItem2, paramString3) + " " + paramString5 + ":" + 
+/* 1277 */             PokUtils.getAttributeFlagValue(entityItem2, paramString5) + NEWLINE);
+/* 1278 */         eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute(paramString3);
+/* 1279 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString4)) {
+/* 1280 */           eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute(paramString5);
+/* 1281 */           if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString6)) {
+/* 1282 */             diffEntity = diffEntity1;
+/*      */           }
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1290 */     return diffEntity;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean isDerivefromLSEOBUNDLE(DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) {
+/* 1308 */     boolean bool = false;
+/* 1309 */     if (paramDiffEntity.getEntityType().equals("LSEOBUNDLE")) {
+/* 1310 */       EntityItem entityItem = paramDiffEntity.getCurrentEntityItem();
+/* 1311 */       if (entityItem != null) {
+/* 1312 */         ABRUtil.append(paramStringBuffer, "XMLANNElem.DerivefromLSEO" + entityItem.getKey() + " SPECBID: " + 
+/* 1313 */             PokUtils.getAttributeValue(entityItem, "SPECBID", ", ", "@@", false) + NEWLINE);
+/* 1314 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("SPECBID");
+/* 1315 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected("11458")) {
+/* 1316 */           bool = true;
+/*      */         }
+/*      */       } 
+/*      */     } 
+/* 1320 */     return bool;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private DiffEntity getCatlgor(Hashtable paramHashtable, String paramString1, Vector[] paramArrayOfVector, String paramString2, StringBuffer paramStringBuffer) {
+/* 1338 */     DiffEntity diffEntity = null;
+/*      */     
+/* 1340 */     Vector<DiffEntity> vector = getLseoAndLseobundleCatlgor(paramHashtable, paramString1, paramStringBuffer);
+/*      */     
+/* 1342 */     String str = "COUNTRYLIST";
+/* 1343 */     ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.getCatlgor looking for " + str + ":" + paramString2 + " in CATLGOR allVct.size:" + ((vector == null) ? "null" : ("" + vector
+/* 1344 */         .size())) + NEWLINE);
+/* 1345 */     if (vector == null) {
+/* 1346 */       return diffEntity;
+/*      */     }
+/*      */ 
+/*      */     
+/* 1350 */     for (byte b = 0; b < vector.size(); b++) {
+/* 1351 */       DiffEntity diffEntity1 = vector.elementAt(b);
+/* 1352 */       EntityItem entityItem1 = diffEntity1.getCurrentEntityItem();
+/* 1353 */       EntityItem entityItem2 = diffEntity1.getPriorEntityItem();
+/* 1354 */       if (diffEntity1.isDeleted()) {
+/* 1355 */         ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.getCatlgor checking[" + b + "]: deleted " + diffEntity1.getKey() + " " + str + ":" + 
+/* 1356 */             PokUtils.getAttributeFlagValue(entityItem2, str) + NEWLINE);
+/* 1357 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute(str);
+/* 1358 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString2)) {
+/* 1359 */           diffEntity = diffEntity1;
+/*      */           
+/*      */           break;
+/*      */         } 
+/* 1363 */       } else if (diffEntity1.isNew()) {
+/* 1364 */         ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.getCatlgor checking[" + b + "]: new " + diffEntity1.getKey() + " " + str + ":" + 
+/* 1365 */             PokUtils.getAttributeFlagValue(entityItem1, str) + NEWLINE);
+/* 1366 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute(str);
+/* 1367 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString2)) {
+/* 1368 */           diffEntity = diffEntity1;
+/*      */           
+/*      */           break;
+/*      */         } 
+/*      */       } else {
+/* 1373 */         ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.getCatlgor checking[" + b + "]: current " + diffEntity1.getKey() + " " + str + ":" + 
+/* 1374 */             PokUtils.getAttributeFlagValue(entityItem1, str) + NEWLINE);
+/* 1375 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute(str);
+/* 1376 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString2)) {
+/* 1377 */           diffEntity = diffEntity1;
+/*      */           
+/*      */           break;
+/*      */         } 
+/* 1381 */         ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.getCatlgor checking[" + b + "]: prior " + diffEntity1.getKey() + " " + str + ":" + 
+/* 1382 */             PokUtils.getAttributeFlagValue(entityItem2, str) + NEWLINE);
+/* 1383 */         eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute(str);
+/* 1384 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString2)) {
+/* 1385 */           diffEntity = diffEntity1;
+/*      */           
+/*      */           break;
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 1392 */     return diffEntity;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private static class CtryAudRecord
+/*      */     extends CtryRecord
+/*      */   {
+/*      */     public String country;
+/*      */     
+/*      */     private DiffEntity availDiff;
+/*      */ 
+/*      */     
+/*      */     CtryAudRecord(DiffEntity param1DiffEntity, String param1String) {
+/* 1406 */       super((String)null);
+/* 1407 */       this.country = param1String;
+/* 1408 */       this.availDiff = param1DiffEntity;
+/*      */     }
+/*      */     
+/*      */     void setUpdateAvail(DiffEntity param1DiffEntity) {
+/* 1412 */       this.availDiff = param1DiffEntity;
+/* 1413 */       setAction("Update");
+/*      */     }
+/*      */ 
+/*      */     
+/*      */     String getCountry() {
+/* 1418 */       return this.country;
+/*      */     }
+/*      */     
+/*      */     String getKey() {
+/* 1422 */       return this.country;
+/*      */     }
+/*      */ 
+/*      */     
+/*      */     public String toString() {
+/* 1427 */       return (this.availDiff != null) ? (this.availDiff.getKey() + " action:" + this.action) : "There is no AVAIL! ";
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     void setAllFields(DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, DiffEntity param1DiffEntity3, DiffEntity param1DiffEntity4, DiffEntity param1DiffEntity5, DiffEntity param1DiffEntity6, Hashtable param1Hashtable, EntityItem param1EntityItem, DiffEntity param1DiffEntity7, String param1String, boolean param1Boolean1, boolean param1Boolean2, StringBuffer param1StringBuffer) {
+/* 1453 */       ABRUtil.append(param1StringBuffer, "CtryRecord.setAllFields entered for: " + this.availDiff.getKey() + " " + getKey() + NEWLINE);
+/*      */ 
+/*      */       
+/* 1456 */       ABRUtil.append(param1StringBuffer, "CtryRecord.setAllFields entered for: " + this.availDiff.getKey() + " " + getKey() + NEWLINE);
+/*      */       
+/* 1458 */       this.availStatus = "0020";
+/* 1459 */       this.rfravailStatus = "0040";
+/*      */ 
+/*      */       
+/* 1462 */       String[] arrayOfString1 = deriveAnnDate(false, param1StringBuffer);
+/* 1463 */       String[] arrayOfString2 = deriveAnnDate(true, param1StringBuffer);
+/*      */ 
+/*      */ 
+/*      */       
+/* 1467 */       String[] arrayOfString3 = deriveAnnNumber(false, param1StringBuffer);
+/* 1468 */       String[] arrayOfString4 = deriveAnnNumber(true, param1StringBuffer);
+/*      */ 
+/*      */ 
+/*      */       
+/* 1472 */       String[] arrayOfString5 = deriveFIRSTORDER(param1DiffEntity1, param1DiffEntity3, false, param1StringBuffer);
+/* 1473 */       String[] arrayOfString6 = deriveFIRSTORDER(param1DiffEntity1, param1DiffEntity3, true, param1StringBuffer);
+/*      */ 
+/*      */       
+/* 1476 */       String[] arrayOfString7 = derivePlannedavailability(false, param1StringBuffer);
+/* 1477 */       String[] arrayOfString8 = derivePlannedavailability(true, param1StringBuffer);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1490 */       String[] arrayOfString9 = derivePubFrom(param1DiffEntity1, param1DiffEntity2, param1DiffEntity3, false, param1StringBuffer);
+/* 1491 */       String[] arrayOfString10 = derivePubFrom(param1DiffEntity1, param1DiffEntity2, param1DiffEntity3, true, param1StringBuffer);
+/*      */ 
+/*      */ 
+/*      */       
+/* 1495 */       String[] arrayOfString11 = derivePubTo(param1DiffEntity1, param1DiffEntity2, param1DiffEntity4, false, param1StringBuffer);
+/* 1496 */       String[] arrayOfString12 = derivePubTo(param1DiffEntity1, param1DiffEntity2, param1DiffEntity4, true, param1StringBuffer);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1501 */       String[] arrayOfString13 = deriveWDANNDATE(param1DiffEntity6, false, param1StringBuffer);
+/* 1502 */       String[] arrayOfString14 = deriveWDANNDATE(param1DiffEntity6, true, param1StringBuffer);
+/*      */ 
+/*      */ 
+/*      */       
+/* 1506 */       String[] arrayOfString15 = deriveLastOrder(param1DiffEntity1, param1DiffEntity4, false, param1StringBuffer);
+/* 1507 */       String[] arrayOfString16 = deriveLastOrder(param1DiffEntity1, param1DiffEntity4, true, param1StringBuffer);
+/*      */ 
+/*      */       
+/* 1510 */       String[] arrayOfString17 = deriveEOSANNDATE(param1DiffEntity5, false, param1StringBuffer);
+/* 1511 */       String[] arrayOfString18 = deriveEOSANNDATE(param1DiffEntity5, true, param1StringBuffer);
+/*      */ 
+/*      */       
+/* 1514 */       String[] arrayOfString19 = deriveENDOFSERVICE(param1DiffEntity5, false, param1StringBuffer);
+/* 1515 */       String[] arrayOfString20 = deriveENDOFSERVICE(param1DiffEntity5, true, param1StringBuffer);
+/*      */ 
+/*      */       
+/* 1518 */       handleResults(arrayOfString1, arrayOfString2, arrayOfString3, arrayOfString4, arrayOfString5, arrayOfString6, arrayOfString7, arrayOfString8, arrayOfString9, arrayOfString10, arrayOfString11, arrayOfString12, arrayOfString13, arrayOfString14, arrayOfString15, arrayOfString16, arrayOfString19, arrayOfString20, arrayOfString17, arrayOfString18, this.country, param1Boolean1, param1Boolean2, param1StringBuffer);
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveENDOFSERVICE(DiffEntity param1DiffEntity, boolean param1Boolean, StringBuffer param1StringBuffer) {
+/* 1583 */       ABRUtil.append(param1StringBuffer, "XMLAVAILElem.deriveEndOfService  eofAvailDiff: " + ((param1DiffEntity == null) ? "null" : param1DiffEntity
+/* 1584 */           .getKey()) + " findT1:" + param1Boolean + NEWLINE);
+/* 1585 */       String str1 = "@@";
+/* 1586 */       String str2 = "@@";
+/* 1587 */       String[] arrayOfString1 = new String[2];
+/* 1588 */       String[] arrayOfString2 = new String[2];
+/*      */       
+/* 1590 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 1592 */         arrayOfString2 = AvailUtil.getAvailAttributeDate(param1Boolean, param1DiffEntity, str1, str2, this.country, "EFFECTIVEDATE", param1StringBuffer);
+/* 1593 */         str1 = arrayOfString2[0];
+/* 1594 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 1597 */       arrayOfString1[0] = str1;
+/* 1598 */       arrayOfString1[1] = str2;
+/* 1599 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] derivePubTo(DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, DiffEntity param1DiffEntity3, boolean param1Boolean, StringBuffer param1StringBuffer) {
+/* 1611 */       ABRUtil.append(param1StringBuffer, "XMLAVAILElem.derivePubTo  loAvailDiff: " + ((param1DiffEntity3 == null) ? "null" : param1DiffEntity3.getKey()) + " findT1:" + param1Boolean + NEWLINE);
+/*      */ 
+/*      */       
+/* 1614 */       String str1 = "@@";
+/* 1615 */       String str2 = "@@";
+/* 1616 */       String[] arrayOfString1 = new String[2];
+/* 1617 */       String[] arrayOfString2 = new String[2];
+/*      */       
+/* 1619 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 1621 */         arrayOfString2 = AvailUtil.getBHcatlgorAttributeDate(param1Boolean, param1DiffEntity1, param1DiffEntity2, str1, str2, this.country, "PUBTO", param1StringBuffer);
+/* 1622 */         str1 = arrayOfString2[0];
+/* 1623 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 1626 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 1628 */         arrayOfString2 = AvailUtil.getAvailAttributeDate(param1Boolean, param1DiffEntity3, str1, str2, this.country, "EFFECTIVEDATE", param1StringBuffer);
+/* 1629 */         str1 = arrayOfString2[0];
+/* 1630 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 1633 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 1635 */         arrayOfString2 = AvailUtil.getParentAttributeDate(param1Boolean, param1DiffEntity1, str1, str2, "BUNDLUNPUBDATEMTRGT", param1StringBuffer);
+/* 1636 */         str1 = arrayOfString2[0];
+/* 1637 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 1640 */       arrayOfString1[0] = str1;
+/* 1641 */       arrayOfString1[1] = str2;
+/* 1642 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] derivePubFrom(DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, DiffEntity param1DiffEntity3, boolean param1Boolean, StringBuffer param1StringBuffer) {
+/* 1659 */       String str1 = "@@";
+/* 1660 */       String str2 = "@@";
+/* 1661 */       String[] arrayOfString1 = new String[2];
+/* 1662 */       String[] arrayOfString2 = new String[2];
+/*      */       
+/* 1664 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 1666 */         arrayOfString2 = AvailUtil.getBHcatlgorAttributeDate(param1Boolean, param1DiffEntity1, param1DiffEntity2, str1, str2, this.country, "PUBFROM", param1StringBuffer);
+/* 1667 */         str1 = arrayOfString2[0];
+/* 1668 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 1670 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 1672 */         arrayOfString2 = AvailUtil.getAvailAttributeDate(param1Boolean, param1DiffEntity3, str1, str2, this.country, "EFFECTIVEDATE", param1StringBuffer);
+/* 1673 */         str1 = arrayOfString2[0];
+/* 1674 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 1676 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */ 
+/*      */         
+/* 1679 */         arrayOfString2 = AvailUtil.getAvailAnnAttributeDate(param1Boolean, this.availDiff, str1, str2, this.country, "ANNDATE", param1StringBuffer);
+/* 1680 */         str1 = arrayOfString2[0];
+/* 1681 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 1684 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 1686 */         arrayOfString2 = AvailUtil.getAvailAttributeDate(param1Boolean, this.availDiff, str1, str2, this.country, "EFFECTIVEDATE", param1StringBuffer);
+/* 1687 */         str1 = arrayOfString2[0];
+/* 1688 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 1691 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 1693 */         arrayOfString2 = AvailUtil.getParentAttributeDate(param1Boolean, param1DiffEntity1, str1, str2, "BUNDLPUBDATEMTRGT", param1StringBuffer);
+/* 1694 */         str1 = arrayOfString2[0];
+/* 1695 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 1698 */       arrayOfString1[0] = str1;
+/* 1699 */       arrayOfString1[1] = str2;
+/* 1700 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveAnnNumber(boolean param1Boolean, StringBuffer param1StringBuffer) {
+/* 1710 */       String str1 = "@@";
+/* 1711 */       String str2 = "@@";
+/* 1712 */       String[] arrayOfString1 = new String[2];
+/* 1713 */       String[] arrayOfString2 = new String[2];
+/*      */       
+/* 1715 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 1717 */         arrayOfString2 = AvailUtil.getAvailAnnAttributeDate(param1Boolean, this.availDiff, str1, str2, this.country, "ANNNUMBER", param1StringBuffer);
+/* 1718 */         str1 = arrayOfString2[0];
+/* 1719 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 1722 */       arrayOfString1[0] = str1;
+/* 1723 */       arrayOfString1[1] = str2;
+/* 1724 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveAnnDate(boolean param1Boolean, StringBuffer param1StringBuffer) {
+/* 1734 */       String str1 = "@@";
+/* 1735 */       String str2 = "@@";
+/* 1736 */       String[] arrayOfString1 = new String[2];
+/*      */       
+/* 1738 */       String[] arrayOfString2 = new String[2];
+/*      */       
+/* 1740 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/* 1741 */         arrayOfString2 = AvailUtil.getAvailAnnAttributeDate(param1Boolean, this.availDiff, str1, str2, this.country, "ANNDATE", param1StringBuffer);
+/* 1742 */         str1 = arrayOfString2[0];
+/* 1743 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 1746 */       arrayOfString1[0] = str1;
+/* 1747 */       arrayOfString1[1] = str2;
+/* 1748 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveFIRSTORDER(DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, boolean param1Boolean, StringBuffer param1StringBuffer) {
+/* 1760 */       String str1 = "@@";
+/* 1761 */       String str2 = "@@";
+/* 1762 */       String[] arrayOfString1 = new String[2];
+/* 1763 */       String[] arrayOfString2 = new String[2];
+/*      */       
+/* 1765 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 1767 */         arrayOfString2 = AvailUtil.getAvailAttributeDate(param1Boolean, param1DiffEntity2, str1, str2, this.country, "EFFECTIVEDATE", param1StringBuffer);
+/* 1768 */         str1 = arrayOfString2[0];
+/* 1769 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 1772 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 1774 */         arrayOfString2 = AvailUtil.getAvailAnnAttributeDate(param1Boolean, this.availDiff, str1, str2, this.country, "ANNDATE", param1StringBuffer);
+/* 1775 */         str1 = arrayOfString2[0];
+/* 1776 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 1779 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 1781 */         arrayOfString2 = AvailUtil.getParentAttributeDate(param1Boolean, param1DiffEntity1, str1, str2, "BUNDLPUBDATEMTRGT", param1StringBuffer);
+/* 1782 */         str1 = arrayOfString2[0];
+/* 1783 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 1786 */       arrayOfString1[0] = str1;
+/* 1787 */       arrayOfString1[1] = str2;
+/* 1788 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveEOSANNDATE(DiffEntity param1DiffEntity, boolean param1Boolean, StringBuffer param1StringBuffer) {
+/* 1798 */       String str1 = "@@";
+/* 1799 */       String str2 = "@@";
+/* 1800 */       String[] arrayOfString1 = new String[2];
+/* 1801 */       String[] arrayOfString2 = new String[2];
+/*      */       
+/* 1803 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 1805 */         arrayOfString2 = AvailUtil.getAvailAnnDateByAnntype(param1Boolean, param1DiffEntity, str1, str2, this.country, "13", param1StringBuffer);
+/* 1806 */         str1 = arrayOfString2[0];
+/* 1807 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 1810 */       arrayOfString1[0] = str1;
+/* 1811 */       arrayOfString1[1] = str2;
+/* 1812 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveWDANNDATE(DiffEntity param1DiffEntity, boolean param1Boolean, StringBuffer param1StringBuffer) {
+/* 1822 */       String str1 = "@@";
+/* 1823 */       String str2 = "@@";
+/* 1824 */       String[] arrayOfString1 = new String[2];
+/* 1825 */       String[] arrayOfString2 = new String[2];
+/*      */       
+/* 1827 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 1829 */         arrayOfString2 = AvailUtil.getAvailAnnDateByAnntype(param1Boolean, param1DiffEntity, str1, str2, this.country, "14", param1StringBuffer);
+/* 1830 */         str1 = arrayOfString2[0];
+/* 1831 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 1834 */       arrayOfString1[0] = str1;
+/* 1835 */       arrayOfString1[1] = str2;
+/* 1836 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveLastOrder(DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, boolean param1Boolean, StringBuffer param1StringBuffer) {
+/* 1846 */       String str1 = "@@";
+/* 1847 */       String str2 = "@@";
+/* 1848 */       String[] arrayOfString1 = new String[2];
+/* 1849 */       String[] arrayOfString2 = new String[2];
+/*      */       
+/* 1851 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 1853 */         arrayOfString2 = AvailUtil.getAvailAttributeDate(param1Boolean, param1DiffEntity2, str1, str2, this.country, "EFFECTIVEDATE", param1StringBuffer);
+/* 1854 */         str1 = arrayOfString2[0];
+/* 1855 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 1858 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 1860 */         arrayOfString2 = AvailUtil.getParentAttributeDate(param1Boolean, param1DiffEntity1, str1, str2, "BUNDLUNPUBDATEMTRGT", param1StringBuffer);
+/* 1861 */         str1 = arrayOfString2[0];
+/* 1862 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 1865 */       arrayOfString1[0] = str1;
+/* 1866 */       arrayOfString1[1] = str2;
+/* 1867 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] derivePlannedavailability(boolean param1Boolean, StringBuffer param1StringBuffer) {
+/* 1878 */       ABRUtil.append(param1StringBuffer, "XMLAVAILElem.derivePlannedavailability  availDiff: " + ((this.availDiff == null) ? "null" : this.availDiff
+/* 1879 */           .getKey()) + " findT1:" + param1Boolean + NEWLINE);
+/* 1880 */       String str1 = "@@";
+/* 1881 */       String str2 = "@@";
+/* 1882 */       String[] arrayOfString1 = new String[2];
+/* 1883 */       String[] arrayOfString2 = new String[2];
+/*      */       
+/* 1885 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 1887 */         arrayOfString2 = AvailUtil.getAvailAttributeDate(param1Boolean, this.availDiff, str1, str2, this.country, "EFFECTIVEDATE", param1StringBuffer);
+/* 1888 */         str1 = arrayOfString2[0];
+/* 1889 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 1892 */       arrayOfString1[0] = str1;
+/* 1893 */       arrayOfString1[1] = str2;
+/* 1894 */       return arrayOfString1;
+/*      */     }
+/*      */     
+/*      */     void setAllLSEOFields(DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, boolean param1Boolean1, boolean param1Boolean2, StringBuffer param1StringBuffer) {
+/* 1898 */       this.availStatus = "0020";
+/* 1899 */       this.rfravailStatus = "0040";
+/*      */       
+/* 1901 */       ABRUtil.append(param1StringBuffer, "CtryRecord.setAllFields entered for country is belong to LSEO " + ((param1DiffEntity1 == null) ? "null" : param1DiffEntity1.getKey()) + ". catlgorDiff is " + ((param1DiffEntity2 == null) ? "null" : param1DiffEntity2.getKey()) + NEWLINE);
+/*      */ 
+/*      */       
+/* 1904 */       String[] arrayOfString1 = { "@@", "@@" };
+/* 1905 */       String[] arrayOfString2 = deriveLSEOPubFrom(param1DiffEntity1, param1DiffEntity2, false, param1StringBuffer);
+/* 1906 */       String[] arrayOfString3 = deriveLSEOPubFrom(param1DiffEntity1, param1DiffEntity2, true, param1StringBuffer);
+/*      */ 
+/*      */       
+/* 1909 */       String[] arrayOfString4 = deriveLSEOFirstOrder(param1DiffEntity1, false, param1StringBuffer);
+/* 1910 */       String[] arrayOfString5 = deriveLSEOFirstOrder(param1DiffEntity1, true, param1StringBuffer);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1915 */       String[] arrayOfString6 = deriveLSEOplannedavailability(param1DiffEntity1, false, param1StringBuffer);
+/* 1916 */       String[] arrayOfString7 = deriveLSEOplannedavailability(param1DiffEntity1, true, param1StringBuffer);
+/*      */       
+/* 1918 */       String[] arrayOfString8 = deriveLSEOLastOrder(param1DiffEntity1, false, param1StringBuffer);
+/* 1919 */       String[] arrayOfString9 = deriveLSEOLastOrder(param1DiffEntity1, true, param1StringBuffer);
+/*      */ 
+/*      */       
+/* 1922 */       String[] arrayOfString10 = deriveLSEOPubTo(param1DiffEntity1, param1DiffEntity2, false, param1StringBuffer);
+/* 1923 */       String[] arrayOfString11 = deriveLSEOPubTo(param1DiffEntity1, param1DiffEntity2, true, param1StringBuffer);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1930 */       handleResults(arrayOfString4, arrayOfString5, arrayOfString1, arrayOfString1, arrayOfString4, arrayOfString5, arrayOfString6, arrayOfString7, arrayOfString2, arrayOfString3, arrayOfString10, arrayOfString11, arrayOfString8, arrayOfString9, arrayOfString8, arrayOfString9, arrayOfString1, arrayOfString1, arrayOfString1, arrayOfString1, this.country, param1Boolean1, param1Boolean2, param1StringBuffer);
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveLSEOPubFrom(DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, boolean param1Boolean, StringBuffer param1StringBuffer) {
+/* 1954 */       ABRUtil.append(param1StringBuffer, "XMLAVAILElem.deriveLSEOPubFrom catlgorDiff: " + ((param1DiffEntity2 == null) ? "null" : param1DiffEntity2
+/* 1955 */           .getKey()) + "findT1:" + param1Boolean + NEWLINE);
+/*      */       
+/* 1957 */       String str1 = "@@";
+/* 1958 */       String str2 = "@@";
+/* 1959 */       String[] arrayOfString1 = new String[2];
+/* 1960 */       String[] arrayOfString2 = new String[2];
+/*      */       
+/* 1962 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 1964 */         arrayOfString2 = AvailUtil.getBHcatlgorAttributeDate(param1Boolean, param1DiffEntity1, param1DiffEntity2, str1, str2, this.country, "PUBFROM", param1StringBuffer);
+/* 1965 */         str1 = arrayOfString2[0];
+/* 1966 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 1968 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 1970 */         arrayOfString2 = AvailUtil.getParentAttributeDate(param1Boolean, param1DiffEntity1, str1, str2, "BUNDLPUBDATEMTRGT", param1StringBuffer);
+/* 1971 */         str1 = arrayOfString2[0];
+/* 1972 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 1975 */       arrayOfString1[0] = str1;
+/* 1976 */       arrayOfString1[1] = str2;
+/* 1977 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveLSEOplannedavailability(DiffEntity param1DiffEntity, boolean param1Boolean, StringBuffer param1StringBuffer) {
+/* 1988 */       ABRUtil.append(param1StringBuffer, "XMLAVAILElem.plannedavailability parentDiff: " + ((param1DiffEntity == null) ? "null" : param1DiffEntity
+/* 1989 */           .getKey()) + "findT1:" + param1Boolean + NEWLINE);
+/*      */       
+/* 1991 */       String str1 = "@@";
+/* 1992 */       String str2 = "@@";
+/* 1993 */       String[] arrayOfString1 = new String[2];
+/* 1994 */       String[] arrayOfString2 = new String[2];
+/*      */       
+/* 1996 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 1998 */         arrayOfString2 = AvailUtil.getParentAttributeDate(param1Boolean, param1DiffEntity, str1, str2, "BUNDLPUBDATEMTRGT", param1StringBuffer);
+/* 1999 */         str1 = arrayOfString2[0];
+/* 2000 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 2003 */       arrayOfString1[0] = str1;
+/* 2004 */       arrayOfString1[1] = str2;
+/* 2005 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveLSEOFirstOrder(DiffEntity param1DiffEntity, boolean param1Boolean, StringBuffer param1StringBuffer) {
+/* 2015 */       ABRUtil.append(param1StringBuffer, "XMLAVAILElem.deriveLSEOFirstOrder parentDiff: " + ((param1DiffEntity == null) ? "null" : param1DiffEntity
+/* 2016 */           .getKey()) + "findT1:" + param1Boolean + NEWLINE);
+/*      */       
+/* 2018 */       String str1 = "@@";
+/* 2019 */       String str2 = "@@";
+/* 2020 */       String[] arrayOfString1 = new String[2];
+/* 2021 */       String[] arrayOfString2 = new String[2];
+/*      */       
+/* 2023 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */ 
+/*      */         
+/* 2026 */         arrayOfString2 = AvailUtil.getParentAttributeDate(param1Boolean, param1DiffEntity, str1, str2, "BUNDLPUBDATEMTRGT", param1StringBuffer);
+/* 2027 */         str1 = arrayOfString2[0];
+/* 2028 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2030 */       arrayOfString1[0] = str1;
+/* 2031 */       arrayOfString1[1] = str2;
+/* 2032 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveLSEOLastOrder(DiffEntity param1DiffEntity, boolean param1Boolean, StringBuffer param1StringBuffer) {
+/* 2042 */       ABRUtil.append(param1StringBuffer, "XMLAVAILElem.deriveLSEOLastOrder parentDiff: " + ((param1DiffEntity == null) ? "null" : param1DiffEntity
+/* 2043 */           .getKey()) + "findT1:" + param1Boolean + NEWLINE);
+/*      */       
+/* 2045 */       String str1 = "@@";
+/* 2046 */       String str2 = "@@";
+/* 2047 */       String[] arrayOfString1 = new String[2];
+/* 2048 */       String[] arrayOfString2 = new String[2];
+/*      */       
+/* 2050 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2052 */         arrayOfString2 = AvailUtil.getParentAttributeDate(param1Boolean, param1DiffEntity, str1, str2, "BUNDLUNPUBDATEMTRGT", param1StringBuffer);
+/* 2053 */         str1 = arrayOfString2[0];
+/* 2054 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2056 */       arrayOfString1[0] = str1;
+/* 2057 */       arrayOfString1[1] = str2;
+/* 2058 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveLSEOPubTo(DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, boolean param1Boolean, StringBuffer param1StringBuffer) {
+/* 2069 */       ABRUtil.append(param1StringBuffer, "XMLAVAILElem.deriveLSEOPubTo catlgorDiff: " + ((param1DiffEntity2 == null) ? "null" : param1DiffEntity2
+/* 2070 */           .getKey()) + "findT1:" + param1Boolean + NEWLINE);
+/*      */       
+/* 2072 */       String str1 = "@@";
+/* 2073 */       String str2 = "@@";
+/* 2074 */       String[] arrayOfString1 = new String[2];
+/* 2075 */       String[] arrayOfString2 = new String[2];
+/*      */       
+/* 2077 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2079 */         arrayOfString2 = AvailUtil.getBHcatlgorAttributeDate(param1Boolean, param1DiffEntity1, param1DiffEntity2, str1, str2, this.country, "PUBTO", param1StringBuffer);
+/* 2080 */         str1 = arrayOfString2[0];
+/* 2081 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2083 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2085 */         arrayOfString2 = AvailUtil.getParentAttributeDate(param1Boolean, param1DiffEntity1, str1, str2, "BUNDLUNPUBDATEMTRGT", param1StringBuffer);
+/* 2086 */         str1 = arrayOfString2[0];
+/* 2087 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 2090 */       arrayOfString1[0] = str1;
+/* 2091 */       arrayOfString1[1] = str2;
+/* 2092 */       return arrayOfString1;
+/*      */     }
+/*      */   }
+/*      */ }
 
-package COM.ibm.eannounce.abr.util;
 
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.TreeMap;
-import java.util.Vector;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import COM.ibm.eannounce.objects.EANFlagAttribute;
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.eannounce.objects.MetaFlag;
-import COM.ibm.opicmpdh.middleware.Database;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-
-import com.ibm.transform.oim.eacm.diff.DiffEntity;
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-/**********************************************************************************
- * Class used to hold info and structure to be generated for the xml feed
- * for abrs.
- *    * Constructor for <AVAILABILITYLIST> elements
- * <AVAILABILITYLIST> 2	AVAIL - for each country in COUNTRYLIST where AVAILTYPE = 146 (Planned Availability)
- * <AVIAILABILITYELEMENT>	 3		
- *   <AVAILABILITYACTION>		    4  AVAIL	CountryAction
- *   <STATUS>	                    
- *   <COUNTRY>	</COUNTRY>		4	AVAIL	COUNTRYLIST - Flag Description Class 
- 
- *   <EARLIESTSHIPDATE>	</EARLIESTSHIPDATE>		4	AVAIL/
- * 	<PUBFROM>	</PUBFROM>		4	AVAIL/	PubFrom
- * 	<PUBTO>	</PUBTO>			4	AVAIL/	PubTo
- * 	<ENDOFSERVICEDATE>	</ENDOFSERVICEDATE>			4	AVAIL/	Endofservice	
- * </AVIAILABILITYELEMENT>		3
- * </AVAILABILITYLIST>		2
- *
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\XMLLSEOBUNDELAVAILElembh1.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-// $Log: XMLLSEOBUNDELAVAILElembh1.java,v $
-// Revision 1.6  2015/01/26 15:53:39  wangyul
-// fix the issue PR24222 -- SPF ADS abr string buffer
-//
-// Revision 1.5  2014/03/25 14:48:16  guobin
-// flows to BH prof srv - multi status change - more broadly then we needed. data not in final sent as final-
-//
-// Revision 1.4  2013/12/03 13:19:58  guobin
-// fix delete XML Spec sent to dev - Avails RFR Defect: BH 185136 -: VV DOA:REGVVN- 293/390-7906AC1/MC1 The Withdrawn FC A3AN,A3AP are displayed in UI
-//
-// Revision 1.3  2013/08/16 05:11:47  wangyulo
-// fix the issue RCQ00222829 for the BHCATLGOR which change the CATLGOR to BHCATLGOR
-//
-// Revision 1.2  2012/08/24 15:30:10  wangyulo
-// fix the Defects( 123011 and 123362) -- CATLGOR PUBFROM/TO not in XML
-//
-// Revision 1.1  2012/01/22 05:39:01  guobin
-// RTM work item number on the change is 643541 / BHCQ 81991 Update to XML System Feed Mapping 20120117.doc - correct design for PUBFROM, FIRSTORDER, PUBTO
-//
-// Revision 1.24  2012/01/05 13:38:38  liuweimi
-// Defect 623414 - for changes to the handling of AVAILABILITYLIST for Special Bid LSEOs and LSEOBUNDLEs
-//
-// Revision 1.23  2011/11/17 13:17:32  liuweimi
-// Fix Defect - 591202 based on BH FS ABR Data Transformation System Feed 20111031.doc
-//
-// Revision 1.22  2011/10/31 14:13:16  guobin
-// comment out the release momery AVAIL and ANNOUNCE from HashTable
-//
-// Revision 1.21  2011/08/26 01:55:41  guobin
-// add AVAILIBILITYLIST countrylist to table for WARRLIST to check COUNTRYLIST
-//
-// Revision 1.20  2011/08/17 08:46:10  guobin
-// update the defect for generation of Sales Org /Plant Code in SEO_UPDATE
-//
-// Revision 1.19  2011/07/15 14:52:27  guobin
-// check COFCATentity != null  for  parent Model of LSEO.
-//
-// Revision 1.18  2011/03/30 07:45:10  guobin
-// add the world wide avail of SLEORGGRP/SLEORGNPLNTCD
-//
-// Revision 1.17  2011/03/03 14:03:32  guobin
-// add SLEORGNPLNTCODE for the LSEO and LSEO special
-//
-// Revision 1.16  2011/02/22 07:35:16  guobin
-// change for the LSEO special bid
-//
-// Revision 1.15  2011/02/16 03:15:15  guobin
-// add change for LSEO SPECBID
-//
-// Revision 1.14  2011/02/14 05:35:45  guobin
-// changes for the merge list for special bid LSEO
-//
-// Revision 1.13  2011/01/25 05:47:43  guobin
-// change the LSEO path to D:AVAILSLEORGA:D, not from the root
-//
-// Revision 1.12  2011/01/24 14:16:53  guobin
-// add hasChanges method
-//
-// Revision 1.11  2011/01/22 14:11:47  guobin
-// Add new association from LSEOBUNDLE to SLEORGA path = "D:LSEOBUNDLESLEORGA:D";
-//
-// Revision 1.10  2011/01/21 12:39:14  guobin
-// find the WWSEOLSEO  relator  of MODEL
-//
-// Revision 1.9  2011/01/14 09:34:45  guobin
-// Set values	to <SLEORGGRPLIST>, <SLEORGNPLNTCODELIST> when LSEOBUNDLE.SPECBID =11458(Yes)
-//
-// Revision 1.8  2011/01/05 02:55:14  guobin
-// Add AVAIL action is DELETE_ACTIVITY case
-//
-// Revision 1.7  2010/12/29 06:27:27  guobin
-// Add <SLEORGGRPLIST> in <AVAILABILITYLIST>
-//
-// Revision 1.6  2010/11/22 13:46:36  guobin
-// fix the parameter problem of deriveWDANNDATE().
-//
-// Revision 1.5  2010/10/19 09:46:10  guobin
-// Add isDeriveFromLSEOBUNDLE() and createNodeFromLSEOBUNDLE
-//
-// Revision 1.4  2010/09/17 04:27:55  yang
-// When geting CATLGOR.PUBFROM and PUBTO need to check CATLGOR.OFFCOUNTRY = country
-//
-// Revision 1.3  2010/08/26 08:50:51  yang
-// Derive PubFrom ,Plannedavailability from CATLGOR
-//
-// Revision 1.2  2010/07/06 09:49:47  yang
-// Complete all elements for 1.0
-//
-// Revision 1.1  2010/06/23 09:52:08  yang
-// <AVAILABILITYLIST> for LSEO bh1.0
-//
-// Revision 1.2  2010/06/09 03:29:29  yang
-// Line 394. Change to CtryAudRecord.country
-//
-// Revision 1.1  2010/06/03 15:22:01  yang
-// build AVAILABILITYLIST for LSEO
-//
-// Revision 1.15  2010/04/15 01:21:18  yang
-//  when derive from Model set AVAILABILITYACTION = Update
-//
-// Revision 1.14  2010/03/22 15:03:35  yang
-// Add derivefromModel where there is no Planned Avail and Modle.Anndate less than 2010-03-31.
-//
-// Revision 1.13  2010/02/05 20:14:46  rick
-// format prob take 4
-//
-// Revision 1.12  2010/02/05 20:12:15  rick
-// format prob take 3
-//
-// Revision 1.11  2010/02/05 20:06:43  rick
-// format prob take 2
-//
-// Revision 1.10  2010/02/05 19:37:07  rick
-// possible format problem.
-//
-// Revision 1.9  2010/02/05 19:25:05  rick
-// change <ENDOFSERVICE> to <ENDOFSERVICEDATE>
-//
-// Revision 1.8  2010/01/29 01:19:24  yang
-// change isNewCountry().
-//
-// Revision 1.7  2010/01/28 08:46:27  yang
-// comment out <EARLIESTSHIPDATE>, it is not for wave1
-//
-// Revision 1.6  2010/01/11 16:30:14  yang
-// Use the first one of the results of AVAILANNA getDownLink() .
-//
-// Revision 1.5  2009/12/24 12:57:24  yang
-// BH get<PUBFROM> from Avail downlink() Announcement.
-//
-// Revision 1.4  2009/12/17 11:36:11  yang
-// *** empty log message ***
-//
-// Revision 1.3  2009/12/15 08:46:08  yang
-// BH
-//
-// Revision 1.2  2009/12/10 14:31:58  yang
-// BH
-//
-// Revision 1.1  2009/12/09 09:52:17  yang
-// For BH <AVAILABILITYLIST>
-//
-// Revision 1.3  2008/05/28 13:44:23  wendy
-// Added STATUS to output for spec "SG FS ABR ADS System Feed 20080528c.doc"
-//
-// Revision 1.2  2008/04/29 14:26:12  wendy
-// Add defaults
-//
-// Revision 1.1  2008/04/17 19:37:53  wendy
-// Init for
-// -   CQ00003539-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC
-// -   CQ00005096-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Add Category MM and Images
-// -   CQ00005046-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Support CRAD in BHC
-// -   CQ00005045-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Upgrade/Conversion Support
-// -   CQ00006862-WI  - BHC 3.0 Support - Support for Services Data UI
-//
-//
-public class XMLLSEOBUNDELAVAILElembh1 extends XMLElem {	
-	private static XMLSLEORGGRPElem SLEORGGRP = new XMLSLEORGGRPElem();
-
-	/**********************************************************************************
-	 * Constructor for <AVAILABILITYLIST> elements
-	 * <AVAILABILITYLIST> 2	AVAIL - for each country in COUNTRYLIST where AVAILTYPE = 146 (Planned Availability)
-	 * <AVIAILABILITYELEMENT>	 3		
-	 *   <AVAILABILITYACTION>		    4  AVAIL	CountryAction
-	 *   <STATUS>	                    
-	 *   <COUNTRY>	</COUNTRY>		4	AVAIL	COUNTRYLIST - Flag Description Class
-	 
-	 *   <EARLIESTSHIPDATE>	</EARLIESTSHIPDATE>		4	AVAIL/
-	 * 	<PUBFROM>	</PUBFROM>		4	AVAIL/	PubFrom
-	 * 	<PUBTO>	</PUBTO>			4	AVAIL/	PubTo
-	 * 	<ENDOFSERVICEDATE>	</ENDOFSERVICEDATE>			4	AVAIL/	Endofservice	
-	 * </AVIAILABILITYELEMENT>		3
-	 * </AVAILABILITYLIST>		2
-	 *
-	 *
-	 */
-	public XMLLSEOBUNDELAVAILElembh1() {
-		super("AVAILABILITYELEMENT");
-	}
-	
-	/**********************************************************************************
-	 *@param dbCurrent Database
-	 *@param table Hashtable of Vectors of DiffEntity
-	 *@param document Document needed to create nodes
-	 *@param parent Element node to add this node too
-	 *@param parentItem DiffEntity - parent to use if path is specified in XMLGroupElem, item to use otherwise
-	 *@param debugSb StringBuffer for debug output
-	 */
-	public void addElements(Database dbCurrent, Hashtable table, Document document, Element parent, DiffEntity parentItem,
-		StringBuffer debugSb) throws COM.ibm.eannounce.objects.EANBusinessRuleException, java.sql.SQLException,
-		COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException, COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-		java.rmi.RemoteException, java.io.IOException, COM.ibm.opicmpdh.middleware.MiddlewareException,
-		COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException {
-
-	    String path = null;
-//		 get parent Model for SLEORGGRPLIST and set Path to get SLEORGGRPLINTOCDE
-		EntityItem COFCATentity = null ;
-		COFCATentity=parentItem.getCurrentEntityItem();
-		path = "D:LSEOBUNDLEAVAIL:D:AVAIL:D:AVAILSLEORGA:D";
-//		 * availType: LSEOSPECBID
-//		 *            LSEO
-//		 *            LSEOBUNDLESPECBID
-//		 *            LSEOBUNDLE 
-		String availType = CHEAT; 
-	    boolean compatModel = false;
-	    boolean isExistfinal = false;
-	    compatModel = AvailUtil.iscompatmodel();
-		
-        if(!compatModel){
-        	//new added(xml status)
-    		String status = null;
-    		status = (String) table.get("_chSTATUS");
-    		ABRUtil.append(debugSb,"the status is" + status + NEWLINE);
-    		if(STATUS_FINAL.equals(status)){
-    			isExistfinal = true;
-    		}else{
-    			isExistfinal = false;
-    		}
-        }	
-        
-		if (isDerivefromLSEOBUNDLE(parentItem, debugSb)){
-			path = "D:LSEOBUNDLESLEORGA:D";
-			availType ="LSEOBUNDLESPECBID";
-			createNodeFromLSEOBUNDLE(table, availType, document, parent, parentItem, COFCATentity, path,  isExistfinal,  compatModel, debugSb);
-		}else {
-			//      	 get all AVAILs where AVAILTYPE="Planned Availability" (146) - some may be deleted
-//			if(parenttype.equals("LSEO")){
-//				availType = "LSEO";
-//			}else{
-		    availType = "LSEOBUNDLE";
-			//}
-			Vector plnAvlVct = getPlannedAvails(table, availType, debugSb);
-
-			if (plnAvlVct.size() > 0) { // must have planned avail for any of this, wayne said there will always be at least 1
-				// get model audience values, t2[0] current, t1[1] prior
-				// must account for AVAILa to have had US, CANADA at T1, and just CANADA at T2 and a new
-				// AVAILb to have US at T2			
-		        
-				//build T1 country list
-				TreeMap ctryAudElemMap = new TreeMap();
-				for (int i = 0; i < plnAvlVct.size(); i++) {
-					DiffEntity availDiff = (DiffEntity) plnAvlVct.elementAt(i);
-					buildCtryAudRecs(ctryAudElemMap, availDiff, true, debugSb);
-				}// end each planned avail
-
-				//build T2 country list
-				for (int i = 0; i < plnAvlVct.size(); i++) {
-					DiffEntity availDiff = (DiffEntity) plnAvlVct.elementAt(i);
-					buildCtryAudRecs(ctryAudElemMap, availDiff, false, debugSb);
-				}// end each planned avail
-
-				
-				// output the elements
-				Vector mdlAudVct[] = getModelAudience(parentItem, debugSb);
-				Collection ctryrecs = ctryAudElemMap.values();
-				Iterator itr = ctryrecs.iterator();
-				StringBuffer countrysb = new StringBuffer();
-				while (itr.hasNext()) {
-//					add coutrylist to table for WARRLIST to check whether MODLEWARR|PRODSTRUCTWARR. coutrylist in this AVAILIBILITYLIST.countrylist
-    				CtryAudRecord ctryAudRec = (CtryAudRecord) itr.next();
-    				if ("LSEO".equals(availType)){	
-    					if (countrysb.length()==0){
-        					countrysb.append(ctryAudRec.getCountry());
-        				}else{
-        					countrysb.append("|" + ctryAudRec.getCountry());
-        				}
-    				}
-					//Rows marked as Delete do not need further updating and the Action should not be changed by further updating.
-					//if (!ctryAudRec.isDeleted()) {
-					// find firstorder avail for this country
-					DiffEntity foAvailDiff = getEntityForAttrs(table, availType, "AVAIL", "AVAILTYPE", "143", "COUNTRYLIST", ctryAudRec
-						.getCountry(), debugSb);
-					// find lastorder avail for this country
-					DiffEntity loAvailDiff = getEntityForAttrs(table, availType, "AVAIL", "AVAILTYPE", "149", "COUNTRYLIST", ctryAudRec
-						.getCountry(), debugSb);
-					DiffEntity endAvailDiff = getEntityForAttrs(table, availType, "AVAIL", "AVAILTYPE", "151", "COUNTRYLIST", ctryAudRec
-						.getCountry(), debugSb);
-					DiffEntity endMktAvailDiff = getEntityForAttrs(table, availType, "AVAIL", "AVAILTYPE", "200", "COUNTRYLIST", ctryAudRec
-						.getCountry(), debugSb);
-					DiffEntity catlgorDiff = getCatlgor(table, availType, mdlAudVct, ctryAudRec.getCountry(), debugSb);
-					// add other info now
-					ctryAudRec.setAllFields(parentItem, catlgorDiff, foAvailDiff, loAvailDiff, endAvailDiff, endMktAvailDiff, table, COFCATentity, ctryAudRec.availDiff, path,  isExistfinal,  compatModel, debugSb);
-					//}
-					if (ctryAudRec.isDisplayable() || ctryAudRec.isrfrDisplayable()) {
-						createNodeSet(table, document, parent, COFCATentity,  ctryAudRec.availDiff, ctryAudRec, path, availType, debugSb);
-					} else {
-						ABRUtil.append(debugSb,"XMLCtryAudElem.addElements no changes found for " + ctryAudRec + NEWLINE);
-					}
-					ctryAudRec.dereference();
-				}
-                //add countrylist to table
-//				if ("LSEO".equals(availType))
-//				table.put(countryKey, countrysb.toString());
-				// release memory
-				ctryAudElemMap.clear();
-//				Vector annVct = (Vector) table.get("ANNOUNCEMENT");
-//				Vector availVct = (Vector) table.get("AVAIL");
-//				availVct.clear();
-//				annVct.clear();
-			} else {
-				ABRUtil.append(debugSb,"XMLCtryAudElem.addElements no planned AVAILs found" + NEWLINE);
-			}
-		}
-	}
-
-	 	
-	/**
-	 * availType: LSEOSPECBID
-	 *            LSEO
-	 *            LSEOBUNDLESPECBID
-	 *            LSEOBUNDLE            
-	 * 
-	 * @param table
-	 * @param isfromLSEOModel
-	 * @param debugSb
-	 * @return
-	 */
-	private Vector getSeoAndLseobundleAvail(Hashtable table,String availType,StringBuffer debugSb){
-		
-		Vector allVct = (Vector) table.get("AVAIL");
-		//printTable(table, debugSb);
-		Vector overrideVct = new Vector(1); 
-		if (allVct != null) {
-			if(availType.equals("LSEOBUNDLE")|| availType.equals("LSEOBUNDLESPECBID")){
-				overrideVct=allVct;
-			}else{
-				for (int i = 0; i < allVct.size(); i++) {
-					DiffEntity diffitem = (DiffEntity) allVct.elementAt(i);
-					if(diffitem.toString().indexOf("MODELAVAIL")>-1){
-						if(availType.equals("LSEOSPECBID")) 
-						{
-							overrideVct.add(diffitem);
-						}
-					} else if(diffitem.toString().indexOf("LSEOAVAIL")>-1){
-						if(availType.equals("LSEO")) {
-							overrideVct.add(diffitem);
-						}
-					}					
-				}
-			}
-		}
-		return overrideVct;		
-	}
-	/**
-	 * new change base on the BH FS ABR XML System Feed Mapping 20130214.doc 
-	 * for the RCQ00222829 - BHCATLGOR 
-	 * availType: LSEOSPECBID
-	 *            LSEO
-	 *            LSEOBUNDLESPECBID
-	 *            LSEOBUNDLE 
-	 *       
-	 *  
-	 * @param table
-	 * @param availType
-	 * @param debugSb
-	 * @return
-	 */
-	private Vector getLseoAndLseobundleCatlgor(Hashtable table,String availType,StringBuffer debugSb){
-	    //RCQ00222829 change  CATLGOR to BHCATLGOR base on the doc BH FS ABR XML System Feed Mapping 20130214.doc		
-		Vector allVct = (Vector) table.get("BHCATLGOR");
-		Vector overrideVct = new Vector(1); 
-		DiffEntity diffitem = null;
-		EntityItem curritem = null;
-		String BHStatus ="";
-		//add the check of the status of BHCATLGOR
-		if (allVct != null) {
-			if(availType.equals("LSEOBUNDLE")|| availType.equals("LSEOBUNDLESPECBID")){
-				for (int i = 0; i < allVct.size(); i++) {
-					diffitem = (DiffEntity) allVct.elementAt(i);
-					curritem = diffitem.getCurrentEntityItem();
-					BHStatus  = PokUtils.getAttributeFlagValue(curritem,"STATUS");
-					if(STATUS_FINAL.equals(BHStatus)){
-						overrideVct.add(diffitem);
-					}
-				}
-			}else{
-				for (int i = 0; i < allVct.size(); i++) {
-					diffitem = (DiffEntity) allVct.elementAt(i);
-					curritem = diffitem.getCurrentEntityItem();
-					BHStatus  = PokUtils.getAttributeFlagValue(curritem,"STATUS");
-					if(STATUS_FINAL.equals(BHStatus)){
-						if(!diffitem.getKey().equals("BHCATLGOR")){	
-							if(diffitem.toString().indexOf("LSEOBHCATLGOR")>-1){
-								 overrideVct.add(diffitem);
-							}
-						}
-					}
-				}
-			}
-		}
-		return overrideVct;		
-	}
-//	private Vector getLseoAndLseobundleCatlgor(Hashtable table,String availType,StringBuffer debugSb){
-//		Vector allVct = (Vector) table.get("CATLGOR");
-//		Vector overrideVct = new Vector(1); 
-//		if (allVct != null) {
-//			if(availType.equals("LSEOBUNDLE")|| availType.equals("LSEOBUNDLESPECBID")){
-//				overrideVct=allVct;
-//			}else{
-//				for (int i = 0; i < allVct.size(); i++) {
-//					DiffEntity diffitem = (DiffEntity) allVct.elementAt(i);
-//					if(!diffitem.getKey().equals("CATLGOR")){	
-////						if(diffitem.toString().indexOf("MDLCATLGOR")>-1){
-////							if(availType.equals("LSEOSPECBID")) overrideVct.add(diffitem);
-////						} else 
-//							if(diffitem.toString().indexOf("LSEOCATLGOR")>-1){
-//							 overrideVct.add(diffitem);
-//						}
-//					}
-//				}
-//			}
-//		}
-//		return overrideVct;		
-//	}
-	/**
-	 * @param dbCurrent
-	 * @param document
-	 * @param parent
-	 * @param modelItem
-	 * @param debugSb
-	 * @param returnStatus
-	 * @param anndate
-	 * @param withdrawanndate
-	 * @throws SQLException
-	 * @throws MiddlewareException 
-	 */
-//	private void createNodeFromModel(Hashtable table, Database dbCurrent, Document document, Element parent, DiffEntity modelItem, String path, 
-//			String availType, StringBuffer debugSb) throws SQLException, MiddlewareException {
-//	 	ReturnDataResultSet rdrs = null;
-//        ResultSet rs = null;
-//        ReturnStatus returnStatus = new ReturnStatus(-1);
-//        String strEnterprise = null;
-//        String anndate = CHEAT;
-//        String withdrawanndate = CHEAT;
-//        EntityItem curritem = null;
-//        if (modelItem != null){
-//        	curritem = modelItem.getCurrentEntityItem();
-//        	if (curritem != null){
-//        		strEnterprise = curritem.getProfile().getEnterprise();
-//    			anndate = PokUtils.getAttributeValue(curritem, "ANNDATE",", ", CHEAT, false);
-//    		    withdrawanndate = PokUtils.getAttributeValue(curritem, "WTHDRWEFFCTVDATE",", ", CHEAT, false);
-//    		    ABRUtil.append(debugSb,"XMLAVAILElem.addElements"  + curritem.getKey() + " thedate: "
-//    					+ anndate + " withdrawanndate: " + withdrawanndate + NEWLINE);
-//    		   }
-//        }
-//		
-//		TreeMap ctryAudElemMap = new TreeMap();
-//		try {
-//			 // for all World Wide Countries 
-//			 rs = dbCurrent.callGBL9999A(returnStatus, strEnterprise, "GENAREASELECTION","1999","COUNTRYLIST");
-//			 rdrs = new ReturnDataResultSet(rs);
-//		    } finally {
-//			if (rs != null){
-//				rs.close();
-//				rs = null;
-//			}
-//			dbCurrent.commit();
-//			dbCurrent.freeStatement();
-//			dbCurrent.isPending();
-//		}
-//		for (int iii = 0; iii < rdrs.size(); iii++) {
-//			String country = rdrs.getColumn(iii, 0).trim();
-//			ABRUtil.append(debugSb,"derivefrommodel world wide counry "+ country +NEWLINE);
-//			
-//			String mapkey = country;
-//			if (!ctryAudElemMap.containsKey(mapkey)){
-//				CtryAudRecord ctryAudRec = new CtryAudRecord(null, country);
-//				//For the the case of - If there isn an AVAIL where AVAILTYPE="Planned Availability" (146) and ANNDATE < '20100301' - 
-//                //ANNNUMBER  is empty
-//				//PLANNEDAVAILABILITY is MODEL.ANNDATE 
-//				ctryAudRec.action = UPDATE_ACTIVITY;
-//				ctryAudRec.anndate = anndate;
-//				ctryAudRec.firstorder = anndate;
-//				ctryAudRec.plannedavailability = anndate;
-//				ctryAudRec.pubfrom = anndate;
-//				ctryAudRec.pubto = withdrawanndate;
-//				ctryAudRec.wdanndate = withdrawanndate;
-//				ctryAudRec.lastorder = withdrawanndate;		
-//				ctryAudElemMap.put(ctryAudRec.getKey(),ctryAudRec);
-//			}
-//		}
-//		Collection ctryrecs = ctryAudElemMap.values();
-//		Iterator itr = ctryrecs.iterator();
-//		//add world wide 
-//		if(itr.hasNext()){
-//			
-//			XMLSLEORGNPLNTCODESearchElem search = new XMLSLEORGNPLNTCODESearchElem();
-//			Hashtable xmltable = new Hashtable();
-//			try {
-//				xmltable = search.doSearch(dbCurrent, modelItem.getCurrentEntityItem(), debugSb);
-//			} catch (MiddlewareShutdownInProgressException e) {
-//				e.printStackTrace();
-//			} catch (SBRException exc) {
-//				java.io.StringWriter exBuf = new java.io.StringWriter();
-//				exc.printStackTrace(new java.io.PrintWriter(exBuf));
-//				ABRUtil.append(debugSb,"XMLAVAILElem.addElements search!! SBRException: "+exBuf.getBuffer().toString()+ NEWLINE);
-//				exc.printStackTrace();				
-//			}
-//			ABRUtil.append(debugSb,"XMLAVAILElem.addElements search!! " + NEWLINE);
-//			
-//			
-//			while(itr.hasNext()) {
-//					CtryAudRecord ctryAudRec = (CtryAudRecord) itr.next();		       
-//					createNodeSetModel(table, document, parent, curritem, ctryAudRec, modelItem, path, availType, xmltable, debugSb);
-//					ctryAudRec.dereference();
-//			}
-//			xmltable.clear();
-//			ctryAudElemMap.clear();
-//		}
-//		// ADD contrylist to table
-//		table.put(countryKey, "ALL");
-//	}
-	/**
-	 * print table VE information
-	 * @param table
-	 * @param debugSb
-	 */
-//	private void printTable(Hashtable table, StringBuffer debugSb) {
-//		ABRUtil.append(debugSb,"XMLCtryAudElem.printTable for new lseo:" + NEWLINE);
-//		Iterator it = table.keySet().iterator();
-//		while (it.hasNext()){
-//			String key =(String)it.next();
-//			ABRUtil.append(debugSb,"table:key=" + key + ";value=" + table.get(key)+NEWLINE);
-//		}
-//		
-//	}
-
-
-	
-	/**
-	 * *  Class used to hold info and structure to be generated for the xml feed
-	 * for abrs.
-	 * 1.	If LSEOBUNDLE.SPECBID = 11458 (Yes) then
-	 * a)	<ACTION> 
-     * This is derived based on each value of LSEO.COUNTRYLIST.
-     * b)	<STATUS>
-     * LSEO.STATUS
-     * c)	<COUNTRY_FC>
-     * The description class of LSEO.COUNTRYLIST. There is one <AVAILABILITYELEMENT> for each value of COUNTRYLIST 
-     * d)	<ANNDATE>
-     * BUNDLPUBDATEMTRGT
-     * e)	<ANNNUMBER>
-     * Empty
-     * f)	<FIRSTORDER>
-     * BUNDLPUBDATEMTRGT
-     * g)	<PLANNEDAVAILABILITY>
-     * BUNDLPUBDATEMTRGT
-     * h)	<PUBFROM>
-     * 1.	LSEOBUNDLECATLGOR-d: CATLGOR.PUBFROM
-     * 2.	BUNDLPUBDATEMTRGT
-     * i)	<PUBTO>
-     * 1.	LSEOBUNDLECATLGOR-d: CATLGOR.PUBTO
-     * 2.	BUNDLUNPUBDATEMTRGT
-     * j)	<WDANNDATE>
-     * BUNDLUNPUBDATEMTRGT
-     * k)	<LASTORDER>
-     * BUNDLUNPUBDATEMTRGT
-     * l)	<EOSANNDATE>
-     * Null or empty
-     * m)	<ENDOFSERVICEDATE>
-     * Null or empty
-	 * @param Hashtable
-	 * @param document
-	 * @param parent
-	 * @param parentItem
-	 * @param debugSb
-	 * @param returnStatus
-	 * @param anndate
-	 * @param withdrawanndate
-	 * @throws SQLException
-	 * @throws MiddlewareException 
-	 */
-	private void createNodeFromLSEOBUNDLE(Hashtable table, String availType, Document document, Element parent, DiffEntity parentItem, EntityItem COFCATentity, String path,
-		boolean isExistfinal, boolean compatModel, StringBuffer debugSb) throws SQLException, MiddlewareException {
-
-		EntityItem curritem = parentItem.getCurrentEntityItem();
-		EntityItem prioritem = parentItem.getPriorEntityItem();
-		TreeMap ctryAudElemMap = new TreeMap();
-		
-		if (parentItem.isNew()) { // If the AVAIL was deleted, set Action = Delete
-
-			EANFlagAttribute ctryAtt = (EANFlagAttribute) curritem.getAttribute("COUNTRYLIST");
-			ABRUtil.append(debugSb,"XMLCtryAudElem.buildCtryAudRecs for new lseo: ctryAtt "
-				+ PokUtils.getAttributeFlagValue(curritem, "COUNTRYLIST") + NEWLINE);
-			if (ctryAtt != null) {
-				MetaFlag[] mfArray = (MetaFlag[]) ctryAtt.get();
-				for (int im = 0; im < mfArray.length; im++) {
-					// get selection
-					if (mfArray[im].isSelected()) {
-						String ctryVal = mfArray[im].getFlagCode();
-						String mapkey = ctryVal;
-						if (ctryAudElemMap.containsKey(mapkey)) {
-							// dont overwrite
-							CtryAudRecord rec = (CtryAudRecord) ctryAudElemMap.get(mapkey);
-							ABRUtil.append(debugSb,"WARNING buildCtryAudRecs for New " + parentItem.getKey() + " " + mapkey
-								+ " already exists, keeping orig " + rec + NEWLINE);
-						} else {
-							CtryAudRecord ctryAudRec = new CtryAudRecord(null, ctryVal);
-							ctryAudRec.setAction(UPDATE_ACTIVITY);
-							ctryAudElemMap.put(ctryAudRec.getKey(), ctryAudRec);
-							ABRUtil.append(debugSb,"XMLCtryAudElem.buildCtryAudRecs for New:" + parentItem.getKey() + " rec: "
-								+ ctryAudRec.getKey() + NEWLINE);
-						}
-					}
-				}
-			}
-		} else if (!parentItem.isDeleted()) {
-			HashSet prevSet = new HashSet();
-			HashSet currSet = new HashSet();
-			//put all current country into currvSet.
-			EANFlagAttribute ctryAtt = (EANFlagAttribute) curritem.getAttribute("COUNTRYLIST");
-			ABRUtil.append(debugSb,"XMLCtryAudElem.buildCtryAudRecs for current lseo: ctryAtt "
-				+ PokUtils.getAttributeFlagValue(curritem, "COUNTRYLIST") + NEWLINE);
-			if (ctryAtt != null) {
-				MetaFlag[] mfArray = (MetaFlag[]) ctryAtt.get();
-				for (int im = 0; im < mfArray.length; im++) {
-					// get selection
-					if (mfArray[im].isSelected()) {
-						String ctryVal = mfArray[im].getFlagCode();
-						currSet.add(ctryVal);
-					}
-				}
-			}
-
-			//				put all prior country  into currvSet.
-			ctryAtt = (EANFlagAttribute) prioritem.getAttribute("COUNTRYLIST");
-			ABRUtil.append(debugSb,"XMLCtryAudElem.buildCtryAudRecs for prior lseo: ctryAtt "
-				+ PokUtils.getAttributeFlagValue(prioritem, "COUNTRYLIST") + NEWLINE);
-			if (ctryAtt != null) {
-				MetaFlag[] mfArray = (MetaFlag[]) ctryAtt.get();
-				for (int im = 0; im < mfArray.length; im++) {
-					// get selection
-					if (mfArray[im].isSelected()) {
-						String ctryVal = mfArray[im].getFlagCode();
-						prevSet.add(ctryVal);
-					}
-				}
-			}
-			//				 look for changes in country
-			Iterator itr = currSet.iterator();
-			while (itr.hasNext()) {
-				String ctryVal = (String) itr.next();
-				if (!prevSet.contains(ctryVal)) { // If a pair of CountryAudience was added, set that row's Action = Update
-					//create crossproduct between new ctry and current audience for this item
-					if (ctryAudElemMap.containsKey(ctryVal)) {
-						CtryAudRecord rec = (CtryAudRecord) ctryAudElemMap.get(ctryVal);
-						ABRUtil.append(debugSb,"WARNING buildCtryAudRecs for added ctry on " + parentItem.getKey() + " " + ctryVal
-							+ " already exists, replacing orig " + rec + NEWLINE);
-					} else {
-						CtryAudRecord ctryAudRec = new CtryAudRecord(null, ctryVal);
-						ctryAudRec.setAction(UPDATE_ACTIVITY);
-						ctryAudElemMap.put(ctryAudRec.getKey(), ctryAudRec);
-						ABRUtil.append(debugSb,"XMLCtryAudElem.buildCtryAudRecs for added ctry:" + parentItem.getKey() + " rec: "
-							+ ctryAudRec.getKey() + NEWLINE);
-					}
-				} else {
-					// ctryaudience already existed but something else may have changed
-					if (ctryAudElemMap.containsKey(ctryVal)) {
-						CtryAudRecord rec = (CtryAudRecord) ctryAudElemMap.get(ctryVal);
-						ABRUtil.append(debugSb,"WARNING buildCtryAudRecs for existing ctry on " + parentItem.getKey() + " " + ctryVal
-							+ " already exists, keeping orig " + rec + NEWLINE);
-					} else {
-						CtryAudRecord ctryAudRec = new CtryAudRecord(null, ctryVal);
-						ctryAudElemMap.put(ctryAudRec.getKey(), ctryAudRec);
-						ABRUtil.append(debugSb,"XMLCtryAudElem.buildCtryAudRecs for existing ctry:" + parentItem.getKey() + " rec: "
-							+ ctryAudRec.getKey() + NEWLINE);
-					}
-
-				}
-			}
-			itr = prevSet.iterator();
-			while (itr.hasNext()) {
-				String ctryVal = (String) itr.next();
-				if (!currSet.contains(ctryVal)) { //If a pair of countryaudience was deleted, set that row's Action = Delete
-					//create crossproduct between deleted ctry and previous audience for this item
-					if (ctryAudElemMap.containsKey(ctryVal)) {
-						CtryAudRecord rec = (CtryAudRecord) ctryAudElemMap.get(ctryVal);
-						ABRUtil.append(debugSb,"WARNING buildCtryAudRecs for delete ctry on " + parentItem.getKey() + " " + ctryVal
-							+ " already exists, keeping orig " + rec + NEWLINE);
-					} else {
-						CtryAudRecord ctryAudRec = new CtryAudRecord(null, ctryVal);
-						ctryAudRec.setAction(DELETE_ACTIVITY);
-						ctryAudElemMap.put(ctryAudRec.getKey(), ctryAudRec);
-						ABRUtil.append(debugSb,"XMLCtryAudElem.buildCtryAudRecs for deleted ctry:" + parentItem.getKey() + " rec: "
-							+ ctryAudRec.getKey() + NEWLINE);
-					}
-
-				}
-			}
-		}
-		Vector mdlAudVct[] = getModelAudience(parentItem, debugSb);
-		Collection ctryrecs = ctryAudElemMap.values();
-		Iterator itr = ctryrecs.iterator();
-		while (itr.hasNext()) {
-
-			CtryAudRecord ctryAudRec = (CtryAudRecord) itr.next();
-			
-
-			DiffEntity catlgorDiff = getCatlgor(table, availType, mdlAudVct, ctryAudRec.getCountry(), debugSb);
-			//Rows marked as Delete do not need further updating and the Action should not be changed by further updating.
-			// add other info now
-
-			ctryAudRec.setAllLSEOFields(parentItem, catlgorDiff,  isExistfinal,  compatModel, debugSb);
-					
-//            boolean SLEORGGRPChaned	= SLEORGGRP.hasChanges(table, COFCATentity, parentItem, path, ctryAudRec.country, debugSb);			    
-//			if (SLEORGGRPChaned){
-//				ctryAudRec.setAction(UPDATE_ACTIVITY);
-//			}
-//					
-			if (ctryAudRec.isDisplayable()||ctryAudRec.isrfrDisplayable()) {
-				createNodeSet(table, document, parent, COFCATentity, parentItem, ctryAudRec, path, availType, debugSb);
-			} else {
-				ABRUtil.append(debugSb,"XMLCtryAudElem.addElements no changes found for " + ctryAudRec.country + NEWLINE);
-			}
-			ctryAudRec.dereference();
-		}
-		ctryAudElemMap.clear();
-	}
-	
-	
-	/********************
-	 * create the nodes for this ctry|audience record
-	 */
-	private void createNodeSet(Hashtable table, Document document, Element parent, EntityItem COFCATitem, DiffEntity realtedSLEORGGRP, 
-			     CtryAudRecord ctryAudRec, String path, String availType, StringBuffer debugSb) {
-		if(ctryAudRec.isDisplayable()){
-			Element elem = (Element) document.createElement(nodeName); // create COUNTRYAUDIENCEELEMENT
-			addXMLAttrs(elem);
-			parent.appendChild(elem); 
-	
-			// add child nodes
-			Element child = (Element) document.createElement("AVAILABILITYACTION");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getAction()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("STATUS");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getAvailStatus()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("COUNTRY_FC");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getCountry()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("ANNDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getAnndate()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("ANNNUMBER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getAnnnumber()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("FIRSTORDER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getFirstorder()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("PLANNEDAVAILABILITY");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getPlannedavailability()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("PUBFROM");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getPubFrom()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("PUBTO");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getPubTo()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("WDANNDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getWdanndate()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("LASTORDER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getLastorder()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("EOSANNDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getEosanndate()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("ENDOFSERVICEDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getEndOfService()));
-			elem.appendChild(child);
-			//add SLEORGGRP
-			if(availType.equals("LSEO")){
-				SLEORGGRP.displayAVAILSLEORGLSEO(table, document, elem, COFCATitem, realtedSLEORGGRP, 
-						path, ctryAudRec.country, ctryAudRec.getAction(), availType, debugSb);
-			}else{
-				SLEORGGRP.displayAVAILSLEORG(table, document, elem, COFCATitem, realtedSLEORGGRP, 
-						path, ctryAudRec.country, ctryAudRec.getAction(), debugSb);
-		    }
-		}
-		if(ctryAudRec.isrfrDisplayable()){
-			Element elem = (Element) document.createElement(nodeName); // create
-																		// COUNTRYAUDIENCEELEMENT
-			addXMLAttrs(elem);
-			parent.appendChild(elem);
-	
-			// add child nodes
-			Element child = (Element) document.createElement("AVAILABILITYACTION");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfraction()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("STATUS");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfravailStatus()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("COUNTRY_FC");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getCountry()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("ANNDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfranndate()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("ANNNUMBER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrannnumber()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("FIRSTORDER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrfirstorder()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("PLANNEDAVAILABILITY");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrplannedavailability()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("PUBFROM");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrpubfrom()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("PUBTO");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrpubto()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("WDANNDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrwdanndate()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("LASTORDER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrlastorder()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("EOSANNDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfreosanndate()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("ENDOFSERVICEDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrendofservice()));
-			elem.appendChild(child);
-			//add SLEORGGRP
-			if(availType.equals("LSEO")){
-				SLEORGGRP.displayAVAILSLEORGLSEO(table, document, elem, COFCATitem, realtedSLEORGGRP, 
-						path, ctryAudRec.country, ctryAudRec.getAction(), availType, debugSb);
-			}else{
-				SLEORGGRP.displayAVAILSLEORG(table, document, elem, COFCATitem, realtedSLEORGGRP, 
-						path, ctryAudRec.country, ctryAudRec.getAction(), debugSb);
-		    }
-		}
-	}
-
-	/******************** this method has changed for BH. 
-	 * Create rows in the table as follows:
-	 * Insert one row for each Audience in MODEL.AUDIEN & each Country in AVAIL.COUNTRYLIST where AVAILTYPE = 146
-	 * If the AVAIL was deleted, set Action = Delete
-	 * If the AVAIL was added or updated, set Action = Update
-	 * 
-	 * If AVAIL.COUNTRYLIST has a country added, set that row's Action = Update
-	 * If AVAIL.COUNTRYLIST has a country deleted, set that row's Action = Delete
-	 *
-	 * Note:
-	 * Rows marked as Delete do not need further updating and the Action should not be changed by further updating.
-	 * If any of the following steps have data that do not match an existing row in this table, ignore that data.
-	 */
-	/********************
-	 * get audience values from t1 and t2 for this model, do it once and use for each avail
-	 */
-	private Vector[] getModelAudience(DiffEntity modelDiff, StringBuffer debugSb) {
-		ABRUtil.append(debugSb,"XMLCtryAudElem.getModelAudience for " + modelDiff.getKey() + NEWLINE);
-
-		EANFlagAttribute audienceAtt = (EANFlagAttribute) modelDiff.getCurrentEntityItem().getAttribute("AUDIEN");
-		Vector currAudVct = new Vector(1);
-		Vector prevAudVct = new Vector(1);
-		Vector vct[] = new Vector[2];
-		vct[0] = currAudVct;
-		vct[1] = prevAudVct;
-		ABRUtil.append(debugSb,"XMLCtryAudElem.getModelAudience cur audienceAtt " + audienceAtt + NEWLINE);
-		if (audienceAtt != null) {
-			MetaFlag[] mfArray = (MetaFlag[]) audienceAtt.get();
-			for (int i = 0; i < mfArray.length; i++) {
-				// get selection
-				if (mfArray[i].isSelected()) {
-					currAudVct.addElement(mfArray[i].toString()); // this is long desc
-				}
-			}
-		}
-
-		if (!modelDiff.isNew()) {
-			audienceAtt = (EANFlagAttribute) modelDiff.getPriorEntityItem().getAttribute("AUDIEN");
-			ABRUtil.append(debugSb,"XMLCtryAudElem.getModelAudience new audienceAtt " + audienceAtt + NEWLINE);
-			if (audienceAtt != null) {
-				MetaFlag[] mfArray = (MetaFlag[]) audienceAtt.get();
-				for (int i = 0; i < mfArray.length; i++) {
-					// get selection
-					if (mfArray[i].isSelected()) {
-						prevAudVct.addElement(mfArray[i].toString()); // this is long desc
-					}
-				}
-			}
-		}
-
-		return vct;
-	}
-
-//	private void buildCtryAudRecs(TreeMap ctryAudElemMap, DiffEntity availDiff, StringBuffer debugSb) {
-//
-//		ABRUtil.append(debugSb,"XMLCtryAudElem.buildCtryAudRecs " + availDiff.getKey() + NEWLINE);
-//
-//		// must account for AVAILa to have had US, CANADA at T1, and just CANADA at T2 and a new
-//		// AVAILb to have US at T2
-//		// only delete action if ctry or aud was removed at t2!!! allow update to override it
-//
-//		EntityItem curritem = availDiff.getCurrentEntityItem();
-//		EntityItem prioritem = availDiff.getPriorEntityItem();
-//		if (availDiff.isDeleted()) { // If the AVAIL was deleted, set Action = Delete
-//			// mark all records as delete
-//			EANFlagAttribute ctryAtt = (EANFlagAttribute) prioritem.getAttribute("COUNTRYLIST");
-//			ABRUtil.append(debugSb,"XMLCtryAudElem.buildCtryAudRecs for deleted avail: ctryAtt "
-//				+ PokUtils.getAttributeFlagValue(prioritem, "COUNTRYLIST") + NEWLINE);
-//			if (ctryAtt != null) {
-//				MetaFlag[] mfArray = (MetaFlag[]) ctryAtt.get();
-//				for (int im = 0; im < mfArray.length; im++) {
-//					// get selection
-//					if (mfArray[im].isSelected()) {
-//						String ctryVal = mfArray[im].getFlagCode();
-//						String mapkey = ctryVal;
-//						if (ctryAudElemMap.containsKey(mapkey)) {
-//							// dont overwrite
-//							CtryAudRecord rec = (CtryAudRecord) ctryAudElemMap.get(mapkey);
-//							ABRUtil.append(debugSb,"WARNING buildCtryAudRecs for deleted " + availDiff.getKey() + " " + mapkey
-//								+ " already exists, keeping orig " + rec + NEWLINE);
-//						} else {
-//							CtryAudRecord ctryAudRec = new CtryAudRecord(availDiff, ctryVal);
-//							ctryAudRec.setAction(DELETE_ACTIVITY);
-//							ctryAudElemMap.put(ctryAudRec.getKey(), ctryAudRec);
-//							ABRUtil.append(debugSb,"XMLCtryAudElem.buildCtryAudRecs for deleted:" + availDiff.getKey() + " rec: "
-//								+ ctryAudRec.getKey() + NEWLINE);
-//						}
-//					}
-//				}
-//			}
-//		} else if (availDiff.isNew()) { //If the AVAIL was added or updated, set Action = Update
-//			// mark all records as update
-//			EANFlagAttribute ctryAtt = (EANFlagAttribute) curritem.getAttribute("COUNTRYLIST");
-//			ABRUtil.append(debugSb,"XMLCtryAudElem.buildCtryAudRecs for new avail:  ctryAtt and anncodeAtt "
-//				+ PokUtils.getAttributeFlagValue(curritem, "COUNTRYLIST")
-//				+ PokUtils.getAttributeFlagValue(curritem, "ANNCODENAME") + NEWLINE);
-//			if (ctryAtt != null) {
-//				MetaFlag[] mfArray = (MetaFlag[]) ctryAtt.get();
-//				for (int im = 0; im < mfArray.length; im++) {
-//					// get selection
-//					if (mfArray[im].isSelected()) {
-//						String ctryVal = mfArray[im].getFlagCode();
-//						String mapkey = ctryVal;
-//						if (ctryAudElemMap.containsKey(mapkey)) {
-//							CtryAudRecord rec = (CtryAudRecord) ctryAudElemMap.get(mapkey);
-//							ABRUtil.append(debugSb,"WARNING buildCtryAudRecs for new " + availDiff.getKey() + " " + mapkey
-//								+ " already exists, replacing orig " + rec + NEWLINE);
-//							rec.setUpdateAvail(availDiff);
-//						} else {
-//							CtryAudRecord ctryAudRec = new CtryAudRecord(availDiff, ctryVal);
-//							ctryAudRec.setAction(UPDATE_ACTIVITY);
-//							ctryAudElemMap.put(ctryAudRec.getKey(), ctryAudRec);
-//							ABRUtil.append(debugSb,"XMLCtryAudElem.buildCtryAudRecs for new:" + availDiff.getKey() + " rec: "
-//								+ ctryAudRec.getKey() + NEWLINE);
-//						}
-//					}
-//				}
-//			}
-//		} else {// else if one country in the countrylist has changed, update this row to update!
-//			HashSet prevSet = new HashSet();
-//			HashSet currSet = new HashSet();
-//			// get current set of countries
-//			EANFlagAttribute fAtt = (EANFlagAttribute) curritem.getAttribute("COUNTRYLIST");
-//			ABRUtil.append(debugSb,"XMLCtryAudElem.buildCtryAudRecs for curr avail: fAtt and curranncodeAtt "
-//				+ PokUtils.getAttributeFlagValue(curritem, "COUNTRYLIST")
-//				+ PokUtils.getAttributeFlagValue(curritem, "ANNCODENAME") + NEWLINE);
-//			if (fAtt != null && fAtt.toString().length() > 0) {
-//				// Get the selected Flag codes.
-//				MetaFlag[] mfArray = (MetaFlag[]) fAtt.get();
-//				for (int i = 0; i < mfArray.length; i++) {
-//					// get selection
-//					if (mfArray[i].isSelected()) {
-//						currSet.add(mfArray[i].getFlagCode());
-//					} // metaflag is selected
-//				}// end of flagcodes
-//			}
-//
-//			// get prev set of countries
-//			fAtt = (EANFlagAttribute) prioritem.getAttribute("COUNTRYLIST");
-//			ABRUtil.append(debugSb,"XMLCtryAudElem.buildCtryAudRecs for prev avail:  fAtt and prevanncodeAtt "
-//				+ PokUtils.getAttributeFlagValue(prioritem, "COUNTRYLIST")
-//				+ PokUtils.getAttributeFlagValue(prioritem, "ANNCODENAME") + NEWLINE);
-//			if (fAtt != null && fAtt.toString().length() > 0) {
-//				// Get the selected Flag codes.
-//				MetaFlag[] mfArray = (MetaFlag[]) fAtt.get();
-//				for (int i = 0; i < mfArray.length; i++) {
-//					// get selection
-//					if (mfArray[i].isSelected()) {
-//						prevSet.add(mfArray[i].getFlagCode());
-//					} // metaflag is selected
-//				}// end of flagcodes
-//			}
-//
-//			// look for changes in country
-//			Iterator itr = currSet.iterator();
-//			while (itr.hasNext()) {
-//				String ctryVal = (String) itr.next();
-//				if (!prevSet.contains(ctryVal)) { // If AVAIL.COUNTRYLIST has a country added, set that row's Action = Update
-//
-//					String mapkey = ctryVal;
-//					if (ctryAudElemMap.containsKey(mapkey)) {
-//						CtryAudRecord rec = (CtryAudRecord) ctryAudElemMap.get(mapkey);
-//						ABRUtil.append(debugSb,"WARNING buildCtryAudRecs for added ctry on " + availDiff.getKey() + " " + mapkey
-//							+ " already exists, replacing orig " + rec + NEWLINE);
-//						rec.setUpdateAvail(availDiff);
-//					} else {
-//						CtryAudRecord ctryAudRec = new CtryAudRecord(availDiff, ctryVal);
-//						ctryAudRec.setAction(UPDATE_ACTIVITY);
-//						ctryAudElemMap.put(ctryAudRec.getKey(), ctryAudRec);
-//						ABRUtil.append(debugSb,"XMLCtryAudElem.buildCtryAudRecs for added ctry:" + availDiff.getKey() + " rec: "
-//							+ ctryAudRec.getKey() + NEWLINE);
-//					}
-//				} else {
-//					// BH this country has already exist, put into ctryaudrec, but don't udpate Action to 'update'/'delete'.
-//					String mapkey = ctryVal;
-//					if (ctryAudElemMap.containsKey(mapkey)) {
-//						CtryAudRecord rec = (CtryAudRecord) ctryAudElemMap.get(mapkey);
-//						ABRUtil.append(debugSb,"WARNING buildCtryAudRecs for existing ctry but new aud on " + availDiff.getKey() + " "
-//							+ mapkey + " already exists, keeping orig " + rec + NEWLINE);
-//					} else {
-//						CtryAudRecord ctryAudRec = new CtryAudRecord(availDiff, ctryVal);
-//						ctryAudElemMap.put(ctryAudRec.getKey(), ctryAudRec);
-//						ABRUtil.append(debugSb,"XMLCtryAudElem.buildCtryAudRecs for existing ctry:" + availDiff.getKey() + " rec: "
-//							+ ctryAudRec.getKey() + NEWLINE);
-//					}
-//				}
-//			}//end of currset while(itr.hasNext())
-//			itr = prevSet.iterator();
-//			while (itr.hasNext()) {
-//				String ctryVal = (String) itr.next();
-//				if (!currSet.contains(ctryVal)) { //If AVAIL.COUNTRYLIST has a country deleted, set that row's Action = Delete
-//					//create crossproduct between deleted ctry and previous audience for this item	
-//					String mapkey = ctryVal;
-//					if (ctryAudElemMap.containsKey(mapkey)) {
-//						CtryAudRecord rec = (CtryAudRecord) ctryAudElemMap.get(mapkey);
-//						ABRUtil.append(debugSb,"WARNING buildCtryAudRecs for delete ctry on " + availDiff.getKey() + " " + mapkey
-//							+ " already exists, keeping orig " + rec + NEWLINE);
-//					} else {
-//						CtryAudRecord ctryAudRec = new CtryAudRecord(availDiff, ctryVal);
-//						ctryAudRec.setAction(DELETE_ACTIVITY);
-//						ctryAudElemMap.put(ctryAudRec.getKey(), ctryAudRec);
-//						ABRUtil.append(debugSb,"XMLCtryAudElem.buildCtryAudRecs for delete ctry:" + availDiff.getKey() + " rec: "
-//							+ ctryAudRec.getKey() + NEWLINE);
-//					}
-//				}
-//
-//			}
-//		} // end avail existed at both t1 and t2
-//	}
-	
-	  /**
-	   * buildCtryAudRecs at T1 ,T2
-	   * @param ctryAudElemMap
-	   * @param availDiff
-	   * @param T1
-	   * @param debugSb
-	   */
-	  private void buildCtryAudRecs(TreeMap ctryAudElemMap, DiffEntity availDiff, boolean T1, StringBuffer debugSb){
-	
-	
-			ABRUtil.append(debugSb,"XMLAVAILElem.buildCtryAudRecs build T1 country list " + T1 + " " + availDiff.getKey()+NEWLINE);
-	
-		// must account for AVAILa to have had US, CANADA at T1, and just CANADA at T2 and a new
-		// AVAILb to have US at T2
-		// only delete action if ctry or aud was removed at t2!!! allow update to override it
-	
-		EntityItem curritem = availDiff.getCurrentEntityItem();
-		EntityItem prioritem = availDiff.getPriorEntityItem();
-		if (T1){
-			if (!availDiff.isNew()){ // If the AVAIL was deleted, set Action = Delete
-				// mark all records as delete
-				EANFlagAttribute ctryAtt = (EANFlagAttribute)prioritem.getAttribute("COUNTRYLIST");
-				ABRUtil.append(debugSb,"XMLAVAILElem.buildCtryAudRecs for deleted / update avail at T1: ctryAtt "+
-							PokUtils.getAttributeFlagValue(prioritem, "COUNTRYLIST") +NEWLINE);
-				if (ctryAtt!=null){
-					MetaFlag[] mfArray = (MetaFlag[]) ctryAtt.get();
-					for (int im = 0; im < mfArray.length; im++){
-						// get selection
-						if (mfArray[im].isSelected()) {
-							String ctryVal = mfArray[im].getFlagCode();
-							String mapkey = ctryVal;
-							if (ctryAudElemMap.containsKey(mapkey)){
-								// dont overwrite
-								CtryAudRecord rec = (CtryAudRecord)ctryAudElemMap.get(mapkey);
-								ABRUtil.append(debugSb,"WARNING buildCtryAudRecs for deleted / update "+availDiff.getKey()+
-									" "+mapkey+" already exists, keeping orig "+rec+NEWLINE);
-							}else{
-								CtryAudRecord ctryAudRec = new CtryAudRecord(availDiff, ctryVal);
-								ctryAudRec.setAction(DELETE_ACTIVITY);
-								ctryAudElemMap.put(ctryAudRec.getKey(),ctryAudRec);
-							}
-						}
-					}				
-				}
-			}			
-		}else {
-			if (!availDiff.isDeleted()){ //If the AVAIL was added or updated, set Action = Update
-				// mark all records as update			
-				EANFlagAttribute ctryAtt = (EANFlagAttribute)curritem.getAttribute("COUNTRYLIST");
-				ABRUtil.append(debugSb,"XMLAVAILElem.buildCtryAudRecs for new /update avail:  ctryAtt and anncodeAtt "+
-						PokUtils.getAttributeFlagValue(curritem, "COUNTRYLIST")+ 
-				        PokUtils.getAttributeFlagValue(curritem, "ANNCODENAME") +NEWLINE);
-				if (ctryAtt!=null){
-					MetaFlag[] mfArray = (MetaFlag[]) ctryAtt.get();
-					for (int im = 0; im < mfArray.length; im++){
-						// get selection
-						if (mfArray[im].isSelected()) {
-							String ctryVal = mfArray[im].getFlagCode();					
-							String mapkey = ctryVal;
-							if (ctryAudElemMap.containsKey(mapkey)){
-								CtryAudRecord rec = (CtryAudRecord)ctryAudElemMap.get(mapkey);
-								if (DELETE_ACTIVITY.equals(rec.action)){
-									ABRUtil.append(debugSb,"WARNING buildCtryAudRecs for new /udpate"+availDiff.getKey()+
-										" "+mapkey+" already exists, replacing orig "+rec+NEWLINE);
-										rec.setUpdateAvail(availDiff);
-										rec.setAction(CHEAT);
-								}
-							}else{
-								CtryAudRecord ctryAudRec = new CtryAudRecord(availDiff, ctryVal);
-								ctryAudRec.setAction(UPDATE_ACTIVITY);
-								ctryAudElemMap.put(ctryAudRec.getKey(),ctryAudRec);
-								ABRUtil.append(debugSb,"XMLAVAILElem.buildCtryAudRecs for new:"+availDiff.getKey()+" rec: "+
-								ctryAudRec.getKey() + NEWLINE);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	/********************
-	 * get planned avails - availtype cant be changed
-	 */
-	private Vector getPlannedAvails(Hashtable table, String availType, StringBuffer debugSb) {
-		Vector avlVct = new Vector(1);
-		//Vector allVct = (Vector) table.get("AVAIL");
-		Vector allVct = getSeoAndLseobundleAvail(table, availType,debugSb);
-
-		ABRUtil.append(debugSb,"XMLCtryAudElem.getPlannedAvails looking for AVAILTYPE:146 in AVAIL" + " allVct.size:"
-			+ (allVct == null ? "null" : "" + allVct.size()) + NEWLINE);
-		if (allVct == null) {
-			return avlVct;
-		}
-
-		// find those of specified type
-		for (int i = 0; i < allVct.size(); i++) {
-			DiffEntity diffitem = (DiffEntity) allVct.elementAt(i);
-			EntityItem curritem = diffitem.getCurrentEntityItem();
-			EntityItem prioritem = diffitem.getPriorEntityItem();
-			if (diffitem.isDeleted()) {
-				ABRUtil.append(debugSb,"XMLCtryAudElem.getPlannedAvails checking[" + i + "]: deleted " + diffitem.getKey()
-					+ " AVAILTYPE: " + PokUtils.getAttributeFlagValue(prioritem, "AVAILTYPE") + NEWLINE);
-				EANFlagAttribute fAtt = (EANFlagAttribute) prioritem.getAttribute("AVAILTYPE");
-				if (fAtt != null && fAtt.isSelected("146")) {
-					avlVct.add(diffitem);
-				}
-			} else {
-				ABRUtil.append(debugSb,"XMLCtryAudElem.getPlannedAvails checking[" + i + "]:" + diffitem.getKey() + " AVAILTYPE: "
-					+ PokUtils.getAttributeFlagValue(curritem, "AVAILTYPE") + NEWLINE);
-				EANFlagAttribute fAtt = (EANFlagAttribute) curritem.getAttribute("AVAILTYPE");
-				if (fAtt != null && fAtt.isSelected("146")) {
-					avlVct.add(diffitem);
-				}
-			}
-		}
-
-		return avlVct;
-	}
-	/**
-	 * check the item is from the same relator that it connect from the root entity
-	 * @param item
-	 * @param debugSb
-	 * @return
-	 */
-	/********************
-	 * get entity with specified values - should only be one
-	 * could be two if one was deleted and one was added, but the added one will override and be an 'update'
-	 */
-	private DiffEntity getEntityForAttrs(Hashtable table, String availType, String etype, String attrCode, String attrVal, String attrCode2,
-		String attrVal2, StringBuffer debugSb) {
-		DiffEntity diffEntity = null;
-		//Vector allVct = (Vector) table.get(etype);
-		Vector allVct = getSeoAndLseobundleAvail(table, availType, debugSb);
-		
-		ABRUtil.append(debugSb,"XMLCtryAudElem.getEntityForAttrs looking for " + attrCode + ":" + attrVal + " and " + attrCode2 + ":"
-			+ attrVal2 + " in " + etype + " allVct.size:" + (allVct == null ? "null" : "" + allVct.size()) + NEWLINE);
-		if (allVct == null) {
-			return diffEntity;
-		}
-		// find those of specified type
-		for (int i = 0; i < allVct.size(); i++) {
-			DiffEntity diffitem = (DiffEntity) allVct.elementAt(i);
-			EntityItem curritem = diffitem.getCurrentEntityItem();
-			EntityItem prioritem = diffitem.getPriorEntityItem();
-			if (diffitem.isDeleted()) {
-				ABRUtil.append(debugSb,"XMLCtryAudElem.getEntityForAttrs checking[" + i + "]: deleted " + diffitem.getKey() + " "
-					+ attrCode + ":" + PokUtils.getAttributeFlagValue(prioritem, attrCode) + " " + attrCode2 + ":"
-					+ PokUtils.getAttributeFlagValue(prioritem, attrCode2) + NEWLINE);
-				EANFlagAttribute fAtt = (EANFlagAttribute) prioritem.getAttribute(attrCode);
-				if (fAtt != null && fAtt.isSelected(attrVal)) {
-					fAtt = (EANFlagAttribute) prioritem.getAttribute(attrCode2);
-					if (fAtt != null && fAtt.isSelected(attrVal2)) {
-						diffEntity = diffitem; // keep looking for one that is not deleted
-					}
-				}
-			} else {
-				if (diffitem.isNew()) {
-					ABRUtil.append(debugSb,"XMLCtryAudElem.getEntityForAttrs checking[" + i + "]: new " + diffitem.getKey() + " "
-						+ attrCode + ":" + PokUtils.getAttributeFlagValue(curritem, attrCode) + " " + attrCode2 + ":"
-						+ PokUtils.getAttributeFlagValue(curritem, attrCode2) + NEWLINE);
-					EANFlagAttribute fAtt = (EANFlagAttribute) curritem.getAttribute(attrCode);
-					if (fAtt != null && fAtt.isSelected(attrVal)) {
-						fAtt = (EANFlagAttribute) curritem.getAttribute(attrCode2);
-						if (fAtt != null && fAtt.isSelected(attrVal2)) {
-							diffEntity = diffitem;
-							break;
-						}
-					}
-				} else {
-					// must check to see if the prior item had a match too
-					ABRUtil.append(debugSb,"XMLCtryAudElem.getEntityForAttrs checking[" + i + "]: current " + diffitem.getKey() + " "
-						+ attrCode + ":" + PokUtils.getAttributeFlagValue(curritem, attrCode) + " " + attrCode2 + ":"
-						+ PokUtils.getAttributeFlagValue(curritem, attrCode2) + NEWLINE);
-					EANFlagAttribute fAtt = (EANFlagAttribute) curritem.getAttribute(attrCode);
-					if (fAtt != null && fAtt.isSelected(attrVal)) {
-						fAtt = (EANFlagAttribute) curritem.getAttribute(attrCode2);
-						if (fAtt != null && fAtt.isSelected(attrVal2)) {
-							diffEntity = diffitem;
-							break;
-						}
-					}
-					ABRUtil.append(debugSb,"XMLCtryAudElem.getEntityForAttrs checking[" + i + "]: prior " + diffitem.getKey() + " "
-						+ attrCode + ":" + PokUtils.getAttributeFlagValue(prioritem, attrCode) + " " + attrCode2 + ":"
-						+ PokUtils.getAttributeFlagValue(prioritem, attrCode2) + NEWLINE);
-					fAtt = (EANFlagAttribute) prioritem.getAttribute(attrCode);
-					if (fAtt != null && fAtt.isSelected(attrVal)) {
-						fAtt = (EANFlagAttribute) prioritem.getAttribute(attrCode2);
-						if (fAtt != null && fAtt.isSelected(attrVal2)) {
-							diffEntity = diffitem;
-							//break; see if there is another that is current
-						}
-					}
-				}
-			}
-		}
-
-		return diffEntity;
-	}
-
-	/***************************************************************************
-	 * If LSEOBUNDLE.SPECBID is not equal to 11458 (Yes) , then derive from
-	 * LSEO.
-	 * 
-	 * @param table
-	 *            Hashtable that contain all the entities.
-	 * @param availtype
-	 *            AVAIL.AVAILTYPE
-	 * @param debugSb
-	 *            StringBuffer logo output.
-	 * 
-	 * If WWSEO.SPECBID is not equal to 'No' (11457), then derive from from LSEO
-	 * attributes
-	 */
-	private boolean isDerivefromLSEOBUNDLE(DiffEntity parentItem, StringBuffer debugSb) {
-		boolean isfromLSEO = false;
-		if (parentItem.getEntityType().equals("LSEOBUNDLE")) {
-			EntityItem curritem = parentItem.getCurrentEntityItem();
-			if (curritem != null) {
-				ABRUtil.append(debugSb,"XMLANNElem.DerivefromLSEO" + curritem.getKey() + " SPECBID: "
-					+ PokUtils.getAttributeValue(curritem, "SPECBID", ", ", CHEAT, false) + NEWLINE);
-				EANFlagAttribute fAtt = (EANFlagAttribute) curritem.getAttribute("SPECBID");
-				if (fAtt != null && fAtt.isSelected("11458")) {
-					isfromLSEO = true;
-				}
-			}
-		}
-		return isfromLSEO;
-	}
-	/***************************************************************************
-	 * CATAUDIENCE CBP Catalog - Business Partner Catalog - Business Partner
-	 * CATAUDIENCE CIR Catalog - Indirect/Reseller Catalog - Indirect/Reseller
-	 * CATAUDIENCE LE LE Direct LE Direct CATAUDIENCE None None None CATAUDIENCE
-	 * Shop Public Public
-	 * 
-	 * AUDIEN 100 SDI Channel AUDIEN 10046 Catalog - Business Partner Catalog -
-	 * Business Partner AUDIEN 10048 Catalog - Indirect/Reseller Catalog -
-	 * Indirect/Reseller AUDIEN 10054 Public Public AUDIEN 10055 None None
-	 * AUDIEN 10062 LE Direct LE Direct AUDIEN 10067 DAC/MAX DAC/MAX get entity
-	 * with specified values - should only be one could be two if one was
-	 * deleted and one was added, but the added one will override and be an
-	 * 'update'
-	 */
-	private DiffEntity getCatlgor(Hashtable table, String availType, Vector mdlAudVct[], String attrVal2, StringBuffer debugSb) {
-		// remove the check of the CATLGOR Audience 2012-08-24
-		DiffEntity diffEntity = null;
-		//Vector allVct = (Vector) table.get("CATLGOR");
-		Vector allVct = getLseoAndLseobundleCatlgor(table, availType, debugSb);
-//		String attrCode2 = "OFFCOUNTRY"; // need flag code
-		String attrCode2 = BHCOUNTRYLIST; // need flag code
-		ABRUtil.append(debugSb,"XMLCtryAudElem.getCatlgor looking for " + attrCode2 + ":" + attrVal2 + " in CATLGOR allVct.size:"
-			+ (allVct == null ? "null" : "" + allVct.size()) + NEWLINE);
-		if (allVct == null) {
-			return diffEntity;
-		}
-
-		// find those of specified type
-		diffloop: for (int i = 0; i < allVct.size(); i++) {
-			DiffEntity diffitem = (DiffEntity) allVct.elementAt(i);
-			EntityItem curritem = diffitem.getCurrentEntityItem();
-			EntityItem prioritem = diffitem.getPriorEntityItem();
-			if (diffitem.isDeleted()) {
-				ABRUtil.append(debugSb,"XMLCtryAudElem.getCatlgor checking[" + i + "]: deleted " + diffitem.getKey() + " " + attrCode2 + ":"
-					+ PokUtils.getAttributeFlagValue(prioritem, attrCode2) + NEWLINE);				
-				EANFlagAttribute fAtt2 = (EANFlagAttribute) prioritem.getAttribute(attrCode2);
-				if (fAtt2 != null && fAtt2.isSelected(attrVal2)) {
-					diffEntity = diffitem; // keep looking for one that is not deleted
-					break;
-				}
-			} else {
-				if (diffitem.isNew()) {
-					ABRUtil.append(debugSb,"XMLCtryAudElem.getCatlgor checking[" + i + "]: new " + diffitem.getKey() + " " + attrCode2 + ":"
-						+ PokUtils.getAttributeFlagValue(curritem, attrCode2) + NEWLINE);
-					EANFlagAttribute fAtt2 = (EANFlagAttribute) curritem.getAttribute(attrCode2);
-					if (fAtt2 != null && fAtt2.isSelected(attrVal2)) {
-						diffEntity = diffitem;
-						break diffloop;
-					}
-				} else {
-					// must check to see if the prior item had a match too
-					ABRUtil.append(debugSb,"XMLCtryAudElem.getCatlgor checking[" + i + "]: current " + diffitem.getKey() + " " + attrCode2 + ":"
-						+ PokUtils.getAttributeFlagValue(curritem, attrCode2) + NEWLINE);					
-					EANFlagAttribute fAtt2 = (EANFlagAttribute) curritem.getAttribute(attrCode2);
-					if (fAtt2 != null && fAtt2.isSelected(attrVal2)) {
-						diffEntity = diffitem;
-						break diffloop;
-					}							
-
-					ABRUtil.append(debugSb,"XMLCtryAudElem.getCatlgor checking[" + i + "]: prior " + diffitem.getKey() + " " + attrCode2 + ":"
-						+ PokUtils.getAttributeFlagValue(prioritem, attrCode2) + NEWLINE);					
-					fAtt2 = (EANFlagAttribute) prioritem.getAttribute(attrCode2);
-					if (fAtt2 != null && fAtt2.isSelected(attrVal2)) {
-						diffEntity = diffitem;
-						break; //see if there is another that is current
-					}							
-				}
-			}
-		}
-
-		return diffEntity;
-	}	
-	
-	/*******************************
-	 * one for every  AVAIL.COUNTRYLIST where availtype='planned availbility(146)  include the avails (delete,new and update) 
-	 *
-	 */
-	private static class CtryAudRecord extends CtryRecord{
-	
-		public String country;
-		private DiffEntity availDiff;
-
-
-		CtryAudRecord(DiffEntity diffitem, String ctry) {
-			super(null);
-			country = ctry;
-			availDiff = diffitem;
-		}
-
-		void setUpdateAvail(DiffEntity avl) {
-			availDiff = avl;// allow replacement
-			setAction(UPDATE_ACTIVITY);
-		}
-		
-		
-		String getCountry() {
-			return country;
-		}
-
-		String getKey() {
-			return country;
-		}
-
-
-		public String toString() {
-			return (availDiff!=null?availDiff.getKey()+ " action:" + action:"There is no AVAIL! ");
-		}
-
-
-		/*********************
-		 * 3.	<EARLIESTSHIPDATE>
-		 * 	AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = "Planned Availability" (146)
-		 * 	this avail cannot be deleted at this point
-		 * 
-		 *  * 	<PUBFROM>
-		 The first applicable / available date is used.
-		 1.	AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = "First Order" (143)
-		 2.	ANNOUNCEMENT.ANNDATE for the AVAIL where AVAIL.AVAILTYPE = Planned Availability (146).
-		 3.	Empty (aka Null)
-		 *  * 	<PUBTO> 
-		 The first applicable / available date is used.
-		 1.	AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = "Last Order" (149)
-		 2 .	Empty (aka Null)
-		 
-		 * 	 * <ENDOFSERVICEDATE>
-		 The first applicable / available date is used.
-		 1.	AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = End of Service (151)
-		 2.	Empty (aka Null)
-		 */
-		void setAllFields(DiffEntity parentDiffEntity, DiffEntity catlgorDiff, DiffEntity foAvailDiff, DiffEntity loAvailDiff, DiffEntity endAvailDiff, DiffEntity endMktAvailDiff, Hashtable table, EntityItem COFCATentity, DiffEntity relatedSLEORGGRP, String path,
-			boolean isExistfinal, boolean compatModel, StringBuffer debugSb) {
-			ABRUtil.append(debugSb,"CtryRecord.setAllFields entered for: " + availDiff.getKey() + " " + getKey() + NEWLINE);
-
-
-			ABRUtil.append(debugSb,"CtryRecord.setAllFields entered for: " + availDiff.getKey() + " " + getKey() + NEWLINE);
-
-			availStatus = "0020";
-            rfravailStatus = "0040";
-            
-			//ANNDATE is ANNOUNCEMENT.ANNDATE for the AVAIL where AVAIL.AVAILTYPE = Planned Availability(146).
-            String[] anndates  = deriveAnnDate(false, debugSb);
-            String[] anndatesT1 = deriveAnnDate(true, debugSb);
-
-			
-			//ANNNUMBER is ANNOUNCEMENT.ANNNUMBER for the AVAIL where AVAIL.AVAILTYPE = Planned Availability(146).
-            String[] annnumbers = deriveAnnNumber(false, debugSb);
-            String[] annnumbersT1 = deriveAnnNumber(true, debugSb);
-
-		
-			//FIRSTORDER - should be AVAIL.EFFECTIVEDATE where AVAILTYPE = 143 or null.
-            String[] firstorders = deriveFIRSTORDER(parentDiffEntity, foAvailDiff, false, debugSb);
-            String[] firstordersT1 = deriveFIRSTORDER(parentDiffEntity, foAvailDiff, true, debugSb);
-
-         // PLANNEDAVAILABILITY is AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = "Planned Availability" (146)
-            String[] plannedavailabilitys = derivePlannedavailability(false, debugSb);
-            String[] plannedavailabilitysT1 = derivePlannedavailability(true, debugSb);
-            
-			//LASTORDER is equal to PUBTO. 			
-			
-			
-			//If the country in AVAIL.COUNTRYLIST was newly added or the AVAIL(first order) is newly added, then set Action UPDATE_ACTIVITY
-			//If the country in AVAIL.COUNTRYLIST was deleted or AVAIL was deleted, but get the current pubfrom is equal to the prior one, then don't set Action UPDATE_ACTIVITY
-			//If the AVAIL was updated, but get the current pubfrom is equal to the prior one, then don't set Action UPDATE_ACTIVITY
-//			if (isNewCountry(foAvailDiff, debugSb)) {
-//				setAction(UPDATE_ACTIVITY);
-//			}
-
-			//set PUBFROM
-			String[] pubfroms  = derivePubFrom(parentDiffEntity, catlgorDiff, foAvailDiff, false, debugSb);
-			String[] pubfromsT1 = derivePubFrom(parentDiffEntity, catlgorDiff, foAvailDiff, true, debugSb);
-
-			
-			// set PUBTO
-			String[] pubtos = derivePubTo(parentDiffEntity, catlgorDiff, loAvailDiff, false, debugSb);
-			String[] pubtosT1 = derivePubTo(parentDiffEntity, catlgorDiff, loAvailDiff, true, debugSb);
-
-
-
-			// set WDANNDATE
-			String[] wdanndates = deriveWDANNDATE(endMktAvailDiff, false, debugSb);
-			String[] wdanndatesT1 = deriveWDANNDATE(endMktAvailDiff, true, debugSb);
-
-
-            //set LASTORDER
-			String[] lastorders = deriveLastOrder(parentDiffEntity, loAvailDiff, false, debugSb);
-			String[] lastordersT1 = deriveLastOrder(parentDiffEntity, loAvailDiff, true, debugSb);
-
-        	//set EOSANNDATE
-			String[] eosanndates = deriveEOSANNDATE(endAvailDiff, false, debugSb);
-			String[] eosanndatesT1 = deriveEOSANNDATE(endAvailDiff, true, debugSb);
-
-			// BH set ENDOFSERVICE
-			String[] endofservices = deriveENDOFSERVICE(endAvailDiff, false, debugSb);
-			String[] endofservicesT1 = deriveENDOFSERVICE(endAvailDiff, true, debugSb);
-			
-			
-		    handleResults(anndates, anndatesT1, annnumbers, annnumbersT1,firstorders, firstordersT1,
-	              plannedavailabilitys, plannedavailabilitysT1, pubfroms,pubfromsT1, pubtos,  pubtosT1,
-	              wdanndates,  wdanndatesT1,  lastorders,  lastordersT1,  endofservices,  endofservicesT1,
-	               eosanndates,  eosanndatesT1, country, isExistfinal, compatModel, debugSb);
-			
-	
-			
-			
-
-			//If the country in AVAIL.COUNTRYLIST was newly added or the AVAIL(first order) is newly added, then set Action UPDATE_ACTIVITY
-			//If the country in AVAIL.COUNTRYLIST was deleted or AVAIL was deleted, but get the current pubfrom is equal to the prior one, then don't set Action UPDATE_ACTIVITY
-			//If the AVAIL was updated, but get the current pubfrom is equal to the prior one, then don't set Action UPDATE_ACTIVITY
-
-			
-			
-//
-//			boolean SLEORGGRPChaned = false;
-//		
-//			SLEORGGRPChaned	= SLEORGGRP.hasChanges(table, COFCATentity, relatedSLEORGGRP, path, country, debugSb);			    
-//				
-//			if (SLEORGGRPChaned){
-//				setAction(UPDATE_ACTIVITY);
-//			}
-			
-		}
-
-//		/****************************
-//		 * all the new added country that in First order Avail set the action is update.
-//		 return whether the country is new.
-//		 */
-//
-//		private boolean isNewCountry(DiffEntity diffEntity, StringBuffer debugSb) {
-//
-//			boolean isNew = false;
-//			if (diffEntity != null && diffEntity.isNew()) {
-//				isNew = true;
-//				ABRUtil.append(debugSb,"XMLAVAILElem.setAllFields isNewAvail" + diffEntity.getKey() + NEWLINE);
-//			} else if (diffEntity != null && !diffEntity.isDeleted()) {
-//				EANFlagAttribute fAtt2 = null;
-//				EANFlagAttribute fAtt1 = null;
-//				EntityItem currentitem = diffEntity.getCurrentEntityItem();
-//				EntityItem prioritem = diffEntity.getPriorEntityItem();
-//				if (currentitem != null) {
-//					fAtt2 = (EANFlagAttribute) currentitem.getAttribute("COUNTRYLIST");
-//				}
-//				if (prioritem != null) {
-//					fAtt1 = (EANFlagAttribute) prioritem.getAttribute("COUNTRYLIST");
-//				}
-//				if (fAtt1 != null && !fAtt1.isSelected(country) && fAtt2 != null && fAtt2.isSelected(country)) {
-//					isNew = true;
-//					ABRUtil.append(debugSb,"XMLAVAILElem.setAllFields isNewCountry" + diffEntity.getKey() + NEWLINE);
-//				}
-//			}
-//			return isNew;
-//
-//		}
-
-		/****************************
-		 * <ENDOFSERVICEDATE>
-		 The first applicable / available date is used.
-		 1.	AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = End of Service (151)
-		 2.	Empty (aka Null)
-
-		 */
-		private String[] deriveENDOFSERVICE(DiffEntity endAvailDiff, boolean findT1, StringBuffer debugSb) {
-			ABRUtil.append(debugSb,"XMLAVAILElem.deriveEndOfService " + " eofAvailDiff: "
-				+ (endAvailDiff == null ? "null" : endAvailDiff.getKey()) + " findT1:" + findT1 + NEWLINE);
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String[] sReturn = new String[2];			
-			String[] temps   = new String[2];
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				// try to get it from the lastorder avail
-				temps = AvailUtil.getAvailAttributeDate(findT1, endAvailDiff, thedate, rfrthedate, country, "EFFECTIVEDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			sReturn[0]= thedate;
-			sReturn[1]= rfrthedate;
-			return sReturn;			
-		}
-
-		/****************************
-		 * 	<PUBTO> 
-		 The first applicable / available date is used.
-		 1.	MDLCATLGOR-d: CATLGOR.PUBTO
-		 2.	AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = "Last Order" (149)
-		 3.	LSEOBUNDLE.BUNDLUNPUBDATEMTRGT
-		 */
-		
-		private String[] derivePubTo(DiffEntity parentDiff, DiffEntity catlgorDiff, DiffEntity loAvailDiff, boolean findT1, StringBuffer debugSb) {
-			ABRUtil.append(debugSb,"XMLAVAILElem.derivePubTo " + " loAvailDiff: " + (loAvailDiff == null ? "null" : loAvailDiff.getKey())
-				+ " findT1:" + findT1 + NEWLINE);
-
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String[] sReturn = new String[2];
-			String[] temps = new String[2];			
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//1.get CATLGOR.PUBTO
-				temps = AvailUtil.getBHcatlgorAttributeDate(findT1, parentDiff, catlgorDiff, thedate, rfrthedate, country, "PUBTO", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//2.AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = "Last Order" (149)
-				temps = AvailUtil.getAvailAttributeDate(findT1, loAvailDiff, thedate, rfrthedate, country, "EFFECTIVEDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//3. get LSEOBUNDLE.BUNDLUNPUBDATEMTRGT
-				temps = AvailUtil.getParentAttributeDate(findT1, parentDiff, thedate, rfrthedate, "BUNDLUNPUBDATEMTRGT", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			sReturn[0]= thedate;
-			sReturn[1]= rfrthedate;
-			return sReturn;
-		}
-
-		/****************************
-		 * 	<PUBFROM>
-		 0. LSEOCATLGOR-d: CATLGOR.PUBFROM
-		 1.	AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = "First Order" (143)
-		 2.	ANNOUNCEMENT.ANNDATE for the AVAIL where AVAIL.AVAILTYPE = Planned Availability (146).
-		 
-		  ADD System Feed Mapping20120117.doc
-		  * 4.	AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = “Planned Availability” (146).
-            5.	LSEOBUNDLE. BUNDLPUBDATEMTRGT
-
-		 3.	Empty (aka Null)
-
-		 */
-		private String[] derivePubFrom(DiffEntity parentDiff, DiffEntity catlgorDiff, DiffEntity foAvailDiff, boolean findT1, StringBuffer debugSb) {
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String[] sReturn = new String[2];
-			String[] temps = new String[2];
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//1 get the catlgorDiff.PUBFROM 
-				temps = AvailUtil.getBHcatlgorAttributeDate(findT1, parentDiff, catlgorDiff, thedate, rfrthedate, country, "PUBFROM", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//2 get the foAvailDiff.EFFECTIVEDATE
-				temps = AvailUtil.getAvailAttributeDate(findT1, foAvailDiff, thedate, rfrthedate, country, "EFFECTIVEDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//3 try to get it from ANNOUNCEMENT.ANNDATE for the AVAIL
-				// where AVAIL.AVAILTYPE = "Planned Availability" (146).
-				temps = AvailUtil.getAvailAnnAttributeDate(findT1, availDiff, thedate, rfrthedate, country, "ANNDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//4 get the plAvailDiff.EFFECTIVEDATE
-				temps = AvailUtil.getAvailAttributeDate(findT1, availDiff, thedate, rfrthedate, country, "EFFECTIVEDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//5. get parentDiff.BUNDLPUBDATEMTRGT
-				temps = AvailUtil.getParentAttributeDate(findT1, parentDiff, thedate, rfrthedate, "BUNDLPUBDATEMTRGT", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			sReturn[0]= thedate;
-			sReturn[1]= rfrthedate;
-			return sReturn;
-		}
-
-		/****************************
-		 * 	<ANNNUMBER>
-		 1.	ANNNUMBER is ANNOUNCEMENT.ANNNUMBER for the AVAIL where AVAIL.AVAILTYPE = Planned Availability(146).
-		 2.	Empty (aka Null)
-
-		 */
-		private String[] deriveAnnNumber(boolean findT1, StringBuffer debugSb) {
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String returns[] = new String[2];
-			String temps[] = new String[2];
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//get the AVAIL(146)--> ANNOUNCEMENT.ANNDATE
-				temps = AvailUtil.getAvailAnnAttributeDate(findT1, availDiff, thedate, rfrthedate, country, "ANNNUMBER", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}		
-			
-			returns[0] = thedate;
-			returns[1] = rfrthedate;
-			return returns;
-		}
-
-		/****************************
-		 * 	<ANNDATE>
-		 1.	ANNNUMBER is ANNOUNCEMENT.ANNDATE for the AVAIL where AVAIL.AVAILTYPE = Planned Availability(146).
-		 2.	Empty (aka Null)
-
-		 */
-		private String[] deriveAnnDate(boolean findT1, StringBuffer debugSb) {
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String returns[] = new String[2];			
-			
-			String temps[] = new String[2];
-			//1 try to get it from ANNOUNCEMENT.ANNDATE for the AVAIL where AVAIL.AVAILTYPE =   Planned Availability   (146).
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				temps = AvailUtil.getAvailAnnAttributeDate(findT1, availDiff, thedate, rfrthedate, country, "ANNDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			returns[0] = thedate;
-			returns[1] = rfrthedate;
-			return returns;
-		}
-
-		/****************************
-		 * 	<FIRSTORDER>
-		 * new change : 1.LSEOBUNDLEAVAIL-d: AVAILANNA-d: AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = “First Order” (143)
-		 *			    2.MODELAVAIL-d: AVAILANNA-d: ANNOUNCEMENT.ANNDATE where AVAIL.AVAILTYPE =  “Planned Availability” (146)
-		 *       DELETE 2.<ANNDATE>
-		 *  ADD         3.LSEOBUNDLE.BUNDLPUBDATEMTRGT
-
-		 */
-		private String[] deriveFIRSTORDER(DiffEntity parentDiffEntity, DiffEntity foAvailDiff, boolean findT1, StringBuffer debugSb) {
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String returns[] = new String[2];
-			String temps[] = new String[2];
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//1.get the first order avail effective date
-				temps = AvailUtil.getAvailAttributeDate(findT1, foAvailDiff, thedate, rfrthedate, country, "EFFECTIVEDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//2.get the plan avail--> ANNOUNCEMENT.ANNDATE
-				temps = AvailUtil.getAvailAnnAttributeDate(findT1, availDiff, thedate, rfrthedate, country, "ANNDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//3. get LSEOBUNDLE.BUNDLPUBDATEMTRGT
-				temps = AvailUtil.getParentAttributeDate(findT1, parentDiffEntity, thedate, rfrthedate, "BUNDLPUBDATEMTRGT", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-
-			returns[0] = thedate;
-			returns[1] = rfrthedate;
-			return returns;
-		}
-
-		/****************************
-		 * 	<EOSANNDATE>
-		 1.	MODELAVAIL-d: AVAILANNA-d: ANNOUNCEMENT.ANNDATE where AVAIL.AVAILTYPE = End of Service(151) and ANNOUNCEMENT.ANNTYPE = "End Of Life - Discontinuance of service" (13)
-		 2.	Empty (aka Null)
-
-		 */
-		private String[] deriveEOSANNDATE(DiffEntity endAvailDiff, boolean findT1, StringBuffer debugSb) {
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String returns[] = new String[2];
-			String temps[] = new String[2];
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				// get the ANNOUNCEMENT.ANNDATE where ANNTYPE =13
-				temps = AvailUtil.getAvailAnnDateByAnntype(findT1, endAvailDiff, thedate, rfrthedate, country, "13", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			returns[0]= thedate;
-			returns[1]= rfrthedate;
-			return returns;	
-		}
-
-		/****************************
-		 * 	<WDANNDATE>
-		 1.	MODELAVAIL-d: AVAILANNA-d: ANNOUNCEMENT.ANNDATE where AVAIL.AVAILTYPE = "Last Order" (149) and ANNOUNCEMENT.ANNTYPE = "End Of Life - Withdrawal from mktg" (14)
-		 2.	Empty (aka Null)
-
-		 */
-		private String[] deriveWDANNDATE(DiffEntity endMktAvailDiff, boolean findT1, StringBuffer debugSb) {
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String returns[] = new String[2];
-			String temps[] = new String[2];
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				// get the ANNOUNCEMENT.ANNDATE where ANNTYPE =14
-				temps = AvailUtil.getAvailAnnDateByAnntype(findT1, endMktAvailDiff, thedate, rfrthedate, country, "14", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			returns[0]= thedate;
-			returns[1]= rfrthedate;
-			return returns;
-		}
-		/***********************************************************************
-		 * <LASTORDER> The first applicable / available date is used. 1.
-		 * AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = "Last Order" (149) 2 .
-		 * Empty (aka Null)
-		 //
-		  * 2.	LSEOBUNDLE.BUNDLUNPUBDATEMTRGT
-		 */
-		private String[] deriveLastOrder(DiffEntity parentDiffEntity, DiffEntity loAvailDiff, boolean findT1, StringBuffer debugSb) {
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String returns[] = new String[2];
-			String temps[] = new String[2];
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//get AVAIL.EFFECTIVEDATE
-				temps = AvailUtil.getAvailAttributeDate(findT1, loAvailDiff, thedate, rfrthedate, country, "EFFECTIVEDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//2. get LSEOBUNDLE.BUNDLUNPUBDATEMTRGT
-				temps = AvailUtil.getParentAttributeDate(findT1, parentDiffEntity, thedate, rfrthedate, "BUNDLUNPUBDATEMTRGT", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			returns[0]= thedate;
-			returns[1]= rfrthedate;
-			return returns;
-		}
-		
-		/****************************
-		 * <PLANNEDAVAILABILITY>
-		 The first applicable / available date is used.
-         1. PLANNEDAVAILABILITY is AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = "Planned Availability" (146)
-		 2.	Empty (aka Null)
-
-		 */
-		private String[] derivePlannedavailability(boolean findT1, StringBuffer debugSb) {
-			ABRUtil.append(debugSb,"XMLAVAILElem.derivePlannedavailability " + " availDiff: "
-				+ (availDiff == null ? "null" : availDiff.getKey()) + " findT1:" + findT1 + NEWLINE);
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String[] sReturn = new String[2];			
-			String[] temps   = new String[2];
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				// try to get it from the lastorder avail
-				temps = AvailUtil.getAvailAttributeDate(findT1, availDiff, thedate, rfrthedate, country, "EFFECTIVEDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			sReturn[0]= thedate;
-			sReturn[1]= rfrthedate;
-			return sReturn;			
-		}
-		
-		void setAllLSEOFields(DiffEntity parentDiffEntity, DiffEntity catlgorDiff, boolean isExistfinal, boolean compatModel, StringBuffer debugSb){
-			availStatus = "0020";
-            rfravailStatus = "0040";
-			
-			ABRUtil.append(debugSb,"CtryRecord.setAllFields entered for country is belong to LSEO " + (parentDiffEntity == null ? "null" : parentDiffEntity.getKey()) + ". catlgorDiff is " +  (catlgorDiff == null ? "null" : catlgorDiff.getKey())
-				+ NEWLINE);
-			
-			String[] emptys = {CHEAT,CHEAT};
-			String[] pubfroms = deriveLSEOPubFrom(parentDiffEntity,catlgorDiff,false,debugSb);
-			String[] pubfromsT1 = deriveLSEOPubFrom(parentDiffEntity,catlgorDiff,true,debugSb);
-			
-			
-			String[] firstorders = deriveLSEOFirstOrder(parentDiffEntity,false,debugSb);
-			String[] firstordersT1= deriveLSEOFirstOrder(parentDiffEntity,true,debugSb);
-			
-			//ctryAudRec.plannedavailability = ctryAudRec.pubfrom;
-			//ctryAudRec.anndate = ctryAudRec.firstorder;
-			
-			String[] plannedavailabilitys = deriveLSEOplannedavailability(parentDiffEntity,false,debugSb);
-			String[] plannedavailabilitysT1 = deriveLSEOplannedavailability(parentDiffEntity,true,debugSb);
-			
-			String[] lastorders = deriveLSEOLastOrder(parentDiffEntity,false,debugSb);
-			String[] lastordersT1 = deriveLSEOLastOrder(parentDiffEntity,true,debugSb);
-			
-			
-			String[] pubtos = deriveLSEOPubTo(parentDiffEntity,catlgorDiff,false,debugSb);
-			String[] pubtosT1 = deriveLSEOPubTo(parentDiffEntity,catlgorDiff,true,debugSb);
-			
-//		    boolean handleResults(String[] anndates, String[] anndatesT1, String[] annnumbers, String[] annnumbersT1, String[] firstorders,
-//				String[] firstordersT1, String[] plannedavailabilitys, String[] plannedavailabilitysT1, String[] pubfroms,
-//				String[] pubfromsT1, String[] pubtos, String[] pubtosT1, String[] wdanndates, String[] wdanndatesT1, String[] lastorders,
-//				String[] lastordersT1, String[] endofservices, String[] endofservicesT1, String[] eosanndates, String[] eosanndatesT1,
-//				String country, Element element, StringBuffer debugSb) 
-			handleResults(firstorders, firstordersT1, emptys, emptys,firstorders, firstordersT1,
-				plannedavailabilitys, plannedavailabilitysT1, pubfroms,pubfromsT1, pubtos,  pubtosT1,
-				lastorders,  lastordersT1,  lastorders,  lastordersT1,  emptys,  emptys,
-				emptys,  emptys, country, isExistfinal, compatModel, debugSb);
-			
-//			boolean SLEORGGRPChaned	= SLEORGGRP.hasChanges(table, COFCATentity, parentDiffEntity, path, country, debugSb);			    	    
-//			if (SLEORGGRPChaned) {
-//				if(existfnialT2){
-//					setAction(UPDATE_ACTIVITY);
-//					setrfrAction(UPDATE_ACTIVITY);
-//				}else{
-//					setrfrAction(UPDATE_ACTIVITY);
-//				}
-//			}
-		}
-		/**
-		 * deriveLSEOPubFrom
-		 * @param parentDiff
-		 * @param catlgorDiff
-		 * @param findT1
-		 * @param debugSb
-		 * @return
-		 */
-		private String[] deriveLSEOPubFrom(DiffEntity parentDiff, DiffEntity catlgorDiff, boolean findT1, StringBuffer debugSb) {
-			ABRUtil.append(debugSb,"XMLAVAILElem.deriveLSEOPubFrom catlgorDiff: " 
-				+ (catlgorDiff == null ? "null" : catlgorDiff.getKey()) + "findT1:" + findT1 + NEWLINE);
-			
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String[] sReturn = new String[2];
-			String[] temps = new String[2];
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//1 get the catlgorDiff.PUBFROM 
-				temps = AvailUtil.getBHcatlgorAttributeDate(findT1, parentDiff, catlgorDiff, thedate, rfrthedate, country, "PUBFROM", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//BUNDLPUBDATEMTRGT
-				temps = AvailUtil.getParentAttributeDate(findT1, parentDiff, thedate, rfrthedate, "BUNDLPUBDATEMTRGT", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			sReturn[0]= thedate;
-			sReturn[1]= rfrthedate;
-			return sReturn;
-		}
-		/**
-		 * plannedavailability
-		 * @param parentDiff
-		 * @param catlgorDiff
-		 * @param findT1
-		 * @param debugSb
-		 * @return
-		 */
-		private String[] deriveLSEOplannedavailability(DiffEntity parentDiff, boolean findT1, StringBuffer debugSb) {
-			ABRUtil.append(debugSb,"XMLAVAILElem.plannedavailability parentDiff: " 
-				+ (parentDiff == null ? "null" : parentDiff.getKey()) + "findT1:" + findT1 + NEWLINE);
-			
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String[] sReturn = new String[2];
-			String[] temps = new String[2];
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//     BUNDLPUBDATEMTRGT
-				temps = AvailUtil.getParentAttributeDate(findT1, parentDiff, thedate, rfrthedate, "BUNDLPUBDATEMTRGT", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			sReturn[0]= thedate;
-			sReturn[1]= rfrthedate;
-			return sReturn;
-		}
-		/**
-		 * deriveLSEOFirstOrder
-		 * @param parentDiff
-		 * @param findT1
-		 * @param debugSb
-		 * @return
-		 */
-		private String[] deriveLSEOFirstOrder(DiffEntity parentDiff, boolean findT1, StringBuffer debugSb) {
-			ABRUtil.append(debugSb,"XMLAVAILElem.deriveLSEOFirstOrder parentDiff: " 
-				+ (parentDiff == null ? "null" : parentDiff.getKey()) + "findT1:" + findT1 + NEWLINE);
-			
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String[] sReturn = new String[2];
-			String[] temps = new String[2];
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-
-				//LSEOBOUNDLE.BUNDLPUBDATEMTRGT
-				temps = AvailUtil.getParentAttributeDate(findT1, parentDiff, thedate, rfrthedate, "BUNDLPUBDATEMTRGT", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			sReturn[0]= thedate;
-			sReturn[1]= rfrthedate;
-			return sReturn;
-		}
-		/**
-		 * deriveLSEOLastOrder
-		 * @param parentDiff
-		 * @param findT1
-		 * @param debugSb
-		 * @return
-		 */
-		private String[] deriveLSEOLastOrder(DiffEntity parentDiff, boolean findT1, StringBuffer debugSb) {
-			ABRUtil.append(debugSb,"XMLAVAILElem.deriveLSEOLastOrder parentDiff: " 
-				+ (parentDiff == null ? "null" : parentDiff.getKey()) + "findT1:" + findT1 + NEWLINE);
-			
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String[] sReturn = new String[2];
-			String[] temps = new String[2];
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//LSEOBUNDLE.BUNDLUNPUBDATEMTRGT
-				temps = AvailUtil.getParentAttributeDate(findT1, parentDiff, thedate, rfrthedate, "BUNDLUNPUBDATEMTRGT", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			sReturn[0]= thedate;
-			sReturn[1]= rfrthedate;
-			return sReturn;
-		}
-		/**
-		 * deriveLSEOPubTo
-		 * @param parentDiff
-		 * @param catlgorDiff
-		 * @param findT1
-		 * @param debugSb
-		 * @return
-		 */
-		private String[] deriveLSEOPubTo(DiffEntity parentDiff, DiffEntity catlgorDiff, boolean findT1, StringBuffer debugSb) {
-			ABRUtil.append(debugSb,"XMLAVAILElem.deriveLSEOPubTo catlgorDiff: " 
-				+ (catlgorDiff == null ? "null" : catlgorDiff.getKey()) + "findT1:" + findT1 + NEWLINE);
-			
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String[] sReturn = new String[2];
-			String[] temps = new String[2];
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//1 get the catlgorDiff.PUBFROM 
-				temps = AvailUtil.getBHcatlgorAttributeDate(findT1, parentDiff, catlgorDiff, thedate, rfrthedate, country, "PUBTO", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//LSEOBUNDLE.BUNDLUNPUBDATEMTRGT
-				temps = AvailUtil.getParentAttributeDate(findT1, parentDiff, thedate, rfrthedate, "BUNDLUNPUBDATEMTRGT", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			sReturn[0]= thedate;
-			sReturn[1]= rfrthedate;
-			return sReturn;
-		}
-		
-	}
-	
-}

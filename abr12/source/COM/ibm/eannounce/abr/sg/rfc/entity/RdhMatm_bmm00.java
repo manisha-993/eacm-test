@@ -1,235 +1,239 @@
-/* Copyright IBM Corp. 2016 */
-package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*     */ package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*     */ 
+/*     */ import com.google.gson.annotations.SerializedName;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class RdhMatm_bmm00
+/*     */ {
+/*     */   @SerializedName("TCODE")
+/*     */   private String tcode;
+/*     */   @SerializedName("MATNR")
+/*     */   private String matnr;
+/*     */   @SerializedName("MTART")
+/*     */   private String mtart;
+/*     */   @SerializedName("MBRSH")
+/*     */   private String mbrsh;
+/*     */   @SerializedName("WERKS")
+/*     */   private String werks;
+/*     */   @SerializedName("LGORT")
+/*     */   private String lgort;
+/*     */   @SerializedName("VKORG")
+/*     */   private String vkorg;
+/*     */   @SerializedName("VTWEG")
+/*     */   private String vtweg;
+/*     */   @SerializedName("XEIB1")
+/*     */   private String xeib1;
+/*     */   @SerializedName("XEID1")
+/*     */   private String xeid1;
+/*     */   @SerializedName("XEID2")
+/*     */   private String xeid2;
+/*     */   @SerializedName("XEIK1")
+/*     */   private String xeik1;
+/*     */   @SerializedName("XEIV4")
+/*     */   private String xeiv4;
+/*     */   @SerializedName("XEIE1")
+/*     */   private String xeie1;
+/*     */   @SerializedName("XEIV1")
+/*     */   private String xeiv1;
+/*     */   
+/*     */   public String getTcode() {
+/*  44 */     return this.tcode;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setTcode(String paramString) {
+/*  51 */     this.tcode = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getMatnr() {
+/*  58 */     return this.matnr;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setMatnr(String paramString) {
+/*  65 */     this.matnr = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getMtart() {
+/*  72 */     return this.mtart;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setMtart(String paramString) {
+/*  79 */     this.mtart = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getMbrsh() {
+/*  86 */     return this.mbrsh;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setMbrsh(String paramString) {
+/*  93 */     this.mbrsh = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getWerks() {
+/* 100 */     return this.werks;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setWerks(String paramString) {
+/* 107 */     this.werks = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getLgort() {
+/* 114 */     return this.lgort;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setLgort(String paramString) {
+/* 121 */     this.lgort = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVkorg() {
+/* 128 */     return this.vkorg;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setVkorg(String paramString) {
+/* 135 */     this.vkorg = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVtweg() {
+/* 142 */     return this.vtweg;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setVtweg(String paramString) {
+/* 149 */     this.vtweg = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getXeib1() {
+/* 156 */     return this.xeib1;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setXeib1(String paramString) {
+/* 163 */     this.xeib1 = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getXeid1() {
+/* 170 */     return this.xeid1;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setXeid1(String paramString) {
+/* 177 */     this.xeid1 = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getXeid2() {
+/* 184 */     return this.xeid2;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setXeid2(String paramString) {
+/* 191 */     this.xeid2 = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getXeik1() {
+/* 198 */     return this.xeik1;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setXeik1(String paramString) {
+/* 205 */     this.xeik1 = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getXeiv4() {
+/* 212 */     return this.xeiv4;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setXeiv4(String paramString) {
+/* 219 */     this.xeiv4 = paramString;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public String getXeie1() {
+/* 224 */     return this.xeie1;
+/*     */   }
+/*     */   
+/*     */   public void setXeie1(String paramString) {
+/* 228 */     this.xeie1 = paramString;
+/*     */   }
+/*     */   public void setXeiv1(String paramString) {
+/* 231 */     this.xeiv1 = paramString;
+/*     */   }
+/*     */ }
 
-import com.google.gson.annotations.SerializedName;
 
-public class RdhMatm_bmm00
-{
-    @SerializedName("TCODE")
-    private String tcode;
-    @SerializedName("MATNR")
-    private String matnr;
-    @SerializedName("MTART")
-    private String mtart;
-    @SerializedName("MBRSH")
-    private String mbrsh;
-    @SerializedName("WERKS")
-    private String werks;
-    @SerializedName("LGORT")
-    private String lgort;
-    @SerializedName("VKORG")
-    private String vkorg;
-    @SerializedName("VTWEG")
-    private String vtweg;
-    @SerializedName("XEIB1")
-    private String xeib1;
-    @SerializedName("XEID1")
-    private String xeid1;
-    @SerializedName("XEID2")
-    private String xeid2;
-    @SerializedName("XEIK1")
-    private String xeik1;
-    @SerializedName("XEIV4")
-    private String xeiv4;
-    @SerializedName("XEIE1")
-    private String xeie1;
-    @SerializedName("XEIV1")
-    private String xeiv1;
-    
-    /**
-     * @return the tcode
-     */
-    public String getTcode()
-    {
-        return tcode;
-    }
-    /**
-     * @param tcode the tcode to set
-     */
-    public void setTcode(String tcode)
-    {
-        this.tcode = tcode;
-    }
-    /**
-     * @return the matnr
-     */
-    public String getMatnr()
-    {
-        return matnr;
-    }
-    /**
-     * @param matnr the matnr to set
-     */
-    public void setMatnr(String matnr)
-    {
-        this.matnr = matnr;
-    }
-    /**
-     * @return the mtart
-     */
-    public String getMtart()
-    {
-        return mtart;
-    }
-    /**
-     * @param mtart the mtart to set
-     */
-    public void setMtart(String mtart)
-    {
-        this.mtart = mtart;
-    }
-    /**
-     * @return the mbrsh
-     */
-    public String getMbrsh()
-    {
-        return mbrsh;
-    }
-    /**
-     * @param mbrsh the mbrsh to set
-     */
-    public void setMbrsh(String mbrsh)
-    {
-        this.mbrsh = mbrsh;
-    }
-    /**
-     * @return the werks
-     */
-    public String getWerks()
-    {
-        return werks;
-    }
-    /**
-     * @param werks the werks to set
-     */
-    public void setWerks(String werks)
-    {
-        this.werks = werks;
-    }
-    /**
-     * @return the lgort
-     */
-    public String getLgort()
-    {
-        return lgort;
-    }
-    /**
-     * @param lgort the lgort to set
-     */
-    public void setLgort(String lgort)
-    {
-        this.lgort = lgort;
-    }
-    /**
-     * @return the vkorg
-     */
-    public String getVkorg()
-    {
-        return vkorg;
-    }
-    /**
-     * @param vkorg the vkorg to set
-     */
-    public void setVkorg(String vkorg)
-    {
-        this.vkorg = vkorg;
-    }
-    /**
-     * @return the vtweg
-     */
-    public String getVtweg()
-    {
-        return vtweg;
-    }
-    /**
-     * @param vtweg the vtweg to set
-     */
-    public void setVtweg(String vtweg)
-    {
-        this.vtweg = vtweg;
-    }
-    /**
-     * @return the xeib1
-     */
-    public String getXeib1()
-    {
-        return xeib1;
-    }
-    /**
-     * @param xeib1 the xeib1 to set
-     */
-    public void setXeib1(String xeib1)
-    {
-        this.xeib1 = xeib1;
-    }
-    /**
-     * @return the xeid1
-     */
-    public String getXeid1()
-    {
-        return xeid1;
-    }
-    /**
-     * @param xeid1 the xeid1 to set
-     */
-    public void setXeid1(String xeid1)
-    {
-        this.xeid1 = xeid1;
-    }
-    /**
-     * @return the xeid2
-     */
-    public String getXeid2()
-    {
-        return xeid2;
-    }
-    /**
-     * @param xeid2 the xeid2 to set
-     */
-    public void setXeid2(String xeid2)
-    {
-        this.xeid2 = xeid2;
-    }
-    /**
-     * @return the xeik1
-     */
-    public String getXeik1()
-    {
-        return xeik1;
-    }
-    /**
-     * @param xeik1 the xeik1 to set
-     */
-    public void setXeik1(String xeik1)
-    {
-        this.xeik1 = xeik1;
-    }
-    /**
-     * @return the xeiv4
-     */
-    public String getXeiv4()
-    {
-        return xeiv4;
-    }
-    /**
-     * @param xeiv4 the xeiv4 to set
-     */
-    public void setXeiv4(String xeiv4)
-    {
-        this.xeiv4 = xeiv4;
-    }
-    
-    public String getXeie1()
-    {
-        return xeie1;
-    }
-    public void setXeie1(String xeie1)
-    {
-        this.xeie1 = xeie1;
-    }
-	public void setXeiv1(String xeiv1) {
-		this.xeiv1 = xeiv1;
-	}
-
-    
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\entity\RdhMatm_bmm00.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

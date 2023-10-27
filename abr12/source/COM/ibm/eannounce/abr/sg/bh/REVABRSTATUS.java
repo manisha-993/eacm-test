@@ -1,103 +1,109 @@
-//Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2010  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.abr.sg.bh;
+/*     */ package COM.ibm.eannounce.abr.sg.bh;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import java.sql.SQLException;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class REVABRSTATUS
+/*     */   extends DQABRSTATUS
+/*     */ {
+/*     */   protected boolean isVEneeded(String paramString) {
+/*  39 */     return false;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void completeNowR4RProcessing() throws SQLException, MiddlewareException, MiddlewareRequestException {}
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void completeNowFinalProcessing() throws SQLException, MiddlewareException, MiddlewareRequestException {
+/*  70 */     addDebug(" status now final");
+/*  71 */     setFlagValue(this.m_elist.getProfile(), "ADSABRSTATUS", getQueuedValue("ADSABRSTATUS"));
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void doDQChecking(EntityItem paramEntityItem, String paramString) throws Exception {
+/*  80 */     addDebug("No checking required");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/*  90 */     return "REVUNBUNDCOMP ABR.";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 101 */     return "$Revision: 1.3 $";
+/*     */   }
+/*     */ }
 
-import COM.ibm.eannounce.objects.*;
 
-/**********************************************************************************
-* REVABRSTATUS class
-*
-* From "SG FS ABR Data Quality 20101117.doc"
-* 
-REVABRSTATUS_class=COM.ibm.eannounce.abr.sg.bh.REVABRSTATUS
-REVABRSTATUS_enabled=true
-REVABRSTATUS_idler_class=A
-REVABRSTATUS_keepfile=true
-REVABRSTATUS_report_type=DGTYPE01
-*/
-//$Log: REVABRSTATUS.java,v $
-//Revision 1.3  2010/12/09 17:47:43  wendy
-//Remove r10 check, control thru props file
-//
-//Revision 1.2  2010/12/09 17:43:24  wendy
-//correct comment
-//
-//Revision 1.1  2010/11/18 17:11:27  wendy
-//BH FS ABR Data Quality 20101117 updates
-//
-public class REVABRSTATUS extends DQABRSTATUS
-{
-
-	/**********************************
-	* nothing needed
-	*/
-	protected boolean isVEneeded(String statusFlag) {
-		return false;
-	}
-	
-/*
- * from sets ss
-204.00		REVUNBUNDCOMP									
-205.00	R1.0	SET			REVUNBUNDCOMP				ADSABRSTATUS		&ADSFEED
-206.00		END	204.00	REVUNBUNDCOMP							
- */	
-	/**********************************
-	 * complete abr processing after status moved to readyForReview; (status was chgreq)
-	 * C.	Status changed to Ready for Review
-	 */
-	protected void completeNowR4RProcessing() throws
-	java.sql.SQLException,
-	COM.ibm.opicmpdh.middleware.MiddlewareException,
-	COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-	{
-			//setFlagValue(m_elist.getProfile(),"ADSABRSTATUS", getRFRQueuedValue("ADSABRSTATUS"));
-	}
-
-	/**********************************
-	 * complete abr processing after status moved to final; (status was r4r)
-	 *D. STATUS changed to Final
-	 *
-	 */
-	protected void completeNowFinalProcessing() throws
-	java.sql.SQLException,
-	COM.ibm.opicmpdh.middleware.MiddlewareException,
-	COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-	{
-		addDebug(" status now final");
-		setFlagValue(m_elist.getProfile(),"ADSABRSTATUS", getQueuedValue("ADSABRSTATUS"));
-	}
-	/**********************************
-	* Note the ABR is only called when
-	* DATAQUALITY transitions from 'Draft to Ready for Review',
-	*	'Change Request to Ready for Review' and from 'Ready for Review to Final'
-	*/
-    protected void doDQChecking(EntityItem rootEntity, String statusFlag) throws Exception
-    {
-        addDebug("No checking required");
-    }
-
-    /***********************************************
-    *  Get ABR description
-    *
-    *@return java.lang.String
-    */
-    public String getDescription()
-    {
-        String desc =  "REVUNBUNDCOMP ABR.";
-        return desc;
-    }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getABRVersion()
-    {
-        return "$Revision: 1.3 $";
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\bh\REVABRSTATUS.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

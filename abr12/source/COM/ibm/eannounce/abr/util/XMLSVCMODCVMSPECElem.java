@@ -1,260 +1,265 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import com.ibm.transform.oim.eacm.diff.DiffEntity;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.StringTokenizer;
+/*     */ import java.util.Vector;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class XMLSVCMODCVMSPECElem
+/*     */   extends XMLElem
+/*     */ {
+/*  59 */   private String path = null;
+/*  60 */   private String etype = null;
+/*     */   
+/*     */   public XMLSVCMODCVMSPECElem(String paramString) {
+/*  63 */     super(paramString);
+/*  64 */     this.path = null;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public XMLSVCMODCVMSPECElem(String paramString1, String paramString2, String paramString3, String paramString4) {
+/*  69 */     super(paramString1, paramString2);
+/*  70 */     this.path = paramString4;
+/*  71 */     this.etype = paramString3;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean hasChanges(Hashtable paramHashtable, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) {
+/*  82 */     EntityItem entityItem1 = paramDiffEntity.getCurrentEntityItem();
+/*  83 */     EntityItem entityItem2 = paramDiffEntity.getPriorEntityItem();
+/*  84 */     boolean bool = false;
+/*  85 */     String str1 = "";
+/*  86 */     String str2 = "";
+/*     */     
+/*  88 */     if (entityItem2 != null) {
+/*  89 */       str2 = getCONTENTS(entityItem2, paramStringBuffer);
+/*     */     }
+/*     */     
+/*  92 */     if (entityItem1 != null) {
+/*  93 */       str1 = getCONTENTS(entityItem1, paramStringBuffer);
+/*     */     }
+/*  95 */     if (!str1.equals(str2)) {
+/*  96 */       bool = true;
+/*     */     }
+/*     */     
+/*  99 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addElements(Database paramDatabase, Hashtable paramHashtable, Document paramDocument, Element paramElement, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 123 */     String str1 = "";
+/* 124 */     String str2 = paramDiffEntity.getEntityType();
+/* 125 */     ABRUtil.append(paramStringBuffer, "XMLSVCMODCVMSPECElem entitytype =" + str2 + NEWLINE);
+/* 126 */     if (str2.equals("CVMSPEC")) {
+/* 127 */       EntityItem entityItem = paramDiffEntity.getCurrentEntityItem();
+/* 128 */       str1 = getCONTENTS(entityItem, paramStringBuffer);
+/*     */     } 
+/*     */     
+/* 131 */     createNodeSet(paramDocument, paramElement, str1, paramStringBuffer);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String getCONTENTS(EntityItem paramEntityItem, StringBuffer paramStringBuffer) {
+/* 150 */     boolean bool = false;
+/* 151 */     String str1 = "";
+/* 152 */     String str2 = "";
+/* 153 */     if (paramEntityItem != null) {
+/* 154 */       if (this.path != null) {
+/* 155 */         Vector<EntityItem> vector = getPathEntity(paramEntityItem, paramStringBuffer);
+/* 156 */         for (byte b = 0; b < vector.size(); b++) {
+/* 157 */           EntityItem entityItem = vector.elementAt(b);
+/* 158 */           str2 = PokUtils.getAttributeFlagValue(entityItem, this.attrCode);
+/* 159 */           if (str2.equalsIgnoreCase("C1")) {
+/* 160 */             str1 = PokUtils.getAttributeValue(paramEntityItem, "CHARVAL", ", ", "@@", false);
+/* 161 */           } else if (str2.equalsIgnoreCase("C2")) {
+/* 162 */             str1 = PokUtils.getAttributeValue(paramEntityItem, "VMSPECID", ", ", "@@", false);
+/*     */           } 
+/*     */         } 
+/* 165 */         ABRUtil.append(paramStringBuffer, "XMLSVCMODCVMSPECElem get from Path CVMTYPE:" + str2 + " cvmspecID:" + str1 + NEWLINE);
+/*     */       } else {
+/* 167 */         Vector<EntityItem> vector = paramEntityItem.getUpLink();
+/* 168 */         for (byte b = 0; b < vector.size(); b++) {
+/* 169 */           EntityItem entityItem = vector.get(b);
+/* 170 */           if (entityItem != null && "CVMCVMSPEC".equals(entityItem.getEntityType())) {
+/*     */             
+/* 172 */             EntityItem entityItem1 = (EntityItem)entityItem.getUpLink(0);
+/* 173 */             if (entityItem1 != null) {
+/* 174 */               str2 = PokUtils.getAttributeFlagValue(entityItem1, "CVMTYPE");
+/* 175 */               if (str2 != null && str2.equalsIgnoreCase("C1")) {
+/* 176 */                 str1 = PokUtils.getAttributeValue(paramEntityItem, "CHARACID", ", ", "@@", false);
+/* 177 */                 bool = true;
+/*     */                 break;
+/*     */               } 
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/* 183 */         if (!bool) {
+/* 184 */           str1 = PokUtils.getAttributeValue(paramEntityItem, "VMSPECID", ", ", "@@", false);
+/*     */         }
+/*     */       } 
+/*     */     }
+/*     */     
+/* 189 */     return str1;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void createNodeSet(Document paramDocument, Element paramElement, String paramString, StringBuffer paramStringBuffer) {
+/* 202 */     Element element = paramDocument.createElement(this.nodeName);
+/* 203 */     element.appendChild(paramDocument.createTextNode("" + paramString));
+/* 204 */     paramElement.appendChild(element);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private Vector getPathEntity(EntityItem paramEntityItem, StringBuffer paramStringBuffer) {
+/* 214 */     Vector<EntityItem> vector1 = new Vector(1);
+/* 215 */     Vector<EntityItem> vector2 = new Vector(1);
+/* 216 */     vector1.add(paramEntityItem);
+/* 217 */     StringTokenizer stringTokenizer = new StringTokenizer(this.path, ":");
+/* 218 */     while (stringTokenizer.hasMoreTokens()) {
+/* 219 */       String str1 = stringTokenizer.nextToken();
+/* 220 */       String str2 = this.etype;
+/* 221 */       if (stringTokenizer.hasMoreTokens()) {
+/* 222 */         str2 = stringTokenizer.nextToken();
+/*     */       }
+/* 224 */       ABRUtil.append(paramStringBuffer, "XMLSVCMODCVMSPECElem.getItems: node:" + this.nodeName + " path:" + this.path + " dir:" + str1 + " destination " + str2 + NEWLINE);
+/*     */ 
+/*     */       
+/* 227 */       Vector<EntityItem> vector = new Vector();
+/* 228 */       for (byte b = 0; b < vector1.size(); b++) {
+/* 229 */         EntityItem entityItem = vector1.elementAt(b);
+/*     */         
+/* 231 */         Vector<EntityItem> vector3 = null;
+/* 232 */         if (str1.equals("D")) {
+/* 233 */           vector3 = entityItem.getDownLink();
+/*     */         } else {
+/* 235 */           vector3 = entityItem.getUpLink();
+/*     */         } 
+/* 237 */         for (byte b1 = 0; b1 < vector3.size(); b1++) {
+/* 238 */           EntityItem entityItem1 = vector3.elementAt(b1);
+/*     */           
+/* 240 */           if (entityItem1.getEntityType().equals(str2)) {
+/* 241 */             if (stringTokenizer.hasMoreTokens()) {
+/*     */               
+/* 243 */               vector.add(entityItem1);
+/*     */             } else {
+/*     */               
+/* 246 */               vector2.add(entityItem1);
+/*     */             } 
+/*     */           }
+/*     */         } 
+/*     */       } 
+/*     */       
+/* 252 */       vector1.clear();
+/* 253 */       vector1 = vector;
+/*     */     } 
+/*     */     
+/* 256 */     vector1.clear();
+/* 257 */     return vector2;
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.util;
 
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.objects.*;
-
-import org.w3c.dom.*;
-
-import java.util.*;
-
-import com.ibm.transform.oim.eacm.diff.*;
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-/**********************************************************************************
-* Class used to hold info and structure to be generated for the xml feed
-* for abrs.  values are fixed for these nodes
-*/
-// $Log: XMLSVCMODCVMSPECElem.java,v $
-// Revision 1.6  2015/01/26 15:53:40  wangyul
-// fix the issue PR24222 -- SPF ADS abr string buffer
-//
-// Revision 1.5  2011/08/23 13:02:22  guobin
-// update getContent method
-//
-// Revision 1.3  2011/03/16 07:20:37  guobin
-// add hasChanges method
-//
-// Revision 1.2  2011/03/14 09:03:49  guobin
-// update the mapping and add derivation rule for SVCMOD
-//
-// Revision 1.1  2011/03/11 03:08:30  guobin
-//  Change 20110310	Change mapping and add derivation rule for SVCMOD
-//
-// Init for
-// Change 20110310	Change mapping and add derivation rule	
-// 104.00		1	1.0	<REFCVMSPECID>	</REFCVMSPECID>	8	SVCMOD_UPDATE /CHRGCOMPLIST /CHRGCOMPELEMENT /PRICEPOINTLIST /PRICEPOINTELEMENT /REFCVMSPECLIST /REFCVMSPECELEMENT /REFCVMSPECID				
-// CVMSPEC	"CHARACID// VMSPECID"		Text	
-
-//From CVMSPEC find CVM then
-// 	If CVM.CVMTYPE = 'C1' (Characteristic) 
-//		set to CVMSPEC.CHARACID, 
-//	else 
-//		set to CVMSPEC.VMSPECID  
-//
-//
-
-public class XMLSVCMODCVMSPECElem extends XMLElem
-{
-    /**********************************************************************************
-    * Constructor for null value elements
-    *
-    */
-	private String path = null;
-	private String etype =null;
-    public XMLSVCMODCVMSPECElem(String nname)
-    {
-    	super(nname);
-    	path = null;
-    }    
-
-    public XMLSVCMODCVMSPECElem(String nname, String code, String etype1, String rootpath )
-    {
-    	super(nname,code);
-         path = rootpath;
-         etype = etype1;
-    }    
-
-    /**
-     * check if it has changed
-     *@param table Hashtable of Vectors of DiffEntity
-     *@param table Hashtable of Vectors of DiffEntity 
-     *@param debugSb StringBuffer for debug output
-     */
-    protected boolean hasChanges(Hashtable table, DiffEntity parentItem, StringBuffer debugSb) {
-        //check at both times if one existed or not
-		EntityItem curritem = parentItem.getCurrentEntityItem();
-		EntityItem previtem = parentItem.getPriorEntityItem();
-		boolean changed = false;
-    	String currVal = "";
-		String prevVal = "";
-		//T1 time
-		if (previtem != null){
-			prevVal = getCONTENTS(previtem, debugSb);
-		}
-		//T2 time
-		if (curritem != null){
-			currVal = getCONTENTS(curritem, debugSb);			
-		}
-		if (!currVal.equals(prevVal)){ // we only care if there was a change
-			changed = true;
-		}		
-		
-    	return changed;
-    }
-    /**********************************************************************************
-    * Create a node for this element and add to the parent and any children this node has
-    *
-    *@param dbCurrent Database
-    *@param table Hashtable of Vectors of DiffEntity
-    *@param document Document needed to create nodes
-    *@param parent Element node to add this node too
-	*@param parentItem DiffEntity - parent to use if path is specified in XMLGroupElem, item to use otherwise
-    *@param debugSb StringBuffer for debug output
-    */
-	public void addElements(Database dbCurrent,Hashtable table, Document document, Element parent,
-		DiffEntity parentItem, StringBuffer debugSb)
-    throws
-        COM.ibm.eannounce.objects.EANBusinessRuleException,
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-        java.rmi.RemoteException,
-        java.io.IOException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {
-		String currContents= "";
-		String parenttype = parentItem.getEntityType();
-		ABRUtil.append(debugSb,"XMLSVCMODCVMSPECElem entitytype ="  + parenttype + NEWLINE);
-		if(parenttype.equals("CVMSPEC")){
-			EntityItem currentItem = parentItem.getCurrentEntityItem();
-			currContents = getCONTENTS(currentItem, debugSb);
-		} 
-
-        createNodeSet(document,parent,currContents,debugSb);
-	}
-
-	/**
-	 * From CVMSPEC find CVM then
- 	 *	CVM.CVMTYPE must equal to CVMSPEC.CVMTYPE
-	 *		If CVM.CVMTYPE = 'C1' (Characteristic) 
-	 *			set to CVMSPEC.CHARACID, 
-	 *		else 
-	 *	set to CVMSPEC.VMSPECID 
-	 *
-	 * @param parentItem
-	 * @param debugSb
-	 * @param CONTENTS
-	 * @param findCVM
-	 * @return
-	 */
-	private String getCONTENTS(EntityItem cvmspecItem, StringBuffer debugSb) {
-		
-		boolean findCVM = false;
-		String CONTENTS = "";
-		String CVMTYPE = "";
-		if (cvmspecItem != null){
-			if (path!=null){
-				Vector desVec = getPathEntity(cvmspecItem,debugSb);
-				for (int i=0; i<desVec.size(); i++){
-					EntityItem desentityitem = (EntityItem )desVec.elementAt(i);
-				    CVMTYPE = PokUtils.getAttributeFlagValue(desentityitem, attrCode);
-	    			if(CVMTYPE.equalsIgnoreCase("C1")){
-	    				CONTENTS = PokUtils.getAttributeValue(cvmspecItem, "CHARVAL", ", ", CHEAT, false);	        				
-	    			}else if (CVMTYPE.equalsIgnoreCase("C2")){			
-	    				CONTENTS = PokUtils.getAttributeValue(cvmspecItem, "VMSPECID", ", ", CHEAT, false);
-	    			}
-				}
-				ABRUtil.append(debugSb,"XMLSVCMODCVMSPECElem get from Path CVMTYPE:" + CVMTYPE + " cvmspecID:" + CONTENTS + NEWLINE);
-			}else {			 
-				Vector uprelator = cvmspecItem.getUpLink();
-				for (int i=0; i<uprelator.size(); i++){
-					EntityItem upItem = (EntityItem)uprelator.get(i);
-					if (upItem != null && "CVMCVMSPEC".equals(upItem.getEntityType())){
-						//find the CVM
-						EntityItem cvmItem = (EntityItem)upItem.getUpLink(0);
-						if(cvmItem!=null){
-			    		     CVMTYPE = PokUtils.getAttributeFlagValue(cvmItem, "CVMTYPE");
-			    			if(CVMTYPE!=null && CVMTYPE.equalsIgnoreCase("C1")){
-			    				CONTENTS = PokUtils.getAttributeValue(cvmspecItem, "CHARACID", ", ", CHEAT, false);
-			    				findCVM = true;		    				
-				    			break;
-			    			}
-						}
-					}
-				}
-				if(!findCVM){
-					CONTENTS = PokUtils.getAttributeValue(cvmspecItem, "VMSPECID", ", ", CHEAT, false);
-				}	
-			}	
-		}
-		
-		return CONTENTS;
-	}
-	
-	
-	/**
-	 * create nodeset of the REFCVMSPECID attribute of CVMSPEC 
-	 * 
-	 * @param document
-	 * @param parent
-	 * @param debugSb
-	 */
-	private void createNodeSet(Document document, Element parent,
-			String CONTENTS, StringBuffer debugSb) {
-		Element child = (Element) document.createElement(nodeName); 
-		child.appendChild(document.createTextNode("" + CONTENTS));
-		parent.appendChild(child);
-	}	
-	/**
-	 * through the path get the destinaiton entity.
-	 * @param parentitem
-	 * @param path
-	 * @param debugSb
-	 * @return
-	 */
-	private Vector getPathEntity(EntityItem parentitem, StringBuffer debugSb){
-		Vector parentitemsVct = new Vector(1);
-		Vector overrideVct = new Vector(1);
-		parentitemsVct.add(parentitem);
-		StringTokenizer st1 = new StringTokenizer(path, ":");
-		while (st1.hasMoreTokens()) {
-			String dir = st1.nextToken();
-			String destination = etype;
-			if (st1.hasMoreTokens()) {
-				destination = st1.nextToken();
-			}
-			ABRUtil.append(debugSb,"XMLSVCMODCVMSPECElem.getItems: node:" + nodeName + " path:" + path + " dir:" + dir + " destination "
-				+ destination + NEWLINE);
-			// know we know dir and type needed
-			Vector tmp = new Vector();
-			for (int p = 0; p < parentitemsVct.size(); p++) {
-				EntityItem pitem = (EntityItem) parentitemsVct.elementAt(p);
-				//ABRUtil.append(debugSb,"XMLSVCMODCVMSPECElem.getItems: loop pitem " + pitem.getKey() + NEWLINE);
-				Vector linkVct = null;
-				if (dir.equals("D")) {
-					linkVct = pitem.getDownLink();
-				} else {
-					linkVct = pitem.getUpLink();
-				}
-				for (int i = 0; i < linkVct.size(); i++) {
-					EntityItem entity = (EntityItem) linkVct.elementAt(i);
-					//ABRUtil.append(debugSb,"XMLSVCMODCVMSPECElem.getItems: linkloop entity " + entity.getKey() + NEWLINE);
-					if (entity.getEntityType().equals(destination)) {
-						if (st1.hasMoreTokens()) {
-							//keep looking
-							tmp.add(entity);
-						} else {
-							//find diffitem in table
-							overrideVct.add(entity);
-							//ABRUtil.append(debugSb,"XMLSVCMODCVMSPECElem.getItems: find entity key=" + entity.getKey() + NEWLINE);
-						}
-					}
-				}// end linkloop
-			}// end parentloop
-			parentitemsVct.clear();// remove all
-			parentitemsVct = tmp;
-		}
-
-		parentitemsVct.clear();
-		return overrideVct;
-	}
-		
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\XMLSVCMODCVMSPECElem.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

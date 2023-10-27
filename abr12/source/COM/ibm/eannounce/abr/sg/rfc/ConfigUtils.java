@@ -1,101 +1,107 @@
-/* Copyright IBM Corp. 2016 */
-package COM.ibm.eannounce.abr.sg.rfc;
+/*    */ package COM.ibm.eannounce.abr.sg.rfc;
+/*    */ 
+/*    */ import java.util.ResourceBundle;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class ConfigUtils
+/*    */ {
+/* 15 */   private static ResourceBundle bundle = null;
+/*    */   
+/* 17 */   private static String BUNDLENAME = "rdhclientconfig";
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   private static ResourceBundle getResourceBundle() {
+/* 26 */     if (bundle == null)
+/*    */     {
+/* 28 */       bundle = ResourceBundle.getBundle(BUNDLENAME);
+/*    */     }
+/* 30 */     return bundle;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public static String getBundleName() {
+/* 40 */     return BUNDLENAME;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public static void setBundleName(String paramString) {
+/* 50 */     BUNDLENAME = paramString;
+/* 51 */     bundle = null;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public static String getProperty(String paramString) {
+/* 63 */     if (paramString == null)
+/* 64 */       return null; 
+/* 65 */     String str = null;
+/*    */     
+/*    */     try {
+/* 68 */       str = getResourceBundle().getString(paramString).trim();
+/* 69 */     } catch (Throwable throwable) {
+/*    */       
+/* 71 */       System.out.println("Key '" + paramString + "'not found.");
+/*    */     } 
+/* 73 */     return str;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public static void refreshResourceBundle() {
+/* 81 */     bundle = null;
+/* 82 */     getResourceBundle();
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public static String getValue(String paramString1, String paramString2) {
+/* 94 */     String str = getProperty(paramString1);
+/* 95 */     if (str == null || str.trim().length() == 0)
+/*    */     {
+/* 97 */       str = paramString2;
+/*    */     }
+/* 99 */     return str;
+/*    */   }
+/*    */ }
 
-import java.util.ResourceBundle;
 
-/**
- * A utility class to read RDH config parameters from RDH config properties file
- * It may be replaced by SPDI config utility in the future
- * 
- * @author wangyul
- * @since 03/11/2019
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\ConfigUtils.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class ConfigUtils
-{
-    private static ResourceBundle bundle = null;
-
-    private static String BUNDLENAME = "rdhclientconfig";
-
-    /**
-     * Gets a resource bundle using the specified name
-     * 
-     * @return ResourceBundle
-     */
-    private static ResourceBundle getResourceBundle()
-    {
-        if (bundle == null)
-        {
-            bundle = ResourceBundle.getBundle(BUNDLENAME);
-        }
-        return bundle;
-    }
-
-    /**
-     * Get specified bundle name
-     * 
-     * @return
-     */
-    public static String getBundleName()
-    {
-        return BUNDLENAME;
-    }
-
-    /**
-     * set bundle name
-     * 
-     * @param name
-     */
-    public static void setBundleName(String name)
-    {
-        BUNDLENAME = name;
-        bundle = null;
-    }
-
-    /**
-     * Gets a string for the given key from specified resource bundle, if no
-     * value is found, then retrun null
-     * 
-     * @param name
-     * @return
-     */
-    public static String getProperty(String name)
-    {
-        if (name == null)
-            return null;
-        String value = null;
-        try
-        {
-            value = getResourceBundle().getString(name).trim();
-        } catch (Throwable ex)
-        {
-            System.out.println("Key '" + name + "'not found.");
-        }
-        return value;
-    }
-
-    /**
-     * Fefresh Resource Bundle if new bundle resource is set
-     */
-    public static void refreshResourceBundle()
-    {
-        bundle = null;
-        getResourceBundle();
-    }
-
-    /**
-     * Gets a string for the given key from specified resource bundle, if no
-     * value is found, then retrun defaultValue
-     * 
-     * @param name
-     * @return
-     */
-    public static String getValue(String key, String defaultValue)
-    {
-        String value = getProperty(key);
-        if ((value == null) || (value.trim().length() == 0))
-        {
-            value = defaultValue;
-        }
-        return value;
-    }
-}

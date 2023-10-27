@@ -1,266 +1,272 @@
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *   Module Name: SPSTWDAVAIL.java
- *
- *   Copyright  : COPYRIGHT IBM CORPORATION, 2013
- *                LICENSED MATERIAL - PROGRAM PROPERTY OF IBM
- *                REFER TO COPYRIGHT INSTRUCTION FORM#G120-2083
- *                RESTRICTED MATERIALS OF IBM
- *                IBM CONFIDENTIAL
- *
- *   Version: 1.0
- *
- *   Functional Description: 
- *
- *   Component : 
- *   Author(s) Name(s): Will
- *   Date of Creation: Nov 22, 2013
- *   Languages/APIs Used: Java
- *   Compiler/JDK Used: JDK 1.3, 1.4
- *   Production Operating System: AIX 4.x, Windows
- *   Production Dependencies: JDK 1.3 or greater
- *
- *   Change History:
- *   Author(s)     Date	        Change #    Description
- *   -----------   ----------   ---------   ---------------------------------------------
- *   Will   Nov 22, 2013     RQ          Initial code 
- *   
- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.LinkActionItem;
+/*     */ import COM.ibm.eannounce.objects.WorkflowException;
+/*     */ import COM.ibm.opicmpdh.middleware.LockException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.Vector;
+/*     */ import org.w3c.dom.Element;
+/*     */ import org.w3c.dom.Node;
+/*     */ import org.w3c.dom.NodeList;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class SPSTWDAVAILABR
+/*     */   extends SPSTABR
+/*     */ {
+/*     */   public void validateData(SPSTABRSTATUS paramSPSTABRSTATUS, Element paramElement) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 111 */     super.validateData(paramSPSTABRSTATUS, paramElement);
+/*     */   }
+/*     */   
+/*     */   public String getVersion() {
+/* 115 */     return "1.0";
+/*     */   }
+/*     */   
+/*     */   public String getTitle() {
+/* 119 */     return "Last Order Avail is created and the MODELs, LSEOs & LSEOBUNDLEs are linked to this Avail.";
+/*     */   }
+/*     */   
+/*     */   public String getDescription() {
+/* 123 */     return "Last Order Avail Created - AVAIL";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void checkRelatedEntities(Element paramElement) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException {}
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void generateEntities(Vector paramVector, Hashtable paramHashtable, Element paramElement, StringBuffer paramStringBuffer) throws MiddlewareRequestException, SQLException, MiddlewareException, EANBusinessRuleException, RemoteException, MiddlewareShutdownInProgressException, LockException, WorkflowException {
+/* 155 */     EntityItem entityItem = null;
+/* 156 */     String str1 = (String)paramHashtable.get("EFFECTIVEDATE");
+/* 157 */     NodeList nodeList1 = paramElement.getElementsByTagName("MODELLIST");
+/*     */     
+/* 159 */     StringBuffer stringBuffer1 = new StringBuffer();
+/* 160 */     StringBuffer stringBuffer2 = new StringBuffer();
+/* 161 */     StringBuffer stringBuffer3 = new StringBuffer();
+/* 162 */     for (byte b1 = 0; b1 < nodeList1.getLength(); b1++) {
+/* 163 */       Node node = nodeList1.item(b1);
+/* 164 */       if (node.getNodeType() == 1) {
+/*     */ 
+/*     */         
+/* 167 */         NodeList nodeList = ((Element)node).getElementsByTagName("MODELELEMENT");
+/* 168 */         for (byte b = 0; b < nodeList.getLength(); b++) {
+/* 169 */           Node node1 = nodeList.item(b);
+/* 170 */           if (node1.getNodeType() == 1) {
+/*     */ 
+/*     */             
+/* 173 */             Element element = (Element)node1;
+/* 174 */             String str5 = this.spstAbr.getNodeValue(element, "MACHTYPE", false);
+/* 175 */             String str6 = this.spstAbr.getNodeValue(element, "MODELATR", false);
+/*     */             
+/* 177 */             EntityItem entityItem1 = searchForModel(str5, str6);
+/*     */             
+/* 179 */             if (entityItem1 != null) {
+/* 180 */               if (isValidNewAvail(entityItem1, (Vector)paramHashtable.get("COUNTRYLIST"), "149")) {
+/* 181 */                 LinkActionItem linkActionItem = new LinkActionItem(null, this.spstAbr.getDatabase(), this.spstAbr.getProfile(), "LINKAVAILMODEL");
+/*     */                 
+/* 183 */                 entityItem = createOrRefAvail(entityItem1, entityItem, "CRPEERAVAIL", paramVector, paramHashtable, linkActionItem);
+/*     */                 
+/* 185 */                 this.spstAbr.setTextValue(this.spstAbr.getProfile(), "WTHDRWEFFCTVDATE", str1, entityItem1);
+/* 186 */                 this.spstAbr.setTextValue(this.spstAbr.getProfile(), "WITHDRAWDATE", str1, entityItem1);
+/* 187 */                 stringBuffer1.append(" " + str5 + str6 + " ");
+/*     */               } else {
+/* 189 */                 this.spstAbr.addError("ERROR_EXIST_AVAIL", (Object[])new String[] { "MODEL-" + str5 + str6 });
+/*     */               } 
+/*     */             } else {
+/* 192 */               this.spstAbr.addError("ERROR_MODEL_NOT_FOUND", (Object[])new String[] { str5, str6 });
+/*     */             } 
+/* 194 */             entityItem1 = null;
+/* 195 */             String str7 = this.spstAbr.getNodeValue(element, "SEOID", false);
+/* 196 */             EntityItem entityItem2 = searchForLSEO(str7);
+/* 197 */             if (entityItem2 != null) {
+/* 198 */               if (isValidNewAvail(entityItem2, (Vector)paramHashtable.get("COUNTRYLIST"), "149")) {
+/* 199 */                 LinkActionItem linkActionItem = new LinkActionItem(null, this.spstAbr.getDatabase(), this.spstAbr.getProfile(), "LINKAVAILLSEO");
+/* 200 */                 entityItem = createOrRefAvail(entityItem2, entityItem, "CRPEERAVAIL9", paramVector, paramHashtable, linkActionItem);
+/* 201 */                 this.spstAbr.setTextValue(this.spstAbr.getProfile(), "LSEOUNPUBDATEMTRGT", str1, entityItem2);
+/* 202 */                 stringBuffer2.append(" " + str7 + " ");
+/*     */               } else {
+/* 204 */                 this.spstAbr.addError("ERROR_EXIST_AVAIL", (Object[])new String[] { "LSEO-" + str7 });
+/*     */               } 
+/*     */             } else {
+/* 207 */               this.spstAbr.addError("ERROR_LSEO_NOT_FOUND2", (Object[])new String[] { str7 });
+/*     */             } 
+/* 209 */             entityItem2 = null;
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/* 213 */     }  NodeList nodeList2 = paramElement.getElementsByTagName("BUNDLELIST");
+/* 214 */     for (byte b2 = 0; b2 < nodeList2.getLength(); b2++) {
+/* 215 */       Node node = nodeList2.item(b2);
+/* 216 */       if (node.getNodeType() == 1) {
+/*     */ 
+/*     */         
+/* 219 */         NodeList nodeList = ((Element)node).getChildNodes();
+/* 220 */         for (byte b = 0; b < nodeList.getLength(); b++) {
+/* 221 */           Node node1 = nodeList.item(b);
+/* 222 */           if (node1.getNodeType() == 1) {
+/*     */ 
+/*     */             
+/* 225 */             Element element = (Element)node1;
+/* 226 */             String str = this.spstAbr.getNodeValue(element, "BDLSEOID", false);
+/* 227 */             EntityItem entityItem1 = searchForLSEOBUNDLE(str);
+/* 228 */             if (entityItem1 != null) {
+/* 229 */               if (isValidNewAvail(entityItem1, (Vector)paramHashtable.get("COUNTRYLIST"), "149")) {
+/* 230 */                 LinkActionItem linkActionItem = new LinkActionItem(null, this.spstAbr.getDatabase(), this.spstAbr.getProfile(), "LINKAVAILLSEOBUNDLE");
+/* 231 */                 entityItem = createOrRefAvail(entityItem1, entityItem, "CRPEERAVAIL10", paramVector, paramHashtable, linkActionItem);
+/* 232 */                 this.spstAbr.setTextValue(this.spstAbr.getProfile(), "BUNDLUNPUBDATEMTRGT", str1, entityItem1);
+/* 233 */                 stringBuffer3.append(" " + str + " ");
+/*     */               } else {
+/* 235 */                 this.spstAbr.addError("ERROR_EXIST_AVAIL", (Object[])new String[] { "LSEOBUNDLE-" + str });
+/*     */               } 
+/*     */             } else {
+/* 238 */               this.spstAbr.addError("ERROR_LSEOBUNDLE_NOT_FOUND", (Object[])new String[] { str });
+/*     */             } 
+/* 240 */             entityItem1 = null;
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */     
+/* 248 */     String str2 = stringBuffer1.toString();
+/* 249 */     if (str2.length() > 0) {
+/* 250 */       str2 = "<br />&nbsp;&nbsp;&nbsp;MODEL - " + str2;
+/*     */     }
+/* 252 */     String str3 = stringBuffer2.toString();
+/* 253 */     if (str3.length() > 0) {
+/* 254 */       str3 = "<br />&nbsp;&nbsp;&nbsp;LSEO - " + str3;
+/*     */     }
+/* 256 */     String str4 = stringBuffer3.toString();
+/* 257 */     if (str4.length() > 0) {
+/* 258 */       str4 = "<br />&nbsp;&nbsp;&nbsp;LSEOBUNDLE -" + str4;
+/*     */     }
+/* 260 */     if (entityItem != null) {
+/* 261 */       this.spstAbr.addOutput("CREATED_WD_AVAIL", (Object[])new String[] { (String)paramHashtable
+/* 262 */             .get("COMNAME"), paramStringBuffer.toString(), str2, str3, str4 });
+/*     */     }
+/* 264 */     entityItem = null;
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.sg;
 
-import java.rmi.RemoteException;
-import java.sql.SQLException;
-import java.util.Hashtable;
-import java.util.Vector;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import COM.ibm.eannounce.objects.EANBusinessRuleException;
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.eannounce.objects.LinkActionItem;
-import COM.ibm.eannounce.objects.WorkflowException;
-import COM.ibm.opicmpdh.middleware.LockException;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
-import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
-
-//$Log: SPSTWDAVAILABR.java,v $
-//Revision 1.5  2014/07/09 03:05:14  liuweimi
-//Fix out of memory issue
-//
-//Revision 1.4  2014/02/18 07:48:59  liuweimi
-//change based on BH FS Inbound Feed SPST20140120.doc.
-//Mapping updates for a few items and default values.
-//Add TAXCATG relator to service pacs.Check mapping for more details.
-//Create new AVAIL existing SEOs/MODELs for the different set of countries.
-//Check if a LSEO exists for the incoming bundle SEOID. If it does, fail the xml for that particular SEOID.
-//Set LSEOQTY attribute on LSEOBUNDLELSEO relator. When creating LSEOBUNDLELSEO relator, set LSEOQTY attribute to 1
-//
-//Revision 1.3  2014/01/07 14:55:15  liuweimi
-//3 Open issues - 1. If the first avail fails, continue to process other avails in the xml. This doesn't refer to invalid flag codes or invalid xml format
-//2. Check if a LSEO exists for the incoming bundle SEOID. If it does, fail the xml for that particular SEOID
-//3. Set LSEOQTY attribute on LSEOBUNDLELSEO relator. When creating LSEOBUNDLELSEO relator, set LSEOQTY attribute to 1
-//
-
-/**
- * Steps 1 to 3 below are for a model. Repeat these steps for LSEOs and LSEOBUNDLEs if they exist in the XML.
-
-	1.Search for MODEL using:
-	•	<MODEL.MACHTYPEATR> and <MODEL.MODELATR>
-	•	Update MODEL. WTHDRWEFFCTVDATE to the Withdraw Date provided by SPST based on XML mapping SS.
-	
-	2.Create AVAIL
-	The parent is the MODEL in step 1.Create AVAIL entity as follows.The attributes of the AVAIL  including default values are supplied via the XML shown in the SS.
-	Use the derive COMNAME value based in the SS.
-	
-	3.Link AVAIL to MODEL
-	Link the MODEL in step 1 to the newly created AVAIL in step 2. 
-	Create Report
-	
-	4. A report is created and submitted to Subscription/Notification as follows:
-	
-	Last Order Avail is created and the MODELs, LSEOs & LSEOBUNDLEs are linked to this Avail.
-	 
-	Userid:
-	Role:
-	Workgroup:
-	Date:
-	Description: Last Order Avail Created - AVAIL
-	Return code:
-	
-	<COMNAME> created for
-	<COUNTRY>
-	
-	And linked to 
-	
-	<MT> <MODEL>, 
-	<SEOID>, <BDLSEOID> as referenced
-
-
-
- * @author Will
- *
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\SPSTWDAVAILABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class SPSTWDAVAILABR extends SPSTABR {
-	
-	public void validateData(SPSTABRSTATUS theAbr, Element rootElem)
-			throws SQLException, MiddlewareException,
-			MiddlewareShutdownInProgressException {
-		super.validateData(theAbr, rootElem);
-	}
-
-	public String getVersion() {
-		return "1.0";
-	}
-
-	public String getTitle() {
-		return "Last Order Avail is created and the MODELs, LSEOs & LSEOBUNDLEs are linked to this Avail.";
-	}
-
-	public String getDescription() {
-		return "Last Order Avail Created - AVAIL";
-	}
-
-	
-	protected void checkRelatedEntities(Element availElem) throws SQLException, MiddlewareException,
-			MiddlewareShutdownInProgressException {
-		return;//no checking for this
-	}
-
-	/**
-	 * Steps 1 to 3 below are for a model. Repeat these steps for LSEOs and LSEOBUNDLEs if they exist in the XML.
-
-		1.Search for MODEL using:
-		•	<MODEL.MACHTYPEATR> and <MODEL.MODELATR>
-		•	Update MODEL. WTHDRWEFFCTVDATE to the Withdraw Date provided by SPST based on XML mapping SS.
-		
-		
-		2.Create AVAIL
-		The parent is the MODEL in step 1.Create AVAIL entity as follows.The attributes of the AVAIL  including default values are supplied via the XML shown in the SS.
-		Use the derive COMNAME value based in the SS.
-		
-		
-		3.Link AVAIL to MODEL
-		Link the MODEL in step 1 to the newly created AVAIL in step 2. 
- 
-	 */
-	protected void generateEntities(Vector availattcodeVct,
-			Hashtable availattValtab, Element availElem, StringBuffer availCntySb)
-			throws MiddlewareRequestException, SQLException,
-			MiddlewareException, EANBusinessRuleException, RemoteException,
-			MiddlewareShutdownInProgressException, LockException,
-			WorkflowException {
-		EntityItem availitem = null;
-		String effdate = (String)availattValtab.get("EFFECTIVEDATE");//get it for setting withdraw date for model, lseo and bundle
-		NodeList modelList =availElem.getElementsByTagName("MODELLIST");//MODELIST
-		//					<1..N>	<MODELELEMENT>		5	
-		StringBuffer modelmsg = new StringBuffer();
-		StringBuffer seomsg = new StringBuffer();
-		StringBuffer bundlemsg = new StringBuffer();
-		for (int f=0; f<modelList.getLength(); f++){
-			Node modelNode = modelList.item(f);
-			if (modelNode.getNodeType()!=Node.ELEMENT_NODE){							
-				continue;
-			}						
-			NodeList modelElems = ((Element)modelNode).getElementsByTagName("MODELELEMENT");//MODEL
-			for(int g=0;g<modelElems.getLength();g++){
-				Node modelelemNode = modelElems.item(g);
-				if(modelelemNode.getNodeType()!=Node.ELEMENT_NODE){
-					continue;
-				}
-				Element modelElem = (Element)modelelemNode;
-				String machtype = spstAbr.getNodeValue(modelElem, "MACHTYPE", false);
-				String modelatr = spstAbr.getNodeValue(modelElem,"MODELATR", false);
-				
-				EntityItem modelitem = this.searchForModel(machtype, modelatr);
-
-				if(modelitem !=null){
-					if(isValidNewAvail(modelitem,(Vector) availattValtab.get("COUNTRYLIST"), "149")){
-						LinkActionItem modelavaillink = new LinkActionItem(null, spstAbr.getDatabase(),spstAbr.getProfile(),MODELAVAIL_LINK_ACTION);
-						//create avail based on model, if the avail has been created, just do the reference
-						availitem = createOrRefAvail(modelitem, availitem, MODELAVAIL_CREATE_ACTION, availattcodeVct, availattValtab, 
-								modelavaillink);
-						spstAbr.setTextValue(spstAbr.getProfile(), "WTHDRWEFFCTVDATE", effdate,modelitem);
-						spstAbr.setTextValue(spstAbr.getProfile(), "WITHDRAWDATE", effdate,modelitem);					
-						modelmsg.append(" " + machtype + modelatr + " ");
-					}else{
-						spstAbr.addError("ERROR_EXIST_AVAIL",new String[]{"MODEL-"+machtype+modelatr});//TODO Fail the ABR
-					}
-				}else{
-					spstAbr.addError("ERROR_MODEL_NOT_FOUND",new String[]{machtype,modelatr});//Fail the ABR
-				}
-				modelitem = null;
-				String seoid = spstAbr.getNodeValue((Element)modelElem, "SEOID", false);
-				EntityItem lseo = this.searchForLSEO(seoid);
-				if(lseo != null){							
-					if(isValidNewAvail(lseo,(Vector) availattValtab.get("COUNTRYLIST"), "149")){
-						LinkActionItem lseolavaillink = new LinkActionItem(null, spstAbr.getDatabase(),spstAbr.getProfile(),LSEOAVAIL_LINK_ACTION);
-						availitem = createOrRefAvail(lseo, availitem, LSEOAVAIL_CREATE_ACTION, availattcodeVct, availattValtab, lseolavaillink);
-						spstAbr.setTextValue(spstAbr.getProfile(), "LSEOUNPUBDATEMTRGT", effdate,lseo);//TODO LSEOUNPUBDATEMTRGT?
-						seomsg.append(" " + seoid + " ");
-					}else{
-						spstAbr.addError("ERROR_EXIST_AVAIL",new String[]{"LSEO-" + seoid});//TODO Fail the ABR
-					}
-				}else{					
-					spstAbr.addError("ERROR_LSEO_NOT_FOUND2",new String[]{seoid});//Fail the ABR
-				}
-				lseo = null;
-			}
-		}
-//		1	<BUNDLELIST>		4	
-		NodeList bundleList =availElem.getElementsByTagName("BUNDLELIST");//BUNDLELIST
-		for (int f=0; f<bundleList.getLength(); f++){
-			Node bundlelNode = bundleList.item(f);
-			if (bundlelNode.getNodeType()!=Node.ELEMENT_NODE){							
-				continue;
-			}						
-			NodeList bundleElems = ((Element)bundlelNode).getChildNodes();
-			for(int g=0;g<bundleElems.getLength();g++){
-				Node bundleelemNode = bundleElems.item(g);
-				if(bundleelemNode.getNodeType()!=Node.ELEMENT_NODE){
-					continue;
-				}
-				Element bundleElem = (Element)bundleelemNode;
-				String seoid = spstAbr.getNodeValue(bundleElem, "BDLSEOID", false);
-				EntityItem bundle = this.searchForLSEOBUNDLE(seoid);
-				if(bundle != null){
-					if(isValidNewAvail(bundle,(Vector) availattValtab.get("COUNTRYLIST"), "149")){
-						LinkActionItem lai = new LinkActionItem(null,spstAbr.getDatabase(),spstAbr.getProfile(),LSEOBUNDLEAVAIL_LINK_ACTION);
-						availitem = this.createOrRefAvail(bundle, availitem, LSEOBUNDLEAVAIL_CREATE_ACTION, availattcodeVct, availattValtab, lai);
-						spstAbr.setTextValue(spstAbr.getProfile(), "BUNDLUNPUBDATEMTRGT", effdate,bundle);//TODO BUNDLUNPUBDATEMTRGT?
-						bundlemsg.append(" " + seoid + " ");
-					}else{
-						spstAbr.addError("ERROR_EXIST_AVAIL",new String[]{"LSEOBUNDLE-"+seoid});//TODO Fail the ABR
-					}
-				}else{
-					spstAbr.addError("ERROR_LSEOBUNDLE_NOT_FOUND",new String[]{seoid});//Fail the ABR
-				}
-				bundle = null;
-			}
-		}
-//		CREATED_WD_AVAIL = AVAIL - {0} created for <br />  &nbsp;&nbsp;&nbsp;country:{1}<br />&nbsp;&nbsp;&nbsp;
-//		And linked to <br />&nbsp;&nbsp;&nbsp;
-//		MODEL - {2} <br />&nbsp;&nbsp;&nbsp;
-//		LSEO - {3}<br />&nbsp;&nbsp;&nbsp;
-//		LSEOBUNDLE - {4} as referenced
-		String modelstr = modelmsg.toString();
-		if(modelstr.length()>0){
-			modelstr = "<br />&nbsp;&nbsp;&nbsp;MODEL - " + modelstr;
-		}
-		String seostr = seomsg.toString();
-		if(seostr.length()>0){
-			seostr = "<br />&nbsp;&nbsp;&nbsp;LSEO - " + seostr;
-		}
-		String bundlestr = bundlemsg.toString();
-		if(bundlestr.length() > 0){//sometimes bundle will not exiest in the xml
-			bundlestr = "<br />&nbsp;&nbsp;&nbsp;LSEOBUNDLE -" + bundlestr;
-		}
-		if(availitem!=null)
-			spstAbr.addOutput("CREATED_WD_AVAIL", new String[]{
-					(String)availattValtab.get("COMNAME"),availCntySb.toString(),modelstr,
-					seostr,bundlestr});
-		availitem=null;
-	}
-}

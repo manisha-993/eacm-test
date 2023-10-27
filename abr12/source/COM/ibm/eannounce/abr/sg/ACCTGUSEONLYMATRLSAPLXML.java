@@ -1,272 +1,278 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2007  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.abr.sg;
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.SAPLCHQISOElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLFixedElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLGEOElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLIdElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLItemElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLMessageIDElem;
+/*     */ import COM.ibm.eannounce.abr.util.SAPLNLSElem;
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.eannounce.objects.MetaFlag;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Vector;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class ACCTGUSEONLYMATRLSAPLXML
+/*     */   extends SAPLXMLBase
+/*     */ {
+/*     */   private static final String SAPVE_NAME = "SAPLVEACCTMATRL";
+/* 104 */   private static final Vector SAPLXMLMAP_VCT = new Vector(); static {
+/* 105 */     SAPLElem sAPLElem1 = new SAPLElem("wsnt:Notify");
+/*     */     
+/* 107 */     sAPLElem1.addXMLAttribute("xmlns:wsnt", "http://docs.oasis-open.org/wsn/2004/06/wsn-WS-BaseNotification-1.2-draft-01.xsd");
+/* 108 */     sAPLElem1.addXMLAttribute("xmlns:ebi", "http://ibm.com/esh/ebi");
+/*     */     
+/* 110 */     SAPLXMLMAP_VCT.addElement(sAPLElem1);
+/*     */     
+/* 112 */     SAPLElem sAPLElem2 = new SAPLElem("wsnt:NotificationMessage");
+/* 113 */     sAPLElem1.addChild(sAPLElem2);
+/*     */     
+/* 115 */     sAPLElem2.addChild(new SAPLTopicElem());
+/* 116 */     SAPLElem sAPLElem3 = new SAPLElem("wsnt:Message");
+/* 117 */     sAPLElem2.addChild(sAPLElem3);
+/*     */     
+/* 119 */     sAPLElem3.addChild((SAPLElem)new SAPLMessageIDElem());
+/* 120 */     sAPLElem3.addChild((SAPLElem)new SAPLFixedElem("ebi:priority", "Normal"));
+/* 121 */     sAPLElem3.addChild((SAPLElem)new SAPLFixedElem("PayloadFormat", "EACM_Material"));
+/* 122 */     sAPLElem3.addChild((SAPLElem)new SAPLFixedElem("NativeCodePage", "1208"));
+/*     */     
+/* 124 */     SAPLElem sAPLElem4 = new SAPLElem("body");
+/* 125 */     sAPLElem3.addChild(sAPLElem4);
+/*     */     
+/* 127 */     SAPLElem sAPLElem5 = new SAPLElem("Material");
+/* 128 */     sAPLElem4.addChild(sAPLElem5);
+/*     */ 
+/*     */     
+/* 131 */     sAPLElem5.addChild((SAPLElem)new SAPLFixedElem("EACMEntityType", "ACCTGUSEONLYMATRL"));
+/* 132 */     sAPLElem5.addChild((SAPLElem)new SAPLIdElem("EACMEntityId"));
+/* 133 */     sAPLElem5.addChild(new SAPLElem("Division", "ACCTGUSEONLYMATRL", "DIV", true, 1));
+/* 134 */     sAPLElem5.addChild(new SAPLElem("ProductID", "ACCTGUSEONLYMATRL", "ACCTGUSEONLYMATRLID", true));
+/* 135 */     sAPLElem5.addChild(new SAPLElem("ProductTypeCode", "ACCTGUSEONLYMATRL", "PRODTYPE", true, 1));
+/* 136 */     sAPLElem5.addChild(new SAPLElem("ProfitCenter", "ACCTGUSEONLYMATRL", "PRFTCTR", true, 1));
+/* 137 */     sAPLElem5.addChild(new SAPLElem("VendorNumber", "ACCTGUSEONLYMATRL", "VENDID", true));
+/* 138 */     sAPLElem5.addChild(new SAPLElem("AccountAssignmentGroup", "ACCTGUSEONLYMATRL", "ACCTASGNGRP", true, 1));
+/*     */     
+/* 140 */     SAPLElem sAPLElem6 = new SAPLElem("DescriptionDataList");
+/* 141 */     SAPLNLSElem sAPLNLSElem = new SAPLNLSElem("DescriptionData");
+/*     */     
+/* 143 */     sAPLNLSElem.addChild(new SAPLElem("MaterialDescription", "ACCTGUSEONLYMATRL", "PRCFILENAM", true));
+/* 144 */     sAPLNLSElem.addChild((SAPLElem)new SAPLCHQISOElem("DescriptionLanguage"));
+/*     */ 
+/*     */     
+/* 147 */     sAPLElem6.addChild((SAPLElem)sAPLNLSElem);
+/*     */     
+/* 149 */     sAPLElem5.addChild(sAPLElem6);
+/*     */     
+/* 151 */     sAPLElem6 = new SAPLElem("GeographyList");
+/* 152 */     sAPLElem5.addChild(sAPLElem6);
+/* 153 */     SAPLGEOElem sAPLGEOElem = new SAPLGEOElem("Geography", "GEODATE", "GEODATEGAA");
+/* 154 */     sAPLElem6.addChild((SAPLElem)sAPLGEOElem);
+/* 155 */     sAPLGEOElem.addChild((SAPLElem)new SAPLItemElem("RFAGEO", "GENERALAREA", "RFAGEO"));
+/* 156 */     sAPLGEOElem.addChild((SAPLElem)new SAPLItemElem("Country", "GENERALAREA", "GENAREANAME"));
+/* 157 */     sAPLGEOElem.addChild((SAPLElem)new SAPLItemElem("SalesOrg", "GENERALAREA", "SLEORG"));
+/* 158 */     sAPLGEOElem.addChild((SAPLElem)new SAPLItemElem("SalesOffice", "GENERALAREA", "SLEOFFC"));
+/* 159 */     sAPLGEOElem.addChild((SAPLElem)new SAPLItemElem("ProductAnnounceDateCountry", "GEODATE", "PUBFROM"));
+/* 160 */     sAPLGEOElem.addChild((SAPLElem)new SAPLItemElem("ProductWithdrawalDate", "GEODATE", "PUBTO"));
+/*     */     
+/* 162 */     sAPLElem6 = new SAPLElem("PlantDataList");
+/* 163 */     sAPLElem5.addChild(sAPLElem6);
+/* 164 */     SAPLElem sAPLElem7 = new SAPLElem("PlantData");
+/* 165 */     sAPLElem6.addChild(sAPLElem7);
+/* 166 */     sAPLElem7.addChild(new SAPLElem("Plant", "ACCTGUSEONLYMATRL", "PLNTCD", true, 1));
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected Vector getMQPropertiesFN() {
+/* 177 */     Vector<String> vector = new Vector(1);
+/* 178 */     vector.add("OIDHMQSERIES");
+/* 179 */     return vector;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getSaplVeName() {
+/* 185 */     return "SAPLVEACCTMATRL";
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   protected Vector getSAPLXMLMap() {
+/* 190 */     return SAPLXMLMAP_VCT;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getVersion() {
+/* 199 */     return "1.2";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   static class SAPLTopicElem
+/*     */     extends SAPLElem
+/*     */   {
+/*     */     SAPLTopicElem() {
+/* 217 */       super("wsnt:Topic", null, null, false);
+/* 218 */       addXMLAttribute("Dialect", "http://docs.oasis-open.org/wsn/t-1/TopicExpression/Concrete");
+/*     */     }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*     */     public void addElements(Database param1Database, EntityList param1EntityList, Document param1Document, Element param1Element, StringBuffer param1StringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 241 */       Element element = param1Document.createElement(this.nodeName);
+/* 242 */       addXMLAttrs(element);
+/* 243 */       EntityItem entityItem = param1EntityList.getParentEntityGroup().getEntityItem(0);
+/*     */       
+/* 245 */       String str1 = "esh:MaterialManual/Scope/";
+/* 246 */       String str2 = " ";
+/*     */ 
+/*     */       
+/* 249 */       EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("PRODTYPE");
+/* 250 */       if (eANFlagAttribute != null) {
+/*     */         
+/* 252 */         MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 253 */         for (byte b1 = 0; b1 < arrayOfMetaFlag.length; b1++) {
+/*     */           
+/* 255 */           if (arrayOfMetaFlag[b1].isSelected()) {
+/* 256 */             str2 = arrayOfMetaFlag[b1].getFlagCode();
+/*     */             
+/*     */             break;
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/* 262 */       element.appendChild(param1Document.createTextNode(str1 + str2));
+/* 263 */       param1Element.appendChild(element);
+/*     */ 
+/*     */       
+/* 266 */       for (byte b = 0; b < this.childVct.size(); b++) {
+/* 267 */         SAPLElem sAPLElem = this.childVct.elementAt(b);
+/* 268 */         sAPLElem.addElements(param1Database, param1EntityList, param1Document, element, param1StringBuffer);
+/*     */       } 
+/*     */     }
+/*     */   }
+/*     */ }
 
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-import java.util.*;
-import org.w3c.dom.*;
 
-/**********************************************************************************
-* ACCTGUSEONLYMATRLSAPLXML class generates xml for ACCTGUSEONLYMATRL
-*
-* From "SG FS ABR SAPL 20070830.doc"
-*
-*/
-// ACCTGUSEONLYMATRLSAPLXML.java,v
-// Revision 1.2  2008/01/22 17:11:18  wendy
-// Cleanup RSA warnings
-//
-// Revision 1.1  2007/09/13 12:40:28  wendy
-// Init for RQ0426071527 - XCC GX
-//
-//
-public class ACCTGUSEONLYMATRLSAPLXML extends SAPLXMLBase
-{
-
-    private static final String SAPVE_NAME = "SAPLVEACCTMATRL";  // extract to use for xml
-/*
-SAPLVEACCTMATRL	0	ACCTGUSEONLYMATRL	Relator	ACCTMATRLGEODATE	GEODATE
-SAPLVEACCTMATRL	1	GEODATE	Association	GEODATEGAA	GENERALAREA
-*/
-
-    private static final Vector SAPLXMLMAP_VCT;
-
-/* SAPL XML
-1   <Material>
-2   <EACMEntityType>    "ACCTGUSEONLYMATRL"
-2   <EACMEntityId>  EntityId of EACM EntityType
-2   <Division>  ACCTGUSEONLYMATRL.ClassOf(DIV)
-2   <ProductID> ACCTGUSEONLYMATRL.ACCTGUSEONLYMATRLID
-2   <ProductTypeCode>  ACCTGUSEONLYMATRL.ClassOf(PRODTYPE)
-2   <ProfitCenter>  ACCTGUSEONLYMATRL.ClassOf(PRFTCTR)
-2   <VendorNumber>  ACCTGUSEONLYMATRL.VENDID
-2   <AccountAssignmentGroup>    ACCTGUSEONLYMATRL.ClassOf(ACCTASGNGRP)
-2   <DescriptionDataList>
-3   <DescriptionData>
-4   <MaterialDescription>   ACCTGUSEONLYMATRL.PRCFILENAM
-4   <DescriptionLanguage>   NLSID ==> CHQISONLSIDMAP.CHQNLSID : CHQISONLSID.CHQISOLANG
-3   </DescriptionData>
-2   </DescriptionDataList>
-2   <GeographyList>
-3   <Geography> use GEODATE.COUNTRYLIST to GENERALAREA where GENERALAREA.GENAREATYPE=2452 (Country)
-4   <RFAGEO>    GENERALAREA.RFAGEO
-4   <Country>   GENERALAREA.GENAREANAME
-4   <SalesOrg>  GENERALAREA.SLEORG
-4   <SalesOffice>   GENERALAREA.SLEOFFC
-4   <ProductAnnounceDateCountry>    GEODATE.PUBFROM
-4   <ProductWithdrawalDate> GEODATE.PUBTO
-3   </Geography>
-2   </GeographyList>
-2   <PlantDataList>
-3   <PlantData>
-4   <Plant> ACCTGUSEONLYMATRL..ClassOf(PLNTCD)
-3   </PlantData>
-2   </PlantDataList>
-1   </Material>
-
-*/
-
-/*
-1	<wsnt:Notify xmlns:wsnt="http://docs.oasis-open.org/wsn/2004/06/wsn-WS-BaseNotification-1.2-draft-01.xsd" xmlns:ebi="http://ibm.com/esh/ebi">
-2	<wsnt:NotificationMessage>
-3	<wsnt:Topic Dialect="http://docs.oasis-open.org/wsn/t-1/TopicExpression/Concrete">
-	For MODEL, PRODSTRUCT, SWPRODSTRUCT, ORDABLEPARTNO
-		Type/Legacy/Nomenclature/?1/Country/?2/?2/.../EndCountry/
-	For ACCTGUSEONLYMATRL
-		Type/Manual/Scope/?3/
-3	</wsnt:Topic>
-3	<wsnt:Message>
-4	<ebi:MessageID>	EA00000000
-4	<ebi:priority>	"Normal"
-4	<PayloadFormat>	EACM_Material
-4	<NativeCodePage>	0
-4	<body>
-	insert EACM PayLoad here
-4	</body>
-3	</wsnt:Message>
-2	</wsnt:NotificationMessage>
-1	</wsnt:Notify>
-Substitution Explanation
-	?1 = MTM for Model or Prodstruct
-	?1 = PN for OrderablePartnumber
-	?2 = Country (GENERALAREA.GENAREACODE)
-	?3 = ACCTGUSEONLYMATRL.PRODTYPE
-
-*/
-
-    static {
-        SAPLXMLMAP_VCT = new Vector();  // set of elements
-        SAPLElem topElem = new SAPLElem("wsnt:Notify");
-
-        topElem.addXMLAttribute("xmlns:wsnt",XMLNS_WSNT);
-		topElem.addXMLAttribute("xmlns:ebi",XMLNS_EBI);
-
-		SAPLXMLMAP_VCT.addElement(topElem);
-		 // level2
-        SAPLElem level2Elem = new SAPLElem("wsnt:NotificationMessage");
-        topElem.addChild(level2Elem);
-		//level 3
-        level2Elem.addChild(new SAPLTopicElem());
-        SAPLElem messageElem = new SAPLElem("wsnt:Message");
-        level2Elem.addChild(messageElem);
-        // level4
-		messageElem.addChild(new SAPLMessageIDElem());
-		messageElem.addChild(new SAPLFixedElem("ebi:priority","Normal"));
-		messageElem.addChild(new SAPLFixedElem("PayloadFormat","EACM_Material"));
-		messageElem.addChild(new SAPLFixedElem("NativeCodePage","1208"));
-
- 	    SAPLElem bodyElem = new SAPLElem("body");
- 	    messageElem.addChild(bodyElem);
-
-        SAPLElem materialElem = new SAPLElem("Material"); // add EACM payload level1
-        bodyElem.addChild(materialElem);
-
-        // add EACM payload level2(s)
-		materialElem.addChild(new SAPLFixedElem("EACMEntityType","ACCTGUSEONLYMATRL"));
-		materialElem.addChild(new SAPLIdElem("EACMEntityId"));
-		materialElem.addChild(new SAPLElem("Division","ACCTGUSEONLYMATRL","DIV",true,SAPLElem.FLAGVAL));
-        materialElem.addChild(new SAPLElem("ProductID","ACCTGUSEONLYMATRL","ACCTGUSEONLYMATRLID",true));
-        materialElem.addChild(new SAPLElem("ProductTypeCode","ACCTGUSEONLYMATRL","PRODTYPE",true,SAPLElem.FLAGVAL));
-        materialElem.addChild(new SAPLElem("ProfitCenter","ACCTGUSEONLYMATRL","PRFTCTR",true,SAPLElem.FLAGVAL));
-        materialElem.addChild(new SAPLElem("VendorNumber","ACCTGUSEONLYMATRL","VENDID",true));
-        materialElem.addChild(new SAPLElem("AccountAssignmentGroup","ACCTGUSEONLYMATRL","ACCTASGNGRP",true,SAPLElem.FLAGVAL));
-
-        SAPLElem listElem = new SAPLElem("DescriptionDataList");
-		SAPLElem elem3 = new SAPLNLSElem("DescriptionData");
-		// add level4
-        elem3.addChild(new SAPLElem("MaterialDescription","ACCTGUSEONLYMATRL","PRCFILENAM",true));
-		elem3.addChild(new SAPLCHQISOElem("DescriptionLanguage"));
-
-        // add level3
-        listElem.addChild(elem3);
-        // add level2(s)
-        materialElem.addChild(listElem);
-
-		listElem = new SAPLElem("GeographyList"); // level2
-        materialElem.addChild(listElem);
-        elem3 = new SAPLGEOElem("Geography","GEODATE","GEODATEGAA");  		// level3
-        listElem.addChild(elem3);
-        elem3.addChild(new SAPLItemElem("RFAGEO","GENERALAREA","RFAGEO"));
-        elem3.addChild(new SAPLItemElem("Country","GENERALAREA","GENAREANAME"));
-        elem3.addChild(new SAPLItemElem("SalesOrg","GENERALAREA","SLEORG"));
-        elem3.addChild(new SAPLItemElem("SalesOffice","GENERALAREA","SLEOFFC"));
-        elem3.addChild(new SAPLItemElem("ProductAnnounceDateCountry","GEODATE","PUBFROM"));
-        elem3.addChild(new SAPLItemElem("ProductWithdrawalDate","GEODATE","PUBTO"));
-
-		listElem = new SAPLElem("PlantDataList"); // level2
-        materialElem.addChild(listElem);
-        elem3 = new SAPLElem("PlantData");  		// level3
-        listElem.addChild(elem3);
-        elem3.addChild(new SAPLElem("Plant","ACCTGUSEONLYMATRL","PLNTCD",true,SAPLElem.FLAGVAL));
-    }
-
-    /**********************************
-    * get the name(s) of the MQ properties file to use, could be more than one
-    TIR 7STP5L
-Wayne Kehrli
-ESH = all but ACCGUSEONLYMATRL
-OIDH = all but PRODSTRUCT & SWPRODSTRUCT
-	*/
-    protected Vector getMQPropertiesFN() {
-        Vector vct = new Vector(1);
-        vct.add(OIDHMQSERIES);
-        return vct;
-    }
-
-    /**********************************
-    * get the name of the VE to use for the feed
-    */
-    protected String getSaplVeName() { return SAPVE_NAME;}
-
-    /**********************************
-    * get SAPL xml objects
-    */
-    protected Vector getSAPLXMLMap() { return SAPLXMLMAP_VCT;}
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getVersion()
-    {
-        return "1.2";
-    }
-	static class SAPLTopicElem extends SAPLElem
-	{
-		/**********************************************************************************
-		* Constructor for Topic element
-		*
-		*3	<wsnt:Topic Dialect="http://docs.oasis-open.org/wsn/t-1/TopicExpression/Concrete">
-		*	For MODEL, PRODSTRUCT, SWPRODSTRUCT, ORDABLEPARTNO
-		*		Type/Legacy/Nomenclature/?1/Country/?2/?2/.../EndCountry/
-		*	For AccountingUse
-		*	esh:MaterialManual/Scope/val(ACCTGUSEONLYMATRL.PRODTYPE)
-		*3	</wsnt:Topic>
-		*
-		*?3 = ACCTGUSEONLYMATRL.PRODTYPE
-		*/
-		SAPLTopicElem()
-		{
-			super("wsnt:Topic",null,null,false);
-			addXMLAttribute("Dialect", "http://docs.oasis-open.org/wsn/t-1/TopicExpression/Concrete");
-		}
-
-		/**********************************************************************************
-		* Create a node for this element and add to the parent and any children this node has
-		*
-		*@param list EntityList
-		*@param document Document needed to create nodes
-		*@param parent Element node to add this node too
-		*@param debugSb StringBuffer for debug output
-		*/
-		public void addElements(Database dbCurrent,EntityList list, Document document, Element parent,
-			StringBuffer debugSb)
-        throws
-			COM.ibm.eannounce.objects.EANBusinessRuleException,
-			java.sql.SQLException,
-			COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-			COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-			java.rmi.RemoteException,
-			java.io.IOException,
-			COM.ibm.opicmpdh.middleware.MiddlewareException,
-			COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-		{
-			Element elem = (Element) document.createElement(nodeName);
-			addXMLAttrs(elem);
-			EntityItem item = list.getParentEntityGroup().getEntityItem(0);
-
-			String value = "esh:MaterialManual/Scope/";
-			String flagcode = " ";
-			//	PokUtils.getAttributeValue(item, "PRODTYPE",", ", " ", false);
-
-			EANFlagAttribute fAtt = (EANFlagAttribute)item.getAttribute("PRODTYPE");
-			if (fAtt!=null){
-				// Get the selected Flag code
-				MetaFlag[] mfArray = (MetaFlag[]) fAtt.get();
-				for (int i = 0; i < mfArray.length; i++){
-					// get selection
-					if (mfArray[i].isSelected()){
-						flagcode=(mfArray[i].getFlagCode());
-						break;
-					}  // metaflag is selected
-				}// end of flagcodes
-			}
-
-			elem.appendChild(document.createTextNode(value+flagcode));
-			parent.appendChild(elem);
-
-			// add any children
-			for (int c=0; c<childVct.size(); c++){
-				SAPLElem childElem = (SAPLElem)childVct.elementAt(c);
-				childElem.addElements(dbCurrent,list, document,elem,debugSb);
-			}
-		}
-	}
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\ACCTGUSEONLYMATRLSAPLXML.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

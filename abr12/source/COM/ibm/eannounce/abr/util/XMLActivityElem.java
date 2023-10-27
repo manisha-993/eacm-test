@@ -1,118 +1,124 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.opicmpdh.middleware.D;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import com.ibm.transform.oim.eacm.diff.DiffEntity;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Hashtable;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class XMLActivityElem
+/*     */   extends XMLElem
+/*     */ {
+/*     */   public XMLActivityElem(String paramString) {
+/*  46 */     super(paramString);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addElements(Database paramDatabase, EntityList paramEntityList, Document paramDocument, Element paramElement, EntityItem paramEntityItem, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  70 */     D.ebug(0, "Working on the item:" + this.nodeName);
+/*  71 */     Element element = paramDocument.createElement(this.nodeName);
+/*  72 */     addXMLAttrs(element);
+/*     */     
+/*  74 */     element.appendChild(paramDocument.createTextNode("Update"));
+/*  75 */     paramElement.appendChild(element);
+/*     */ 
+/*     */     
+/*  78 */     for (byte b = 0; b < this.childVct.size(); b++) {
+/*  79 */       XMLElem xMLElem = this.childVct.elementAt(b);
+/*  80 */       xMLElem.addElements(paramDatabase, paramEntityList, paramDocument, element, paramEntityItem, paramStringBuffer);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addElements(Database paramDatabase, Hashtable paramHashtable, Document paramDocument, Element paramElement, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 105 */     D.ebug(0, "Working on the item:" + this.nodeName);
+/* 106 */     Element element = paramDocument.createElement(this.nodeName);
+/* 107 */     addXMLAttrs(element);
+/*     */     
+/* 109 */     element.appendChild(paramDocument.createTextNode(paramDiffEntity.isDeleted() ? "Delete" : "Update"));
+/* 110 */     paramElement.appendChild(element);
+/*     */ 
+/*     */     
+/* 113 */     for (byte b = 0; b < this.childVct.size(); b++) {
+/* 114 */       XMLElem xMLElem = this.childVct.elementAt(b);
+/* 115 */       xMLElem.addElements(paramDatabase, paramHashtable, paramDocument, element, paramDiffEntity, paramStringBuffer);
+/*     */     } 
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.util;
 
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.objects.*;
-
-import org.w3c.dom.*;
-import java.util.*;
-import com.ibm.transform.oim.eacm.diff.*;
-
-/**********************************************************************************
-*  Class used to hold info and structure to be generated for the xml feed
-* for abrs.  Checks for deleted or updated entity
-*/
-// $Log: XMLActivityElem.java,v $
-// Revision 1.2  2020/02/05 13:29:08  xujianbo
-// Add debug info to investigate   performance issue
-//
-// Revision 1.1  2008/04/17 19:37:53  wendy
-// Init for
-// -   CQ00003539-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC
-// -   CQ00005096-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Add Category MM and Images
-// -   CQ00005046-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Support CRAD in BHC
-// -   CQ00005045-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Upgrade/Conversion Support
-// -   CQ00006862-WI  - BHC 3.0 Support - Support for Services Data UI
-//
-//
-
-public class XMLActivityElem extends XMLElem
-{
-    /**********************************************************************************
-    * Constructor for ACTIVITY elements
-    *
-    * <ACTIVITY>	</ACTIVITY>			2	MODEL	Activity "Delete":"Update"
-    *
-    *@param nname String with name of node to be created
-    */
-    public XMLActivityElem(String nname)
-    {
-        super(nname);
-    }
-
-    /**********************************************************************************
-    * Create a node for this element and add to the parent and any children this node has
-    *
-    *@param dbCurrent Database
-    *@param list EntityList
-    *@param document Document needed to create nodes
-    *@param parent Element node to add this node too
-    *@param debugSb StringBuffer for debug output
-    */
-    public void addElements(Database dbCurrent,EntityList list, Document document, Element parent,
-        EntityItem parentItem,StringBuffer debugSb)
-    throws
-        COM.ibm.eannounce.objects.EANBusinessRuleException,
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-        java.rmi.RemoteException,
-        java.io.IOException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {
-    	D.ebug(D.EBUG_ERR,"Working on the item:"+nodeName);
-        Element elem = (Element) document.createElement(nodeName);
-        addXMLAttrs(elem);
-        // fixme more work needed if this method with list is used, must determine if entity was deleted
-        elem.appendChild(document.createTextNode(UPDATE_ACTIVITY));
-        parent.appendChild(elem);
-
-        // add any children
-        for (int c=0; c<childVct.size(); c++){
-            XMLElem childElem = (XMLElem)childVct.elementAt(c);
-            childElem.addElements(dbCurrent,list, document,elem,parentItem,debugSb);
-        }
-    }
-    /**********************************************************************************
-    * Create a node for this element and add to the parent and any children this node has
-    *
-    *@param dbCurrent Database
-    *@param table Hashtable of Vectors of DiffEntity
-    *@param document Document needed to create nodes
-    *@param parent Element node to add this node too
-    *@param parentItem DiffEntity - parent to use if path is specified in XMLGroupElem, item to use otherwise
-    *@param debugSb StringBuffer for debug output
-    */
-    public void addElements(Database dbCurrent,Hashtable table, Document document, Element parent,
-        DiffEntity parentItem, StringBuffer debugSb)
-    throws
-        COM.ibm.eannounce.objects.EANBusinessRuleException,
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-        java.rmi.RemoteException,
-        java.io.IOException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {
-    	D.ebug(D.EBUG_ERR,"Working on the item:"+nodeName);
-        Element elem = (Element) document.createElement(nodeName);
-        addXMLAttrs(elem);
-        // check if this was deleted or not
-        elem.appendChild(document.createTextNode(parentItem.isDeleted()?DELETE_ACTIVITY:UPDATE_ACTIVITY));
-        parent.appendChild(elem);
-
-        // add any children
-        for (int c=0; c<childVct.size(); c++){
-            XMLElem childElem = (XMLElem)childVct.elementAt(c);
-            childElem.addElements(dbCurrent,table, document,elem,parentItem,debugSb);
-        }
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\XMLActivityElem.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

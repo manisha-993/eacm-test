@@ -1,1496 +1,1502 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2009  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.abr.sg;
+/*      */ package COM.ibm.eannounce.abr.sg;
+/*      */ 
+/*      */ import COM.ibm.eannounce.abr.util.ABRUtil;
+/*      */ import COM.ibm.eannounce.abr.util.EACustom;
+/*      */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*      */ import COM.ibm.eannounce.objects.DeleteActionItem;
+/*      */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*      */ import COM.ibm.eannounce.objects.EANList;
+/*      */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*      */ import COM.ibm.eannounce.objects.EntityGroup;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.EntityList;
+/*      */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*      */ import COM.ibm.eannounce.objects.LinkActionItem;
+/*      */ import COM.ibm.eannounce.objects.SBRException;
+/*      */ import COM.ibm.eannounce.objects.WorkflowException;
+/*      */ import COM.ibm.opicmpdh.middleware.LockException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*      */ import COM.ibm.opicmpdh.middleware.Profile;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.io.PrintWriter;
+/*      */ import java.io.StringWriter;
+/*      */ import java.rmi.RemoteException;
+/*      */ import java.sql.SQLException;
+/*      */ import java.text.MessageFormat;
+/*      */ import java.util.Hashtable;
+/*      */ import java.util.Iterator;
+/*      */ import java.util.ResourceBundle;
+/*      */ import java.util.Vector;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public class BOXERWWSEOABRALWR
+/*      */   extends PokBaseABR
+/*      */ {
+/*   61 */   private StringBuffer rptSb = new StringBuffer();
+/*   62 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/*   63 */   static final String NEWLINE = new String(FOOL_JTEST);
+/*   64 */   private Object[] args = (Object[])new String[10];
+/*      */   
+/*   66 */   private ResourceBundle rsBundle = null;
+/*   67 */   private Hashtable metaTbl = new Hashtable<>();
+/*   68 */   private String navName = ""; private EntityItem modelItem;
+/*      */   private EntityItem wwseoItem;
+/*   70 */   private Vector cdentityVct = new Vector();
+/*   71 */   private Vector createdLseoVct = new Vector(1);
+/*   72 */   private Vector updatedLseoVct = new Vector(1);
+/*   73 */   private LinkActionItem lai = null;
+/*   74 */   private DeleteActionItem dai = null;
+/*   75 */   private Hashtable fcodePsTbl = new Hashtable<>();
+/*   76 */   private Vector seoidVct = new Vector();
+/*      */   
+/*      */   private static final String LSEO_CREATEACTION_NAME = "CRPEERLSEO";
+/*      */   
+/*      */   private static final String LSEO_SRCHACTION_NAME = "SRDLSEO4";
+/*      */   private static final String LSEOPS_LINKACTION_NAME = "LINKPRODSTRUCTLSEO";
+/*      */   private static final String LSEOPS_DELETEACTION_NAME = "DELLSEOPRODSTRUCT";
+/*      */   private static final String STATUS_FINAL = "0020";
+/*   84 */   private static final String[] FCLIST_ATTR = new String[] { "LINECORDFCLIST", "KEYBRDFCLIST", "POINTDEVFCLIST", "CTRYPACKFCLIST", "LANGPACKFCLIST", "PACKAGINGFCLIST", "PUBFCLIST", "OTHERFCLIST" };
+/*      */ 
+/*      */   
+/*   87 */   private static final String[] REQ_CDENTITY_ATTR = new String[] { "COUNTRYLIST", "CD", "GENAREASELECTION" };
+/*   88 */   private static final String[] REQ_WWSEO_ATTR = new String[] { "SEOID", "XXPARTNO" };
+/*   89 */   private static final String[] REQ_LSEO_ATTR = new String[] { "XXPARTNO" };
+/*      */ 
+/*      */   
+/*   92 */   private static final Vector AUDIEN_VCT = new Vector(); static {
+/*   93 */     AUDIEN_VCT.addElement("10046");
+/*   94 */     AUDIEN_VCT.addElement("10048");
+/*   95 */     AUDIEN_VCT.addElement("10054");
+/*   96 */     AUDIEN_VCT.addElement("10062");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void execute_run() {
+/*  119 */     String str1 = "<head>" + EACustom.getMetaTags(getDescription()) + NEWLINE + EACustom.getCSS() + NEWLINE + EACustom.getTitle("{0} {1}") + NEWLINE + "</head>" + NEWLINE + "<body id=\"ibm-com\">" + EACustom.getMastheadDiv() + NEWLINE + "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
+/*      */     
+/*  121 */     String str2 = "<table>" + NEWLINE + "<tr><th>Userid: </th><td>{0}</td></tr>" + NEWLINE + "<tr><th>Role: </th><td>{1}</td></tr>" + NEWLINE + "<tr><th>Workgroup: </th><td>{2}</td></tr>" + NEWLINE + "<tr><th>Date: </th><td>{3}</td></tr>" + NEWLINE + "<tr><th>Description: </th><td>{4}</td></tr>" + NEWLINE + "<tr><th>Return code: </th><td>{5}</td></tr>" + NEWLINE + "</table>" + NEWLINE + "<!-- {6} -->" + NEWLINE;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  132 */     String str3 = "";
+/*  133 */     String str4 = "";
+/*      */     
+/*  135 */     println(EACustom.getDocTypeHtml());
+/*      */     
+/*      */     try {
+/*  138 */       start_ABRBuild(false);
+/*      */       
+/*  140 */       String str = "BOXERWWSEO";
+/*  141 */       if (getEntityType().equals("LSEO")) {
+/*  142 */         str = "BOXERLSEO";
+/*      */       }
+/*      */ 
+/*      */       
+/*  146 */       this.m_elist = this.m_db.getEntityList(this.m_prof, new ExtractActionItem(null, this.m_db, this.m_prof, str), new EntityItem[] { new EntityItem(null, this.m_prof, 
+/*      */               
+/*  148 */               getEntityType(), getEntityID()) });
+/*      */ 
+/*      */       
+/*  151 */       this.rsBundle = ResourceBundle.getBundle(getClass().getName(), ABRUtil.getLocale(this.m_prof.getReadLanguage().getNLSID()));
+/*      */       
+/*  153 */       EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*      */       
+/*  155 */       addDebug("DEBUG: " + getShortClassName(getClass()) + " entered for " + entityItem.getKey() + " extract: " + str + " using DTS: " + this.m_prof
+/*  156 */           .getValOn() + NEWLINE + PokUtils.outputList(this.m_elist));
+/*      */ 
+/*      */       
+/*  159 */       setReturnCode(0);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  164 */       this.navName = getNavigationName(entityItem);
+/*  165 */       str3 = "&quot;" + this.m_elist.getParentEntityGroup().getLongDescription() + "&quot; " + this.navName;
+/*      */       
+/*  167 */       this.modelItem = this.m_elist.getEntityGroup("MODEL").getEntityItem(0);
+/*      */       
+/*  169 */       if (getEntityType().equals("WWSEO")) {
+/*  170 */         this.wwseoItem = entityItem;
+/*  171 */         verifyEntity(entityItem, REQ_WWSEO_ATTR);
+/*      */       } else {
+/*  173 */         this.wwseoItem = this.m_elist.getEntityGroup("WWSEO").getEntityItem(0);
+/*  174 */         verifyEntity(entityItem, REQ_LSEO_ATTR);
+/*      */       } 
+/*      */       
+/*  177 */       if (this.wwseoItem == null) {
+/*      */         
+/*  179 */         this.args[0] = this.m_elist.getEntityGroup("WWSEO").getLongDescription();
+/*  180 */         addError("NOT_FOUND_ERR", this.args);
+/*      */       } 
+/*  182 */       if (this.modelItem == null) {
+/*      */         
+/*  184 */         this.args[0] = this.m_elist.getEntityGroup("MODEL").getLongDescription();
+/*  185 */         addError("NOT_FOUND_ERR", this.args);
+/*      */       } 
+/*  187 */       if (this.m_elist.getEntityGroup("CDG").getEntityItemCount() == 0) {
+/*      */         
+/*  189 */         this.args[0] = this.m_elist.getEntityGroup("CDG").getLongDescription();
+/*  190 */         addError("NOT_FOUND_ERR", this.args);
+/*      */       } 
+/*  192 */       if (this.m_elist.getEntityGroup("CDG").getEntityItemCount() > 1) {
+/*      */         
+/*  194 */         this.args[0] = this.m_elist.getEntityGroup("CDG").getLongDescription();
+/*  195 */         addError("MULTIPLE_ERR", this.args);
+/*      */       } 
+/*  197 */       if (getReturnCode() == 0) {
+/*  198 */         EntityItem entityItem1 = this.m_elist.getEntityGroup("CDG").getEntityItem(0);
+/*      */ 
+/*      */         
+/*  201 */         Vector vector = checkCDEntity(entityItem, entityItem1);
+/*  202 */         EntityList entityList = null;
+/*  203 */         if (vector.size() > 0) {
+/*      */           
+/*  205 */           EntityItem[] arrayOfEntityItem = new EntityItem[vector.size()];
+/*  206 */           vector.copyInto((Object[])arrayOfEntityItem);
+/*      */           
+/*  208 */           entityList = this.m_db.getEntityList(this.m_prof, new ExtractActionItem(null, this.m_db, this.m_prof, "BOXERLSEO2"), arrayOfEntityItem);
+/*      */ 
+/*      */           
+/*  211 */           addDebug("current lseoprodstruct using VE BOXERLSEO2: " + PokUtils.outputList(entityList));
+/*  212 */           vector.clear();
+/*      */         } 
+/*      */         byte b;
+/*  215 */         for (b = 0; b < this.cdentityVct.size(); b++) {
+/*  216 */           CDEntityLseo cDEntityLseo = this.cdentityVct.elementAt(b);
+/*  217 */           if (cDEntityLseo.lseoItem == null) {
+/*  218 */             createLSEO(cDEntityLseo, entityItem);
+/*      */           } else {
+/*  220 */             updateLSEO(cDEntityLseo, entityItem, entityList);
+/*      */           } 
+/*      */         } 
+/*      */         
+/*  224 */         if (this.createdLseoVct.size() > 0) {
+/*      */           
+/*  226 */           this.args[0] = "" + this.createdLseoVct.size();
+/*  227 */           this.args[1] = "";
+/*  228 */           for (b = 0; b < this.createdLseoVct.size(); b++) {
+/*  229 */             this.args[1] = this.args[1] + this.createdLseoVct.elementAt(b).toString();
+/*      */           }
+/*  231 */           MessageFormat messageFormat1 = new MessageFormat(this.rsBundle.getString("CREATED_MSG"));
+/*  232 */           addOutput(messageFormat1.format(this.args));
+/*      */         } 
+/*  234 */         if (this.updatedLseoVct.size() > 0) {
+/*      */           
+/*  236 */           this.args[0] = "" + this.updatedLseoVct.size();
+/*  237 */           this.args[1] = "";
+/*  238 */           for (b = 0; b < this.updatedLseoVct.size(); b++) {
+/*  239 */             this.args[1] = this.args[1] + this.updatedLseoVct.elementAt(b).toString();
+/*      */           }
+/*  241 */           MessageFormat messageFormat1 = new MessageFormat(this.rsBundle.getString("UPDATED_MSG"));
+/*  242 */           addOutput(messageFormat1.format(this.args));
+/*      */         } 
+/*  244 */         if (this.createdLseoVct.size() == 0 && this.updatedLseoVct.size() == 0)
+/*      */         {
+/*  246 */           addOutput(this.rsBundle.getString("NO_CHGS"));
+/*      */         }
+/*  248 */         if (entityList != null) {
+/*  249 */           entityList.dereference();
+/*      */         }
+/*      */       }
+/*      */     
+/*  253 */     } catch (Throwable throwable) {
+/*  254 */       StringWriter stringWriter = new StringWriter();
+/*  255 */       String str6 = "<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
+/*  256 */       String str7 = "<pre>{0}</pre>";
+/*  257 */       MessageFormat messageFormat1 = new MessageFormat(str6);
+/*  258 */       setReturnCode(-3);
+/*  259 */       throwable.printStackTrace(new PrintWriter(stringWriter));
+/*      */       
+/*  261 */       this.args[0] = throwable.getMessage();
+/*  262 */       this.rptSb.append(messageFormat1.format(this.args) + NEWLINE);
+/*  263 */       messageFormat1 = new MessageFormat(str7);
+/*  264 */       this.args[0] = stringWriter.getBuffer().toString();
+/*  265 */       this.rptSb.append(messageFormat1.format(this.args) + NEWLINE);
+/*  266 */       logError("Exception: " + throwable.getMessage());
+/*  267 */       logError(stringWriter.getBuffer().toString());
+/*      */     }
+/*      */     finally {
+/*      */       
+/*  271 */       setDGTitle(this.navName);
+/*  272 */       setDGRptName(getShortClassName(getClass()));
+/*  273 */       setDGRptClass(getABRCode());
+/*      */       
+/*  275 */       if (!isReadOnly())
+/*      */       {
+/*  277 */         clearSoftLock();
+/*      */       }
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/*  283 */     MessageFormat messageFormat = new MessageFormat(str1);
+/*  284 */     this.args[0] = getDescription();
+/*  285 */     this.args[1] = this.navName;
+/*  286 */     String str5 = messageFormat.format(this.args);
+/*  287 */     messageFormat = new MessageFormat(str2);
+/*  288 */     this.args[0] = this.m_prof.getOPName();
+/*  289 */     this.args[1] = this.m_prof.getRoleDescription();
+/*  290 */     this.args[2] = this.m_prof.getWGName();
+/*  291 */     this.args[3] = getNow();
+/*  292 */     this.args[4] = str3;
+/*  293 */     this.args[5] = (getReturnCode() == 0) ? "Passed" : "Failed";
+/*  294 */     this.args[6] = str4 + " " + getABRVersion();
+/*      */     
+/*  296 */     this.rptSb.insert(0, str5 + messageFormat.format(this.args) + NEWLINE);
+/*      */     
+/*  298 */     println(this.rptSb.toString());
+/*  299 */     printDGSubmitString();
+/*  300 */     println(EACustom.getTOUDiv());
+/*  301 */     buildReportFooter();
+/*      */     
+/*  303 */     this.metaTbl.clear();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector checkCDEntity(EntityItem paramEntityItem1, EntityItem paramEntityItem2) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  374 */     Vector vector = new Vector(1);
+/*  375 */     Vector<EntityItem> vector1 = PokUtils.getAllLinkedEntities(paramEntityItem2, "CDGCDENTITY", "CDENTITY");
+/*  376 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("CDENTITY");
+/*      */     
+/*  378 */     if (vector1.size() == 0) {
+/*      */       
+/*  380 */       this.args[0] = entityGroup.getLongDescription();
+/*  381 */       this.args[1] = paramEntityItem2.getEntityGroup().getLongDescription();
+/*  382 */       this.args[2] = getNavigationName(paramEntityItem2);
+/*  383 */       addError("NOT_FOUND_ERR2", this.args);
+/*  384 */       return vector;
+/*      */     } 
+/*      */     
+/*  387 */     byte b = 0; while (true) { if (b < vector1.size()) {
+/*  388 */         EntityItem entityItem = vector1.elementAt(b);
+/*      */ 
+/*      */         
+/*  391 */         String str = PokUtils.getAttributeValue(entityItem, "CD", "", "", false);
+/*  392 */         addDebug("Checking " + entityItem.getKey() + " CD: " + str);
+/*  393 */         int i = str.length();
+/*  394 */         if (paramEntityItem1.getEntityType().equals("WWSEO"))
+/*      */         
+/*      */         { 
+/*      */           
+/*  398 */           if (i != 1)
+/*      */           
+/*  400 */           { this.args[0] = PokUtils.getAttributeDescription(entityGroup, "CD", "CD");
+/*  401 */             this.args[1] = str;
+/*  402 */             this.args[2] = getNavigationName(entityItem);
+/*  403 */             addError("INVALID_CD_ERR", this.args);
+/*  404 */             outputSkipErrMsg(entityItem, paramEntityItem2);
+/*  405 */             addDebug("Skipping " + entityItem.getKey() + " because wrong CD.len"); }
+/*      */           
+/*      */           else
+/*      */           
+/*  409 */           { String str1 = PokUtils.getAttributeValue(paramEntityItem1, "SEOID", "", "", false);
+/*  410 */             if (str1.length() > 6) {
+/*  411 */               str1 = str1.substring(0, 6);
+/*      */             }
+/*  413 */             str1 = str1 + str;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */             
+/*  436 */             addDebug("derived seoid " + str1); }  } else if (i != 2) { this.args[0] = PokUtils.getAttributeDescription(entityGroup, "CD", "CD"); this.args[1] = str; this.args[2] = getNavigationName(entityItem); addError("INVALID_CD_ERR", this.args); outputSkipErrMsg(entityItem, paramEntityItem2); addDebug("Skipping " + entityItem.getKey() + " because wrong CD.len"); } else { String str1 = PokUtils.getAttributeValue(paramEntityItem1, "XXPARTNO", "", "", false); if (str1.length() > 5) str1 = str1.substring(0, 5);  str1 = str1 + str; addDebug("derived seoid " + str1); }
+/*      */       
+/*      */       } else {
+/*      */         break;
+/*      */       } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*      */       b++; }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  572 */     return vector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void outputSkipErrMsg(EntityItem paramEntityItem1, EntityItem paramEntityItem2) throws SQLException, MiddlewareException {
+/*  584 */     this.args[0] = paramEntityItem1.getEntityGroup().getLongDescription();
+/*  585 */     this.args[1] = getNavigationName(paramEntityItem1);
+/*  586 */     this.args[2] = paramEntityItem2.getEntityGroup().getLongDescription();
+/*  587 */     this.args[3] = getNavigationName(paramEntityItem2);
+/*  588 */     addError("SKIPPING_MSG", this.args);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityItem findFeatureProdstruct(String paramString) {
+/*  598 */     EntityItem entityItem = (EntityItem)this.fcodePsTbl.get(paramString);
+/*  599 */     if (entityItem == null) {
+/*  600 */       EntityGroup entityGroup = this.m_elist.getEntityGroup("FEATURE");
+/*  601 */       for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/*  602 */         EntityItem entityItem1 = entityGroup.getEntityItem(b);
+/*  603 */         String str = PokUtils.getAttributeValue(entityItem1, "FEATURECODE", "", "", false);
+/*  604 */         if (str.equals(paramString)) {
+/*  605 */           entityItem = (EntityItem)entityItem1.getDownLink(0);
+/*  606 */           addDebug("findFeatureProdstruct for " + paramString + " found " + entityItem1.getKey() + " " + entityItem.getKey());
+/*  607 */           if (entityItem1.getDownLink().size() > 1) {
+/*  608 */             addDebug("Warning: " + entityItem1.getKey() + " had multiple downlinks");
+/*  609 */             for (byte b1 = 0; b1 < entityItem1.getDownLink().size(); b1++) {
+/*  610 */               addDebug("Warning: downlink[" + b1 + "] " + entityItem1.getDownLink(b1).getKey());
+/*      */             }
+/*      */           } 
+/*  613 */           this.fcodePsTbl.put(paramString, entityItem);
+/*      */           
+/*      */           break;
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*  619 */     return entityItem;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityItem findLseo(String paramString) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  633 */     EntityItem entityItem = null;
+/*  634 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("LSEO");
+/*  635 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/*  636 */       EntityItem entityItem1 = entityGroup.getEntityItem(b);
+/*  637 */       String str = PokUtils.getAttributeValue(entityItem1, "SEOID", "", "", false);
+/*  638 */       if (str.equals(paramString)) {
+/*  639 */         entityItem = entityItem1;
+/*  640 */         addDebug("findLseo for " + paramString + " found " + entityItem.getKey());
+/*      */         
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/*  645 */     return entityItem;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityItem searchForLSEO(String paramString) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  660 */     EntityItem entityItem = null;
+/*  661 */     Vector<String> vector1 = new Vector(1);
+/*  662 */     vector1.addElement("SEOID");
+/*  663 */     Vector<String> vector2 = new Vector(1);
+/*  664 */     vector2.addElement(paramString);
+/*      */     
+/*  666 */     EntityItem[] arrayOfEntityItem = null;
+/*      */     try {
+/*  668 */       StringBuffer stringBuffer = new StringBuffer();
+/*  669 */       arrayOfEntityItem = ABRUtil.doSearch(this.m_db, this.m_prof, "SRDLSEO4", "LSEO", false, vector1, vector2, stringBuffer);
+/*      */       
+/*  671 */       if (stringBuffer.length() > 0) {
+/*  672 */         addDebug(stringBuffer.toString());
+/*      */       }
+/*  674 */     } catch (SBRException sBRException) {
+/*      */       
+/*  676 */       StringWriter stringWriter = new StringWriter();
+/*  677 */       sBRException.printStackTrace(new PrintWriter(stringWriter));
+/*  678 */       addDebug("searchForLSEO SBRException: " + stringWriter.getBuffer().toString());
+/*      */     } 
+/*  680 */     if (arrayOfEntityItem != null && arrayOfEntityItem.length > 0) {
+/*  681 */       for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/*  682 */         addDebug("searchForLSEO found " + arrayOfEntityItem[b].getKey());
+/*      */       }
+/*      */       
+/*  685 */       entityItem = arrayOfEntityItem[0];
+/*      */     } 
+/*  687 */     vector1.clear();
+/*  688 */     vector2.clear();
+/*  689 */     return entityItem;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean verifyEntity(EntityItem paramEntityItem, String[] paramArrayOfString) throws SQLException, MiddlewareException {
+/*  697 */     boolean bool = true;
+/*  698 */     for (byte b = 0; b < paramArrayOfString.length; b++) {
+/*  699 */       String str = PokUtils.getAttributeValue(paramEntityItem, paramArrayOfString[b], "", null, false);
+/*  700 */       if (str == null) {
+/*      */         
+/*  702 */         this.args[0] = paramEntityItem.getEntityGroup().getLongDescription();
+/*  703 */         this.args[1] = getNavigationName(paramEntityItem);
+/*  704 */         this.args[2] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), paramArrayOfString[b], paramArrayOfString[b]);
+/*  705 */         addError("MISSING_ATTR_ERR", this.args);
+/*  706 */         bool = false;
+/*      */       } 
+/*      */     } 
+/*      */     
+/*  710 */     return bool;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createLSEO(CDEntityLseo paramCDEntityLseo, EntityItem paramEntityItem) throws MiddlewareRequestException, RemoteException, SQLException, MiddlewareException, EANBusinessRuleException, MiddlewareShutdownInProgressException, LockException, WorkflowException {
+/*      */     LSEOAttrSet lSEOAttrSet;
+/*  736 */     addDebug("createLSEO entered for SEOID " + paramCDEntityLseo.seoid);
+/*      */     
+/*  738 */     EntityItem entityItem = null;
+/*  739 */     WWSEOAttrSet wWSEOAttrSet = null;
+/*  740 */     if (paramEntityItem.getEntityType().equals("WWSEO")) {
+/*  741 */       wWSEOAttrSet = new WWSEOAttrSet(paramCDEntityLseo, paramEntityItem);
+/*      */     } else {
+/*  743 */       lSEOAttrSet = new LSEOAttrSet(paramCDEntityLseo, paramEntityItem);
+/*      */     } 
+/*      */     
+/*  746 */     StringBuffer stringBuffer = new StringBuffer();
+/*  747 */     entityItem = ABRUtil.createEntity(this.m_db, this.m_prof, "CRPEERLSEO", this.wwseoItem, "LSEO", lSEOAttrSet
+/*  748 */         .getAttrCodes(), lSEOAttrSet.getAttrValues(), stringBuffer);
+/*  749 */     if (stringBuffer.length() > 0) {
+/*  750 */       addDebug(stringBuffer.toString());
+/*      */     }
+/*      */     
+/*  753 */     lSEOAttrSet.dereference();
+/*      */     
+/*  755 */     if (entityItem == null) {
+/*      */       
+/*  757 */       this.args[0] = paramCDEntityLseo.seoid;
+/*  758 */       addError("LSEO_CREATE_ERR", this.args);
+/*      */     } else {
+/*  760 */       this.createdLseoVct.addElement(new StringBuffer(getNavigationName(entityItem)));
+/*      */       
+/*  762 */       createFeatureRefs(paramCDEntityLseo, entityItem);
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void updateLSEO(CDEntityLseo paramCDEntityLseo, EntityItem paramEntityItem, EntityList paramEntityList) throws MiddlewareBusinessRuleException, RemoteException, EANBusinessRuleException, MiddlewareException, MiddlewareShutdownInProgressException, SQLException, LockException, WorkflowException {
+/*  787 */     EntityItem entityItem = paramEntityList.getParentEntityGroup().getEntityItem(paramCDEntityLseo.lseoItem.getKey());
+/*  788 */     addDebug("updateLSEO entered for SEOID " + paramCDEntityLseo.seoid + " " + entityItem.getKey());
+/*      */     
+/*  790 */     boolean bool = updateLSEOAttributes(paramCDEntityLseo, paramEntityItem, entityItem);
+/*      */ 
+/*      */ 
+/*      */     
+/*  794 */     String str = updateFeatureRefs(paramCDEntityLseo, entityItem);
+/*  795 */     if (bool || str.length() > 0) {
+/*  796 */       this.updatedLseoVct.addElement(getNavigationName(entityItem) + str);
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean updateLSEOAttributes(CDEntityLseo paramCDEntityLseo, EntityItem paramEntityItem1, EntityItem paramEntityItem2) throws EANBusinessRuleException, MiddlewareBusinessRuleException, RemoteException, MiddlewareException, MiddlewareShutdownInProgressException, SQLException {
+/*      */     LSEOAttrSet lSEOAttrSet;
+/*  815 */     WWSEOAttrSet wWSEOAttrSet = null;
+/*  816 */     addDebug("updateLSEOAttributes entered for " + paramEntityItem2.getKey());
+/*  817 */     if (paramEntityItem1.getEntityType().equals("WWSEO")) {
+/*  818 */       wWSEOAttrSet = new WWSEOAttrSet(paramCDEntityLseo, paramEntityItem1);
+/*      */     } else {
+/*  820 */       lSEOAttrSet = new LSEOAttrSet(paramCDEntityLseo, paramEntityItem1);
+/*      */     } 
+/*  822 */     boolean bool = false;
+/*      */ 
+/*      */     
+/*  825 */     Vector<String> vector = lSEOAttrSet.getAttrCodes();
+/*  826 */     for (byte b = 0; b < vector.size(); b++) {
+/*  827 */       String str = vector.elementAt(b);
+/*  828 */       StringBuffer stringBuffer = new StringBuffer();
+/*      */       
+/*  830 */       EANMetaAttribute eANMetaAttribute = paramEntityItem2.getEntityGroup().getMetaAttribute(str);
+/*  831 */       if (eANMetaAttribute == null) {
+/*  832 */         addDebug("MetaAttribute cannot be found " + paramEntityItem2.getEntityGroup().getEntityType() + "." + str + "\n");
+/*      */       } else {
+/*      */         String str1; boolean bool1;
+/*  835 */         Object object = lSEOAttrSet.getAttrValues().get(str);
+/*  836 */         switch (eANMetaAttribute.getAttributeType().charAt(0)) {
+/*      */ 
+/*      */ 
+/*      */           
+/*      */           case 'L':
+/*      */           case 'T':
+/*      */           case 'X':
+/*  843 */             str1 = PokUtils.getAttributeValue(paramEntityItem2, str, "", "", false);
+/*  844 */             if (!object.equals(str1)) {
+/*  845 */               addDebug("Updating " + str + " was: " + str1 + " newval " + object);
+/*      */               
+/*  847 */               ABRUtil.setText(paramEntityItem2, str, (String)object, stringBuffer);
+/*  848 */               bool = true;
+/*      */             } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */             
+/*  917 */             if (stringBuffer.length() > 0)
+/*  918 */               addDebug(stringBuffer.toString());  break;case 'U': str1 = PokUtils.getAttributeFlagValue(paramEntityItem2, str); if (!object.equals(str1)) { if (str1 == null && object.equals("")) break;  addDebug("Updating " + str + " was: " + str1 + " newval " + object); ABRUtil.setUniqueFlag(paramEntityItem2, str, (String)object, stringBuffer); bool = true; }  if (stringBuffer.length() > 0) addDebug(stringBuffer.toString());  break;case 'F': str1 = PokUtils.getAttributeFlagValue(paramEntityItem2, str); bool1 = false; if (str1 == null) { if (object instanceof String && object.equals("")) break;  addDebug("Updating " + str + " was: " + str1 + " newval " + object); bool1 = true; } else if (object instanceof String) { if (!object.equals(str1)) { addDebug(str + " needs to be updated, " + str1 + " newval " + object); bool1 = true; }  } else { Vector<?> vector1 = (Vector)object; String[] arrayOfString = PokUtils.convertToArray(str1); Vector<String> vector2 = new Vector(arrayOfString.length); for (byte b1 = 0; b1 < arrayOfString.length; b1++) vector2.addElement(arrayOfString[b1]);  if (!vector2.containsAll(vector1) || !vector1.containsAll(vector2)) { addDebug(str + " needs to be updated"); bool1 = true; }  }  if (bool1) { Vector<Object> vector1 = null; if (object instanceof String) { vector1 = new Vector(); if (!object.equals("")) vector1.addElement(object);  } else { vector1 = (Vector<Object>)object; }  ABRUtil.setMultiFlag(paramEntityItem2, str, vector1, stringBuffer); bool = true; }  if (stringBuffer.length() > 0) addDebug(stringBuffer.toString());  break;default: addDebug("MetaAttribute Type=" + eANMetaAttribute.getAttributeType() + " is not supported yet " + paramEntityItem2.getEntityGroup().getEntityType() + "." + str + "\n"); if (stringBuffer.length() > 0) addDebug(stringBuffer.toString());  break;
+/*      */         } 
+/*      */       } 
+/*  921 */     }  if (bool) {
+/*  922 */       paramEntityItem2.commit(this.m_db, null);
+/*      */     }
+/*      */     
+/*  925 */     lSEOAttrSet.dereference();
+/*      */     
+/*  927 */     return bool;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createFeatureRefs(CDEntityLseo paramCDEntityLseo, EntityItem paramEntityItem) throws MiddlewareRequestException, SQLException, MiddlewareException, LockException, MiddlewareShutdownInProgressException, EANBusinessRuleException, WorkflowException, RemoteException {
+/*  947 */     String str1 = "LINKPRODSTRUCTLSEO";
+/*  948 */     if (this.lai == null) {
+/*  949 */       this.lai = new LinkActionItem(null, this.m_db, this.m_prof, str1);
+/*      */     }
+/*  951 */     EntityItem[] arrayOfEntityItem1 = { paramEntityItem };
+/*  952 */     EntityItem[] arrayOfEntityItem2 = new EntityItem[paramCDEntityLseo.fcQtyVct.size()];
+/*      */     
+/*  954 */     Hashtable<Object, Object> hashtable = new Hashtable<>();
+/*      */     
+/*  956 */     for (byte b1 = 0; b1 < paramCDEntityLseo.fcQtyVct.size(); b1++) {
+/*  957 */       FCQty fCQty = paramCDEntityLseo.fcQtyVct.elementAt(b1);
+/*  958 */       arrayOfEntityItem2[b1] = fCQty.prodItem;
+/*  959 */       hashtable.put(arrayOfEntityItem2[b1].getKey(), fCQty);
+/*      */     } 
+/*      */ 
+/*      */     
+/*  963 */     this.lai.setParentEntityItems(arrayOfEntityItem1);
+/*  964 */     this.lai.setChildEntityItems(arrayOfEntityItem2);
+/*  965 */     this.m_db.executeAction(this.m_prof, this.lai);
+/*      */ 
+/*      */ 
+/*      */     
+/*  969 */     Profile profile = this.m_prof.getNewInstance(this.m_db);
+/*  970 */     String str2 = this.m_db.getDates().getNow();
+/*  971 */     profile.setValOnEffOn(str2, str2);
+/*      */     
+/*  973 */     EntityList entityList = this.m_db.getEntityList(profile, new ExtractActionItem(null, this.m_db, profile, "BOXERLSEO2"), arrayOfEntityItem1);
+/*      */ 
+/*      */ 
+/*      */     
+/*  977 */     addDebug("createFeatureRefs list using VE BOXERLSEO2 after linkaction: " + str1 + "\n" + 
+/*  978 */         PokUtils.outputList(entityList));
+/*  979 */     EntityGroup entityGroup = entityList.getEntityGroup("PRODSTRUCT");
+/*  980 */     StringBuffer stringBuffer1 = new StringBuffer();
+/*  981 */     for (byte b2 = 0; b2 < entityGroup.getEntityItemCount(); b2++) {
+/*  982 */       EntityItem entityItem1 = entityGroup.getEntityItem(b2);
+/*  983 */       FCQty fCQty = (FCQty)hashtable.get(entityItem1.getKey());
+/*  984 */       String str = fCQty.qty;
+/*      */       
+/*  986 */       stringBuffer1.append(getResourceMsg("ADDED_REF_MSG", new Object[] { FCQty.access$500(fCQty), FCQty.access$200(fCQty) }));
+/*  987 */       EntityItem entityItem2 = (EntityItem)entityItem1.getUpLink(0);
+/*  988 */       addDebug(entityItem1.getKey() + " use qty: " + str + " on " + entityItem2.getKey());
+/*  989 */       if (str != null && !str.equals("1")) {
+/*  990 */         StringBuffer stringBuffer = new StringBuffer();
+/*      */         
+/*  992 */         ABRUtil.setText(entityItem2, "CONFQTY", str, stringBuffer);
+/*  993 */         if (stringBuffer.length() > 0) {
+/*  994 */           addDebug(stringBuffer.toString());
+/*      */         }
+/*      */         
+/*  997 */         entityItem2.commit(this.m_db, null);
+/*      */       } 
+/*      */     } 
+/* 1000 */     StringBuffer stringBuffer2 = this.createdLseoVct.lastElement();
+/* 1001 */     stringBuffer2.append(stringBuffer1.toString());
+/*      */     
+/* 1003 */     hashtable.clear();
+/* 1004 */     entityList.dereference();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String updateFeatureRefs(CDEntityLseo paramCDEntityLseo, EntityItem paramEntityItem) throws MiddlewareRequestException, SQLException, MiddlewareException, LockException, MiddlewareShutdownInProgressException, EANBusinessRuleException, WorkflowException, RemoteException {
+/* 1026 */     StringBuffer stringBuffer = new StringBuffer();
+/* 1027 */     Hashtable<Object, Object> hashtable = new Hashtable<>();
+/*      */     
+/* 1029 */     for (byte b1 = 0; b1 < paramCDEntityLseo.fcQtyVct.size(); b1++) {
+/* 1030 */       FCQty fCQty = paramCDEntityLseo.fcQtyVct.elementAt(b1);
+/* 1031 */       hashtable.put(fCQty.prodItem.getKey(), fCQty);
+/*      */     } 
+/*      */ 
+/*      */     
+/* 1035 */     Vector<EntityItem> vector1 = PokUtils.getAllLinkedEntities(paramEntityItem, "LSEOPRODSTRUCT", "PRODSTRUCT");
+/* 1036 */     addDebug("updateFeatureRefs origPsVct " + vector1.size());
+/* 1037 */     for (byte b2 = 0; b2 < vector1.size(); b2++) {
+/* 1038 */       addDebug("updateFeatureRefs origPsVct[" + b2 + "] " + ((EntityItem)vector1.elementAt(b2)).getKey());
+/*      */     }
+/*      */ 
+/*      */     
+/* 1042 */     Vector<EntityItem> vector2 = new Vector();
+/* 1043 */     for (byte b3 = 0; b3 < paramCDEntityLseo.fcQtyVct.size(); b3++) {
+/* 1044 */       FCQty fCQty = paramCDEntityLseo.fcQtyVct.elementAt(b3);
+/* 1045 */       boolean bool = false;
+/* 1046 */       Iterator<EntityItem> iterator = vector1.iterator();
+/* 1047 */       while (iterator.hasNext()) {
+/* 1048 */         EntityItem entityItem = iterator.next();
+/* 1049 */         if (entityItem.getKey().equals(fCQty.prodItem.getKey())) {
+/* 1050 */           addDebug("updateFeatureRefs already exists " + fCQty.prodItem.getKey());
+/* 1051 */           bool = true;
+/* 1052 */           iterator.remove();
+/*      */           break;
+/*      */         } 
+/*      */       } 
+/* 1056 */       if (!bool) {
+/* 1057 */         addDebug("updateFeatureRefs missing " + fCQty.prodItem.getKey());
+/* 1058 */         vector2.add(fCQty.prodItem);
+/*      */         
+/* 1060 */         stringBuffer.append(getResourceMsg("ADDED_REF_MSG", new Object[] { FCQty.access$500(fCQty), FCQty.access$200(fCQty) }));
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 1064 */     EntityItem[] arrayOfEntityItem = { paramEntityItem };
+/* 1065 */     String str1 = "LINKPRODSTRUCTLSEO";
+/*      */     
+/* 1067 */     if (vector2.size() > 0) {
+/* 1068 */       addDebug("updateFeatureRefs  missingPsVct " + vector2.size());
+/* 1069 */       for (byte b = 0; b < vector2.size(); b++) {
+/* 1070 */         addDebug("updateFeatureRefs missingPsVct[" + b + "] " + ((EntityItem)vector2.elementAt(b)).getKey());
+/*      */       }
+/* 1072 */       if (this.lai == null) {
+/* 1073 */         this.lai = new LinkActionItem(null, this.m_db, this.m_prof, str1);
+/*      */       }
+/*      */       
+/* 1076 */       EntityItem[] arrayOfEntityItem1 = new EntityItem[vector2.size()];
+/* 1077 */       vector2.copyInto((Object[])arrayOfEntityItem1);
+/*      */ 
+/*      */       
+/* 1080 */       this.lai.setParentEntityItems(arrayOfEntityItem);
+/* 1081 */       this.lai.setChildEntityItems(arrayOfEntityItem1);
+/* 1082 */       this.m_db.executeAction(this.m_prof, this.lai);
+/*      */     } 
+/*      */     
+/* 1085 */     String str2 = "DELLSEOPRODSTRUCT";
+/* 1086 */     if (vector1.size() > 0) {
+/* 1087 */       addDebug("updateFeatureRefs unneeded cnt " + vector1.size());
+/* 1088 */       for (byte b = 0; b < vector1.size(); b++) {
+/* 1089 */         EntityItem entityItem = vector1.elementAt(b);
+/* 1090 */         addDebug("updateFeatureRefs unneeded [" + b + "] " + entityItem.getKey());
+/* 1091 */         for (byte b5 = 0; b5 < entityItem.getUpLinkCount(); b5++) {
+/* 1092 */           EntityItem entityItem1 = (EntityItem)entityItem.getUpLink(b5);
+/* 1093 */           if (entityItem1.getEntityType().equals("FEATURE")) {
+/*      */             
+/* 1095 */             stringBuffer.append(getResourceMsg("DELETED_REF_MSG", new Object[] {
+/* 1096 */                     PokUtils.getAttributeValue(entityItem1, "FEATURECODE", "", "", false) }));
+/*      */             break;
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/* 1101 */       if (this.dai == null) {
+/* 1102 */         this.dai = new DeleteActionItem(null, this.m_db, this.m_prof, str2);
+/*      */       }
+/*      */       
+/* 1105 */       EntityItem[] arrayOfEntityItem1 = new EntityItem[vector1.size()];
+/* 1106 */       vector1.copyInto((Object[])arrayOfEntityItem1);
+/*      */       
+/* 1108 */       this.dai.setEntityItems(arrayOfEntityItem1);
+/* 1109 */       this.m_db.executeAction(this.m_prof, this.dai);
+/* 1110 */       vector1.clear();
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1115 */     Profile profile = this.m_prof.getNewInstance(this.m_db);
+/* 1116 */     String str3 = this.m_db.getDates().getNow();
+/* 1117 */     profile.setValOnEffOn(str3, str3);
+/*      */     
+/* 1119 */     EntityList entityList = this.m_db.getEntityList(profile, new ExtractActionItem(null, this.m_db, profile, "BOXERLSEO2"), arrayOfEntityItem);
+/*      */ 
+/*      */ 
+/*      */     
+/* 1123 */     addDebug("updateFeatureRefs list using VE BOXERLSEO2 after linkaction: " + str1 + " and deleteaction: " + str2 + "\n" + 
+/* 1124 */         PokUtils.outputList(entityList));
+/* 1125 */     EntityGroup entityGroup = entityList.getEntityGroup("PRODSTRUCT");
+/*      */     
+/* 1127 */     for (byte b4 = 0; b4 < entityGroup.getEntityItemCount(); b4++) {
+/* 1128 */       EntityItem entityItem1 = entityGroup.getEntityItem(b4);
+/* 1129 */       FCQty fCQty = (FCQty)hashtable.get(entityItem1.getKey());
+/* 1130 */       String str4 = fCQty.qty;
+/* 1131 */       EntityItem entityItem2 = (EntityItem)entityItem1.getUpLink(0);
+/* 1132 */       String str5 = PokUtils.getAttributeValue(entityItem2, "CONFQTY", "", "", false);
+/* 1133 */       addDebug(entityItem1.getKey() + " needs qty: " + str4 + " on " + entityItem2.getKey() + " has qty: " + str5);
+/* 1134 */       if (str4 != null && !str4.equals(str5)) {
+/* 1135 */         StringBuffer stringBuffer1 = new StringBuffer();
+/*      */         
+/* 1137 */         ABRUtil.setText(entityItem2, "CONFQTY", str4, stringBuffer1);
+/* 1138 */         if (stringBuffer1.length() > 0) {
+/* 1139 */           addDebug(stringBuffer1.toString());
+/*      */         }
+/* 1141 */         if (!vector2.contains(entityItem1))
+/*      */         {
+/* 1143 */           stringBuffer.append(getResourceMsg("UPDATED_REF_MSG", new Object[] { FCQty.access$500(fCQty), FCQty.access$200(fCQty) }));
+/*      */         }
+/*      */         
+/* 1146 */         entityItem2.commit(this.m_db, null);
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 1150 */     hashtable.clear();
+/* 1151 */     vector2.clear();
+/* 1152 */     entityList.dereference();
+/* 1153 */     return stringBuffer.toString();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void dereference() {
+/* 1159 */     super.dereference();
+/*      */     
+/* 1161 */     for (byte b = 0; b < this.cdentityVct.size(); b++) {
+/* 1162 */       CDEntityLseo cDEntityLseo = this.cdentityVct.elementAt(b);
+/* 1163 */       cDEntityLseo.dereference();
+/*      */     } 
+/* 1165 */     this.cdentityVct.clear();
+/* 1166 */     this.cdentityVct = null;
+/*      */     
+/* 1168 */     this.createdLseoVct.clear();
+/* 1169 */     this.createdLseoVct = null;
+/* 1170 */     this.updatedLseoVct.clear();
+/* 1171 */     this.updatedLseoVct = null;
+/*      */     
+/* 1173 */     this.rsBundle = null;
+/* 1174 */     this.modelItem = null;
+/* 1175 */     this.wwseoItem = null;
+/* 1176 */     this.lai = null;
+/* 1177 */     this.dai = null;
+/*      */     
+/* 1179 */     this.rptSb = null;
+/* 1180 */     this.args = null;
+/*      */     
+/* 1182 */     this.metaTbl = null;
+/* 1183 */     this.navName = null;
+/* 1184 */     this.fcodePsTbl.clear();
+/* 1185 */     this.fcodePsTbl = null;
+/* 1186 */     this.seoidVct.clear();
+/* 1187 */     this.seoidVct = null;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getABRVersion() {
+/* 1193 */     return "1.4";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getDescription() {
+/* 1200 */     return "WWSEOABRALWR";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addOutput(String paramString) {
+/* 1206 */     this.rptSb.append("<p>" + paramString + "</p>" + NEWLINE);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addDebug(String paramString) {
+/* 1212 */     this.rptSb.append("<!-- " + paramString + " -->" + NEWLINE);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getResourceMsg(String paramString, Object[] paramArrayOfObject) {
+/* 1223 */     String str = this.rsBundle.getString(paramString);
+/* 1224 */     if (paramArrayOfObject != null) {
+/* 1225 */       MessageFormat messageFormat = new MessageFormat(str);
+/* 1226 */       str = messageFormat.format(paramArrayOfObject);
+/*      */     } 
+/*      */     
+/* 1229 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addError(String paramString, Object[] paramArrayOfObject) {
+/* 1236 */     setReturnCode(-1);
+/*      */     
+/* 1238 */     String str = this.rsBundle.getString(paramString);
+/*      */     
+/* 1240 */     if (paramArrayOfObject != null) {
+/* 1241 */       MessageFormat messageFormat = new MessageFormat(str);
+/* 1242 */       str = messageFormat.format(paramArrayOfObject);
+/*      */     } 
+/*      */     
+/* 1245 */     addOutput(str);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getNavigationName(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 1255 */     StringBuffer stringBuffer = new StringBuffer();
+/*      */ 
+/*      */     
+/* 1258 */     EANList eANList = (EANList)this.metaTbl.get(paramEntityItem.getEntityType());
+/* 1259 */     if (eANList == null) {
+/*      */       
+/* 1261 */       EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, paramEntityItem.getEntityType(), "Navigate");
+/* 1262 */       eANList = entityGroup.getMetaAttribute();
+/* 1263 */       this.metaTbl.put(paramEntityItem.getEntityType(), eANList);
+/*      */     } 
+/* 1265 */     for (byte b = 0; b < eANList.size(); b++) {
+/*      */       
+/* 1267 */       EANMetaAttribute eANMetaAttribute = (EANMetaAttribute)eANList.getAt(b);
+/* 1268 */       stringBuffer.append(PokUtils.getAttributeValue(paramEntityItem, eANMetaAttribute.getAttributeCode(), ", ", "", false));
+/* 1269 */       if (b + 1 < eANList.size()) {
+/* 1270 */         stringBuffer.append(" ");
+/*      */       }
+/*      */     } 
+/*      */     
+/* 1274 */     return stringBuffer.toString();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private class AttrSet
+/*      */   {
+/* 1312 */     private Vector attrCodeVct = new Vector();
+/* 1313 */     private Hashtable attrValTbl = new Hashtable<>();
+/*      */     protected void addSingle(EntityItem param1EntityItem, String param1String) {
+/* 1315 */       addSingle(param1EntityItem, param1String, param1String);
+/*      */     }
+/*      */     protected void addSingle(EntityItem param1EntityItem, String param1String1, String param1String2) {
+/* 1318 */       String str = PokUtils.getAttributeFlagValue(param1EntityItem, param1String1);
+/* 1319 */       if (str == null) {
+/* 1320 */         str = "";
+/*      */       }
+/* 1322 */       this.attrCodeVct.addElement(param1String2);
+/* 1323 */       this.attrValTbl.put(param1String2, str);
+/*      */     }
+/*      */     protected void addText(EntityItem param1EntityItem, String param1String) {
+/* 1326 */       addText(param1EntityItem, param1String, param1String);
+/*      */     }
+/*      */     protected void addText(EntityItem param1EntityItem, String param1String1, String param1String2) {
+/* 1329 */       String str = PokUtils.getAttributeValue(param1EntityItem, param1String1, "", "", false);
+/* 1330 */       this.attrCodeVct.addElement(param1String2);
+/* 1331 */       this.attrValTbl.put(param1String2, str);
+/*      */     }
+/*      */     protected void addMult(EntityItem param1EntityItem, String param1String) {
+/* 1334 */       String str = PokUtils.getAttributeFlagValue(param1EntityItem, param1String);
+/* 1335 */       if (str == null) {
+/* 1336 */         str = "";
+/*      */       }
+/* 1338 */       String[] arrayOfString = PokUtils.convertToArray(str);
+/* 1339 */       Vector<String> vector = new Vector(arrayOfString.length);
+/* 1340 */       for (byte b = 0; b < arrayOfString.length; b++) {
+/* 1341 */         vector.addElement(arrayOfString[b]);
+/*      */       }
+/* 1343 */       this.attrCodeVct.addElement(param1String);
+/* 1344 */       this.attrValTbl.put(param1String, vector);
+/*      */     }
+/*      */     
+/*      */     AttrSet(BOXERWWSEOABRALWR.CDEntityLseo param1CDEntityLseo) {
+/* 1348 */       this.attrCodeVct.addElement("ACCTASGNGRP");
+/* 1349 */       this.attrValTbl.put("ACCTASGNGRP", "01");
+/*      */       
+/* 1351 */       this.attrCodeVct.addElement("AUDIEN");
+/* 1352 */       this.attrValTbl.put("AUDIEN", BOXERWWSEOABRALWR.AUDIEN_VCT);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1357 */       this.attrCodeVct.addElement("SEOID");
+/* 1358 */       this.attrValTbl.put("SEOID", param1CDEntityLseo.seoid);
+/* 1359 */       this.attrCodeVct.addElement("COMNAME");
+/* 1360 */       this.attrValTbl.put("COMNAME", param1CDEntityLseo.seoid);
+/*      */       
+/* 1362 */       addSingle(param1CDEntityLseo.cdEntity, "LANGUAGES");
+/*      */       
+/* 1364 */       addSingle(param1CDEntityLseo.cdEntity, "OFFCOUNTRY");
+/*      */       
+/* 1366 */       addMult(param1CDEntityLseo.cdEntity, "GENAREASELECTION");
+/*      */       
+/* 1368 */       addMult(param1CDEntityLseo.cdEntity, "COUNTRYLIST");
+/*      */     }
+/* 1370 */     Vector getAttrCodes() { return this.attrCodeVct; } Hashtable getAttrValues() {
+/* 1371 */       return this.attrValTbl;
+/*      */     }
+/*      */     
+/*      */     void dereference() {
+/* 1375 */       this.attrCodeVct.clear();
+/* 1376 */       this.attrValTbl.clear();
+/* 1377 */       this.attrCodeVct = null;
+/* 1378 */       this.attrValTbl = null;
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private class WWSEOAttrSet
+/*      */     extends AttrSet
+/*      */   {
+/*      */     WWSEOAttrSet(BOXERWWSEOABRALWR.CDEntityLseo param1CDEntityLseo, EntityItem param1EntityItem) {
+/* 1392 */       super(param1CDEntityLseo);
+/*      */       
+/* 1394 */       addText(param1EntityItem, "XXPARTNO");
+/*      */       
+/* 1396 */       addText(param1EntityItem, "MKTGNAME", "LSEOMKTGDESC");
+/*      */       
+/* 1398 */       addText(param1EntityItem, "PRODHIERCD");
+/*      */ 
+/*      */       
+/* 1401 */       EANMetaAttribute eANMetaAttribute = param1EntityItem.getEntityGroup().getMetaAttribute("PDHDOMAIN");
+/* 1402 */       if (eANMetaAttribute.getAttributeType().equals("F")) {
+/* 1403 */         addMult(param1EntityItem, "PDHDOMAIN");
+/*      */       } else {
+/* 1405 */         addSingle(param1EntityItem, "PDHDOMAIN");
+/*      */       } 
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private class LSEOAttrSet
+/*      */     extends AttrSet
+/*      */   {
+/*      */     LSEOAttrSet(BOXERWWSEOABRALWR.CDEntityLseo param1CDEntityLseo, EntityItem param1EntityItem) {
+/* 1420 */       super(param1CDEntityLseo);
+/*      */       
+/* 1422 */       addText(param1EntityItem, "XXPARTNO");
+/*      */       
+/* 1424 */       addText(param1EntityItem, "LSEOMKTGDESC");
+/*      */       
+/* 1426 */       addText(param1EntityItem, "PRODHIERCD");
+/*      */       
+/* 1428 */       addText(param1EntityItem, "LSEOPUBDATEMTRGT");
+/*      */       
+/* 1430 */       addText(param1EntityItem, "LSEOUNPUBDATEMTRGT");
+/*      */ 
+/*      */       
+/* 1433 */       EANMetaAttribute eANMetaAttribute = param1EntityItem.getEntityGroup().getMetaAttribute("PDHDOMAIN");
+/* 1434 */       if (eANMetaAttribute.getAttributeType().equals("F")) {
+/* 1435 */         addMult(param1EntityItem, "PDHDOMAIN");
+/*      */       } else {
+/* 1437 */         addSingle(param1EntityItem, "PDHDOMAIN");
+/*      */       } 
+/*      */     }
+/*      */   }
+/*      */   
+/*      */   private class CDEntityLseo { private EntityItem cdEntity;
+/*      */     private String seoid;
+/* 1444 */     private Vector fcQtyVct = new Vector(); private EntityItem lseoItem;
+/*      */     
+/*      */     CDEntityLseo(EntityItem param1EntityItem, String param1String) {
+/* 1447 */       this.cdEntity = param1EntityItem;
+/* 1448 */       this.seoid = param1String;
+/*      */     }
+/*      */     void addFcQty(BOXERWWSEOABRALWR.FCQty param1FCQty) {
+/* 1451 */       this.fcQtyVct.add(param1FCQty);
+/*      */     }
+/* 1453 */     boolean hasFeatures() { return (this.fcQtyVct.size() > 0); } void setLseo(EntityItem param1EntityItem) {
+/* 1454 */       this.lseoItem = param1EntityItem;
+/*      */     } void dereference() {
+/* 1456 */       for (byte b = 0; b < this.fcQtyVct.size(); b++) {
+/* 1457 */         BOXERWWSEOABRALWR.FCQty fCQty = this.fcQtyVct.elementAt(b);
+/* 1458 */         fCQty.dereference();
+/*      */       } 
+/* 1460 */       this.fcQtyVct.clear();
+/* 1461 */       this.fcQtyVct = null;
+/*      */       
+/* 1463 */       this.lseoItem = null;
+/* 1464 */       this.cdEntity = null;
+/* 1465 */       this.seoid = null;
+/*      */     } }
+/*      */   
+/*      */   private class FCQty {
+/*      */     private String fcode;
+/*      */     private String qty;
+/*      */     private EntityItem prodItem;
+/*      */     
+/*      */     FCQty(String param1String1, String param1String2, EntityItem param1EntityItem) {
+/* 1474 */       this.fcode = param1String1;
+/* 1475 */       this.qty = param1String2;
+/* 1476 */       this.prodItem = param1EntityItem;
+/*      */     }
+/*      */ 
+/*      */     
+/*      */     public boolean equals(Object param1Object) {
+/* 1481 */       FCQty fCQty = (FCQty)param1Object;
+/* 1482 */       return this.fcode.equals(fCQty.fcode);
+/*      */     }
+/*      */     public String toString() {
+/* 1485 */       if (this.qty.equals("1")) {
+/* 1486 */         return this.fcode;
+/*      */       }
+/* 1488 */       return this.fcode + ":" + this.qty;
+/*      */     }
+/*      */     void dereference() {
+/* 1491 */       this.fcode = null;
+/* 1492 */       this.qty = null;
+/* 1493 */       this.prodItem = null;
+/*      */     }
+/*      */   }
+/*      */ }
 
-import java.rmi.RemoteException;
-import java.sql.SQLException;
-import java.text.MessageFormat;
-import java.util.*;
 
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.opicmpdh.middleware.*;
-
-/**************************************
- * From SG FS ABR ALWR 20090210.doc
- * V.	WWSEO/LSEO ALWR
- * This ABR is run for a selected WWSEO or LSEO. This ABR creates LSEOs based on setup data 
- * associated with the WWSEO or LSEO. This data is created via the User Interface (JUI or BUI) 
- * in a manner similar to creating and editing offering information. New actions will be provided 
- * by the OIM BAs via the standard metadata spreadsheet update process.
- * 
- * The user will create a Country Designator Group (CDG) at the Workgroup (via WGCDG). A CDG will 
- * have a unique Name (CDGNAME).
- * 
- * The user will create one or more Country Designator (CDENTITY) as children of the CDG (via CDGCDENTITY).
- * 
- * The user will navigate to a list of WWSEOs or LSEOs and then reference (search & link) a single CDG.
- * 
- * The user will use a Workflow action to queue this ABR which will:
- * -	process the selected WWSEO or LSEO (i.e. the ABR’s attribute is on the WWSEO/LSEO)
- * -	find the related CDG and its related CDENTITYs
- * -	create or update an LSEO for each valid CDENTITY
- * 
- * This ABR ignores all WWSEOALWRs that are directly related to the WWSEO via WWSEOWWSEOALWR.
- *
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\BOXERWWSEOABRALWR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-//BOXERWWSEOABRALWR.java,v
-//Revision 1.4  2009/04/01 13:02:56  wendy
-//Handle PDHDOMAIN meta chg from F to U
-//
-//Revision 1.3  2009/02/23 14:48:44  wendy
-//Added check for multiple CDG
-//
-//Revision 1.2  2009/02/13 18:36:44  wendy
-//add qty to feature msg
-//
-//Revision 1.1  2009/02/13 16:44:01  wendy
-//rename
-//
-//Revision 1.2  2009/02/13 13:07:47  wendy
-//CQ00007061 Boxer
-//
-public class BOXERWWSEOABRALWR extends PokBaseABR 
-{
-    private StringBuffer rptSb = new StringBuffer();
-    private static final char[] FOOL_JTEST = {'\n'};
-    static final String NEWLINE = new String(FOOL_JTEST);
-    private Object[] args = new String[10];
-
-    private ResourceBundle rsBundle = null;
-    private Hashtable metaTbl = new Hashtable();
-    private String navName = "";
-    private EntityItem modelItem, wwseoItem;
-    private Vector cdentityVct = new Vector(); // CDEntityLseo
-    private Vector createdLseoVct = new Vector(1);
-    private Vector updatedLseoVct = new Vector(1);
-    private LinkActionItem lai = null;
-    private DeleteActionItem dai = null;
-    private Hashtable fcodePsTbl = new Hashtable();
-    private Vector seoidVct = new Vector(); // make sure multiple CDENTITY dont conflict and have same CD-seoid
-    
-    private static final String LSEO_CREATEACTION_NAME = "CRPEERLSEO";
-    private static final String LSEO_SRCHACTION_NAME = "SRDLSEO4";//"SRDLSEO3"; // need search w/o domain restrictions
-    private static final String LSEOPS_LINKACTION_NAME = "LINKPRODSTRUCTLSEO";
-    private static final String LSEOPS_DELETEACTION_NAME = "DELLSEOPRODSTRUCT";
-    private static final String STATUS_FINAL = "0020";
-  
-    private static final String[] FCLIST_ATTR = {"LINECORDFCLIST","KEYBRDFCLIST","POINTDEVFCLIST",
-    	"CTRYPACKFCLIST","LANGPACKFCLIST","PACKAGINGFCLIST","PUBFCLIST","OTHERFCLIST"};
-
-    private static final String[] REQ_CDENTITY_ATTR = {"COUNTRYLIST","CD","GENAREASELECTION"}; // should have a local rule but chk anyway
-    private static final String[] REQ_WWSEO_ATTR = {"SEOID","XXPARTNO"}; 
-    private static final String[] REQ_LSEO_ATTR = {"XXPARTNO"};
-    private static final Vector AUDIEN_VCT;
-    static {
-    	AUDIEN_VCT = new Vector(); // AUDIEN          	F 
-    	AUDIEN_VCT.addElement("10046"); // '10046' (Catalog - Business Partner)
-    	AUDIEN_VCT.addElement("10048"); // '10048' (Catalog - Indirect/Reseller)
-    	AUDIEN_VCT.addElement("10054"); // '10054' (Public)
-    	AUDIEN_VCT.addElement("10062"); // '10062' (LE Direct)
-    }
-    
-    /**********************************
-     *  Execute ABR.
-     */
-    public void execute_run()
-    {
-        /*
-        The Report should identify:
-            USERID (USERTOKEN)
-            Role
-            Workgroup
-            Date/Time
-            EntityType LongDescription
-			Any errors or list LSEO created or changed
-        */
-        // must split because too many arguments for messageformat, max of 10.. this was 11
-        String HEADER = "<head>"+
-             EACustom.getMetaTags(getDescription()) + NEWLINE +
-             EACustom.getCSS() + NEWLINE +
-             EACustom.getTitle("{0} {1}") + NEWLINE +
-            "</head>" + NEWLINE + "<body id=\"ibm-com\">" +
-             EACustom.getMastheadDiv() + NEWLINE +
-            "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
-        String HEADER2 = "<table>"+NEWLINE +
-             "<tr><th>Userid: </th><td>{0}</td></tr>"+NEWLINE +
-             "<tr><th>Role: </th><td>{1}</td></tr>"+NEWLINE +
-             "<tr><th>Workgroup: </th><td>{2}</td></tr>"+NEWLINE +
-             "<tr><th>Date: </th><td>{3}</td></tr>"+NEWLINE +
-             "<tr><th>Description: </th><td>{4}</td></tr>"+NEWLINE +
-             "<tr><th>Return code: </th><td>{5}</td></tr>"+NEWLINE +
-             "</table>"+NEWLINE+
-            "<!-- {6} -->" + NEWLINE;
-
-        MessageFormat msgf;
-        String rootDesc="";
-        String abrversion="";
-       
-        println(EACustom.getDocTypeHtml()); //Output the doctype and html
-        try
-        {
-            start_ABRBuild(false); // dont pull VE yet, have to get name based on roottype
-
-            String VEname = "BOXERWWSEO";
-            if (getEntityType().equals("LSEO")){
-				VEname = "BOXERLSEO";
-			}
-
-            // create VE
-            m_elist = m_db.getEntityList(m_prof,
-                new ExtractActionItem(null, m_db,m_prof,VEname),
-                new EntityItem[] { new EntityItem(null, m_prof, getEntityType(), getEntityID()) });
-
-            //get properties file for the base class
-            rsBundle = ResourceBundle.getBundle(getClass().getName(), ABRUtil.getLocale(m_prof.getReadLanguage().getNLSID()));
-            // get root from VE
-            EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-            // debug display list of groups
-            addDebug("DEBUG: "+getShortClassName(getClass())+" entered for " +rootEntity.getKey()+
-                " extract: "+VEname+" using DTS: "+m_prof.getValOn()+NEWLINE + PokUtils.outputList(m_elist));
-
-            //Default set to pass
-            setReturnCode(PASS);
-//fixme remove this.. avoid msgs to userid for testing
-//setCreateDGEntity(false);
-  
-            //NAME is navigate attributes
-            navName = getNavigationName(rootEntity);
-            rootDesc = "&quot;"+m_elist.getParentEntityGroup().getLongDescription()+"&quot; "+navName;
-            
-            modelItem = m_elist.getEntityGroup("MODEL").getEntityItem(0);
-        
-            if (getEntityType().equals("WWSEO")){ // root is WWSEO
-            	wwseoItem = rootEntity;
-            	verifyEntity(rootEntity,REQ_WWSEO_ATTR); 
-            }else{ // root is LSEO
-            	wwseoItem = m_elist.getEntityGroup("WWSEO").getEntityItem(0);
-            	verifyEntity(rootEntity,REQ_LSEO_ATTR); 
-            }
-
-            if (wwseoItem==null){
-        		//NOT_FOUND_ERR = Error: No {0} found.
-    			args[0] =m_elist.getEntityGroup("WWSEO").getLongDescription();
-        		addError("NOT_FOUND_ERR",args);
-            }
-            if (modelItem==null){
-        		//NOT_FOUND_ERR = Error: No {0} found.
-    			args[0] =m_elist.getEntityGroup("MODEL").getLongDescription();
-        		addError("NOT_FOUND_ERR",args);
-            }
-            if (m_elist.getEntityGroup("CDG").getEntityItemCount()==0){
-        		//NOT_FOUND_ERR = Error: No {0} found.
-    			args[0] =m_elist.getEntityGroup("CDG").getLongDescription();
-        		addError("NOT_FOUND_ERR",args);
-            }
-            if (m_elist.getEntityGroup("CDG").getEntityItemCount()>1){
-        		//MULTIPLE_ERR = Error: Multiple {0} found.  Only one is supported.
-    			args[0] =m_elist.getEntityGroup("CDG").getLongDescription();
-        		addError("MULTIPLE_ERR",args);
-            }
-            if(getReturnCode()== PokBaseABR.PASS){
-                EntityItem cdgItem = m_elist.getEntityGroup("CDG").getEntityItem(0);
-
-                // validate the CDENTITY and accumulate the list of features for each
-            	Vector lseoExistVct = checkCDEntity(rootEntity,cdgItem);
-            	EntityList lseoList = null;
-            	if (lseoExistVct.size()>0){
-            		// pull all LSEOPRODSTRUCT for current LSEO at once
-            		EntityItem eiArray[] = new EntityItem[lseoExistVct.size()];
-            		lseoExistVct.copyInto(eiArray);
-
-            		lseoList = m_db.getEntityList(m_prof, 
-            				new ExtractActionItem(null, m_db,m_prof, "BOXERLSEO2"), 
-            				eiArray);
-            		addDebug("current lseoprodstruct using VE BOXERLSEO2: "+PokUtils.outputList(lseoList));
-            		lseoExistVct.clear();
-            	}
-            	// Errors may have been found, but if any CDEntityLseo exist, run them
-            	for (int i=0; i<cdentityVct.size(); i++){
-            		CDEntityLseo cde = (CDEntityLseo)cdentityVct.elementAt(i);
-            		if (cde.lseoItem==null){
-                    	createLSEO(cde, rootEntity);
-            		}else{
-            			updateLSEO(cde, rootEntity, lseoList);
-            		}
-                } 	
-            	 
-            	if (createdLseoVct.size()>0){
-            		// CREATED_MSG = Created {0} LSEO: {1}
-            		args[0] =""+createdLseoVct.size();
-            		args[1]="";
-            		for (int i=0; i<createdLseoVct.size(); i++){
-            			args[1] = args[1]+createdLseoVct.elementAt(i).toString();
-            		}
-            		msgf = new MessageFormat(rsBundle.getString("CREATED_MSG"));
-            		addOutput(msgf.format(args));
-            	}
-            	if (updatedLseoVct.size()>0){
-            		// UPDATED_MSG = Updated {0} LSEO: {1}
-            		args[0] =""+updatedLseoVct.size();
-            		args[1]="";
-            		for (int i=0; i<updatedLseoVct.size(); i++){
-            			args[1] = args[1]+updatedLseoVct.elementAt(i).toString();
-            		}
-            		msgf = new MessageFormat(rsBundle.getString("UPDATED_MSG"));
-            		addOutput(msgf.format(args));
-            	}
-            	if (createdLseoVct.size()==0 &&updatedLseoVct.size()==0){
-            		//NO_CHGS=No changes made.
-            		addOutput(rsBundle.getString("NO_CHGS"));
-            	}
-            	if (lseoList!= null){
-            		lseoList.dereference();
-            	}
-            } // ok to here
-        }
-        catch(Throwable exc) {
-            java.io.StringWriter exBuf = new java.io.StringWriter();
-            String Error_EXCEPTION="<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
-            String Error_STACKTRACE="<pre>{0}</pre>";
-            msgf = new MessageFormat(Error_EXCEPTION);
-            setReturnCode(INTERNAL_ERROR);
-            exc.printStackTrace(new java.io.PrintWriter(exBuf));
-            // Put exception into document
-            args[0] = exc.getMessage();
-            rptSb.append(msgf.format(args) + NEWLINE);
-            msgf = new MessageFormat(Error_STACKTRACE);
-            args[0] = exBuf.getBuffer().toString();
-            rptSb.append(msgf.format(args) + NEWLINE);
-            logError("Exception: "+exc.getMessage());
-            logError(exBuf.getBuffer().toString());
-        }
-        finally
-        {
-            setDGTitle(navName);
-            setDGRptName(getShortClassName(getClass()));
-            setDGRptClass(getABRCode());
-            // make sure the lock is released
-            if(!isReadOnly())
-            {
-                clearSoftLock();
-            }
-        }
-
-        //Print everything up to </html>
-        //Insert Header into beginning of report
-        msgf = new MessageFormat(HEADER);
-        args[0] = getDescription();
-        args[1] = navName;
-        String header1 = msgf.format(args);
-        msgf = new MessageFormat(HEADER2);
-        args[0] = m_prof.getOPName();
-        args[1] = m_prof.getRoleDescription();
-        args[2] = m_prof.getWGName();
-        args[3] = getNow();
-        args[4] = rootDesc;
-        args[5] = (this.getReturnCode()==PokBaseABR.PASS?"Passed":"Failed");
-        args[6] = abrversion+" "+getABRVersion();
-
-        rptSb.insert(0, header1+msgf.format(args) + NEWLINE);
-
-        println(rptSb.toString()); // Output the Report
-        printDGSubmitString();
-        println(EACustom.getTOUDiv());
-        buildReportFooter(); // Print </html>
-
-        metaTbl.clear();
-    }
-    /*************
-     * A.	Setup Data
-     * 
-     * Entity Type:  CDG
-     * Attributes:  CDGNAME
-     * 
-     * A WWSEO may have one CDG which may have one or more CDENTITYs.
-     * 
-     * Entity Type:  CDENTITY
-     * Attributes:
-     * AttributeCode	Type	LONGDESCRIPTION
-     * CD				T	Country Designator*
-     * COUNTRYLIST		F	Country List*
-     * OFFCOUNTRY		U	Offering Country
-     * GENAREASELECTION	F	General Area Selection*
-     * LANGUAGES		U	Language
-     * LINECORDFCLIST	T	Line Cord FC List
-     * KEYBRDFCLIST		T	Keyboard FC List
-     * POINTDEVFCLIST	T	Pointing Device
-     * CTRYPACKFCLIST	T	Country Pack FC List
-     * LANGPACKFCLIST	T	Language Pack FC List
-     * PACKAGINGFCLIST	T	Packaging FC List
-     * PUBFCLIST		T	Publication FC List
-     * OTHERFCLIST		T	Other FC List
-     * 
-     * Notes:
-     * 	1.	CD is 1 - 2 alpha integer upper characters controlled by a local rule.
-     * 	2.	Long Description * indicates a local rule will require the attribute
-     * 	3.	The FC Lists are lists of Feature Codes separated by a comma. The optional quantity is separated 
-     * 	from Feature Code by a colon. The default quantity is one. Spaces are ignored and are not required.
-     * 	Format:  featurecode or featurecode:quantity
-     * 	e.g. 1234,4567:2, 7654:1
-     * 	4.	There are eight lists of FC to facilitate data entry. From an ABR point of view, the eight 
-     * 	lists could be concatenated using a comma between the lists. The ABR should not treat the lists differently
-     * 	5.	If a Feature Code is duplicated either within a list or in different lists:
-     * 		a.	If the quantity is identical for all instances, then process one of them with a
-     * 		warning message; however, do NOT set WWSEOABRALWR  = Failed (0040).
-     * 		b.	If the quantity is not identical for all instances, report the error, then skip the
-     * 		CDENTITY and continue with the next CDENTITY and set WWSEOABRALWR  = Failed (0040)
-     *
-     * B.	Processing
-     * 
-     * The ABR must be able to be re-run. Every execution of the ABR creates a set of required LSEOs
-     * that are needed. It then compares this list to the current children LSEOs for the WWSEO or LSEO.
-     * There are several possibilities:
-     * 1.	Current LSEO has a matching SEOID to one that is needed. A search is done that is not 
-     * 	limited by PDHDOMAIN. 	If the parent WWSEO is not the WWSEO that was selected for the ABR, 
-     * 	do NOT update the LSEO and report an Error for the CDENTITY indicating that the LSEO does not 
-     *  have this WWSEO as a parent and proceed to the next CDENTITY.
-     *  
-     *  If the LSEO STATUS = 0020 (Final), then do NOT update the LSEO and report an Error for the CDENTITY 
-     *  indicating that the LSEO (identify the LSEO) is Final and proceed to the next CDENITTY.
-     *  
-     *  Check the LSEO vs the CDENTITY data
-     *  a.	Everything matches – nothing to do.
-     *  b.	Not an exact match (e.g. list of features and/or attributes do not match) – update the 
-     *  differences (this could be both adds and deletes of features).
-     * 2.	No current LSEO – create the LSEO.
-     * 
-     * @param rootEntity
-     * @param cdgItem
-     * @return
-     * @throws SQLException
-     * @throws MiddlewareException
-     * @throws MiddlewareShutdownInProgressException
-     */
-    private Vector checkCDEntity(EntityItem rootEntity,EntityItem cdgItem) 
-    throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException
-    {
-    	Vector lseoUpdateVct = new Vector(1);
-    	Vector cdeVct = PokUtils.getAllLinkedEntities(cdgItem, "CDGCDENTITY", "CDENTITY");
-    	EntityGroup cdeGrp = m_elist.getEntityGroup("CDENTITY");
-    	// if no CDENTITY were found, this is an error
-    	if (cdeVct.size()==0){
-    		//NOT_FOUND_ERR2 = Error: No {0} found for {1} &quot;{2}&quot;.
-			args[0] = cdeGrp.getLongDescription();
-			args[1] = cdgItem.getEntityGroup().getLongDescription();
-			args[2] = getNavigationName(cdgItem);
-    		addError("NOT_FOUND_ERR2",args);
-    		return lseoUpdateVct;
-    	}
-    	//look at each CDENTITY and validate
-    	for (int i=0; i<cdeVct.size(); i++){
-    		EntityItem cdeItem = (EntityItem)cdeVct.elementAt(i);
-    		String seoid;
-    		//CDENTITY.CD length 
-    		String cd = PokUtils.getAttributeValue(cdeItem, "CD", "", "", false);
-    		addDebug("Checking "+cdeItem.getKey()+" CD: "+cd);
-    		int cdlen = cd.length();
-    		if (rootEntity.getEntityType().equals("WWSEO")){
-    			//WWSEO – if the length is greater than 1 character, report the selected WWSEO, 
-    			//the referenced CDG and the CDENTITY. Skip the CDENTITY and continue with the next CDENTITY and 
-    			//set WWSEOABRALWR  = Failed (0040).
-    			if (cdlen!=1){
-    				//INVALID_CD_ERR = Error: Invalid {0} = {1} for &quot;{2}&quot;
-					args[0]=PokUtils.getAttributeDescription(cdeGrp, "CD", "CD");
-					args[1] = cd;
-					args[2] = getNavigationName(cdeItem);	
-					addError("INVALID_CD_ERR",args);
-	    			outputSkipErrMsg(cdeItem, cdgItem);
-					addDebug("Skipping "+cdeItem.getKey()+" because wrong CD.len");
-					continue;
-    			}
-    			//WWSEO: Left(WWSEO.SEOID,6)&& CDENTITY.CD
-    			seoid = PokUtils.getAttributeValue(rootEntity, "SEOID", "", "", false);
-    			if (seoid.length()>6){
-    				seoid=seoid.substring(0, 6);
-    			}
-    			seoid = seoid+cd;
-    		}else{
-    			//LSEO – if the length is !=2 characters, do not generate the LSEO, report the selected LSEO, 
-    			//the referenced CDG and the CDENTITY. Skip the CDENTITY and continue with the next CDENTITY and 
-    			//set WWSEOABRALWR  = Failed (0040)
-    			if (cdlen!=2){
-    				//INVALID_CD_ERR = Error: Invalid {0} = {1} for &quot;{2}&quot;
-					args[0]=PokUtils.getAttributeDescription(cdeGrp, "CD", "CD");
-					args[1] = cd;
-					args[2] = getNavigationName(cdeItem);	
-					addError("INVALID_CD_ERR",args);
-	    			outputSkipErrMsg(cdeItem, cdgItem);
-					addDebug("Skipping "+cdeItem.getKey()+" because wrong CD.len");
-    				continue;
-    			}
-
-    			//LSEO: Left(LSEO.XXPARTNO,5) && Left(CDENTITY.CD,2)
-    			seoid = PokUtils.getAttributeValue(rootEntity, "XXPARTNO", "", "", false);
-    			if (seoid.length()>5){
-    				seoid=seoid.substring(0, 5);
-    			}
-    			seoid = seoid+cd;
-    		}
-    		addDebug("derived seoid "+seoid);
-    		if (seoidVct.contains(seoid)){ //supposed to have uniqueness check, but check anyway
-    			//DUPLICATE_SEOID_ERR = Error: Duplicate SEOID {0} created by {1} = {2} for &quot;{3}&quot;
-				args[0]=seoid;
-				args[1]=PokUtils.getAttributeDescription(cdeGrp, "CD", "CD");
-				args[2] = cd;
-				args[3] = getNavigationName(cdeItem);	
-				addError("DUPLICATE_SEOID_ERR",args);
-    			outputSkipErrMsg(cdeItem, cdgItem);
-				addDebug("Skipping "+cdeItem.getKey()+" because duplicate CD-seoid");
-				continue;
-    		}
-    		seoidVct.addElement(seoid);
-    		// verify the CDENTITY attributes
-    		if(verifyEntity(cdeItem,REQ_CDENTITY_ATTR)){
-    			Vector fcmsgVct = new Vector(1); //hang onto fc checked, so dont have same missing msg over and over
-    			CDEntityLseo cdlseo = new CDEntityLseo(cdeItem, seoid); // hang onto info
-    			boolean featureError = false;
-    			// accumulate all features and quantity
-    			for (int a=0; a<FCLIST_ATTR.length; a++){
-    				String fclist = PokUtils.getAttributeValue(cdeItem, FCLIST_ATTR[a], "", "", false);
-    				addDebug(FCLIST_ATTR[a]+" "+fclist);
-    				if (fclist.length()>0){
-    					StringTokenizer st = new StringTokenizer(fclist,",");
-    					while(st.hasMoreTokens()) {
-    						String qty = "1";
-    						String fcode = st.nextToken().trim();
-    						// check for qty
-    						int id = fcode.indexOf(":");
-    						if (id != -1){
-    							qty = fcode.substring(id+1).trim();
-    							fcode = fcode.substring(0,id).trim();
-    						}
-
-    						//3. Error	If one of the FEATURE lists identifies a FEATURE Code that is not available 
-    						//(i.e. the Feature Code is not related to the parent MODEL via PRODSTRUCT). 
-    						EntityItem psItem = findFeatureProdstruct(fcode);
-    						if (psItem==null){
-    							if (!fcmsgVct.contains(fcode)){
-    								//FC_NOTFOUND_ERR = Error: Feature {0} was not related to Model &quot;{1}&quot;
-    								args[0] = fcode;
-    								args[1] = getNavigationName(modelItem);
-    								addError("FC_NOTFOUND_ERR",args);
-    								fcmsgVct.addElement(fcode);
-    							}
-    							featureError = true;
-    						}else{
-    							FCQty fcqty = new FCQty(fcode, qty,psItem);
-    							int fcqtyId = cdlseo.fcQtyVct.indexOf(fcqty);
-    							if (fcqtyId!= -1){ // matched on fcode
-    								FCQty fcq1 = (FCQty) cdlseo.fcQtyVct.elementAt(fcqtyId);
-    								//b.If the quantity is not identical for all instances, report the error, then skip the CDENTITY and 
-    								//continue with the next CDENTITY and set WWSEOABRALWR  = Failed (0040)
-    								if (!fcq1.qty.equals(fcqty.qty)){
-    									//DUPLICATE_FCQTY_ERR = Error: Found duplicate Features with conflicting quantity values for {0} &quot;{1}&quot;. Features are {2}
-    									args[0] = cdeGrp.getLongDescription();
-    									args[1] = getNavigationName(cdeItem);
-    									args[2]=fcq1+" "+fcqty;
-    									addError("DUPLICATE_FCQTY_ERR",args);
-    									featureError=true;
-    								}else{
-    									//a.If the quantity is identical for all instances, then process one of them with a 
-    									//warning message; however, do NOT set WWSEOABRALWR  = Failed (0040).
-    									//DUPLICATE_FC_MSG = Warning: Found duplicate Feature code {0} in {1} &quot;{2}&quot; in {3} &quot;{4}&quot;
-    									args[0] = fcode;
-    									args[1] = cdeGrp.getLongDescription();
-    									args[2] = getNavigationName(cdeItem);
-    									args[3] = cdgItem.getEntityGroup().getLongDescription();
-    									args[4] = getNavigationName(cdgItem);
-    									addOutput(getResourceMsg("DUPLICATE_FC_MSG", args));
-    								}
-    								fcqty.dereference();
-    							}else{
-    								cdlseo.addFcQty(fcqty);
-    							}
-    						}
-    					} // end has more tokens
-    				} // endof featurelist[a] has a value
-    			} // end of feature list attributes
-    			
-    			if (featureError){
-        			outputSkipErrMsg(cdeItem, cdgItem);
-					cdlseo.dereference();
-					continue;
-    			}
-
-    			//2.Error If an instance of CDENTITY has no Feature Codes identified. List the instance that is incomplete.
-    			//Note:  at least one of the lists has to identify at least one Feature Code.
-    			if (cdlseo.hasFeatures()){
-    				// look for the LSEO matching this seoid
-    				EntityItem lseo = findLseo(seoid);
-    				if (lseo!= null){
-    	    	        String statusFlag = PokUtils.getAttributeFlagValue(lseo, "STATUS");
-    	    	        addDebug(lseo.getKey()+" STATUS: "+PokUtils.getAttributeValue(lseo, "STATUS",", ", "", false)+" ["+statusFlag+"] ");
-
-    	    	        if(null == statusFlag || statusFlag.length()==0)  {
-    	    	            statusFlag = STATUS_FINAL; // default to final 
-    	    	        }
-    	    	        if (statusFlag.equals(STATUS_FINAL)){
-    	    	        	//LSEO_FINAL_ERR = Error: LSEO with SEOID:{0} is Final.
-    						args[0] = seoid;
-    						addError("LSEO_FINAL_ERR",args);  
-    		    			outputSkipErrMsg(cdeItem, cdgItem);
-    						cdlseo.dereference();
-    	    	        }else{
-    	    	        	cdlseo.setLseo(lseo);
-        					lseoUpdateVct.addElement(lseo);
-        					cdentityVct.add(cdlseo);
-    	    	        }
-    				}else{
-    					// look in PDH to make sure this seoid does not exist, error if it does
-    					lseo = searchForLSEO(seoid);
-    					if (lseo!= null){
-    						//LSEO_DUPLICATE_ERR = Error: LSEO with SEOID:{0} does not have this WWSEO as a parent.
-    						args[0] = seoid;
-    						addError("LSEO_DUPLICATE_ERR",args);  
-    		    			outputSkipErrMsg(cdeItem, cdgItem);
-    						cdlseo.dereference();
-    					}else{
-    						cdentityVct.add(cdlseo);
-    					}
-    				}
-    			}else{
-    				//NO_CDENTITYFC_ERR = Error: No Valid Features listed for {0} &quot;{1}&quot;.
-    				args[0] = cdeGrp.getLongDescription();
-    				args[1] = getNavigationName(cdeItem);
-    				addError("NO_CDENTITYFC_ERR",args);   
-        			outputSkipErrMsg(cdeItem, cdgItem);
-    				cdlseo.dereference();
-    			}
-    		} // end verifyEntity ok
-    		else{
-    			outputSkipErrMsg(cdeItem, cdgItem);
-    		}
-    	} //end CDENTITY loop  
-    	
-    	return lseoUpdateVct;
-    }
-    /**
-     * output skipping msg
-     * @param cdeItem
-     * @param cdgItem
-     * @throws SQLException
-     * @throws MiddlewareException
-     */
-    private void outputSkipErrMsg(EntityItem cdeItem, EntityItem cdgItem) throws SQLException, MiddlewareException
-    {
-    	// SKIPPING_MSG = {0} &quot;{1}quot; in {2} &quot;{3}&quot; will be skipped.
-		args[0]= cdeItem.getEntityGroup().getLongDescription();
-		args[1] = getNavigationName(cdeItem);	
-		args[2] = cdgItem.getEntityGroup().getLongDescription();
-		args[3] = getNavigationName(cdgItem);
-		addError("SKIPPING_MSG",args);
-    }
-    /******************
-     * Find the Feature in the extract and return the prodstruct
-     * One of the FEATURE lists identifies a FEATURE Code that is not available 
-     * 	(i.e. the Feature Code is not related to the parent MODEL via PRODSTRUCT). 
-     * @param fcode
-     * @return
-     */
-    private EntityItem findFeatureProdstruct(String fcode){
-    	EntityItem psItem = (EntityItem)fcodePsTbl.get(fcode);
-    	if (psItem==null){
-    		EntityGroup fcGrp = m_elist.getEntityGroup("FEATURE");
-    		for (int i=0; i<fcGrp.getEntityItemCount(); i++){
-    			EntityItem featItem = fcGrp.getEntityItem(i);
-    			String fc = PokUtils.getAttributeValue(featItem, "FEATURECODE", "", "", false);
-    			if (fc.equals(fcode)){
-    				psItem = (EntityItem)featItem.getDownLink(0);
-    				addDebug("findFeatureProdstruct for "+fcode+" found "+featItem.getKey()+" "+psItem.getKey());
-    				if (featItem.getDownLink().size()>1){
-    					addDebug("Warning: "+featItem.getKey()+" had multiple downlinks");
-    					for (int d=0; d<featItem.getDownLink().size();d++){
-    						addDebug("Warning: downlink["+d+"] "+featItem.getDownLink(d).getKey());
-    					}
-    				}
-    				fcodePsTbl.put(fcode,psItem);// hang onto to prevent dupe error msgs
-    				break;
-    			}
-    		}
-    	}
-    	
-    	return psItem;
-    }
-    /******************
-     * Look to see if any LSEO in the extract exists for this seoid
-     * 
-     * @param seoid
-     * @return
-     * @throws MiddlewareShutdownInProgressException 
-     * @throws MiddlewareException 
-     * @throws SQLException 
-     */
-    private EntityItem findLseo(String seoid) throws SQLException, MiddlewareException, 
-    MiddlewareShutdownInProgressException
-    {
-    	EntityItem lseoItem = null;
-    	EntityGroup lseoGrp = m_elist.getEntityGroup("LSEO");
-    	for (int i=0; i<lseoGrp.getEntityItemCount(); i++){
-    		EntityItem item = lseoGrp.getEntityItem(i);
-    		String sid = PokUtils.getAttributeValue(item, "SEOID", "", "", false);
-    		if (sid.equals(seoid)){
-    			lseoItem = item;
-    			addDebug("findLseo for "+seoid+" found "+lseoItem.getKey());
-    			break;
-    		}
-    	}
-  
-    	return lseoItem;
-    }
-	/*****************************************
-	 * Search for LSEO using:
-	 * -	<SEOID>
-	 * 
-	 * @param seoid
-	 * @return
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws MiddlewareShutdownInProgressException
-	 */
-	private EntityItem searchForLSEO(String seoid) 
-	throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException
-	{
-		EntityItem lseo = null;
-		Vector attrVct = new Vector(1);
-		attrVct.addElement("SEOID");
-		Vector valVct = new Vector(1);
-		valVct.addElement(seoid);
-
-		EntityItem eia[]= null;
-		try{
-			StringBuffer debugSb = new StringBuffer();
-			eia= ABRUtil.doSearch(m_db, m_prof, 
-					LSEO_SRCHACTION_NAME, "LSEO", false, attrVct, valVct, debugSb);
-			if (debugSb.length()>0){
-				addDebug(debugSb.toString());
-			}
-		}catch(SBRException exc){
-			// these exceptions are for missing flagcodes or failed business rules, dont pass back
-			java.io.StringWriter exBuf = new java.io.StringWriter();
-			exc.printStackTrace(new java.io.PrintWriter(exBuf));
-			addDebug("searchForLSEO SBRException: "+exBuf.getBuffer().toString());
-		}
-		if (eia!=null && eia.length > 0){			
-			for (int i=0; i<eia.length; i++){
-				addDebug("searchForLSEO found "+eia[i].getKey());
-			}
-
-			lseo = eia[0];
-		}
-		attrVct.clear();
-		valVct.clear();
-		return lseo;
-	}    
-    /**************
-     * REQ_CDENTITY_ATTR = {"COUNTRYLIST","CD","GENAREASELECTION"};
-     * REQ_WWSEO_ATTR = {"XXPARTNO"};
-     * REQ_LSEO_ATTR = {"XXPARTNO"};
-     */
-    private boolean verifyEntity(EntityItem cdeItem, String attrlist[]) throws SQLException, MiddlewareException{
-    	boolean isok = true;
-    	for (int i=0; i<attrlist.length; i++){
-    		String value = PokUtils.getAttributeValue(cdeItem, attrlist[i], "", null,false);
-    		if (value==null){
-    			//MISSING_ATTR_ERR = Error: {0} &quot;{1}&quot; does not have a value for {2}.
-				args[0] = cdeItem.getEntityGroup().getLongDescription();
-				args[1] = getNavigationName(cdeItem);
-				args[2] = PokUtils.getAttributeDescription(cdeItem.getEntityGroup(), attrlist[i], attrlist[i]);
-				addError("MISSING_ATTR_ERR",args);    	
-				isok=false;
-    		}
-    	}
-    	
-    	return isok;
-    }
-    /**************
-     * C.  LSEO Creation
-     * 
-     * If invoked at a WWSEO, then for each instance of CDENTITY (WWSEO -> CDG -> CDENTITY), create
-     * a LSEO as a child of the selected WWSEO.
-     * 
-     * If invoked at a LSEO, then for each instance of CDENTITY (LSEO -> CDG -> CDENTITY), create a
-     * LSEO as a peer of the selected LSEO (i.e. the selected LSEO's parent WWSEO).
-     *   
-     * @param cde
-     * @param rootEntity
-     * @throws MiddlewareRequestException
-     * @throws RemoteException
-     * @throws SQLException
-     * @throws MiddlewareException
-     * @throws EANBusinessRuleException
-     * @throws MiddlewareShutdownInProgressException
-     * @throws LockException
-     * @throws WorkflowException
-     */
-    private void createLSEO(CDEntityLseo cde, EntityItem rootEntity) 
-    throws MiddlewareRequestException, RemoteException, SQLException, MiddlewareException, 
-    EANBusinessRuleException, MiddlewareShutdownInProgressException, LockException, WorkflowException
-    {
-    	addDebug("createLSEO entered for SEOID "+cde.seoid);
-    	// create the lseo with wwseo as parent
-		EntityItem lseoItem = null;
-		AttrSet attrSet = null;
-		if (rootEntity.getEntityType().equals("WWSEO")){
-			attrSet = new WWSEOAttrSet(cde,rootEntity);
-		}else{
-			attrSet = new LSEOAttrSet(cde,rootEntity);
-		}
-
-		StringBuffer debugSb = new StringBuffer();
-		lseoItem = ABRUtil.createEntity(m_db, m_prof, LSEO_CREATEACTION_NAME, wwseoItem,  
-				"LSEO", attrSet.getAttrCodes(), attrSet.getAttrValues(), debugSb); 
-		if (debugSb.length()>0){
-			addDebug(debugSb.toString());
-		}
-		// release memory
-		attrSet.dereference();	
-		
-		if (lseoItem==null){
-			//LSEO_CREATE_ERR = Error: Can not create LSEO entity for SEOID:{0}
-			args[0] = cde.seoid;
-			addError("LSEO_CREATE_ERR",args);
-		}else{    	
-			createdLseoVct.addElement(new StringBuffer(getNavigationName(lseoItem)));
-			// link all prodstructs to this lseo thru lseoprodstruct and set the qty
-			createFeatureRefs(cde, lseoItem);
-		}	
-    }
-    
-    /*********************
-     * Update an existing LSEO if needed
-     * all attributes must match
-     * all referenced features must match and their quantity
-     * extra lseoprodstruct must be deleted
-     * @param cde
-     * @param rootEntity
-     * @param lseoList
-     * @throws SQLException 
-     * @throws MiddlewareShutdownInProgressException 
-     * @throws MiddlewareException 
-     * @throws EANBusinessRuleException 
-     * @throws RemoteException 
-     * @throws MiddlewareBusinessRuleException 
-     * @throws WorkflowException 
-     * @throws LockException 
-     */
-    private void updateLSEO(CDEntityLseo cde, EntityItem rootEntity, EntityList lseoList) 
-    throws MiddlewareBusinessRuleException, RemoteException, EANBusinessRuleException,
-    MiddlewareException, MiddlewareShutdownInProgressException, SQLException, LockException, WorkflowException
-    {
-    	EntityItem lseoItem = lseoList.getParentEntityGroup().getEntityItem(cde.lseoItem.getKey());
-    	addDebug("updateLSEO entered for SEOID "+cde.seoid+" "+lseoItem.getKey());
-    	// make sure all attributes match
-    	boolean chgsMade = updateLSEOAttributes(cde, rootEntity, lseoItem);
-    	
-    	// link missing prodstructs
-    	// remove extra lseoprodstructs	
-    	String updatemsg = updateFeatureRefs(cde, lseoItem);
-    	if (chgsMade || updatemsg.length()>0){
-    		updatedLseoVct.addElement(getNavigationName(lseoItem)+updatemsg);
-    	}
-    }
-    /**************
-     * make sure this lseo has the specified attribute values
-     * 
-     * @param cdeItem
-     * @param rootEntity
-     * @param lseoItem
-     * @throws EANBusinessRuleException 
-     * @throws SQLException 
-     * @throws MiddlewareShutdownInProgressException 
-     * @throws MiddlewareException 
-     * @throws RemoteException 
-     * @throws MiddlewareBusinessRuleException 
-     */
-    private boolean updateLSEOAttributes(CDEntityLseo cde, EntityItem rootEntity, EntityItem lseoItem) 
-    throws EANBusinessRuleException, MiddlewareBusinessRuleException, RemoteException, MiddlewareException, MiddlewareShutdownInProgressException, SQLException
-    {
-    	AttrSet attrSet = null;
-    	addDebug("updateLSEOAttributes entered for "+lseoItem.getKey());
-		if (rootEntity.getEntityType().equals("WWSEO")){
-			attrSet = new WWSEOAttrSet(cde,rootEntity);
-		}else{
-			attrSet = new LSEOAttrSet(cde,rootEntity);
-		}
-		boolean commitNeeded = false;
-		
-    	// make sure all attributes match
-		Vector attrCodeVct = attrSet.getAttrCodes(); // all attr
-		for (int i=0; i<attrCodeVct.size(); i++){
-			String attrCode = (String)attrCodeVct.elementAt(i);
-			StringBuffer debugSb= new StringBuffer();
-			// get the meta attribute
-			EANMetaAttribute ma = lseoItem.getEntityGroup().getMetaAttribute(attrCode);
-			if (ma==null) {
-				addDebug("MetaAttribute cannot be found "+lseoItem.getEntityGroup().getEntityType()+"."+attrCode+"\n");
-				continue;
-			}
-			Object value = attrSet.getAttrValues().get(attrCode);
-			switch (ma.getAttributeType().charAt(0))
-			{
-			case 'T':
-			case 'L':
-			case 'X':
-			{
-				// check the Text attributes
-				String curVal = PokUtils.getAttributeValue(lseoItem, attrCode, "", "", false);
-				if (!value.equals(curVal)){
-					addDebug("Updating "+attrCode+" was: "+curVal+" newval "+value);
-					// save the Text attributes 
-					ABRUtil.setText(lseoItem,attrCode, (String)value, debugSb); 
-					commitNeeded = true;
-				}
-				break;
-			}
-			case 'U':
-			{
-				String curVal = PokUtils.getAttributeFlagValue(lseoItem, attrCode);
-				if (!value.equals(curVal)){
-					if (curVal==null && value.equals("")){
-						continue;
-					}
-					addDebug("Updating "+attrCode+" was: "+curVal+" newval "+value);
-					ABRUtil.setUniqueFlag(lseoItem,attrCode, (String)value,debugSb); 
-					commitNeeded = true;
-				}
-				break;
-			}
-			case 'F':
-			{
-				String curVal = PokUtils.getAttributeFlagValue(lseoItem, attrCode);
-				boolean updateNeeded = false;
-				if (curVal==null){
-					if ((value instanceof String) && value.equals("")){
-						continue;
-					}
-					addDebug("Updating "+attrCode+" was: "+curVal+" newval "+value);
-					updateNeeded = true;
-				}else if (value instanceof String){
-					if (!value.equals(curVal)){
-						addDebug(attrCode+" needs to be updated, "+curVal+" newval "+value);
-						updateNeeded = true;
-					}
-				}else {
-					Vector tmp = (Vector)value;
-					String curValArray[] = PokUtils.convertToArray(curVal);
-					Vector curVct = new Vector(curValArray.length);
-					for (int c=0; c<curValArray.length; c++){
-						curVct.addElement(curValArray[c]);						
-					}
-					if (curVct.containsAll(tmp)&&tmp.containsAll(curVct)){
-					}else{
-						addDebug(attrCode+" needs to be updated");
-						updateNeeded = true;
-					}
-				}
-				if (updateNeeded){
-					Vector tmp = null;
-					if (value instanceof String){
-						tmp = new Vector();
-						if (!value.equals("")){
-							tmp.addElement(value);
-						}
-					}else {
-						tmp = (Vector)value;
-					}
-
-					ABRUtil.setMultiFlag(lseoItem,attrCode,tmp,debugSb); // make sure flagcodes are passed in 
-					commitNeeded = true;
-				}
-				break;
-			}
-			default:
-			{
-				addDebug("MetaAttribute Type="+ma.getAttributeType()+
-						" is not supported yet "+lseoItem.getEntityGroup().getEntityType()+"."+attrCode+"\n");
-				// could not get anything
-				break;
-			}			         
-			}
-			if (debugSb.length()>0){
-				addDebug(debugSb.toString());
-			}
-		}
-		if(commitNeeded){
-			lseoItem.commit(m_db, null);
-		}
-		// release memory
-		attrSet.dereference();	   
-		
-		return commitNeeded;
-    }
-
-	/**
-	 * link lseo to prodstructs
-	 * @param cde
-	 * @param lseoItem
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws LockException
-	 * @throws MiddlewareShutdownInProgressException
-	 * @throws EANBusinessRuleException
-	 * @throws WorkflowException
-	 * @throws RemoteException
-	 */
-	private void createFeatureRefs(CDEntityLseo cde, EntityItem lseoItem) 
-	throws MiddlewareRequestException, SQLException, MiddlewareException, LockException, 
-	MiddlewareShutdownInProgressException, EANBusinessRuleException, WorkflowException, RemoteException 	
-	{
-		String linkAction = LSEOPS_LINKACTION_NAME;
-		if (lai ==null){
-			lai = new LinkActionItem(null, m_db,m_prof,linkAction);
-		}
-		EntityItem parentArray[] = new EntityItem[]{lseoItem};
-		EntityItem childArray[] = new EntityItem[cde.fcQtyVct.size()];
-
-		Hashtable psFcqTbl = new Hashtable();
-		// get each prodstruct
-		for (int i=0; i<cde.fcQtyVct.size(); i++){
-			FCQty fcq = (FCQty)cde.fcQtyVct.elementAt(i);
-			childArray[i] = fcq.prodItem;
-			psFcqTbl.put(childArray[i].getKey(), fcq);
-		}
-
-		// do the link	
-		lai.setParentEntityItems(parentArray);     
-		lai.setChildEntityItems(childArray);
-		m_db.executeAction(m_prof, lai);
-
-		// extract and update QTY
-		//update dts in profile
-		Profile profile = m_prof.getNewInstance(m_db);
-		String now = m_db.getDates().getNow();
-		profile.setValOnEffOn(now, now);
-		// VE for lseo to each ps BOXERLSEO2
-		EntityList list = m_db.getEntityList(profile, 
-				new ExtractActionItem(null, m_db,profile, "BOXERLSEO2"), 
-				parentArray);
-
-		addDebug("createFeatureRefs list using VE BOXERLSEO2 after linkaction: "+
-				linkAction+"\n"+PokUtils.outputList(list));
-		EntityGroup psGrp = list.getEntityGroup("PRODSTRUCT");
-		StringBuffer refSb = new StringBuffer();
-		for (int x=0; x<psGrp.getEntityItemCount(); x++){
-			EntityItem psitem = psGrp.getEntityItem(x);
-			FCQty fcq = (FCQty)psFcqTbl.get(psitem.getKey());
-			String qty = fcq.qty;
-			//ADDED_REF_MSG=<br />&nbsp;&nbsp;Adding reference to Feature {0} with quantity {1}
-			refSb.append(getResourceMsg("ADDED_REF_MSG", new Object[]{fcq.fcode,fcq.qty}));
-			EntityItem lseopsitem = (EntityItem)psitem.getUpLink(0);  // get the new relator
-			addDebug(psitem.getKey()+" use qty: "+qty+" on "+lseopsitem.getKey());
-			if (qty!= null && !qty.equals("1")){  // 1 is default so nothing needed
-				StringBuffer debugSb = new StringBuffer();
-				// save the qty attribute
-				ABRUtil.setText(lseopsitem,"CONFQTY", qty, debugSb); 
-				if (debugSb.length()>0){
-					addDebug(debugSb.toString());
-				}
-				// must commit changed entity to the PDH 
-				lseopsitem.commit(m_db, null);	
-			}
-		}
-		StringBuffer lseoinfo = (StringBuffer)createdLseoVct.lastElement();
-		lseoinfo.append(refSb.toString());
-		
-		psFcqTbl.clear();
-		list.dereference();
-	}
-	
-	/**********************
-	 *  link missing prodstructs, remove extra lseoprodstructs, update qty on existing lseoprodstructs
-	 *  if needed
-	 * @param cde
-	 * @param lseoItem
-	 * @return
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws LockException
-	 * @throws MiddlewareShutdownInProgressException
-	 * @throws EANBusinessRuleException
-	 * @throws WorkflowException
-	 * @throws RemoteException
-	 */
-	private String updateFeatureRefs(CDEntityLseo cde, EntityItem lseoItem) 
-	throws MiddlewareRequestException, SQLException, MiddlewareException, LockException, 
-	MiddlewareShutdownInProgressException, EANBusinessRuleException, WorkflowException, RemoteException 	
-	{
-		StringBuffer refSb = new StringBuffer();
-		Hashtable psFcqTbl = new Hashtable();
-		// get each prodstruct and its qty
-		for (int i=0; i<cde.fcQtyVct.size(); i++){
-			FCQty fcq = (FCQty)cde.fcQtyVct.elementAt(i);
-			psFcqTbl.put(fcq.prodItem.getKey(), fcq);
-		}	
-		
-		// verify referenced features and quantity
-		Vector origPsVct = PokUtils.getAllLinkedEntities(lseoItem, "LSEOPRODSTRUCT", "PRODSTRUCT");
-		addDebug("updateFeatureRefs origPsVct "+origPsVct.size());
-		for (int i=0; i<origPsVct.size(); i++){
-			addDebug("updateFeatureRefs origPsVct["+i+"] "+((EntityItem)origPsVct.elementAt(i)).getKey());
-		}
-		
-		// get all required prodstructs
-		Vector missingPsVct = new Vector();
-		for (int i=0; i<cde.fcQtyVct.size(); i++){
-			FCQty fcq = (FCQty)cde.fcQtyVct.elementAt(i);
-			boolean found = false;
-			Iterator itr = origPsVct.iterator();
-			while (itr.hasNext()){
-				EntityItem psItem = (EntityItem)itr.next();
-				if (psItem.getKey().equals(fcq.prodItem.getKey())){
-					addDebug("updateFeatureRefs already exists "+fcq.prodItem.getKey());
-					found = true;
-					itr.remove();
-					break;
-				}
-			}
-			if (!found){
-				addDebug("updateFeatureRefs missing "+fcq.prodItem.getKey());
-				missingPsVct.add(fcq.prodItem);
-				//ADDED_REF_MSG=<br />&nbsp;&nbsp;Adding reference to Feature {0} with quantity {1}
-				refSb.append(getResourceMsg("ADDED_REF_MSG", new Object[]{fcq.fcode,fcq.qty}));
-			}
-		}
-		
-		EntityItem parentArray[] = new EntityItem[]{lseoItem};
-		String linkAction = LSEOPS_LINKACTION_NAME;
-		// add any missing LSEOPRODSTRUCT
-		if (missingPsVct.size()>0){
-			addDebug("updateFeatureRefs  missingPsVct "+missingPsVct.size());
-			for (int i=0; i<missingPsVct.size(); i++){
-				addDebug("updateFeatureRefs missingPsVct["+i+"] "+((EntityItem)missingPsVct.elementAt(i)).getKey());
-			}
-			if (lai ==null){
-				lai = new LinkActionItem(null, m_db,m_prof,linkAction);
-			}
-
-			EntityItem childArray[] = new EntityItem[missingPsVct.size()];
-			missingPsVct.copyInto(childArray);
-
-			// do the link	
-			lai.setParentEntityItems(parentArray);     
-			lai.setChildEntityItems(childArray);
-			m_db.executeAction(m_prof, lai);
-		}
-		// remove any extra LSEOPRODSTRUCT
-		String deleteAction =LSEOPS_DELETEACTION_NAME;
-		if (origPsVct.size()>0){
-			addDebug("updateFeatureRefs unneeded cnt "+origPsVct.size());
-			for (int i=0; i<origPsVct.size(); i++){
-				EntityItem psitem = (EntityItem)origPsVct.elementAt(i);
-				addDebug("updateFeatureRefs unneeded ["+i+"] "+psitem.getKey());
-				for (int f=0; f<psitem.getUpLinkCount();f++){
-					EntityItem featitem = (EntityItem)psitem.getUpLink(f);
-					if (featitem.getEntityType().equals("FEATURE")){
-						//DELETED_REF_MSG=<br />&nbsp;&nbsp;Deleting reference to Feature {0}
-						refSb.append(getResourceMsg("DELETED_REF_MSG", 
-								new Object[]{PokUtils.getAttributeValue(featitem, "FEATURECODE", "", "", false)}));
-						break;
-					}
-				}
-			}
-			if (dai ==null){
-				dai = new DeleteActionItem(null, m_db,m_prof,deleteAction);
-			}
-
-			EntityItem childArray[] = new EntityItem[origPsVct.size()];
-			origPsVct.copyInto(childArray);
-			// do the delete	
-			dai.setEntityItems(childArray);
-			m_db.executeAction(m_prof, dai);
-			origPsVct.clear();
-		}		
-			
-		// extract and update QTY
-		//update dts in profile
-		Profile profile = m_prof.getNewInstance(m_db);
-		String now = m_db.getDates().getNow();
-		profile.setValOnEffOn(now, now);
-		// VE for lseo to each ps BOXERLSEO2
-		EntityList list = m_db.getEntityList(profile, 
-				new ExtractActionItem(null, m_db,profile, "BOXERLSEO2"), 
-				parentArray);
-
-		addDebug("updateFeatureRefs list using VE BOXERLSEO2 after linkaction: "+
-				linkAction+" and deleteaction: "+deleteAction+"\n"+PokUtils.outputList(list));
-		EntityGroup psGrp = list.getEntityGroup("PRODSTRUCT");
-		
-		for (int x=0; x<psGrp.getEntityItemCount(); x++){
-			EntityItem psitem = psGrp.getEntityItem(x);
-			FCQty fcq = (FCQty)psFcqTbl.get(psitem.getKey());
-			String qty = fcq.qty;
-			EntityItem lseopsitem = (EntityItem)psitem.getUpLink(0);  // get the relator
-			String qtyValue = PokUtils.getAttributeValue(lseopsitem, "CONFQTY", "", "", false);
-			addDebug(psitem.getKey()+" needs qty: "+qty+" on "+lseopsitem.getKey()+" has qty: "+qtyValue);
-			if (qty!= null && !qty.equals(qtyValue)){  //must match
-				StringBuffer debugSb = new StringBuffer();
-				// save the qty attribute
-				ABRUtil.setText(lseopsitem,"CONFQTY", qty, debugSb); 
-				if (debugSb.length()>0){
-					addDebug(debugSb.toString());
-				}
-				if (!missingPsVct.contains(psitem)){ // this lseops->ps already existed
-					//UPDATED_REF_MSG=<br />&nbsp;&nbsp;Updating reference to Feature {0} with quantity {1}
-					refSb.append(getResourceMsg("UPDATED_REF_MSG", new Object[]{fcq.fcode,fcq.qty}));
-				}
-				// must commit changed entity to the PDH 
-				lseopsitem.commit(m_db, null);	
-			}
-		}
-		
-		psFcqTbl.clear();
-		missingPsVct.clear();
-		list.dereference();
-		return refSb.toString();
-	}
-    /******
-     * @see COM.ibm.eannounce.abr.util.PokBaseABR#dereference()
-     */
-    public void dereference(){
-    	super.dereference();
-
-    	for (int v=0; v<cdentityVct.size(); v++){
-    		CDEntityLseo sma = (CDEntityLseo)cdentityVct.elementAt(v);
-    		sma.dereference();
-    	}
-    	cdentityVct.clear();
-    	cdentityVct = null;
- 
-    	createdLseoVct.clear();
-    	createdLseoVct = null;
-        updatedLseoVct.clear();
-        updatedLseoVct = null;
-        
-    	rsBundle = null;
-    	modelItem = null;
-    	wwseoItem = null;
-    	lai = null;
-    	dai = null;
-    	
-    	rptSb = null;
-        args = null;
-
-        metaTbl = null;
-        navName = null;
-        fcodePsTbl.clear();
-        fcodePsTbl = null;
-        seoidVct.clear();
-        seoidVct = null;
-    }
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.util.PokBaseABR#getABRVersion()
-	 */
-	public String getABRVersion() {
-		return "1.4";
-	}
-
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.util.PokBaseABR#getDescription()
-	 */
-	public String getDescription() {
-		return "WWSEOABRALWR";
-	}
-	/**********************************
-	 * add msg to report output
-	 * @param msg
-	 */
-	private void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
-
-	/**********************************
-	 * add debug info as html comment
-	 * @param msg
-	 */
-	private void addDebug(String msg) { rptSb.append("<!-- "+msg+" -->"+NEWLINE);}
-
-	/**********************************
-	 * get message using resource
-	 *
-	 * @param resrcCode
-	 * @param args
-	 * @return
-	 */
-	private String getResourceMsg(String resrcCode, Object args[])
-	{
-		String msg = rsBundle.getString(resrcCode);
-		if (args != null){
-			MessageFormat msgf = new MessageFormat(msg);
-			msg = msgf.format(args);
-		}
-
-		return msg;
-	}
-	/**********************************
-	 * used for error output
-	 */
-	private void addError(String errCode, Object args[])
-	{
-		setReturnCode(FAIL);
-
-		String msg =rsBundle.getString(errCode);
-		// get message to output
-		if (args!=null){
-			MessageFormat msgf = new MessageFormat(msg);
-			msg = msgf.format(args);
-		}
-
-		addOutput(msg);
-	}
-
-	/**********************************************************************************
-	 *  Get Name based on navigation attributes for specified entity
-	 *
-	 *@return java.lang.String
-	 */
-    private String getNavigationName(EntityItem theItem) throws java.sql.SQLException, MiddlewareException
-    {
-        StringBuffer navName = new StringBuffer();
-        // NAME is navigate attributes
-        // check hashtable to see if we already got this meta
-        EANList metaList = (EANList)metaTbl.get(theItem.getEntityType());
-        if (metaList==null)
-        {
-            EntityGroup eg = new EntityGroup(null, m_db, m_prof, theItem.getEntityType(), "Navigate");
-            metaList = eg.getMetaAttribute();  // iterator does not maintain navigate order
-            metaTbl.put(theItem.getEntityType(), metaList);
-        }
-        for (int ii=0; ii<metaList.size(); ii++)
-        {
-            EANMetaAttribute ma = (EANMetaAttribute)metaList.getAt(ii);
-            navName.append(PokUtils.getAttributeValue(theItem, ma.getAttributeCode(),", ", "", false));
-            if (ii+1<metaList.size()){
-                navName.append(" ");
-            }
-        }
-
-        return navName.toString();
-    }
-    //===================================================================================================
-    //===================================================================================================
-    /************** 
-     * The LSEO attributes are as follows:
-     * 
-     * AttributeCode   	Type    Derivation
-     * ACCTASGNGRP     	U       '01' (01 - 3000100000)
-     * AUDIEN          	F       '10046' (Catalog - Business Partner)
-     *                          '10048' (Catalog - Indirect/Reseller)
-     *                          '10054' (Public)
-     *                          '10062' (LE Direct)
-     * 
-     * COUNTRYLIST     	F       CDENTITY.COUNTRYLIST
-     * GENAREASELECTION    F    CDENTITY.GENAREASELECTION
-     * LANGUAGES       	U       CDENTITY.LANGUAGES**
-     * OFFCOUNTRY      	U       CDENTITY.OFFCOUNTRY**
-     * XXPARTNO        	T       WWSEO: WWSEO.XXPARTNO
-	 *						    LSEO: LSEO.XXPARTNO
-     * 
-     * COMNAME         	T       WWSEO: Left(WWSEO.SEOID,6)&& CDENTITY.CD
-     *                          LSEO: Left(LSEO.XXPARTNO,5) && Left(CDENTITY.CD,2)
-     * SEOID           	T       WWSEO: Left(WWSEO.SEOID,6)&& CDENTITY.CD
-     *                          LSEO: Left(LSEO.XXPARTNO,5) && Left(CDENTITY.CD,2)
-     * LSEOMKTGDESC    	T       WWSEO: WWSEO.MKTGNAME**
-     *                          LSEO: LSEO.LSEOMKTGDESC**
-     * LSEOPUBDATEMTRGT    T    WWSEO: null
-     *                          LSEO: LSEO. LSEOPUBDATEMTRGT
-     * LSEOUNPUBDATEMTRGT  T    WWSEO: null
-     *                          LSEO: LSEO. LSEOUNPUBDATEMTRGT
-     * PDHDOMAIN       	F       WWSEO: WWSEO.PDHDOMAIN
-     *                          LSEO: LSEO.PDHDOMAIN
-     * PRODHIERCD      	T       WWSEO: WWSEO. PRODHIERCD**
-     *                          LSEO: LSEO.PRODHIERCD**
-     * Note:  Those attributes with a '**' at the end of the Description are not required.                    
-     */   
-    private class AttrSet{
-		private Vector attrCodeVct = new Vector();
-		private Hashtable attrValTbl = new Hashtable();
-		protected void addSingle(EntityItem item, String attrCode){
-			addSingle(item, attrCode, attrCode);
-		}
-		protected void addSingle(EntityItem item, String attrCode, String attrCode2){
-			String value = PokUtils.getAttributeFlagValue(item, attrCode);
-			if (value==null){
-				value = "";
-			}
-			attrCodeVct.addElement(attrCode2);
-			attrValTbl.put(attrCode2, value);
-		}
-		protected void addText(EntityItem item, String attrCode){
-			addText(item, attrCode, attrCode);
-		}
-		protected void addText(EntityItem item, String attrCode, String attrCode2){
-			String 	value = PokUtils.getAttributeValue(item, attrCode, "", "", false);
-			attrCodeVct.addElement(attrCode2);
-			attrValTbl.put(attrCode2, value);
-		}
-		protected void addMult(EntityItem item, String attrCode){
-			String value = PokUtils.getAttributeFlagValue(item, attrCode);
-			if (value==null){
-				value = "";
-			}
-			String flagArray[] = PokUtils.convertToArray(value);
-			Vector tmp = new Vector(flagArray.length);
-			for (int i=0; i<flagArray.length; i++){
-				tmp.addElement(flagArray[i]);
-			}
-			attrCodeVct.addElement(attrCode);
-			attrValTbl.put(attrCode, tmp);
-		}
-		AttrSet(CDEntityLseo cde){
-			// ACCTASGNGRP     	U       '01' (01 - 3000100000)
-			attrCodeVct.addElement("ACCTASGNGRP");
-			attrValTbl.put("ACCTASGNGRP", "01"); //ACCTASGNGRP	U	Account Assignment Group	"01 - 3000100000" =>ACCTASGNGRP	01	01 - 3000100000
-			// AUDIEN          	F 
-			attrCodeVct.addElement("AUDIEN");
-			attrValTbl.put("AUDIEN", AUDIEN_VCT); 
-            //SEOID           	T       WWSEO: Left(WWSEO.SEOID,6)&& CDENTITY.CD
-            //							LSEO: Left(LSEO.XXPARTNO,5) && Left(CDENTITY.CD,2)
-			//COMNAME         	T       WWSEO: Left(WWSEO.SEOID,6)&& CDENTITY.CD
-            //							LSEO: Left(LSEO.XXPARTNO,5) && Left(CDENTITY.CD,2)
-			attrCodeVct.addElement("SEOID");
-			attrValTbl.put("SEOID", cde.seoid);
-			attrCodeVct.addElement("COMNAME");
-			attrValTbl.put("COMNAME", cde.seoid);                             
-			//LANGUAGES       	U       CDENTITY.LANGUAGES
-			addSingle(cde.cdEntity, "LANGUAGES");
-			//OFFCOUNTRY      	U       CDENTITY.OFFCOUNTRY
-			addSingle(cde.cdEntity, "OFFCOUNTRY");
-			//GENAREASELECTION    F       CDENTITY.GENAREASELECTION
-			addMult(cde.cdEntity, "GENAREASELECTION");
-			//COUNTRYLIST     	F       CDENTITY.COUNTRYLIST
-			addMult(cde.cdEntity, "COUNTRYLIST");
-		}
-		Vector getAttrCodes() { return attrCodeVct;}
-		Hashtable getAttrValues() { return attrValTbl; }
-		
-		void dereference(){
-			// release memory
-			attrCodeVct.clear();
-			attrValTbl.clear();
-			attrCodeVct = null;
-			attrValTbl = null;
-		}
-    }
-    /************
-     * XXPARTNO        		T       WWSEO: WWSEO.XXPARTNO
-     * LSEOMKTGDESC    		T       WWSEO: WWSEO.MKTGNAME
-     * LSEOPUBDATEMTRGT     T       WWSEO: Do NOT set/update
-     * LSEOUNPUBDATEMTRGT   T       WWSEO: Do NOT set/update
-     * PDHDOMAIN       		F       WWSEO: WWSEO.PDHDOMAIN
-     * PRODHIERCD      		T       WWSEO: WWSEO. PRODHIERCD
-     *
-     */
-    private class WWSEOAttrSet extends AttrSet{
-    	WWSEOAttrSet(CDEntityLseo cde, EntityItem rootEntity){
-    		super(cde);
-    		//XXPARTNO        	T       WWSEO: WWSEO.XXPARTNO
-    		addText(rootEntity, "XXPARTNO");
-    		//LSEOMKTGDESC    	T       WWSEO: WWSEO.MKTGNAME
-    		addText(rootEntity, "MKTGNAME","LSEOMKTGDESC");
-			//PRODHIERCD      	T       WWSEO: WWSEO. PRODHIERCD
-    		addText(rootEntity, "PRODHIERCD");
-			//PDHDOMAIN       	F       WWSEO: WWSEO.PDHDOMAIN
-    		// Entity/Attribute	WWSEO	PDHDOMAIN	SetAttributeType	U ->now overrides F
-    		EANMetaAttribute ma = rootEntity.getEntityGroup().getMetaAttribute("PDHDOMAIN");
-    		if(ma.getAttributeType().equals("F")){
-    			addMult(rootEntity, "PDHDOMAIN");
-    		}else{
-    			addSingle(rootEntity, "PDHDOMAIN");
-    		}
-    	}
-    }
-    /************
-     * XXPARTNO        		T   LSEO: LSEO.XXPARTNO
-     * LSEOMKTGDESC    		T	LSEO: LSEO.LSEOMKTGDESC
-     * LSEOPUBDATEMTRGT    	T   LSEO: LSEO.LSEOPUBDATEMTRGT
-     * LSEOUNPUBDATEMTRGT  	T   LSEO: LSEO.LSEOUNPUBDATEMTRGT
-     * PDHDOMAIN       		F   LSEO: LSEO.PDHDOMAIN
-     * PRODHIERCD      		T   LSEO: LSEO.PRODHIERCD
-     *
-     */
-    private class LSEOAttrSet extends AttrSet{
-    	LSEOAttrSet(CDEntityLseo cde, EntityItem rootEntity){
-    		super(cde);
-    		//XXPARTNO        	T       LSEO: LSEO.XXPARTNO
-    		addText(rootEntity, "XXPARTNO");
-    		//LSEOMKTGDESC    	T		LSEO: LSEO.LSEOMKTGDESC
-    		addText(rootEntity, "LSEOMKTGDESC");
-			//PRODHIERCD      	T       LSEO: LSEO. PRODHIERCD
-    		addText(rootEntity, "PRODHIERCD");
-			//LSEOPUBDATEMTRGT    	T   LSEO: LSEO. LSEOPUBDATEMTRGT
-    		addText(rootEntity, "LSEOPUBDATEMTRGT");
-	   	    // LSEOUNPUBDATEMTRGT  	T   LSEO: LSEO. LSEOUNPUBDATEMTRGT
-    		addText(rootEntity, "LSEOUNPUBDATEMTRGT");
-			//PDHDOMAIN       	F       LSEO: LSEO.PDHDOMAIN
-    		// Entity/Attribute	LSEO	PDHDOMAIN	SetAttributeType	U ->now overrides F
-    		EANMetaAttribute ma = rootEntity.getEntityGroup().getMetaAttribute("PDHDOMAIN");
-    		if(ma.getAttributeType().equals("F")){
-    			addMult(rootEntity, "PDHDOMAIN");
-    		}else{
-    			addSingle(rootEntity, "PDHDOMAIN");
-    		} 
-    	}
-    }
-    private class CDEntityLseo{
-    	private EntityItem cdEntity;
-    	private String seoid;
-    	private Vector fcQtyVct = new Vector();  // vector of FCQty
-    	private EntityItem lseoItem;
-    	CDEntityLseo(EntityItem item, String id){
-    		cdEntity = item;
-    		seoid=id;
-    	}
-    	void addFcQty(FCQty fcq){
-    		fcQtyVct.add(fcq);
-    	}
-    	boolean hasFeatures() {return fcQtyVct.size()>0;}
-    	void setLseo(EntityItem item){ lseoItem = item;}
-    	void dereference(){
-    		for (int v=0; v<fcQtyVct.size(); v++){
-    			FCQty sma = (FCQty)fcQtyVct.elementAt(v);
-    			sma.dereference();
-    		}
-    		fcQtyVct.clear();
-    		fcQtyVct=null;
-
-    		lseoItem = null;
-    		cdEntity = null;
-    		seoid=null;
-    	}
-    }
-    private class FCQty {
-    	private String fcode;
-    	private String qty;
-    	private EntityItem prodItem; // prodstruct to the feature with this featurecode
-   
-    	FCQty(String fc, String q, EntityItem ei){
-    		fcode = fc;
-    		qty = q;
-    		prodItem = ei;
-    	}
-
-        public boolean equals(Object obj) // used by Vector.contains()
-        {
-        	FCQty pn = (FCQty)obj;
-            return (fcode.equals(pn.fcode));
-        }
-        public String toString(){
-        	if (qty.equals("1")){
-        		return fcode;
-        	}
-        	return fcode+":"+qty;
-        }
-        void dereference(){
-        	fcode=null;
-        	qty=null;
-        	prodItem = null;
-        }
-    }
-}

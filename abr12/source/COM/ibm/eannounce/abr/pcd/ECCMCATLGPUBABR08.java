@@ -1,277 +1,283 @@
-//  (c) Copyright International Business Machines Corporation, 2001
-//  All Rights Reserved.</pre>
-//
-//$Log: ECCMCATLGPUBABR08.java,v $
-//Revision 1.3  2008/01/30 19:27:19  wendy
-//Cleanup RSA warnings
-//
-//Revision 1.2  2006/06/05 18:33:52  joan
-//changes
-//
-//Revision 1.1  2006/06/05 17:50:47  joan
-//changes
+/*     */ package COM.ibm.eannounce.abr.pcd;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.LockPDHEntityException;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.abr.util.UpdatePDHEntityException;
+/*     */ import COM.ibm.eannounce.objects.CATCBPDG;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.PDGUtility;
+/*     */ import COM.ibm.eannounce.objects.SBRException;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.DatePackage;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class ECCMCATLGPUBABR08
+/*     */   extends PokBaseABR
+/*     */ {
+/*  34 */   public static final String ABR = new String("ECCMECCMCATLGPUBABR08");
+/*  35 */   private EntityItem m_ei = null;
+/*  36 */   private PDGUtility m_utility = new PDGUtility();
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static final String STARTDATE = "1980-01-01-00.00.00.000000";
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static final String FOREVER = "9999-12-31-00.00.00.000000";
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/*  49 */     DatePackage datePackage = null;
+/*  50 */     String str1 = null;
+/*  51 */     EntityGroup entityGroup = null;
+/*     */     
+/*  53 */     String str2 = null;
+/*  54 */     String str3 = System.getProperty("line.separator");
+/*     */     try {
+/*  56 */       start_ABRBuild(false);
+/*  57 */       setReturnCode(0);
+/*  58 */       buildReportHeaderII();
+/*     */       
+/*  60 */       datePackage = this.m_db.getDates();
+/*  61 */       str1 = datePackage.getNow();
+/*  62 */       String str4 = this.m_utility.getDate(str1.substring(0, 10), 15);
+/*  63 */       entityGroup = new EntityGroup(null, this.m_db, this.m_prof, this.m_abri.getEntityType(), "Edit", false);
+/*  64 */       this.m_ei = new EntityItem(entityGroup, this.m_prof, this.m_db, this.m_abri.getEntityType(), this.m_abri.getEntityID());
+/*     */       
+/*  66 */       println("<br><b>" + this.m_ei.getKey() + "</b>");
+/*  67 */       printNavigateAttributes(this.m_ei, entityGroup, true);
+/*     */       
+/*  69 */       String str5 = this.m_utility.getAttrValueDesc(this.m_ei, "GENAREANAME");
+/*  70 */       String[] arrayOfString = this.m_utility.getFlagCodeForExactDesc(this.m_db, this.m_prof, "OFFCOUNTRY", str5);
+/*  71 */       if (arrayOfString == null || arrayOfString.length <= 0) {
+/*  72 */         System.out.println(getABRVersion() + " unable to find OFFCOUNTRY for desc: " + str5);
+/*  73 */         setCreateDGEntity(false);
+/*  74 */         setReturnCode(-1);
+/*     */       } else {
+/*  76 */         String str = arrayOfString[0];
+/*  77 */         if (!isCATLGCNTRYExist(this.m_db, this.m_prof, str)) {
+/*  78 */           setCreateDGEntity(false);
+/*  79 */           setReturnCode(-1);
+/*  80 */           System.out.println(getABRVersion() + " no CATLGCNTRY exists for " + str);
+/*     */         } 
+/*     */       } 
+/*     */       
+/*  84 */       if (getReturnCode() == 0 && 
+/*  85 */         this.m_ei.getEntityType().equals("CB")) {
+/*     */ 
+/*     */ 
+/*     */         
+/*  89 */         String str6 = this.m_utility.getAttrValue(this.m_ei, "TARG_ANN_DATE_CB");
+/*  90 */         String str7 = this.m_utility.getAttrValue(this.m_ei, "CBSOLSTATUS");
+/*  91 */         int i = this.m_utility.dateCompare(str6, str4);
+/*  92 */         if (i == 2 || str7.equals("0040") || str7.equals("0020")) {
+/*  93 */           setReturnCode(0);
+/*  94 */           log("ECCMCATLGPUBABR08 generating data");
+/*  95 */           CATCBPDG cATCBPDG = new CATCBPDG(null, this.m_db, this.m_prof, "CATCBPDG");
+/*  96 */           cATCBPDG.setEntityItem(this.m_ei);
+/*  97 */           cATCBPDG.executeAction(this.m_db, this.m_prof);
+/*  98 */           log("ECCMCATLGPUBABR08 finish generating data");
+/*     */         } else {
+/* 100 */           setCreateDGEntity(false);
+/* 101 */           setReturnCode(-1);
+/*     */         }
+/*     */       
+/*     */       } 
+/* 105 */     } catch (LockPDHEntityException lockPDHEntityException) {
+/* 106 */       setReturnCode(-2);
+/* 107 */       println("<h3><font color=red>IAB1007E: Could not get soft lock.  Rule execution is terminated.<br />" + lockPDHEntityException
+/*     */ 
+/*     */ 
+/*     */           
+/* 111 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 113 */       logError(lockPDHEntityException.getMessage());
+/* 114 */     } catch (UpdatePDHEntityException updatePDHEntityException) {
+/* 115 */       setReturnCode(-2);
+/* 116 */       println("<h3><font color=red>UpdatePDH error: " + updatePDHEntityException
+/*     */           
+/* 118 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 120 */       logError(updatePDHEntityException.getMessage());
+/* 121 */     } catch (SBRException sBRException) {
+/* 122 */       String str = sBRException.toString();
+/* 123 */       int i = str.indexOf("(ok)");
+/* 124 */       if (i < 0) {
+/* 125 */         setReturnCode(-2);
+/* 126 */         println("<h3><font color=red>Generate Data error: " + 
+/*     */             
+/* 128 */             replace(str, str3, "<br>") + "</font></h3>");
+/*     */         
+/* 130 */         logError(sBRException.toString());
+/*     */       } else {
+/* 132 */         str = str.substring(0, i);
+/* 133 */         println(replace(str, str3, "<br>"));
+/*     */       } 
+/* 135 */     } catch (Exception exception) {
+/*     */       
+/* 137 */       println("Error in " + this.m_abri.getABRCode() + ":" + exception.getMessage());
+/* 138 */       println("" + exception);
+/* 139 */       exception.printStackTrace();
+/*     */       
+/* 141 */       if (getABRReturnCode() != -2) {
+/* 142 */         setReturnCode(-3);
+/*     */       }
+/*     */     } finally {
+/* 145 */       println("<br /><b>" + 
+/*     */           
+/* 147 */           buildMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 150 */               getABRDescription(), 
+/* 151 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }) + "</b>");
+/*     */       
+/* 154 */       log(buildLogMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 157 */               getABRDescription(), 
+/* 158 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }));
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 165 */       str2 = getABRDescription() + ":" + this.m_abri.getEntityType() + ":" + this.m_abri.getEntityID();
+/* 166 */       if (str2.length() > 64) {
+/* 167 */         str2 = str2.substring(0, 64);
+/*     */       }
+/* 169 */       setDGTitle(str2);
+/* 170 */       setDGRptName(ABR);
+/*     */ 
+/*     */       
+/* 173 */       setDGString(getABRReturnCode());
+/* 174 */       printDGSubmitString();
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 180 */       if (!isReadOnly()) {
+/* 181 */         clearSoftLock();
+/*     */       }
+/*     */     } 
+/*     */   }
+/*     */   
+/*     */   private boolean isCATLGCNTRYExist(Database paramDatabase, Profile paramProfile, String paramString) {
+/*     */     try {
+/* 188 */       StringBuffer stringBuffer = new StringBuffer();
+/* 189 */       stringBuffer.append("map_OFFCOUNTRY=" + paramString);
+/*     */       
+/* 191 */       String str = new String("SRDCATLGCNTRY01");
+/* 192 */       EntityItem[] arrayOfEntityItem = this.m_utility.dynaSearch(paramDatabase, paramProfile, null, str, "CATLGCNTRY", stringBuffer.toString());
+/* 193 */       if (arrayOfEntityItem == null || arrayOfEntityItem.length <= 0) {
+/* 194 */         return false;
+/*     */       }
+/* 196 */       return true;
+/*     */     }
+/* 198 */     catch (Exception exception) {
+/* 199 */       exception.printStackTrace();
+/*     */       
+/* 201 */       return false;
+/*     */     } 
+/*     */   }
+/*     */   private String replace(String paramString1, String paramString2, String paramString3) {
+/* 205 */     String str = "";
+/* 206 */     int i = paramString1.indexOf(paramString2);
+/*     */     
+/* 208 */     while (paramString1.length() > 0 && i >= 0) {
+/* 209 */       str = str + paramString1.substring(0, i) + paramString3;
+/* 210 */       paramString1 = paramString1.substring(i + paramString2.length());
+/* 211 */       i = paramString1.indexOf(paramString2);
+/*     */     } 
+/* 213 */     str = str + paramString1;
+/* 214 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getABREntityDesc(String paramString, int paramInt) {
+/* 225 */     return null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 234 */     return "Catalog Offering Publication For CB ABR";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getStyle() {
+/* 245 */     return "";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getRevision() {
+/* 255 */     return new String("$Revision: 1.3 $");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String getVersion() {
+/* 265 */     return "$Id: ECCMCATLGPUBABR08.java,v 1.3 2008/01/30 19:27:19 wendy Exp $";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 275 */     return "ECCMECCMCATLGPUBABR08.java";
+/*     */   }
+/*     */ }
 
 
-package COM.ibm.eannounce.abr.pcd;
-
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.eannounce.abr.util.*;
-
-/**
- * ECCMCATLGPUBABR08
- *
- *@author     Administrator
- *@created    August 30, 2002
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\pcd\ECCMCATLGPUBABR08.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class ECCMCATLGPUBABR08 extends PokBaseABR {
-    /**
-    *  Execute ABR.
-    *
-    */
-
-    // Class constants
-    public final static String ABR = new String("ECCMECCMCATLGPUBABR08");
-    private EntityItem m_ei = null;
-    private PDGUtility m_utility = new PDGUtility();
-    /**
-     * STARTDATE
-     *
-     */
-    public final static String STARTDATE = "1980-01-01-00.00.00.000000";
-    public final static String FOREVER = "9999-12-31-00.00.00.000000";
-    /**
-     * execute_run
-     *
-     * @author Owner
-     */
-    public void execute_run() {
-        DatePackage dp = null;
-        String strNow = null;
-        EntityGroup eg = null;
-
-        String strDgName = null;
-        String RETURN = System.getProperty("line.separator");
-        try {
-            start_ABRBuild(false);
-            setReturnCode(PASS);
-            buildReportHeaderII();
-
-            dp = m_db.getDates();
-            strNow = dp.getNow();
-            String strDate = m_utility.getDate(strNow.substring(0, 10), 15);
-            eg = new EntityGroup(null, m_db, m_prof, m_abri.getEntityType(), "Edit", false);
-            m_ei = new EntityItem(eg, m_prof, m_db, m_abri.getEntityType(), m_abri.getEntityID());
-
-            println("<br><b>" + m_ei.getKey() + "</b>");
-            printNavigateAttributes(m_ei, eg, true);
-
-			String strGA = m_utility.getAttrValueDesc(m_ei, "GENAREANAME");
-			String[] aOC = m_utility.getFlagCodeForExactDesc(m_db, m_prof, "OFFCOUNTRY", strGA);
-			if (aOC == null || aOC.length <= 0) {
-				System.out.println(getABRVersion() + " unable to find OFFCOUNTRY for desc: " + strGA);
-				setCreateDGEntity(false);
-				setReturnCode(FAIL);
-			} else {
-				String strOffCountry = aOC[0];
-				if (!isCATLGCNTRYExist(m_db, m_prof, strOffCountry)) {
-					setCreateDGEntity(false);
-					setReturnCode(FAIL);
-					System.out.println(getABRVersion() + " no CATLGCNTRY exists for " + strOffCountry);
-				}
-			}
-
-			if (getReturnCode() == PASS) {
-				if (m_ei.getEntityType().equals("CB")) {
-					//TARG_ANN_DATE_CB < NOW() + 15 Days
-					//“logical OR” CBSOLSTATUS = Ready for Review (0040)
-					//“logical OR” CBSOLSTATUS = Final (0020)
-					String strTARG_ANN_DATE_CB = m_utility.getAttrValue(m_ei, "TARG_ANN_DATE_CB");
-					String strCBSOLSTATUS = m_utility.getAttrValue(m_ei, "CBSOLSTATUS");
-					int iDC = m_utility.dateCompare(strTARG_ANN_DATE_CB, strDate);
-					if (iDC == PDGUtility.EARLIER || strCBSOLSTATUS.equals("0040") || strCBSOLSTATUS.equals("0020")) {
-						setReturnCode(PASS);
-						log("ECCMCATLGPUBABR08 generating data");
-						CATCBPDG pdg = new CATCBPDG(null, m_db, m_prof, "CATCBPDG");
-						pdg.setEntityItem(m_ei);
-						pdg.executeAction(m_db, m_prof);
-						log("ECCMCATLGPUBABR08 finish generating data");
-					} else {
-						setCreateDGEntity(false);
-						setReturnCode(FAIL);
-					}
-				}
-			}
-	    } catch (LockPDHEntityException le) {
-			setReturnCode(UPDATE_ERROR);
-			println(
-			"<h3><font color=red>"
-			  + ERR_IAB1007E
-			  + "<br />"
-			  + le.getMessage()
-			  + "</font></h3>");
-			logError(le.getMessage());
-		} catch (UpdatePDHEntityException le) {
-			setReturnCode(UPDATE_ERROR);
-			println(
-			"<h3><font color=red>UpdatePDH error: "
-			  + le.getMessage()
-			  + "</font></h3>");
-			logError(le.getMessage());
-		} catch (SBRException _sbrex) {
-			String strError = _sbrex.toString();
-			int i = strError.indexOf("(ok)");
-			if (i < 0) {
-				setReturnCode(UPDATE_ERROR);
-				println(
-				  "<h3><font color=red>Generate Data error: "
-					+ replace(strError, RETURN, "<br>")
-					+ "</font></h3>");
-				logError(_sbrex.toString());
-			} else {
-				strError = strError.substring(0, i);
-				println(replace(strError, RETURN, "<br>"));
-			}
-		} catch (Exception exc) {
-		  // Report this error to both the datbase log and the PrintWriter
-			println("Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-			println("" + exc);
-			exc.printStackTrace();
-		  // don't overwrite an update exception
-			if (getABRReturnCode() != UPDATE_ERROR) {
-				setReturnCode(INTERNAL_ERROR);
-			}
-		} finally {
-			println(
-			"<br /><b>"
-			  + buildMessage(
-				MSG_IAB2016I,
-				new String[] {
-				  getABRDescription(),
-				  (getReturnCode() == PASS ? "Passed" : "Failed")})
-			  + "</b>");
-
-			log(buildLogMessage(
-			  MSG_IAB2016I,
-			  new String[] {
-				getABRDescription(),
-				(getReturnCode() == PASS ? "Passed" : "Failed")}));
-
-		  // set DG title
-			strDgName = getABRDescription()
-					+ ":"
-					+ m_abri.getEntityType()
-					+ ":"
-					+ m_abri.getEntityID();
-			if (strDgName.length() > 64) {
-				strDgName = strDgName.substring(0, 64);
-			}
-			setDGTitle(strDgName);
-			setDGRptName(ABR);
-
-		  // set DG submit string
-			setDGString(getABRReturnCode());
-			printDGSubmitString();
-			//Stuff into report for subscription and notification
-
-			// Tack on the DGString
-
-			// make sure the lock is released
-			if (!isReadOnly()) {
-				clearSoftLock();
-			}
-		}
-    }
-
-   private boolean isCATLGCNTRYExist(Database _db, Profile _prof, String _strOffCountry) {
-	   try {
-			StringBuffer sb = new StringBuffer();
-			sb.append("map_OFFCOUNTRY=" +  _strOffCountry);
-
-			String strSai =  new String("SRDCATLGCNTRY01");
-			EntityItem[] aeiCATLGCNTRY = m_utility.dynaSearch(_db, _prof, null, strSai, "CATLGCNTRY", sb.toString());
-			if (aeiCATLGCNTRY == null || aeiCATLGCNTRY.length <= 0) {
-				return false;
-			} else {
-				return true;
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return false;
-   }
-
-  private String replace(String _s, String _s1, String _s2) {
-    String sResult = "";
-    int iTab = _s.indexOf(_s1);
-
-    while (_s.length() > 0 && iTab >= 0) {
-      sResult = sResult + _s.substring(0, iTab) + _s2;
-      _s = _s.substring(iTab + _s1.length());
-      iTab = _s.indexOf(_s1);
-    }
-    sResult = sResult + _s;
-    return sResult;
-  }
-
-  /**
-  *  Get the entity description to use in error messages
-  *
-  *@param  entityType  Description of the Parameter
-  *@param  entityId    Description of the Parameter
-  *@return             String
-  */
-  protected String getABREntityDesc(String entityType, int entityId) {
-    return null;
-  }
-
-  /**
-   *  Get ABR description
-   *
-   *@return    java.lang.String
-   */
-  public String getDescription() {
-    return "Catalog Offering Publication For CB ABR";
-  }
-
-  /**
-   *  Get any style that should be used for this page. Derived classes can
-   *  override this to set styles They must include the <style>...</style> tags
-   *
-   *@return    String
-   */
-  protected String getStyle() {
-    // Print out the PSG stylesheet
-    return "";
-  }
-
-  /**
-     * getRevision
-     *
-     * @return
-     * @author Owner
-     */
-    public String getRevision() {
-    return new String("$Revision: 1.3 $");
-  }
-
-  /**
-     * getVersion
-     *
-     * @return
-     * @author Owner
-     */
-    public static String getVersion() {
-    return ("$Id: ECCMCATLGPUBABR08.java,v 1.3 2008/01/30 19:27:19 wendy Exp $");
-  }
-
-  /**
-     * getABRVersion
-     *
-     * @return
-     * @author Owner
-     */
-    public String getABRVersion() {
-    return "ECCMECCMCATLGPUBABR08.java";
-  }
-}

@@ -1,1322 +1,1327 @@
-//Licensed Materials -- Property of IBM
+/*      */ package COM.ibm.eannounce.abr.sg;
+/*      */ 
+/*      */ import COM.ibm.eannounce.abr.util.ABRUtil;
+/*      */ import COM.ibm.eannounce.objects.EANAttribute;
+/*      */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*      */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*      */ import COM.ibm.eannounce.objects.EntityGroup;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.EntityList;
+/*      */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*      */ import COM.ibm.eannounce.objects.LinkActionItem;
+/*      */ import COM.ibm.eannounce.objects.SBRException;
+/*      */ import COM.ibm.eannounce.objects.WorkflowException;
+/*      */ import COM.ibm.opicmpdh.middleware.LockException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.io.PrintWriter;
+/*      */ import java.io.StringWriter;
+/*      */ import java.rmi.RemoteException;
+/*      */ import java.sql.SQLException;
+/*      */ import java.util.Collection;
+/*      */ import java.util.Enumeration;
+/*      */ import java.util.HashSet;
+/*      */ import java.util.Hashtable;
+/*      */ import java.util.Iterator;
+/*      */ import java.util.Vector;
+/*      */ import org.w3c.dom.Element;
+/*      */ import org.w3c.dom.Node;
+/*      */ import org.w3c.dom.NodeList;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public class LXLEADSADDBUNDLEABR
+/*      */   implements LXABRInterface
+/*      */ {
+/*      */   private static final String LSEOBDL_SRCHACTION_NAME = "LDSRDLSEOBUNDLE";
+/*      */   private static final String LSEOBDL_CREATEACTION_NAME = "LDCRLSEOBUNDLE";
+/*      */   private static final String LSEOBDL_LINKACTION_NAME = "LDLINKLSEOLSEOB";
+/*  156 */   private LXABRSTATUS lxAbr = null;
+/*  157 */   private String dtsOfData = null;
+/*  158 */   private Element rootElem = null;
+/*  159 */   private String factSheetNum = null;
+/*  160 */   private String bdlseoid = null;
+/*  161 */   private String bdlPubfrom = null;
+/*      */   
+/*  163 */   private String bdlMktgDesc = null;
+/*  164 */   private EntityItem lseobdlItem = null;
+/*      */   
+/*  166 */   private Hashtable tmfTbl = new Hashtable<>();
+/*  167 */   private Hashtable psQtyTbl = new Hashtable<>();
+/*  168 */   private Hashtable mdlTbl = new Hashtable<>();
+/*  169 */   private Hashtable ctryTbl = new Hashtable<>();
+/*  170 */   private Object domain = null;
+/*  171 */   private String domainStr = null;
+/*  172 */   private Object audien = null;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void validateXML() throws MiddlewareRequestException, SQLException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  220 */     this.dtsOfData = this.lxAbr.getNodeValue(this.rootElem, "DTSOFDATA");
+/*  221 */     this.factSheetNum = this.lxAbr.getNodeValue(this.rootElem, "FACTSHEETNUM");
+/*  222 */     this.bdlseoid = this.lxAbr.getNodeValue(this.rootElem, "BDLSEOID");
+/*  223 */     this.bdlPubfrom = this.lxAbr.getNodeValue(this.rootElem, "BUNDLPUBDATEMTRGT", "");
+/*  224 */     this.bdlMktgDesc = this.lxAbr.getNodeValue(this.rootElem, "BUNDLMKTGDESC", "");
+/*      */     
+/*  226 */     this.audien = LXLEADSUtil.deriveAudien(this.lxAbr.getNodeValue(this.rootElem, "ACCOUNTTYPE", ""));
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  234 */     NodeList nodeList1 = this.rootElem.getElementsByTagName("COUNTRYLIST");
+/*  235 */     if (nodeList1 == null) {
+/*      */       
+/*  237 */       this.lxAbr.addError("ERROR_MISSINGXML", "COUNTRYLIST");
+/*      */     } else {
+/*  239 */       this.lxAbr.verifyChildNodes(nodeList1, "COUNTRYLIST", "COUNTRYELEMENT", 1);
+/*      */       
+/*  241 */       Element element = null;
+/*  242 */       for (byte b = 0; b < nodeList1.getLength(); b++) {
+/*  243 */         Node node = nodeList1.item(b);
+/*  244 */         if (node.getNodeType() == 1) {
+/*      */ 
+/*      */ 
+/*      */           
+/*  248 */           Element element1 = (Element)nodeList1.item(b);
+/*  249 */           if (element1.getParentNode() == this.rootElem) {
+/*  250 */             if (element != null) {
+/*      */               
+/*  252 */               this.lxAbr.addError("ERROR_INVALIDXML", "COUNTRYLIST");
+/*      */               break;
+/*      */             } 
+/*  255 */             element = (Element)nodeList1.item(b);
+/*      */           } 
+/*      */ 
+/*      */           
+/*  259 */           findCountry(element1);
+/*      */         } 
+/*      */       } 
+/*  262 */       if (element == null)
+/*      */       {
+/*  264 */         this.lxAbr.addError("ERROR_MISSINGXML", "COUNTRYLIST");
+/*      */       }
+/*      */     } 
+/*      */     
+/*  268 */     NodeList nodeList2 = this.rootElem.getElementsByTagName("SEOLIST");
+/*      */ 
+/*      */     
+/*  271 */     if (nodeList2 == null || nodeList2.getLength() != 1) {
+/*  272 */       this.lxAbr.addError("ERROR_INVALIDXML", "SEOLIST");
+/*      */     } else {
+/*  274 */       this.lxAbr.verifyChildNodes(nodeList2, "SEOLIST", "SEOELEMENT", 2);
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getHeader() {
+/*  284 */     if (this.dtsOfData == null || this.factSheetNum == null || this.bdlseoid == null) {
+/*  285 */       return "";
+/*      */     }
+/*      */     
+/*  288 */     String str = this.lxAbr.getResourceMsg("LSEOBDL_HEADER", new Object[] { this.dtsOfData, this.factSheetNum, this.bdlseoid });
+/*  289 */     if (this.domainStr != null) {
+/*  290 */       str = str + "<br />Domain = " + this.domainStr;
+/*      */     }
+/*  292 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void findCountry(Element paramElement) throws MiddlewareRequestException, SQLException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  309 */     NodeList nodeList = paramElement.getChildNodes();
+/*  310 */     for (byte b = 0; b < nodeList.getLength(); b++) {
+/*  311 */       Node node = nodeList.item(b);
+/*  312 */       if (node.getNodeType() == 1) {
+/*      */ 
+/*      */ 
+/*      */         
+/*  316 */         Element element = (Element)nodeList.item(b);
+/*  317 */         String str = this.lxAbr.getNodeValue(element, "COUNTRY");
+/*  318 */         if (str != null) {
+/*  319 */           this.lxAbr.addDebug("findCountry checking " + str);
+/*  320 */           String str1 = (String)this.ctryTbl.get(str);
+/*  321 */           if (str1 == null) {
+/*  322 */             StringBuffer stringBuffer = new StringBuffer();
+/*      */             
+/*  324 */             EntityItem entityItem = LXLEADSUtil.searchForGENERALAREA(this.lxAbr.getDatabase(), this.lxAbr
+/*  325 */                 .getProfile(), str, stringBuffer);
+/*  326 */             if (stringBuffer.length() > 0) {
+/*  327 */               this.lxAbr.addDebug(stringBuffer.toString());
+/*      */             }
+/*  329 */             if (entityItem != null) {
+/*      */               
+/*  331 */               str1 = PokUtils.getAttributeFlagValue(entityItem, "GENAREANAME");
+/*  332 */               if (str1 != null) {
+/*  333 */                 this.ctryTbl.put(str, str1);
+/*      */               } else {
+/*  335 */                 String str2 = this.bdlseoid;
+/*  336 */                 if (paramElement.getParentNode() != this.rootElem)
+/*      */                 {
+/*  338 */                   str2 = this.lxAbr.getNodeValue((Element)paramElement.getParentNode(), "SEOID");
+/*      */                 }
+/*      */ 
+/*      */                 
+/*  342 */                 this.lxAbr.addError("ERROR_SEO_COUNTRY", new Object[] { str2, str });
+/*      */               } 
+/*      */             } else {
+/*  345 */               this.lxAbr.addError("GENERALAREA item not found for COUNTRY: " + str);
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void dereference() {
+/*  356 */     this.lxAbr = null;
+/*  357 */     this.dtsOfData = null;
+/*  358 */     this.rootElem = null;
+/*  359 */     this.factSheetNum = null;
+/*  360 */     this.bdlseoid = null;
+/*  361 */     this.bdlPubfrom = null;
+/*  362 */     this.bdlMktgDesc = null;
+/*  363 */     if (this.lseobdlItem != null) {
+/*  364 */       this.lseobdlItem.getEntityGroup().getEntityList().dereference();
+/*  365 */       this.lseobdlItem = null;
+/*      */     } 
+/*      */     
+/*  368 */     if (this.tmfTbl != null) {
+/*  369 */       for (Enumeration<Vector> enumeration = this.tmfTbl.elements(); enumeration.hasMoreElements(); ) {
+/*  370 */         Vector<EntityItem> vector = enumeration.nextElement();
+/*  371 */         for (byte b = 0; b < vector.size(); b++) {
+/*  372 */           EntityItem entityItem = vector.elementAt(b);
+/*      */           try {
+/*  374 */             EntityList entityList = entityItem.getEntityGroup().getEntityList();
+/*  375 */             if (entityList != null) {
+/*  376 */               entityList.dereference();
+/*      */             }
+/*  378 */           } catch (Exception exception) {}
+/*      */         } 
+/*  380 */         vector.clear();
+/*      */       } 
+/*  382 */       this.tmfTbl.clear();
+/*  383 */       this.tmfTbl = null;
+/*      */     } 
+/*      */     
+/*  386 */     this.psQtyTbl.clear();
+/*  387 */     this.psQtyTbl = null;
+/*      */     
+/*  389 */     this.ctryTbl.clear();
+/*  390 */     this.ctryTbl = null;
+/*  391 */     this.mdlTbl.clear();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void validateData(LXABRSTATUS paramLXABRSTATUS, Element paramElement) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  424 */     this.lxAbr = paramLXABRSTATUS;
+/*  425 */     this.rootElem = paramElement;
+/*      */     
+/*  427 */     validateXML();
+/*      */     
+/*  429 */     if (this.lxAbr.getReturnCode() != 0) {
+/*      */       return;
+/*      */     }
+/*      */     
+/*  433 */     searchForLseoBundle();
+/*      */     
+/*  435 */     if (0 == this.lxAbr.getReturnCode()) {
+/*      */       
+/*  437 */       NodeList nodeList = this.rootElem.getElementsByTagName("SEOLIST");
+/*  438 */       for (byte b = 0; b < nodeList.getLength(); b++) {
+/*  439 */         Node node = nodeList.item(b);
+/*  440 */         if (node.getNodeType() == 1) {
+/*      */ 
+/*      */ 
+/*      */           
+/*  444 */           NodeList nodeList1 = nodeList.item(b).getChildNodes();
+/*  445 */           for (byte b1 = 0; b1 < nodeList1.getLength(); b1++) {
+/*  446 */             node = nodeList1.item(b1);
+/*  447 */             if (node.getNodeType() == 1) {
+/*      */ 
+/*      */ 
+/*      */               
+/*  451 */               Element element = (Element)nodeList1.item(b1);
+/*  452 */               String str1 = this.lxAbr.getNodeValue(element, "MT");
+/*  453 */               String str2 = this.lxAbr.getNodeValue(element, "MODEL");
+/*  454 */               String str3 = this.lxAbr.getNodeValue(element, "SEOID");
+/*  455 */               this.lxAbr.addDebug("validateData looking for seoElem[" + b1 + "] seoid: " + str3 + " mt: " + str1 + " model: " + str2);
+/*      */               
+/*  457 */               NodeList nodeList2 = element.getElementsByTagName("FEATURELIST");
+/*      */               
+/*  459 */               if (nodeList2 == null || nodeList2.getLength() != 1) {
+/*  460 */                 this.lxAbr.addError("ERROR_INVALIDXML", "FEATURELIST");
+/*      */               } else {
+/*  462 */                 this.lxAbr.verifyChildNodes(nodeList2, "FEATURELIST", "FEATUREELEMENT", 1);
+/*  463 */                 EntityItem entityItem = LXLEADSUtil.searchForModel(this.lxAbr, str1, str2);
+/*  464 */                 if (entityItem != null) {
+/*      */ 
+/*      */ 
+/*      */                   
+/*  468 */                   matchProdstructs(str1, str2, str3, entityItem, nodeList2);
+/*  469 */                   this.mdlTbl.put(str1 + ":" + str2, entityItem);
+/*      */                 } else {
+/*      */                   
+/*  472 */                   this.lxAbr.addError("ERROR_LSEOBDL_MODEL", new Object[] { str1, str2 });
+/*      */                 } 
+/*      */               } 
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void searchForLseoBundle() throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  495 */     Vector<String> vector1 = new Vector(1);
+/*  496 */     vector1.addElement("SEOID");
+/*  497 */     Vector<String> vector2 = new Vector(1);
+/*  498 */     vector2.addElement(this.bdlseoid);
+/*      */     
+/*  500 */     EntityItem[] arrayOfEntityItem = null;
+/*      */     try {
+/*  502 */       StringBuffer stringBuffer = new StringBuffer();
+/*  503 */       arrayOfEntityItem = ABRUtil.doSearch(this.lxAbr.getDatabase(), this.lxAbr.getProfile(), "LDSRDLSEOBUNDLE", "LSEOBUNDLE", false, vector1, vector2, stringBuffer);
+/*      */       
+/*  505 */       if (stringBuffer.length() > 0) {
+/*  506 */         this.lxAbr.addDebug(stringBuffer.toString());
+/*      */       }
+/*  508 */     } catch (SBRException sBRException) {
+/*      */       
+/*  510 */       StringWriter stringWriter = new StringWriter();
+/*  511 */       sBRException.printStackTrace(new PrintWriter(stringWriter));
+/*  512 */       this.lxAbr.addDebug("searchForLseoBundle SBRException: " + stringWriter.getBuffer().toString());
+/*      */     } 
+/*      */     
+/*  515 */     if (arrayOfEntityItem != null && arrayOfEntityItem.length > 0) {
+/*  516 */       for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/*  517 */         this.lxAbr.addDebug("searchForLseoBundle found " + arrayOfEntityItem[b].getKey());
+/*      */       }
+/*      */       
+/*  520 */       this.lxAbr.addError("ERROR_LSEOBDL", (Object[])null);
+/*      */     } else {
+/*  522 */       this.lxAbr.addDebug("searchForLseoBundle NO LSEOBUNDLE found for " + this.bdlseoid);
+/*  523 */       EntityItem entityItem = LXLEADSUtil.searchForLSEO(this.lxAbr, this.bdlseoid);
+/*  524 */       if (entityItem != null) {
+/*  525 */         this.lxAbr.addDebug("searchForLseo found " + entityItem.getKey());
+/*      */         
+/*  527 */         this.lxAbr.addError("ERROR_LSEO_LSEOBDL", this.bdlseoid);
+/*      */       } else {
+/*  529 */         this.lxAbr.addDebug("searchForLseoBundle NO LSEO found for bundleseoid: " + this.bdlseoid);
+/*      */       } 
+/*      */     } 
+/*      */     
+/*  533 */     vector1.clear();
+/*  534 */     vector2.clear();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void matchProdstructs(String paramString1, String paramString2, String paramString3, EntityItem paramEntityItem, NodeList paramNodeList) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  655 */     String str1 = null;
+/*  656 */     String str2 = "";
+/*  657 */     String str3 = PokUtils.getAttributeValue(paramEntityItem, "COFCAT", "", "", false);
+/*  658 */     String str4 = PokUtils.getAttributeFlagValue(paramEntityItem, "COFCAT");
+/*  659 */     this.lxAbr.addDebug("matchProdstructs using " + paramEntityItem.getKey() + " cofcatflag:" + str4);
+/*      */     
+/*  661 */     if ("100".equals(str4)) {
+/*  662 */       str2 = "FEATURE";
+/*  663 */       str1 = "EXRPT3LEADS";
+/*  664 */     } else if ("101".equals(str4)) {
+/*  665 */       str2 = "SWFEATURE";
+/*  666 */       str1 = "EXRPT3LEADS2";
+/*  667 */     } else if ("102".equals(str4)) {
+/*  668 */       this.lxAbr.addDebug("matchProdstructs Model is Service, no references needed");
+/*      */       
+/*      */       return;
+/*      */     } 
+/*  672 */     EntityList entityList = this.lxAbr.getDatabase().getEntityList(this.lxAbr.getProfile(), new ExtractActionItem(null, this.lxAbr
+/*  673 */           .getDatabase(), this.lxAbr.getProfile(), str1), new EntityItem[] { paramEntityItem });
+/*      */     
+/*  675 */     this.lxAbr.addDebug("matchProdstructs VE:" + str1 + "\n" + PokUtils.outputList(entityList));
+/*  676 */     Hashtable<Object, Object> hashtable = new Hashtable<>();
+/*  677 */     EntityGroup entityGroup = entityList.getEntityGroup(str2); byte b;
+/*  678 */     for (b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/*  679 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/*  680 */       String str = PokUtils.getAttributeValue(entityItem, "FEATURECODE", "", "", false);
+/*  681 */       Vector vector = entityItem.getDownLink();
+/*  682 */       for (byte b1 = 0; b1 < vector.size(); b1++) {
+/*  683 */         this.lxAbr.addDebug("matchProdstructs featurecode: " + str + " on " + entityItem.getKey() + " dnlink[" + b1 + "] " + entityItem
+/*  684 */             .getDownLink(b1).getKey());
+/*      */       }
+/*  686 */       hashtable.put(str, vector);
+/*      */     } 
+/*      */     
+/*  689 */     for (b = 0; b < paramNodeList.getLength(); b++) {
+/*  690 */       Node node = paramNodeList.item(b);
+/*  691 */       if (node.getNodeType() == 1) {
+/*      */ 
+/*      */ 
+/*      */         
+/*  695 */         NodeList nodeList = paramNodeList.item(b).getChildNodes();
+/*  696 */         for (byte b1 = 0; b1 < nodeList.getLength(); b1++) {
+/*  697 */           node = nodeList.item(b1);
+/*  698 */           if (node.getNodeType() == 1) {
+/*      */ 
+/*      */ 
+/*      */             
+/*  702 */             Element element = (Element)nodeList.item(b1);
+/*  703 */             String str5 = this.lxAbr.getNodeValue(element, "FEATURECODE");
+/*  704 */             String str6 = this.lxAbr.getNodeValue(element, "QTY", "1");
+/*  705 */             if (str5 != null) {
+/*  706 */               Vector<EntityItem> vector = (Vector)hashtable.get(str5);
+/*  707 */               if (vector == null || vector.size() == 0) {
+/*      */                 
+/*  709 */                 this.lxAbr.addError("ERROR_LSEOBDL_TMF", new Object[] { paramString1, str3, paramString2, paramString3, str5 });
+/*      */               } else {
+/*  711 */                 String str = paramString1 + ":" + paramString2 + ":" + paramString3;
+/*  712 */                 Vector<EntityItem> vector1 = (Vector)this.tmfTbl.get(str);
+/*  713 */                 if (vector1 == null) {
+/*  714 */                   vector1 = new Vector();
+/*  715 */                   this.tmfTbl.put(str, vector1);
+/*      */                 } 
+/*      */                 
+/*  718 */                 for (byte b2 = 0; b2 < vector.size(); b2++) {
+/*  719 */                   EntityItem entityItem = vector.elementAt(b2);
+/*  720 */                   this.lxAbr.addDebug("matchProdstructs fc " + str5 + " using: " + entityItem.getKey());
+/*  721 */                   this.psQtyTbl.put(entityItem.getKey(), str6);
+/*  722 */                   vector1.add(entityItem);
+/*      */                 } 
+/*      */               } 
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void execute() throws MiddlewareRequestException, SQLException, MiddlewareException, EANBusinessRuleException, RemoteException, MiddlewareShutdownInProgressException, LockException, WorkflowException {
+/*  773 */     derivePDHDOMAIN();
+/*  774 */     if (this.lxAbr.getReturnCode() != 0) {
+/*      */       return;
+/*      */     }
+/*      */ 
+/*      */     
+/*  779 */     createLSEOBDL();
+/*  780 */     if (this.lseobdlItem != null) {
+/*      */       
+/*  782 */       NodeList nodeList = this.rootElem.getElementsByTagName("SEOLIST");
+/*  783 */       Vector<EntityItem> vector = new Vector(1);
+/*  784 */       StringBuffer stringBuffer1 = new StringBuffer();
+/*  785 */       StringBuffer stringBuffer2 = new StringBuffer();
+/*      */       byte b;
+/*  787 */       label58: for (b = 0; b < nodeList.getLength(); b++) {
+/*  788 */         Node node = nodeList.item(b);
+/*  789 */         if (node.getNodeType() == 1) {
+/*      */ 
+/*      */ 
+/*      */           
+/*  793 */           NodeList nodeList1 = nodeList.item(b).getChildNodes();
+/*  794 */           for (byte b1 = 0; b1 < nodeList1.getLength(); b1++) {
+/*  795 */             if (this.lxAbr.getReturnCode() != 0) {
+/*      */               break label58;
+/*      */             }
+/*  798 */             node = nodeList1.item(b1);
+/*  799 */             if (node.getNodeType() == 1)
+/*      */             
+/*      */             { 
+/*      */               
+/*  803 */               StringBuffer stringBuffer = new StringBuffer();
+/*  804 */               Element element = (Element)nodeList1.item(b1);
+/*  805 */               String str1 = this.lxAbr.getNodeValue(element, "MT");
+/*  806 */               String str2 = this.lxAbr.getNodeValue(element, "MODEL");
+/*  807 */               String str3 = this.lxAbr.getNodeValue(element, "SEOID");
+/*      */               
+/*  809 */               EntityItem entityItem1 = (EntityItem)this.mdlTbl.get(str1 + ":" + str2);
+/*      */               
+/*  811 */               this.lxAbr.addDebug("execute looking at seoid[" + b1 + "]: " + str3 + " mt: " + str1 + " model: " + str2 + " " + entityItem1.getKey());
+/*      */               
+/*  813 */               EntityItem entityItem2 = getLSEO(entityItem1, element, str1, str2, str3, stringBuffer);
+/*  814 */               if (entityItem2 == null) {
+/*      */                 break label58;
+/*      */               }
+/*  817 */               vector.add(entityItem2);
+/*  818 */               stringBuffer2.append(" " + entityItem2.getKey());
+/*  819 */               if (stringBuffer1.length() > 0) {
+/*  820 */                 stringBuffer1.append("<br />");
+/*      */               }
+/*  822 */               stringBuffer1.append(stringBuffer.toString()); } 
+/*      */           } 
+/*      */         } 
+/*  825 */       }  if (this.lxAbr.getReturnCode() == 0) {
+/*      */         
+/*  827 */         LinkActionItem linkActionItem = new LinkActionItem(null, this.lxAbr.getDatabase(), this.lxAbr.getProfile(), "LDLINKLSEOLSEOB");
+/*  828 */         EntityItem[] arrayOfEntityItem1 = { this.lseobdlItem };
+/*  829 */         EntityItem[] arrayOfEntityItem2 = new EntityItem[vector.size()];
+/*      */ 
+/*      */         
+/*  832 */         vector.copyInto((Object[])arrayOfEntityItem2);
+/*      */         
+/*  834 */         this.lxAbr.addDebug("Link " + this.lseobdlItem.getKey() + " to " + stringBuffer2.toString());
+/*      */         
+/*  836 */         linkActionItem.setParentEntityItems(arrayOfEntityItem1);
+/*  837 */         linkActionItem.setChildEntityItems(arrayOfEntityItem2);
+/*  838 */         this.lxAbr.getDatabase().executeAction(this.lxAbr.getProfile(), linkActionItem);
+/*      */         
+/*  840 */         vector.clear();
+/*      */         
+/*  842 */         if (this.lxAbr.getReturnCode() == 0) {
+/*      */           
+/*  844 */           StringBuffer stringBuffer = new StringBuffer();
+/*  845 */           NodeList nodeList1 = this.rootElem.getElementsByTagName("COUNTRYLIST");
+/*  846 */           for (byte b1 = 0; b1 < nodeList1.getLength(); b1++) {
+/*  847 */             Node node = nodeList1.item(b1);
+/*  848 */             if (node.getNodeType() == 1) {
+/*      */ 
+/*      */ 
+/*      */               
+/*  852 */               Element element = (Element)nodeList1.item(b1);
+/*  853 */               if (element.getParentNode() == this.rootElem) {
+/*  854 */                 Element element1 = (Element)nodeList1.item(b1);
+/*  855 */                 NodeList nodeList2 = element1.getChildNodes();
+/*  856 */                 for (byte b2 = 0; b2 < nodeList2.getLength(); b2++) {
+/*  857 */                   node = nodeList2.item(b2);
+/*  858 */                   if (node.getNodeType() == 1) {
+/*      */ 
+/*      */ 
+/*      */                     
+/*  862 */                     Element element2 = (Element)nodeList2.item(b2);
+/*  863 */                     String str = this.lxAbr.getNodeValue(element2, "COUNTRY");
+/*  864 */                     stringBuffer.append(str + " ");
+/*      */                   } 
+/*      */                 }  break;
+/*      */               } 
+/*      */             } 
+/*  869 */           }  this.lxAbr.addOutput("CREATED_SEOBDL_MSG", new Object[] { this.lseobdlItem
+/*  870 */                 .getEntityGroup().getLongDescription(), this.bdlseoid, stringBuffer
+/*  871 */                 .toString(), stringBuffer1.toString() });
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void derivePDHDOMAIN() throws SQLException, MiddlewareException {
+/*  917 */     EntityItem entityItem = null;
+/*  918 */     Collection collection = this.mdlTbl.values();
+/*      */     
+/*  920 */     Iterator<EntityItem> iterator = collection.iterator();
+/*  921 */     if (collection.size() == 1) {
+/*  922 */       entityItem = iterator.next();
+/*      */     } else {
+/*  924 */       EntityItem entityItem1 = null;
+/*  925 */       EntityItem entityItem2 = null;
+/*  926 */       while (iterator.hasNext()) {
+/*  927 */         EntityItem entityItem3 = iterator.next();
+/*  928 */         String str = PokUtils.getAttributeFlagValue(entityItem3, "COFCAT");
+/*  929 */         this.lxAbr.addDebug("derivePDHDOMAIN checking cofcat:" + str + " " + entityItem3.getKey());
+/*      */         
+/*  931 */         if ("100".equals(str)) {
+/*  932 */           entityItem = entityItem3; break;
+/*      */         } 
+/*  934 */         if ("101".equals(str)) {
+/*  935 */           if (entityItem1 != null) {
+/*  936 */             String str1 = PokUtils.getAttributeFlagValue(entityItem3, "COFSUBCAT");
+/*  937 */             String str2 = PokUtils.getAttributeFlagValue(entityItem1, "COFSUBCAT");
+/*  938 */             this.lxAbr.addDebug("derivePDHDOMAIN SW " + entityItem3.getKey() + " cofsubcatflag " + str1 + " curSW " + entityItem1
+/*  939 */                 .getKey() + " curcofsubcatflag " + str2);
+/*  940 */             if (LXLEADSUtil.SW_COFSUBCAT_SET.contains(str2)) {
+/*  941 */               if (LXLEADSUtil.SW_COFSUBCAT_SET.contains(str1))
+/*      */               {
+/*      */ 
+/*      */ 
+/*      */                 
+/*  946 */                 if (str1.compareTo(str2) < 0) {
+/*  947 */                   this.lxAbr.addDebug("derivePDHDOMAIN SW " + entityItem3.getKey() + " overrides " + entityItem1
+/*  948 */                       .getKey());
+/*  949 */                   entityItem1 = entityItem3;
+/*      */                 }  } 
+/*      */               continue;
+/*      */             } 
+/*  953 */             entityItem1 = entityItem3;
+/*      */             continue;
+/*      */           } 
+/*  956 */           entityItem1 = entityItem3; continue;
+/*      */         } 
+/*  958 */         if ("102".equals(str)) {
+/*  959 */           entityItem2 = entityItem3;
+/*      */         }
+/*      */       } 
+/*      */       
+/*  963 */       if (entityItem == null) {
+/*  964 */         entityItem = entityItem1;
+/*      */       }
+/*  966 */       if (entityItem == null) {
+/*  967 */         entityItem = entityItem2;
+/*      */       }
+/*      */     } 
+/*      */ 
+/*      */     
+/*  972 */     EANAttribute eANAttribute = entityItem.getAttribute("PDHDOMAIN");
+/*  973 */     HashSet<String> hashSet = new HashSet();
+/*  974 */     if (eANAttribute != null) {
+/*  975 */       EANMetaAttribute eANMetaAttribute = eANAttribute.getMetaAttribute();
+/*  976 */       String str = PokUtils.getAttributeFlagValue(entityItem, "PDHDOMAIN");
+/*  977 */       this.domainStr = PokUtils.getAttributeValue(entityItem, "PDHDOMAIN", ", ", "", false);
+/*  978 */       this.lxAbr.addDebug("derivePDHDOMAIN using " + entityItem.getKey() + " PDHDOMAIN " + str);
+/*  979 */       if (eANMetaAttribute.getAttributeType().equals("U")) {
+/*  980 */         this.domain = str;
+/*      */       } else {
+/*  982 */         String[] arrayOfString = PokUtils.convertToArray(str);
+/*  983 */         Vector<String> vector = new Vector(arrayOfString.length);
+/*  984 */         for (byte b = 0; b < arrayOfString.length; b++) {
+/*  985 */           vector.add(arrayOfString[b]);
+/*  986 */           hashSet.add(arrayOfString[b]);
+/*      */         } 
+/*  988 */         this.domain = vector;
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createLSEOBDL() throws MiddlewareRequestException, SQLException, MiddlewareException, EANBusinessRuleException, RemoteException, MiddlewareShutdownInProgressException {
+/* 1023 */     Vector<String> vector1 = new Vector();
+/* 1024 */     Hashtable<Object, Object> hashtable = new Hashtable<>();
+/* 1025 */     vector1.addElement("SEOID");
+/* 1026 */     hashtable.put("SEOID", this.bdlseoid);
+/* 1027 */     vector1.addElement("COMNAME");
+/* 1028 */     hashtable.put("COMNAME", this.bdlseoid);
+/* 1029 */     vector1.addElement("BUNDLPUBDATEMTRGT");
+/* 1030 */     hashtable.put("BUNDLPUBDATEMTRGT", this.bdlPubfrom);
+/* 1031 */     vector1.addElement("BUNDLMKTGDESC");
+/* 1032 */     hashtable.put("BUNDLMKTGDESC", this.bdlMktgDesc);
+/*      */ 
+/*      */     
+/* 1035 */     String str = "722";
+/* 1036 */     if (this.lxAbr.getPROJCDNAME() != null) {
+/* 1037 */       str = this.lxAbr.getPROJCDNAME();
+/*      */     }
+/*      */ 
+/*      */     
+/* 1041 */     vector1.addElement("PROJCDNAM");
+/* 1042 */     hashtable.put("PROJCDNAM", str);
+/*      */     
+/* 1044 */     vector1.addElement("ACCTASGNGRP");
+/* 1045 */     hashtable.put("ACCTASGNGRP", "01");
+/* 1046 */     vector1.addElement("SPECBID");
+/* 1047 */     hashtable.put("SPECBID", "11458");
+/* 1048 */     vector1.addElement("AUDIEN");
+/* 1049 */     hashtable.put("AUDIEN", this.audien);
+/*      */     
+/* 1051 */     vector1.addElement("PDHDOMAIN");
+/* 1052 */     hashtable.put("PDHDOMAIN", this.domain);
+/* 1053 */     vector1.addElement("COUNTRYLIST");
+/* 1054 */     Vector<String> vector2 = new Vector();
+/*      */     
+/* 1056 */     NodeList nodeList = this.rootElem.getElementsByTagName("COUNTRYLIST");
+/* 1057 */     for (byte b = 0; b < nodeList.getLength(); b++) {
+/* 1058 */       Node node = nodeList.item(b);
+/* 1059 */       if (node.getNodeType() == 1) {
+/*      */ 
+/*      */ 
+/*      */         
+/* 1063 */         Element element = (Element)nodeList.item(b);
+/* 1064 */         if (element.getParentNode() == this.rootElem) {
+/* 1065 */           Element element1 = (Element)nodeList.item(b);
+/* 1066 */           NodeList nodeList1 = element1.getChildNodes();
+/* 1067 */           for (byte b1 = 0; b1 < nodeList1.getLength(); b1++) {
+/* 1068 */             node = nodeList1.item(b1);
+/* 1069 */             if (node.getNodeType() == 1) {
+/*      */ 
+/*      */ 
+/*      */               
+/* 1073 */               Element element2 = (Element)nodeList1.item(b1);
+/* 1074 */               String str1 = this.lxAbr.getNodeValue(element2, "COUNTRY");
+/* 1075 */               String str2 = (String)this.ctryTbl.get(str1);
+/* 1076 */               vector2.addElement(str2);
+/*      */             } 
+/*      */           }  break;
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/* 1082 */     hashtable.put("COUNTRYLIST", vector2);
+/*      */     
+/* 1084 */     StringBuffer stringBuffer = new StringBuffer();
+/*      */     
+/*      */     try {
+/* 1087 */       EntityItem entityItem = new EntityItem(null, this.lxAbr.getProfile(), "WG", this.lxAbr.getProfile().getWGID());
+/* 1088 */       this.lseobdlItem = ABRUtil.createEntity(this.lxAbr.getDatabase(), this.lxAbr.getProfile(), "LDCRLSEOBUNDLE", entityItem, "LSEOBUNDLE", vector1, hashtable, stringBuffer);
+/*      */     }
+/* 1090 */     catch (EANBusinessRuleException eANBusinessRuleException) {
+/* 1091 */       throw eANBusinessRuleException;
+/*      */     } finally {
+/* 1093 */       if (stringBuffer.length() > 0) {
+/* 1094 */         this.lxAbr.addDebug(stringBuffer.toString());
+/*      */       }
+/* 1096 */       if (this.lseobdlItem == null) {
+/* 1097 */         this.lxAbr.addError("ERROR: Can not create LSEOBUNDLE entity for seoid: " + this.bdlseoid);
+/*      */       }
+/* 1099 */       vector1.clear();
+/* 1100 */       hashtable.clear();
+/* 1101 */       vector2.clear();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityItem getLSEO(EntityItem paramEntityItem, Element paramElement, String paramString1, String paramString2, String paramString3, StringBuffer paramStringBuffer) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException, RemoteException, EANBusinessRuleException, LockException, WorkflowException {
+/* 1145 */     EntityItem entityItem = LXLEADSUtil.searchForLSEO(this.lxAbr, paramString3);
+/* 1146 */     if (entityItem != null) {
+/*      */       
+/* 1148 */       this.lxAbr.addDebug("getLSEO found " + entityItem.getKey());
+/*      */       
+/* 1150 */       paramStringBuffer.append(this.lxAbr.getResourceMsg("REF_SEO_MSG", (Object[])new String[] { entityItem
+/* 1151 */               .getEntityGroup().getLongDescription(), paramString3 }));
+/*      */     }
+/*      */     else {
+/*      */       
+/* 1155 */       EntityItem entityItem1 = getWWSEO(paramEntityItem, paramElement, paramString3, paramString1, paramString2, paramStringBuffer);
+/* 1156 */       if (entityItem1 != null) {
+/* 1157 */         String str = this.lxAbr.getNodeValue(paramElement, "PUBFROM");
+/* 1158 */         NodeList nodeList = paramElement.getElementsByTagName("COUNTRYLIST");
+/*      */         
+/* 1160 */         if (nodeList == null || nodeList.getLength() != 1) {
+/* 1161 */           this.lxAbr.addError("ERROR_INVALIDXML", "COUNTRYLIST");
+/*      */         }
+/*      */         
+/* 1164 */         if (this.lxAbr.getReturnCode() == 0) {
+/* 1165 */           Vector<String> vector = new Vector(1);
+/* 1166 */           for (byte b = 0; b < nodeList.getLength(); b++) {
+/* 1167 */             Node node = nodeList.item(b);
+/* 1168 */             if (node.getNodeType() == 1) {
+/*      */ 
+/*      */ 
+/*      */               
+/* 1172 */               NodeList nodeList1 = nodeList.item(b).getChildNodes();
+/* 1173 */               for (byte b1 = 0; b1 < nodeList1.getLength(); b1++) {
+/* 1174 */                 node = nodeList1.item(b1);
+/* 1175 */                 if (node.getNodeType() == 1) {
+/*      */ 
+/*      */ 
+/*      */                   
+/* 1179 */                   Element element = (Element)nodeList1.item(b1);
+/* 1180 */                   String str1 = this.lxAbr.getNodeValue(element, "COUNTRY");
+/* 1181 */                   String str2 = (String)this.ctryTbl.get(str1);
+/* 1182 */                   vector.addElement(str2);
+/*      */                 } 
+/*      */               } 
+/*      */             } 
+/* 1186 */           }  entityItem = LXLEADSUtil.createLSEO(this.lxAbr, entityItem1, paramString3, str, vector, this.domain, this.audien);
+/*      */           
+/* 1188 */           if (entityItem != null) {
+/* 1189 */             this.lxAbr.addDebug("getLSEO created " + entityItem.getKey());
+/*      */             
+/* 1191 */             String str1 = PokUtils.getAttributeValue(paramEntityItem, "COFCAT", "", "", false);
+/*      */             
+/* 1193 */             paramStringBuffer.append(this.lxAbr.getResourceMsg("CREATED_SEO_MSG", new Object[] { entityItem.getEntityGroup().getLongDescription(), paramString3, str1, paramString1, paramString2 }));
+/*      */ 
+/*      */             
+/* 1196 */             String str2 = PokUtils.getAttributeFlagValue(paramEntityItem, "COFCAT");
+/* 1197 */             if (!"102".equals(str2)) {
+/*      */               
+/* 1199 */               NodeList nodeList1 = paramElement.getElementsByTagName("FEATURELIST");
+/* 1200 */               for (byte b2 = 0; b2 < nodeList1.getLength(); b2++) {
+/* 1201 */                 Node node = nodeList1.item(b2);
+/* 1202 */                 if (node.getNodeType() == 1) {
+/*      */ 
+/*      */ 
+/*      */                   
+/* 1206 */                   NodeList nodeList2 = nodeList1.item(b2).getChildNodes();
+/* 1207 */                   for (byte b3 = 0; b3 < nodeList2.getLength(); b3++) {
+/* 1208 */                     node = nodeList2.item(b3);
+/* 1209 */                     if (node.getNodeType() == 1) {
+/*      */ 
+/*      */ 
+/*      */                       
+/* 1213 */                       Element element = (Element)nodeList2.item(b3);
+/* 1214 */                       String str3 = this.lxAbr.getNodeValue(element, "FEATURECODE");
+/* 1215 */                       String str4 = this.lxAbr.getNodeValue(element, "QTY", "1");
+/*      */                       
+/* 1217 */                       paramStringBuffer.append(this.lxAbr.getResourceMsg("REF_FEATURE_MSG", new Object[] { str3, str4 }));
+/*      */                     } 
+/*      */                   } 
+/*      */                 } 
+/*      */               } 
+/*      */             } 
+/* 1223 */             paramStringBuffer.append(this.lxAbr.getResourceMsg("REF_COUNTRY_MSG", (Object[])null));
+/* 1224 */             for (byte b1 = 0; b1 < nodeList.getLength(); b1++) {
+/* 1225 */               Node node = nodeList.item(b1);
+/* 1226 */               if (node.getNodeType() == 1) {
+/*      */ 
+/*      */ 
+/*      */                 
+/* 1230 */                 NodeList nodeList1 = nodeList.item(b1).getChildNodes();
+/* 1231 */                 for (byte b2 = 0; b2 < nodeList1.getLength(); b2++) {
+/* 1232 */                   node = nodeList1.item(b2);
+/* 1233 */                   if (node.getNodeType() == 1) {
+/*      */ 
+/*      */ 
+/*      */                     
+/* 1237 */                     Element element = (Element)nodeList1.item(b2);
+/* 1238 */                     String str3 = this.lxAbr.getNodeValue(element, "COUNTRY");
+/* 1239 */                     paramStringBuffer.append(str3 + " ");
+/*      */                   } 
+/*      */                 } 
+/*      */               } 
+/* 1243 */             }  vector.clear();
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 1249 */     return entityItem;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityItem getWWSEO(EntityItem paramEntityItem, Element paramElement, String paramString1, String paramString2, String paramString3, StringBuffer paramStringBuffer) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException, RemoteException, EANBusinessRuleException, LockException, WorkflowException {
+/* 1272 */     EntityItem entityItem = LXLEADSUtil.searchForWWSEO(this.lxAbr, paramString1);
+/* 1273 */     if (entityItem != null) {
+/* 1274 */       this.lxAbr.addDebug("getWWSEO found " + entityItem.getKey());
+/*      */     } else {
+/*      */       
+/* 1277 */       String str = this.lxAbr.getNodeValue(paramElement, "SEOTECHDESC");
+/* 1278 */       entityItem = LXLEADSUtil.createWWSEO(this.lxAbr, paramEntityItem, paramString1, str, this.domain);
+/* 1279 */       if (entityItem != null) {
+/* 1280 */         this.lxAbr.addDebug("getWWSEO created " + entityItem.getKey());
+/* 1281 */         String str1 = PokUtils.getAttributeValue(paramEntityItem, "COFCAT", "", "", false);
+/*      */         
+/* 1283 */         paramStringBuffer.append(this.lxAbr.getResourceMsg("CREATED_SEO_MSG", new Object[] { entityItem
+/* 1284 */                 .getEntityGroup().getLongDescription(), paramString1, str1, paramString2, paramString3 }) + "<br />");
+/*      */ 
+/*      */         
+/* 1287 */         String str2 = paramString2 + ":" + paramString3 + ":" + paramString1;
+/* 1288 */         Vector<EntityItem> vector = (Vector)this.tmfTbl.get(str2);
+/* 1289 */         if (vector != null) {
+/* 1290 */           this.lxAbr.addDebug("getWWSEO: tmf key: " + str2 + " size: " + vector.size());
+/* 1291 */           for (byte b = 0; b < vector.size(); b++) {
+/* 1292 */             this.lxAbr.addDebug("tmf[" + b + "]" + ((EntityItem)vector.elementAt(b)).getKey());
+/*      */           }
+/* 1294 */           LXLEADSUtil.createFeatureRefs(this.lxAbr, entityItem, paramEntityItem, vector, this.psQtyTbl);
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 1299 */     return entityItem;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getDescription() {
+/* 1305 */     return "Create Special Bid - LSEOBUNDLE";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getTitle() {
+/* 1312 */     return "LSEOBUNDLE Special Bid from LEADS" + ((this.lxAbr.getReturnCode() == 0) ? " created" : "");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getVersion() {
+/* 1319 */     return "1.11";
+/*      */   }
+/*      */ }
 
-//(C) Copyright IBM Corp. 2008  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-package COM.ibm.eannounce.abr.sg;
 
-import java.rmi.RemoteException;
-import java.sql.SQLException;
-import java.util.*;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-import COM.ibm.eannounce.abr.util.ABRUtil;
-import COM.ibm.eannounce.abr.util.PokBaseABR;
-import COM.ibm.eannounce.objects.EANAttribute;
-import COM.ibm.eannounce.objects.EANBusinessRuleException;
-import COM.ibm.eannounce.objects.EANMetaAttribute;
-import COM.ibm.eannounce.objects.EntityGroup;
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.eannounce.objects.EntityList;
-import COM.ibm.eannounce.objects.ExtractActionItem;
-import COM.ibm.eannounce.objects.LinkActionItem;
-import COM.ibm.eannounce.objects.SBRException;
-import COM.ibm.eannounce.objects.WorkflowException;
-import COM.ibm.opicmpdh.middleware.LockException;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
-import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
-/**********************************************************************************
- * From "SG FS Inbound Feed Leads 20090423.doc"
- * 
- * Card	XML_Begin	XML_End					Level
- * 1	<?XML VERSION="1.0" ENCODING="UTF-8"?>	1
- * 1	<LEADSADDBUNDLE>						1
- * 1		<DTSOFDATA>	</DTSOFDATA>			2
- * 1		<FACTSHEETNUM>	</FACTSHEETNUM>		2
- * 1		<BDLSEOID>	</BDLSEOID>				2
- * 1		<BUNDLMKTGDESC>	</BUNDLMKTGDESC>	2
- * 1		<BUNDLPUBDATEMTRGT>	</BUNDLPUBDATEMTRGT>	2
- * 1		<COUNTRYLIST>						2
- * <1..N>		<COUNTRYELEMENT>				3
- * 1				<COUNTRY>	</COUNTRY>		4
- * 				</COUNTRYELEMENT>				3
- * 			</COUNTRYLIST>						2
- * 1		<SEOLIST>							2
- * <2..N>		<SEOELEMENT>					3
- * 1				<SEOID>	</SEOID>			4
- * 1				<MT>	</MT>				4
- * 1				<MODEL>	</MODEL>			4
- * 1				<SEOTECHDESC>	</SEOTECHDESC>	4
- * 1				<PUBFROM>	</PUBFROM>		4
- * 1				<FEATURELIST>				4
- * <1..N>				<FEATUREELEMENT>		5
- * 1						<FEATURECODE>	</FEATURECODE>	6
- * 1						<QTY>	</QTY>		6
- * 						</FEATUREELEMENT>		5
- * 					</FEATURELIST>				4
- * 1				<COUNTRYLIST>				4
- * <1..N>				<COUNTRYELEMENT>		5
- * 1						<COUNTRY>	</COUNTRY>	6
- * 						</COUNTRYELEMENT>		5
- * 					</COUNTRYLIST>				4
- * 				</SEOELEMENT>					3
- * 			</SEOLIST>							2
- * 		</LEADSADDBUNDLE>						1
- * 
- * VII.	<LEADSADDBUNDLE>
-
-The attached spreadsheet has the definition of this XML message on the tab named "SG_XML_Bundle".
-
-1.	Search for LSEOBUNDLE using:
-•	<SEOID>
-
-If found, then this is an error:
-Date/Time = <DTSOFDATA>
-Fact Sheet = <FACTSHEETNUM>
-LSEOBUNDLE = <BDLSEOID>
-Message = "LSEOBUNDLE already exists"
-LXABRSTATUS = "Failed"
-
-2.	Create LSEOBUNDLE
-The attributes of the LSEOBUNDLE are supplied via the XML shown in the SS on the SG_XML_Bundle 
-tab with details provided on the SG Notes tab.
-
-The LSEOBUNDLE’s COUNTRYLIST has one value for each instance of <COUNTRYELEMENT>  Id = 9.
-
-3.	Create references to LSEOs
-For each <SEOELEMENT>, search for LSEO using <SEOID> Id 15 in the XML. If found, then create 
-Relator LSEOBUNDLELSEO between the LSEOBUNDLE created in step 2 and the LSEO found via this search. 
-If not found, then create the LSEO as described in the prior section for <LEADSADDSEO>. 
-If a feature is not found, then the error message needs to include the LSEOBUNDLE identification. For example:
-Fact Sheet = <FACTSHEETNUM>
-Lseobundle = <BDLSEOID>
-Machine Type = <MT>
-Model = <MODEL>
-SEO = <SEOID>
-Feature Code = <FEATURECODE>
-Message = "TMF does not exist"
-LXABRSTATUS = "Failed"
-
- 
-4.	Create Report
-A report is created and submitted to Subscription/Notification as follows:
-
-LSEOBUNDLE Special Bid from LEADS created (LXABRSTATUS)
-
-Userid:
-Role:
-Workgroup:
-Date:
-Description: Special Bid Created
-Return code:
-
-<BDLSEOID> created for
-<COUNTRY>
-
-with
-
-<SEOID> referenced
-"logical or" 
-<SEOID> created for <MT> <MODEL>
-<FEATURECODE> <QTY>
-for
-<COUNTRY>
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\LXLEADSADDBUNDLEABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-//LXLEADSADDBUNDLEABR.java,v
-//Revision 1.11  2010/03/01 17:15:32  wendy
-//Expanded to support Blue Harmony (BH) IDLs.
-//
-//Revision 1.10  2009/05/20 19:09:47  wendy
-//spec updates
-//
-//Revision 1.9  2009/05/06 12:38:52  wendy
-//RCQ00028947 - LEADS to EACM Feed - Update Mapping for Audience, Rate Card Code, UNSPSC Code
-//RCQ00029975 - LEADS inbound feed Workgroup Selection
-//
-//Revision 1.8  2009/04/20 18:40:31  wendy
-//Use VE instead of search to improve performance
-//
-//Revision 1.7  2009/04/09 18:14:28  wendy
-//Add check for existing LSEO with bundle SEOID
-//
-//Revision 1.6  2009/04/09 15:24:28  wendy
-//Enhance error msgs
-//
-public class LXLEADSADDBUNDLEABR implements LXABRInterface {
-	private static final String LSEOBDL_SRCHACTION_NAME = "LDSRDLSEOBUNDLE";//"SRDLSEOBUNDLE1";
-	private static final String LSEOBDL_CREATEACTION_NAME = "LDCRLSEOBUNDLE";//"CRLSEOBUNDLE"; 
-	private static final String LSEOBDL_LINKACTION_NAME = "LDLINKLSEOLSEOB";//"LINKLSEOLSEOBUNDLE";
-	
-	private LXABRSTATUS lxAbr=null;
-	private String dtsOfData=null;
-	private Element rootElem = null;
-	private String factSheetNum = null;
-	private String bdlseoid = null;
-	private String bdlPubfrom =null;
-
-	private String bdlMktgDesc = null;
-	private EntityItem lseobdlItem = null;
-
-	private Hashtable tmfTbl = new Hashtable(); //  mt+":"+model+":"+seoid is key, vector of ps is value
-	private Hashtable psQtyTbl = new Hashtable(); // ps.key is key, qty is value
-	private Hashtable mdlTbl = new Hashtable(); // mt:model is key, modelitem is value
-	private Hashtable ctryTbl = new Hashtable(); //<COUNTRY> is key, COUNTRYLIST flagcode is value
-	private Object domain = null; // must be derived from MODELs
-	private String domainStr = null;
-	private Object audien = null;
-	
-	/**********************************************************************************
-	 * Make sure the xml has the specified set of tags
-	 * 
-	 * Card	XML_Begin	XML_End					Level
-	 * 1	<?XML VERSION="1.0" ENCODING="UTF-8"?>	1
-	 * 1	<LEADSADDBUNDLE>						1
-	 * 1		<DTSOFDATA>	</DTSOFDATA>			2
-	 * 1		<FACTSHEETNUM>	</FACTSHEETNUM>		2
-	 * 1		<BDLSEOID>	</BDLSEOID>				2
-	 * 1		<BUNDLMKTGDESC>	</BUNDLMKTGDESC>	2
-	 * 1		<BUNDLPUBDATEMTRGT>	</BUNDLPUBDATEMTRGT>	2
-	 * 1		<COUNTRYLIST>						2
-	 * <1..N>		<COUNTRYELEMENT>				3
-	 * 1				<COUNTRY>	</COUNTRY>		4
-	 * 				</COUNTRYELEMENT>				3
-	 * 			</COUNTRYLIST>						2
-	 * 1		<SEOLIST>							2
-	 * <2..N>		<SEOELEMENT>					3
-	 * 1				<SEOID>	</SEOID>			4
-	 * 1				<MT>	</MT>				4
-	 * 1				<MODEL>	</MODEL>			4
-	 * 1				<SEOTECHDESC>	</SEOTECHDESC>	4
-	 * 1				<PUBFROM>	</PUBFROM>		4
-	 * 1				<FEATURELIST>				4
-	 * <1..N>				<FEATUREELEMENT>		5
-	 * 1						<FEATURECODE>	</FEATURECODE>	6
-	 * 1						<QTY>	</QTY>		6
-	 * 						</FEATUREELEMENT>		5
-	 * 					</FEATURELIST>				4
-	 * 1				<COUNTRYLIST>				4
-	 * <1..N>				<COUNTRYELEMENT>		5
-	 * 1						<COUNTRY>	</COUNTRY>	6
-	 * 						</COUNTRYELEMENT>		5
-	 * 					</COUNTRYLIST>				4
-	 * 				</SEOELEMENT>					3
-	 * 			</SEOLIST>							2
-	 * 		</LEADSADDBUNDLE>						1 
-	 * @throws MiddlewareShutdownInProgressException 
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 * @throws MiddlewareRequestException 
-	 */
-	private void validateXML() throws MiddlewareRequestException, SQLException, 
-		MiddlewareException, MiddlewareShutdownInProgressException 
-	{
-		// check for specific elements
-		dtsOfData = lxAbr.getNodeValue(rootElem,"DTSOFDATA");
-		factSheetNum = lxAbr.getNodeValue(rootElem,"FACTSHEETNUM");
-		bdlseoid = lxAbr.getNodeValue(rootElem,"BDLSEOID");
-		bdlPubfrom = lxAbr.getNodeValue(rootElem,"BUNDLPUBDATEMTRGT","");
-		bdlMktgDesc = lxAbr.getNodeValue(rootElem,"BUNDLMKTGDESC","");	
-		// derive audience value
-		audien = LXLEADSUtil.deriveAudien(lxAbr.getNodeValue(rootElem,"ACCOUNTTYPE",""));
-		// build countrylist vector
-		//1	<COUNTRYLIST>	
-		//<1..N>	<COUNTRYELEMENT>	
-		//1				<COUNTRY>	</COUNTRY>
-		//			</COUNTRYELEMENT>
-		//	</COUNTRYLIST>
-		
-		NodeList ctrylist = rootElem.getElementsByTagName("COUNTRYLIST");
-		if (ctrylist==null){
-			// ERROR_MISSINGXML = Missing xml tag {0}.
-			lxAbr.addError("ERROR_MISSINGXML", "COUNTRYLIST");
-		}else{
-			lxAbr.verifyChildNodes(ctrylist, "COUNTRYLIST", "COUNTRYELEMENT", 1);
-			
-			Element ctryListElem = null;
-			for (int x=0; x<ctrylist.getLength(); x++){
-				Node node = ctrylist.item(x);
-				if (node.getNodeType()!=Node.ELEMENT_NODE){
-					//lxAbr.addDebug("COUNTRYLIST node ["+x+"] is not an Node.ELEMENT_NODE, it is "+node.getNodeType());
-					continue;
-				}
-				Element elem = (Element)ctrylist.item(x);
-				if ((elem.getParentNode()==rootElem)){
-					if (ctryListElem !=null){ // must be only one at this level
-						//ERROR_INVALIDXML = Invalid xml tag: {0}.
-						lxAbr.addError("ERROR_INVALIDXML", "COUNTRYLIST");
-						break;
-					}else{
-						ctryListElem = (Element)ctrylist.item(x);
-					}
-				}
-				// check each country
-				findCountry(elem);
-			}	
-
-			if (ctryListElem == null){
-				// ERROR_MISSINGXML = Missing xml tag {0}.
-				lxAbr.addError("ERROR_MISSINGXML", "COUNTRYLIST");
-			}
-		}
-		
-		NodeList seolist = rootElem.getElementsByTagName("SEOLIST");
-
-		//ERROR_INVALIDXML = Invalid xml tag: {0}.
-		if (seolist==null || seolist.getLength()!=1){
-			lxAbr.addError("ERROR_INVALIDXML", "SEOLIST");
-		}else {
-			lxAbr.verifyChildNodes(seolist, "SEOLIST", "SEOELEMENT", 2);
-		}
-	}
-
-	/***********************************************
-	 *  Get the header
-	 *
-	 *@return java.lang.String
-	 */
-	public String getHeader(){
-		if (dtsOfData==null||factSheetNum==null||bdlseoid==null){
-			return "";
-		}
-		// LSEOBDL_HEADER = Date/Time = {0}<br />Fact Sheet = {1}<br />Lseobundle = {2}
-		String header = lxAbr.getResourceMsg("LSEOBDL_HEADER", new Object[]{dtsOfData,factSheetNum,bdlseoid});
-		if (domainStr!= null){
-			header = header+"<br />Domain = "+domainStr;
-		}
-		return header;
-	}	
-	/*********************
-	 * find the country and add flagcode for COUNTRYLIST to the hashtable
-	 * COUNTRY is a 2 character Country Code found in GENERALAREA.GENAREACODE and used to get 
-	 * GENAREANAME which is the same as COUNTRYLIST
-	 * 
-	 * @param elem
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws MiddlewareShutdownInProgressException
-	 */
-	private void findCountry(Element elem) throws MiddlewareRequestException, 
-		SQLException, MiddlewareException, MiddlewareShutdownInProgressException
-	{
-		// check each country
-		NodeList ctryelemlist = elem.getChildNodes(); // get COUNTRYELEMENT
-		for (int e=0; e<ctryelemlist.getLength(); e++){	
-			Node node = ctryelemlist.item(e);
-			if (node.getNodeType()!=Node.ELEMENT_NODE){
-				//lxAbr.addDebug("COUNTRYELEMENT node ["+e+"] is not an Node.ELEMENT_NODE, it is "+node.getNodeType());
-				continue;
-			}
-			Element ctryElem = (Element)ctryelemlist.item(e);
-			String ctryDesc = lxAbr.getNodeValue(ctryElem, "COUNTRY");
-			if (ctryDesc != null){
-				lxAbr.addDebug("findCountry checking "+ctryDesc);
-				String ctryflagcode = (String)ctryTbl.get(ctryDesc);
-				if (ctryflagcode==null){
-					StringBuffer debugSb = new StringBuffer();
-					// GENAREACODE
-					EntityItem genarea = LXLEADSUtil.searchForGENERALAREA(lxAbr.getDatabase(), 
-							lxAbr.getProfile(), ctryDesc,debugSb);
-					if (debugSb.length()>0){
-						lxAbr.addDebug(debugSb.toString());
-					}
-					if (genarea!= null){
-						// get genareaname attr flag value
-						ctryflagcode = PokUtils.getAttributeFlagValue(genarea, "GENAREANAME");
-						if (ctryflagcode!= null) {
-							ctryTbl.put(ctryDesc, ctryflagcode);
-						}else{
-							String seoid = bdlseoid;
-							if ((elem.getParentNode()!=rootElem)){
-								// get seoid
-								seoid= lxAbr.getNodeValue((Element)elem.getParentNode(), "SEOID");
-							}
-
-							//ERROR_SEO_COUNTRY = SEO= {0} <br />Country = {1}<br />Country Code not found.
-							lxAbr.addError("ERROR_SEO_COUNTRY",new Object[]{seoid,ctryDesc});
-						}
-					}else{
-						lxAbr.addError("GENERALAREA item not found for COUNTRY: "+ctryDesc);
-					}	
-				}				
-			}
-		}
-	}
-	/******************************************************
-	 * release memory
-	 * @see COM.ibm.eannounce.abr.sg.LXABRInterface#dereference()
-	 */
-	public void dereference(){
-		lxAbr = null;
-		dtsOfData = null;
-		rootElem = null;
-		factSheetNum = null;
-		bdlseoid=null;
-		bdlPubfrom=null;
-		bdlMktgDesc = null;
-		if (lseobdlItem!= null){
-			lseobdlItem.getEntityGroup().getEntityList().dereference();
-			lseobdlItem = null;
-		}
-
-		if (tmfTbl != null){
-			for (Enumeration eNum = tmfTbl.elements(); eNum.hasMoreElements();)  {
-				Vector tmfVct = (Vector)eNum.nextElement();
-				for (int i=0; i<tmfVct.size(); i++){
-					EntityItem ei = (EntityItem)tmfVct.elementAt(i);
-					try{
-						EntityList list = ei.getEntityGroup().getEntityList();
-						if (list!=null){ // may have already been deref
-							list.dereference();
-						}
-					}catch(Exception e){}
-				}	
-				tmfVct.clear();
-			}
-			tmfTbl.clear();
-			tmfTbl = null;
-		}
-
-		psQtyTbl.clear();
-		psQtyTbl = null;
-		
-		ctryTbl.clear();
-		ctryTbl = null;
-		mdlTbl.clear();
-	}
-
-	/***********************
-	 * 1.	Search for LSEOBUNDLE using:
-	 * 			<BDLSEOID>
-	 * 
-	 * If found, then this is an error:
-	 * Date/Time = <DTSOFDATA>
-	 * Fact Sheet = <FACTSHEETNUM>
-	 * LSEOBUNDLE = <BDLSEOID>
-	 * Message = 'LSEOBUNDLE already exists'
-	 * LXABRSTATUS = 'Failed'
-	 * 
-	 * Search for Model using mt and model, 
-	 * search for prodstructs using featurecode, mt and model , 
-	 * 
-	 * If not found, then this is an error:
-	 * 	Date/Time = <DTSOFDATA>
-	 * 	Fact Sheet = <FACTSHEETNUM>
-	 * Lseobundle = <BDLSEOID>
-	 * Machine Type = <MT>
-	 * Model = <MODEL>
-	 * SEO = <SEOID>
-	 * Feature Code = <FEATURECODE>
-	 * Message = "TMF does not exist"
-	 * LXABRSTATUS = "Failed"
-	 * 
-	 * @see COM.ibm.eannounce.abr.sg.LXABRInterface#validateData(COM.ibm.eannounce.abr.sg.LXABRSTATUS, org.w3c.dom.Element)
-	 */
-	public void validateData(LXABRSTATUS theAbr, Element root) throws SQLException, MiddlewareException,
-			MiddlewareShutdownInProgressException 
-	{
-		lxAbr = theAbr;
-		rootElem = root;
-		
-		validateXML();
-		
-		if (lxAbr.getReturnCode()!= PokBaseABR.PASS){
-			return;
-		}		
-		// search for entities
-		searchForLseoBundle();
-
-		if (PokBaseABR.PASS==lxAbr.getReturnCode()){ // no errors yet
-			// loop thru each SEOELEMENT
-			NodeList seolist = rootElem.getElementsByTagName("SEOLIST");
-			for (int x=0; x<seolist.getLength(); x++){
-				Node node = seolist.item(x);
-				if (node.getNodeType()!=Node.ELEMENT_NODE){
-					//lxAbr.addDebug("SEOLIST node ["+x+"] is not an Node.ELEMENT_NODE, it is "+node.getNodeType());
-					continue;
-				}
-				NodeList seoelemlist = seolist.item(x).getChildNodes(); // SEOELEMENT
-				for (int e=0; e<seoelemlist.getLength(); e++){		
-					node = seoelemlist.item(e);
-					if (node.getNodeType()!=Node.ELEMENT_NODE){
-						//lxAbr.addDebug("SEOELEMENT node ["+e+"] is not an Node.ELEMENT_NODE, it is "+node.getNodeType());
-						continue;
-					}
-					Element seoElem = (Element)seoelemlist.item(e);
-					String mt = lxAbr.getNodeValue(seoElem,"MT");
-					String model = lxAbr.getNodeValue(seoElem,"MODEL");	
-					String seoid = lxAbr.getNodeValue(seoElem,"SEOID");
-					lxAbr.addDebug("validateData looking for seoElem["+e+"] seoid: "+seoid+" mt: "+mt+" model: "+model);
-					// get all feature codes
-					NodeList flist = seoElem.getElementsByTagName("FEATURELIST");
-					//ERROR_INVALIDXML = Invalid xml tag: {0}.
-					if (flist==null || flist.getLength()!=1){
-						lxAbr.addError("ERROR_INVALIDXML", "FEATURELIST");
-					}else{
-						lxAbr.verifyChildNodes(flist, "FEATURELIST", "FEATUREELEMENT", 1);
-						EntityItem modelItem  = LXLEADSUtil.searchForModel(lxAbr,mt, model);
-						if (modelItem != null){
-							// find MODEL, determine what cofcat is
-							// search for TMF using this info
-							//searchForProdstructs(mt, model,seoid, modelItem,flist);
-							matchProdstructs(mt, model,seoid, modelItem,flist);
-							mdlTbl.put(mt+":"+model, modelItem);
-						}else{
-							//ERROR_LSEOBDL_MODEL = Machine Type = {0}<br />Model = {1}<br />MODEL does not exist.
-							lxAbr.addError("ERROR_LSEOBDL_MODEL", new Object[]{mt,model});
-						}
-					}
-				}
-			}
-		}
-	}
-	/****************
-	 * 1.	Search for LSEOBUNDLE using:
-	 * 			<BDLSEOID>
-	 * If found, then this is an error:
-	 * 	Date/Time = <DTSOFDATA>
-	 * 	Fact Sheet = <FACTSHEETNUM>
-	 * 	LSEOBUNDLE = <BDLSEOID>
-	 * 	Message = 'LSEOBUNDLE already exists'
-	 * 	LXABRSTATUS = 'Failed' 
-	 * @throws MiddlewareShutdownInProgressException 
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 */
-	private void searchForLseoBundle() 
-	throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException
-	{
-		Vector attrVct = new Vector(1);
-		attrVct.addElement("SEOID");
-		Vector valVct = new Vector(1);
-		valVct.addElement(bdlseoid);
-		
-		EntityItem eia[]=null;
-		try{
-			StringBuffer debugSb = new StringBuffer();
-			eia= ABRUtil.doSearch(lxAbr.getDatabase(), lxAbr.getProfile(), 
-					LSEOBDL_SRCHACTION_NAME, "LSEOBUNDLE", false, attrVct, valVct, debugSb);
-			if (debugSb.length()>0){
-				lxAbr.addDebug(debugSb.toString());
-			}
-		}catch(SBRException exc){
-			// these exceptions are for missing flagcodes or failed business rules, dont pass back
-			java.io.StringWriter exBuf = new java.io.StringWriter();
-			exc.printStackTrace(new java.io.PrintWriter(exBuf));
-			lxAbr.addDebug("searchForLseoBundle SBRException: "+exBuf.getBuffer().toString());
-		}
-		
-		if (eia!=null && eia.length > 0){			
-			for (int i=0; i<eia.length; i++){
-				lxAbr.addDebug("searchForLseoBundle found "+eia[i].getKey());
-			}
-			//ERROR_LSEOBDL = LSEOBUNDLE already exists.
-			lxAbr.addError("ERROR_LSEOBDL",null);
-		}else{
-			lxAbr.addDebug("searchForLseoBundle NO LSEOBUNDLE found for "+bdlseoid);
-			EntityItem lseo = LXLEADSUtil.searchForLSEO(lxAbr, bdlseoid);
-			if (lseo != null){
-				lxAbr.addDebug("searchForLseo found "+lseo.getKey());
-				// ERROR_LSEO_LSEOBDL = LSEO already exists for {0}.  LSEOBUNDLE can not be created with this seoid.
-				lxAbr.addError("ERROR_LSEO_LSEOBDL", bdlseoid);
-			}else{
-				lxAbr.addDebug("searchForLseoBundle NO LSEO found for bundleseoid: "+bdlseoid);
-			}
-		}
-		
-		attrVct.clear();
-		valVct.clear();
-	}
-
-	/***********************
-	 * search for prodstructs using featurecode, mt and model
-	 * 
-	 * If not found, then this is an error:
-	 * 	Date/Time = <DTSOFDATA>
-	 * 	Fact Sheet = <FACTSHEETNUM>
-	 * Lseobundle = <BDLSEOID>
-	 * Machine Type = <MT>
-	 * Model = <MODEL>
-	 * SEO = <SEOID>
-	 * Feature Code = <FEATURECODE>
-	 * Message = "TMF does not exist"
-	 * LXABRSTATUS = "Failed"
-	 * 
-	 * @param mt
-	 * @param model
-	 * @param seoid
-	 * @param modelItem
-	 * @param flist
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws MiddlewareShutdownInProgressException
-	 * /
-	private void searchForProdstructs(String mt, String model, String seoid, 
-			EntityItem modelItem, NodeList flist) throws SQLException, MiddlewareException, 
-			MiddlewareShutdownInProgressException
-	{
-		Vector attrVct = new Vector(3);
-		attrVct.addElement("MODEL:MACHTYPEATR");
-		attrVct.addElement("MODEL:MODELATR");
-		
-		Vector valVct = new Vector(2);
-		valVct.addElement(mt);
-		valVct.addElement(model);
-
-		String searchAction = "";
-		String searchType = "";
-		String cofcat = PokUtils.getAttributeValue(modelItem, "COFCAT", "", "",false);
-		String cofcatflag = PokUtils.getAttributeFlagValue(modelItem, "COFCAT");
-		lxAbr.addDebug("searchForProdstructs using "+modelItem.getKey()+" cofcatflag:"+cofcatflag);
-		
-		if (LXLEADSUtil.COFCAT_HW.equals(cofcatflag)){
-			searchAction = LXLEADSUtil.PS_SRCHACTION_NAME;
-			searchType = "PRODSTRUCT";
-			attrVct.addElement("FEATURE:FEATURECODE");
-		}else if (LXLEADSUtil.COFCAT_SW.equals(cofcatflag)){
-			searchAction = LXLEADSUtil.SWPS_SRCHACTION_NAME;
-			searchType = "SWPRODSTRUCT";	
-			attrVct.addElement("SWFEATURE:FEATURECODE");
-		}else if (LXLEADSUtil.COFCAT_SVC.equals(cofcatflag)){
-			lxAbr.addDebug("searchForProdstructs Model is Service, no references needed");
-			attrVct.clear();
-			valVct.clear();
-			return;
-		}
-		for (int x=0; x<flist.getLength(); x++){
-			Node node = flist.item(x);
-			if (node.getNodeType()!=Node.ELEMENT_NODE){
-				//lxAbr.addDebug("FEATURELIST node ["+x+"] is not an Node.ELEMENT_NODE, it is "+node.getNodeType());
-				continue;
-			}
-			NodeList felemlist = flist.item(x).getChildNodes(); // FEATUREELEMENTS
-			for (int e=0; e<felemlist.getLength(); e++){
-				node = felemlist.item(e);
-				if (node.getNodeType()!=Node.ELEMENT_NODE){
-					//lxAbr.addDebug("FEATUREELEMENT node ["+e+"] is not an Node.ELEMENT_NODE, it is "+node.getNodeType());
-					continue;
-				}
-				Element fcElem = (Element)felemlist.item(e);
-				String fcode = lxAbr.getNodeValue(fcElem, "FEATURECODE");
-				String qty = lxAbr.getNodeValue(fcElem, "QTY","1");
-				if (fcode!= null){
-					Vector valTmp = new Vector(valVct);
-					valTmp.add(fcode);
-
-					EntityItem eia[]= null;
-					try{
-						// srch should be domain restricted!!
-						StringBuffer debugSb = new StringBuffer();
-						eia= ABRUtil.doSearch(lxAbr.getDatabase(), lxAbr.getProfile(), 
-								searchAction, searchType, true, attrVct, valTmp, debugSb);
-						if (debugSb.length()>0){
-							lxAbr.addDebug(debugSb.toString());
-						}
-					}catch(SBRException exc){
-						// these exceptions are for missing flagcodes or failed business rules, dont pass back
-						java.io.StringWriter exBuf = new java.io.StringWriter();
-						exc.printStackTrace(new java.io.PrintWriter(exBuf));
-						lxAbr.addDebug("searchForProdstructs SBRException: "+exBuf.getBuffer().toString());
-					}
-
-					valTmp.clear();
-
-					if (eia==null || eia.length == 0){
-						//ERROR_LSEOBDL_TMF = Machine Type = {0}<br />{1} Model = {2}<br />SEO = {3}<br />Feature Code = {4}<br />TMF does not exist.
-						lxAbr.addError("ERROR_LSEOBDL_TMF", new Object[]{mt, cofcat, model, seoid, fcode});
-					}else{
-						String key = mt+":"+model+":"+seoid;
-						Vector tmfVct = (Vector)tmfTbl.get(key);
-						if (tmfVct==null){
-							tmfVct = new Vector();
-							tmfTbl.put(key, tmfVct);
-						}
-
-						for (int i=0; i<eia.length; i++){
-							psQtyTbl.put(eia[i].getKey(),qty);
-							tmfVct.addElement(eia[i]);
-						}
-						lxAbr.addDebug("searchForProdstructs found:\n"+PokUtils.outputList(eia[0].getEntityGroup().getEntityList()));
-					}	
-				} // end valid FEATURECODE and QTY
-			} // end FEATUREELEMENTS loop
-		}	// end FEATURELIST loop		
-	}*/
-	private void matchProdstructs(String mt, String model, String seoid, 
-			EntityItem modelItem, NodeList flist) throws SQLException, MiddlewareException, 
-			MiddlewareShutdownInProgressException
-	{
-		String vename = null;
-		String featureType = "";
-		String cofcat = PokUtils.getAttributeValue(modelItem, "COFCAT", "", "",false);
-		String cofcatflag = PokUtils.getAttributeFlagValue(modelItem, "COFCAT");
-		lxAbr.addDebug("matchProdstructs using "+modelItem.getKey()+" cofcatflag:"+cofcatflag);
-		
-		if (LXLEADSUtil.COFCAT_HW.equals(cofcatflag)){
-			featureType = "FEATURE";
-			vename = "EXRPT3LEADS";
-		}else if (LXLEADSUtil.COFCAT_SW.equals(cofcatflag)){
-			featureType = "SWFEATURE";
-			vename = "EXRPT3LEADS2";
-		}else if (LXLEADSUtil.COFCAT_SVC.equals(cofcatflag)){
-			lxAbr.addDebug("matchProdstructs Model is Service, no references needed");
-			return;
-		}
-		// pull VE to improve performance 
-		EntityList psList = lxAbr.getDatabase().getEntityList(lxAbr.getProfile(), 
-				new ExtractActionItem(null, lxAbr.getDatabase(), lxAbr.getProfile(), vename), 
-				new EntityItem[]{modelItem});
-		lxAbr.addDebug("matchProdstructs VE:"+vename+"\n"+PokUtils.outputList(psList));
-		Hashtable fcTbl = new Hashtable();  // easy lookup
-		EntityGroup featGrp = psList.getEntityGroup(featureType);
-		for (int i=0; i<featGrp.getEntityItemCount(); i++){
-			EntityItem featItem = featGrp.getEntityItem(i);
-			String fc = PokUtils.getAttributeValue(featItem, "FEATURECODE", "", "",false);	
-			Vector vct = featItem.getDownLink();
-			for (int d=0; d<vct.size(); d++){
-				lxAbr.addDebug("matchProdstructs featurecode: "+fc+" on "+featItem.getKey()+
-					" dnlink["+d+"] "+featItem.getDownLink(d).getKey());
-			}
-			fcTbl.put(fc, vct);
-		}
-		
-		for (int x=0; x<flist.getLength(); x++){
-			Node node = flist.item(x);
-			if (node.getNodeType()!=Node.ELEMENT_NODE){
-				//lxAbr.addDebug("FEATURELIST node ["+x+"] is not an Node.ELEMENT_NODE, it is "+node.getNodeType());
-				continue;
-			}
-			NodeList felemlist = flist.item(x).getChildNodes(); // FEATUREELEMENTS
-			for (int e=0; e<felemlist.getLength(); e++){
-				node = felemlist.item(e);
-				if (node.getNodeType()!=Node.ELEMENT_NODE){
-					//lxAbr.addDebug("FEATUREELEMENT node ["+e+"] is not an Node.ELEMENT_NODE, it is "+node.getNodeType());
-					continue;
-				}
-				Element fcElem = (Element)felemlist.item(e);
-				String fcode = lxAbr.getNodeValue(fcElem, "FEATURECODE");
-				String qty = lxAbr.getNodeValue(fcElem, "QTY","1");
-				if (fcode!= null){
-					Vector dnlinks = (Vector)fcTbl.get(fcode);
-					if (dnlinks==null || dnlinks.size() == 0){
-						// ERROR_LSEOBDL_TMF = Machine Type = {0}<br />{1} Model = {2}<br />SEO = {3}<br />Feature Code = {4}<br />TMF does not exist.
-						lxAbr.addError("ERROR_LSEOBDL_TMF", new Object[]{mt, cofcat, model, seoid, fcode});
-					}else{
-						String key = mt+":"+model+":"+seoid;
-						Vector tmfVct = (Vector)tmfTbl.get(key);
-						if (tmfVct==null){
-							tmfVct = new Vector();
-							tmfTbl.put(key, tmfVct);
-						}						
-						
-						for (int i=0; i<dnlinks.size(); i++){
-							EntityItem psitem = (EntityItem)dnlinks.elementAt(i);
-							lxAbr.addDebug("matchProdstructs fc "+fcode+" using: "+psitem.getKey());
-							psQtyTbl.put(psitem.getKey(),qty);
-							tmfVct.add(psitem);
-						}
-					}	
-				} // end valid FEATURECODE and QTY
-			} // end FEATUREELEMENTS loop
-		}	// end FEATURELIST loop		
-	}
-	/********************************************************
-	2.	Create LSEOBUNDLE
-	The attributes of the LSEOBUNDLE are supplied via the XML shown in the SS on the SG_XML_Bundle 
-	tab with details provided on the SG Notes tab.
-
-	The LSEOBUNDLE’s COUNTRYLIST has one value for each instance of <COUNTRYELEMENT>  Id = 9.
-
-	3.	Create references to LSEOs
-	For each <SEOELEMENT>, search for LSEO using <SEOID> Id 15 in the XML. If found, then create 
-	Relator LSEOBUNDLELSEO between the LSEOBUNDLE created in step 2 and the LSEO found via this search. 
-	If not found, then create the LSEO as described in the prior section for <LEADSADDSEO>. 
-		 
-	4.	Create Report
-	A report is created and submitted to Subscription/Notification as follows:
-
-	LSEOBUNDLE Special Bid from LEADS created (LXABRSTATUS)
-
-	Userid:
-	Role:
-	Workgroup:
-	Date:
-	Description: Special Bid Created
-	Return code:
-
-	<BDLSEOID> created for
-	<COUNTRY>
-
-	with
-
-	<SEOID> referenced
-	"logical or" 
-	<SEOID> created for <MT> <MODEL>
-	<FEATURECODE> <QTY>
-	for
-	<COUNTRY>
-
-	 * @see COM.ibm.eannounce.abr.sg.LXABRInterface#execute()
-	 */
-	public void execute() throws MiddlewareRequestException, SQLException,
-			MiddlewareException, EANBusinessRuleException, RemoteException,
-			MiddlewareShutdownInProgressException, LockException,
-			WorkflowException 
-	{
-		// find the model to use for determining PDHDOMAIN
-		derivePDHDOMAIN(); //	RCQ00029975
-		if (lxAbr.getReturnCode()!=PokBaseABR.PASS){
-			return;
-		}
-		
-		// create the lseobundle
-		createLSEOBDL();
-		if (lseobdlItem != null){
-			// loop thru each SEOELEMENT
-			NodeList seolist = rootElem.getElementsByTagName("SEOLIST");
-			Vector lseoVct = new Vector(1);
-			StringBuffer lseoSb = new StringBuffer();
-			StringBuffer lseo2link = new StringBuffer();
-
-			outerloop:for (int x=0; x<seolist.getLength(); x++){
-				Node node = seolist.item(x);
-				if (node.getNodeType()!=Node.ELEMENT_NODE){
-					//lxAbr.addDebug("SEOLIST node ["+x+"] is not an Node.ELEMENT_NODE, it is "+node.getNodeType());
-					continue;
-				}
-				NodeList seoelemlist = seolist.item(x).getChildNodes(); // SEOELEMENT
-				for (int e=0; e<seoelemlist.getLength(); e++){							
-					if (lxAbr.getReturnCode()!=PokBaseABR.PASS){
-						break outerloop;
-					}
-					node = seoelemlist.item(e);
-					if (node.getNodeType()!=Node.ELEMENT_NODE){
-						//lxAbr.addDebug("SEOELEMENT node ["+e+"] is not an Node.ELEMENT_NODE, it is "+node.getNodeType());
-						continue;
-					}
-					StringBuffer sb = new StringBuffer();
-					Element seoElem = (Element)seoelemlist.item(e);
-					String mt = lxAbr.getNodeValue(seoElem,"MT");
-					String model = lxAbr.getNodeValue(seoElem,"MODEL");	
-					String seoid = lxAbr.getNodeValue(seoElem,"SEOID");
-					// get MODEL
-					EntityItem modelItem  = (EntityItem)mdlTbl.get(mt+":"+model);
-
-					lxAbr.addDebug("execute looking at seoid["+e+"]: "+seoid+" mt: "+mt+" model: "+model+" "+modelItem.getKey());
-					// search for LSEO, create if necessary
-					EntityItem lseo = getLSEO(modelItem, seoElem, mt, model, seoid, sb);
-					if (lseo==null){
-						break outerloop;
-					}
-					lseoVct.add(lseo);
-					lseo2link.append(" "+lseo.getKey());
-					if (lseoSb.length()>0){
-						lseoSb.append("<br />");
-					}
-					lseoSb.append(sb.toString());
-				}
-			}
-			if (lxAbr.getReturnCode()==PokBaseABR.PASS){
-				// link this lseo to the new lseobundle
-				LinkActionItem lai = new LinkActionItem(null, lxAbr.getDatabase(), lxAbr.getProfile(),LSEOBDL_LINKACTION_NAME);
-				EntityItem parentArray[] = new EntityItem[]{lseobdlItem};
-				EntityItem childArray[] = new EntityItem[lseoVct.size()];
-
-				// get each prodstruct
-				lseoVct.copyInto(childArray);
-
-				lxAbr.addDebug("Link "+lseobdlItem.getKey()+" to "+lseo2link.toString());
-				// do the link	
-				lai.setParentEntityItems(parentArray);     
-				lai.setChildEntityItems(childArray);
-				lxAbr.getDatabase().executeAction(lxAbr.getProfile(), lai);
-
-				lseoVct.clear();
-
-				if (lxAbr.getReturnCode()==PokBaseABR.PASS){
-					// CREATED_SEOBDL_MSG = {0} {1} created for <br />{2} <br />with<br /> {3}
-					StringBuffer sb = new StringBuffer();
-					NodeList ctrylist = rootElem.getElementsByTagName("COUNTRYLIST");
-					for (int x=0; x<ctrylist.getLength(); x++){
-						Node node = ctrylist.item(x);
-						if (node.getNodeType()!=Node.ELEMENT_NODE){
-							//lxAbr.addDebug("COUNTRYLIST node ["+x+"] is not an Node.ELEMENT_NODE, it is "+node.getNodeType());
-							continue;
-						}
-						Element elem = (Element)ctrylist.item(x);
-						if ((elem.getParentNode()==rootElem)){
-							Element	ctryListElem = (Element)ctrylist.item(x);
-							NodeList ctryelemlist = ctryListElem.getChildNodes(); // COUNTRYELEMENT
-							for (int e=0; e<ctryelemlist.getLength(); e++){	
-								node = ctryelemlist.item(e);
-								if (node.getNodeType()!=Node.ELEMENT_NODE){
-									//lxAbr.addDebug("COUNTRYELEMENT node ["+e+"] is not an Node.ELEMENT_NODE, it is "+node.getNodeType());
-									continue;
-								}
-								Element ctryElem = (Element)ctryelemlist.item(e);
-								String ctryDesc = lxAbr.getNodeValue(ctryElem, "COUNTRY");
-								sb.append(ctryDesc+" ");
-							}
-							break;
-						}
-					}	
-					lxAbr.addOutput("CREATED_SEOBDL_MSG", new Object[]{
-							lseobdlItem.getEntityGroup().getLongDescription(),
-							bdlseoid,sb.toString(),lseoSb.toString()});
-				}
-			}
-		}
-	}
-	/******
-	 * 	RCQ00029975
-	 * Find the pdhdomain to use from the first HW model in the XML, if no HW use first SW model
-	 * For the CHW system, PDHDOMAIN is determined as follows:
-1.	Search (restricted to PDHDOMAIN) for the Model using: 
-•	MACHTYPEATR = <MT>
-•	MODELATR = <MODEL>
-2.	If more than one MODEL, then:
-•	If COFCAT = Hardware (100), choose the one where COFGRP = Base (150)
-b)	If COFCAT = Software(101), choose the one where COFGRP = Base (150) and 
-i.	COFSUBCAT = HIPO (125) 
-ii.	COFSUBCAT = Application (127)
-iii.COFSUBCAT = Subscription (133)
-c)	If COFCAT = Service (102), choose the first one.
-3.	Use the PDHDOMAIN of this MODEL for all data created. 
-
-Notes:
-When processing XML <LEADSADDSEO>, only one MODEL should be found based on the criteria in step 2. There should be only one match or else there is an error. For example, only one of the criteria a) thru c) should find a match including criteria b) i. thru iii.
-
-When processing XML <LEADSADDBUNDLE>, a <SEOELEMENT> should meet the same criteria as <LEADSADDSEO>. The priority of <SEOELEMENT> is:
-1.	2.a)
-2.	2.b).i
-3.	2.b).ii
-4.	2.b).iii
-5.	2.c)
-
-If more than one <SEOELEMENT> matches the same criterion, then choose the first. 
-
-
-If there is an error, see the message found in the sections below when searching for MODEL.
-
-priority =
-1) Hardware
-2) Software
-3) Service
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	
-	private void derivePDHDOMAIN() throws SQLException, MiddlewareException{
-		// find the model to use for determining PDHDOMAIN and finding WG
-		EntityItem hwMdlItem = null;
-		Collection mdlCol = mdlTbl.values();
-		
-		Iterator itr = mdlCol.iterator();
-		if (mdlCol.size()==1){
-			hwMdlItem = (EntityItem) itr.next();
-		}else{
-			EntityItem swMdlItem = null;
-			EntityItem svcMdlItem = null;
-			while (itr.hasNext()) {
-				EntityItem mdlitem = (EntityItem) itr.next();
-				String cofcatflag = PokUtils.getAttributeFlagValue(mdlitem, "COFCAT");
-				lxAbr.addDebug("derivePDHDOMAIN checking cofcat:"+cofcatflag+" "+mdlitem.getKey());
-				// find hw model to use for PDHDOMAIN
-				if (LXLEADSUtil.COFCAT_HW.equals(cofcatflag)){
-					hwMdlItem = mdlitem;
-					break;
-				}else if (LXLEADSUtil.COFCAT_SW.equals(cofcatflag)){
-					if (swMdlItem!=null){ //found one, see if this overrides it
-						String cofsubcatflag = PokUtils.getAttributeFlagValue(mdlitem, "COFSUBCAT");
-						String curcofsubcatflag = PokUtils.getAttributeFlagValue(swMdlItem, "COFSUBCAT");
-						lxAbr.addDebug("derivePDHDOMAIN SW "+mdlitem.getKey()+" cofsubcatflag "+cofsubcatflag+
-								" curSW "+swMdlItem.getKey()+" curcofsubcatflag "+curcofsubcatflag);
-						if (LXLEADSUtil.SW_COFSUBCAT_SET.contains(curcofsubcatflag)){
-							if (LXLEADSUtil.SW_COFSUBCAT_SET.contains(cofsubcatflag)){ // this one may override
-								// priority happens to be in compare order
-								//i.	COFSUBCAT = HIPO (125) 
-								//ii.	COFSUBCAT = Application (127)
-								//iii.	COFSUBCAT = Subscription (133)
-								if (cofsubcatflag.compareTo(curcofsubcatflag)<0){
-									lxAbr.addDebug("derivePDHDOMAIN SW "+mdlitem.getKey()+" overrides "+
-											swMdlItem.getKey());
-									swMdlItem = mdlitem;
-								}
-							}
-						}else{ // current sw model was not in set so use this one.. it may not be in set either
-							swMdlItem = mdlitem;
-						}
-					}else{
-						swMdlItem = mdlitem;
-					}			
-				}else if (LXLEADSUtil.COFCAT_SVC.equals(cofcatflag)){
-					svcMdlItem = mdlitem;
-				}
-			}
-	        
-	        if(hwMdlItem==null){
-	        	hwMdlItem = swMdlItem;
-	        }
-	        if(hwMdlItem==null){
-	        	hwMdlItem = svcMdlItem;
-	        }
-		}
-		
-        // PDHDOMAIN must be derived from the MODEL
-		EANAttribute attr = hwMdlItem.getAttribute("PDHDOMAIN");
-		HashSet mdlSet = new HashSet();
-        if (attr!=null){ // really should never happen
-            EANMetaAttribute ma = attr.getMetaAttribute();
-            String domainAttr = PokUtils.getAttributeFlagValue(hwMdlItem, "PDHDOMAIN");
-            domainStr = PokUtils.getAttributeValue(hwMdlItem, "PDHDOMAIN", ", ", "", false);
-            lxAbr.addDebug("derivePDHDOMAIN using "+hwMdlItem.getKey()+" PDHDOMAIN "+domainAttr);
-            if (ma.getAttributeType().equals("U")){
-            	domain = domainAttr;
-            }else{ // must be F
-                String[] domainArray = PokUtils.convertToArray(domainAttr);
-                Vector tmp = new Vector(domainArray.length);
-                for (int k=0; k<domainArray.length; k++){
-                    tmp.add(domainArray[k]);
-                    mdlSet.add(domainArray[k]);
-                }
-                domain = tmp;
-            }
-        }
-	}
-	/*****************************************************
-	 * 2.	Create LSEOBUNDLE
-	 * The attributes of the LSEOBUNDLE are supplied via the XML shown in the SS on the SG_XML_Bundle 
-	tab with details provided on the SG Notes tab.
-
-	The LSEOBUNDLE’s COUNTRYLIST has one value for each instance of <COUNTRYELEMENT>  Id = 9.
-	 * ACCTASGNGRP	U	Account Assignment Group	"01 - 3000100000" =>ACCTASGNGRP	01	01 - 3000100000
-	 * COMNAME	T	Common Name	<SEOID>
-	 * COUNTRYLIST	F	Country List	<COUNTRY>
-	 * DATAQUALITY	S	DataQuality	Default
-	 * PDHDOMAIN	F	Domains	Derived from MODEL
-	 * SEOID	T	SEO ID	SEOID
-	 * SPECBID	U	Special Bid	"Yes"
-	 * TRANSLATIONWATCH	U	Translation Watch	Default
-	 * BUNDLMKTGDESC	T	Bundle Marketing Description <BUNDLMKTGDESC>
-	 * BUNDLPUBDATEMTRGT	T	Bundle Publish Date - Target <BUNDLPUBDATEMTRGT>
-	 * PROJCDNAM	U	Project Code Name	"LEADS FEED SPECIAL BID"
-	 * If the LEADSXML has a value for PROJCDNAM, then use it; otherwise, use the default specified in the SS.
-	 * 
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 * @throws MiddlewareRequestException 
-	 * @throws EANBusinessRuleException 
-	 * @throws MiddlewareShutdownInProgressException 
-	 * @throws RemoteException 
-	 */
-	private void createLSEOBDL() 
-	throws MiddlewareRequestException, SQLException, MiddlewareException, EANBusinessRuleException, 
-	RemoteException, MiddlewareShutdownInProgressException
-	{
-		// create the entity
-		Vector attrCodeVct = new Vector();
-		Hashtable attrValTbl = new Hashtable();
-		attrCodeVct.addElement("SEOID");
-		attrValTbl.put("SEOID", bdlseoid);
-		attrCodeVct.addElement("COMNAME");
-		attrValTbl.put("COMNAME", bdlseoid);  //COMNAME	T	Common Name	<SEOID>
-		attrCodeVct.addElement("BUNDLPUBDATEMTRGT");
-		attrValTbl.put("BUNDLPUBDATEMTRGT", bdlPubfrom);  //BUNDLPUBDATEMTRGT	<BUNDLPUBDATEMTRGT>
-		attrCodeVct.addElement("BUNDLMKTGDESC");
-		attrValTbl.put("BUNDLMKTGDESC", bdlMktgDesc);  //BUNDLMKTGDESC	<BUNDLMKTGDESC>		
-			 
-		// get the PROJCDNAM - expanded to support Blue Harmony (BH) IDLs.
-		String prjname = "722";
-		if(lxAbr.getPROJCDNAME() !=null){
-			prjname = lxAbr.getPROJCDNAME();
-		}
-		
-		// write the flags
-		attrCodeVct.addElement("PROJCDNAM");
-		attrValTbl.put("PROJCDNAM",prjname);//PROJCDNAM	U	Project Code Name	"LEADS FEED SPECIAL BID" =>'722'
-		
-		attrCodeVct.addElement("ACCTASGNGRP");
-		attrValTbl.put("ACCTASGNGRP","01");//ACCTASGNGRP	U	Account Assignment Group	"01 - 3000100000" =>ACCTASGNGRP	01	01 - 3000100000
-		attrCodeVct.addElement("SPECBID");
-		attrValTbl.put("SPECBID","11458");//SPECBID	U	Special Bid	"Yes" =>SPECBID	11458	Y	Yes
-		attrCodeVct.addElement("AUDIEN");
-		attrValTbl.put("AUDIEN",audien); //AUDIEN	F	Audience	"LE Direct"	flag code = 10062
-		// PDHDOMAIN was derived
-		attrCodeVct.addElement("PDHDOMAIN");
-		attrValTbl.put("PDHDOMAIN", domain);
-		attrCodeVct.addElement("COUNTRYLIST");
-		Vector ctryVct = new Vector();
-
-		NodeList ctrylist = rootElem.getElementsByTagName("COUNTRYLIST");
-		for (int x=0; x<ctrylist.getLength(); x++){
-			Node node = ctrylist.item(x);
-			if (node.getNodeType()!=Node.ELEMENT_NODE){
-				//lxAbr.addDebug("COUNTRYLIST node ["+x+"] is not an Node.ELEMENT_NODE, it is "+node.getNodeType());
-				continue;
-			}
-			Element elem = (Element)ctrylist.item(x);
-			if ((elem.getParentNode()==rootElem)){
-				Element	ctryListElem = (Element)ctrylist.item(x);
-				NodeList ctryelemlist = ctryListElem.getChildNodes(); // COUNTRYELEMENT
-				for (int e=0; e<ctryelemlist.getLength(); e++){	
-					node = ctryelemlist.item(e);
-					if (node.getNodeType()!=Node.ELEMENT_NODE){
-						//lxAbr.addDebug("COUNTRYELEMENT node ["+e+"] is not an Node.ELEMENT_NODE, it is "+node.getNodeType());
-						continue;
-					}
-					Element ctryElem = (Element)ctryelemlist.item(e);
-					String ctryDesc = lxAbr.getNodeValue(ctryElem, "COUNTRY");
-					String ctryflagcode = (String)ctryTbl.get(ctryDesc);
-					ctryVct.addElement(ctryflagcode);
-				}
-				break;
-			}
-		}	
-		
-		attrValTbl.put("COUNTRYLIST",ctryVct);//COUNTRYLIST	F	Country List	<COUNTRY>
-		
-		StringBuffer debugSb = new StringBuffer();
-		try{
-			// use WG but it will not be linked to this now
-			EntityItem wgItem = new EntityItem(null, lxAbr.getProfile(), "WG", lxAbr.getProfile().getWGID());
-			lseobdlItem = ABRUtil.createEntity(lxAbr.getDatabase(), lxAbr.getProfile(), LSEOBDL_CREATEACTION_NAME, wgItem,  
-					"LSEOBUNDLE", attrCodeVct, attrValTbl, debugSb); 
-		}catch(EANBusinessRuleException ere){
-			throw ere;
-		}finally{
-			if (debugSb.length()>0){
-				lxAbr.addDebug(debugSb.toString());
-			}
-			if (lseobdlItem==null){
-				lxAbr.addError("ERROR: Can not create LSEOBUNDLE entity for seoid: "+bdlseoid);
-			}	
-			attrCodeVct.clear();
-			attrValTbl.clear();
-			ctryVct.clear();
-		}
-	}
-	
-	/*****************************************
-	 * 3.	Search for LSEO using:
-	 * -	<SEOID>
-	 * If found, build msg and return.
-	 * If not found, create LSEO, WWSEO and feature references, build msg and return.
-	 * 
-	 * 	<SEOID> referenced
-	 * 'logical or'
-	 * 	<SEOID> created for <MT> <MODEL>
-	 * 	<FEATURECODE> <QTY>
-	 * 	for <COUNTRY>
-	 * 
-	 * If <COUNTRY> is not found, then this is an error for the instance of <COUNTRYELEMENT>:
-	 * Date/Time = <DTSOFDATA>
-	 * Fact Sheet = <FACTSHEETNUM>
-	 * LSEOBUNDLE = <BDLSEOID>
-	 * Country = <COUNTRY>
-	 * Message = Country Code not found
-	 * LXABRSTATUS = Failed
-	 * 
-	 * @param modelItem
-	 * @param seoElem
-	 * @param mt
-	 * @param model
-	 * @param seoid
-	 * @param sb
-	 * @return
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws MiddlewareShutdownInProgressException
-	 * @throws RemoteException
-	 * @throws EANBusinessRuleException
-	 * @throws LockException
-	 * @throws WorkflowException
-	 */
-	private EntityItem getLSEO(EntityItem modelItem, Element seoElem, String mt, String model, 
-			String seoid, StringBuffer sb) 
-	throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException,
-	RemoteException, EANBusinessRuleException, LockException, WorkflowException
-	{
-		EntityItem lseo = LXLEADSUtil.searchForLSEO(lxAbr, seoid);
-		if (lseo != null){
-			// no other checks needed
-			lxAbr.addDebug("getLSEO found "+lseo.getKey());
-			// REF_SEO_MSG = {0} {1} referenced
-			sb.append(lxAbr.getResourceMsg("REF_SEO_MSG", 
-					new String []{lseo.getEntityGroup().getLongDescription(),seoid}));
-		}else{
-			// must create an lseo
-			//find or create wwseo first and the feature references
-			EntityItem wwseo = getWWSEO(modelItem, seoElem,seoid,mt,model,sb);
-			if (wwseo != null){
-				String pubfrom = lxAbr.getNodeValue(seoElem,"PUBFROM");
-				NodeList ctrylist = seoElem.getElementsByTagName("COUNTRYLIST");
-				// ERROR_INVALIDXML = Invalid xml tag: {0}.
-				if (ctrylist==null || ctrylist.getLength()!=1){
-					lxAbr.addError("ERROR_INVALIDXML", "COUNTRYLIST");
-				}
-
-				if (lxAbr.getReturnCode()==PokBaseABR.PASS){
-					Vector countryVct = new Vector(1);
-					for (int x=0; x<ctrylist.getLength(); x++){	
-						Node node = ctrylist.item(x);
-						if (node.getNodeType()!=Node.ELEMENT_NODE){
-							//lxAbr.addDebug("COUNTRYLIST node ["+x+"] is not an Node.ELEMENT_NODE, it is "+node.getNodeType());
-							continue;
-						}
-						NodeList ctryelemlist = ctrylist.item(x).getChildNodes(); // COUNTRYELEMENT
-						for (int e=0; e<ctryelemlist.getLength(); e++){		
-							node = ctryelemlist.item(e);
-							if (node.getNodeType()!=Node.ELEMENT_NODE){
-								//lxAbr.addDebug("COUNTRYELEMENT node ["+e+"] is not an Node.ELEMENT_NODE, it is "+node.getNodeType());
-								continue;
-							}
-							Element ctryElem = (Element)ctryelemlist.item(e);
-							String ctryDesc = lxAbr.getNodeValue(ctryElem, "COUNTRY");
-							String ctryflagcode = (String)ctryTbl.get(ctryDesc);
-							countryVct.addElement(ctryflagcode);
-						}
-					}				
-
-					lseo = LXLEADSUtil.createLSEO(lxAbr, wwseo, seoid, pubfrom, countryVct,domain, audien);
-
-					if (lseo != null){
-						lxAbr.addDebug("getLSEO created "+lseo.getKey());
-
-						String cofcat = PokUtils.getAttributeValue(modelItem, "COFCAT", "", "",false);
-						// CREATED_SEO_MSG = {0} {1} created for {2} Model: {3} {4}
-						sb.append(lxAbr.getResourceMsg("CREATED_SEO_MSG", new Object[]{lseo.getEntityGroup().getLongDescription(),
-								seoid,cofcat,mt,model}));
-						
-						String cofcatflag = PokUtils.getAttributeFlagValue(modelItem, "COFCAT");
-						if (!LXLEADSUtil.COFCAT_SVC.equals(cofcatflag)){
-							//	list all feature codes and qty
-							NodeList flist = seoElem.getElementsByTagName("FEATURELIST");
-							for (int x=0; x<flist.getLength(); x++){
-								Node node = flist.item(x);
-								if (node.getNodeType()!=Node.ELEMENT_NODE){
-									//lxAbr.addDebug("FEATURELIST node ["+x+"] is not an Node.ELEMENT_NODE, it is "+node.getNodeType());
-									continue;
-								}
-								NodeList felemlist = flist.item(x).getChildNodes(); // FEATUREELEMENTS
-								for (int e=0; e<felemlist.getLength(); e++){
-									node = felemlist.item(e);
-									if (node.getNodeType()!=Node.ELEMENT_NODE){
-										//lxAbr.addDebug("FEATUREELEMENT node ["+e+"] is not an Node.ELEMENT_NODE, it is "+node.getNodeType());
-										continue;
-									}
-									Element fcElem = (Element)felemlist.item(e);
-									String fcode = lxAbr.getNodeValue(fcElem, "FEATURECODE");
-									String qty = lxAbr.getNodeValue(fcElem, "QTY","1");
-									//REF_FEATURE_MSG = <br /> Feature Code: {0} Quantity: {1} 
-									sb.append(lxAbr.getResourceMsg("REF_FEATURE_MSG", new Object[]{fcode,qty}));
-								} // end FEATUREELEMENTS loop
-							}	// end FEATURELIST loop		
-						}
-
-						// REF_COUNTRY_MSG= <br />&nbsp;&nbsp;&nbsp;for Country:&nbsp;
-						sb.append(lxAbr.getResourceMsg("REF_COUNTRY_MSG", null));
-						for (int x=0; x<ctrylist.getLength(); x++){	
-							Node node = ctrylist.item(x);
-							if (node.getNodeType()!=Node.ELEMENT_NODE){
-								//lxAbr.addDebug("COUNTRYLIST node ["+x+"] is not an Node.ELEMENT_NODE, it is "+node.getNodeType());
-								continue;
-							}
-							NodeList ctryelemlist = ctrylist.item(x).getChildNodes(); // COUNTRYELEMENT
-							for (int e=0; e<ctryelemlist.getLength(); e++){	
-								node = ctryelemlist.item(e);
-								if (node.getNodeType()!=Node.ELEMENT_NODE){
-									//lxAbr.addDebug("COUNTRYELEMENT node ["+e+"] is not an Node.ELEMENT_NODE, it is "+node.getNodeType());
-									continue;
-								}
-								Element ctryElem = (Element)ctryelemlist.item(e);
-								String ctryDesc = lxAbr.getNodeValue(ctryElem, "COUNTRY");
-								sb.append(ctryDesc+" ");
-							}
-						}		
-
-						countryVct.clear();		
-					}
-				} // end all ok so far
-			} // end wwseo != null
-		}
-	
-		return lseo;
-	}
-	/*****************************************
-	 * 3.	Search for WWSEO using:
-	 * -	<SEOID>
-	 * 
-	 * @param modelItem
-	 * @param seoElem
-	 * @param seoid
-	 * @return
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws MiddlewareShutdownInProgressException
-	 * @throws RemoteException
-	 * @throws EANBusinessRuleException
-	 * @throws LockException
-	 * @throws WorkflowException
-	 */
-	private EntityItem getWWSEO(EntityItem modelItem, Element seoElem, String seoid,String mt, String model,
-			StringBuffer sb) 
-	throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException, 
-	 RemoteException, EANBusinessRuleException, LockException, WorkflowException
-	{
-		EntityItem wwseo = LXLEADSUtil.searchForWWSEO(lxAbr, seoid);
-		if (wwseo != null){
-			lxAbr.addDebug("getWWSEO found "+wwseo.getKey());
-		}else{
-			// must create a wwseo
-			String seoTechDesc = lxAbr.getNodeValue(seoElem,"SEOTECHDESC");
-			wwseo = LXLEADSUtil.createWWSEO(lxAbr, modelItem, seoid, seoTechDesc,domain);
-			if (wwseo!= null){
-				lxAbr.addDebug("getWWSEO created "+wwseo.getKey());
-				String cofcat = PokUtils.getAttributeValue(modelItem, "COFCAT", "", "",false);
-				// CREATED_SEO_MSG = {0} {1} created for {2} Model: {3} {4}
-				sb.append(lxAbr.getResourceMsg("CREATED_SEO_MSG", new Object[]{
-						wwseo.getEntityGroup().getLongDescription(),
-						seoid,cofcat,mt,model})+"<br />");
-				// add references
-				String key = mt+":"+model+":"+seoid;
-				Vector tmfVct = (Vector)tmfTbl.get(key);
-				if (tmfVct != null){ // SVC models will not have TMF
-					lxAbr.addDebug("getWWSEO: tmf key: "+key+" size: "+tmfVct.size());
-					for (int i=0; i<tmfVct.size(); i++){
-						lxAbr.addDebug("tmf["+i+"]"+((EntityItem)tmfVct.elementAt(i)).getKey());
-					}
-					LXLEADSUtil.createFeatureRefs(lxAbr, wwseo, modelItem, tmfVct,  psQtyTbl);
-				}
-			}
-		}
-	
-		return wwseo;
-	}	
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.sg.LXABRInterface#getDescription()
-	 */
-	public String getDescription() {
-		return "Create Special Bid - LSEOBUNDLE";
-	}
-
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.sg.LXABRInterface#getTitle()
-	 */
-	public String getTitle() {
-		return "LSEOBUNDLE "+LXABRSTATUS.TITLE+(lxAbr.getReturnCode()==PokBaseABR.PASS?" created":"");
-	}
-
-	/* (non-Javadoc)
-	 * @see COM.ibm.eannounce.abr.sg.LXABRInterface#getVersion()
-	 */
-	public String getVersion() {
-		return "1.11";
-	}
-
-}

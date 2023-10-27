@@ -1,1017 +1,1023 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2005, 2006  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-//CATLGPUBABR02.java,v
-//Revision 1.28  2008/09/09 12:52:08  wendy
-//Cleanup RSA warnings
-//
-//Revision 1.27  2008/05/29 21:13:21  wendy
-//MN35543346 - dont update custimize in this abr
-//
-//Revision 1.26  2008/01/04 16:45:32  wendy
-//MN33416775 handling of salesstatus chgs
-//
-//Revision 1.25  2007/05/04 13:30:54  wendy
-//RQ022507373 and MN31580435 updates
-//
-//Revision 1.24  2007/02/12 19:13:57  wendy
-//Changed no SS found from fail to pass
-//
-//Revision 1.23  2006/12/18 14:19:35  wendy
-//MN30141434, 30208266, 30237329, 30173561, 30262285
-//default a null PUBTO to '9999-12-31'
-//always update CATLGPUBs, just report errors
-//only do error chk3 for LSEO with ss='ZJ' and after all other ss have been checked
-//use country filter too to find LSEOBUNDLE for LSEO
-//handle ss for SWMODEL as well as MODEL
-//use first 4 chars from MATNR in search, don't find flag code
-//AHE and jtest modifications
-//
-//Revision 1.22  2006/09/26 18:42:06  joan
-//working on catlgpub
-//
-//Revision 1.21  2006/09/26 01:29:35  joan
-//fixes
-//
-//Revision 1.20  2006/09/26 01:23:55  joan
-//fixes
-//
-//Revision 1.19  2006/09/26 00:55:44  joan
-//add catupdatedby
-//
-//Revision 1.18  2006/08/30 19:37:41  joan
-//changes
-//
-//Revision 1.17  2006/08/24 00:31:41  joan
-//changes
-//
-//Revision 1.16  2006/08/18 22:28:38  joan
-//fixes
-//
-//Revision 1.15  2006/08/09 21:27:39  joan
-//fixes
-//
-//Revision 1.14  2006/08/09 20:47:11  joan
-//fixes
-//
-//Revision 1.13  2006/03/10 18:20:32  joan
-//fixes
-//
-//Revision 1.12  2006/03/09 17:43:54  joan
-//fixes
-//
-//Revision 1.11  2006/03/03 19:23:26  bala
-//remove reference to Constants.CSS
-//
-//Revision 1.10  2006/01/24 17:00:32  yang
-//Jtest Changes
-//
-//Revision 1.9  2005/12/23 18:49:59  joan
-//fixes
-//
-//Revision 1.8  2005/12/07 21:01:43  joan
-//fixes
-//
-//Revision 1.7  2005/11/16 17:29:55  joan
-//fixes
-//
-//Revision 1.6  2005/11/14 18:43:58  joan
-//fixes
-//
-//Revision 1.5  2005/11/02 18:21:10  joan
-//fixes
-//
-//Revision 1.4  2005/11/02 00:44:09  joan
-//fixes
-//
-//Revision 1.3  2005/11/01 17:22:21  joan
-//fixes
-//
-//Revision 1.2  2005/10/31 23:54:05  joan
-//fixes
-//
-//Revision 1.1  2005/10/31 22:35:53  joan
-//add abr
-//
-//Revision 1.1  2005/10/18 22:06:52  joan
-//add new abr
-//
-//
+/*      */ package COM.ibm.eannounce.abr.sg;
+/*      */ 
+/*      */ import COM.ibm.eannounce.abr.util.EACustom;
+/*      */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*      */ import COM.ibm.eannounce.objects.EANAttribute;
+/*      */ import COM.ibm.eannounce.objects.EANList;
+/*      */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*      */ import COM.ibm.eannounce.objects.EANObject;
+/*      */ import COM.ibm.eannounce.objects.EntityGroup;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.EntityList;
+/*      */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*      */ import COM.ibm.eannounce.objects.PDGUtility;
+/*      */ import COM.ibm.eannounce.objects.SBRException;
+/*      */ import COM.ibm.eannounce.objects.SalesStatusInfo;
+/*      */ import COM.ibm.eannounce.objects.SalesStatusItem;
+/*      */ import COM.ibm.opicmpdh.middleware.D;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*      */ import COM.ibm.opicmpdh.middleware.ReturnDataResultSet;
+/*      */ import COM.ibm.opicmpdh.middleware.ReturnStatus;
+/*      */ import COM.ibm.opicmpdh.transactions.OPICMList;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.io.PrintWriter;
+/*      */ import java.io.StringWriter;
+/*      */ import java.sql.ResultSet;
+/*      */ import java.sql.SQLException;
+/*      */ import java.text.MessageFormat;
+/*      */ import java.util.Hashtable;
+/*      */ import java.util.Vector;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public class CATLGPUBABR02
+/*      */   extends PokBaseABR
+/*      */ {
+/*      */   private static final String STARTDATE = "1980-01-01-00.00.00.000000";
+/*      */   private static final String FOREVER = "9999-12-31-00.00.00.000000";
+/*      */   private static final String ABR = "CATLGPUBABR02";
+/*      */   private static final String ATT_CATSEOID = "CATSEOID";
+/*      */   private static final String ATT_CATADDTOCART = "CATADDTOCART";
+/*      */   private static final String ATT_CATBUYABLE = "CATBUYABLE";
+/*      */   private static final String ATT_CATHIDE = "CATHIDE";
+/*      */   private static final String ATT_CATSALESSTATUS = "CATSALESSTATUS";
+/*      */   private static final String ATT_CATOFFTYPE = "CATOFFTYPE";
+/*      */   private static final String ATT_CATMACHTYPE = "CATMACHTYPE";
+/*      */   private static final String ATT_CATMODEL = "CATMODEL";
+/*      */   private static final String ATT_COFCAT = "COFCAT";
+/*      */   private static final String HW = "100";
+/*      */   private static final String SW = "101";
+/*      */   private static final String SVC = "102";
+/*      */   private static final String ATT_PT = "PUBTO";
+/*      */   private static final String ATT_SEOID = "SEOID";
+/*      */   private static final String ATT_CATWORKFLOW = "CATWORKFLOW";
+/*      */   private static final String ATT_CATLGOFFPUBLASTRUN = "CATLGOFFPUBLASTRUN";
+/*      */   private static final String ATT_OFFCOUNTRY = "OFFCOUNTRY";
+/*      */   private static final int I64 = 64;
+/*  152 */   private PDGUtility m_utility = new PDGUtility();
+/*  153 */   private String strUpdatedBy = null;
+/*  154 */   private String strOFFCOUNTRY = null;
+/*  155 */   private String strCurrentDate = null;
+/*  156 */   private String strCATLGOFFPUBLASTRUN = null;
+/*  157 */   private int updateCount = 0;
+/*      */   private boolean outputWarning = false;
+/*      */   private static final String SS_EXTRACTNAME = "EXCATLGPUBVE";
+/*  160 */   private Hashtable sskeyTbl = new Hashtable<>();
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void execute_run() {
+/*      */     try {
+/*  169 */       EntityGroup entityGroup = null;
+/*  170 */       EntityItem entityItem = null;
+/*  171 */       String str3 = null;
+/*      */       
+/*  173 */       String str4 = null;
+/*      */       
+/*  175 */       start_ABRBuild(false);
+/*  176 */       println(EACustom.getDocTypeHtml());
+/*      */       
+/*  178 */       println("<head>" + EACustom.NEWLINE + 
+/*  179 */           EACustom.getMetaTags(getDescription()) + EACustom.NEWLINE + 
+/*  180 */           EACustom.getCSS() + EACustom.NEWLINE + 
+/*  181 */           EACustom.getTitle(getDescription()) + EACustom.NEWLINE + "</head>" + EACustom.NEWLINE + "<body id=\"ibm-com\">");
+/*      */ 
+/*      */ 
+/*      */       
+/*  185 */       println(EACustom.getMastheadDiv());
+/*      */       
+/*  187 */       setReturnCode(0);
+/*      */       
+/*  189 */       str3 = this.m_db.getDates().getNow();
+/*  190 */       this.strCurrentDate = str3.substring(0, 10);
+/*  191 */       this.strUpdatedBy = "CATLGPUBABR02" + getRevision() + str3;
+/*      */ 
+/*      */       
+/*  194 */       this.m_prof = this.m_utility.setProfValOnEffOn(this.m_db, this.m_prof);
+/*      */       
+/*  196 */       printHeader(str3);
+/*      */ 
+/*      */       
+/*  199 */       entityGroup = new EntityGroup(null, this.m_db, this.m_prof, this.m_abri.getEntityType(), "Edit", false);
+/*  200 */       entityItem = new EntityItem(entityGroup, this.m_prof, this.m_db, this.m_abri.getEntityType(), this.m_abri.getEntityID());
+/*      */       
+/*  202 */       println("<p class=\"ibm-intro ibm-alternate-three\"><em>Catalog Country: " + entityItem.getKey() + "</em></p>");
+/*      */       
+/*  204 */       printNavigateAttributes(entityItem, entityGroup);
+/*      */ 
+/*      */ 
+/*      */       
+/*  208 */       this.strCATLGOFFPUBLASTRUN = this.m_utility.getAttrValue(entityItem, "CATLGOFFPUBLASTRUN");
+/*  209 */       if (this.strCATLGOFFPUBLASTRUN == null || this.strCATLGOFFPUBLASTRUN.length() <= 0) {
+/*  210 */         OPICMList oPICMList1 = new OPICMList();
+/*  211 */         this.strCATLGOFFPUBLASTRUN = "1980-01-01-00.00.00.000000";
+/*  212 */         oPICMList1.put("CATLGOFFPUBLASTRUN", "CATLGOFFPUBLASTRUN=" + this.strCATLGOFFPUBLASTRUN);
+/*  213 */         this.m_utility.updateAttribute(this.m_db, this.m_prof, entityItem, oPICMList1);
+/*      */       }
+/*  215 */       else if (!this.m_utility.isDateFormat(this.strCATLGOFFPUBLASTRUN)) {
+/*  216 */         println("<h2>CATLGOFFPUBLASTRUN is not in date format 1980-01-01 or 1980-01-01-00.00.00.000000.</h2>");
+/*  217 */         setReturnCode(-1);
+/*      */       }
+/*  219 */       else if (this.strCATLGOFFPUBLASTRUN.length() == 10) {
+/*  220 */         OPICMList oPICMList1 = new OPICMList();
+/*  221 */         this.strCATLGOFFPUBLASTRUN += "-00.00.00.000000";
+/*  222 */         oPICMList1.put("CATLGOFFPUBLASTRUN", "CATLGOFFPUBLASTRUN=" + this.strCATLGOFFPUBLASTRUN);
+/*  223 */         this.m_utility.updateAttribute(this.m_db, this.m_prof, entityItem, oPICMList1);
+/*      */       } 
+/*      */ 
+/*      */ 
+/*      */       
+/*  228 */       this.strOFFCOUNTRY = this.m_utility.getAttrValue(entityItem, "OFFCOUNTRY");
+/*  229 */       str4 = this.m_utility.getAttrValueDesc(entityItem, "OFFCOUNTRY");
+/*  230 */       if (this.strOFFCOUNTRY == null || this.strOFFCOUNTRY.length() <= 0) {
+/*  231 */         println("<h2>OFFCOUNTRY is blank.</h2>");
+/*  232 */         setReturnCode(-1);
+/*      */       } 
+/*      */       
+/*  235 */       println("<!-- CATLGOFFPUBLASTRUN:" + this.strCATLGOFFPUBLASTRUN + " OFFCOUNTRY: " + str4 + " -->");
+/*      */       
+/*  237 */       if (getReturnCode() == 0) {
+/*      */ 
+/*      */ 
+/*      */         
+/*  241 */         EANList eANList = null;
+/*      */         
+/*  243 */         ExtractActionItem extractActionItem = new ExtractActionItem(null, this.m_db, this.m_prof, "EXTCATLGCNTRYGAA1");
+/*  244 */         String str5 = this.m_utility.getGENAREACODE(this.m_db, this.m_prof, extractActionItem, entityItem, this.strOFFCOUNTRY);
+/*  245 */         String str6 = "";
+/*  246 */         if (str5.indexOf(":") > 0) {
+/*  247 */           int i = str5.indexOf(":");
+/*  248 */           str6 = str5.substring(i + 1);
+/*  249 */           str5 = str5.substring(0, i);
+/*      */         } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/*  255 */         eANList = getFilteredSalesStatus(str6, this.strCurrentDate);
+/*  256 */         if (eANList.size() <= 0) {
+/*  257 */           println("<h2>No updated salesstatus records found for SEO, MODEL or SWMODEL with offering country: " + str4 + ", GENAREACODE:" + str6 + "</h2>");
+/*      */         }
+/*      */         else {
+/*      */           
+/*  261 */           Vector<String> vector = new Vector();
+/*  262 */           println("<!-- Found " + eANList.size() + " salesstatus records found SEO, MODEL or SWMODEL with offering country: " + str4 + ", GENAREACODE:" + str6 + " -->");
+/*      */ 
+/*      */           
+/*  265 */           ExtractActionItem extractActionItem1 = new ExtractActionItem(null, this.m_db, this.m_prof, "EXCATLGPUBVE");
+/*      */           
+/*      */           byte b;
+/*  268 */           for (b = 0; b < eANList.size(); b++) {
+/*      */             
+/*  270 */             SalesStatusItem salesStatusItem = (SalesStatusItem)eANList.getAt(b);
+/*  271 */             String str = salesStatusItem.getMATERIALSTATUS();
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */             
+/*  279 */             Vector<EntityItem> vector1 = findCatlgpub(salesStatusItem);
+/*  280 */             println("<!-- Checked SS[" + b + "] " + salesStatusItem.dump(true) + " found " + vector1.size() + " CATLGPUB -->");
+/*  281 */             for (byte b1 = 0; b1 < vector1.size(); b1++) {
+/*  282 */               String str7 = null;
+/*  283 */               String str8 = null;
+/*  284 */               int i = 0;
+/*  285 */               EntityItem entityItem1 = vector1.elementAt(b1);
+/*  286 */               D.ebug(4, "CATLGPUBABR02 found " + entityItem1.getKey());
+/*      */               
+/*  288 */               str7 = this.m_utility.getAttrValue(entityItem1, "PUBTO");
+/*  289 */               if (str7.length() == 0) {
+/*  290 */                 str7 = "9999-12-31-00.00.00.000000".substring(0, 10);
+/*      */               }
+/*  292 */               str8 = this.m_utility.getAttrValue(entityItem1, "CATOFFTYPE");
+/*  293 */               println("<!-- found " + entityItem1.getKey() + " [" + b1 + "] curDate: " + this.strCurrentDate + " PUBTO: " + str7 + " " + "CATOFFTYPE" + ": " + str8 + " -->");
+/*      */               
+/*  295 */               i = this.m_utility.dateCompare(str7, this.strCurrentDate);
+/*      */               
+/*  297 */               if (str.equals("ZJ")) {
+/*  298 */                 if (i == 1) {
+/*  299 */                   String str9 = "Sales Status Withdraw prior to the Publish To date. <br />SALES_STATUS.MATERIALSTATUS: " + str;
+/*      */                   
+/*  301 */                   printAllAttributes(str9, entityItem1);
+/*  302 */                   setReturnCode(-1);
+/*      */                 } 
+/*  304 */                 if (str8.equals("LSEO")) {
+/*  305 */                   String str9 = this.m_utility.getAttrValue(entityItem1, "CATSEOID");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */                   
+/*  310 */                   if (!vector.contains(str9)) {
+/*  311 */                     vector.add(str9);
+/*      */                   
+/*      */                   }
+/*      */                 }
+/*      */               
+/*      */               }
+/*  317 */               else if (i == 2) {
+/*  318 */                 String str9 = "Sales Status is not Withdraw after the Publish To date. <br />SALES_STATUS.MATERIALSTATUS: " + str;
+/*      */                 
+/*  320 */                 printAllAttributes(str9, entityItem1);
+/*  321 */                 setReturnCode(-1);
+/*      */               } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */               
+/*  331 */               updateCatlgpub(entityItem1, str, extractActionItem1);
+/*      */             } 
+/*      */             
+/*  334 */             vector1.clear();
+/*      */           } 
+/*      */           
+/*  337 */           if (vector.size() > 0) {
+/*  338 */             for (b = 0; b < vector.size(); b++) {
+/*  339 */               String str = vector.elementAt(b);
+/*      */ 
+/*      */               
+/*  342 */               checkParentLseoBundleCatlgpub(str, "ZJ");
+/*      */             } 
+/*      */             
+/*  345 */             vector.clear();
+/*      */           } 
+/*      */           
+/*  348 */           eANList.clear();
+/*      */         } 
+/*      */       } 
+/*      */ 
+/*      */ 
+/*      */       
+/*  354 */       OPICMList oPICMList = new OPICMList();
+/*  355 */       oPICMList.put("CATLGOFFPUBLASTRUN", "CATLGOFFPUBLASTRUN=" + str3);
+/*  356 */       this.m_utility.updateAttribute(this.m_db, this.m_prof, entityItem, oPICMList);
+/*  357 */       this.sskeyTbl.clear();
+/*      */       
+/*  359 */       println("<!-- Updated a total of " + this.updateCount + " CATLGPUB entities -->");
+/*  360 */     } catch (SBRException sBRException) {
+/*  361 */       String str2 = sBRException.toString();
+/*  362 */       int i = str2.indexOf("(ok)");
+/*  363 */       if (i < 0) {
+/*  364 */         setReturnCode(-2);
+/*  365 */         println("<h3><span style=\"color:#c00; font-weight:bold;\">Generate Data error: <pre>" + str2 + "</pre></span></h3>");
+/*      */         
+/*  367 */         logError(sBRException.toString());
+/*      */       } else {
+/*  369 */         str2 = str2.substring(0, i);
+/*  370 */         println("<pre>" + str2 + "</pre>");
+/*      */       } 
+/*  372 */     } catch (Throwable throwable) {
+/*  373 */       String[] arrayOfString = new String[1];
+/*  374 */       StringWriter stringWriter = new StringWriter();
+/*  375 */       String str3 = "<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
+/*  376 */       String str4 = "<pre>{0}</pre>";
+/*  377 */       MessageFormat messageFormat = new MessageFormat(str3);
+/*  378 */       setReturnCode(-1);
+/*  379 */       throwable.printStackTrace(new PrintWriter(stringWriter));
+/*      */       
+/*  381 */       arrayOfString[0] = throwable.getMessage();
+/*  382 */       println(messageFormat.format(arrayOfString));
+/*  383 */       messageFormat = new MessageFormat(str4);
+/*  384 */       arrayOfString[0] = stringWriter.getBuffer().toString();
+/*  385 */       println(messageFormat.format(arrayOfString));
+/*  386 */       logError("Exception: " + throwable.getMessage());
+/*  387 */       logError(stringWriter.getBuffer().toString());
+/*      */     } finally {
+/*  389 */       String str1 = null;
+/*  390 */       String str2 = buildMessage("IAB2016I: %1# has %2#.", new String[] { getABRDescription(), (getReturnCode() == 0) ? "Passed" : "Failed" });
+/*  391 */       println("<p><b>" + str2 + "</b></p>");
+/*  392 */       log(str2);
+/*      */ 
+/*      */       
+/*  395 */       str1 = getABRDescription() + ":" + getEntityType() + ":" + getEntityID();
+/*  396 */       if (str1.length() > 64) {
+/*  397 */         str1 = str1.substring(0, 64);
+/*      */       }
+/*  399 */       setDGTitle(str1);
+/*  400 */       setDGRptName("CATLGPUBABR02");
+/*      */ 
+/*      */       
+/*  403 */       setDGString(getABRReturnCode());
+/*      */       
+/*  405 */       println(EACustom.getTOUDiv());
+/*      */ 
+/*      */ 
+/*      */       
+/*  409 */       printDGSubmitString();
+/*  410 */       buildReportFooter();
+/*      */ 
+/*      */       
+/*  413 */       if (!isReadOnly()) {
+/*  414 */         clearSoftLock();
+/*      */       }
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EANList getFilteredSalesStatus(String paramString1, String paramString2) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  434 */     String str1 = "CATLGPUBABR02 getFilteredSalesStatus method ";
+/*      */     
+/*  436 */     ReturnDataResultSet returnDataResultSet = null;
+/*  437 */     ResultSet resultSet = null;
+/*  438 */     ReturnStatus returnStatus = new ReturnStatus(-1);
+/*  439 */     EANList eANList = new EANList();
+/*  440 */     String str2 = this.m_utility.getDate(paramString2, 1);
+/*      */     
+/*  442 */     D.ebug(4, str1 + paramString1 + " currentDate:" + paramString2 + " tomorrow:" + str2);
+/*      */     try {
+/*  444 */       resultSet = this.m_db.callGBL9305(returnStatus, paramString1);
+/*  445 */       returnDataResultSet = new ReturnDataResultSet(resultSet);
+/*      */     } finally {
+/*  447 */       if (resultSet != null) {
+/*  448 */         resultSet.close();
+/*      */       }
+/*  450 */       resultSet = null;
+/*  451 */       this.m_db.commit();
+/*  452 */       this.m_db.freeStatement();
+/*  453 */       this.m_db.isPending();
+/*      */     } 
+/*  455 */     if (returnDataResultSet != null) {
+/*  456 */       for (byte b = 0; b < returnDataResultSet.size(); b++) {
+/*  457 */         String str3 = returnDataResultSet.getColumn(b, 0).trim();
+/*  458 */         String str4 = returnDataResultSet.getColumn(b, 1).trim();
+/*  459 */         String str5 = returnDataResultSet.getColumn(b, 2).trim();
+/*  460 */         String str6 = returnDataResultSet.getColumn(b, 3).trim();
+/*  461 */         String str7 = returnDataResultSet.getColumn(b, 4).trim();
+/*  462 */         String str8 = returnDataResultSet.getColumn(b, 5).trim();
+/*  463 */         String str9 = returnDataResultSet.getColumn(b, 6).trim();
+/*  464 */         String str10 = returnDataResultSet.getColumn(b, 7).trim();
+/*  465 */         this.m_db.debug(4, str1 + " gbl9305 result:" + str3 + ":" + str4 + ":" + str5 + ":" + str6 + ":" + str7 + ":" + str8 + ":" + str9 + ":" + str10);
+/*      */ 
+/*      */ 
+/*      */         
+/*  469 */         if ((str5.equalsIgnoreCase("MODEL") || str5
+/*  470 */           .equalsIgnoreCase("SWMODEL") || str5
+/*  471 */           .equalsIgnoreCase("SEO")) && 
+/*  472 */           str10.equals("N")) {
+/*  473 */           boolean bool = false;
+/*      */           
+/*  475 */           int i = this.m_utility.longDateCompare(str9, this.strCATLGOFFPUBLASTRUN);
+/*  476 */           if (i == 1 && str8
+/*  477 */             .compareTo(paramString2) <= 0) {
+/*  478 */             bool = true;
+/*      */           }
+/*      */           
+/*  481 */           if (str8.equals(str2)) {
+/*  482 */             bool = true;
+/*      */           }
+/*  484 */           if (bool) {
+/*  485 */             String str = str3 + str4 + str5 + str6;
+/*  486 */             if (eANList.get(str) == null) {
+/*  487 */               SalesStatusItem salesStatusItem = new SalesStatusItem(this.m_prof, str);
+/*  488 */               salesStatusItem.setMATNR(str3);
+/*  489 */               salesStatusItem.setVARCOND(str4);
+/*  490 */               salesStatusItem.setVARCONDTYPE(str5);
+/*  491 */               salesStatusItem.setSALESORG(str6);
+/*  492 */               salesStatusItem.setMATERIALSTATUS(str7);
+/*  493 */               salesStatusItem.setMATERIALSTATUSDATE(str8);
+/*  494 */               salesStatusItem.setLASTUPDATED(str9);
+/*  495 */               salesStatusItem.setMARKEDFORDELETION(str10);
+/*  496 */               eANList.put((EANObject)salesStatusItem);
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     }
+/*      */     
+/*  503 */     return eANList;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkParentLseoBundleCatlgpub(String paramString1, String paramString2) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException, SBRException {
+/*  525 */     String str = "SRDLSEO1";
+/*  526 */     StringBuffer stringBuffer = new StringBuffer();
+/*  527 */     stringBuffer.append("map_SEOID=" + paramString1);
+/*      */     
+/*  529 */     EntityItem[] arrayOfEntityItem = this.m_utility.dynaSearch(this.m_db, this.m_prof, null, str, "LSEO", stringBuffer.toString());
+/*  530 */     if (arrayOfEntityItem != null && arrayOfEntityItem.length > 0) {
+/*  531 */       ExtractActionItem extractActionItem = new ExtractActionItem(null, this.m_db, this.m_prof, "EXTLSEO1");
+/*      */       
+/*  533 */       EntityList entityList = EntityList.getEntityList(this.m_db, this.m_prof, extractActionItem, arrayOfEntityItem);
+/*  534 */       EntityGroup entityGroup = entityList.getEntityGroup("LSEOBUNDLE");
+/*      */       byte b;
+/*  536 */       for (b = 0; b < entityList.getParentEntityGroup().getEntityItemCount(); b++) {
+/*  537 */         EntityItem entityItem = entityList.getParentEntityGroup().getEntityItem(b);
+/*  538 */         println("<!-- found " + entityItem.getKey() + " for CATSEOID: " + paramString1 + " -->");
+/*      */       } 
+/*      */       
+/*  541 */       if (entityGroup != null) {
+/*  542 */         for (b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/*      */           
+/*  544 */           EntityItem entityItem = entityGroup.getEntityItem(b);
+/*  545 */           String str1 = this.m_utility.getAttrValue(entityItem, "SEOID");
+/*  546 */           println("<!-- found parent " + entityItem.getKey() + " for child LSEO.CATSEOID: " + paramString1 + " -->");
+/*      */ 
+/*      */           
+/*  549 */           stringBuffer = new StringBuffer();
+/*  550 */           stringBuffer.append("map_OFFCOUNTRY=" + this.strOFFCOUNTRY + ";");
+/*  551 */           stringBuffer.append("map_CATSEOID=" + str1 + ";");
+/*  552 */           stringBuffer.append("map_CATOFFTYPE=BUNDLE");
+/*  553 */           str = "SRDCATLGPUB1";
+/*  554 */           EntityItem[] arrayOfEntityItem1 = this.m_utility.dynaSearch(this.m_db, this.m_prof, null, str, "CATLGPUB", stringBuffer.toString());
+/*      */           
+/*  556 */           if (arrayOfEntityItem1 != null && arrayOfEntityItem1.length > 0) {
+/*  557 */             for (byte b1 = 0; b1 < arrayOfEntityItem1.length; b1++) {
+/*  558 */               int i = 0;
+/*  559 */               EntityItem entityItem1 = arrayOfEntityItem1[b1];
+/*  560 */               String str2 = this.m_utility.getAttrValue(entityItem1, "PUBTO");
+/*  561 */               if (str2.length() == 0) {
+/*  562 */                 str2 = "9999-12-31-00.00.00.000000".substring(0, 10);
+/*      */               }
+/*      */               
+/*  565 */               println("<!-- parent " + entityItem.getKey() + " has " + entityItem1.getKey() + " curDate: " + this.strCurrentDate + " PUBTO: " + str2 + " SEOID: " + str1 + " -->");
+/*      */               
+/*  567 */               i = this.m_utility.dateCompare(str2, this.strCurrentDate);
+/*  568 */               if (i == 1) {
+/*  569 */                 String str3 = "LSEO Sales Status Withdraw prior to the LSEOBUNDLE. <br />SALES_STATUS.MATERIALSTATUS: " + paramString2;
+/*      */                 
+/*  571 */                 printAllAttributes(str3, entityItem1);
+/*  572 */                 setReturnCode(-1);
+/*      */               } 
+/*      */             } 
+/*      */           } else {
+/*      */             
+/*  577 */             println("<!-- NO CATLGPUB found for " + stringBuffer + " -->");
+/*      */           } 
+/*      */         } 
+/*      */       } else {
+/*      */         
+/*  582 */         println("<h2>Error: VE for EXTLSEO1 is missing LSEOBUNDLE group </h2>");
+/*  583 */         setReturnCode(-1);
+/*      */       } 
+/*      */       
+/*  586 */       entityList.dereference();
+/*      */     } else {
+/*      */       
+/*  589 */       println("<!-- NO LSEO found for " + stringBuffer + " -->");
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector findCatlgpub(SalesStatusItem paramSalesStatusItem) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException, SBRException {
+/*  606 */     Vector vector = new Vector();
+/*  607 */     String str1 = paramSalesStatusItem.getMATNR().trim();
+/*  608 */     String str2 = paramSalesStatusItem.getVARCONDTYPE();
+/*  609 */     StringBuffer stringBuffer = new StringBuffer();
+/*      */     
+/*  611 */     D.ebug(4, "CATLGPUBABR02 info from SalesStatusItem: " + paramSalesStatusItem.dump(true));
+/*  612 */     if (str2.equalsIgnoreCase("MODEL") || str2.equalsIgnoreCase("SWMODEL")) {
+/*  613 */       if (str1.length() >= 4) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/*  619 */         stringBuffer.append("map_CATMACHTYPE=" + str1.substring(0, 4) + ";");
+/*  620 */         stringBuffer.append("map_CATMODEL=" + str1.substring(4) + ";");
+/*  621 */         stringBuffer.append("map_OFFCOUNTRY=" + this.strOFFCOUNTRY + ";");
+/*  622 */         stringBuffer.append("map_CATOFFTYPE=MODEL");
+/*      */         
+/*  624 */         doCatlgpubSearch(stringBuffer, vector);
+/*      */       
+/*      */       }
+/*      */       else {
+/*      */ 
+/*      */         
+/*  630 */         println("<!--findCatlgpub: skipping " + str2 + " with MATNR<4 " + str1 + " -->");
+/*      */       } 
+/*  632 */     } else if (str2.equalsIgnoreCase("SEO")) {
+/*  633 */       StringBuffer stringBuffer1 = new StringBuffer();
+/*  634 */       stringBuffer.append("map_CATSEOID=" + str1 + ";");
+/*  635 */       stringBuffer.append("map_OFFCOUNTRY=" + this.strOFFCOUNTRY + ";");
+/*  636 */       stringBuffer.append("map_CATOFFTYPE=LSEO");
+/*      */       
+/*  638 */       doCatlgpubSearch(stringBuffer, vector);
+/*      */       
+/*  640 */       stringBuffer1.append("map_CATSEOID=" + str1 + ";");
+/*  641 */       stringBuffer1.append("map_OFFCOUNTRY=" + this.strOFFCOUNTRY + ";");
+/*  642 */       stringBuffer1.append("map_CATOFFTYPE=BUNDLE");
+/*      */       
+/*  644 */       doCatlgpubSearch(stringBuffer1, vector);
+/*      */     } 
+/*      */     
+/*  647 */     return vector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void doCatlgpubSearch(StringBuffer paramStringBuffer, Vector<EntityItem> paramVector) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException, SBRException {
+/*  659 */     String str = "SRDCATLGPUB1";
+/*  660 */     EntityItem[] arrayOfEntityItem = null;
+/*      */     
+/*  662 */     D.ebug(4, "CATLGPUBABR02 looking for CATLGPUB matching: " + paramStringBuffer);
+/*  663 */     arrayOfEntityItem = this.m_utility.dynaSearch(this.m_db, this.m_prof, null, str, "CATLGPUB", paramStringBuffer.toString());
+/*  664 */     if (arrayOfEntityItem != null && arrayOfEntityItem.length > 0) {
+/*  665 */       for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/*  666 */         EntityItem entityItem = arrayOfEntityItem[b];
+/*  667 */         paramVector.addElement(entityItem);
+/*  668 */         arrayOfEntityItem[b] = null;
+/*      */       } 
+/*      */     } else {
+/*  671 */       D.ebug(4, "CATLGPUBABR02 Unable to find CATLGPUB for " + paramStringBuffer);
+/*  672 */       println("<!--doCatlgpubSearch: Unable to find CATLGPUB for " + paramStringBuffer + " -->");
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void updateCatlgpub(EntityItem paramEntityItem, String paramString, ExtractActionItem paramExtractActionItem) throws MiddlewareException, MiddlewareShutdownInProgressException, SQLException, SBRException {
+/*  688 */     OPICMList oPICMList = new OPICMList();
+/*  689 */     String str1 = "";
+/*  690 */     String str2 = "";
+/*  691 */     String str3 = "";
+/*      */ 
+/*      */ 
+/*      */     
+/*  695 */     if (SalesStatusInfo.isSimpleSS(paramString)) {
+/*  696 */       SalesStatusInfo salesStatusInfo = SalesStatusInfo.getSalesStatusInfo(paramString, "");
+/*  697 */       println("<!--updateCatlgpub: sskey: " + paramString + " values " + salesStatusInfo + " -->");
+/*      */       
+/*  699 */       str3 = salesStatusInfo.getAddToCart();
+/*  700 */       str1 = salesStatusInfo.getBuyable();
+/*  701 */       str2 = salesStatusInfo.getHide();
+/*      */     } else {
+/*      */       
+/*  704 */       SalesStatusInfo salesStatusInfo = findSalesStatusInfo(paramEntityItem, paramString, paramExtractActionItem);
+/*      */ 
+/*      */       
+/*  707 */       str3 = salesStatusInfo.getAddToCart();
+/*  708 */       str1 = salesStatusInfo.getBuyable();
+/*  709 */       str2 = salesStatusInfo.getHide();
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  731 */     if (!this.m_utility.getAttrValue(paramEntityItem, "CATSALESSTATUS").equals(paramString)) {
+/*  732 */       oPICMList.put("CATSALESSTATUS", "CATSALESSTATUS=" + paramString);
+/*      */     }
+/*      */     
+/*  735 */     if (!this.m_utility.getAttrValue(paramEntityItem, "CATADDTOCART").equals(str3)) {
+/*  736 */       oPICMList.put("CATADDTOCART", "CATADDTOCART=" + str3);
+/*      */     }
+/*      */     
+/*  739 */     if (!this.m_utility.getAttrValue(paramEntityItem, "CATBUYABLE").equals(str1)) {
+/*  740 */       oPICMList.put("CATBUYABLE", "CATBUYABLE=" + str1);
+/*      */     }
+/*      */     
+/*  743 */     if (!this.m_utility.getAttrValue(paramEntityItem, "CATHIDE").equals(str2)) {
+/*  744 */       oPICMList.put("CATHIDE", "CATHIDE=" + str2);
+/*      */     }
+/*      */     
+/*  747 */     if (oPICMList.size() > 0) {
+/*  748 */       String str = this.m_utility.getAttrValue(paramEntityItem, "CATWORKFLOW");
+/*      */       
+/*  750 */       if (str.equals("Override")) {
+/*  751 */         oPICMList.put("CATWORKFLOW", "CATWORKFLOW=SalesStatusOverride");
+/*  752 */       } else if (str.equals("Accept")) {
+/*  753 */         oPICMList.put("CATWORKFLOW", "CATWORKFLOW=Change");
+/*  754 */       } else if (str.equals("New")) {
+/*  755 */         oPICMList.put("CATWORKFLOW", "CATWORKFLOW=Change");
+/*      */       } 
+/*  757 */       if (this.strUpdatedBy != null && this.strUpdatedBy.length() > 0) {
+/*  758 */         oPICMList.put("CATUPDATEDBY", "CATUPDATEDBY=" + this.strUpdatedBy);
+/*      */       }
+/*      */       
+/*  761 */       println("<!--updateCatlgpub: Updating " + paramEntityItem.getKey() + " using " + oPICMList + " -->");
+/*  762 */       this.m_utility.updateAttribute(this.m_db, this.m_prof, paramEntityItem, oPICMList);
+/*  763 */       this.updateCount++;
+/*      */     } else {
+/*  765 */       println("<!--updateCatlgpub: NO changes found for " + paramEntityItem.getKey() + " -->");
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private SalesStatusInfo findSalesStatusInfo(EntityItem paramEntityItem, String paramString, ExtractActionItem paramExtractActionItem) throws MiddlewareException, MiddlewareShutdownInProgressException, SQLException {
+/*  791 */     String str1 = "";
+/*  792 */     String str2 = "";
+/*  793 */     String str3 = "";
+/*  794 */     String str4 = "";
+/*  795 */     EntityItem[] arrayOfEntityItem = { paramEntityItem };
+/*      */     
+/*  797 */     String str5 = this.m_utility.getAttrValue(paramEntityItem, "CATOFFTYPE");
+/*  798 */     println("<!--findSalesStatusInfo: " + paramEntityItem.getKey() + " offtype: " + str5 + " ss: " + paramString + " -->");
+/*  799 */     if ("MODEL".equals(str5)) {
+/*      */       
+/*  801 */       str4 = this.m_utility.getAttrValue(paramEntityItem, "CATMACHTYPE") + this.m_utility.getAttrValue(paramEntityItem, "CATMODEL");
+/*      */     } else {
+/*      */       
+/*  804 */       str4 = this.m_utility.getAttrValue(paramEntityItem, "CATSEOID") + this.m_utility.getAttrValue(paramEntityItem, "CATSEOID");
+/*      */     } 
+/*      */     
+/*  807 */     String str6 = (String)this.sskeyTbl.get(str4);
+/*  808 */     if (str6 == null) {
+/*      */       
+/*  810 */       EntityList entityList = EntityList.getEntityList(this.m_db, this.m_prof, paramExtractActionItem, arrayOfEntityItem);
+/*  811 */       println("<!--findSalesStatusInfo: Extract EXCATLGPUBVE " + PokUtils.outputList(entityList) + " -->");
+/*      */       
+/*  813 */       EntityGroup entityGroup = null;
+/*  814 */       if ("MODEL".equals(str5)) {
+/*  815 */         entityGroup = entityList.getEntityGroup("MODEL");
+/*  816 */         if (entityGroup.getEntityItemCount() == 0) {
+/*  817 */           println("<!--findSalesStatusInfo: ERROR no " + entityGroup.getEntityType() + " found -->");
+/*      */         } else {
+/*  819 */           EntityItem entityItem = entityGroup.getEntityItem(0);
+/*  820 */           str1 = this.m_utility.getAttrValue(entityItem, "COFCAT");
+/*  821 */           println("<!--findSalesStatusInfo: using " + entityItem.getKey() + " cofcat: " + str1 + " -->");
+/*      */         } 
+/*  823 */         str6 = str1;
+/*  824 */       } else if ("BUNDLE".equals(str5)) {
+/*  825 */         str2 = "yes";
+/*  826 */         entityGroup = entityList.getEntityGroup("LSEOBUNDLE");
+/*  827 */         if (entityGroup.getEntityItemCount() == 0) {
+/*  828 */           println("<!--findSalesStatusInfo: ERROR no " + entityGroup.getEntityType() + " found -->");
+/*      */         } else {
+/*  830 */           EntityItem entityItem = entityGroup.getEntityItem(0);
+/*  831 */           str3 = this.m_utility.getAttrValue(entityItem, "SPECBID");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */           
+/*  836 */           String str = this.m_utility.getAttrValue(entityItem, "BUNDLETYPE");
+/*  837 */           if (str.length() == 0) {
+/*  838 */             str1 = "100";
+/*      */           }
+/*  840 */           else if (str.indexOf("100") != -1) {
+/*  841 */             str1 = "100";
+/*  842 */           } else if (str.indexOf("101") != -1) {
+/*  843 */             str1 = "101";
+/*      */           } else {
+/*  845 */             str1 = "102";
+/*      */           } 
+/*      */           
+/*  848 */           println("<!--findSalesStatusInfo: using " + entityItem.getKey() + " specbid: " + str3 + " cofcat: " + str1 + " from btype: " + str + " -->");
+/*      */         } 
+/*      */ 
+/*      */         
+/*  852 */         str6 = str1 + ":" + str2 + ":" + str3;
+/*      */       } else {
+/*  854 */         entityGroup = entityList.getEntityGroup("MODEL");
+/*  855 */         if (entityGroup.getEntityItemCount() == 0) {
+/*  856 */           println("<!--findSalesStatusInfo: ERROR no " + entityGroup.getEntityType() + " found -->");
+/*      */         } else {
+/*  858 */           EntityItem entityItem = entityGroup.getEntityItem(0);
+/*  859 */           str1 = this.m_utility.getAttrValue(entityItem, "COFCAT");
+/*  860 */           println("<!--findSalesStatusInfo: using " + entityItem.getKey() + " cofcat: " + str1 + " -->");
+/*      */         } 
+/*  862 */         entityGroup = entityList.getEntityGroup("WWSEO");
+/*  863 */         if (entityGroup.getEntityItemCount() == 0) {
+/*  864 */           println("<!--findSalesStatusInfo: ERROR no " + entityGroup.getEntityType() + " found -->");
+/*      */         } else {
+/*  866 */           EntityItem entityItem = entityGroup.getEntityItem(0);
+/*  867 */           str3 = this.m_utility.getAttrValue(entityItem, "SPECBID");
+/*  868 */           println("<!--findSalesStatusInfo: using " + entityItem.getKey() + " specbid: " + str3 + " -->");
+/*      */         } 
+/*  870 */         entityGroup = entityList.getEntityGroup("LSEO");
+/*  871 */         if (entityGroup.getEntityItemCount() == 0) {
+/*  872 */           println("<!--findSalesStatusInfo: ERROR no " + entityGroup.getEntityType() + " found -->");
+/*      */         } else {
+/*  874 */           EntityItem entityItem = entityGroup.getEntityItem(0);
+/*  875 */           str2 = this.m_utility.getAttrValue(entityItem, "PRCINDC");
+/*  876 */           println("<!--findSalesStatusInfo: using " + entityItem.getKey() + " priced: " + str2 + " -->");
+/*      */         } 
+/*      */         
+/*  879 */         str6 = str1 + ":" + str2 + ":" + str3;
+/*      */       } 
+/*  881 */       this.sskeyTbl.put(str4, str6);
+/*  882 */       entityList.dereference();
+/*      */     } else {
+/*  884 */       println("<!--findSalesStatusInfo: sskey " + str6 + " already found for " + str4 + " -->");
+/*      */     } 
+/*      */     
+/*  887 */     SalesStatusInfo salesStatusInfo = SalesStatusInfo.getSalesStatusInfo(paramString, str6);
+/*  888 */     println("<!--findSalesStatusInfo: sskey: " + paramString + ":" + str6 + " returned " + salesStatusInfo + " -->");
+/*      */     
+/*  890 */     return salesStatusInfo;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void printAllAttributes(String paramString, EntityItem paramEntityItem) {
+/*  896 */     byte b1 = 0;
+/*  897 */     EntityGroup entityGroup = paramEntityItem.getEntityGroup();
+/*  898 */     if (!this.outputWarning) {
+/*  899 */       this.outputWarning = true;
+/*  900 */       println("<h2>These attribute values are listed before salesstatus updates were applied.</h2>");
+/*      */     } 
+/*  902 */     println("<h2 class=\"orange-med\">" + paramString + "</h2>");
+/*  903 */     println("<table width=\"100%\">");
+/*  904 */     println("<tr style=\"background-color:#cef;\"><th width=\"50%\" title=\"" + paramEntityItem
+/*  905 */         .getKey() + "\">Attribute Description</th><th width=\"50%\">Attribute Value</th></tr>");
+/*      */ 
+/*      */     
+/*  908 */     for (byte b2 = 0; b2 < entityGroup.getMetaAttributeCount(); b2++) {
+/*  909 */       EANMetaAttribute eANMetaAttribute = entityGroup.getMetaAttribute(b2);
+/*  910 */       EANAttribute eANAttribute = paramEntityItem.getAttribute(eANMetaAttribute.getAttributeCode());
+/*  911 */       println("<tr class=\"" + ((b1++ % 2 != 0) ? "even" : "odd") + "\"><td width=\"50%\" >" + eANMetaAttribute
+/*      */ 
+/*      */           
+/*  914 */           .getLongDescription() + "</td><td width=\"50%\">" + ((eANAttribute == null || eANAttribute
+/*      */           
+/*  916 */           .toString().length() == 0) ? "** Not Populated **" : eANAttribute.toString()) + "</td></tr>");
+/*      */     } 
+/*      */     
+/*  919 */     println("</table><br />");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void printNavigateAttributes(EntityItem paramEntityItem, EntityGroup paramEntityGroup) {
+/*  927 */     byte b1 = 0;
+/*  928 */     println("<table width=\"100%\">");
+/*  929 */     println("<tr style=\"background-color:#cef;\"><th width=\"50%\">Navigation Attribute</th><th width=\"50%\">Attribute Value</th></tr>");
+/*      */     
+/*  931 */     for (byte b2 = 0; b2 < paramEntityGroup.getMetaAttributeCount(); b2++) {
+/*  932 */       EANMetaAttribute eANMetaAttribute = paramEntityGroup.getMetaAttribute(b2);
+/*  933 */       if (eANMetaAttribute.isNavigate()) {
+/*  934 */         EANAttribute eANAttribute = paramEntityItem.getAttribute(eANMetaAttribute.getAttributeCode());
+/*  935 */         println("<tr class=\"" + ((b1++ % 2 != 0) ? "even" : "odd") + "\"><td width=\"50%\" >" + eANMetaAttribute
+/*      */ 
+/*      */             
+/*  938 */             .getLongDescription() + "</td><td width=\"50%\">" + ((eANAttribute == null || eANAttribute
+/*      */             
+/*  940 */             .toString().length() == 0) ? "** Not Populated **" : eANAttribute.toString()) + "</td></tr>");
+/*      */       } 
+/*      */     } 
+/*      */     
+/*  944 */     println("</table>");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void printHeader(String paramString) {
+/*  951 */     println("<table width=\"750\" cellpadding=\"0\" cellspacing=\"0\">");
+/*  952 */     println("<tr><th width=\"25%\">ABRName: </th><td>" + 
+/*  953 */         getABRCode() + "</td></tr>");
+/*  954 */     println("<tr><th width=\"25%\">Abr Version: </th><td>" + 
+/*  955 */         getABRVersion() + "</td></tr>");
+/*  956 */     println("<tr><th width=\"25%\">Enterprise: </th><td>" + 
+/*  957 */         getEnterprise() + "</td></tr>");
+/*  958 */     println("<tr><th width=\"25%\">Valid Date: </th><td>" + this.m_prof
+/*  959 */         .getValOn() + "</td></tr>");
+/*  960 */     println("<tr><th width=\"25%\">Effective Date: </th><td>" + this.m_prof
+/*  961 */         .getEffOn() + "</td></tr>");
+/*  962 */     println("<tr><th width=\"25%\">Date Generated: </th><td>" + paramString + "</td></tr></table>");
+/*      */ 
+/*      */     
+/*  965 */     println("<h3>Description: </h3><p>" + getDescription() + "</p><hr>");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected String getABREntityDesc(String paramString, int paramInt) {
+/*  976 */     return null;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getDescription() {
+/*  985 */     return "Sales Status ABR";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getRevision() {
+/*  995 */     return "1.28";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getABRVersion() {
+/* 1015 */     return "CATLGPUBABR02.java " + getRevision();
+/*      */   }
+/*      */ }
 
-package COM.ibm.eannounce.abr.sg;
 
-import COM.ibm.opicmpdh.middleware.*;
-import java.sql.*;
-import COM.ibm.opicmpdh.transactions.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.eannounce.abr.util.*;
-import java.util.*;
-import java.text.*;
-
-/**
- * CATLGPUBABR02 for salesstatus checks
- *
- *@author     Administrator
- *@created    August 30, 2005
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\CATLGPUBABR02.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class CATLGPUBABR02 extends PokBaseABR {
-	private final static String STARTDATE = "1980-01-01-00.00.00.000000";
-	private final static String FOREVER = "9999-12-31-00.00.00.000000";
-
-    // Class constants
-    private final static String ABR = "CATLGPUBABR02";
-
-    //private static final String ATT_CATCUSTIMIZE = "CATCUSTIMIZE";
-    private static final String ATT_CATSEOID = "CATSEOID";
-    private static final String ATT_CATADDTOCART = "CATADDTOCART";
-    private static final String ATT_CATBUYABLE = "CATBUYABLE";
-    private static final String ATT_CATHIDE = "CATHIDE";
-    private static final String ATT_CATSALESSTATUS = "CATSALESSTATUS";
-    private static final String ATT_CATOFFTYPE = "CATOFFTYPE";
-    private static final String ATT_CATMACHTYPE = "CATMACHTYPE";
-    private static final String ATT_CATMODEL = "CATMODEL";
-
-    private static final String ATT_COFCAT = "COFCAT";
-
-	private static final String HW = "100";
-	private static final String SW = "101";
-	private static final String SVC = "102";
-
-    private static final String ATT_PT = "PUBTO";
-    private static final String ATT_SEOID = "SEOID";
-    private static final String ATT_CATWORKFLOW = "CATWORKFLOW";
-    private static final String ATT_CATLGOFFPUBLASTRUN = "CATLGOFFPUBLASTRUN";
-
-    private static final String ATT_OFFCOUNTRY = "OFFCOUNTRY";
-
-    private static final int I64=64;
-
-    private PDGUtility m_utility = new PDGUtility();
-    private String strUpdatedBy=null;
-    private String strOFFCOUNTRY = null;
-    private String strCurrentDate = null;
-    private String strCATLGOFFPUBLASTRUN = null;
-    private int updateCount = 0;
-    private boolean outputWarning = false;
-	private static final String SS_EXTRACTNAME = "EXCATLGPUBVE";
-	private Hashtable sskeyTbl = new Hashtable();// hang onto keys to ss, prevent getting list over and over
-
-    /**
-     * execute_run
-     *
-     * @author Owner
-     */
-    public void execute_run() {
-        try {
-        	EntityGroup eg = null;
-        	EntityItem m_ei = null;
-        	String strNow = null;
-			OPICMList attList;
-        	String strOCDesc = null;
-
-            start_ABRBuild(false);
-            println(EACustom.getDocTypeHtml()); // Output the doctype and html
-
-            println("<head>"+EACustom.NEWLINE+
-	            EACustom.getMetaTags(getDescription())+EACustom.NEWLINE+
-                EACustom.getCSS()+EACustom.NEWLINE+
-            	EACustom.getTitle(getDescription())+EACustom.NEWLINE+
-                "</head>"+EACustom.NEWLINE+
-                "<body id=\"ibm-com\">");
-
-            println(EACustom.getMastheadDiv());
-
-            setReturnCode(PASS);
-
-            strNow = m_db.getDates().getNow();
-            strCurrentDate = strNow.substring(0, 10);
-            strUpdatedBy = ABR + getRevision() + strNow;
-
-			// set the profile to the current time and use it everywhere
-			m_prof = m_utility.setProfValOnEffOn(m_db,m_prof);
-
-            printHeader(strNow);
-
-            // abr entitytype=CATLGCNTRY
-            eg = new EntityGroup(null,m_db, m_prof, m_abri.getEntityType(), "Edit", false);
-            m_ei = new EntityItem(eg, m_prof, m_db, m_abri.getEntityType(), m_abri.getEntityID());
-
-            println("<p class=\"ibm-intro ibm-alternate-three\"><em>Catalog Country: " + m_ei.getKey() + "</em></p>");
-
-            printNavigateAttributes(m_ei, eg);
-
-            // check CATLGCNTRY attributes
-            // set CATLGOFFPUBLASTRUN if not set yet or not ISO date format
-            strCATLGOFFPUBLASTRUN = m_utility.getAttrValue(m_ei, ATT_CATLGOFFPUBLASTRUN);
-            if (strCATLGOFFPUBLASTRUN == null || strCATLGOFFPUBLASTRUN.length() <= 0) {
-		        attList = new OPICMList();
-		        strCATLGOFFPUBLASTRUN = STARTDATE;
-		        attList.put(ATT_CATLGOFFPUBLASTRUN,"CATLGOFFPUBLASTRUN=" + strCATLGOFFPUBLASTRUN);
-		        m_utility.updateAttribute(m_db, m_prof, m_ei, attList);
-            } else {
-                if (!m_utility.isDateFormat(strCATLGOFFPUBLASTRUN)) {
-                    println("<h2>CATLGOFFPUBLASTRUN is not in date format 1980-01-01 or 1980-01-01-00.00.00.000000.</h2>");
-                    setReturnCode(FAIL);
-                } else {
-                    if (strCATLGOFFPUBLASTRUN.length() == 10) {
-			            attList = new OPICMList();
-				        strCATLGOFFPUBLASTRUN = strCATLGOFFPUBLASTRUN + "-00.00.00.000000";
-			            attList.put(ATT_CATLGOFFPUBLASTRUN,"CATLGOFFPUBLASTRUN=" + strCATLGOFFPUBLASTRUN);
-			            m_utility.updateAttribute(m_db, m_prof, m_ei, attList);
-                    }
-                }
-            }
-
-            strOFFCOUNTRY = m_utility.getAttrValue(m_ei, ATT_OFFCOUNTRY);
-            strOCDesc = m_utility.getAttrValueDesc(m_ei, ATT_OFFCOUNTRY);
-            if (strOFFCOUNTRY == null || strOFFCOUNTRY.length() <= 0) {
-                println("<h2>"+ATT_OFFCOUNTRY+" is blank.</h2>");
-                setReturnCode(FAIL);
-            }
-
-            println("<!-- CATLGOFFPUBLASTRUN:"+strCATLGOFFPUBLASTRUN+" OFFCOUNTRY: " + strOCDesc+" -->");
-
-            if (getReturnCode() == PASS) {
-				/* Scan all SALES_STATUS for change (i.e. LASTUPDATED > CATLGOFFPUBLASTRUN
-				(if CATLGOFFPUBLASTRUN doesn’t have a value, assume 1980-01-01) and the column 'MarkedforDeletion' is 'N'.
-				*/
-        		EANList list = null;
-				// get the countrycode for this catlgcntry.offcountry
-                ExtractActionItem xaiCATLGCNTRYGAA = new ExtractActionItem(null, m_db, m_prof, "EXTCATLGCNTRYGAA1");
-                String strGENAREACODE = m_utility.getGENAREACODE(m_db, m_prof, xaiCATLGCNTRYGAA, m_ei, strOFFCOUNTRY);
-                String strGENAREACODEDESC = "";
-                if (strGENAREACODE.indexOf(":") > 0) {
-                    int iColon = strGENAREACODE.indexOf(":");
-                    strGENAREACODEDESC = strGENAREACODE.substring(iColon + 1);
-                    strGENAREACODE = strGENAREACODE.substring(0, iColon);
-                }
-                // get all salesstatus records for OFFCOUNTRY's countrycode using
-                // select * FROM EACM.SALESORG_COUNTRY SC
-                // INNER JOIN EACM.SALES_STATUS SS ON SS.SALESORG = SC.SALESORG WHERE SC.COUNTRYCODE = :countrycode
-                // and then filter for VARCONDTYPE=SWMODEL, MODEL or SEO, MARKEDFORDELETION=N and LASTUPDATED > catlgcntry.CATLGOFFPUBLASTRUN
-                list = getFilteredSalesStatus(strGENAREACODEDESC,strCurrentDate);
-                if (list.size() <= 0) {
-                    println("<h2>No updated salesstatus records found for SEO, MODEL or SWMODEL with offering country: " + strOCDesc +
-                    	", GENAREACODE:" + strGENAREACODEDESC+"</h2>");
-                	//setReturnCode(FAIL); // not sure this is really a failure but allow notification
-        		}else{
-					Vector lseoToCheckVct = new Vector();
-					println("<!-- Found "+list.size()+" salesstatus records found SEO, MODEL or SWMODEL with offering country: " + strOCDesc +
-							", GENAREACODE:" + strGENAREACODEDESC+" -->");
-
-					ExtractActionItem xai = new ExtractActionItem(null,m_db, m_prof,SS_EXTRACTNAME);
-
-					// this list has ssi.VARCONDTYPE=LSEO or MODEL or SWMODEL, MFD=No and ssi.LASTUPDATED > catlgcntry.CATLGOFFPUBLASTRUN
-					for (int i = 0; i < list.size(); i++) {
-						Vector catlgpubVct;
-						SalesStatusItem ssi = (SalesStatusItem) list.getAt(i);
-						String strMATERIALSTATUS = ssi.getMATERIALSTATUS();
-
-						/*search for all CATLGPUB matching this salesstatus record
-						For each change, find the corresponding instance of CATLGPUB based on
-						COUNTRYCODE (CATLGPUB.OFFCOUNTRY),
-						VARCONDTYPE (CATLGPUB.CATOFFTYPE) and
-						MATNR (from CATLGPUB based on CATOFFTYPE, match either CATSEOID or CATMACHTYPE & CATMODEL)
-						*/
-						catlgpubVct = findCatlgpub(ssi);
-						println("<!-- Checked SS["+i+"] "+ssi.dump(true)+" found "+catlgpubVct.size()+" CATLGPUB -->");
-						for (int j = 0; j < catlgpubVct.size(); j++) {
-							String strPUBTO = null;
-							String strCATOFFTYPE = null;
-							int iDC2 = 0;
-							EntityItem eiCATLGPUB = (EntityItem)catlgpubVct.elementAt(j);
-							D.ebug(D.EBUG_SPEW, ABR + " found " + eiCATLGPUB.getKey());
-							// if null it means in the future.. then the checks will not work because iDC2=ILLEGALARGUMENT for null or ""
-							strPUBTO = m_utility.getAttrValue(eiCATLGPUB, ATT_PT);
-							if (strPUBTO.length()==0){ //wss
-								strPUBTO = FOREVER.substring(0, 10);
-							}
-							strCATOFFTYPE = m_utility.getAttrValue(eiCATLGPUB, ATT_CATOFFTYPE);
-							println("<!-- found " + eiCATLGPUB.getKey()+" ["+j+"] curDate: "+strCurrentDate+
-								" PUBTO: "+strPUBTO+" "+ATT_CATOFFTYPE+": "+strCATOFFTYPE+" -->");
-							iDC2 = m_utility.dateCompare(strPUBTO, strCurrentDate);
-							// ZJ means withdrawn by RDh, if PUBTO is after today then flag this as an error
-							if (strMATERIALSTATUS.equals("ZJ")){
-								if(iDC2 == PDGUtility.LATER) {  // error type 1
-									String msg = "Sales Status Withdraw prior to the Publish To date. "+
-										"<br />SALES_STATUS.MATERIALSTATUS: " + strMATERIALSTATUS;
-									printAllAttributes(msg,eiCATLGPUB);
-									setReturnCode(FAIL);
-								}
-								if (strCATOFFTYPE.equals("LSEO")) { // check for error type3
-									String strCATSEOID = m_utility.getAttrValue(eiCATLGPUB, ATT_CATSEOID);
-									// this means the LSEO was withdrawn so check the parent LSEOBUNDLE for withdrawn too
-									// do this error check after looking at all SS because the update for the
-									// bundle may be later in the list and an invalid error would be generated
-									//checkParentLseoBundleCatlgpub(strCATSEOID, strMATERIALSTATUS);
-									if(!lseoToCheckVct.contains(strCATSEOID)){ //just add this one once
-										lseoToCheckVct.add(strCATSEOID);
-									}
-								}
-							}// end status=ZJ
-							else {
-								// anything but ZJ means still valid by RDh, if PUBTO is before today then flag this as an error
-								if (iDC2 == PDGUtility.EARLIER) {  // error type 2
-									String msg = "Sales Status is not Withdraw after the Publish To date. "+
-										"<br />SALES_STATUS.MATERIALSTATUS: " + strMATERIALSTATUS;
-									printAllAttributes(msg, eiCATLGPUB);
-									setReturnCode(FAIL);
-								}
-							} // end status!=ZJ
-
-							/*
-	Wayne Kehrli	also - if SalesStatus produces error ---- when = "ZJ"; it should update the 3 flags --- Linda thinks that it does
-	Wayne Kehrli	if SaleStatus <> "ZJ" and there is an error - then you should also update the 3 flags --- again, Linda thinks that it does
-							*/
-							//always try to update now - this may pull one VE depending on the
-							// value of ss, all CATLGPUB for this ss will use the values found in the VE
-							updateCatlgpub(eiCATLGPUB, strMATERIALSTATUS, xai);
-						} // end CATLGPUB vct loop
-
-						catlgpubVct.clear();  // release memory
-					}// end ss loop
-
-					if (lseoToCheckVct.size()>0){
-						for (int i=0; i<lseoToCheckVct.size(); i++){
-							String strCATSEOID = (String) lseoToCheckVct.elementAt(i);
-							// do this error check after looking at all SS because the update for the
-							// bundle may be later in the list and an invalid error would be generated
-							checkParentLseoBundleCatlgpub(strCATSEOID, "ZJ");
-						}
-
-						lseoToCheckVct.clear();
-					}
-
-					list.clear(); // release memory
-				}  // some ss found
-            } // end all ok so far
-
-			// Upon completion of the ABR, set CATLGOFFPUBLASTRUN = the DTS from the server obtained at
-			// the beginning execution of the ABR.
-			attList = new OPICMList();
-			attList.put(ATT_CATLGOFFPUBLASTRUN,"CATLGOFFPUBLASTRUN=" + strNow);
-			m_utility.updateAttribute(m_db, m_prof, m_ei, attList);
-			sskeyTbl.clear();
-
-			println("<!-- Updated a total of "+updateCount+" CATLGPUB entities -->");
-        } catch (SBRException _sbrex) {
-            String strError = _sbrex.toString();
-            int i = strError.indexOf("(ok)");
-            if (i < 0) {
-                setReturnCode(UPDATE_ERROR);
-                println("<h3><span style=\"color:#c00; font-weight:bold;\">Generate Data error: <pre>" +
-                	strError+ "</pre></span></h3>");
-                logError(_sbrex.toString());
-            } else {
-                strError = strError.substring(0, i);
-                println("<pre>"+strError+"</pre>");
-            }
-        } catch (Throwable exc) {
-        	Object[] args = new String[1];
-            java.io.StringWriter exBuf = new java.io.StringWriter();
-            String Error_EXCEPTION="<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
-            String Error_STACKTRACE="<pre>{0}</pre>";
-            MessageFormat msgf = new MessageFormat(Error_EXCEPTION);
-            setReturnCode(FAIL);
-            exc.printStackTrace(new java.io.PrintWriter(exBuf));
-            // Put exception into document
-            args[0] = exc.getMessage();
-            println(msgf.format(args));
-            msgf = new MessageFormat(Error_STACKTRACE);
-            args[0] = exBuf.getBuffer().toString();
-            println(msgf.format(args));
-            logError("Exception: "+exc.getMessage());
-            logError(exBuf.getBuffer().toString());
-        } finally {
-        	String strDgName = null;
-        	String msg = buildMessage(MSG_IAB2016I,new String[] {getABRDescription(),(getReturnCode() == PASS ? "Passed" : "Failed")}) ;
-            println("<p><b>"+ msg+ "</b></p>");
-            log(msg);
-
-          // set DG title
-            strDgName = getABRDescription() + ":" + getEntityType() + ":" + getEntityID();
-            if (strDgName.length() > I64) {
-                strDgName = strDgName.substring(0, I64);
-            }
-            setDGTitle(strDgName);
-            setDGRptName(ABR);
-
-            // set DG submit string
-            setDGString(getABRReturnCode());
-
-			println(EACustom.getTOUDiv());
-
-      		//Stuff into report for subscription and notification
-      		// Tack on the DGString
-            printDGSubmitString();
-	        buildReportFooter();    // Print </html>
-
-	      // make sure the lock is released
-            if (!isReadOnly()) {
-                clearSoftLock();
-            }
-        }
-    }
-
-	/********************
-	* copied from PDGUtility.getSalesStatusForCountry, added varcondtype, markedfordeletion and date check
-	* filtering at this level to reduce memory and improve performance.  Filtering at the SP level is really
-	* the way to do it, but do it here for now.
-	RQ022507373 and MN31580435
-Wayne Kehrli	2 different criteria to include
-1) . LASTUPDATED > CATLGOFFPUBLASTRUN (if CATLGOFFPUBLASTRUN doesn’t have a value, assume 1980-01-01) and
-the column 'MarkedforDeletion' is 'N' and MATERIALSTATUSDATE is less than or equal to NOW()
-2) Also include all SALES_STATUS where MATERIALSTATUSDATE is equal to NOW() + 1 day and the column 'MarkedforDeletion' is 'N'
-Wendy	criteria 1 will find all those that are recently updated and have an effective date of today or in the past
-criteria 2 will find any that have an effective date of tomorrow
-	*/
-	private EANList getFilteredSalesStatus(String _strGenareaCode, String strCurrentDate)
-		throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException
-	{
-		String strTraceBase = ABR+" getFilteredSalesStatus method ";
-		// Initialize some SP specific objects needed in this method
-		ReturnDataResultSet rdrs = null;
-		ResultSet rs = null;
-		ReturnStatus returnStatus = new ReturnStatus(-1);
-		EANList returnList = new EANList();
-		String tomorrow = m_utility.getDate(strCurrentDate, 1);
-
-		D.ebug(D.EBUG_SPEW,strTraceBase + _strGenareaCode+" currentDate:"+strCurrentDate+" tomorrow:"+tomorrow);
-		try {
-			rs = m_db.callGBL9305(returnStatus, _strGenareaCode);
-			rdrs = new ReturnDataResultSet(rs);
-		} finally {
-			if(rs!=null){
-				rs.close();
-			}
-			rs = null;
-			m_db.commit();
-			m_db.freeStatement();
-			m_db.isPending();
-		}
-		if(rdrs!=null) {
-			for (int ii = 0; ii < rdrs.size(); ii++) {
-				String strMATNR = rdrs.getColumn(ii,0).trim();
-				String strVARCOND = rdrs.getColumn(ii,1).trim();
-				String strVARCONDTYPE = rdrs.getColumn(ii,2).trim();
-				String strSALESORG = rdrs.getColumn(ii,3).trim();
-				String strMATERIALSTATUS = rdrs.getColumn(ii,4).trim();
-				String strMATERIALSTATUSDATE = rdrs.getColumn(ii,5).trim();
-				String strLASTUPDATED = rdrs.getColumn(ii,6).trim();
-				String strMARKEDFORDELETION = rdrs.getColumn(ii,7).trim();
-				m_db.debug(D.EBUG_SPEW, strTraceBase + " gbl9305 result:" + strMATNR + ":" + strVARCOND
-						+ ":" + strVARCONDTYPE + ":" + strSALESORG + ":" + strMATERIALSTATUS
-						+ ":" + strMATERIALSTATUSDATE + ":" + strLASTUPDATED + ":" + strMARKEDFORDELETION);
-
-				if (strVARCONDTYPE.equalsIgnoreCase("MODEL") ||
-					strVARCONDTYPE.equalsIgnoreCase("SWMODEL") ||
-					strVARCONDTYPE.equalsIgnoreCase("SEO")) {
-					if (strMARKEDFORDELETION.equals("N")){	// use those SS that are MFD=No
-						boolean addSS = false;
-						// 1) if LASTUPDATED > catlgcntry.CATLGOFFPUBLASTRUN and MATERIALSTATUSDATE is less than or equal to NOW()
-						int iDC1 = m_utility.longDateCompare(strLASTUPDATED, strCATLGOFFPUBLASTRUN);
-						if (iDC1 == PDGUtility.LATER &&
-							(strMATERIALSTATUSDATE.compareTo(strCurrentDate)<=0)) {
-							addSS = true;
-						}
-						//2) Also include all SALES_STATUS where MATERIALSTATUSDATE is equal to NOW() + 1 day
-						if (strMATERIALSTATUSDATE.equals(tomorrow)){
-							addSS = true;
-						}
-						if (addSS){
-							String strKey = strMATNR + strVARCOND + strVARCONDTYPE + strSALESORG;
-							if (returnList.get(strKey) == null) {
-								SalesStatusItem ssi = new SalesStatusItem(m_prof, strKey);
-								ssi.setMATNR(strMATNR);
-								ssi.setVARCOND(strVARCOND);
-								ssi.setVARCONDTYPE(strVARCONDTYPE);
-								ssi.setSALESORG(strSALESORG);
-								ssi.setMATERIALSTATUS(strMATERIALSTATUS);
-								ssi.setMATERIALSTATUSDATE(strMATERIALSTATUSDATE);
-								ssi.setLASTUPDATED(strLASTUPDATED);
-								ssi.setMARKEDFORDELETION(strMARKEDFORDELETION);
-								returnList.put(ssi);
-							}
-						}
-					}
-				}
-			}
-		}
-		return returnList;
-	}
-
-  	/*********************
-   	* check parent LSEOBUNDLE for this LSEO (CATLGPUB.CATOFFTYPE)
-	* If the change applies to a LSEO (CATLGPUB.CATOFFTYPE),
-	* then find the LSEO entity where the SEOID = CATLGPUB.CATSEOID
-	* and find the parent LSEOBUNDLEs.
-	* Then find the corresponding instances of CATLGPUB
-	* (where CATOFFTYPE = 'LSEOBUNDLE' and CATSEOID=LSEOBUNDLE.SEOID).
-	* Report an error for these CATLGPUB instances if the CATLGPUB>NOW().
-	*
-   	* this should only be done for MATERIALSTATUS='ZJ'
-   	*@param strCATSEOID String from CATLGPUB.CATSEOID
-   	*@param strMATERIALSTATUS String MATERIALSTATUS from salesstatus record, only used in msg
-   	*/
-    private void checkParentLseoBundleCatlgpub(String strCATSEOID, String strMATERIALSTATUS)
-		throws java.sql.SQLException, COM.ibm.opicmpdh.middleware.MiddlewareException,
-		COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-		COM.ibm.eannounce.objects.SBRException
-    {
-		EntityItem[] aeiLSEO;
-		String strSai = "SRDLSEO1";
-		StringBuffer sb = new StringBuffer();
-		sb.append("map_SEOID=" + strCATSEOID);
-		// find the LSEO matching this seoid
-		aeiLSEO = m_utility.dynaSearch(m_db,m_prof, null, strSai, "LSEO", sb.toString());
-		if (aeiLSEO != null && aeiLSEO.length > 0) {
-			ExtractActionItem xaiLSEO = new ExtractActionItem(null,m_db, m_prof,"EXTLSEO1");
-			// get the parent LSEOBUNDLEs
-			EntityList elLSEO = EntityList.getEntityList(m_db,m_prof,xaiLSEO,aeiLSEO);
-			EntityGroup egLSEOBUNDLE = elLSEO.getEntityGroup("LSEOBUNDLE");
-			// output some debug info
-			for (int i=0; i<elLSEO.getParentEntityGroup().getEntityItemCount(); i++) {
-				EntityItem lseoitem = elLSEO.getParentEntityGroup().getEntityItem(i);
-				println("<!-- found "+lseoitem.getKey()+" for CATSEOID: " + strCATSEOID+" -->");
-			}
-
-			if (egLSEOBUNDLE != null) {
-				for (int b = 0; b < egLSEOBUNDLE.getEntityItemCount(); b++) {
-					EntityItem[] aeiLSEOBDLCATLGPUB;
-					EntityItem eiLSEOBUNDLE = egLSEOBUNDLE.getEntityItem(b);
-					String strLSEOBDLSEOID = m_utility.getAttrValue(eiLSEOBUNDLE, ATT_SEOID);
-					println("<!-- found parent "+eiLSEOBUNDLE.getKey()+" for child LSEO.CATSEOID: " + strCATSEOID+" -->");
-
-					// search for CATLGPUB for parent LSEOBUNDLE
-					sb = new StringBuffer();
-					sb.append("map_OFFCOUNTRY=" + strOFFCOUNTRY + ";"); //wss country should be part of search
-					sb.append("map_CATSEOID=" + strLSEOBDLSEOID + ";");
-					sb.append("map_CATOFFTYPE=BUNDLE");
-					strSai = "SRDCATLGPUB1";
-					aeiLSEOBDLCATLGPUB = m_utility.dynaSearch(m_db, m_prof, null, strSai,"CATLGPUB", sb.toString());
-					// check the date on the LSEOBUNDLE's CATLGPUBs
-					if (aeiLSEOBDLCATLGPUB != null && aeiLSEOBDLCATLGPUB.length > 0) {
-						for (int k = 0; k < aeiLSEOBDLCATLGPUB.length; k++) {
-							int iDC4=0;
-							EntityItem eiLSEOBDLCATLGPUB = aeiLSEOBDLCATLGPUB[k];
-							String strPUBTO2 = m_utility.getAttrValue(eiLSEOBDLCATLGPUB,ATT_PT);
-							if (strPUBTO2.length()==0){ //wss
-								strPUBTO2 = FOREVER.substring(0, 10);
-							}
-
-							println("<!-- parent "+eiLSEOBUNDLE.getKey()+" has " + eiLSEOBDLCATLGPUB.getKey()+" curDate: "+
-								strCurrentDate+" PUBTO: "+strPUBTO2+" SEOID: "+strLSEOBDLSEOID+" -->");
-							iDC4 = m_utility.dateCompare(strPUBTO2, strCurrentDate);
-							if (iDC4 == PDGUtility.LATER) {  // error type 3
-								String msg = "LSEO Sales Status Withdraw prior to the LSEOBUNDLE. "+
-									"<br />SALES_STATUS.MATERIALSTATUS: " + strMATERIALSTATUS;
-								printAllAttributes(msg, eiLSEOBDLCATLGPUB);
-								setReturnCode(FAIL);
-							}
-						} // end CATLGPUB for LSEOBUNDLE loop
-					}// end some CATLGPUB found for LSEOBUNDLE.CATSEOID
-					else{
-						println("<!-- NO CATLGPUB found for " + sb+" -->");
-					}
-				} // end LSEOBUNDLE loop
-			}// end LSEOBUNDLE group found
-			else{
-				println("<h2>Error: VE for EXTLSEO1 is missing LSEOBUNDLE group </h2>");
-				setReturnCode(FAIL);
-			}
-
-			elLSEO.dereference();  // release memory
-		}// end some LSEO found for CATSEOID
-		else{
-			println("<!-- NO LSEO found for " + sb+" -->");
-		}
-	}
-
-  	/*********************
-   	* find the CATLGPUB for this salesstatus record
-   	*.For each change, find the corresponding instance of CATLGPUB based on COUNTRYCODE (CATLGPUB.OFFCOUNTRY),
-   	* VARCONDTYPE (CATLGPUB.CATOFFTYPE) and MATNR (from CATLGPUB based on CATOFFTYPE,
-   	* match either CATSEOID or CATMACHTYPE & CATMODEL)
-   	*@param ssi SalesStatusItem
-   	*@return Vector of CATLGPUB
-   	*/
-	private Vector findCatlgpub(SalesStatusItem ssi)
-		throws java.sql.SQLException, COM.ibm.opicmpdh.middleware.MiddlewareException,
-		COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-		COM.ibm.eannounce.objects.SBRException
-	{
-		Vector catlgpubVct = new Vector();
-		String strMATNR = ssi.getMATNR().trim();
-		String strVARCONDTYPE = ssi.getVARCONDTYPE();
-		StringBuffer sb = new StringBuffer();
-
-		D.ebug( D.EBUG_SPEW, ABR  + " info from SalesStatusItem: " + ssi.dump(true));
-		if (strVARCONDTYPE.equalsIgnoreCase("MODEL")|| strVARCONDTYPE.equalsIgnoreCase("SWMODEL")) {
-			if (strMATNR.length() >= 4) {
-				// wayne says to use the MATNR directly, not the flag code
-				// and this doesn't work because CATMACHTYPE is a text attr, flagcode is never found!!
-				//String[] astrMachType = m_utility.getFlagCodeForLikedDesc(m_db, m_prof, ATT_CATMACHTYPE, strMATNR.substring(0, 4));
-				//if (astrMachType!=null && astrMachType.length > 0) {
-//					sb.append("map_CATMACHTYPE=" + astrMachType[0] + ";");
-					sb.append("map_CATMACHTYPE=" + strMATNR.substring(0, 4) + ";");
-					sb.append("map_CATMODEL=" + strMATNR.substring(4) + ";");
-					sb.append("map_OFFCOUNTRY=" + strOFFCOUNTRY + ";");
-					sb.append("map_CATOFFTYPE=MODEL");
-					// search for CATLGPUB
-					doCatlgpubSearch(sb,catlgpubVct);
-				//} else {
-				//	D.ebug(D.EBUG_SPEW, ABR + " unable to find machtype for : " + strMATNR.substring(0, 4));
-				//	println("<!-- unable to find "+strVARCONDTYPE+" "+ATT_CATMACHTYPE+" flagcode for "+strMATNR.substring(0, 4)+" -->");
-				//}
-			}else{
-				println("<!--findCatlgpub: skipping "+strVARCONDTYPE+" with MATNR<4 "+strMATNR+" -->");
-			}
-		} else if (strVARCONDTYPE.equalsIgnoreCase("SEO")) {
-			StringBuffer sb2 = new StringBuffer();
-			sb.append("map_CATSEOID=" + strMATNR + ";");
-			sb.append("map_OFFCOUNTRY=" + strOFFCOUNTRY + ";");
-			sb.append("map_CATOFFTYPE=LSEO");
-			// search for CATLGPUB
-			doCatlgpubSearch(sb,catlgpubVct);
-
-			sb2.append("map_CATSEOID=" + strMATNR + ";");
-			sb2.append("map_OFFCOUNTRY=" + strOFFCOUNTRY + ";");
-			sb2.append("map_CATOFFTYPE=BUNDLE");
-			// search for CATLGPUB
-			doCatlgpubSearch(sb2,catlgpubVct);
-		}
-
-		return catlgpubVct;
-	}
-
-  	/*********************
-   	* search for CATLGPUB specified in string
-   	*@param sb StringBuffer with search criteria
-   	*/
-   	private void doCatlgpubSearch(StringBuffer sb, Vector catlgpubVct)
-		throws java.sql.SQLException, COM.ibm.opicmpdh.middleware.MiddlewareException,
-		COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-		COM.ibm.eannounce.objects.SBRException
-	{
-		String strSai = "SRDCATLGPUB1";
-		EntityItem[] aeiCATLGPUB1 = null;
-
-		D.ebug(D.EBUG_SPEW, ABR + " looking for CATLGPUB matching: " + sb);
-		aeiCATLGPUB1 = m_utility.dynaSearch(m_db, m_prof, null, strSai, "CATLGPUB", sb.toString());
-		if (aeiCATLGPUB1 != null && aeiCATLGPUB1.length > 0) {
-			for (int j = 0; j < aeiCATLGPUB1.length; j++) {
-				EntityItem eiCATLGPUB = aeiCATLGPUB1[j];
-				catlgpubVct.addElement(eiCATLGPUB);
-				aeiCATLGPUB1[j]=null;
-			}
-		}else{
-			D.ebug(D.EBUG_SPEW, ABR + " Unable to find CATLGPUB for " + sb);
-			println("<!--doCatlgpubSearch: Unable to find CATLGPUB for " + sb+" -->");
-		}
-	}
-
-  	/*********************
-   	*  update this CATLGPUB if changes are found
-   	*@param eiCATLGPUB CATLGPUB entityitem
-   	*@param strMATERIALSTATUS String MATERIALSTATUS from salesstatus record
-   	*/
-    private void updateCatlgpub(EntityItem eiCATLGPUB, String strMATERIALSTATUS,
-    			ExtractActionItem xai)
-    	throws COM.ibm.opicmpdh.middleware.MiddlewareException,
-		COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-    	java.sql.SQLException,
-    	COM.ibm.eannounce.objects.SBRException
-    {
-		OPICMList attL = new OPICMList();
-		String strBuyable = "";
-		String strHide = "";
-		String strCart = "";
-		//String strCustomize = null;
-
-		//MN33416775
-		if (SalesStatusInfo.isSimpleSS(strMATERIALSTATUS)){
-			SalesStatusInfo sshbac = SalesStatusInfo.getSalesStatusInfo(strMATERIALSTATUS,"");//MN33416775
-            println("<!--updateCatlgpub: sskey: " + strMATERIALSTATUS+" values "+sshbac+" -->");
-			// custimize not part of simple ss
-			strCart = sshbac.getAddToCart(); //MN33416775
-			strBuyable = sshbac.getBuyable(); //MN33416775
-			strHide = sshbac.getHide(); //MN33416775
-		}else{
-			// must pull related info for this CATLGPUB
-			SalesStatusInfo sshbac = findSalesStatusInfo(eiCATLGPUB, strMATERIALSTATUS,	xai);
-
-			//strCustomize = sshbac.getCustimize(); //MN33416775
-			strCart = sshbac.getAddToCart(); //MN33416775
-			strBuyable = sshbac.getBuyable(); //MN33416775
-			strHide = sshbac.getHide(); //MN33416775
-		}
-
-	/*MN33416775
-		// more efficient to get all at once
-		String strMtrnCodes = (String)PDGUtility.m_hshMTRNCODE.get(strMATERIALSTATUS);
-		if (strMtrnCodes != null && strMtrnCodes.length() > 0) {
-			StringTokenizer st = new StringTokenizer(strMtrnCodes, ",");
-			if (st.countTokens() == 3) {
-				strBuyable = st.nextToken();
-				strHide = st.nextToken();
-				strCart = st.nextToken();
-			}
-		}*/
-	/*MN35543346 - dont change customize once it is set
-		if (strCustomize != null){
-			if (!m_utility.getAttrValue(eiCATLGPUB,ATT_CATCUSTIMIZE).equals(strCustomize)) {
-				attL.put(ATT_CATCUSTIMIZE, ATT_CATCUSTIMIZE + "=" + strCustomize);
-			}
-		}
-		*/
-
-		if (!m_utility.getAttrValue(eiCATLGPUB,ATT_CATSALESSTATUS).equals(strMATERIALSTATUS)) {
-			attL.put(ATT_CATSALESSTATUS, ATT_CATSALESSTATUS + "=" + strMATERIALSTATUS);
-		}
-
-		if (!m_utility.getAttrValue(eiCATLGPUB,ATT_CATADDTOCART).equals(strCart)) {
-			attL.put(ATT_CATADDTOCART, ATT_CATADDTOCART + "=" + strCart);
-		}
-
-		if (!m_utility.getAttrValue(eiCATLGPUB, ATT_CATBUYABLE).equals(strBuyable)) {
-			attL.put(ATT_CATBUYABLE, ATT_CATBUYABLE + "=" + strBuyable);
-		}
-
-		if (!m_utility.getAttrValue(eiCATLGPUB,ATT_CATHIDE).equals(strHide)) {
-			attL.put(ATT_CATHIDE,ATT_CATHIDE + "=" + strHide);
-		}
-
-		if (attL.size() > 0) {
-			String strWorkFlow = m_utility.getAttrValue(eiCATLGPUB,ATT_CATWORKFLOW);
-
-			if (strWorkFlow.equals("Override")) {
-				attL.put(ATT_CATWORKFLOW,"CATWORKFLOW=SalesStatusOverride");
-			} else if (strWorkFlow.equals("Accept")) {
-				attL.put(ATT_CATWORKFLOW,"CATWORKFLOW=Change");
-			} else if (strWorkFlow.equals("New")) {
-				attL.put(ATT_CATWORKFLOW,"CATWORKFLOW=Change");
-			}
-			if(strUpdatedBy != null && strUpdatedBy.length() > 0) {
-				attL.put("CATUPDATEDBY", "CATUPDATEDBY=" + strUpdatedBy);
-			}
-
-			println("<!--updateCatlgpub: Updating "+eiCATLGPUB.getKey()+" using "+attL+" -->");
-			m_utility.updateAttribute(m_db,m_prof,eiCATLGPUB,attL);
-			updateCount++;
-		}else{
-			println("<!--updateCatlgpub: NO changes found for "+eiCATLGPUB.getKey()+" -->");
-		}
-	}
-
-	/************
-	* 1.	MODEL.COFCAT = {Hardware, Software, Service}
-	*	LSEO via WWSEOLSEO via MODELWWSEO to MODEL.COFCAT
-	*	LSEOBUNDLE.BUNDLETYPE
-	*		If not specified, then Hardware
-	*		If one of the values = Hardware, then Hardware
-	*		else IF one of the values = Software, then Software
-	*		else Service
-	*
-	* 2.	LSEO.PRCINDC = Yes implies Priced
-	* 	LSEOBUNDLE assumed to be Priced
-	* 3.	SPECBID = Yes implies Custom
-	* 	LSEO found on WWSEO; LSEOBUNDLE
-	*
-	*/
-	private SalesStatusInfo findSalesStatusInfo(EntityItem eiCATLGPUB, String strMATERIALSTATUS,
-		ExtractActionItem xai)
-		throws COM.ibm.opicmpdh.middleware.MiddlewareException,
-		COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-    	java.sql.SQLException
-	{
-		// must pull related info for this CATLGPUB
-		String cofcat="";
-		String priced="";
-		String specbid="";
-		String offeringid = "";
-		EntityItem[] aei = new EntityItem[] {eiCATLGPUB};
-
-		String offtype = m_utility.getAttrValue(eiCATLGPUB,ATT_CATOFFTYPE);
-		println("<!--findSalesStatusInfo: "+eiCATLGPUB.getKey()+" offtype: " + offtype+" ss: "+strMATERIALSTATUS+" -->");
-		if ("MODEL".equals(offtype)){
-			offeringid = m_utility.getAttrValue(eiCATLGPUB,ATT_CATMACHTYPE)+
-				m_utility.getAttrValue(eiCATLGPUB,ATT_CATMODEL);
-		}else{
-			offeringid = m_utility.getAttrValue(eiCATLGPUB,ATT_CATSEOID)+
-				m_utility.getAttrValue(eiCATLGPUB,ATT_CATSEOID);
-		}
-
-		String sskey = (String) sskeyTbl.get(offeringid);
-		if (sskey==null){
-			// get the parent LSEOBUNDLE/LSEO/MODEL try one extract for all
-			EntityList list = EntityList.getEntityList(m_db,m_prof,xai,aei);
-			println("<!--findSalesStatusInfo: Extract "+SS_EXTRACTNAME+" " + com.ibm.transform.oim.eacm.util.PokUtils.outputList(list)+" -->");
-
-			EntityGroup eg = null;
-			if ("MODEL".equals(offtype)){
-				eg = list.getEntityGroup("MODEL");
-				if (eg.getEntityItemCount()==0) {
-					println("<!--findSalesStatusInfo: ERROR no "+eg.getEntityType()+" found -->");
-				} else {
-					EntityItem ei = eg.getEntityItem(0);
-					cofcat = m_utility.getAttrValue(ei, ATT_COFCAT);
-					println("<!--findSalesStatusInfo: using "+ei.getKey()+" cofcat: "+cofcat+" -->");
-				}
-				sskey = cofcat;
-			}else if ("BUNDLE".equals(offtype)){
-				priced = "yes"; //LSEOBUNDLE assumed to be Priced- PRCINDC yes
-				eg = list.getEntityGroup("LSEOBUNDLE");
-				if (eg.getEntityItemCount()==0) {
-					println("<!--findSalesStatusInfo: ERROR no "+eg.getEntityType()+" found -->");
-				} else {
-					EntityItem ei = eg.getEntityItem(0);
-					specbid = m_utility.getAttrValue(ei, "SPECBID");
-					// determine HW, SW or SVC from BUNDLETYPE, it is F multiflag
-					//BUNDLETYPE	100	Hardware
-					//BUNDLETYPE	101	Software
-					//BUNDLETYPE	102	Service
-					String btype = m_utility.getAttrValue(ei, "BUNDLETYPE");
-					if (btype.length()==0){ // default to hw
-						cofcat = HW;
-					}else{
-						if (btype.indexOf(HW) != -1){ // if HW selected, use that
-							cofcat = HW;
-						}else if (btype.indexOf(SW) != -1){ // if SW selected, use that
-							cofcat = SW;
-						}else{
-							cofcat = SVC;
-						}
-					}
-					println("<!--findSalesStatusInfo: using "+ei.getKey()+" specbid: "+specbid+
-						" cofcat: "+cofcat+" from btype: "+btype+" -->");
-				}
-
-				sskey = cofcat+":"+priced+":"+specbid;
-			}else{ // must be LSEO
-				eg = list.getEntityGroup("MODEL");
-				if (eg.getEntityItemCount()==0) {
-					println("<!--findSalesStatusInfo: ERROR no "+eg.getEntityType()+" found -->");
-				} else {
-					EntityItem ei = eg.getEntityItem(0);
-					cofcat = m_utility.getAttrValue(ei, ATT_COFCAT);
-					println("<!--findSalesStatusInfo: using "+ei.getKey()+" cofcat: "+cofcat+" -->");
-				}
-				eg = list.getEntityGroup("WWSEO");
-				if (eg.getEntityItemCount()==0) {
-					println("<!--findSalesStatusInfo: ERROR no "+eg.getEntityType()+" found -->");
-				} else {
-					EntityItem ei = eg.getEntityItem(0);
-					specbid = m_utility.getAttrValue(ei, "SPECBID");
-					println("<!--findSalesStatusInfo: using "+ei.getKey()+" specbid: "+specbid+" -->");
-				}
-				eg = list.getEntityGroup("LSEO");
-				if (eg.getEntityItemCount()==0) {
-					println("<!--findSalesStatusInfo: ERROR no "+eg.getEntityType()+" found -->");
-				} else {
-					EntityItem ei = eg.getEntityItem(0);
-					priced = m_utility.getAttrValue(ei, "PRCINDC");
-					println("<!--findSalesStatusInfo: using "+ei.getKey()+" priced: "+priced+" -->");
-				}
-
-				sskey = cofcat+":"+priced+":"+specbid;
-			}
-			sskeyTbl.put(offeringid, sskey);
-			list.dereference();
-		}else{ // already got list, so use this
-			println("<!--findSalesStatusInfo: sskey "+sskey+" already found for "+offeringid+" -->");
-		}
-
-		SalesStatusInfo sshbac = SalesStatusInfo.getSalesStatusInfo(strMATERIALSTATUS,sskey);
-		println("<!--findSalesStatusInfo: sskey: "+strMATERIALSTATUS+":" + sskey+" returned "+sshbac+" -->");
-
-		return sshbac;
-	}
-  	/*********************
-   	*  print the attribute information for this entity
-   	*/
-    private void printAllAttributes(String msg, EntityItem entity) {
-        int lineCnt=0;
-        EntityGroup eg = entity.getEntityGroup();
-        if (!outputWarning) { // just output once at top
-        	outputWarning = true;
-    	    println("<h2>These attribute values are listed before salesstatus updates were applied.</h2>");
-		}
-        println("<h2 class=\"orange-med\">"+msg+"</h2>");
-        println("<table width=\"100%\">");
-		println("<tr style=\"background-color:#cef;\"><th width=\"50%\" title=\""+
-			entity.getKey()+"\">Attribute Description</th>"+
-			"<th width=\"50%\">Attribute Value</th></tr>");
-
-		for(int i=0;i<eg.getMetaAttributeCount();i++){
-			EANMetaAttribute ma = eg.getMetaAttribute(i);
-            EANAttribute att = entity.getAttribute(ma.getAttributeCode());
-            println(
-                "<tr class=\""+(lineCnt++%2!=0?"even":"odd")+"\">"+
-                "<td width=\"50%\" >"
-                + ma.getLongDescription()
-                + "</td><td width=\"50%\">"
-                + (att == null || att.toString().length() == 0 ? "** Not Populated **" : att.toString())
-                + "</td></tr>");
-        }
-        println("</table><br />");
-    }
-
-    /*********************
-    **Get Nav Attributes of an Entity
-    **
-    */
-	private void printNavigateAttributes(EntityItem entity, EntityGroup eg){
-		int lineCnt=0;
-		println("<table width=\"100%\">");
-		println("<tr style=\"background-color:#cef;\"><th width=\"50%\">Navigation Attribute</th>"+
-			"<th width=\"50%\">Attribute Value</th></tr>");
-		for(int i=0;i<eg.getMetaAttributeCount();i++){
-			EANMetaAttribute ma = eg.getMetaAttribute(i);
-			if(ma.isNavigate()){
-				EANAttribute att = entity.getAttribute(ma.getAttributeCode());
-				println(
-					"<tr class=\""+(lineCnt++%2!=0?"even":"odd")+"\">"+
-					"<td width=\"50%\" >"
-					+ ma.getLongDescription()
-					+ "</td><td width=\"50%\">"
-					+ (att == null || att.toString().length() == 0 ? "** Not Populated **" : att.toString())
-					+ "</td></tr>");
-			}
-		}
-		println("</table>");
-	}
-
-  	/*********************
-   	*  print the heading information about this abr
-   	*/
-    private void printHeader(String strNow)  {
-		println("<table width=\"750\" cellpadding=\"0\" cellspacing=\"0\">");
-		println("<tr><th width=\"25%\">ABRName: </th><td>" +
-			getABRCode() + "</td></tr>");
-		println("<tr><th width=\"25%\">Abr Version: </th><td>" +
-			getABRVersion() + "</td></tr>");
-		println("<tr><th width=\"25%\">Enterprise: </th><td>" +
-			getEnterprise() + "</td></tr>");
-		println("<tr><th width=\"25%\">Valid Date: </th><td>" +
-			m_prof.getValOn() + "</td></tr>");
-		println("<tr><th width=\"25%\">Effective Date: </th><td>" +
-			m_prof.getEffOn() + "</td></tr>");
-		println("<tr><th width=\"25%\">Date Generated: </th><td>" +
-			strNow + "</td></tr>" +
-			"</table>");
-		println("<h3>Description: </h3><p>" + getDescription() + "</p><hr>");
-	}
-
-	/**
-	*  Get the entity description to use in error messages
-	*
-	*@param  entityType  Description of the Parameter
-	*@param  entityId    Description of the Parameter
-	*@return             String
-	*/
-	protected String getABREntityDesc(String entityType, int entityId) {
-		return null;
-	}
-
-	/**
-	*  Get ABR description
-	*
-	*@return    java.lang.String
-	*/
-	public String getDescription() {
-		return "Sales Status ABR";
-	}
-
-	/**
-	* getRevision
-	*
-	* @return
-	* @author Owner
-	*/
-	public String getRevision() {
-		return "1.28";
-	}
-
-	/** removed because of jtest error: "Avoid hiding inherited "static" member methods. [OOP.AHSM]"
-	* getVersion
-	*
-	* @return
-	* @author Owner
-	*
-	public static String getVersion() {
-	return ("CATLGPUBABR02.java,v 1.28 2008/09/09 12:52:08 wendy Exp");
-	}*/
-
-	/**
-	* getABRVersion
-	*
-	* @return
-	* @author Owner
-	*/
-	public String getABRVersion() {
-		return "CATLGPUBABR02.java "+getRevision();
-	}
-}

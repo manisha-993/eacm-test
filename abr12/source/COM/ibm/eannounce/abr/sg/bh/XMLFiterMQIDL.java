@@ -1,861 +1,816 @@
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *   Module Name: XMLFiterMQIDL.java
- *
- *   Copyright  : COPYRIGHT IBM CORPORATION, 2011
- *                LICENSED MATERIAL - PROGRAM PROPERTY OF IBM
- *                REFER TO COPYRIGHT INSTRUCTION FORM#G120-2083
- *                RESTRICTED MATERIALS OF IBM
- *                IBM CONFIDENTIAL
- *
- *   Version: 1.0
- *
- *   Functional Description: 
- *
- *   Component : 
- *   Author(s) Name(s): Will
- *   Date of Creation: 2011-5-16
- *   Languages/APIs Used: Java
- *   Compiler/JDK Used: JDK 1.3, 1.4
- *   Production Operating System: AIX 4.x, Windows
- *   Production Dependencies: JDK 1.3 or greater
- *
- *   Change History:
- *   Author(s)     Date	        Change #    Description
- *   -----------   ----------   ---------   ---------------------------------------------
- *   Will   2011-5-16     RQ          Initial code 
- *   
- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/*     */ package COM.ibm.eannounce.abr.sg.bh;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EntityChangeHistoryGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.MQUsage;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.DatePackage;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import COM.ibm.opicmpdh.middleware.Stopwatch;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.sql.PreparedStatement;
+/*     */ import java.sql.ResultSet;
+/*     */ import java.sql.SQLException;
+/*     */ import java.text.SimpleDateFormat;
+/*     */ import java.util.ArrayList;
+/*     */ import java.util.Date;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.Iterator;
+/*     */ import java.util.Locale;
+/*     */ import java.util.ResourceBundle;
+/*     */ import java.util.StringTokenizer;
+/*     */ import java.util.Vector;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class XMLFiterMQIDL
+/*     */ {
+/*  77 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/*  78 */   static final String NEWLINE = new String(FOOL_JTEST);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*  83 */   private StringBuffer rptSb = new StringBuffer();
+/*     */ 
+/*     */ 
+/*     */   
+/*  87 */   private Vector succQueueNameVct = new Vector();
+/*     */ 
+/*     */   
+/*  90 */   private static final Vector FLAGVALUE_COL = new Vector(); private static final String XMLENTITYTYPE = "XMLENTITYTYPE"; private static final String MQUEUE_ATTR = "XMLABRPROPFILE"; private static final String UPDATE_SUFFIX = "_UPDATE"; private static final String NAMESPACE_PREFIX = "'declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/"; private static final String FILTER_SQL_BASE = "select xmlentitytype,xmlentityid,xmlmessage,xmlcachedts from cache.XMLIDLCACHE where XMLCACHEVALIDTO > current timestamp"; static {
+/*  91 */     FILTER_TBL = new Hashtable<>();
+/*  92 */     ENTITY_ROOT_MAP = new Hashtable<>();
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*  97 */     FILTER_TBL.put("CATNAV", new String[] { "FLFILSYSINDC|F:FLFILSYSINDC|F" });
+/*  98 */     FILTER_TBL.put("FCTRANSACTION", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X", "MACHTYPEATR|U:TOMACHTYPE|X", "MODELATR|T:TOMODEL|X", "WTHDRWEFFCTVDATE|D:WTHDRWEFFCTVDATE|D", "WITHDRAWDATEMIN|A:WTHDRWEFFCTVDATE|D" });
+/*     */ 
+/*     */     
+/* 101 */     FILTER_TBL
+/* 102 */       .put("FEATURE", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X", "FCTYPE|U:FCTYPE|X", "COUNTRYLIST|F:COUNTRYLIST/COUNTRYELEMENT/COUNTRYCODE|X", "WITHDRAWDATEEFF_T|D:WTHDRWEFFCTVDATE|D", "WITHDRAWDATEMIN|A:WTHDRWEFFCTVDATE|D" });
+/*     */ 
+/*     */     
+/* 105 */     FILTER_TBL.put("SWFEATURE", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X", "FCTYPE|U:FCTYPE|X", "WITHDRAWDATEEFF_T|D:WTHDRWEFFCTVDATE|D", "WITHDRAWDATEMIN|A:WTHDRWEFFCTVDATE|D" });
+/*     */     
+/* 107 */     FILTER_TBL.put("GBT", new String[0]);
+/* 108 */     FILTER_TBL.put("IMG", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X" });
+/* 109 */     FILTER_TBL.put("LSEOBUNDLE", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X", "FLFILSYSINDC|F:FLFILSYSINDC|F", "BUNDLETYPE|F:BUNDLETYPE|X", "BUNDLUNPUBDATEMTRGT|D:WTHDRWEFFCTVDATE|D", "WITHDRAWDATEMIN|A:WTHDRWEFFCTVDATE|D", "SPECBID|U:SPECIALBID|X", "COUNTRYLIST|F:AVAILABILITYLIST/AVAILABILITYELEMENT/COUNTRY_FC|X", "DIVTEXT|F:DIVISION|X" });
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 114 */     FILTER_TBL.put("MODEL", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X", "FLFILSYSINDC|F:FLFILSYSINDC|F", "WITHDRAWDATEMIN|A:WTHDRWEFFCTVDATE|D", "WTHDRWEFFCTVDATE|D:WTHDRWEFFCTVDATE|D", "SPECBID|U:SPECBID|X", "COFCAT|U:CATEGORY|X", "COFSUBCAT|U:SUBCATEGORY|X", "COFGRP|U:GROUP|X", "COFSUBGRP|U:SUBGROUP|X", "COUNTRYLIST|F:AVAILABILITYLIST/AVAILABILITYELEMENT/COUNTRY_FC|X", "DIVTEXT|F:DIVISION|X" });
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 120 */     FILTER_TBL.put("MODELCONVERT", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X", "MACHTYPEATR|U:TOMACHTYPE|X", "MODELATR|T:TOMODEL|X", "WITHDRAWDATEMIN|A:WTHDRWEFFCTVDATE|D", "WTHDRWEFFCTVDATE|D:WTHDRWEFFCTVDATE|D", "COUNTRYLIST|F:AVAILABILITYLIST/AVAILABILITYELEMENT/COUNTRY_FC|X" });
+/*     */ 
+/*     */     
+/* 123 */     FILTER_TBL.put("LSEO", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X", "FLFILSYSINDC|F:FLFILSYSINDC|F", "LSEOUNPUBDATEMTRGT|D:WTHDRWEFFCTVDATE|D", "WITHDRAWDATEMIN|A:WTHDRWEFFCTVDATE|D", "SPECBID|U:SPECIALBID|X", "COFCAT|U:CATEGORY|X", "COFSUBCAT|U:SUBCATEGORY|X", "COFGRP|U:GROUP|X", "COFSUBGRP|U:SUBGROUP|X", "COUNTRYLIST|F:AVAILABILITYLIST/AVAILABILITYELEMENT/COUNTRY_FC|X", "DIVTEXT|F:DIVISION|X" });
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 130 */     FILTER_TBL.put("SLEORGNPLNTCODE", new String[0]);
+/*     */ 
+/*     */ 
+/*     */     
+/* 134 */     FILTER_TBL.put("SVCLEV", new String[0]);
+/* 135 */     FILTER_TBL.put("SVCMOD", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X", "WTHDRWEFFCTVDATE|D:WTHDRWEFFCTVDATE|D", "SVCMODCATG|U:CATEGORY|X", "SVCMODSUBCATG|U:SUBCATEGORY|X", "SVCMODGRP|U:GROUP|X", "WITHDRAWDATEMIN|A:WTHDRWEFFCTVDATE|D", "SVCMODSUBGRP|U:SUBGROUP|X", "COUNTRYLIST|F:AVAILABILITYLIST/AVAILABILITYELEMENT/COUNTRY_FC|X", "DIVTEXT|F:DIVISION|X" });
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 140 */     FILTER_TBL.put("PRODSTRUCT", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X", "MACHTYPEATR|U:MACHTYPE|X", "MODELATR|T:MODEL|X", "FCTYPE|U:FCTYPE|X", "WTHDRWEFFCTVDATE|D:WTHDRWEFFCTVDATE|D", "FLFILSYSINDC|F:FLFILSYSINDC|F", "COUNTRYLIST|F:AVAILABILITYLIST/AVAILABILITYELEMENT/COUNTRY_FC|X", "WITHDRAWDATEMIN|A:WTHDRWEFFCTVDATE|D" });
+/*     */ 
+/*     */     
+/* 143 */     FILTER_TBL.put("SWPRODSTRUCT", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X", "MACHTYPEATR|U:MACHTYPE|X", "MODELATR|T:MODEL|X", "FCTYPE|U:FCTYPE|X", "WTHDRWEFFCTVDATE|D:WTHDRWEFFCTVDATE|D", "COUNTRYLIST|F:AVAILABILITYLIST/AVAILABILITYELEMENT/COUNTRY_FC|X", "WITHDRAWDATEMIN|A:WTHDRWEFFCTVDATE|D" });
+/*     */ 
+/*     */ 
+/*     */     
+/* 147 */     FILTER_TBL.put("WARR", new String[0]);
+/* 148 */     FILTER_TBL.put("REVUNBUNDCOMP", new String[0]);
+/*     */ 
+/*     */     
+/* 151 */     FILTER_TBL.put("REFOFER", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X" });
+/* 152 */     FILTER_TBL.put("REFOFERFEAT", new String[0]);
+/*     */ 
+/*     */     
+/* 155 */     ENTITY_ROOT_MAP.put("LSEO", "SEO");
+/* 156 */     ENTITY_ROOT_MAP.put("SWFEATURE", "FEATURE");
+/* 157 */     ENTITY_ROOT_MAP.put("REVUNBUNDCOMP", "UNBUNDCOMP");
+/* 158 */     ENTITY_ROOT_MAP.put("PRODSTRUCT", "TMF");
+/* 159 */     ENTITY_ROOT_MAP.put("SWPRODSTRUCT", "TMF");
+/* 160 */     ENTITY_ROOT_MAP.put("IMG", "IMAGE");
+/*     */ 
+/*     */     
+/* 163 */     FLAGVALUE_COL.add("COUNTRYLIST/COUNTRYELEMENT/COUNTRYCODE");
+/* 164 */     FLAGVALUE_COL.add("AVAILABILITYLIST/AVAILABILITYELEMENT/COUNTRY_FC");
+/*     */     
+/* 166 */     FLAGVALUE_COL.add("COUNTRY_FC");
+/* 167 */     FLAGVALUE_COL.add("FLFILSYSINDC");
+/*     */   }
+/*     */   private static final String XML_TITLE = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"; private ADSIDLSTATUS abr; private Profile profile; private Database m_db; private static final Hashtable FILTER_TBL; private static final Hashtable ENTITY_ROOT_MAP;
+/*     */   public XMLFiterMQIDL(ADSIDLSTATUS paramADSIDLSTATUS) {
+/* 171 */     this.abr = paramADSIDLSTATUS;
+/* 172 */     this.profile = paramADSIDLSTATUS.getProfile();
+/* 173 */     this.m_db = paramADSIDLSTATUS.getDatabase();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public XMLFiterMQIDL(Database paramDatabase) {
+/* 180 */     this.m_db = paramDatabase;
+/*     */   }
+/*     */   
+/*     */   private Vector getAllFilters(EntityItem paramEntityItem, String paramString) {
+/* 184 */     Vector<String> vector1 = new Vector();
+/* 185 */     Vector<String> vector2 = new Vector();
+/*     */     
+/* 187 */     String[] arrayOfString = (String[])FILTER_TBL.get(paramString);
+/* 188 */     if (arrayOfString != null) {
+/* 189 */       for (byte b = 0; b < arrayOfString.length; b++) {
+/* 190 */         String str1 = getFilterSql(arrayOfString[b], paramEntityItem);
+/*     */         
+/* 192 */         if (isValidCond(str1)) {
+/* 193 */           if (arrayOfString[b].endsWith("X")) {
+/* 194 */             vector2.add(str1);
+/*     */           } else {
+/* 196 */             vector1.add(str1);
+/*     */           } 
+/*     */         }
+/*     */       } 
+/*     */     }
+/* 201 */     String str = compositeFilterCond(vector2).toString();
+/* 202 */     if (isValidCond(str)) {
+/* 203 */       String str1 = compositeFilterforXml(str, paramString);
+/* 204 */       vector1.add(str1);
+/*     */     } 
+/* 206 */     return vector1;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String getFilterSql(String paramString, EntityItem paramEntityItem) {
+/* 212 */     String[] arrayOfString1 = getArraybasedOnDelimiter(paramString, ":");
+/* 213 */     String[] arrayOfString2 = getArraybasedOnDelimiter(arrayOfString1[0], "|");
+/* 214 */     String[] arrayOfString3 = getArraybasedOnDelimiter(arrayOfString1[1], "|");
+/* 215 */     String str = getAttributeValue(paramEntityItem, arrayOfString2[0], arrayOfString3[0]);
+/* 216 */     if (isValidCond(str)) {
+/* 217 */       this.rptSb.append("<br/>" + arrayOfString2[0] + " = " + str + "<br/>");
+/*     */ 
+/*     */       
+/* 220 */       if ("F".equals(arrayOfString2[1])) {
+/* 221 */         return getConditionforMultiFlag(paramEntityItem, str, arrayOfString3[0], "X"
+/* 222 */             .equals(arrayOfString3[1]));
+/*     */       }
+/* 224 */       return getEvaluationStr(arrayOfString3[0], str, "D".equals(arrayOfString2[1]), "X".equals(arrayOfString3[1]), "A".equals(arrayOfString2[1]));
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 233 */     return null;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   private String getAttributeValue(EntityItem paramEntityItem, String paramString1, String paramString2) {
+/* 238 */     String str = null;
+/* 239 */     if (paramString2 != null && FLAGVALUE_COL.contains(paramString2)) {
+/* 240 */       str = PokUtils.getAttributeFlagValue(paramEntityItem, paramString1);
+/*     */     } else {
+/* 242 */       str = PokUtils.getAttributeValue(paramEntityItem, paramString1, "|", null, false);
+/*     */     } 
+/*     */ 
+/*     */     
+/* 246 */     if ("COFGRP".equalsIgnoreCase(paramString1) && !isValidCond(str)) {
+/* 247 */       str = "Base";
+/*     */     }
+/* 249 */     if (("COFGRP".equalsIgnoreCase(paramString1) || "COFSUBGRP".equalsIgnoreCase(paramString1)) && "Service"
+/* 250 */       .equalsIgnoreCase(PokUtils.getAttributeValue(paramEntityItem, "COFCAT", "", null, false)))
+/*     */     {
+/* 252 */       return null;
+/*     */     }
+/* 254 */     if ("DIVTEXT".equalsIgnoreCase(paramString1)) {
+/* 255 */       str = replace(str, ",", "|");
+/*     */     }
+/*     */     
+/* 258 */     return str;
+/*     */   }
+/*     */   
+/*     */   public String replace(String paramString1, String paramString2, String paramString3) {
+/* 262 */     if (paramString1 == null || paramString2 == null || paramString3 == null) return null;
+/*     */ 
+/*     */     
+/* 265 */     StringBuffer stringBuffer = new StringBuffer(paramString1);
+/*     */     try {
+/*     */       int i;
+/* 268 */       while ((i = paramString1.indexOf(paramString2)) != -1) {
+/* 269 */         stringBuffer.replace(i, i + paramString2.length(), paramString3);
+/* 270 */         paramString1 = stringBuffer.toString();
+/*     */       }
+/*     */     
+/* 273 */     } catch (StringIndexOutOfBoundsException stringIndexOutOfBoundsException) {
+/* 274 */       this.rptSb.append("<br />" + stringIndexOutOfBoundsException.getMessage() + "<br />");
+/* 275 */       return null;
+/*     */     } 
+/* 277 */     return paramString1;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String[] getArraybasedOnDelimiter(String paramString1, String paramString2) {
+/* 283 */     int i = paramString1.indexOf(paramString2);
+/* 284 */     String[] arrayOfString = new String[2];
+/* 285 */     arrayOfString[0] = paramString1.substring(0, i);
+/* 286 */     arrayOfString[1] = paramString1.substring(i + 1);
+/* 287 */     return arrayOfString;
+/*     */   }
+/*     */   
+/*     */   private String generateSqlBasedFilter(EntityItem paramEntityItem) {
+/* 291 */     String str = PokUtils.getAttributeValue(paramEntityItem, "XMLENTITYTYPE", "", null, false);
+/*     */ 
+/*     */     
+/* 294 */     this.rptSb.append("<br /><h2>Looking for " + str + " with the following filters:</h2><br />");
+/* 295 */     StringBuffer stringBuffer = new StringBuffer("select xmlentitytype,xmlentityid,xmlmessage,xmlcachedts from cache.XMLIDLCACHE where XMLCACHEVALIDTO > current timestamp");
+/*     */     
+/* 297 */     if (isValidCond(str)) {
+/* 298 */       stringBuffer
+/* 299 */         .append(" and " + 
+/* 300 */           getEvaluationStr("XMLENTITYTYPE", str, false, false, false));
+/*     */       
+/* 302 */       String str1 = PokUtils.getAttributeFlagValue(paramEntityItem, "XMLSTATUS");
+/* 303 */       if (isValidCond(str1) && "XSTATUS02".equalsIgnoreCase(str1)) {
+/* 304 */         stringBuffer.append(" and STATUS = '0020' ");
+/* 305 */         this.rptSb.append("<br/>STATUS = '0020'<br/>");
+/*     */       } 
+/*     */       
+/* 308 */       String str2 = getAttributeValue(paramEntityItem, "XMLIDLREQDTS", null);
+/* 309 */       if (str2 == null) {
+/* 310 */         str2 = "1980-01-01 00:00:00.000000";
+/*     */       } else {
+/* 312 */         this.rptSb.append("<br/>XMLIDLREQDTS = " + str2 + "<br/>");
+/*     */       } 
+/*     */       
+/* 315 */       stringBuffer.append(" and XMLCACHEDTS >= '" + str2 + "' ");
+/* 316 */       if ("REFOFER".equals(str)) {
+/* 317 */         String str5 = PokUtils.getAttributeValue(paramEntityItem, "DCG", "", null, false);
+/* 318 */         if ("Y".equals(str5)) {
+/* 319 */           stringBuffer.append(" and length(trim(xmlcast(xmlquery('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/REFOFER_UPDATE\"; $i/REFOFER_UPDATE/PRODUCTID/text()' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\") as varchar(8))))=7 ");
+/*     */         }
+/*     */       } 
+/*     */       
+/* 323 */       String str3 = PokUtils.getAttributeValue(paramEntityItem, "OLDINDC", "", null, false);
+/* 324 */       if (str3 == null || "".equals(str3)) {
+/* 325 */         stringBuffer.append(" and (OLDINDC != 'Y' or OLDINDC is null) ");
+/*     */       }
+/*     */       
+/* 328 */       Vector vector = getAllFilters(paramEntityItem, str);
+/* 329 */       StringBuffer stringBuffer1 = compositeFilterCond(vector);
+/* 330 */       String str4 = stringBuffer1.toString();
+/* 331 */       if (isValidCond(str4))
+/* 332 */         stringBuffer.append(" and " + str4); 
+/*     */     } else {
+/* 334 */       this.rptSb.append("<br />no entitytype was specified, will get all records (XMLCACHEVALIDTO &gt; current timestamp in Cache.<br />");
+/*     */     } 
+/*     */     
+/* 337 */     stringBuffer.append(" ORDER BY XMLCACHEDTS with ur");
+/* 338 */     this.rptSb.append(NEWLINE);
+/*     */     
+/* 340 */     return stringBuffer.toString();
+/*     */   }
+/*     */   
+/*     */   private StringBuffer compositeFilterCond(Vector<String> paramVector) {
+/* 344 */     StringBuffer stringBuffer = new StringBuffer("");
+/* 345 */     if (paramVector != null && paramVector.size() > 0) {
+/* 346 */       stringBuffer.append(paramVector.get(0));
+/* 347 */       if (paramVector.size() > 1) {
+/* 348 */         for (byte b = 1; b < paramVector.size(); b++) {
+/* 349 */           stringBuffer.append(" and " + (String)paramVector.get(b));
+/*     */         }
+/*     */       }
+/*     */     } 
+/* 353 */     return stringBuffer;
+/*     */   }
+/*     */   
+/*     */   private boolean isValidCond(String paramString) {
+/* 357 */     return (paramString != null && paramString.trim().length() > 0);
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   private String getEvaluationStr(String paramString1, String paramString2, boolean paramBoolean1, boolean paramBoolean2, boolean paramBoolean3) {
+/* 362 */     if (paramBoolean3)
+/* 363 */       return " " + paramString1 + " >= '" + paramString2 + "'"; 
+/* 364 */     if (paramBoolean1)
+/* 365 */       return " " + paramString1 + " <= '" + paramString2 + "'"; 
+/* 366 */     if (paramBoolean2) {
+/* 367 */       return " " + paramString1 + "/text() = \"" + paramString2 + "\"";
+/*     */     }
+/* 369 */     return " " + paramString1 + " = '" + paramString2 + "'";
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   private String getConditionforMultiFlag(EntityItem paramEntityItem, String paramString1, String paramString2, boolean paramBoolean) {
+/* 374 */     StringBuffer stringBuffer = new StringBuffer("");
+/* 375 */     if (paramString1 != null) {
+/* 376 */       String[] arrayOfString = PokUtils.convertToArray(paramString1);
+/* 377 */       stringBuffer.append("(");
+/* 378 */       for (byte b = 0; b < arrayOfString.length; b++) {
+/* 379 */         if (b > 0)
+/* 380 */           stringBuffer.append(" or "); 
+/* 381 */         if (paramBoolean) {
+/* 382 */           stringBuffer.append(paramString2);
+/* 383 */           stringBuffer.append("/text() = \"" + arrayOfString[b] + "\"");
+/*     */         } else {
+/* 385 */           stringBuffer.append(paramString2);
+/* 386 */           stringBuffer.append(" like '%|" + arrayOfString[b] + "|%' or ");
+/* 387 */           stringBuffer.append(paramString2);
+/* 388 */           stringBuffer.append(" like '" + arrayOfString[b] + "|%' or ");
+/* 389 */           stringBuffer.append(paramString2);
+/* 390 */           stringBuffer.append(" like '%|" + arrayOfString[b] + "' or ");
+/* 391 */           stringBuffer.append(paramString2);
+/* 392 */           stringBuffer.append(" = '" + arrayOfString[b] + "'");
+/*     */         } 
+/*     */       } 
+/* 395 */       stringBuffer.append(")");
+/*     */     } 
+/* 397 */     return stringBuffer.toString();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void getFullXmlAndSendToQue(EntityItem paramEntityItem) throws Exception {
+/* 403 */     String str1 = generateSqlBasedFilter(paramEntityItem);
+/* 404 */     log(str1);
+/* 405 */     PreparedStatement preparedStatement = null;
+/* 406 */     ResultSet resultSet = null;
+/* 407 */     this.succQueueNameVct.clear();
+/*     */     
+/* 409 */     Vector<String> vector = new Vector();
+/* 410 */     Vector<ResourceBundle> vector1 = new Vector();
+/* 411 */     Vector<Hashtable> vector2 = getQueueInfors(paramEntityItem, vector, vector1);
+/* 412 */     if (vector2 == null || vector2.size() == 0) {
+/* 413 */       this.rptSb.append("<br/>no queue was set, will quit <br/>");
+/* 414 */       log("no queue was set!");
+/* 415 */       log("ENTITYTYPE = " + paramEntityItem.getEntityType());
+/* 416 */       log("ENTITYID = " + paramEntityItem.getEntityID());
+/*     */       return;
+/*     */     } 
+/* 419 */     String str2 = PokUtils.getAttributeValue(paramEntityItem, "XMLENTITYTYPE", "", null, false);
+/*     */     
+/* 421 */     String str3 = PokUtils.getAttributeValue(paramEntityItem, "XMLIDLMAXMSG", "", null, false);
+/*     */     
+/* 423 */     int i = -1;
+/* 424 */     if (isValidCond(str3)) {
+/*     */       try {
+/* 426 */         i = Integer.parseInt(str3);
+/* 427 */         this.rptSb.append("<br/>XMLIDLMAXMSG = " + str3 + " <br/>");
+/* 428 */         log("XMLIDLMAXMSG = " + str3);
+/* 429 */       } catch (Exception exception) {
+/* 430 */         log("XMLIDLMAXMSG can not be parsed to integer");
+/* 431 */         this.rptSb.append("<br/>XMLIDLMAXMSG can not be parsed to integer<br/>");
+/* 432 */         log(exception.getMessage());
+/* 433 */         throw exception;
+/*     */       } 
+/*     */     }
+/*     */     try {
+/* 437 */       preparedStatement = this.m_db.getODSConnection().prepareStatement(str1);
+/* 438 */       resultSet = preparedStatement.executeQuery();
+/* 439 */       StringBuffer stringBuffer = new StringBuffer();
+/* 440 */       byte b = 0;
+/* 441 */       String str4 = "";
+/*     */       
+/* 443 */       ArrayList arrayList = new ArrayList();
+/*     */       
+/* 445 */       EntityChangeHistoryGroup entityChangeHistoryGroup = paramEntityItem.getThisChangeHistoryGroup(this.m_db);
+/* 446 */       if (entityChangeHistoryGroup != null) {
+/* 447 */         int k = entityChangeHistoryGroup.getChangeHistoryItemCount();
+/* 448 */         this.abr.addDebug(paramEntityItem.getKey() + " getChangeHistoryItemCount: " + k);
+/* 449 */         if (k > 0) {
+/* 450 */           str4 = entityChangeHistoryGroup.getChangeHistoryItem(k - 1).getChangeDate();
+/* 451 */           this.abr.addDebug("setupDTS : " + str4);
+/*     */         } 
+/*     */       } else {
+/*     */         
+/* 455 */         this.abr.addDebug(paramEntityItem.getKey() + "can not find EntitychangeHistoryGroup! SETUPDTS is getnow().");
+/*     */       } 
+/* 457 */       if ("".equals(str4)) {
+/* 458 */         DatePackage datePackage = this.m_db.getDates();
+/* 459 */         str4 = datePackage.getNow();
+/*     */       } 
+/*     */ 
+/*     */       
+/* 463 */       String str5 = paramEntityItem.getEntityType();
+/* 464 */       int j = paramEntityItem.getEntityID();
+/* 465 */       String str6 = getMQCID(str2);
+/* 466 */       String str7 = "";
+/* 467 */       String str8 = "";
+/* 468 */       String str9 = PokUtils.getAttributeFlagValue(paramEntityItem, "XMLABRPROPFILE");
+/* 469 */       if (str9 == null) {
+/* 470 */         str9 = "";
+/*     */       }
+/* 472 */       this.abr.addDebug("Total: " + resultSet.getFetchSize() + " setupDTS: " + str4 + " setupType: " + str5 + " setupID: " + j + " entityType: " + str2 + " MQPropFile: " + str9);
+/*     */       
+/* 474 */       String str10 = null;
+/* 475 */       while (resultSet.next()) {
+/* 476 */         String str11 = resultSet.getString(3);
+/* 477 */         int k = resultSet.getInt(2);
+/*     */         
+/* 479 */         String str12 = "";
+/* 480 */         if (str11 == null) {
+/* 481 */           str12 = resultSet.getString(4);
+/*     */         } else {
+/* 483 */           String str14 = "<DTSOFMSG>";
+/* 484 */           String str15 = "</DTSOFMSG>";
+/* 485 */           int m = str11.indexOf(str14);
+/* 486 */           int n = str11.indexOf(str15);
+/* 487 */           if (m > -1 && n > -1 && n > m) {
+/* 488 */             str12 = str11.substring(m + str14.length(), n);
+/*     */           } else {
+/* 490 */             str12 = resultSet.getString(4);
+/*     */           } 
+/*     */         } 
+/* 493 */         if (str11 == null) {
+/* 494 */           log("Can not get the xml for " + k);
+/*     */           
+/* 496 */           str7 = "F";
+/* 497 */           str8 = "Can not get the xml from xmlidlcache for " + k;
+/*     */           
+/* 499 */           StringTokenizer stringTokenizer = new StringTokenizer(str9, "|", false);
+/* 500 */           while (stringTokenizer.hasMoreElements()) {
+/* 501 */             String str = stringTokenizer.nextToken();
+/* 502 */             putMSGList(arrayList, str5, j, str4, "", str6, str2, k, str12, str7, str8, str);
+/*     */           } 
+/*     */           continue;
+/*     */         } 
+/* 506 */         String str13 = changeFormatOfTime(resultSet.getString(4));
+/* 507 */         str10 = str13;
+/* 508 */         str11 = removeIllString(str11);
+/* 509 */         for (byte b1 = 0; b1 < vector2.size(); b1++) {
+/* 510 */           ResourceBundle resourceBundle; String str; Hashtable<String, String> hashtable = vector2.get(b1);
+/*     */         } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 555 */         if (b)
+/* 556 */           stringBuffer.append(","); 
+/* 557 */         stringBuffer.append(k);
+/* 558 */         b++;
+/* 559 */         if (b % 1000 == 0)
+/* 560 */           this.abr.setTextValue(paramEntityItem, "XMLIDLREQDTS", str13); 
+/* 561 */         if (i >= 0 && b == i) {
+/* 562 */           this.abr.setTextValue(paramEntityItem, "XMLIDLREQDTS", str13);
+/* 563 */           log("The count of msg has reached the max msg definition in the setup entity: " + i);
+/*     */           break;
+/*     */         } 
+/*     */       } 
+/* 567 */       if (str10 != null)
+/* 568 */         this.abr.setTextValue(paramEntityItem, "XMLIDLREQDTS", str10); 
+/* 569 */       if (arrayList.size() > 0)
+/*     */       {
+/* 571 */         inertMSGLOG(arrayList, str5, j, str4, str2);
+/*     */       }
+/*     */ 
+/*     */       
+/* 575 */       this.rptSb.append("<br/><br/><h3>" + b + " entities were sent. </h3><br/>");
+/*     */       
+/* 577 */       this.rptSb.append("<!--");
+/* 578 */       this.rptSb.append("<br/>" + stringBuffer + "<br/>");
+/* 579 */       this.rptSb.append("-->");
+/*     */     } finally {
+/* 581 */       if (resultSet != null) {
+/*     */         try {
+/* 583 */           resultSet.close();
+/* 584 */         } catch (Exception exception) {
+/* 585 */           System.err
+/* 586 */             .println("getFullXmlAndSendToQue(), unable to close result. " + exception);
+/*     */         } 
+/*     */         
+/* 589 */         resultSet = null;
+/*     */       } 
+/*     */       
+/* 592 */       if (preparedStatement != null) {
+/*     */         try {
+/* 594 */           preparedStatement.close();
+/* 595 */         } catch (Exception exception) {
+/* 596 */           System.err
+/* 597 */             .println("getFullXmlAndSendToQue(), unable to close ps. " + exception);
+/*     */         } 
+/*     */         
+/* 600 */         preparedStatement = null;
+/*     */       } 
+/* 602 */       this.m_db.commit();
+/* 603 */       this.m_db.freeStatement();
+/* 604 */       this.m_db.isPending();
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   private String changeFormatOfTime(String paramString) {
+/* 610 */     String str1 = paramString.substring(0, 23);
+/* 611 */     String str2 = paramString.substring(23);
+/* 612 */     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+/*     */     try {
+/* 614 */       Date date = simpleDateFormat.parse(str1);
+/* 615 */       SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss.SSS");
+/* 616 */       return simpleDateFormat1.format(date) + str2;
+/* 617 */     } catch (Exception exception) {
+/* 618 */       this.rptSb.append("<br/><h2>Error: Parse Date Error.</h2><br/>");
+/* 619 */       this.rptSb.append("<!--" + exception.getMessage() + "-->");
+/* 620 */       log(exception.getMessage());
+/* 621 */       exception.printStackTrace();
+/*     */       
+/* 623 */       return null;
+/*     */     } 
+/*     */   }
+/*     */   private Vector getQueueInfors(EntityItem paramEntityItem, Vector<String> paramVector1, Vector<ResourceBundle> paramVector2) {
+/* 627 */     Vector<Hashtable> vector = new Vector();
+/*     */     
+/* 629 */     String str = PokUtils.getAttributeFlagValue(paramEntityItem, "XMLABRPROPFILE");
+/* 630 */     this.rptSb.append("<br/><h2>Queue Information: </h2><br/>");
+/* 631 */     this.rptSb.append("<br/>" + str + "<br/>");
+/* 632 */     if (str != null) {
+/* 633 */       String[] arrayOfString = PokUtils.convertToArray(str);
+/* 634 */       for (byte b = 0; b < arrayOfString.length; b++) {
+/*     */         try {
+/* 636 */           ResourceBundle resourceBundle = ResourceBundle.getBundle(arrayOfString[b], 
+/* 637 */               getLocale(this.profile.getReadLanguage().getNLSID()));
+/*     */           
+/* 639 */           Hashtable hashtable = MQUsage.getMQSeriesVars(resourceBundle);
+/* 640 */           vector.add(hashtable);
+/* 641 */           paramVector1.add(arrayOfString[b]);
+/* 642 */           paramVector2.add(resourceBundle);
+/* 643 */         } catch (Exception exception) {
+/* 644 */           this.rptSb.append("<br/>Can not find the Queue information for " + arrayOfString[b] + "<br/>");
+/* 645 */           this.rptSb.append("<!--" + exception.getMessage() + "-->");
+/* 646 */           this.abr.addError("Prop file " + arrayOfString[b] + " " + paramEntityItem.getKey() + " not found");
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 651 */     return vector;
+/*     */   }
+/*     */   
+/*     */   private String compositeFilterforXml(String paramString1, String paramString2) {
+/* 655 */     if (isValidCond(paramString1)) {
+/* 656 */       StringBuffer stringBuffer = new StringBuffer("");
+/* 657 */       String str1 = (String)ENTITY_ROOT_MAP.get(paramString2);
+/* 658 */       if (str1 == null) {
+/* 659 */         str1 = paramString2;
+/*     */       }
+/* 661 */       String str2 = str1 + "_UPDATE";
+/* 662 */       stringBuffer
+/* 663 */         .append("xmlexists(")
+/* 664 */         .append("'declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/")
+/* 665 */         .append(str2)
+/* 666 */         .append("\"; $i/")
+/* 667 */         .append(str2)
+/* 668 */         .append("[")
+/* 669 */         .append(paramString1)
+/* 670 */         .append("]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\")");
+/*     */       
+/* 672 */       return stringBuffer.toString();
+/*     */     } 
+/* 674 */     return null;
+/*     */   }
+/*     */   
+/*     */   public static Locale getLocale(int paramInt) {
+/* 678 */     Locale locale = null;
+/* 679 */     switch (paramInt)
+/*     */     
+/*     */     { case 1:
+/* 682 */         locale = Locale.US;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 706 */         return locale;case 2: locale = Locale.GERMAN; return locale;case 3: locale = Locale.ITALIAN; return locale;case 4: locale = Locale.JAPANESE; return locale;case 5: locale = Locale.FRENCH; return locale;case 6: locale = new Locale("es", "ES"); return locale;case 7: locale = Locale.UK; return locale; }  locale = Locale.US; return locale;
+/*     */   }
+/*     */   
+/*     */   private String getMQCID(String paramString) {
+/* 710 */     String str = (String)ENTITY_ROOT_MAP.get(paramString);
+/* 711 */     if (str == null) {
+/* 712 */       str = paramString;
+/*     */     }
+/* 714 */     return str + "_UPDATE";
+/*     */   }
+/*     */   
+/*     */   private String removeIllString(String paramString) {
+/* 718 */     int i = paramString.indexOf("?>");
+/* 719 */     if (i > 0) {
+/* 720 */       paramString = paramString.substring(i + 2);
+/*     */     }
+/* 722 */     return paramString;
+/*     */   }
+/*     */   
+/*     */   public String getReport() {
+/* 726 */     return this.rptSb.toString();
+/*     */   }
+/*     */   
+/*     */   private void log(String paramString) {
+/* 730 */     this.abr.addDebug(paramString);
+/*     */   }
+/*     */   
+/*     */   private void putMSGList(ArrayList<String[]> paramArrayList, String paramString1, int paramInt1, String paramString2, String paramString3, String paramString4, String paramString5, int paramInt2, String paramString6, String paramString7, String paramString8, String paramString9) throws MiddlewareException, SQLException {
+/* 734 */     paramArrayList.add(new String[] { Integer.toString(paramInt2), paramString3, paramString4, paramString6, paramString7, paramString8, paramString9 });
+/*     */     
+/* 736 */     if (paramArrayList.size() >= 100) {
+/* 737 */       inertMSGLOG(paramArrayList, paramString1, paramInt1, paramString2, paramString5);
+/*     */     }
+/*     */   }
+/*     */   
+/*     */   private void inertMSGLOG(ArrayList paramArrayList, String paramString1, int paramInt, String paramString2, String paramString3) throws MiddlewareException, SQLException {
+/* 742 */     long l = System.currentTimeMillis();
+/* 743 */     Iterator<String[]> iterator = paramArrayList.iterator();
+/*     */     
+/* 745 */     PreparedStatement preparedStatement = null;
+/* 746 */     StringBuffer stringBuffer = new StringBuffer();
+/* 747 */     stringBuffer
+/* 748 */       .append("INSERT INTO cache.XMLMSGLOG (SETUPENTITYTYPE, SETUPENTITYID, SETUPDTS, SENDMSGDTS, MSGTYPE, MSGCOUNT, ENTITYTYPE, ENTITYID, DTSOFMSG, MSGSTATUS, REASON, MQPROPFILE) ");
+/* 749 */     stringBuffer.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
+/*     */ 
+/*     */     
+/*     */     try {
+/* 753 */       preparedStatement = this.m_db.getODSConnection().prepareStatement(new String(stringBuffer));
+/* 754 */       while (iterator.hasNext()) {
+/* 755 */         String[] arrayOfString = iterator.next();
+/* 756 */         int i = Integer.parseInt(arrayOfString[0]);
+/* 757 */         preparedStatement.setString(1, paramString1);
+/* 758 */         preparedStatement.setInt(2, paramInt);
+/* 759 */         preparedStatement.setString(3, paramString2);
+/* 760 */         preparedStatement.setString(4, arrayOfString[1]);
+/* 761 */         preparedStatement.setString(5, arrayOfString[2]);
+/* 762 */         preparedStatement.setInt(6, 1);
+/* 763 */         preparedStatement.setString(7, paramString3);
+/* 764 */         preparedStatement.setInt(8, i);
+/* 765 */         preparedStatement.setString(9, arrayOfString[3]);
+/* 766 */         preparedStatement.setString(10, arrayOfString[4]);
+/* 767 */         preparedStatement.setString(11, arrayOfString[5]);
+/* 768 */         preparedStatement.setString(12, arrayOfString[6]);
+/* 769 */         preparedStatement.addBatch();
+/* 770 */         this.abr.addDebug("SETUPENTITYTYPE:" + paramString1 + "-" + paramString1.length() + "!SETUPENTITYID:" + paramInt + "-" + (paramInt + "")
+/* 771 */             .length() + "!SETUPDTS:" + paramString2 + "-" + paramString2
+/* 772 */             .length() + "!SENDMSGDTS:" + arrayOfString[1] + "-" + arrayOfString[1]
+/* 773 */             .length() + "!MSGTYPE:" + arrayOfString[2] + "-" + arrayOfString[2]
+/* 774 */             .length() + "!ENTITYTYPE:" + paramString3 + "-" + paramString3
+/* 775 */             .length() + "!ENTITYID:" + i + "-" + (i + "")
+/* 776 */             .length() + "!DTSOFMSG:" + arrayOfString[3] + "-" + arrayOfString[3]
+/* 777 */             .length() + "!MSGSTATUS:" + arrayOfString[4] + "-" + arrayOfString[4]
+/* 778 */             .length() + "!REASON:" + arrayOfString[5] + "-" + arrayOfString[5]
+/* 779 */             .length() + "!MQPROPFILE:" + arrayOfString[6] + "-" + arrayOfString[6]
+/* 780 */             .length() + "!");
+/*     */       } 
+/*     */       
+/* 783 */       preparedStatement.executeBatch();
+/*     */       
+/* 785 */       if (this.m_db.getODSConnection() != null) {
+/* 786 */         this.m_db.getODSConnection().commit();
+/*     */       }
+/*     */       
+/* 789 */       this.abr.addDebug(paramArrayList.size() + " records was inserted into table. Total Time: " + 
+/*     */           
+/* 791 */           Stopwatch.format(System.currentTimeMillis() - l));
+/* 792 */     } catch (MiddlewareException middlewareException) {
+/* 793 */       this.abr.addDebug("MiddlewareException on ? " + middlewareException);
+/* 794 */       middlewareException.printStackTrace();
+/* 795 */       throw middlewareException;
+/* 796 */     } catch (SQLException sQLException) {
+/* 797 */       this.abr.addDebug("SQLException on ? " + sQLException);
+/* 798 */       sQLException.printStackTrace();
+/* 799 */       throw sQLException;
+/*     */     } finally {
+/* 801 */       paramArrayList.clear();
+/* 802 */       if (preparedStatement != null)
+/*     */         try {
+/* 804 */           preparedStatement.close();
+/* 805 */         } catch (SQLException sQLException) {
+/* 806 */           sQLException.printStackTrace();
+/*     */         }  
+/*     */     } 
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.sg.bh;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.StringTokenizer;
-import java.util.Vector;
-
-
-//import COM.ibm.eannounce.abr.sg.adsxmlbh1.XMLMQ;
-//import COM.ibm.eannounce.objects.AttributeChangeHistoryGroup;
-//import COM.ibm.eannounce.objects.AttributeChangeHistoryItem;
-//import COM.ibm.eannounce.objects.EANAttribute;
-//import COM.ibm.eannounce.objects.EANMetaAttribute;
-import COM.ibm.eannounce.objects.EntityChangeHistoryGroup;
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.eannounce.objects.MQUsage;
-import COM.ibm.opicmpdh.middleware.Database;
-import COM.ibm.opicmpdh.middleware.DatePackage;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-import COM.ibm.opicmpdh.middleware.Profile;
-//import COM.ibm.opicmpdh.middleware.ReturnDataResultSet;
-//import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
-import COM.ibm.opicmpdh.middleware.Stopwatch;
-//import COM.ibm.opicmpdh.objects.SingleFlag;
-
-
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-public class XMLFiterMQIDL {
-
-	private static final String XMLENTITYTYPE = "XMLENTITYTYPE";
-	private static final String MQUEUE_ATTR = "XMLABRPROPFILE";
-
-	private static final String UPDATE_SUFFIX = "_UPDATE";
-	private static final String NAMESPACE_PREFIX = "\'declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/";
-    //Bing added xmlcachedts
-	private static final String FILTER_SQL_BASE = "select xmlentitytype,xmlentityid,xmlmessage,xmlcachedts from cache.XMLIDLCACHE where XMLCACHEVALIDTO > current timestamp";
-	private static final String XML_TITLE = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
-	
-	private static final char[] FOOL_JTEST = {'\n'};
-	static final String NEWLINE = new String(FOOL_JTEST);
-	
-	private ADSIDLSTATUS abr; 
-	private Profile profile;
-	private Database m_db;
-	private StringBuffer rptSb = new StringBuffer();// rpt string
-	private static final Hashtable FILTER_TBL;
-	private static final Hashtable ENTITY_ROOT_MAP;
-	private static final Vector FLAGVALUE_COL;
-	private Vector succQueueNameVct = new Vector();// for reconcilaition xml reprot
-
-	static {
-		FLAGVALUE_COL = new Vector();
-		FILTER_TBL = new Hashtable();
-		ENTITY_ROOT_MAP = new Hashtable();
-
-		// they must be in ATTRCODE|type format where type is T for text, U for
-		// flag,F for Multiple Flag , D for MAX date and A for MIN DATE
-		// xml to filter, we have to use substring in sql
-		FILTER_TBL.put("CATNAV", new String[] {"FLFILSYSINDC|F:FLFILSYSINDC|F" });//Confirm with Wayne, should be add the attribute (FLFILSYSINDC) to meta
-		FILTER_TBL.put("FCTRANSACTION", new String[] {
-				"PDHDOMAIN|F:PDHDOMAIN|X","MACHTYPEATR|U:TOMACHTYPE|X","MODELATR|T:TOMODEL|X",
-				"WTHDRWEFFCTVDATE|D:WTHDRWEFFCTVDATE|D","WITHDRAWDATEMIN|A:WTHDRWEFFCTVDATE|D" });
-		FILTER_TBL
-				.put("FEATURE", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X",
-						"FCTYPE|U:FCTYPE|X","COUNTRYLIST|F:COUNTRYLIST/COUNTRYELEMENT/COUNTRYCODE|X",
-						"WITHDRAWDATEEFF_T|D:WTHDRWEFFCTVDATE|D","WITHDRAWDATEMIN|A:WTHDRWEFFCTVDATE|D" });
-		FILTER_TBL.put("SWFEATURE", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X","FCTYPE|U:FCTYPE|X",
-				"WITHDRAWDATEEFF_T|D:WTHDRWEFFCTVDATE|D" ,"WITHDRAWDATEMIN|A:WTHDRWEFFCTVDATE|D"});
-		FILTER_TBL.put("GBT", new String[] { });
-		FILTER_TBL.put("IMG", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X"});//no country infor in IMG xml
-		FILTER_TBL.put("LSEOBUNDLE", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X",
-				"FLFILSYSINDC|F:FLFILSYSINDC|F", "BUNDLETYPE|F:BUNDLETYPE|X",
-				"BUNDLUNPUBDATEMTRGT|D:WTHDRWEFFCTVDATE|D","WITHDRAWDATEMIN|A:WTHDRWEFFCTVDATE|D",
-				"SPECBID|U:SPECIALBID|X","COUNTRYLIST|F:AVAILABILITYLIST/AVAILABILITYELEMENT/COUNTRY_FC|X",
-				"DIVTEXT|F:DIVISION|X" });
-		FILTER_TBL.put("MODEL", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X",
-				"FLFILSYSINDC|F:FLFILSYSINDC|F","WITHDRAWDATEMIN|A:WTHDRWEFFCTVDATE|D",
-				"WTHDRWEFFCTVDATE|D:WTHDRWEFFCTVDATE|D", "SPECBID|U:SPECBID|X",
-				"COFCAT|U:CATEGORY|X", "COFSUBCAT|U:SUBCATEGORY|X",
-				"COFGRP|U:GROUP|X", "COFSUBGRP|U:SUBGROUP|X","COUNTRYLIST|F:AVAILABILITYLIST/AVAILABILITYELEMENT/COUNTRY_FC|X",
-				"DIVTEXT|F:DIVISION|X"});
-		FILTER_TBL.put("MODELCONVERT", new String[] {
-				"PDHDOMAIN|F:PDHDOMAIN|X","MACHTYPEATR|U:TOMACHTYPE|X","MODELATR|T:TOMODEL|X","WITHDRAWDATEMIN|A:WTHDRWEFFCTVDATE|D",
-				"WTHDRWEFFCTVDATE|D:WTHDRWEFFCTVDATE|D" ,"COUNTRYLIST|F:AVAILABILITYLIST/AVAILABILITYELEMENT/COUNTRY_FC|X"});
-		FILTER_TBL.put("LSEO", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X",
-				"FLFILSYSINDC|F:FLFILSYSINDC|F",
-				"LSEOUNPUBDATEMTRGT|D:WTHDRWEFFCTVDATE|D","WITHDRAWDATEMIN|A:WTHDRWEFFCTVDATE|D",
-				"SPECBID|U:SPECIALBID|X", "COFCAT|U:CATEGORY|X",
-				"COFSUBCAT|U:SUBCATEGORY|X", "COFGRP|U:GROUP|X",
-				"COFSUBGRP|U:SUBGROUP|X","COUNTRYLIST|F:AVAILABILITYLIST/AVAILABILITYELEMENT/COUNTRY_FC|X",
-				"DIVTEXT|F:DIVISION|X" });
-		FILTER_TBL.put("SLEORGNPLNTCODE",
-				new String[] { //"COUNTRYLIST|F:COUNTRY_FC|X"
-				
-		});
-		FILTER_TBL.put("SVCLEV", new String[] { });
-		FILTER_TBL.put("SVCMOD", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X",
-				"WTHDRWEFFCTVDATE|D:WTHDRWEFFCTVDATE|D","SVCMODCATG|U:CATEGORY|X",
-				"SVCMODSUBCATG|U:SUBCATEGORY|X", "SVCMODGRP|U:GROUP|X","WITHDRAWDATEMIN|A:WTHDRWEFFCTVDATE|D",
-				"SVCMODSUBGRP|U:SUBGROUP|X","COUNTRYLIST|F:AVAILABILITYLIST/AVAILABILITYELEMENT/COUNTRY_FC|X",
-				"DIVTEXT|F:DIVISION|X" });
-		FILTER_TBL.put("PRODSTRUCT", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X","MACHTYPEATR|U:MACHTYPE|X","MODELATR|T:MODEL|X",
-				"FCTYPE|U:FCTYPE|X", "WTHDRWEFFCTVDATE|D:WTHDRWEFFCTVDATE|D","FLFILSYSINDC|F:FLFILSYSINDC|F",
-				"COUNTRYLIST|F:AVAILABILITYLIST/AVAILABILITYELEMENT/COUNTRY_FC|X","WITHDRAWDATEMIN|A:WTHDRWEFFCTVDATE|D" });
-		FILTER_TBL.put("SWPRODSTRUCT", new String[] {
-				"PDHDOMAIN|F:PDHDOMAIN|X","MACHTYPEATR|U:MACHTYPE|X","MODELATR|T:MODEL|X","FCTYPE|U:FCTYPE|X",
-				"WTHDRWEFFCTVDATE|D:WTHDRWEFFCTVDATE|D","COUNTRYLIST|F:AVAILABILITYLIST/AVAILABILITYELEMENT/COUNTRY_FC|X",
-				"WITHDRAWDATEMIN|A:WTHDRWEFFCTVDATE|D" });
-		FILTER_TBL.put("WARR", new String[] { });
-		FILTER_TBL.put("REVUNBUNDCOMP",
-				new String[] {  });
-		//REFOFER | REFOFERFEAT added based on document - BH FS ABR XML IDL 20110720.doc
-		FILTER_TBL.put("REFOFER", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X" });
-		FILTER_TBL.put("REFOFERFEAT", new String[] { });
-
-		// only put the different between XML root and entitytype
-		ENTITY_ROOT_MAP.put("LSEO", "SEO");
-		ENTITY_ROOT_MAP.put("SWFEATURE", "FEATURE");
-		ENTITY_ROOT_MAP.put("REVUNBUNDCOMP", "UNBUNDCOMP");
-		ENTITY_ROOT_MAP.put("PRODSTRUCT", "TMF");
-		ENTITY_ROOT_MAP.put("SWPRODSTRUCT", "TMF");
-		ENTITY_ROOT_MAP.put("IMG", "IMAGE");
-
-		// add all attribute in the vector that need to get flag value
-		FLAGVALUE_COL.add("COUNTRYLIST/COUNTRYELEMENT/COUNTRYCODE");
-		FLAGVALUE_COL.add("AVAILABILITYLIST/AVAILABILITYELEMENT/COUNTRY_FC");
-//		FLAGVALUE_COL.add("COUNTRYLIST/COUNTRYELEMENT/COUNTRY_FC"); //for refofer
-		FLAGVALUE_COL.add("COUNTRY_FC");
-		FLAGVALUE_COL.add("FLFILSYSINDC");
-	}
-
-	public XMLFiterMQIDL(ADSIDLSTATUS abr) {
-		this.abr = abr;
-		profile = abr.getProfile();
-		m_db = abr.getDatabase();
-	}
-
-	/**
-	 * just for testing
-	 */
-	public XMLFiterMQIDL(Database db) {
-		m_db = db;
-	}
-
-	private Vector getAllFilters(EntityItem setupEntity, String entitytype) {
-		Vector vCond = new Vector();
-		Vector vXmlCond = new Vector();
-
-		String[] filters = (String[]) FILTER_TBL.get(entitytype);
-		if (filters != null) {
-			for (int i = 0; i < filters.length; i++) {
-				String filterCond = getFilterSql(filters[i], setupEntity);
-//				rptSb.append("<br/>"+replace(filterCond,">","&gt;") + "<br/>");
-				if (isValidCond(filterCond)) {
-					if (filters[i].endsWith("X")) {
-						vXmlCond.add(filterCond);
-					} else {
-						vCond.add(filterCond);
-					}
-				}
-			}
-		}
-		String xmlCond = compositeFilterCond(vXmlCond).toString();
-		if (isValidCond(xmlCond)) {
-			String xmlCondComp = compositeFilterforXml(xmlCond, entitytype);
-			vCond.add(xmlCondComp);
-		}
-		return vCond;
-	}
-
-	// SOURCE : DIST
-	// ATTRCODE|ATTRTYPE:ATTRCODE|ATTRTYPE
-	private String getFilterSql(String filter, EntityItem setupEntity) {
-		String[] srcDist = getArraybasedOnDelimiter(filter, ":");
-		String[] srcCode = getArraybasedOnDelimiter(srcDist[0], "|");
-		String[] distCode = getArraybasedOnDelimiter(srcDist[1], "|");
-		String val = getAttributeValue(setupEntity, srcCode[0],distCode[0]);
-		if(isValidCond(val)){	
-			rptSb.append("<br/>"+srcCode[0] + " = " + val+"<br/>");			
-//			rptSb.append("<br/>"+srcCode[0] + ("D".equals(srcCode[1])?" &lt;=":" = ") + val+"<br/>");
-
-			if ("F".equals(srcCode[1])) {
-				return getConditionforMultiFlag(setupEntity, val,
-						distCode[0], "X".equals(distCode[1]));
-			} else {
-				return getEvaluationStr(distCode[0], val, "D".equals(srcCode[1]), "X".equals(distCode[1]), "A".equals(srcCode[1]));	
-			}
-		}
-		//comment this based on document sep 8 -BH FS ABR XML IDL 20110908.doc
-//		else if("D".equals(srcCode[1])){// withdrawdate is null, set it now()
-//			rptSb.append("<br/>"+srcCode[0] + " &gt;= " + "current date" + "<br/>");
-////			return getEvaluationStr(distCode[0], "current date", "D".equals(srcCode[1]), "X".equals(distCode[1]));
-//			return "(" + distCode[0] +" is null or " + distCode[0] + " >= current date) ";
-//		}
-		return null;
-	}
-	
-	
-	private String getAttributeValue(EntityItem entity, String srcAttr, String distAttr){
-		String result = null;
-		if(distAttr != null && FLAGVALUE_COL.contains(distAttr)){
-			result = PokUtils.getAttributeFlagValue(entity, srcAttr);
-		}else{
-			result =  PokUtils.getAttributeValue(entity, srcAttr,
-					"|", null, false);			
-		}
-
-		if("COFGRP".equalsIgnoreCase(srcAttr) && !isValidCond(result)){
-			result = "Base";// if is not specified, set it to 150(Base)
-		}
-		if(("COFGRP".equalsIgnoreCase(srcAttr) || "COFSUBGRP".equalsIgnoreCase(srcAttr))
-				&&("Service".equalsIgnoreCase(PokUtils.getAttributeValue(entity, "COFCAT",
-					"", null, false)))){
-			return null;
-		}
-		if("DIVTEXT".equalsIgnoreCase(srcAttr)){
-			result = this.replace(result, ",", "|");//change "," to "|", so that we can use the common function later
-		}
-		
-		return result;
-	}
-	public String replace(String Text, String OldWord, String NewWord)
-	{
-		if(Text == null || OldWord == null || NewWord == null) return null;
-		
-		int intIndex;
-		StringBuffer strResult = new StringBuffer(Text);
-	        
-		try {
-			while ((intIndex = Text.indexOf(OldWord)) != -1) {			
-				strResult.replace(intIndex, intIndex + OldWord.length(), NewWord);
-				Text = strResult.toString();
-			}
-		}
-		catch (StringIndexOutOfBoundsException ex){
-			rptSb.append("<br />"+ex.getMessage()+"<br />");
-			return null;
-		}
-		return Text;
-	}
-
-	// the rule was hard code in the code, so do not need to check if it is
-	// valid.
-	private String[] getArraybasedOnDelimiter(String str, String Delimiter) {
-		int index = str.indexOf(Delimiter);
-		String[] out = new String[2];
-		out[0] = str.substring(0, index);
-		out[1] = str.substring(index + 1);
-		return out;
-	}
-
-	private String generateSqlBasedFilter(EntityItem setupEntity) {
-		String entityType = PokUtils.getAttributeValue(setupEntity,
-				"XMLENTITYTYPE", "", null, false);
-		
-		rptSb.append("<br /><h2>Looking for "+entityType+" with the following filters:</h2><br />");
-		StringBuffer buffer = new StringBuffer(FILTER_SQL_BASE);
-		// XMLENTITYTYPE
-		if (isValidCond(entityType)) {
-			buffer
-					.append(" and "
-							+ getEvaluationStr(XMLENTITYTYPE, entityType,
-									false, false, false));
-			String xmlStatus = PokUtils.getAttributeFlagValue(setupEntity, "XMLSTATUS");//put status checking here since it is special and for all entities
-			if(isValidCond(xmlStatus) && "XSTATUS02".equalsIgnoreCase(xmlStatus)){
-				buffer.append(" and STATUS = '0020' ");
-				rptSb.append("<br/>STATUS = '0020'<br/>");
-			}
-//			XMLIDLREQDTS
-			String reqDts = this.getAttributeValue(setupEntity, "XMLIDLREQDTS", null);
-			if(reqDts == null){
-				reqDts = "1980-01-01 00:00:00.000000";
-			}else{
-				rptSb.append("<br/>XMLIDLREQDTS = " + reqDts + "<br/>");
-			}
-//			reqDts = reqDts + " 00:00:00.000000";
-			buffer.append(" and XMLCACHEDTS >= \'" + reqDts +"\' ");
-			if("REFOFER".equals(entityType)) {
-				String isDCG = PokUtils.getAttributeValue(setupEntity, "DCG", "", null, false);
-				if("Y".equals(isDCG)) {
-					buffer.append(" and length(trim(xmlcast(xmlquery('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/REFOFER_UPDATE\"; $i/REFOFER_UPDATE/PRODUCTID/text()' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\") as varchar(8))))=7 ");
-				}
-			}
-			
-			String isold = PokUtils.getAttributeValue(setupEntity, "OLDINDC", "", null, false);
-			if(isold == null || "".equals(isold) ) {
-				buffer.append(" and (OLDINDC != 'Y' or OLDINDC is null) ");
-			}
-			
-			Vector vCond = getAllFilters(setupEntity, entityType);
-			StringBuffer filterBuf = compositeFilterCond(vCond);
-			String appFilter = filterBuf.toString();
-			if (isValidCond(appFilter))
-				buffer.append(" and " + appFilter);
-		}else{
-			rptSb.append("<br />no entitytype was specified, " +
-					"will get all records (XMLCACHEVALIDTO &gt; current timestamp in Cache.<br />");
-		}
-		buffer.append(" ORDER BY XMLCACHEDTS with ur");
-		rptSb.append(NEWLINE);
-//		rptSb.append("<br/> Request Sql: "+buffer.toString()+"<br/>");
-		return buffer.toString();
-	}
-
-	private StringBuffer compositeFilterCond(Vector vCond) {
-		StringBuffer filterBuf = new StringBuffer("");
-		if (vCond != null && vCond.size() > 0) {
-			filterBuf.append((String) vCond.get(0));
-			if (vCond.size() > 1) {
-				for (int i = 1; i < vCond.size(); i++) {
-					filterBuf.append(" and " + (String) vCond.get(i));
-				}
-			}
-		}
-		return filterBuf;
-	}
-
-	private boolean isValidCond(String attr) {
-		return attr != null && attr.trim().length() > 0;
-	}
-
-	private String getEvaluationStr(String key, String eVal, boolean isDate,
-			boolean isXml, boolean isMinDate) {
-		if(isMinDate){
-			return " " + key + " >= \'" + eVal + "\'";
-		} else if (isDate) {			
-			return " " + key + " <= \'" + eVal + "\'";
-		} else if (isXml) {
-			return " " + key + "/text() = \"" + eVal + "\"";
-		} else
-			return " " + key + " = \'" + eVal + "\'";
-	}
-
-	private String getConditionforMultiFlag(EntityItem setupEntity,
-			String multival, String attrCode, boolean isXmlFilter) {
-		StringBuffer buffer = new StringBuffer("");		
-		if (multival != null) {
-			String[] vals = PokUtils.convertToArray(multival);
-			buffer.append("(");
-			for (int i = 0; i < vals.length; i++) {								
-				if (i > 0)
-					buffer.append(" or ");				
-				if (isXmlFilter) {	
-					buffer.append(attrCode);
-					buffer.append("/text() = \"" + vals[i] + "\"");
-				}else{
-					buffer.append(attrCode);
-					buffer.append(" like \'%|" + vals[i] + "|%\' or ");
-					buffer.append(attrCode);
-					buffer.append(" like \'" + vals[i] + "|%\' or ");
-					buffer.append(attrCode);
-					buffer.append(" like \'%|" + vals[i] + "\' or ");
-					buffer.append(attrCode);
-					buffer.append(" = \'" + vals[i] + "\'");
-				}
-			}
-			buffer.append(")");
-		}
-		return buffer.toString();
-	}
-
-	public void getFullXmlAndSendToQue(EntityItem setupEntity)
-			throws Exception {
-				 
-		String sql = generateSqlBasedFilter(setupEntity);
-		log(sql);
-		PreparedStatement ps = null;
-		ResultSet result = null;
-		succQueueNameVct.clear();
-		// get the MQ information
-		Vector queueName = new Vector();
-		Vector rsbds = new Vector();
-		Vector queues = getQueueInfors(setupEntity,queueName,rsbds);
-		if(queues == null || queues.size() == 0){
-			rptSb.append("<br/>no queue was set, will quit <br/>");
-			log("no queue was set!");			
-			log("ENTITYTYPE = " + setupEntity.getEntityType());
-			log("ENTITYID = " + setupEntity.getEntityID());
-			return;
-		}
-		String entityType = PokUtils.getAttributeValue(setupEntity,
-				"XMLENTITYTYPE", "", null, false);
-		String maxMsg = PokUtils.getAttributeValue(setupEntity,
-				"XMLIDLMAXMSG", "", null, false);
-		int max = -1;
-		if(isValidCond(maxMsg)){
-			try{
-				max = Integer.parseInt(maxMsg);
-				rptSb.append("<br/>XMLIDLMAXMSG = "+ maxMsg +" <br/>");
-				log("XMLIDLMAXMSG = " + maxMsg);
-			}catch(Exception e){
-				log("XMLIDLMAXMSG can not be parsed to integer");
-				rptSb.append("<br/>XMLIDLMAXMSG can not be parsed to integer<br/>");
-				log(e.getMessage());
-				throw e;
-			}
-		}
-		try {
-			ps = m_db.getODSConnection().prepareStatement(sql);
-			result = ps.executeQuery();
-			StringBuffer allEntityid = new StringBuffer(); 
-			int count = 0;		  
-			String setupDTS = ""; 
-			//Bing add reconciliation 
-			ArrayList MSGLOGList = new ArrayList();
-			//TODO get SETUPDTS from valfrom of SETUP entity in Entity table
-			EntityChangeHistoryGroup historygrop= setupEntity.getThisChangeHistoryGroup(m_db);
-			if (historygrop != null){
-				int ii = historygrop.getChangeHistoryItemCount();
-    			abr.addDebug(setupEntity.getKey() + " getChangeHistoryItemCount: " + ii);
-    			if (ii > 0){
-    			    setupDTS = historygrop.getChangeHistoryItem(ii-1).getChangeDate();
-    				abr.addDebug("setupDTS : " + setupDTS);
-    			}
-    			
-			}else{
-				abr.addDebug(setupEntity.getKey() + "can not find EntitychangeHistoryGroup! SETUPDTS is getnow().");
-			}
-			if ("".equals(setupDTS)){
-				DatePackage dbNow = m_db.getDates();		  
-				setupDTS = dbNow.getNow();
-			}
-//			AttributeChangeHistoryGroup adsStatusHistoy= getXMLIDLABRSTATUSHistory(setupEntity, "ADSIDLSTATUS");
-//			String setupDTS = getSetupDTS(adsStatusHistoy);
-			String setupType = setupEntity.getEntityType();
-			int setupID = setupEntity.getEntityID();
-			String msgType  = getMQCID(entityType);
-			String MSGStatus = "";
-			String reason = "";
-			String MQPropFile = PokUtils.getAttributeFlagValue(setupEntity, MQUEUE_ATTR);
-			if (MQPropFile == null){
-				MQPropFile = "";
-			}
-			abr.addDebug("Total: "+ result.getFetchSize()+ " setupDTS: " + setupDTS + " setupType: " + setupType + " setupID: " + setupID + " entityType: " + entityType + " MQPropFile: " + MQPropFile );
-			//end todo
-			String endtime = null;
-			while (result.next()) {			
-				String xml = result.getString(3);//upgrade to jdk 6.0, we can use the XML type to deal with it(JDBC4), it should be easy
-				int entityid = result.getInt(2);
-				//get the time of the DTSofMSG from the xml				
-				String DTSofMSG = "";
-				if(xml == null){
-					DTSofMSG = result.getString(4);
-				}else{
-					String dts_start = "<DTSOFMSG>";
-					String dts_end   = "</DTSOFMSG>";
-					int iPos_start   = xml.indexOf(dts_start);
-					int iPos_end     = xml.indexOf(dts_end);
-					if(iPos_start>-1 && iPos_end>-1 && iPos_end>iPos_start){
-						DTSofMSG = xml.substring(iPos_start + dts_start.length(),iPos_end);
-					}else{
-						DTSofMSG = result.getString(4);
-					}					
-				} 
-				if (xml == null) {
-					log("Can not get the xml for " + entityid);
-					//Bing added reconciliation
-					MSGStatus = "F";
-					reason = "Can not get the xml from xmlidlcache for " + entityid;
-					
-					StringTokenizer stString = new StringTokenizer(MQPropFile, "|" , false);
-	       			while (stString.hasMoreElements()) {
-	       				String sigleMQPropfile = stString.nextToken();
-	       				putMSGList(MSGLOGList, setupType, setupID, setupDTS, "", msgType, entityType, entityid, DTSofMSG, MSGStatus, reason, sigleMQPropfile);
-	       			}
-					continue;
-				}
-				String cacheDTS = changeFormatOfTime(result.getString(4));
-				endtime = cacheDTS;
-				xml = removeIllString(xml);//because driver problem, we may have the string like ??
-				for (int i = 0;i < queues.size();i++) {
-					Hashtable ht = (Hashtable) queues.get(i);
-					ResourceBundle resourceBundle = (ResourceBundle)rsbds.get(i);
-					String queueN = (String)queueName.get(i);
-					System.out.println(queueN);
-					try {
-						MSGStatus = "";
-						reason = "";
-						String mqcid = getMQCID(entityType);						
-						Hashtable userProperties = MQUsage.getUserProperties(resourceBundle, mqcid);
-						ht.put(MQUsage.MQCID,mqcid);
-						ht.put(MQUsage.XMLTYPE,"ADS");
-						MQUsage.putToMQQueueWithRFH2(XML_TITLE+xml, ht,userProperties);
-						MSGStatus = "S";
-					} catch (com.ibm.mq.MQException ex) {
-						rptSb.append("<br/><h2>Error: An MQSeries error occurred for queue: "+ queueN + ".</h2><br/>");
-						rptSb.append("<!--"+ex.getMessage()+"-->");
-						log(ex.getMessage());
-						System.out.println(ht);
-						ex.printStackTrace();
-						MSGStatus = "F";
-						reason = "Error:MQ error occurred CompletionCode " + ex.completionCode + " ReasonCode"  + ex.reasonCode;
-						abr.addError("Error: An MQSeries error occurred for queue: "+ queueN + "");
-					} catch (java.io.IOException ex) {
-						rptSb.append("<br/><h2>Error: An error occurred when writing to the MQ message buffer for queue: "+ queueN + ".</h2><br/>");
-						rptSb.append("<!--"+ex.getMessage()+"-->");
-						log(ex.getMessage());
-						System.out.println(ht);
-						ex.printStackTrace();
-						MSGStatus = "F";
-						reason = "Error: An error occurred when writing to the MQ message buffer.";
-						abr.addError("Error: An error occurred when writing to the MQ message buffer. "+ queueN + "");
-					} catch (Exception e){
-						MSGStatus = "F";
-						reason = "An error occurred when putMQ";
-						abr.addError("An error occurred when putMQ" + queueN);
-					}finally{
-						reason =reason.length()<64?reason:reason.substring(0,63);
-//						bing added reconciliation
-					    DatePackage dbNow = m_db.getDates();
-					    String sendMSGDTS = dbNow.getNow();
-						//private void putMSGList(ArrayList MSGLOGList, String setupType, int setupid, String setupDTS, String sendMSGDTS, String msgType, String entityType, int entityID, String DTSofMSG, String MSGStatus, String reason, String MQPropFile){
-						putMSGList(MSGLOGList, setupType, setupID, setupDTS, sendMSGDTS, msgType, entityType, entityid, DTSofMSG, MSGStatus, MSGStatus.equals("S")?"":reason, queueN);
-					}
-				}
-				
-				if (count > 0)
-					allEntityid.append(",");
-				allEntityid.append(entityid);
-				count++;
-				if(count%1000 == 0)
-					abr.setTextValue(setupEntity, "XMLIDLREQDTS", cacheDTS);//After every 1000 XML messages successfully placed on the MQ Series Queue
-				if(max >= 0  && count == max){
-					abr.setTextValue(setupEntity, "XMLIDLREQDTS", cacheDTS);//// successfully place all message to the mq based on max
-					log("The count of msg has reached the max msg definition in the setup entity: " + max);
-					break;
-				}			
-			}
-			if(endtime != null)
-				abr.setTextValue(setupEntity, "XMLIDLREQDTS", endtime); // successfully place all message to the mq
-			if (MSGLOGList.size()>0){
-				//inertMSGLOG (ArrayList MSGLOGList, String setupType, int setupid,String setupDTS, String entityType, String MQPropFile){
-				inertMSGLOG(MSGLOGList, setupType, setupID, setupDTS, entityType);
-			}
-			
-		    //end bing added
-			rptSb.append("<br/><br/><h3>" +count + " entities were sent. </h3><br/>");
-//			rptSb.append("<br/>Testing, not send all entities.<br/>");
-			rptSb.append("<!--");
-			rptSb.append("<br/>"+allEntityid+"<br/>");
-			rptSb.append("-->");
-		} finally {
-			if (result != null) {
-				try {
-					result.close();
-				} catch (Exception e) {
-					System.err
-							.println("getFullXmlAndSendToQue(), unable to close result. "
-									+ e);
-				}
-				result = null;
-			}
-
-			if (ps != null) {
-				try {
-					ps.close();
-				} catch (Exception e) {
-					System.err
-							.println("getFullXmlAndSendToQue(), unable to close ps. "
-									+ e);
-				}
-				ps = null;
-			}
-			m_db.commit();
-			m_db.freeStatement();
-			m_db.isPending();
-
-		}
-	}
-
-	private String changeFormatOfTime(String cacheDTS) {
-		String s1 = cacheDTS.substring(0,23);
-		String s2 = cacheDTS.substring(23);		
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-		try{
-			Date date = sdf.parse(s1);
-			SimpleDateFormat sdf_new = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss.SSS");
-			return sdf_new.format(date)+s2;
-		}catch(Exception e){
-			rptSb.append("<br/><h2>Error: Parse Date Error.</h2><br/>");
-			rptSb.append("<!--"+e.getMessage()+"-->");
-			log(e.getMessage());					
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	private Vector getQueueInfors(EntityItem setupEntity,Vector queueNames,Vector Bundles) {
-		Vector queueCol = new Vector();
-		String mqueue = PokUtils
-				.getAttributeFlagValue(setupEntity, MQUEUE_ATTR); 
-		rptSb.append("<br/><h2>"+"Queue Information: "+"</h2><br/>");
-		rptSb.append("<br/>"+mqueue+"<br/>");
-		if (mqueue != null) {
-			String[] queue = PokUtils.convertToArray(mqueue);
-			for (int i = 0; i < queue.length; i++) {
-				try{
-					ResourceBundle rsBundleMQ = ResourceBundle.getBundle(queue[i],
-	                        getLocale(profile.getReadLanguage().getNLSID()));
-//					ResourceBundle rsBundleMQ = ResourceBundle.getBundle(queue[i]);//TODO commemt back
-					Hashtable ht = MQUsage.getMQSeriesVars(rsBundleMQ);
-					queueCol.add(ht);
-					queueNames.add(queue[i]);
-					Bundles.add(rsBundleMQ);
-				}catch(Exception e){
-					rptSb.append("<br/>Can not find the Queue information for "+ queue[i] +"<br/>");
-					rptSb.append("<!--"+e.getMessage()+"-->");
-					abr.addError("Prop file "+queue[i] + " "+setupEntity.getKey() + " not found");
-					continue;
-				}				
-			}
-		}
-		return queueCol;
-	}
-	
-	private String compositeFilterforXml(String cond, String entitytype) {
-		if (isValidCond(cond)) {
-			StringBuffer buff = new StringBuffer("");
-			String xmlroot = (String) ENTITY_ROOT_MAP.get(entitytype);
-			if (xmlroot == null) {
-				xmlroot = entitytype;
-			}
-			String root = xmlroot + UPDATE_SUFFIX;
-			buff
-					.append("xmlexists(")
-					.append(NAMESPACE_PREFIX)
-					.append(root)
-					.append("\"; $i/")
-					.append(root)
-					.append("[")
-					.append(cond)
-					.append(
-							"]\' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\")");
-			return buff.toString();
-		}
-		return null;
-	}
-	public static Locale getLocale(int nlsID)
-    {
-        Locale locale = null;
-        switch (nlsID)
-        {
-        case 1:
-            locale = Locale.US;
-            break;
-        case 2:
-            locale = Locale.GERMAN;
-            break;
-        case 3:
-            locale = Locale.ITALIAN;
-            break;
-        case 4:
-            locale = Locale.JAPANESE;
-            break;
-        case 5:
-            locale = Locale.FRENCH;
-            break;
-        case 6:
-            locale = new Locale("es", "ES");
-            break;
-        case 7:
-            locale = Locale.UK;
-            break;
-        default:
-            locale = Locale.US;
-        break;
-        }
-        return locale;
-    }
-	
-	private String getMQCID(String entitytype) { 
-		String cid = (String) ENTITY_ROOT_MAP.get(entitytype);
-		if (cid == null) {
-			cid = entitytype;
-		}
-		return cid + "_UPDATE"; 
-	}
-	
-	private String removeIllString(String str){
-		int index = str.indexOf("?>");
-		if(index > 0){
-			str = str.substring(index +2);
-		}
-		return str;
-	}
-	
-	public String getReport(){
-		return rptSb.toString();
-	}
-	private void log(String msg) {
-//		System.out.println(msg);
-		abr.addDebug(msg);//TODO comment back
-	}
-    //bing added reconciliation
-	private void putMSGList(ArrayList MSGLOGList, String setupType, int setupid, String setupDTS, String sendMSGDTS, String msgType, String entityType, int entityID, String DTSofMSG, String MSGStatus, String reason, String MQPropFile) throws MiddlewareException, SQLException{
-		MSGLOGList.add(new String[]{Integer.toString(entityID),sendMSGDTS,msgType,DTSofMSG, MSGStatus,reason,MQPropFile});
-		//TODO change to 100
-		if (MSGLOGList.size() >= 100){
-			inertMSGLOG(MSGLOGList,setupType,setupid, setupDTS, entityType);
-		}
-	}
-	private void inertMSGLOG(ArrayList MSGLOGList, String setupType,
-			int setupid, String setupDTS, String entityType) throws MiddlewareException, SQLException {
-		long startTime = System.currentTimeMillis();
-		Iterator list = MSGLOGList.iterator();
-
-		PreparedStatement ps = null;
-		StringBuffer strbSQL = new StringBuffer();
-		strbSQL
-				.append("INSERT INTO cache.XMLMSGLOG (SETUPENTITYTYPE, SETUPENTITYID, SETUPDTS, SENDMSGDTS, MSGTYPE, MSGCOUNT, ENTITYTYPE, ENTITYID, DTSOFMSG, MSGSTATUS, REASON, MQPROPFILE) ");
-		strbSQL.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
-
-		try {
-			//m_db.setAutoCommit(false);
-			ps = m_db.getODSConnection().prepareStatement(new String(strbSQL));
-			while (list.hasNext()) {
-				String record[] = (String[]) list.next();
-				int entityid = Integer.parseInt(record[0]);
-				ps.setString(1, setupType);
-				ps.setInt(2, setupid);
-				ps.setString(3, setupDTS);
-				ps.setString(4, (String) record[1]);
-				ps.setString(5, (String) record[2]);
-				ps.setInt(6, 1);
-				ps.setString(7, entityType);
-				ps.setInt(8, entityid);
-				ps.setString(9, (String) record[3]);
-				ps.setString(10, (String) record[4]);
-				ps.setString(11, (String) record[5]);
-				ps.setString(12, (String) record[6]);
-				ps.addBatch();
-				abr.addDebug("SETUPENTITYTYPE:"+setupType+"-"+setupType.length()+"!"
-						+"SETUPENTITYID:"+setupid+"-"+(setupid+"").length()+"!"
-						+"SETUPDTS:"+setupDTS+"-"+setupDTS.length()+"!"
-						+"SENDMSGDTS:"+record[1]+"-"+record[1].length()+"!"
-						+"MSGTYPE:"+record[2]+"-"+record[2].length()+"!"
-						+"ENTITYTYPE:"+entityType+"-"+entityType.length()+"!"
-						+"ENTITYID:"+entityid+"-"+(entityid+"").length()+"!"
-						+"DTSOFMSG:"+record[3]+"-"+record[3].length()+"!"
-						+"MSGSTATUS:"+record[4]+"-"+record[4].length()+"!"
-						+"REASON:"+record[5]+"-"+record[5].length()+"!"
-						+"MQPROPFILE:"+record[6]+"-"+record[6].length()+"!"
-						);
-			}
-			ps.executeBatch();
-			//TODO change to m_db.getODSConnection() accroding to DBA response
-			if (m_db.getODSConnection() != null){
-				m_db.getODSConnection().commit();
-			}
-			//m_db.commit();
-			abr.addDebug(MSGLOGList.size()
-					+ " records was inserted into table. Total Time: "
-					+ Stopwatch.format(System.currentTimeMillis() - startTime));
-		} catch (MiddlewareException e){
-			abr.addDebug("MiddlewareException on ? " + e);
-		    e.printStackTrace();
-		    throw e;
-		}catch (SQLException rx) {
-			abr.addDebug("SQLException on ? " + rx);
-		    rx.printStackTrace();
-		    throw rx;
-		}finally {
-			MSGLOGList.clear();
-			if (ps != null)
-				try {
-					ps.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-		}
-
-	}	
-//	/**
-//	 * get history of XMLIDLABRSTATUS
-//	 * 
-//	 * @param mqAbr
-//	 * @return
-//	 * @throws MiddlewareException
-//	 */
-//	
-//	  private AttributeChangeHistoryGroup getXMLIDLABRSTATUSHistory(EntityItem setupEntity, String attCode) throws MiddlewareException {
-//	        EANAttribute att = setupEntity.getAttribute(attCode);
-//	        if (att != null) {
-//	            return new AttributeChangeHistoryGroup(m_db, profile, att);
-//	        } else {
-//	        	abr.addDebug(" ADSIDLSTATUS of "+setupEntity.getKey()+ "  was null");
-//	            return null;
-//	        }
-//	    }
-//		/**
-//		 * get setupDTS
-//		 * @param adsStatusHistoy
-//		 * @return
-//		 * @throws MiddlewareException 
-//		 */
-//	  private String getSetupDTS (AttributeChangeHistoryGroup adsStatusHistoy) throws MiddlewareException{
-//		  String setupDTS = null;
-//		  if (adsStatusHistoy != null && adsStatusHistoy.getChangeHistoryItemCount() > 1) {	     
-//              // get the historyitem count.
-//              int i = adsStatusHistoy.getChangeHistoryItemCount();
-//              // Find the time stamp for "Queued" Status. Notic: last
-//              // chghistory is the current one(in process),-2 is queued.
-//              AttributeChangeHistoryItem achi = (AttributeChangeHistoryItem) adsStatusHistoy.getChangeHistoryItem(i - 2);
-//              if (achi != null) {
-//            	  abr.addDebug("getSetupDTS [" + (i - 2) + "] isActive: " + achi.isActive() + " isValid: " + achi.isValid()
-//                          + " chgdate: " + achi.getChangeDate() + " flagcode: " + achi.getFlagCode());
-//                  if (achi.getFlagCode().equals("0020")) {
-//                	  setupDTS = achi.getChangeDate();
-//                  } else {
-//                	  abr.addDebug("getSetupDTS for the value of " + achi.getFlagCode()
-//                              + "is not Queue. ");
-//                	  throw new MiddlewareException("getSetupDTS for the value of " + achi.getFlagCode()
-//                              + "is not Queue. ");
-//                  }
-//              }
-//                
-//	      }else {
-//	    	  abr.addDebug("There is no ADSIDLSTATUS history!");
-//	      }
-//		  return setupDTS;
-//	  }
-	
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\bh\XMLFiterMQIDL.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

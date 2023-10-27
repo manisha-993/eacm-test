@@ -1,38 +1,42 @@
-/* Copyright IBM Corp. 2016 */
-package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class RdhBomc_stko_api01_Adapter
+/*    */ {
+/*    */   private String stuctName;
+/*    */   private RdhBomc_stko_api01 map;
+/*    */   
+/*    */   public String getStuctName() {
+/* 13 */     return this.stuctName;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setStuctName(String paramString) {
+/* 20 */     this.stuctName = paramString;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public RdhBomc_stko_api01 getMap() {
+/* 27 */     return this.map;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void setMap(RdhBomc_stko_api01 paramRdhBomc_stko_api01) {
+/* 34 */     this.map = paramRdhBomc_stko_api01;
+/*    */   }
+/*    */ }
 
-public class RdhBomc_stko_api01_Adapter
-{
-    private String stuctName;
-    private RdhBomc_stko_api01 map;
-    /**
-     * @return the stuctName
-     */
-    public String getStuctName()
-    {
-        return stuctName;
-    }
-    /**
-     * @param stuctName the stuctName to set
-     */
-    public void setStuctName(String stuctName)
-    {
-        this.stuctName = stuctName;
-    }
-    /**
-     * @return the map
-     */
-    public RdhBomc_stko_api01 getMap()
-    {
-        return map;
-    }
-    /**
-     * @param map the map to set
-     */
-    public void setMap(RdhBomc_stko_api01 map)
-    {
-        this.map = map;
-    }
-    
-    
-}
+
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\entity\RdhBomc_stko_api01_Adapter.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

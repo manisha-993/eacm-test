@@ -1,1309 +1,1315 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2005, 2011  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-/**
-FCABRSTATUS_class=COM.ibm.eannounce.abr.sg.FCABRSTATUS
-FCABRSTATUS_enabled=true
-FCABRSTATUS_idler_class=A
-FCABRSTATUS_keepfile=true
-FCABRSTATUS_read_only=true
-FCABRSTATUS_report_type=DGTYPE01
-FCABRSTATUS_vename=EXRPT3FEATURE1
-FCABRSTATUS_CAT1=RPTCLASS.FCABRSTATUS
-FCABRSTATUS_CAT2=
-FCABRSTATUS_CAT3=RPTSTATUS
-FCABRSTATUS_domains=0050,0090,0150,0190,0210,0230,0240,0310,0330,0340,0360,0390
+/*      */ package COM.ibm.eannounce.abr.sg.bh;
+/*      */ 
+/*      */ import COM.ibm.eannounce.abr.util.ABRUtil;
+/*      */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*      */ import COM.ibm.eannounce.objects.EntityGroup;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.SBRException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*      */ import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
+/*      */ import COM.ibm.opicmpdh.objects.Attribute;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.io.PrintWriter;
+/*      */ import java.io.StringWriter;
+/*      */ import java.sql.SQLException;
+/*      */ import java.util.ArrayList;
+/*      */ import java.util.Hashtable;
+/*      */ import java.util.Vector;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public class FCABRSTATUS
+/*      */   extends DQABRSTATUS
+/*      */ {
+/*      */   private static final String FC_SRCHACTION_NAME = "SRDFEATURE9";
+/*  125 */   private static final char[] FC_CODE_ILLEGAL = new char[] { 'O', 'I' };
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected boolean isVEneeded(String paramString) {
+/*  131 */     return true;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected String getVEName(String paramString1, String paramString2) {
+/*  142 */     if (paramString1.equals("0020")) {
+/*  143 */       addDebug("Status already final, use diff ve");
+/*  144 */       return "EXRPT3FEATURE2";
+/*  145 */     }  if (paramString1.equals("0040") && paramString2.equals("REVIEW")) {
+/*  146 */       addDebug("Status already rfr, use diff ve");
+/*  147 */       return "EXRPT3FEATURE2";
+/*      */     } 
+/*  149 */     return this.m_abri.getVEName();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void doAlreadyFinalProcessing(EntityItem paramEntityItem) throws Exception {
+/*  163 */     if (doDARULEs()) {
+/*  164 */       boolean bool = updateDerivedData(paramEntityItem);
+/*  165 */       addDebug("doAlreadyFinalProcessing: " + paramEntityItem.getKey() + " chgsMade " + bool);
+/*  166 */       if (bool) {
+/*  167 */         setSinceFirstFinal(paramEntityItem, "ADSABRSTATUS");
+/*  168 */         queueProdStruct(true);
+/*      */       } else {
+/*      */         
+/*  171 */         this.args[0] = this.m_elist.getEntityGroup("CATDATA").getLongDescription();
+/*  172 */         addResourceMsg("NO_CHGSFOUND", this.args);
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void doAlreadyRFRProcessing(EntityItem paramEntityItem) throws Exception {
+/*  188 */     if (doDARULEs()) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  198 */       boolean bool = updateDerivedData(paramEntityItem);
+/*  199 */       addDebug("doAlreadyRFRProcessing: " + paramEntityItem.getKey() + " chgsMade " + bool);
+/*  200 */       if (bool) {
+/*  201 */         setRFRSinceFirstRFR(paramEntityItem);
+/*  202 */         queueProdStruct(false);
+/*      */       } else {
+/*      */         
+/*  205 */         this.args[0] = this.m_elist.getEntityGroup("CATDATA").getLongDescription();
+/*  206 */         addResourceMsg("NO_CHGSFOUND", this.args);
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void completeNowR4RProcessing() throws SQLException, MiddlewareException, MiddlewareRequestException {
+/*  239 */     if (doR10processing()) {
+/*  240 */       EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*  241 */       setRFRSinceFirstRFR(entityItem);
+/*  242 */       queueProdStruct(false);
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void completeNowFinalProcessing() throws SQLException, MiddlewareException, MiddlewareRequestException {
+/*  270 */     EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*      */     
+/*  272 */     if (doR10processing()) {
+/*      */ 
+/*      */       
+/*  275 */       setSinceFirstFinal(entityItem, "ADSABRSTATUS");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  286 */       queueProdStruct(true);
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  296 */     boolean bool = isQSMRPQ(entityItem);
+/*  297 */     addDebug("completeNowFinalProcessing - isRPQ " + bool);
+/*  298 */     if (bool) {
+/*  299 */       setFlagValue(this.m_elist.getProfile(), "QSMRPQCREFABRSTATUS", getQueuedValueForItem(entityItem, "QSMRPQCREFABRSTATUS"), entityItem);
+/*  300 */       setFlagValue(this.m_elist.getProfile(), "QSMRPQFULLABRSTATUS", getQueuedValueForItem(entityItem, "QSMRPQFULLABRSTATUS"), entityItem);
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void queueProdStruct(boolean paramBoolean) {
+/*  314 */     EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*  315 */     boolean bool = isRPQ(entityItem);
+/*      */     
+/*  317 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("AVAIL");
+/*  318 */     Vector vector = PokUtils.getEntitiesWithMatchedAttr(entityGroup, "AVAILTYPE", "146");
+/*      */ 
+/*      */     
+/*  321 */     addDebug("queueProdStruct - isRPQ " + bool);
+/*  322 */     addDebug("queueProdStruct - ALL plannedAvailVct.size " + vector.size());
+/*  323 */     if (bool || (!bool && vector.size() == 0)) {
+/*  324 */       EntityGroup entityGroup1 = this.m_elist.getEntityGroup("PRODSTRUCT");
+/*  325 */       for (byte b = 0; b < entityGroup1.getEntityItemCount(); b++) {
+/*  326 */         EntityItem entityItem1 = entityGroup1.getEntityItem(b);
+/*  327 */         if (statusIsRFR(entityItem1) && !paramBoolean) {
+/*  328 */           addDebug("queueProdStruct - RFR PS " + entityItem1.getKey());
+/*  329 */           setFlagValue(this.m_elist.getProfile(), "ADSABRSTATUS", getRFRQueuedValueForItem(entityItem1, "ADSABRSTATUS"), entityItem1);
+/*  330 */         } else if (statusIsFinal(entityItem1) && paramBoolean) {
+/*  331 */           addDebug("queueProdStruct - FINAL PS " + entityItem1.getKey());
+/*  332 */           setFlagValue(this.m_elist.getProfile(), "ADSABRSTATUS", getQueuedValueForItem(entityItem1, "ADSABRSTATUS"), entityItem1);
+/*      */ 
+/*      */           
+/*  335 */           setFlagValue(this.m_elist.getProfile(), "RFCABRSTATUS", getQueuedValueForItem(entityItem1, "RFCABRSTATUS"), entityItem1);
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected boolean updateDerivedData(EntityItem paramEntityItem) throws Exception {
+/*  355 */     boolean bool = false;
+/*      */     
+/*  357 */     String str = PokUtils.getAttributeValue(paramEntityItem, "WITHDRAWDATEEFF_T", "", "9999-12-31", false);
+/*  358 */     addDebug("updateDerivedData wdDate: " + str + " now: " + getCurrentDate());
+/*  359 */     if (getCurrentDate().compareTo(str) <= 0) {
+/*  360 */       bool = execDerivedData(paramEntityItem);
+/*      */     }
+/*  362 */     return bool;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected String getLCRFRWFName() {
+/*  369 */     return "WFLCFEATURERFR"; } protected String getLCFinalWFName() {
+/*  370 */     return "WFLCFEATUREFINAL";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void doDQChecking(EntityItem paramEntityItem, String paramString) throws Exception {
+/*  458 */     addHeading(2, paramEntityItem.getEntityGroup().getLongDescription() + " Checks:");
+/*      */ 
+/*      */ 
+/*      */     
+/*  462 */     setBHInvnameHW(paramEntityItem);
+/*      */     
+/*  464 */     if (getReturnCode() != 0) {
+/*      */       return;
+/*      */     }
+/*      */ 
+/*      */     
+/*  469 */     int i = getCheck_W_W_E(paramString);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  475 */     int j = getCount("FEATUREMONITOR");
+/*  476 */     if (j > 1) {
+/*  477 */       EntityGroup entityGroup = this.m_elist.getEntityGroup("MONITOR");
+/*      */ 
+/*      */       
+/*  480 */       this.args[0] = entityGroup.getLongDescription();
+/*  481 */       createMessage(i, "MORE_THAN_ONE_ERR", this.args);
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  488 */     checkFeatureCode(paramEntityItem, 4);
+/*      */ 
+/*      */ 
+/*      */     
+/*  492 */     checkCanNotBeEarlier(paramEntityItem, "WITHDRAWANNDATE_T", "FIRSTANNDATE", i);
+/*      */ 
+/*      */ 
+/*      */     
+/*  496 */     checkCanNotBeEarlier(paramEntityItem, "WITHDRAWDATEEFF_T", "GENAVAILDATE", i);
+/*      */ 
+/*      */     
+/*  499 */     if (!isRPQ(paramEntityItem)) {
+/*  500 */       addDebug(paramEntityItem.getKey() + " was NOT an RPQ FCTYPE: " + getAttributeFlagEnabledValue(paramEntityItem, "FCTYPE"));
+/*  501 */       checkAvails(paramEntityItem, paramString);
+/*      */     } else {
+/*      */       
+/*  504 */       addDebug(paramEntityItem.getKey() + " was an RPQ FCTYPE: " + getAttributeFlagEnabledValue(paramEntityItem, "FCTYPE"));
+/*      */ 
+/*      */       
+/*  507 */       EntityGroup entityGroup = this.m_elist.getEntityGroup("PRODSTRUCT");
+/*  508 */       addHeading(3, entityGroup.getLongDescription() + " RPQ Checks:");
+/*  509 */       for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/*  510 */         EntityItem entityItem = entityGroup.getEntityItem(b);
+/*      */ 
+/*      */         
+/*  513 */         checkCanNotBeEarlier(entityItem, "ANNDATE", paramEntityItem, "FIRSTANNDATE", i);
+/*      */ 
+/*      */ 
+/*      */         
+/*  517 */         checkCanNotBeEarlier(entityItem, "GENAVAILDATE", paramEntityItem, "FIRSTANNDATE", i);
+/*      */ 
+/*      */         
+/*  520 */         checkCanNotBeLater(entityItem, "WITHDRAWDATE", paramEntityItem, "WITHDRAWANNDATE_T", i);
+/*      */ 
+/*      */ 
+/*      */         
+/*  524 */         checkCanNotBeLater(entityItem, "WTHDRWEFFCTVDATE", paramEntityItem, "WITHDRAWDATEEFF_T", i);
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private void checkFeatureCode(EntityItem paramEntityItem, int paramInt) {
+/*  531 */     if (domainInRuleList(paramEntityItem, "PWRFC_LIST")) {
+/*  532 */       String str = PokUtils.getAttributeValue(paramEntityItem, "FEATURECODE", ", ", "", false);
+/*  533 */       if (checkChars(FC_CODE_ILLEGAL, str)) {
+/*  534 */         this.args[0] = getLD_Value(paramEntityItem, "FEATURECODE");
+/*  535 */         createMessage(paramInt, "INVAILD_CHAR_IO_ERROR", this.args);
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkAvails(EntityItem paramEntityItem, String paramString) throws SQLException, MiddlewareException {
+/*  605 */     int i = getCheck_W_W_E(paramString);
+/*      */     
+/*  607 */     ArrayList arrayList = new ArrayList();
+/*  608 */     EntityGroup entityGroup1 = this.m_elist.getEntityGroup("PRODSTRUCT");
+/*      */ 
+/*      */     
+/*  611 */     getCountriesAsList(paramEntityItem, arrayList, i);
+/*  612 */     String str1 = getAttrValueAndCheckLvl(paramEntityItem, "FIRSTANNDATE", i);
+/*  613 */     String str2 = getAttrValueAndCheckLvl(paramEntityItem, "WITHDRAWANNDATE_T", i);
+/*  614 */     addDebug("checkAvails " + paramEntityItem.getKey() + " FIRSTANNDATE: " + str1 + " WITHDRAWANNDATE_T: " + str2 + " featCtrylist " + arrayList);
+/*      */ 
+/*      */ 
+/*      */     
+/*  618 */     EntityGroup entityGroup2 = this.m_elist.getEntityGroup("AVAIL");
+/*      */ 
+/*      */     
+/*  621 */     Vector vector1 = PokUtils.getEntitiesWithMatchedAttr(entityGroup2, "AVAILTYPE", "146");
+/*      */ 
+/*      */ 
+/*      */     
+/*  625 */     addDebug("checkAvails ALL plannedAvailVct " + vector1.size());
+/*  626 */     Vector vector2 = PokUtils.getEntitiesWithMatchedAttr(entityGroup2, "AVAILTYPE", "149");
+/*  627 */     addDebug("checkAvails ALL loAvailVct " + vector2.size());
+/*      */     
+/*  629 */     Vector vector3 = PokUtils.getEntitiesWithMatchedAttr(entityGroup2, "AVAILTYPE", "172");
+/*  630 */     addDebug("checkAvails ALL mesloAvailVct " + vector3.size());
+/*      */     
+/*  632 */     addHeading(3, entityGroup2.getLongDescription() + " Planned Avail Checks:");
+/*  633 */     checkPsPlanOrMesPlanAvail(vector1, paramEntityItem, arrayList, str1, i);
+/*      */ 
+/*      */     
+/*  636 */     Vector vector4 = PokUtils.getEntitiesWithMatchedAttr(entityGroup2, "AVAILTYPE", "171");
+/*  637 */     addDebug("checkAvails ALL mesPlannedAvailVct " + vector4.size());
+/*  638 */     addHeading(3, entityGroup2.getLongDescription() + " MES Planned Avail Checks:");
+/*  639 */     checkPsPlanOrMesPlanAvail(vector4, paramEntityItem, arrayList, str1, i);
+/*      */     
+/*  641 */     addHeading(3, entityGroup2.getLongDescription() + " First Order Avail Checks:");
+/*      */     
+/*  643 */     Vector<EntityItem> vector = PokUtils.getEntitiesWithMatchedAttr(entityGroup2, "AVAILTYPE", "143");
+/*  644 */     addDebug("checkAvails ALL firstOrderAvailVct " + vector.size());
+/*      */     
+/*  646 */     if (vector.size() > 0) {
+/*      */       byte b1;
+/*  648 */       for (b1 = 0; b1 < vector.size(); b1++) {
+/*  649 */         EntityItem entityItem1 = vector.elementAt(b1);
+/*  650 */         EntityItem entityItem2 = getAvailPS(entityItem1, "OOFAVAIL");
+/*      */ 
+/*      */         
+/*  653 */         checkCanNotBeEarlier(entityItem2, entityItem1, "EFFECTIVEDATE", paramEntityItem, "FIRSTANNDATE", i);
+/*      */       } 
+/*      */ 
+/*      */ 
+/*      */       
+/*  658 */       addDebug("\ncheckAvails checking firstorder ps avails ");
+/*      */       
+/*  660 */       for (b1 = 0; b1 < entityGroup1.getEntityItemCount(); b1++) {
+/*  661 */         EntityItem entityItem = entityGroup1.getEntityItem(b1);
+/*  662 */         Vector vector5 = PokUtils.getAllLinkedEntities(entityItem, "OOFAVAIL", "AVAIL");
+/*  663 */         Vector vector6 = PokUtils.getEntitiesWithMatchedAttr(vector5, "AVAILTYPE", "143");
+/*  664 */         Vector vector7 = PokUtils.getEntitiesWithMatchedAttr(vector5, "AVAILTYPE", "146");
+/*      */         
+/*  666 */         Vector vector8 = PokUtils.getEntitiesWithMatchedAttr(vector5, "AVAILTYPE", "171");
+/*  667 */         addDebug("checkAvails for " + entityItem.getKey() + " psplannedAvailVct " + vector7.size() + " psmesplannedAvailVct " + vector8.size() + " psfoAvailVct " + vector6
+/*  668 */             .size());
+/*  669 */         if (vector6.size() > 0) {
+/*  670 */           Hashtable<Object, Object> hashtable1 = new Hashtable<>();
+/*  671 */           boolean bool1 = getAvailByOSN(hashtable1, vector7, true, 3);
+/*      */           
+/*  673 */           Hashtable<Object, Object> hashtable2 = new Hashtable<>();
+/*  674 */           boolean bool2 = getAvailByOSN(hashtable2, vector8, true, 3);
+/*      */           
+/*  676 */           Hashtable<Object, Object> hashtable3 = new Hashtable<>();
+/*  677 */           boolean bool3 = getAvailByOSN(hashtable3, vector6, true, 3);
+/*  678 */           addDebug("checkAvails " + entityItem.getKey() + " foOsnErrors " + bool3 + " foAvailOSNTbl.keys " + hashtable3
+/*  679 */               .keySet() + " plaOsnErrors " + bool1 + " plaAvailOSNTbl.keys " + hashtable1
+/*  680 */               .keySet() + " mesplaOsnErrors " + bool2 + " mesplaAvailOSNTbl.keys " + hashtable2
+/*  681 */               .keySet());
+/*      */ 
+/*      */ 
+/*      */           
+/*  685 */           if (!bool1 && !bool3)
+/*      */           {
+/*  687 */             checkAvailCtryByOSN(hashtable3, hashtable1, "MISSING_PLA_OSNCTRY_ERR", entityItem, true, i);
+/*      */           }
+/*  689 */           if (vector8 != null && vector8.size() > 0 && !bool2 && !bool3)
+/*      */           {
+/*  691 */             checkAvailCtryByOSN(hashtable3, hashtable2, "MISSING_PLA_OSNCTRY_ERR", entityItem, true, i);
+/*      */           }
+/*  693 */           hashtable1.clear();
+/*  694 */           hashtable2.clear();
+/*  695 */           hashtable3.clear();
+/*      */         } 
+/*  697 */         vector5.clear();
+/*  698 */         vector6.clear();
+/*  699 */         vector7.clear();
+/*  700 */         vector8.clear();
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  707 */     if (str1.length() > 0) {
+/*      */       
+/*  709 */       Vector<EntityItem> vector5 = new Vector<>(vector);
+/*      */       
+/*  711 */       removeNonRFAAVAIL(vector5);
+/*      */       
+/*  713 */       Vector<EntityItem> vector6 = PokUtils.getAllLinkedEntities(vector5, "AVAILANNA", "ANNOUNCEMENT");
+/*      */       
+/*  715 */       vector6 = PokUtils.getEntitiesWithMatchedAttr(vector6, "ANNTYPE", "19");
+/*  716 */       addDebug("checkAvails any foavail NEW annVct " + vector6.size());
+/*  717 */       for (byte b1 = 0; b1 < vector6.size(); b1++) {
+/*  718 */         EntityItem entityItem = vector6.elementAt(b1);
+/*  719 */         checkCanNotBeEarlier(entityItem, "ANNDATE", paramEntityItem, "FIRSTANNDATE", i);
+/*      */       } 
+/*  721 */       vector6.clear();
+/*  722 */       vector5.clear();
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  728 */     addHeading(3, entityGroup2.getLongDescription() + " Last Order Avail Checks:");
+/*  729 */     checkPsLastOrderOrMesLastOrderAvail("149", vector2, entityGroup1, paramEntityItem, str2, i);
+/*      */     
+/*  731 */     addHeading(3, entityGroup2.getLongDescription() + " MES Last Order Avail Checks:");
+/*  732 */     checkPsLastOrderOrMesLastOrderAvail("172", vector3, entityGroup1, paramEntityItem, str2, i);
+/*      */ 
+/*      */ 
+/*      */     
+/*  736 */     addHeading(3, entityGroup2.getLongDescription() + " End of Marketing Avail Checks:");
+/*      */     
+/*  738 */     addDebug("\ncheckAvails checking eom ps avails");
+/*      */     byte b;
+/*  740 */     for (b = 0; b < entityGroup1.getEntityItemCount(); b++) {
+/*  741 */       EntityItem entityItem1 = entityGroup1.getEntityItem(b);
+/*  742 */       EntityItem entityItem2 = getDownLinkEntityItem(entityItem1, "MODEL");
+/*  743 */       int j = getCheckLevel(i, entityItem2, "ANNDATE");
+/*      */       
+/*  745 */       Vector vector5 = PokUtils.getAllLinkedEntities(entityItem1, "OOFAVAIL", "AVAIL");
+/*  746 */       Vector vector6 = PokUtils.getEntitiesWithMatchedAttr(vector5, "AVAILTYPE", "146");
+/*  747 */       Vector vector7 = PokUtils.getEntitiesWithMatchedAttr(vector5, "AVAILTYPE", "171");
+/*      */       
+/*  749 */       Vector<EntityItem> vector8 = PokUtils.getEntitiesWithMatchedAttr(vector5, "AVAILTYPE", "200");
+/*      */ 
+/*      */       
+/*  752 */       addDebug("checkAvails " + entityItem1.getKey() + " all avail: " + vector5.size() + " plaAvail: " + vector6
+/*  753 */           .size() + " mesplaAvail: " + vector7.size() + " eomAvail: " + vector8.size());
+/*      */       
+/*  755 */       if (vector8.size() > 0) {
+/*      */         
+/*  757 */         for (byte b1 = 0; b1 < vector8.size(); b1++) {
+/*  758 */           EntityItem entityItem = vector8.elementAt(b1);
+/*      */           
+/*  760 */           checkCanNotBeLater(entityItem1, entityItem, "EFFECTIVEDATE", paramEntityItem, "WITHDRAWANNDATE_T", i);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */           
+/*  765 */           String str = PokUtils.getAttributeFlagValue(entityItem, "AVAILANNTYPE");
+/*  766 */           addDebug("checkAvails " + entityItem.getKey() + " availAnntypeFlag " + str);
+/*  767 */           if (str == null) {
+/*  768 */             str = "RFA";
+/*      */           }
+/*  770 */           if ("RFA".equals(str)) {
+/*      */             
+/*  772 */             Vector<EntityItem> vector9 = PokUtils.getAllLinkedEntities(entityItem, "AVAILANNA", "ANNOUNCEMENT");
+/*  773 */             addDebug("checkAvails EOM " + entityItem.getKey() + " annVct " + vector9.size());
+/*  774 */             for (byte b2 = 0; b2 < vector9.size(); b2++) {
+/*  775 */               EntityItem entityItem3 = vector9.elementAt(b2);
+/*      */               
+/*  777 */               String str3 = PokUtils.getAttributeFlagValue(entityItem3, "ANNTYPE");
+/*  778 */               addDebug("checkAvails " + entityItem3.getKey() + " anntypeFlag " + str3);
+/*      */ 
+/*      */               
+/*  781 */               if (!"14".equals(str3)) {
+/*      */                 
+/*  783 */                 this.args[0] = getLD_NDN(entityItem);
+/*  784 */                 this.args[1] = getLD_NDN(entityItem3);
+/*  785 */                 createMessage(4, "MUST_NOT_BE_IN_ERR2", this.args);
+/*      */               
+/*      */               }
+/*      */               else {
+/*      */                 
+/*  790 */                 checkCanNotBeLater(entityItem3, "ANNDATE", paramEntityItem, "WITHDRAWANNDATE_T", i);
+/*      */               } 
+/*  792 */             }  vector9.clear();
+/*      */           } 
+/*      */         } 
+/*      */ 
+/*      */         
+/*  797 */         Hashtable<Object, Object> hashtable1 = new Hashtable<>();
+/*  798 */         boolean bool1 = getAvailByOSN(hashtable1, vector6, true, 3);
+/*      */         
+/*  800 */         Hashtable<Object, Object> hashtable2 = new Hashtable<>();
+/*  801 */         boolean bool2 = getAvailByOSN(hashtable2, vector7, true, 3);
+/*  802 */         Hashtable<Object, Object> hashtable3 = new Hashtable<>();
+/*  803 */         boolean bool3 = getAvailByOSN(hashtable3, vector8, true, 3);
+/*  804 */         addDebug("checkAvails " + entityItem1.getKey() + " plaOsnErrors " + bool1 + " plaAvailOSNTbl.keys " + hashtable1
+/*  805 */             .keySet() + " mesplaOsnErrors " + bool1 + " mesplaAvailOSNTbl.keys " + hashtable1
+/*  806 */             .keySet() + " eomOsnErrors " + bool3 + " eomAvailOSNTbl.keys " + hashtable3
+/*  807 */             .keySet());
+/*      */ 
+/*      */         
+/*  810 */         if (!bool1 && !bool3)
+/*      */         {
+/*  812 */           checkAvailCtryByOSN(hashtable3, hashtable1, "MISSING_PLA_OSNCTRY_ERR", entityItem1, true, j);
+/*      */         }
+/*  814 */         if (vector7 != null && vector7.size() > 0 && !bool2 && !bool3)
+/*      */         {
+/*  816 */           checkAvailCtryByOSN(hashtable3, hashtable2, "MISSING_PLA_OSNCTRY_ERR", entityItem1, true, j);
+/*      */         }
+/*  818 */         hashtable1.clear();
+/*  819 */         hashtable2.clear();
+/*  820 */         hashtable3.clear();
+/*      */       } 
+/*  822 */       vector5.clear();
+/*  823 */       vector6.clear();
+/*  824 */       vector7.clear();
+/*  825 */       vector8.clear();
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  831 */     addHeading(3, entityGroup2.getLongDescription() + " End of Service Avail Checks:");
+/*  832 */     addDebug("\ncheckAvails checking eos ps avails ");
+/*      */     
+/*  834 */     for (b = 0; b < entityGroup1.getEntityItemCount(); b++) {
+/*  835 */       EntityItem entityItem1 = entityGroup1.getEntityItem(b);
+/*  836 */       EntityItem entityItem2 = getDownLinkEntityItem(entityItem1, "MODEL");
+/*  837 */       int j = getCheckLevel(i, entityItem2, "ANNDATE");
+/*      */       
+/*  839 */       Vector vector5 = PokUtils.getAllLinkedEntities(entityItem1, "OOFAVAIL", "AVAIL");
+/*  840 */       Vector vector6 = PokUtils.getEntitiesWithMatchedAttr(vector5, "AVAILTYPE", "149");
+/*  841 */       Vector vector7 = PokUtils.getEntitiesWithMatchedAttr(vector5, "AVAILTYPE", "172");
+/*      */       
+/*  843 */       Vector vector8 = PokUtils.getEntitiesWithMatchedAttr(vector5, "AVAILTYPE", "151");
+/*      */ 
+/*      */       
+/*  846 */       addDebug("checkAvails " + entityItem1.getKey() + " all avail: " + vector5.size() + " loAvail: " + vector6
+/*  847 */           .size() + " mesloAvail: " + vector7.size() + " eosAvail: " + vector8.size());
+/*      */ 
+/*      */       
+/*  850 */       if (vector8.size() > 0) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/*  912 */         Hashtable<Object, Object> hashtable1 = new Hashtable<>();
+/*  913 */         boolean bool1 = getAvailByOSN(hashtable1, vector6, true, 3);
+/*      */         
+/*  915 */         Hashtable<Object, Object> hashtable2 = new Hashtable<>();
+/*  916 */         boolean bool2 = getAvailByOSN(hashtable2, vector7, true, 3);
+/*      */         
+/*  918 */         Hashtable<Object, Object> hashtable3 = new Hashtable<>();
+/*  919 */         boolean bool3 = getAvailByOSN(hashtable3, vector8, true, 3);
+/*  920 */         addDebug("checkAvails " + entityItem1.getKey() + " loOsnErrors " + bool1 + " loAvailOSNTbl.keys " + hashtable1
+/*  921 */             .keySet() + " mesloOsnErrors " + bool2 + " mesloAvailOSNTbl.keys " + hashtable2
+/*  922 */             .keySet() + " eosOsnErrors " + bool3 + " eosAvailOSNTbl.keys " + hashtable3
+/*  923 */             .keySet());
+/*      */         
+/*  925 */         if (!bool1 && !bool3) {
+/*      */           
+/*  927 */           checkAvailDatesByCtryByOSN(hashtable3, hashtable1, entityItem1, 1, j, "", false);
+/*      */ 
+/*      */           
+/*  930 */           checkAvailCtryByOSN(hashtable3, hashtable1, "MISSING_LO_OSNCTRY_ERR", entityItem1, true, j);
+/*      */         } 
+/*  932 */         if (vector7 != null && vector7.size() > 0 && !bool2 && !bool3) {
+/*      */           
+/*  934 */           checkAvailDatesByCtryByOSN(hashtable3, hashtable2, entityItem1, 1, j, "", false);
+/*      */ 
+/*      */           
+/*  937 */           checkAvailCtryByOSN(hashtable3, hashtable2, "MISSING_LO_OSNCTRY_ERR", entityItem1, true, j);
+/*      */         } 
+/*  939 */         hashtable1.clear();
+/*  940 */         hashtable2.clear();
+/*  941 */         hashtable3.clear();
+/*      */       } 
+/*      */       
+/*  944 */       vector5.clear();
+/*  945 */       vector6.clear();
+/*  946 */       vector7.clear();
+/*  947 */       vector8.clear();
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/*  952 */     vector.clear();
+/*  953 */     arrayList.clear();
+/*  954 */     vector2.clear();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkPsLastOrderOrMesLastOrderAvail(String paramString1, Vector<?> paramVector, EntityGroup paramEntityGroup, EntityItem paramEntityItem, String paramString2, int paramInt) throws SQLException, MiddlewareException {
+/*  968 */     addDebug("\ncheckAvails checking lastorder ps avails");
+/*      */     
+/*  970 */     for (byte b = 0; b < paramEntityGroup.getEntityItemCount(); b++) {
+/*  971 */       EntityItem entityItem1 = paramEntityGroup.getEntityItem(b);
+/*      */       
+/*  973 */       EntityItem entityItem2 = getDownLinkEntityItem(entityItem1, "MODEL");
+/*  974 */       int i = getCheckLevel(paramInt, entityItem2, "ANNDATE");
+/*      */       
+/*  976 */       Vector vector1 = PokUtils.getAllLinkedEntities(entityItem1, "OOFAVAIL", "AVAIL");
+/*      */ 
+/*      */ 
+/*      */       
+/*  980 */       Vector vector2 = PokUtils.getEntitiesWithMatchedAttr(vector1, "AVAILTYPE", "146");
+/*  981 */       Vector vector3 = PokUtils.getEntitiesWithMatchedAttr(vector1, "AVAILTYPE", "171");
+/*      */       
+/*  983 */       Vector vector4 = PokUtils.getEntitiesWithMatchedAttr(vector1, "AVAILTYPE", paramString1);
+/*  984 */       ArrayList arrayList = getCountriesAsList(vector2, paramInt);
+/*      */       
+/*  986 */       addDebug("checkAvails " + entityItem1.getKey() + " " + entityItem2.getKey() + " all avail: " + vector1.size() + " avail type: " + paramString1 + " plaAvail: " + vector2
+/*  987 */           .size() + " loAvail: " + vector4.size() + " mesplaAvail: " + vector3.size() + " plaAvlCtry:" + arrayList);
+/*      */ 
+/*      */       
+/*  990 */       checkPsAvailCWithAvailA(vector4, vector2, entityItem1, paramEntityItem, paramInt, i);
+/*  991 */       if ("172".equals(paramString1))
+/*  992 */         checkPsAvailCWithAvailA(vector4, vector3, entityItem1, paramEntityItem, paramInt, i); 
+/*  993 */       checkPsAvailCWithFeatureW(vector4, entityItem1, paramEntityItem, paramInt);
+/*      */       
+/*  995 */       vector1.clear();
+/*  996 */       vector2.clear();
+/*  997 */       arrayList.clear();
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1003 */     if (paramString2.length() > 0) {
+/*      */       
+/* 1005 */       Vector vector = new Vector(paramVector);
+/*      */       
+/* 1007 */       removeNonRFAAVAIL(vector);
+/*      */       
+/* 1009 */       Vector<EntityItem> vector1 = PokUtils.getAllLinkedEntities(vector, "AVAILANNA", "ANNOUNCEMENT");
+/* 1010 */       addDebug("checkAvails annVct " + vector1.size());
+/* 1011 */       vector1 = PokUtils.getEntitiesWithMatchedAttr(vector1, "ANNTYPE", "14");
+/* 1012 */       addDebug("checkAvails EOL annVct " + vector1.size());
+/* 1013 */       for (byte b1 = 0; b1 < vector1.size(); b1++) {
+/* 1014 */         EntityItem entityItem = vector1.elementAt(b1);
+/* 1015 */         checkCanNotBeLater(entityItem, "ANNDATE", paramEntityItem, "WITHDRAWANNDATE_T", paramInt);
+/*      */       } 
+/* 1017 */       vector1.clear();
+/*      */       
+/* 1019 */       vector.clear();
+/*      */     } 
+/*      */   }
+/*      */   
+/*      */   private void checkPsAvailCWithAvailA(Vector paramVector1, Vector paramVector2, EntityItem paramEntityItem1, EntityItem paramEntityItem2, int paramInt1, int paramInt2) throws SQLException, MiddlewareException {
+/* 1024 */     if (paramVector1.size() > 0) {
+/* 1025 */       Hashtable<Object, Object> hashtable1 = new Hashtable<>();
+/* 1026 */       boolean bool1 = getAvailByOSN(hashtable1, paramVector2, true, 3);
+/* 1027 */       addDebug("checkAvails " + paramEntityItem1.getKey() + " plaOsnErrors " + bool1 + " plaAvailOSNTbl.keys " + hashtable1
+/* 1028 */           .keySet());
+/*      */       
+/* 1030 */       Hashtable<Object, Object> hashtable2 = new Hashtable<>();
+/* 1031 */       boolean bool2 = getAvailByOSN(hashtable2, paramVector1, true, 3);
+/* 1032 */       addDebug("checkAvails " + paramEntityItem1.getKey() + " loOsnErrors " + bool2 + " loAvailOSNTbl.keys " + hashtable2
+/* 1033 */           .keySet());
+/*      */ 
+/*      */       
+/* 1036 */       if (!bool1 && !bool2)
+/*      */       {
+/* 1038 */         checkAvailCtryByOSN(hashtable2, hashtable1, "MISSING_PLA_OSNCTRY_ERR", paramEntityItem1, true, paramInt2);
+/*      */       }
+/* 1040 */       hashtable1.clear();
+/* 1041 */       hashtable2.clear();
+/*      */     } 
+/*      */   }
+/*      */   
+/*      */   private void checkPsAvailCWithFeatureW(Vector<EntityItem> paramVector, EntityItem paramEntityItem1, EntityItem paramEntityItem2, int paramInt) throws SQLException, MiddlewareException {
+/* 1046 */     if (paramVector.size() > 0)
+/*      */     {
+/* 1048 */       for (byte b = 0; b < paramVector.size(); b++) {
+/* 1049 */         EntityItem entityItem = paramVector.elementAt(b);
+/*      */ 
+/*      */         
+/* 1052 */         checkCanNotBeLater(paramEntityItem1, entityItem, "EFFECTIVEDATE", paramEntityItem2, "WITHDRAWDATEEFF_T", paramInt);
+/*      */       } 
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkPsPlanOrMesPlanAvail(Vector<EntityItem> paramVector, EntityItem paramEntityItem, ArrayList paramArrayList, String paramString, int paramInt) throws SQLException, MiddlewareException {
+/* 1073 */     for (byte b = 0; b < paramVector.size(); b++) {
+/* 1074 */       EntityItem entityItem1 = paramVector.elementAt(b);
+/* 1075 */       EntityItem entityItem2 = getAvailPS(entityItem1, "OOFAVAIL");
+/*      */       
+/* 1077 */       checkAvailCtryInEntity(entityItem2, entityItem1, paramEntityItem, paramArrayList, paramInt);
+/*      */ 
+/*      */ 
+/*      */       
+/* 1081 */       checkCanNotBeEarlier(entityItem2, entityItem1, "EFFECTIVEDATE", paramEntityItem, "FIRSTANNDATE", paramInt);
+/*      */     } 
+/*      */     
+/* 1084 */     if (paramString.length() > 0) {
+/*      */       
+/* 1086 */       Vector<EntityItem> vector1 = new Vector<>(paramVector);
+/*      */       
+/* 1088 */       removeNonRFAAVAIL(vector1);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1094 */       Vector<EntityItem> vector2 = PokUtils.getAllLinkedEntities(vector1, "AVAILANNA", "ANNOUNCEMENT");
+/* 1095 */       addDebug("checkAvails all annVct " + vector2.size());
+/* 1096 */       vector2 = PokUtils.getEntitiesWithMatchedAttr(vector2, "ANNTYPE", "19");
+/* 1097 */       addDebug("checkAvails PLA NEW annVct " + vector2.size());
+/* 1098 */       for (byte b1 = 0; b1 < vector2.size(); b1++) {
+/* 1099 */         EntityItem entityItem = vector2.elementAt(b1);
+/* 1100 */         checkCanNotBeEarlier(entityItem, "ANNDATE", paramEntityItem, "FIRSTANNDATE", paramInt);
+/*      */       } 
+/* 1102 */       vector2.clear();
+/* 1103 */       vector1.clear();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getDescription() {
+/* 1114 */     return "FEATURE ABR.";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getABRVersion() {
+/* 1126 */     return "1.23";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setBHInvnameHW(EntityItem paramEntityItem) throws Exception {
+/* 1156 */     boolean bool = true;
+/*      */     
+/* 1158 */     String str1 = PokUtils.getAttributeValue(paramEntityItem, "FEATURECODE", ", ", "", false);
+/* 1159 */     String str2 = PokUtils.getAttributeValue(paramEntityItem, "BHINVNAME", ", ", null, false);
+/* 1160 */     String str3 = PokUtils.getAttributeValue(paramEntityItem, "INVNAME", ", ", null, false);
+/* 1161 */     String str4 = getAttributeFlagEnabledValue(paramEntityItem, "INVENTORYGROUP");
+/*      */     
+/* 1163 */     int i = 254;
+/*      */     
+/* 1165 */     EANMetaAttribute eANMetaAttribute = paramEntityItem.getEntityGroup().getMetaAttribute("BHINVNAME");
+/* 1166 */     if (eANMetaAttribute != null) {
+/* 1167 */       i = eANMetaAttribute.getMaxLen();
+/*      */     }
+/*      */     
+/* 1170 */     addDebug("setBHInvnameHW checking " + paramEntityItem.getKey() + " fcode: " + str1 + " bhinvname: " + str2 + " invname: " + str3 + " invgrp: " + str4 + " maxLen: " + i);
+/*      */ 
+/*      */     
+/* 1173 */     if (str3 == null) {
+/*      */       
+/* 1175 */       this.args[0] = "";
+/* 1176 */       this.args[1] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "INVNAME", "INVNAME");
+/* 1177 */       createMessage(4, "REQ_NOTPOPULATED_ERR", this.args);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*      */       return;
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1187 */     if (str2 != null) {
+/*      */       
+/* 1189 */       String str5 = getTimestamp(paramEntityItem, "INVNAME");
+/*      */       
+/* 1191 */       String str6 = getTimestamp(paramEntityItem, "BHINVNAME");
+/* 1192 */       addDebug("setBHInvnameHW invnameDts: " + str5 + " bhinvnameDts: " + str6);
+/* 1193 */       bool = (str6.compareTo(str5) < 0) ? true : false;
+/*      */     } 
+/*      */     
+/* 1196 */     if (bool) {
+/*      */       
+/* 1198 */       EntityItem[] arrayOfEntityItem = searchForFeature(str4, str3);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1205 */       if (arrayOfEntityItem == null || arrayOfEntityItem.length == 1) {
+/* 1206 */         str2 = str3;
+/*      */       } else {
+/* 1208 */         str2 = str1 + "-" + str3;
+/*      */       } 
+/*      */       
+/* 1211 */       addDebug("setBHInvnameHW derived bhinvname: " + str2);
+/*      */       
+/* 1213 */       setTextValue(this.m_elist.getProfile(), "BHINVNAME", str2, paramEntityItem);
+/*      */     } 
+/*      */ 
+/*      */     
+/* 1217 */     if (str2.length() > i) {
+/*      */ 
+/*      */ 
+/*      */       
+/* 1221 */       this.args[0] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), "BHINVNAME", "BHINVNAME");
+/* 1222 */       this.args[1] = "" + i;
+/* 1223 */       this.args[2] = str2;
+/* 1224 */       createMessage(3, "DERIVED_LEN_ERR", this.args);
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void removeAttrBeforeCommit(ReturnEntityKey paramReturnEntityKey) {
+/* 1232 */     Attribute attribute = null;
+/* 1233 */     for (byte b = 0; b < paramReturnEntityKey.m_vctAttributes.size(); b++) {
+/* 1234 */       Attribute attribute1 = paramReturnEntityKey.m_vctAttributes.elementAt(b);
+/* 1235 */       if (attribute1.getAttributeCode().equals("BHINVNAME")) {
+/* 1236 */         attribute = attribute1;
+/*      */         break;
+/*      */       } 
+/*      */     } 
+/* 1240 */     paramReturnEntityKey.m_vctAttributes.clear();
+/*      */     
+/* 1242 */     if (attribute != null) {
+/* 1243 */       paramReturnEntityKey.m_vctAttributes.addElement(attribute);
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityItem[] searchForFeature(String paramString1, String paramString2) throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 1260 */     Vector<String> vector1 = new Vector(2);
+/* 1261 */     Vector<String> vector2 = new Vector(2);
+/* 1262 */     vector1.addElement("INVNAME");
+/* 1263 */     vector1.addElement("INVENTORYGROUP");
+/*      */     
+/* 1265 */     vector2.addElement(paramString2);
+/* 1266 */     vector2.addElement(paramString1);
+/*      */     
+/* 1268 */     EntityItem[] arrayOfEntityItem = null;
+/*      */     try {
+/* 1270 */       StringBuffer stringBuffer = new StringBuffer();
+/* 1271 */       addDebug("searchForFeature using attrs: " + vector1 + " values: " + vector2);
+/* 1272 */       arrayOfEntityItem = ABRUtil.doSearch(getDatabase(), this.m_elist.getProfile(), "SRDFEATURE9", "FEATURE", false, vector1, vector2, stringBuffer);
+/*      */       
+/* 1274 */       if (stringBuffer.length() > 0) {
+/* 1275 */         addDebug(stringBuffer.toString());
+/*      */       }
+/* 1277 */     } catch (SBRException sBRException) {
+/*      */       
+/* 1279 */       StringWriter stringWriter = new StringWriter();
+/* 1280 */       sBRException.printStackTrace(new PrintWriter(stringWriter));
+/* 1281 */       addDebug("searchForFeature SBRException: " + stringWriter.getBuffer().toString());
+/*      */     } 
+/*      */     
+/* 1284 */     if (arrayOfEntityItem != null) {
+/* 1285 */       for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/* 1286 */         addDebug("searchForFeature found " + arrayOfEntityItem[b].getKey());
+/*      */       }
+/*      */     }
+/*      */     
+/* 1290 */     vector1.clear();
+/* 1291 */     vector2.clear();
+/* 1292 */     return arrayOfEntityItem;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean checkChars(char[] paramArrayOfchar, String paramString) {
+/* 1302 */     for (byte b = 0; b < paramArrayOfchar.length; b++) {
+/* 1303 */       if (paramString.indexOf(paramArrayOfchar[b]) >= 0) {
+/* 1304 */         return true;
+/*      */       }
+/*      */     } 
+/* 1307 */     return false;
+/*      */   }
+/*      */ }
 
- *
- * FCABRSTATUS.java,v
- * Revision 1.21  2011/03/23 11:17:58  wendy
- * Add CATDATA and chg date attr for check 102
- *
- * Revision 1.20  2011/03/05 00:59:58  wendy
- * MNIN454169 - BH FS ABR Data Quality 20110303.doc
- *
- * Revision 1.15  2010/08/25 19:37:10  wendy
- * check for null from search
- *
- * Revision 1.11  2010/01/21 14:27:40  wendy
- * update cmts
- *
- * Revision 1.10  2010/01/20 15:23:41  wendy
- * updates for BH FS ABR Data Quality 20100118.doc
- *
- * Revision 1.8  2009/12/08 12:13:50  wendy
- * cvs failure - restore version and logging
- *
- * Revision 1.6  2009/12/02 18:56:31  wendy
- * Updated for spec chg BH FS ABR Data Qualtity 20091120.xls
- *
- * Revision 1.5  2009/11/04 15:08:07  wendy
- * BH Configurable Services - spec chgs
- *
- * Revision 1.4  2009/09/09 16:45:08  wendy
- * Check avails by (xx)prodstruct instead of as a group
- *
- * Revision 1.3  2009/08/17 15:30:10  wendy
- * Added headings
- *
- * Revision 1.2  2009/08/15 01:41:50  wendy
- * SR10, 11, 12, 15, 17 BH updates phase 4
- *
- * Revision 1.1  2009/07/30 18:54:36  wendy
- * Moved to new pkg for BH SR10, 11, 12, 15, 17
 
- *
- * </pre>
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\bh\FCABRSTATUS.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-package COM.ibm.eannounce.abr.sg.bh;
-
-import COM.ibm.eannounce.abr.util.ABRUtil;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
-import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
-import COM.ibm.opicmpdh.objects.Attribute;
-
-import com.ibm.transform.oim.eacm.util.*;
-
-import java.sql.SQLException;
-import java.util.*;
-
-
-/**********************************************************************************
-* FCABRSTATUS class
-* 
-* BH FS ABR Data Quality 20120131.doc - delete 115-120, add OSN filtering to AVAIL checks
-* 
-* BH FS ABR Data Quality 20110517.doc
-* support already final or rfr - gen catdata and queue ads abr
-* needs new VE EXRPT3FEATURE2
-*   
-* BH FS ABR Data Qualtity Checks 20110318.xls date attr chg
-* 
-* catdata updates, 
-* updated VE EXRPT3FEATURE1
-* 
-* MNIN454169 - BH FS ABR Data Quality 20110303.doc
-* 
-* BH FS ABR Data Qualtity Sets 20100629.xls
-* need LIFECYCLE meta and workflow actions
-* 
-* From "SG FS ABR Data Quality 20100521.doc"
-* 
-need meta
-  - BHINVNAME added
-  - SRDFEATURE9 created
-
-*
-XII.	FEATURE
-
-A.	Checking
-
-A Feature does not have to be in a product (i.e. be related to a MODEL via PRODSTRUCT) at the time it goes Final. 
-Therefore, a FEATURE may not have Availability (AVAIL); however, if it does, then the dates will be checked.
-
-B.	Derivation
-The following is performed in addition to the Checking.
-
-	Perform SetBHInvnameHW
-C.	Status changed to Ready for Review
-
-See the embedded SS.
-D.	Status changed to Final
-
-See the embedded SS.
-
-
-*/
-public class FCABRSTATUS extends DQABRSTATUS
-{
-	private static final String FC_SRCHACTION_NAME = "SRDFEATURE9"; // srch not restricted by PDHDOMAIN
-	private static final char[] FC_CODE_ILLEGAL = {'O','I'};
-	
-	/**********************************
-	* must be xseries or convergedproduct and ready4review
-	*/
-	protected boolean isVEneeded(String statusFlag) {
-		return true;// always need CATDATA domainInList();
-	}
-	/**
-	 * allow derived classes a way to override the VE used when status and dq are the same and checks
-	 * are not needed, but some structure may be needed
-	 * 
-	 * @param statusFlag
-	 * @param dataQualityFlag
-	 * @return
-	 */
-	protected String getVEName(String statusFlag, String dataQualityFlag){
-		if (statusFlag.equals(STATUS_FINAL)){
-			addDebug("Status already final, use diff ve");
-			return "EXRPT3FEATURE2";
-		}else if (statusFlag.equals(STATUS_R4REVIEW) && dataQualityFlag.equals(DQ_R4REVIEW)){
-			addDebug("Status already rfr, use diff ve");
-			return "EXRPT3FEATURE2";	
-		}
-		return 	m_abri.getVEName();
-	}
-	
-	/**********************************
-	 * complete abr processing when status is already final; (dq was final too)
-	 * 
-	 * When this ABR is invoked and STATUS = DATAQUALITY = �Final�, then checking is not required. 
-	 * CATDATA derivation is required. If the generation fails, the DQ ABR will fail. The DQ ABR will 
-	 * process data for the selected offering and only utilizes CATADATA rules that have a Life Cycle of Production. 
-	 * If the generation of CATDATA is successful, then only the setting of ADSABRSTATUS is processed. 
-	 * This includes the necessary conditions and only column N (Final) applies.
-	 */
-    protected void doAlreadyFinalProcessing(EntityItem rootEntity) throws Exception {
-    	// update darules and if there are changes queue ADSABRSTATUS
-    	if(doDARULEs()){
-    		boolean chgsMade = updateDerivedData(rootEntity);
-    		addDebug("doAlreadyFinalProcessing: "+rootEntity.getKey()+" chgsMade "+chgsMade);
-    		if(chgsMade){
-    			 setSinceFirstFinal(rootEntity, "ADSABRSTATUS");
-    		     queueProdStruct(true);
-    		}else{
-				//NO_CHGSFOUND = No {0} changes found.
-				args[0] = m_elist.getEntityGroup("CATDATA").getLongDescription();
-				addResourceMsg("NO_CHGSFOUND",args);
-			}
-    	}
-	}
-	
-	/**********************************
-	 * complete abr processing when status is already rfr; (dq was rfr too)
-	 * 
-	 * When this ABR is invoked and STATUS = DATAQUALITY = �Ready for Review�, then checking is not required. 
-	 * CATDATA derivation is required. If the generation fails, the DQ ABR will fail. The DQ ABR will process 
-	 * data for the selected offering and only utilizes CATADATA rules that have a Life Cycle of Production. 
-	 * If the generation of CATDATA is successful, then only the setting of ADSABRSTATUS is processed. This 
-	 * includes the necessary conditions and only column M (Ready for Review) applies.
-	 */
-    protected void doAlreadyRFRProcessing(EntityItem rootEntity) throws Exception {
-    	// update darules and if there are changes queue ADSABRSTATUS
-    	if(doDARULEs()){
-//    		String lifecycle = PokUtils.getAttributeFlagValue(rootEntity, "LIFECYCLE");
-//    		addDebug("doAlreadyRFRProcessing: "+rootEntity.getKey()+" lifecycle "+lifecycle);
-//    		if (lifecycle==null || lifecycle.length()==0){ 
-//    			lifecycle = LIFECYCLE_Plan;
-//    		}
-    		//59.02	R1.0	IF			FEATURE	STATUS	=	"Ready for Review" (0040)			
-    		//59.04	R1.0	AND			FEATURE	LIFECYCLE	=	"Develop" (LF02)  | "Plan" (LF01)			
-//    		if (LIFECYCLE_Plan.equals(lifecycle) ||  // first time moving to RFR
-//    				LIFECYCLE_Develop.equals(lifecycle)){ // been RFR before
-    			boolean chgsMade = updateDerivedData(rootEntity);
-    			addDebug("doAlreadyRFRProcessing: "+rootEntity.getKey()+" chgsMade "+chgsMade);
-    			if(chgsMade){
-    				setRFRSinceFirstRFR(rootEntity);
-    		    	queueProdStruct(false);
-    			}else{
-    				//NO_CHGSFOUND = No {0} changes found.
-    				args[0] = m_elist.getEntityGroup("CATDATA").getLongDescription();
-    				addResourceMsg("NO_CHGSFOUND",args);
-    			}
-//    		}	
-	   	}
-	}
-	/*
-from sets ss:
-	58.00		FEATURE		Root Entity							
-Delete	59.00	Defer	SET			FEATURE				ADSABRSTATUS	&ADSFEEDRFR	&ADSFEED
-Add	59.02	R1.0	IF			FEATURE	STATUS	=	"Ready for Review" (0040)			
-Add	59.04	R1.0	AND			FEATURE	LIFECYCLE	=	"Develop" (LF02)  | "Plan" (LF01)			
-Add	59.06	R1.0	SET			FEATURE				ADSABRSTATUS	&ADSFEEDRFR	
-Add	59.08	R1.0	END	59.02								
-Add	59.10	R1.0	IF			FEATURE	STATUS	=	"Final" (0020)			
-Add	59.12	R1.0	SET			FEATURE				ADSABRSTATUS		&ADSFEED
-Add	59.14	R1.0	END	59.10								
-	60.00		END	58.00	FEATURE							
-						
-
-	 */
-    /**********************************
-    * complete abr processing after status moved to readyForReview; (status was chgreq)
-	* C.	Status changed to Ready for Review
-20131105 Add		58.200	IF			FEATURE	STATUS	=	"Ready for Review" (0040)				FEATURE is RFR		
-20131105 Add		58.220	SET			FEATURE	ADSABRSTATUS	=	"Passed" (0030) | "Passed Resend RFR" (XMLRFR)	ADSABRSTATUS	&ADSFEEDRFR		XML was sent		
-20131105 Add		58.240	SET			FEATURE	ADSABRSTATUS	<>	"Passed" (0030) | "Passed Resend RFR" (XMLRFR)	ADSABRSTATUS	&ADSFEEDRFRFIRST		XML was never sent		
-
-    */
-    protected void completeNowR4RProcessing() throws
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-    {
-		if(doR10processing()){
-	    	EntityItem rootItem= m_elist.getParentEntityGroup().getEntityItem(0);	
-	    	setRFRSinceFirstRFR(rootItem);
-	    	queueProdStruct(false);
-//	    	String lifecycle = PokUtils.getAttributeFlagValue(rootItem, "LIFECYCLE");
-//	    	addDebug("completeNowR4RProcessing: "+rootItem.getKey()+" lifecycle "+lifecycle);
-//	  		if (lifecycle==null || lifecycle.length()==0){ 
-//				lifecycle = LIFECYCLE_Plan;
-//			}
-//	    	if (LIFECYCLE_Plan.equals(lifecycle) ||  // first time moving to RFR
-//	    			LIFECYCLE_Develop.equals(lifecycle)){ // been RFR before
-//	    		setFlagValue(m_elist.getProfile(),"ADSABRSTATUS", getRFRQueuedValue("ADSABRSTATUS"));
-//	    	}
-		}
-    }
-    
-    /**********************************
-    * complete abr processing after status moved to final; (status was r4r)
-    *D. STATUS changed to Final
-    *
-20131105 Add		58.260	ELSE	58.200									FEATURE is Final		
-20131105 Add		58.280	SetSinceFinal			FEATURE	ADSABRSTATUS	=	"Passed" (0030) | "Passed Resend RFR" (XMLRFR)	ADSABRSTATUS		&ADSFEED	XML sent Final		
-20131105 Add		58.300	SetSinceFinal			FEATURE	ADSABRSTATUS	<>	"Passed" (0030) | "Passed Resend RFR" (XMLRFR)	ADSABRSTATUS		&ADSFEEDFINALFIRST	XML not sent Final		
-20131105 Add		58.320	END	58.200											
-
-    */
-    protected void completeNowFinalProcessing() throws
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-    {
-        EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-//        addDebug(rootEntity.getKey()+" status now final");
-		if(doR10processing()){
-//			setFlagValue(m_elist.getProfile(),"ADSABRSTATUS", getQueuedValue("ADSABRSTATUS"));
-//		}        
-	        setSinceFirstFinal(rootEntity, "ADSABRSTATUS");
-	        //59.100	IF			FEATURE	STATUS	=	"Final" (0020)
-	        //59.120	SET			FEATURE				RFCABRSTATUS		&OIMSFEED	
-	        //59.140	END	59.100
-	        //58.200	IF			FEATURE	STATUS	=	"Ready for Review" (0040)				FEATURE is RFR
-	        //58.220	SET			FEATURE	RFCABRSTATUS	=	"Passed" (0030)				XML was sent
-	        //58.240	SET			FEATURE	RFCABRSTATUS	<>	"Passed" (0030)				XML was never sent
-	        //58.260	ELSE	58.200									FEATURE is Final
-	        //58.280	SetSinceFinal			FEATURE	RFCABRSTATUS	=	"Passed" (0030)	RFCABRSTATUS		&OIMSFEED	XML sent Final
-	        //58.300	SetSinceFinal			FEATURE	RFCABRSTATUS	<>	"Passed" (0030)	RFCABRSTATUS		&OIMSFEED	XML not sent Final
-//	        setRFCSinceFirstFinal(rootEntity, "RFCABRSTATUS");
-	        queueProdStruct(true);
-		}
-		// TODO
-		/*
-		 * Trigger the following attributes when FEATURE , PRODSTRUCTs or a MODEL goes to Final.
-		 * FEATURE.QSMRPQCREFABRSTATUS
-		 * FEATURE.QSMRPQFULLABRSTATUS
-		 * So the Attriubtes are on FEATURE and everytime MODEL, FEATURE and/or PRODSTRUCTs goes to final u triger these two ABRs on a feature entity.
-		 * This only applies when FEATURE.FCTYPE='RPQILISTED','RPQPLISTED','RPQRLISTED'
-		 */
-		boolean isRPQ = isQSMRPQ(rootEntity);
-		addDebug("completeNowFinalProcessing - isRPQ " + isRPQ);
-		if (isRPQ) {			
-			setFlagValue(m_elist.getProfile(), "QSMRPQCREFABRSTATUS", getQueuedValueForItem(rootEntity, "QSMRPQCREFABRSTATUS"), rootEntity);
-			setFlagValue(m_elist.getProfile(), "QSMRPQFULLABRSTATUS", getQueuedValueForItem(rootEntity, "QSMRPQFULLABRSTATUS"), rootEntity);
-		}
-    }
-    
-//    20131105 Add		58.340	IF			FEATURE	FCTYPE	<>	Primary FC (100) | "Secondary FC" (110)				does PRODSTRUCT xml need to be sent		
-//    20131105 Add		58.360	OR		PRODSTRUCT-d: OOFAVAIL-d	AVAIL	CountOf	=	0				If GA & no Planned AVAILs		
-//    20131105 Add		58.380				WHERE	AVAILTYPE	= 	"Planned Availability" (146)				Only count Planned Availability AVAILs		
-//    20131105 Add		58.400	IF			PRODSTRUCT	STATUS	=	"Final" (0020)				Yes - need to send PRODSTRUCT XML		
-//    20131105 Add		58.420	SET			PRODSTRUCT				ADSABRSTATUS		&ADSFEED	Queue PRODSTRUCT		
-//    20131105 Add		58.440	END	58.400											
-//    20131105 Add		58.460	IF			PRODSTRUCT	STATUS	=	"Ready for Review" (0040)						
-//    20131105 Add		58.480	SET			PRODSTRUCT				ADSABRSTATUS	&ADSFEEDRFR		Queue PRODSTRUCT		
-//    20131105 Add		58.500	END	58.460			
-    private void queueProdStruct(boolean status){
-    	EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-    	boolean isRPQ = isRPQ(rootEntity);
-		// get all AVAILS from PRODSTRUCT-u:OOFAVAIL-d
-		EntityGroup availGrp = m_elist.getEntityGroup("AVAIL");
-		Vector plannedAvailVct = PokUtils.getEntitiesWithMatchedAttr(availGrp,
-				"AVAILTYPE", PLANNEDAVAIL);
-
-		addDebug("queueProdStruct - isRPQ "+isRPQ);
-		addDebug("queueProdStruct - ALL plannedAvailVct.size "+plannedAvailVct.size());
-		if(isRPQ || (!isRPQ && plannedAvailVct.size() == 0)){
-			EntityGroup psGrp = m_elist.getEntityGroup("PRODSTRUCT");
-			for(int p=0; p<psGrp.getEntityItemCount(); p++){
-    			EntityItem psitem = psGrp.getEntityItem(p);
-    			if(statusIsRFR(psitem) && !status){
-    				addDebug("queueProdStruct - RFR PS "+psitem.getKey());
-    				setFlagValue(m_elist.getProfile(),"ADSABRSTATUS", getRFRQueuedValueForItem(psitem,"ADSABRSTATUS"), psitem);
-    			}else if(statusIsFinal(psitem) && status){    	
-    				addDebug("queueProdStruct - FINAL PS "+psitem.getKey());
-    				setFlagValue(m_elist.getProfile(),"ADSABRSTATUS", getQueuedValueForItem(psitem, "ADSABRSTATUS"), psitem);
-    				//58.400	IF			PRODSTRUCT	STATUS	=	"Final" (0020)				Yes - need to send PRODSTRUCT XML
-    				//58.420	SET			PRODSTRUCT				RFCABRSTATUS		&OIMSFEED	Queue PRODSTRUCT
-    				setFlagValue(m_elist.getProfile(),"RFCABRSTATUS", getQueuedValueForItem(psitem, "RFCABRSTATUS"), psitem);
-    			}
-    		}
-		}
-    }
-     
-	/** 
-	 * from BH FS ABR Catalog Attr Derivation 20110221.doc
-	 * C.	Data Quality
-	 * As part of the normal process for offering information, a user first creates data in �Draft�. The user 
-	 * then asserts the Data Quality (DATAQUALITY) as being �Ready for Review� which queues the Data Quality ABR. 
-	 * The DQ ABR checks to ensure that the data is �Ready for Review� and then advances Status (STATUS) to 
-	 * �Ready for Review�.
-	 *  
-	 * The Data Quality ABR will be enhanced such that if the checks pass, then the DQ ABR will process the 
-	 * corresponding DARULE. If DARULE is processed successfully, then the DQ ABR will set 
-	 * STATUS = �Ready for Review�. If DARULE is not processed successfully, then the DQ ABR will �Fail� 
-	 * and return Data Quality to the prior state (Draft or Change Request).
-	 */
-	protected boolean updateDerivedData(EntityItem rootEntity) throws Exception {
-		boolean chgsMade = false;
-		//	NOW() <= Global Withdrawal Date Effective (WITHDRAWDATEEFF_T)
-		String wdDate = PokUtils.getAttributeValue(rootEntity, "WITHDRAWDATEEFF_T", "", FOREVER_DATE, false);
-		addDebug("updateDerivedData wdDate: "+wdDate+" now: "+getCurrentDate());
-		if(getCurrentDate().compareTo(wdDate)<=0){
-			chgsMade = execDerivedData(rootEntity);
-		}
-		return chgsMade;
-	}
-	
-    /* (non-Javadoc)
-     * update LIFECYCLE value when STATUS is updated
-     * @see COM.ibm.eannounce.abr.sg.bh.DQABRSTATUS#doPostProcessing(COM.ibm.eannounce.objects.EntityItem, java.lang.String)
-     */
-    protected String getLCRFRWFName(){ return "WFLCFEATURERFR";} 
-    protected String getLCFinalWFName(){ return "WFLCFEATUREFINAL";} 
-
-    /**********************************
-	* Note the ABR is only called when
-	* DATAQUALITY transitions from 'Draft to Ready for Review',
-	*	'Change Request to Ready for Review' and from 'Ready for Review to Final'
-	*
-checking from ss:
-1.00	FEATURE		Root									
-2.00			FIRSTANNDATE									
-3.00			GENAVAILDATE								Not used for GA products	
-4.00			WITHDRAWANNDATE_T	=>	FEATURE	FIRSTANNDATE		W	W	E		{LD: WITHDRAWANNDATE_T} {WITHDRAWANNDATE_T} must not be earlier than the {LD: FIRSTANNDATE} {FIRSTANNDATE}
-5.00			WITHDRAWDATEEFF_T	=>	FEATURE	GENAVAILDATE		W	W	E		{LD: WITHDRAWDATEEFF_T} {WITHDRAWDATEEFF_T} must not be earlier than the {LD: GENAVAILDATE} {GENAVAILDATE}
-6.00			COUNTRYLIST									
-6.20				CheckMAX	FEATURE	BHINVNAME		RE	RE	RE		LD(FEATURE) NDN(FEATURE) LD(BHINVNAME) has a derived value longer than (value of MAX) characters
-7.00	WHEN		FCTYPE	<>	"Primary FC (100) |""Secondary FC"" (110)"						RPQ logic	
-8.00	PRODSTRUCT		ANNDATE	=>	FEATURE	FIRSTANNDATE		W	W	E		{LD: ANNDATE} must not be earlier than the {LD: FEATURE} {LD: FIRSTANNDATE} {FIRSTANNDATE}
-9.00			GENAVAILDATE	=>	FEATURE	FIRSTANNDATE		W	W	E		{LD: GENAVAILDATE} must not be earlier than the {LD: FEATURE} {LD: FIRSTANNDATE} {FIRSTANNDATE}
-10.00			WITHDRAWDATE	<=	FEATURE	WITHDRAWANNDATE_T		W	W	E		{LD: WITHDRAWDATE} must not be later than {LD: FEATURE} {LD: WITHDRAWANNDATE_T} {WITHDRAWANNDATE_T}
-11.00			WTHDRWEFFCTVDATE	<=	FEATURE	WITHDRAWDATEEFF_T		W	W	E		{LD: WTHDRWEFFCTVDATE} must not be later than {LD: FEATURE} {LD: WITHDRAWDATEEFF_T} {WITHDRAWDATEEFF_T}
-12.00	END	7.00										
-13.00	FEATURE		Root									
-14.00	WHEN		FCTYPE	=	"Primary FC (100) | ""Secondary FC"" (110)"						GA logic
-15.00	AVAIL	A	PRODSTRUCT-u:OOFAVAIL-d								AVAIL PA	
-16.00	WHEN		AVAILTYPE	=	"Planned Availability"							
-17.00			COUNTRYLIST	in	FEATURE	COUNTRYLIST		W	W	E		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL} must not include a country that is not in the {LD: FEATURE} {LD: COUNTRYLIST}
-18.00			EFFECTIVEDATE	=>	FEATURE	FIRSTANNDATE		W	W	E		{LD: AVAIL} {NDN: AVAIL} must not be earlier than the {LD: FEATURE} {LD: FIRSTANNDATE} {ANNDATE}
-19.00	ANNOUNCEMENT	B	A: + AVAILANNA-d 								ANNOUNCEMENT PA	
-20.00	WHEN		ANNTYPE	=	New (19)							
-21.00			ANNDATE	=>	FEATURE	FIRSTANNDATE		W	W	E		{LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} must not be earlier than the {LD: FEATURE} {LD: FIRSTANNDATE} {FIRSTANNDATE} 
-22.00	END	20.00										
-23.00	END	16.00										
-24.00	AVAIL	H	PRODSTRUCT-u:OOFAVAIL-d								AVAIL PA	
-25.00	WHEN		AVAILTYPE	=	"First Order"							
-xx26.00			COUNTRYLIST	in	FEATURE	COUNTRYLIST		W	W	E		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL} must not include a country that is not in the {LD: FEATURE} {LD: COUNTRYLIST}
-"Change 20111213
-Change 20111216"	26.00			COUNTRYLIST	in	A: AVAIL	COUNTRYLIST	OSN:XCC_LIST	W	W	E		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL} {LD: COUNTRYLIST} includes a country that does not have a "Planned Availability"
-27.00			EFFECTIVEDATE	=>	FEATURE	FIRSTANNDATE		W	W	E		{LD: AVAIL} {NDN: AVAIL} must not be earlier than the {LD: FEATURE} {LD: FIRSTANNDATE} {ANNDATE}
-27.20	ANNOUNCEMENT		H: + AVAILANNA-d 								ANNOUNCEMENT PA	
-27.40	WHEN		ANNTYPE	=	New (19)							
-27.60			ANNDATE	=>	FEATURE	FIRSTANNDATE		W	W	E		{LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} must not be earlier than the {LD: FEATURE} {LD: FIRSTANNDATE} {FIRSTANNDATE} 
-	END	27.40										
-28.00	END	25.00										
-29.00	AVAIL	C	PRODSTRUCT-u:OOFAVAIL-d								AVAIL LO	
-30.00	WHEN		AVAILTYPE	=	"Last Order"							
-xx31.00			COUNTRYLIST	in	A: AVAIL	COUNTRYLIST		W	W	E*1		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL} {LD: COUNTRYLIST} includes a country that does not have a "Planned Availability"
-Change 20111216	31.00			COUNTRYLIST	in	A: AVAIL	COUNTRYLIST	OSN:XCC_LIST	W	W	E*1		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL} {LD: COUNTRYLIST} includes a country that does not have a "Planned Availability"
-32.00			EFFECTIVEDATE	<=	FEATURE	WITHDRAWDATEEFF_T		W	W	E		{LD: AVAIL} {NDN: AVAIL} must not be later than the {LD: FEATURE} {LD: WITHDRAWDATEEFF_T} {WITHDRAWDATEEFF_T} 
-33.00	ANNOUNCEMENT	D	C: + AVAILANNA-d 								ANNOUNCEMENT LO	
-34.00	WHEN		ANNTYPE	=	End Of Life - Withdrawal from mktg (14)							
-35.00			ANNDATE	<=	FEATURE	WITHDRAWANNDATE_T		W	W	E		{LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} must not be later than the {LD: FEATURE} {LD: WITHDRAWANNDATE_T} {WITHDRAWANNDATE_T}  
-36.00	END	34.00										
-37.00	END	30.00										
-100.00	AVAIL	J	PRODSTRUCT-u: OOFAVAIL-d								PRODSTRUCT AVAIL	
-101.00	WHEN		AVAILTYPE	=	"End of Marketing" (200)							
-102.00			EFFECTIVEDATE	<=	FEATURE	WITHDRAWANNDATE_T		W	W	E		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL} must not be later than the {LD: FEATURE} {LD: WITHDRAWANNDATE_T}{WITHDRAWANNDATE_T}
-xx103.00			COUNTRYLIST	IN	A:AVAIL	COUNTRYLIST		W	W	E*1		 {LD: AVAIL} {NDN: AVAIL}  {LD: COUNTRYLIST} includes a country that does not have a "Planned Availability"
-Change 20111216	103.00			COUNTRYLIST	IN	A:AVAIL	COUNTRYLIST	OSN:XCC_LIST	W	W	E*1		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL}  {LD: COUNTRYLIST} includes a country that does not have a "Planned Availability"
-104.00	ANNOUNCEMENT		J: + AVAILANNA-d 								PRODSTRUCT ANNOUNCEMENT	
-105.00	IF		ANNTYPE	=	"End Of Life - Withdrawal from mktg" (14)							
-106.00	THEN		ANNDATE	<=	FEATURE	WITHDRAWANNDATE_T		W	W	E		{LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} must be earlier than the {LD: FEATURE} {LD: WITHDRAWANNDATE_T}  {WITHDRAWANNDATE_T}
-107.00	ELSE		ANNTYPE	<>	"End Of Life - Withdrawal from mktg" (14)							
-108.00			CountOf	=	0			E	E	E		{LD: AVAIL} {NDN: J:AVAIL} must not be in {LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT}
-109.00	END	105.00										
-110.00	END	101.00										
-111.00	AVAIL	K	PRODSTRUCT-u: OOFAVAIL-d								PRODSTRUCT AVAIL	
-112.00	WHEN		AVAILTYPE	=	"End of Service" (151)							
-xx113.00			EFFECTIVEDATE	=>	C:AVAIL	EFFECTIVEDATE	Yes	W	W	E*1		{LD: AVAIL} {NDN: AVAIL) must not be earlier than the {LD: AVAIL} {NDN: J:AVAIL)
-xx114.00			COUNTRYLIST	IN	C:AVAIL	COUNTRYLIST		W	W	E*1		{LD: AVAIL} {NDN: AVAIL}  {LD: COUNTRYLIST} includes a country that does not have a "Last Order"
-Change 20111216	113.00			EFFECTIVEDATE	=>	C:AVAIL	EFFECTIVEDATE	"Cty OSN:XCC_LIST"	W	W	E*1		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL) must not be earlier than the {LD: AVAIL} {NDN: J:AVAIL)
-Change 20111216	114.00			COUNTRYLIST	IN	C:AVAIL	COUNTRYLIST	OSN:XCC_LIST	W	W	E*1		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL}  {LD: COUNTRYLIST} includes a country that does not have a "Last Order"
-Delete 20111212 115.00	ANNOUNCEMENT		K: + AVAILANNA-d 								PRODSTRUCT ANNOUNCEMENT	
-116.00	IF		ANNTYPE	=	"End Of Life - Discontinuance of service" (13)							
-117.00	THEN		ANNDATE	<=	FEATURE	WITHDRAWDATEEFF_T		W	W	E		{LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} must be earlier than the {LD: FEATURE} {LD: WITHDRAWANNDATE_T} {WITHDRAWANNDATE_T}
-118.00	ELSE		ANNTYPE	<>	"End Of Life - Discontinuance of service" (13)							
-119.00			CountOf	=	0			E	E	E		{LD: AVAIL} {NDN: K:AVAIL} must not be in {LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT}
-120.00	END	116.00	end Delete 20111212 									
-121.00	END	112.00										
-38.00	END	14.00										
-39.00	FEATURE		Root									
-40.00	MONITOR	E	FEATUREMON-d								MONITOR	
-41.00		F	CountOf		E: FEATUREMON							
-42.00		G			FEATUREMONITOR	QTY						
-43.00			F + G	<=	1			W	W	E		must not have more than one {LD: MONITOR}
-
-	*/
-	protected void doDQChecking(EntityItem rootEntity, String statusFlag) throws Exception
-	{
-		addHeading(2,rootEntity.getEntityGroup().getLongDescription()+" Checks:");
-
-		//6.20				CheckMAX	FEATURE	BHINVNAME		RE	RE	RE		LD(FEATURE) NDN(FEATURE) LD(BHINVNAME) has a derived value longer than (value of MAX) characters
-		// this is done for all FCTYPE
-		setBHInvnameHW(rootEntity);
-		
-		if(getReturnCode()!=PASS){ // BHINVNAME failure
-			//If the BHINVNAME is successfully saved, then proceed with the CHECKS
-			return;
-		}
-		
-		int checklvl = getCheck_W_W_E(statusFlag);
-		//40.00	MONITOR	E	FEATUREMON-d								MONITOR
-		//41.00		F	CountOf		E: FEATUREMON
-		//42.00		G			FEATUREMONITOR	QTY
-		//43.00			F + G	<=	1			W	W	E
-		//must not have more than one {LD: MONITOR}
-		int cnt = getCount("FEATUREMONITOR");
-		if(cnt > 1)	{
-			EntityGroup monGrp = m_elist.getEntityGroup("MONITOR");
-			//ErrorMessage  has more than one LD(MONITOR)
-			//MORE_THAN_ONE_ERR = Has more than one {0}
-			args[0] = monGrp.getLongDescription();
-			createMessage(checklvl,"MORE_THAN_ONE_ERR",args);
-		}
-		
-		//		2013-05-13 Add	45.00	FEATURE		Root									
-		//		2013-05-13 Add	46.00	IF		PDHDOMAIN	IN	ABR_PROPERTITIES	PWRFC_LIST 					Limit to Power Series	
-		//		2013-05-13 Add	47.00			CheckChars	<>	IO						Col G is ALPHA UPPER	{LD:FEATURECODE}{FEATRECODE} has an invalid character of I or O.
-		//		2013-05-13 Add	48.00	END	46.00										
-		checkFeatureCode(rootEntity,CHECKLEVEL_E);// will change the check level when document is ready.
-
-		//4.00			WITHDRAWANNDATE_T	=>	FEATURE	FIRSTANNDATE		W	W	E
-		//{LD: WITHDRAWANNDATE_T} {WITHDRAWANNDATE_T} can not be earlier than the {LD: FIRSTANNDATE} {FIRSTANNDATE}
-		checkCanNotBeEarlier(rootEntity, "WITHDRAWANNDATE_T", "FIRSTANNDATE", checklvl);
-
-		//5.00			WITHDRAWDATEEFF_T	=>	FEATURE	GENAVAILDATE		W	W	E
-		//{LD: WITHDRAWDATEEFF_T} {WITHDRAWDATEEFF_T} can not be earlier than the {LD: GENAVAILDATE} {GENAVAILDATE}
-		checkCanNotBeEarlier(rootEntity, "WITHDRAWDATEEFF_T", "GENAVAILDATE", checklvl);
-
-		//14.00	WHEN		FCTYPE	=	"Primary FC (100) | ""Secondary FC"" (110)"						GA logic
-		if (!isRPQ(rootEntity)){
-			addDebug(rootEntity.getKey()+" was NOT an RPQ FCTYPE: "+getAttributeFlagEnabledValue(rootEntity, "FCTYPE"));
-			checkAvails(rootEntity, statusFlag);
-		}else{
-			//7.00	WHEN		FCTYPE	<>	"Primary FC (100) |Secondary FC (110)"						RPQ logic
-			addDebug(rootEntity.getKey()+" was an RPQ FCTYPE: "+getAttributeFlagEnabledValue(rootEntity, "FCTYPE"));
-
-	    	//get all PRODSTRUCT
-			EntityGroup psGrp = m_elist.getEntityGroup("PRODSTRUCT");
-			addHeading(3,psGrp.getLongDescription()+" RPQ Checks:");
-			for (int p=0; p<psGrp.getEntityItemCount(); p++){
-				EntityItem psitem = psGrp.getEntityItem(p);
-				//8.00	PRODSTRUCT		ANNDATE	=>	FEATURE	FIRSTANNDATE		W	W	E
-				//{LD: ANNDATE} must not be earlier than the {LD: FEATURE} {LD: FIRSTANNDATE} {FIRSTANNDATE}
-				checkCanNotBeEarlier(psitem, "ANNDATE", rootEntity,"FIRSTANNDATE", checklvl);
-
-				//9.00			GENAVAILDATE	=>	FEATURE	FIRSTANNDATE		W	W	E
-				//{LD: GENAVAILDATE} must not be earlier than the {LD: FEATURE} {LD: FIRSTANNDATE} {FIRSTANNDATE}
-		    	checkCanNotBeEarlier(psitem, "GENAVAILDATE", rootEntity,"FIRSTANNDATE", checklvl);
-		    	//10.00		WITHDRAWDATE	<=	FEATURE	WITHDRAWANNDATE_T		W	W	E
-				//{LD: WITHDRAWDATE} must not be later than {LD: FEATURE} {LD: WITHDRAWANNDATE_T} {WITHDRAWANNDATE_T}
-		    	checkCanNotBeLater(psitem, "WITHDRAWDATE", rootEntity,"WITHDRAWANNDATE_T", checklvl);
-
-				//11.00		WTHDRWEFFCTVDATE	<=	FEATURE	WITHDRAWDATEEFF_T		W	W	E
-				//{LD: WTHDRWEFFCTVDATE} must not be later than {LD: FEATURE} {LD: WITHDRAWDATEEFF_T} {WITHDRAWDATEEFF_T}
-				checkCanNotBeLater(psitem, "WTHDRWEFFCTVDATE", rootEntity,"WITHDRAWDATEEFF_T", checklvl);
-			}
-		}
-	}
-
-	private void checkFeatureCode(EntityItem featItem, int checklvl) {
-		// add PWRFC_LIST checking - power series
-		if(domainInRuleList(featItem, "PWRFC_LIST")){
-			String fcode = PokUtils.getAttributeValue(featItem, "FEATURECODE",", ", "", false);
-			if(checkChars(FC_CODE_ILLEGAL, fcode)){
-				args[0] = this.getLD_Value(featItem,"FEATURECODE");
-				createMessage(checklvl,"INVAILD_CHAR_IO_ERROR",args);
-			}
-		}
-		
-	}
-	/*
-	 *
-
-15.00	AVAIL	A	PRODSTRUCT-u:OOFAVAIL-d								AVAIL PA
-16.00	WHEN		AVAILTYPE	=	"Planned Availability"
-17.00			COUNTRYLIST	in	FEATURE	COUNTRYLIST		W	W	E		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL} must not include a country that is not in the {LD: FEATURE} {LD: COUNTRYLIST}
-18.00			EFFECTIVEDATE	=>	FEATURE	FIRSTANNDATE		W	W	E		{LD: AVAIL} {NDN: AVAIL} must not be earlier than the {LD: FEATURE} {LD: FIRSTANNDATE} {ANNDATE}
-19.00	ANNOUNCEMENT	B	A: + AVAILANNA-d 								ANNOUNCEMENT PA
-20.00	WHEN		ANNTYPE	=	New (19)
-21.00			ANNDATE	=>	FEATURE	FIRSTANNDATE		W	W	E		{LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} must not be earlier than the {LD: FEATURE} {LD: FIRSTANNDATE} {FIRSTANNDATE}
-22.00	END	20.00
-23.00	END	16.00
-24.00	AVAIL	H	PRODSTRUCT-u:OOFAVAIL-d								AVAIL PA
-25.00	WHEN		AVAILTYPE	=	"First Order"
-xx26.00			COUNTRYLIST	in	FEATURE	COUNTRYLIST		W	W	E		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL} must not include a country that is not in the {LD: FEATURE} {LD: COUNTRYLIST}
-"Change 20111213
-Change 20111216"	26.00			COUNTRYLIST	in	A: AVAIL	COUNTRYLIST	OSN:XCC_LIST	W	W	E		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL} {LD: COUNTRYLIST} includes a country that does not have a "Planned Availability"
-27.00			EFFECTIVEDATE	=>	FEATURE	FIRSTANNDATE		W	W	E		{LD: AVAIL} {NDN: AVAIL} must not be earlier than the {LD: FEATURE} {LD: FIRSTANNDATE} {ANNDATE}
-27.20	ANNOUNCEMENT		H: + AVAILANNA-d 								ANNOUNCEMENT PA
-27.40	WHEN		ANNTYPE	=	New (19)
-27.60			ANNDATE	=>	FEATURE	FIRSTANNDATE		W	W	E		{LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} must not be earlier than the {LD: FEATURE} {LD: FIRSTANNDATE} {FIRSTANNDATE}
-	END	27.40
-28.00	END	25.00
-29.00	AVAIL	C	PRODSTRUCT-u:OOFAVAIL-d								AVAIL LO
-30.00	WHEN		AVAILTYPE	=	"Last Order"
-xx31.00			COUNTRYLIST	in	A: AVAIL	COUNTRYLIST		W	W	E*1		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL} {LD: COUNTRYLIST} includes a country that does not have a "Planned Availability"
-Change 20111216	31.00			COUNTRYLIST	in	A: AVAIL	COUNTRYLIST	OSN:XCC_LIST	W	W	E*1		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL} {LD: COUNTRYLIST} includes a country that does not have a "Planned Availability"
-32.00			EFFECTIVEDATE	<=	FEATURE	WITHDRAWDATEEFF_T		W	W	E		{LD: AVAIL} {NDN: AVAIL} must not be later than the {LD: FEATURE} {LD: WITHDRAWDATEEFF_T} {WITHDRAWDATEEFF_T}
-33.00	ANNOUNCEMENT	D	C: + AVAILANNA-d 								ANNOUNCEMENT LO
-34.00	WHEN		ANNTYPE	=	End Of Life - Withdrawal from mktg (14)
-35.00			ANNDATE	<=	FEATURE	WITHDRAWANNDATE_T		W	W	E		{LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} must not be later than the {LD: FEATURE} {LD: WITHDRAWANNDATE_T} {WITHDRAWANNDATE_T} 
-36.00	END	34.00
-37.00	END	30.00
-100.00	AVAIL	J	PRODSTRUCT-u: OOFAVAIL-d								PRODSTRUCT AVAIL
-101.00	WHEN		AVAILTYPE	=	"End of Marketing" (200)
-102.00			EFFECTIVEDATE	<=	FEATURE	WITHDRAWANNDATE_T		W	W	E		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL} must not be later than the {LD: FEATURE} {LD: WITHDRAWANNDATE_T}{WITHDRAWANNDATE_T}
-xx103.00		COUNTRYLIST	IN	A:AVAIL	COUNTRYLIST		W	W	E*1		{LD: AVAIL} {NDN: AVAIL}  {LD: COUNTRYLIST} includes a country that does not have a "Planned Availability"
-Change 20111216	103.00			COUNTRYLIST	IN	A:AVAIL	COUNTRYLIST	OSN:XCC_LIST	W	W	E*1		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL}  {LD: COUNTRYLIST} includes a country that does not have a "Planned Availability"
-104.00	ANNOUNCEMENT		J: + AVAILANNA-d 								PRODSTRUCT ANNOUNCEMENT
-105.00	IF		ANNTYPE	=	"End Of Life - Withdrawal from mktg" (14)
-106.00	THEN		ANNDATE	<=	FEATURE	WITHDRAWANNDATE_T		W	W	E		{LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} must be earlier than the {LD: FEATURE} {LD: WITHDRAWANNDATE_T}  {WITHDRAWANNDATE_T}
-107.00	ELSE		ANNTYPE	<>	"End Of Life - Withdrawal from mktg" (14)
-108.00			CountOf	=	0			E	E	E		{LD: AVAIL} {NDN: J:AVAIL} must not be in {LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT}
-109.00	END	105.00
-110.00	END	101.00
-111.00	AVAIL	K	PRODSTRUCT-u: OOFAVAIL-d								PRODSTRUCT AVAIL
-112.00	WHEN		AVAILTYPE	=	"End of Service" (151)
-xx113.00			EFFECTIVEDATE	=>	C:AVAIL	EFFECTIVEDATE	Yes	W	W	E*1		{LD: AVAIL} {NDN: AVAIL) must not be earlier than the {LD: AVAIL} {NDN: J:AVAIL)
-xx114.00			COUNTRYLIST	IN	C:AVAIL	COUNTRYLIST		W	W	E*1		{LD: AVAIL} {NDN: AVAIL}  {LD: COUNTRYLIST} includes a country that does not have a "Last Order"
-Change 20111216	113.00			EFFECTIVEDATE	=>	C:AVAIL	EFFECTIVEDATE	"Cty OSN:XCC_LIST"	W	W	E*1		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL) must not be earlier than the {LD: AVAIL} {NDN: J:AVAIL)
-Change 20111216	114.00			COUNTRYLIST	IN	C:AVAIL	COUNTRYLIST	OSN:XCC_LIST	W	W	E*1		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL}  {LD: COUNTRYLIST} includes a country that does not have a "Last Order"
-Delete 20111212 115.00	ANNOUNCEMENT		K: + AVAILANNA-d 								PRODSTRUCT ANNOUNCEMENT
-116.00	IF		ANNTYPE	=	"End Of Life - Discontinuance of service" (13)
-117.00	THEN		ANNDATE	<=	FEATURE	WITHDRAWDATEEFF_T		W	W	E		{LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} must be earlier than the {LD: FEATURE} {LD: WITHDRAWANNDATE_T} {WITHDRAWANNDATE_T}
-118.00	ELSE		ANNTYPE	<>	"End Of Life - Discontinuance of service" (13)
-119.00			CountOf	=	0			E	E	E		{LD: AVAIL} {NDN: K:AVAIL} must not be in {LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT}
-120.00	END	116.00 Delete 20111212 
-121.00	END	112.00
-38.00	END	14.00
-
-	 */
-	private void checkAvails(EntityItem featItem, String statusFlag)
-		throws java.sql.SQLException,
-		COM.ibm.opicmpdh.middleware.MiddlewareException
-	{
-		int checklvl = getCheck_W_W_E(statusFlag);
-
-    	ArrayList featCtrylist = new ArrayList();
-		EntityGroup psGrp = m_elist.getEntityGroup("PRODSTRUCT");
-		
-    	// fill in list with the feature's countries
-    	getCountriesAsList(featItem, featCtrylist,checklvl);
-       	String firstAnnDate = getAttrValueAndCheckLvl(featItem, "FIRSTANNDATE", checklvl);
-    	String wdAnnDate = getAttrValueAndCheckLvl(featItem, "WITHDRAWANNDATE_T", checklvl);
-    	addDebug("checkAvails "+featItem.getKey()+" FIRSTANNDATE: "+firstAnnDate+" WITHDRAWANNDATE_T: "+wdAnnDate+
-    			" featCtrylist "+featCtrylist);
-
-    	//get all AVAILS from PRODSTRUCT-u:OOFAVAIL-d
-		EntityGroup availGrp = m_elist.getEntityGroup("AVAIL");
-
-		//15.00	AVAIL	A	PRODSTRUCT-u:OOFAVAIL-d								AVAIL PA
-    	Vector plannedAvailVct = PokUtils.getEntitiesWithMatchedAttr(availGrp, "AVAILTYPE", PLANNEDAVAIL);
-    	// remove any that are not AVAILANNTYPE=RFA so they arent in the other checks
-    	//removeNonRFAAVAIL(plannedAvailVct); not in spec
-		
-    	addDebug("checkAvails ALL plannedAvailVct "+plannedAvailVct.size());
-		Vector lastOrderAvailVct = PokUtils.getEntitiesWithMatchedAttr(availGrp, "AVAILTYPE", LASTORDERAVAIL);
-	   	addDebug("checkAvails ALL loAvailVct "+lastOrderAvailVct.size());
-
-	   	Vector mesLastOrderAvailVct = PokUtils.getEntitiesWithMatchedAttr(availGrp, "AVAILTYPE", MESLASTORDERAVAIL);
-	   	addDebug("checkAvails ALL mesloAvailVct "+mesLastOrderAvailVct.size());
-	   	
-    	addHeading(3,availGrp.getLongDescription()+" Planned Avail Checks:");
-    	checkPsPlanOrMesPlanAvail(plannedAvailVct, featItem, featCtrylist, firstAnnDate, checklvl);
-    	
-    	//15.00	AVAIL	A	PRODSTRUCT-u:OOFAVAIL-d								AVAIL PA
-    	Vector mesPlannedAvailVct = PokUtils.getEntitiesWithMatchedAttr(availGrp, "AVAILTYPE", MESPLANNEDAVAIL);
-    	addDebug("checkAvails ALL mesPlannedAvailVct "+mesPlannedAvailVct.size());
-    	addHeading(3,availGrp.getLongDescription()+" MES Planned Avail Checks:");
-    	checkPsPlanOrMesPlanAvail(mesPlannedAvailVct, featItem, featCtrylist, firstAnnDate, checklvl);
-
-    	addHeading(3,availGrp.getLongDescription()+" First Order Avail Checks:");
-    	//24.00	AVAIL	H	PRODSTRUCT-u:OOFAVAIL-d								AVAIL PA
-		Vector firstOrderAvailVct = PokUtils.getEntitiesWithMatchedAttr(availGrp, "AVAILTYPE", FIRSTORDERAVAIL);
-    	addDebug("checkAvails ALL firstOrderAvailVct "+firstOrderAvailVct.size());
-
-    	if(firstOrderAvailVct.size()>0){
-    		//	25.00	WHEN		AVAILTYPE	=	"First Order"
-    		for (int i=0; i<firstOrderAvailVct.size(); i++){
-    			EntityItem avail = (EntityItem)firstOrderAvailVct.elementAt(i);
-    			EntityItem psitem = getAvailPS(avail, "OOFAVAIL");
-    			//27.00			EFFECTIVEDATE	=>	FEATURE	FIRSTANNDATE		W	W	E
-    			//{LD: AVAIL} {NDN: AVAIL} must not be earlier than the {LD: FEATURE} {LD: FIRSTANNDATE} {FIRSTANNDATE}
-    			checkCanNotBeEarlier(psitem,avail, "EFFECTIVEDATE", featItem, "FIRSTANNDATE", checklvl);
-
-    			//old 26.00 COUNTRYLIST	in	FEATURE	COUNTRYLIST			
-    			//old checkAvailCtryInEntity(psitem, avail, featItem,featCtrylist,checklvl);
-    		}
-    		addDebug("\ncheckAvails checking firstorder ps avails ");
-    		// get all PRODSTRUCT - must compare each PS-PLA against its own PS-FO
-    		for(int p=0; p<psGrp.getEntityItemCount(); p++){
-    			EntityItem psitem = psGrp.getEntityItem(p);
-    			Vector availVct = PokUtils.getAllLinkedEntities(psitem, "OOFAVAIL", "AVAIL");
-    			Vector psfoAvailVct = PokUtils.getEntitiesWithMatchedAttr(availVct, "AVAILTYPE", FIRSTORDERAVAIL);
-    			Vector psplannedAvailVct = PokUtils.getEntitiesWithMatchedAttr(availVct, "AVAILTYPE", PLANNEDAVAIL);
-    			// MES
-    			Vector psMesPlannedAvailVct = PokUtils.getEntitiesWithMatchedAttr(availVct, "AVAILTYPE", MESPLANNEDAVAIL);
-				addDebug("checkAvails for "+psitem.getKey()+" psplannedAvailVct "+psplannedAvailVct.size()+" psmesplannedAvailVct "+psMesPlannedAvailVct.size()+
-						" psfoAvailVct "+psfoAvailVct.size());
-    			if(psfoAvailVct.size()>0){
-    				Hashtable plaAvailOSNTbl = new Hashtable();
-    				boolean plaOsnErrors = getAvailByOSN(plaAvailOSNTbl,psplannedAvailVct,true,CHECKLEVEL_RE);
-    				// MES
-    				Hashtable mesplaAvailOSNTbl = new Hashtable();
-    				boolean mesplaOsnErrors = getAvailByOSN(mesplaAvailOSNTbl,psMesPlannedAvailVct,true,CHECKLEVEL_RE);
-    				
-    				Hashtable foAvailOSNTbl = new Hashtable();
-    				boolean foOsnErrors = getAvailByOSN(foAvailOSNTbl,psfoAvailVct,true,CHECKLEVEL_RE);
-    				addDebug("checkAvails "+psitem.getKey()+" foOsnErrors "+
-    						foOsnErrors+" foAvailOSNTbl.keys "+foAvailOSNTbl.keySet()+" plaOsnErrors "+
-    						plaOsnErrors+" plaAvailOSNTbl.keys "+plaAvailOSNTbl.keySet()+" mesplaOsnErrors "+
-    						mesplaOsnErrors+" mesplaAvailOSNTbl.keys "+mesplaAvailOSNTbl.keySet());
-    				//Change 20111213
-    				//Change 20111216	26.00			COUNTRYLIST	in	A: AVAIL	COUNTRYLIST	OSN:XCC_LIST	W	W	E	
-    				//	{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL} {LD: COUNTRYLIST} includes a country that does not have a "Planned Availability"
-    				if(!plaOsnErrors && !foOsnErrors){
-    					// only do this check if no errors were found building the OSN buckets
-    					checkAvailCtryByOSN(foAvailOSNTbl,plaAvailOSNTbl, "MISSING_PLA_OSNCTRY_ERR", psitem, true, checklvl);
-    				}
-    				if(psMesPlannedAvailVct != null && psMesPlannedAvailVct.size() > 0 && !mesplaOsnErrors && !foOsnErrors){
-    					// only do this check if no errors were found building the OSN buckets
-    					checkAvailCtryByOSN(foAvailOSNTbl,mesplaAvailOSNTbl, "MISSING_PLA_OSNCTRY_ERR", psitem, true, checklvl);
-    				}
-    				plaAvailOSNTbl.clear();
-    				mesplaAvailOSNTbl.clear();
-    				foAvailOSNTbl.clear();
-    			}
-    			availVct.clear();
-    			psfoAvailVct.clear();
-    			psplannedAvailVct.clear();
-    			psMesPlannedAvailVct.clear();
-    		}
-    	}
-		
-		//27.20	ANNOUNCEMENT		H: + AVAILANNA-d 								ANNOUNCEMENT PA
-		//27.40	WHEN		ANNTYPE	=	New (19)
-		//27.60			ANNDATE	=>	FEATURE	FIRSTANNDATE		W	W	E		{LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} must not be earlier than the {LD: FEATURE} {LD: FIRSTANNDATE} {FIRSTANNDATE}
-		if (firstAnnDate.length()>0){
-			//filter out non RFA avails
-    		Vector tmpFOVct = new Vector(firstOrderAvailVct);
-    		// remove any that are not AVAILANNTYPE=RFA
-        	removeNonRFAAVAIL(tmpFOVct);
-
-			Vector annVct = PokUtils.getAllLinkedEntities(tmpFOVct, "AVAILANNA", "ANNOUNCEMENT");
-
-			annVct = PokUtils.getEntitiesWithMatchedAttr(annVct, "ANNTYPE", ANNTYPE_NEW);
-			addDebug("checkAvails any foavail NEW annVct "+annVct.size());
-			for (int ia=0; ia<annVct.size(); ia++){
-				EntityItem annItem = (EntityItem)annVct.elementAt(ia);
-				checkCanNotBeEarlier(annItem, "ANNDATE", featItem, "FIRSTANNDATE", checklvl);
-			}
-			annVct.clear();
-			tmpFOVct.clear();
-		}
-		//END	27.40
-		//28.00	END	25.00
-
-		//29.00	AVAIL	C	PRODSTRUCT-u:OOFAVAIL-d								AVAIL LO
-		addHeading(3,availGrp.getLongDescription()+" Last Order Avail Checks:");
-		checkPsLastOrderOrMesLastOrderAvail(LASTORDERAVAIL, lastOrderAvailVct, psGrp, featItem, wdAnnDate, checklvl);
-		
-	   	addHeading(3,availGrp.getLongDescription()+" MES Last Order Avail Checks:");
-	   	checkPsLastOrderOrMesLastOrderAvail(MESLASTORDERAVAIL, mesLastOrderAvailVct, psGrp, featItem, wdAnnDate, checklvl);
-
-    	//100.00	AVAIL	J	PRODSTRUCT-u: OOFAVAIL-d								PRODSTRUCT AVAIL
-    	//101.00	WHEN		AVAILTYPE	=	"End of Marketing" (200)
-		addHeading(3,availGrp.getLongDescription()+" End of Marketing Avail Checks:");
-		
-		addDebug("\ncheckAvails checking eom ps avails");
-		// get all PRODSTRUCT - must compare each PS-PLA against its own PS-EOM
-		for(int p=0; p<psGrp.getEntityItemCount(); p++){
-			EntityItem psitem = psGrp.getEntityItem(p);
-			EntityItem mdlItem = getDownLinkEntityItem(psitem, "MODEL");
-			int oldDatachklvl = getCheckLevel(checklvl,mdlItem,"ANNDATE");
-
-			Vector availVct = PokUtils.getAllLinkedEntities(psitem, "OOFAVAIL", "AVAIL");
-			Vector psplannedAvailVct = PokUtils.getEntitiesWithMatchedAttr(availVct, "AVAILTYPE", PLANNEDAVAIL);
-			Vector psmesplannedAvailVct = PokUtils.getEntitiesWithMatchedAttr(availVct, "AVAILTYPE", MESPLANNEDAVAIL);
-			//101.00	WHEN		AVAILTYPE	=	"End of Marketing" (200)
-			Vector psEOMAvailVct = PokUtils.getEntitiesWithMatchedAttr(availVct, "AVAILTYPE", EOMAVAIL);
-			//ArrayList plaAvlCtry = getCountriesAsList(psplannedAvailVct, checklvl);
-
-			addDebug("checkAvails "+psitem.getKey()+" all avail: "+availVct.size()+
-					" plaAvail: "+psplannedAvailVct.size()+" mesplaAvail: "+psmesplannedAvailVct.size()+" eomAvail: "+psEOMAvailVct.size());
-				//	" plaAvlCtry:"+plaAvlCtry);
-			if(psEOMAvailVct.size()>0){
-		
-				for (int i=0; i<psEOMAvailVct.size(); i++){
-					EntityItem avail = (EntityItem)psEOMAvailVct.elementAt(i);
-					//102.00			EFFECTIVEDATE	<=	FEATURE	WITHDRAWANNDATE_T		W	W	E	{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL} must not be later than the {LD: FEATURE} {LD: WITHDRAWANNDATE_T}{WITHDRAWANNDATE_T}
-					checkCanNotBeLater(psitem,avail, "EFFECTIVEDATE", featItem, "WITHDRAWANNDATE_T", checklvl);
-
-					//old103.00			COUNTRYLIST	in	A: AVAIL	COUNTRYLIST		W	W	E*1 - PER PRODSTRUCT
-					//oldcheckPlannedAvailForCtryExists(psitem,avail, plaAvlCtry, oldDatachklvl);
-
-					String availAnntypeFlag = PokUtils.getAttributeFlagValue(avail, "AVAILANNTYPE");
-					addDebug("checkAvails "+avail.getKey()+" availAnntypeFlag "+availAnntypeFlag);
-					if (availAnntypeFlag==null){
-						availAnntypeFlag = AVAILANNTYPE_RFA; // if not set, default to RFA
-					}
-					if (AVAILANNTYPE_RFA.equals(availAnntypeFlag)){ // error was already logged
-						//104.00	ANNOUNCEMENT		J: + AVAILANNA-d 								PRODSTRUCT ANNOUNCEMENT
-						Vector annVct = PokUtils.getAllLinkedEntities(avail, "AVAILANNA", "ANNOUNCEMENT");
-						addDebug("checkAvails EOM "+avail.getKey()+" annVct "+annVct.size());
-						for (int ie=0; ie<annVct.size(); ie++){
-							EntityItem annItem = (EntityItem)annVct.elementAt(ie);
-
-							String anntypeFlag = PokUtils.getAttributeFlagValue(annItem, "ANNTYPE");
-							addDebug("checkAvails "+annItem.getKey()+" anntypeFlag "+anntypeFlag);
-							//107.00	ELSE		ANNTYPE	<>	"End Of Life - Withdrawal from mktg" (14)
-							//108.00			CountOf	=	0			E	E	E		{LD: AVAIL} {NDN: J:AVAIL} must not be in {LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT}
-							if(!ANNTYPE_EOL.equals(anntypeFlag)){
-								//MUST_NOT_BE_IN_ERR2= {0} must not be in {1}
-								args[0] = getLD_NDN(avail);
-								args[1] = getLD_NDN(annItem);
-								createMessage(CHECKLEVEL_E,"MUST_NOT_BE_IN_ERR2",args);
-								continue;
-							}
-							//105.00	IF		ANNTYPE	=	"End Of Life - Withdrawal from mktg" (14)
-							//106.00	THEN		ANNDATE	<=	FEATURE	WITHDRAWANNDATE_T		W	W	E		{LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} must be earlier than the {LD: FEATURE} {LD: WITHDRAWANNDATE_T}  {WITHDRAWANNDATE_T}
-							checkCanNotBeLater(annItem, "ANNDATE", featItem, "WITHDRAWANNDATE_T", checklvl);
-						}
-						annVct.clear();
-					}
-					//109.00	END	105.00
-					//110.00	END	101.00
-				}
-				Hashtable plaAvailOSNTbl = new Hashtable();
-				boolean plaOsnErrors = getAvailByOSN(plaAvailOSNTbl,psplannedAvailVct,true,CHECKLEVEL_RE);
-				// MES
-				Hashtable mesplaAvailOSNTbl = new Hashtable();
-				boolean mesplaOsnErrors = getAvailByOSN(mesplaAvailOSNTbl,psmesplannedAvailVct,true,CHECKLEVEL_RE);
-				Hashtable eomAvailOSNTbl = new Hashtable();
-				boolean eomOsnErrors = getAvailByOSN(eomAvailOSNTbl,psEOMAvailVct,true,CHECKLEVEL_RE);
-				addDebug("checkAvails "+psitem.getKey()+" plaOsnErrors "+
-						plaOsnErrors+" plaAvailOSNTbl.keys "+plaAvailOSNTbl.keySet()+" mesplaOsnErrors "+
-								plaOsnErrors+" mesplaAvailOSNTbl.keys "+plaAvailOSNTbl.keySet()+" eomOsnErrors "+
-						eomOsnErrors+" eomAvailOSNTbl.keys "+eomAvailOSNTbl.keySet());
-				//Change 20111216	103.00			COUNTRYLIST	IN	A:AVAIL	COUNTRYLIST	OSN:XCC_LIST	W	W	E*1
-				//{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL}  {LD: COUNTRYLIST} includes a country that does not have a "Planned Availability"
-				if(!plaOsnErrors && !eomOsnErrors){
-					// only do this check if no errors were found building the OSN buckets
-					checkAvailCtryByOSN(eomAvailOSNTbl,plaAvailOSNTbl, "MISSING_PLA_OSNCTRY_ERR", psitem, true,oldDatachklvl);
-				}
-				if(psmesplannedAvailVct != null && psmesplannedAvailVct.size() > 0 && !mesplaOsnErrors && !eomOsnErrors){
-					// only do this check if no errors were found building the OSN buckets
-					checkAvailCtryByOSN(eomAvailOSNTbl,mesplaAvailOSNTbl, "MISSING_PLA_OSNCTRY_ERR", psitem, true,oldDatachklvl);
-				}
-				plaAvailOSNTbl.clear();
-				mesplaAvailOSNTbl.clear();
-				eomAvailOSNTbl.clear();	
-			}
-			availVct.clear();
-			psplannedAvailVct.clear();
-			psmesplannedAvailVct.clear();
-			psEOMAvailVct.clear();
-			//plaAvlCtry.clear();
-		}
-
-    	//111.00	AVAIL	K	PRODSTRUCT-u: OOFAVAIL-d								PRODSTRUCT AVAIL
-    	//112.00	WHEN		AVAILTYPE	=	"End of Service" (151)
-		addHeading(3,availGrp.getLongDescription()+" End of Service Avail Checks:");
-		addDebug("\ncheckAvails checking eos ps avails ");
-		// get all PRODSTRUCT - must compare each PS-LO against its own PS-EOS
-		for(int p=0; p<psGrp.getEntityItemCount(); p++){
-			EntityItem psitem = psGrp.getEntityItem(p);
-			EntityItem mdlItem = getDownLinkEntityItem(psitem, "MODEL");
-			int oldDatachklvl = getCheckLevel(checklvl,mdlItem,"ANNDATE");
-
-			Vector availVct = PokUtils.getAllLinkedEntities(psitem, "OOFAVAIL", "AVAIL");
-			Vector psLoAvailVct = PokUtils.getEntitiesWithMatchedAttr(availVct, "AVAILTYPE", LASTORDERAVAIL);
-			Vector psmesLoAvailVct = PokUtils.getEntitiesWithMatchedAttr(availVct, "AVAILTYPE", MESLASTORDERAVAIL);
-			//112.00	WHEN		AVAILTYPE	=	"End of Service" (151)
-			Vector psEOSAvailVct = PokUtils.getEntitiesWithMatchedAttr(availVct, "AVAILTYPE", EOSAVAIL);
-			//Hashtable loAvailCtryTbl = getAvailByCountry(psLoAvailVct, checklvl);
-
-			addDebug("checkAvails "+psitem.getKey()+" all avail: "+availVct.size()+
-					" loAvail: "+psLoAvailVct.size()+" mesloAvail: "+psmesLoAvailVct.size()+" eosAvail: "+psEOSAvailVct.size());
-					//" loAvailCtryTbl:"+loAvailCtryTbl.keySet());
-
-			if(psEOSAvailVct.size()>0){
-				/*for (int i=0; i<psEOSAvailVct.size(); i++){
-					EntityItem eosavail = (EntityItem)psEOSAvailVct.elementAt(i);
-
-					Vector loVct = new Vector(); // hold onto loavail for date checks incase same avail for mult ctrys
-					//old114 String missingCtry = checkCtryMismatch(eosavail, loAvailCtryTbl, loVct, checklvl);
-					// do the date checks now
-					for (int m=0; m<loVct.size(); m++){
-						EntityItem loAvail = (EntityItem)loVct.elementAt(m);
-						//xx113.00			EFFECTIVEDATE	=>	C:AVAIL	EFFECTIVEDATE	Yes	W	W	E*1		{LD: AVAIL} {NDN: AVAIL) must not be earlier than the {LD: AVAIL} {NDN: J:AVAIL)
-//			Change 20111216	113.00			EFFECTIVEDATE	=>	C:AVAIL	EFFECTIVEDATE	"Cty OSN:XCC_LIST"	W	W	E*1		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL) must not be earlier than the {LD: AVAIL} {NDN: J:AVAIL)
-						checkCanNotBeEarlier(psitem, eosavail, "EFFECTIVEDATE",	loAvail, "EFFECTIVEDATE",oldDatachklvl);
-					} 
-					loVct.clear();*/
-					/*old114.00			COUNTRYLIST	IN	C:AVAIL	COUNTRYLIST		W	W	E*1	{LD: AVAIL} {NDN: AVAIL}  {LD: COUNTRYLIST} includes a country that does not have a "Last Order"
-					if (missingCtry.length()>0){
-						addDebug("checkAvails eosavail:"+eosavail.getKey()+
-								" COUNTRYLIST had ctry ["+missingCtry+"] that were not in any loavail");
-						//MISSING_LO_CTRY_ERR = {0} {1} includes a Country that does not have a &quot;Last Order Availability&quot; Extra countries are: {2}
-						args[0]=getLD_NDN(psitem)+" "+getLD_NDN(eosavail);
-						args[1] = PokUtils.getAttributeDescription(eosavail.getEntityGroup(), "COUNTRYLIST", "COUNTRYLIST");
-						args[2] = missingCtry;
-						createMessage(oldDatachklvl,"MISSING_LO_CTRY_ERR",args);
-					}*/
-
-					/*
-				Delete 20111212 115.00-120.00 
-				String availAnntypeFlag = PokUtils.getAttributeFlagValue(eosavail, "AVAILANNTYPE");
-				addDebug("checkAvails "+eosavail.getKey()+" availAnntypeFlag "+availAnntypeFlag);
-				if (availAnntypeFlag==null){
-					availAnntypeFlag = AVAILANNTYPE_RFA; // if not set, default to RFA
-				}
-
-				if (AVAILANNTYPE_RFA.equals(availAnntypeFlag)){ // error was already logged
-					//115.00	ANNOUNCEMENT		K: + AVAILANNA-d 								PRODSTRUCT ANNOUNCEMENT
-					Vector annVct = PokUtils.getAllLinkedEntities(eosavail, "AVAILANNA", "ANNOUNCEMENT");
-					addDebug("checkAvails EOS "+eosavail.getKey()+" annVct "+annVct.size());
-					for (int ie=0; ie<annVct.size(); ie++){
-						EntityItem annItem = (EntityItem)annVct.elementAt(ie);
-
-						String anntypeFlag = PokUtils.getAttributeFlagValue(annItem, "ANNTYPE");
-						addDebug("checkAvails "+annItem.getKey()+" anntypeFlag "+anntypeFlag);
-						//118.00	ELSE		ANNTYPE	<>	"End Of Life - Discontinuance of service" (13)
-						//119.00			CountOf	=	0			E	E	E		{LD: AVAIL} {NDN: K:AVAIL} must not be in {LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT}
-						if(!ANNTYPE_EOLDS.equals(anntypeFlag)){
-							//MUST_NOT_BE_IN_ERR2= {0} must not be in {1}
-							args[0] = getLD_NDN(eosavail);
-							args[1] = getLD_NDN(annItem);
-							createMessage(CHECKLEVEL_E,"MUST_NOT_BE_IN_ERR2",args);
-							continue;
-						}
-						//116.00	IF		ANNTYPE	=	"End Of Life - Discontinuance of service" (13)
-						//117.00	THEN		ANNDATE	<=	FEATURE	WITHDRAWDATEEFF_T		W	W	E		{LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} must be earlier than the {LD: FEATURE} {LD: WITHDRAWANNDATE_T} {WITHDRAWANNDATE_T}
-						checkCanNotBeLater(annItem, "ANNDATE", featItem, "WITHDRAWDATEEFF_T", checklvl);
-					}
-					annVct.clear();
-				}
-		    	//120.00	END	116.00
-					 */
-					//121.00	END	112.00
-		//		}// end eos avails loop for one prodstruct
-
-				Hashtable loAvailOSNTbl = new Hashtable();
-				boolean loOsnErrors = getAvailByOSN(loAvailOSNTbl,psLoAvailVct,true,CHECKLEVEL_RE);
-				// MES
-				Hashtable mesloAvailOSNTbl = new Hashtable();
-				boolean mesloOsnErrors = getAvailByOSN(mesloAvailOSNTbl,psmesLoAvailVct,true,CHECKLEVEL_RE);
-
-				Hashtable eosAvailOSNTbl = new Hashtable();
-				boolean eosOsnErrors = getAvailByOSN(eosAvailOSNTbl,psEOSAvailVct,true,CHECKLEVEL_RE);
-				addDebug("checkAvails "+psitem.getKey()+" loOsnErrors "+
-						loOsnErrors+" loAvailOSNTbl.keys "+loAvailOSNTbl.keySet()+" mesloOsnErrors "+
-								mesloOsnErrors+" mesloAvailOSNTbl.keys "+mesloAvailOSNTbl.keySet()+" eosOsnErrors "+
-						eosOsnErrors+" eosAvailOSNTbl.keys "+eosAvailOSNTbl.keySet());
-				// only do this check if no errors were found building the OSN buckets
-				if(!loOsnErrors && !eosOsnErrors){
-					//Change 20111216	113.00			EFFECTIVEDATE	=>	C:AVAIL	EFFECTIVEDATE	"Cty OSN:XCC_LIST"	W	W	E*1		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL) must not be earlier than the {LD: AVAIL} {NDN: J:AVAIL)
-					checkAvailDatesByCtryByOSN(eosAvailOSNTbl,loAvailOSNTbl, psitem, DATE_GR_EQ,oldDatachklvl,"",false);
-					//Change 20111216	114.00			COUNTRYLIST	IN	C:AVAIL	COUNTRYLIST	OSN:XCC_LIST	W	W	E*1		
-					//{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL}  {LD: COUNTRYLIST} includes a country that does not have a "Last Order"
-					checkAvailCtryByOSN(eosAvailOSNTbl,loAvailOSNTbl, "MISSING_LO_OSNCTRY_ERR", psitem,true, oldDatachklvl);
-				}
-				if(psmesLoAvailVct != null && psmesLoAvailVct.size() > 0 && !mesloOsnErrors && !eosOsnErrors){
-					//Change 20111216	113.00			EFFECTIVEDATE	=>	C:AVAIL	EFFECTIVEDATE	"Cty OSN:XCC_LIST"	W	W	E*1		{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL) must not be earlier than the {LD: AVAIL} {NDN: J:AVAIL)
-					checkAvailDatesByCtryByOSN(eosAvailOSNTbl,mesloAvailOSNTbl, psitem, DATE_GR_EQ,oldDatachklvl,"",false);
-					//Change 20111216	114.00			COUNTRYLIST	IN	C:AVAIL	COUNTRYLIST	OSN:XCC_LIST	W	W	E*1		
-					//{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL}  {LD: COUNTRYLIST} includes a country that does not have a "Last Order"
-					checkAvailCtryByOSN(eosAvailOSNTbl,mesloAvailOSNTbl, "MISSING_LO_OSNCTRY_ERR", psitem,true, oldDatachklvl);
-				}
-				loAvailOSNTbl.clear();
-				mesloAvailOSNTbl.clear();
-				eosAvailOSNTbl.clear();			
-			}// end eos avail exist
-
-			availVct.clear();
-			psLoAvailVct.clear();
-			psmesLoAvailVct.clear();
-			psEOSAvailVct.clear();
-			//loAvailCtryTbl.clear();
-		}// end psgrp loop
-    	//38.00	END	14.00
-
-	   	firstOrderAvailVct.clear();
-	   	featCtrylist.clear();
-		lastOrderAvailVct.clear();
-	}
-	
-	/**
-	 * Check PRODSTRUCT Last Order or MES Last Order AVAIL
-	 * @param lastOrderAvailVct
-	 * @param psGrp
-	 * @param featItem
-	 * @param wdAnnDate
-	 * @param checklvl
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	private void checkPsLastOrderOrMesLastOrderAvail(String lastOrderOrMesLastOrderAvailType, Vector lastOrderAvailVct, EntityGroup psGrp, EntityItem featItem, String wdAnnDate, int checklvl) throws SQLException, MiddlewareException { 
-		addDebug("\ncheckAvails checking lastorder ps avails");
-		// get all PRODSTRUCT - must compare each PS-PLA against its own PS-LO
-		for(int p=0; p<psGrp.getEntityItemCount(); p++){
-			EntityItem psitem = psGrp.getEntityItem(p);
-
-			EntityItem mdlItem = getDownLinkEntityItem(psitem, "MODEL");
-			int oldDatachklvl = getCheckLevel(checklvl,mdlItem,"ANNDATE");
-
-			Vector availVct = PokUtils.getAllLinkedEntities(psitem, "OOFAVAIL", "AVAIL");
-			// remove any that are not AVAILANNTYPE=RFA so they arent in the other checks
-	    	//removeNonRFAAVAIL(availVct);
-
-			Vector psplannedAvailVct = PokUtils.getEntitiesWithMatchedAttr(availVct, "AVAILTYPE", PLANNEDAVAIL);
-			Vector psmesplannedAvailVct = PokUtils.getEntitiesWithMatchedAttr(availVct, "AVAILTYPE", MESPLANNEDAVAIL);
-			//29.00	AVAIL	C	PRODSTRUCT-u:OOFAVAIL-d								AVAIL LO
-			Vector pslastOrderAvailVct = PokUtils.getEntitiesWithMatchedAttr(availVct, "AVAILTYPE", lastOrderOrMesLastOrderAvailType);
-			ArrayList plaAvlCtry = getCountriesAsList(psplannedAvailVct, checklvl);
-
-			addDebug("checkAvails "+psitem.getKey()+" "+mdlItem.getKey()+" all avail: "+availVct.size()+" avail type: "+lastOrderOrMesLastOrderAvailType+
-					" plaAvail: "+psplannedAvailVct.size()+" loAvail: "+pslastOrderAvailVct.size()+" mesplaAvail: "+psmesplannedAvailVct.size()+
-					" plaAvlCtry:"+plaAvlCtry);
-
-			checkPsAvailCWithAvailA(pslastOrderAvailVct, psplannedAvailVct, psitem, featItem, checklvl, oldDatachklvl);
-			if(MESLASTORDERAVAIL.equals(lastOrderOrMesLastOrderAvailType))
-				checkPsAvailCWithAvailA(pslastOrderAvailVct, psmesplannedAvailVct, psitem, featItem, checklvl, oldDatachklvl);
-			checkPsAvailCWithFeatureW(pslastOrderAvailVct, psitem, featItem, checklvl);
-			
-			availVct.clear();
-			psplannedAvailVct.clear();
-			plaAvlCtry.clear();
-		}
-
-		//33.00	ANNOUNCEMENT	D	C: + AVAILANNA-d 								ANNOUNCEMENT LO
-		//34.00	WHEN		ANNTYPE	=	End Of Life - Withdrawal from mktg (14)
-		//35.00			ANNDATE	<=	FEATURE	WITHDRAWANNDATE_T		W	W	E		{LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} must not be later than the {LD: FEATURE} {LD: WITHDRAWANNDATE_T} {WITHDRAWANNDATE_T} 
-    	if (wdAnnDate.length()>0){
-    		//filter out non RFA avails
-    		Vector tmpLOVct = new Vector(lastOrderAvailVct);
-    		// remove any that are not AVAILANNTYPE=RFA
-        	removeNonRFAAVAIL(tmpLOVct);
-
-    		Vector annVct = PokUtils.getAllLinkedEntities(tmpLOVct, "AVAILANNA", "ANNOUNCEMENT");
-    		addDebug("checkAvails annVct "+annVct.size());
-    		annVct = PokUtils.getEntitiesWithMatchedAttr(annVct, "ANNTYPE", ANNTYPE_EOL);
-    		addDebug("checkAvails EOL annVct "+annVct.size());
-    		for (int i=0; i<annVct.size(); i++){
-    			EntityItem annItem = (EntityItem)annVct.elementAt(i);
-    			checkCanNotBeLater(annItem, "ANNDATE", featItem, "WITHDRAWANNDATE_T", checklvl);
-    		}
-    		annVct.clear();
-    		//lastOrderAvailVct.clear();
-    		tmpLOVct.clear();
-    	}
-	}
-	
-	private void checkPsAvailCWithAvailA(Vector pslastOrderAvailVct, Vector psplannedAvailVct, EntityItem psitem, EntityItem featItem, int checklvl, int oldDatachklvl) throws SQLException, MiddlewareException {
-		if(pslastOrderAvailVct.size()>0){
-			Hashtable plaAvailOSNTbl = new Hashtable();
-			boolean plaOsnErrors = getAvailByOSN(plaAvailOSNTbl,psplannedAvailVct,true,CHECKLEVEL_RE);
-			addDebug("checkAvails "+psitem.getKey()+" plaOsnErrors "+
-					plaOsnErrors+" plaAvailOSNTbl.keys "+plaAvailOSNTbl.keySet());
-
-			Hashtable loAvailOSNTbl = new Hashtable();
-			boolean loOsnErrors = getAvailByOSN(loAvailOSNTbl,pslastOrderAvailVct,true,CHECKLEVEL_RE);
-			addDebug("checkAvails "+psitem.getKey()+" loOsnErrors "+
-					loOsnErrors+" loAvailOSNTbl.keys "+loAvailOSNTbl.keySet());
-			//Change 20111216	31.00			COUNTRYLIST	in	A: AVAIL	COUNTRYLIST	OSN:XCC_LIST	W	W	E*1		
-			//{LD:PRODSTRUCT}{NDN:PRODSTRUCT} {LD: AVAIL} {NDN: AVAIL} {LD: COUNTRYLIST} includes a country that does not have a "Planned Availability"
-			if(!plaOsnErrors && !loOsnErrors){
-				// only do this check if no errors were found building the OSN buckets
-				checkAvailCtryByOSN(loAvailOSNTbl,plaAvailOSNTbl, "MISSING_PLA_OSNCTRY_ERR", psitem, true, oldDatachklvl);
-			}
-			plaAvailOSNTbl.clear();
-			loAvailOSNTbl.clear();			
-		}
-	}
-	
-	private void checkPsAvailCWithFeatureW(Vector pslastOrderAvailVct, EntityItem psitem, EntityItem featItem, int checklvl) throws SQLException, MiddlewareException {
-		if(pslastOrderAvailVct.size()>0){
-			//18.00	WHEN		AVAILTYPE	=	"Last Order" or "MES Last Order"
-			for (int i=0; i<pslastOrderAvailVct.size(); i++){
-				EntityItem avail = (EntityItem)pslastOrderAvailVct.elementAt(i);
-				//32.00			EFFECTIVEDATE	<=	FEATURE	WITHDRAWDATEEFF_T		W	W	E
-				//{LD: AVAIL} {NDN: AVAIL} must not be later than the {LD: FEATURE} {LD: WITHDRAWDATEEFF_T} {WITHDRAWDATEEFF_T}
-				checkCanNotBeLater(psitem,avail, "EFFECTIVEDATE", featItem, "WITHDRAWDATEEFF_T", checklvl);
-
-				//old31.00			COUNTRYLIST	in	A: AVAIL	COUNTRYLIST		W	W	E*1 - PER PRODSTRUCT
-				//oldcheckPlannedAvailForCtryExists(psitem,avail, plaAvlCtry, oldDatachklvl);
-			}
-		}
-	}
-	
-	/**
-	 * Check PRODSTRUCT Plan AVAIL or MES Plan AVAIL
-	 * @param plannedAvailVct
-	 * @param featItem
-	 * @param featCtrylist
-	 * @param firstAnnDate
-	 * @param checklvl
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	private void checkPsPlanOrMesPlanAvail(Vector plannedAvailVct, EntityItem featItem, ArrayList featCtrylist, String firstAnnDate, int checklvl) throws SQLException, MiddlewareException {
-		//15.00	AVAIL	A	PRODSTRUCT-u:OOFAVAIL-d								AVAIL PA
-    	//16.00	WHEN		AVAILTYPE	=	"Planned Availability" or "MES Planned Availability"
-    	for (int i=0; i<plannedAvailVct.size(); i++){
-    		EntityItem avail = (EntityItem)plannedAvailVct.elementAt(i);
-    		EntityItem psitem = getAvailPS(avail, "OOFAVAIL");
-    		//17.00 COUNTRYLIST	in	FEATURE	COUNTRYLIST
-    		checkAvailCtryInEntity(psitem, avail, featItem,featCtrylist,checklvl);
-
-			//18.00			EFFECTIVEDATE	=>	FEATURE	FIRSTANNDATE		W	W	E
-	    	//{LD: AVAIL} {NDN: AVAIL} must not be earlier than the {LD: FEATURE} {LD: FIRSTANNDATE} {ANNDATE}
-			checkCanNotBeEarlier(psitem,avail, "EFFECTIVEDATE", featItem, "FIRSTANNDATE", checklvl);
-		}
-
-    	if (firstAnnDate.length()>0){
-    		//filter out non RFA avails
-    		Vector tmpPLAVct = new Vector(plannedAvailVct);
-    		// remove any that are not AVAILANNTYPE=RFA
-        	removeNonRFAAVAIL(tmpPLAVct);
-
-        	//19.00	ANNOUNCEMENT	B	A: + AVAILANNA-d 								ANNOUNCEMENT PA
-        	//20.00	WHEN		ANNTYPE	=	New (19)
-        	//21.00			ANNDATE	=>	FEATURE	FIRSTANNDATE		W	W	E
-        	//{LD: ANNOUNCEMENT} {NDN: ANNOUNCEMENT} must not be earlier than the {LD: FEATURE} {LD: FIRSTANNDATE} {FIRSTANNDATE}
-    		Vector annVct = PokUtils.getAllLinkedEntities(tmpPLAVct, "AVAILANNA", "ANNOUNCEMENT");
-    		addDebug("checkAvails all annVct "+annVct.size());
-    		annVct = PokUtils.getEntitiesWithMatchedAttr(annVct, "ANNTYPE", ANNTYPE_NEW);
-    		addDebug("checkAvails PLA NEW annVct "+annVct.size());
-    		for (int i=0; i<annVct.size(); i++){
-    			EntityItem annItem = (EntityItem)annVct.elementAt(i);
-    			checkCanNotBeEarlier(annItem, "ANNDATE", featItem, "FIRSTANNDATE", checklvl);
-    		}
-    		annVct.clear();
-    		tmpPLAVct.clear();
-    	}
-	}
-
-    /***********************************************
-    *  Get ABR description
-    *
-    *@return java.lang.String
-    */
-    public String getDescription()
-    {
-        String desc =  "FEATURE ABR.";
-
-        return desc;
-    }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getABRVersion()
-    {
-    	return "1.23";
-    }
-    /**
-    W.	SetBHInvnameHW
-
-    This check runs for a FEATURE.
-
-If Value of (BHINVNAME) is Empty (aka Null) 
-OR
-if VALFROM(INVNAME) > VALFROM(BHINVNAME)
-then Derive New Value for BHINVNAME
-
-Derive New Value for BHINVNAME as follows:
-SEARCH FEATURE  not restricted by PDHDOMAIN based on 
-�	INVNAME
-�	INVENTORYGROUP
-
-If the search only finds one FEATURE (i.e. itself), 
-then 
-	BHINVNAME = INVNAME
-else
-	BHINVNAME = FEATURECODE & "-" & INVNAME
-
-If the BHINVNAME is successfully saved, then proceed with the CHECKS
-
-     * @param featItem
-     * @throws Exception 
-     */
-    private void setBHInvnameHW(EntityItem featItem) throws Exception
-    {
-    	boolean derive = true;
-    	
-		String fcode = PokUtils.getAttributeValue(featItem, "FEATURECODE",", ", "", false);
-    	String bhinvname = PokUtils.getAttributeValue(featItem, "BHINVNAME",", ", null, false);
-    	String invname = PokUtils.getAttributeValue(featItem, "INVNAME",", ", null, false);
-    	String invgrp = getAttributeFlagEnabledValue(featItem, "INVENTORYGROUP");
-    	
-    	int maxLen = EANMetaAttribute.TEXT_MAX_LEN;
-    	//6.20				CheckMAX	FEATURE	BHINVNAME		RE	RE	RE		LD(FEATURE) NDN(FEATURE) LD(BHINVNAME) has a derived value longer than (value of MAX) characters
-		EANMetaAttribute metaAttr = featItem.getEntityGroup().getMetaAttribute("BHINVNAME");
-		if(metaAttr!=null){
-			maxLen = metaAttr.getMaxLen();
-		}
-		
-    	addDebug("setBHInvnameHW checking "+featItem.getKey()+" fcode: "+fcode+
-    			" bhinvname: "+bhinvname+" invname: "+invname+" invgrp: "+invgrp+" maxLen: "+maxLen);
-    	
-    	if(invname==null){
-    		//REQ_NOTPOPULATED_ERR = {0} {1} is required and does not have a value.
-    		args[0]="";
-    		args[1]=PokUtils.getAttributeDescription(featItem.getEntityGroup(), "INVNAME", "INVNAME");
-    		createMessage(CHECKLEVEL_E,"REQ_NOTPOPULATED_ERR",args); 
-    		return;
-    	}
-    	/*
-If Value of (BHINVNAME) is Empty (aka Null) 
-OR
-if VALFROM(INVNAME) > VALFROM(BHINVNAME)
-then Derive New Value for BHINVNAME
-    	 */
-    	
-    	if(bhinvname!=null){
-    		// get the attributehistory for INVNAME
-    		String invnameDts = getTimestamp(featItem, "INVNAME");
-    		// get the attributehistory for BHINVNAME
-    		String bhinvnameDts = getTimestamp(featItem, "BHINVNAME");
-        	addDebug("setBHInvnameHW invnameDts: "+invnameDts+" bhinvnameDts: "+bhinvnameDts);
-        	derive = bhinvnameDts.compareTo(invnameDts)<0;
-    	}
-    	
-    	if(derive){
-    		// search for FEATUREs with same INVNAME and INVENTORYGROUP
-    		EntityItem eia[] = searchForFeature(invgrp, invname); 
-    		//If the search only finds one FEATURE (i.e. itself), 
-    		//then 
-    		//	BHINVNAME = INVNAME
-    		//else
-    		//	BHINVNAME = FEATURECODE & "-" & INVNAME
-
-    		if(eia==null || eia.length==1){ // null is an error in search
-    			bhinvname = invname;
-    		}else{
-    			bhinvname = fcode+"-"+invname;
-    		}
-	  
-    	   	addDebug("setBHInvnameHW derived bhinvname: "+bhinvname);
-    	   	// always set this now
-    	   	setTextValue(m_elist.getProfile(), "BHINVNAME", bhinvname, featItem);
-    	}
-    	
-    	// check existing values too
-    	if (bhinvname.length()>maxLen){
-    		//If length (bhinvname) > maxLen, then set Return Code = Fail the data quality checks with an 
-    		//ErrorMessage LD(FEATURE) NDN(FEATURE) LD(BHINVNAME) "has a derived value longer than (value of MAX) characters."
-    		//DERIVED_LEN_ERR = {0} has a derived value longer than {1} characters: &quot;{2}&quot;.
-    		args[0] = PokUtils.getAttributeDescription(featItem.getEntityGroup(), "BHINVNAME", "BHINVNAME");
-    		args[1] = ""+maxLen;
-    		args[2] = bhinvname;
-    		createMessage(CHECKLEVEL_RE,"DERIVED_LEN_ERR",args);
-    	}
-    }    
-	/**
-	 * SWFEATURE and FEATURE may derive BHINVNAME that must be committed even though ABR fails
-	 * @param rek
-	 */
-	protected void removeAttrBeforeCommit(ReturnEntityKey rek){
-		Attribute bhinvnameAttr = null;
-		for (int ii=0; ii<rek.m_vctAttributes.size(); ii++){
-			Attribute attr = (Attribute)rek.m_vctAttributes.elementAt(ii);
-			if(attr.getAttributeCode().equals("BHINVNAME")){
-				bhinvnameAttr = attr;
-				break;
-			}
-		}
-		rek.m_vctAttributes.clear();
-		// put this one back
-		if(bhinvnameAttr!=null){
-			rek.m_vctAttributes.addElement(bhinvnameAttr);
-		}
-	}
-    /**
-     *  SEARCH FEATURE  not restricted by PDHDOMAIN based on 
-     *      �	INVNAME
-     *      �	INVENTORYGROUP
-     * @param invgrp
-     * @param invname
-     * @return
-     * @throws SQLException
-     * @throws MiddlewareException
-     * @throws MiddlewareShutdownInProgressException
-     */
-    private EntityItem[] searchForFeature(String invgrp, String invname) 
-	throws SQLException, MiddlewareException, MiddlewareShutdownInProgressException
-	{
-		Vector attrVct = new Vector(2);
-		Vector valVct = new Vector(2);
-		attrVct.addElement("INVNAME");
-		attrVct.addElement("INVENTORYGROUP");
-
-		valVct.addElement(invname);
-		valVct.addElement(invgrp);
-
-		EntityItem eia[]= null;
-		try{
-			StringBuffer debugSb = new StringBuffer();
-			addDebug("searchForFeature using attrs: "+attrVct+" values: "+valVct);
-			eia= ABRUtil.doSearch(getDatabase(), m_elist.getProfile(), 
-					FC_SRCHACTION_NAME, "FEATURE", false, attrVct, valVct, debugSb);
-			if (debugSb.length()>0){
-				addDebug(debugSb.toString());
-			}
-		}catch(SBRException exc){
-			// these exceptions are for missing flagcodes or failed business rules, dont pass back
-			java.io.StringWriter exBuf = new java.io.StringWriter();
-			exc.printStackTrace(new java.io.PrintWriter(exBuf));
-			addDebug("searchForFeature SBRException: "+exBuf.getBuffer().toString());
-		}
-			
-		if(eia!=null){
-			for (int i=0; i<eia.length; i++){
-				addDebug("searchForFeature found "+eia[i].getKey());
-			}
-		}
-
-		attrVct.clear();
-		valVct.clear();
-		return eia;
-	}
-    
-    /**
-     * check if each character of a text field against a specified list of characters.
-     * @param arrayChars list of characters
-     * @param str String in text field 
-     * @return if contains, return true, else false
-     */
-    private boolean checkChars(char[] arrayChars, String str){
-    	for (int i = 0; i < arrayChars.length; i++) {
-			if(str.indexOf(arrayChars[i]) >= 0){
-				return true;
-			}
-		}
-    	return false;
-    }
-}

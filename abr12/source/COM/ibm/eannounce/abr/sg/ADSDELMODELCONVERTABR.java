@@ -1,83 +1,89 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.abr.sg;
+/*    */ package COM.ibm.eannounce.abr.sg;
+/*    */ 
+/*    */ import COM.ibm.eannounce.abr.util.XMLElem;
+/*    */ import COM.ibm.eannounce.abr.util.XMLFixedElem;
+/*    */ import COM.ibm.eannounce.abr.util.XMLGroupElem;
+/*    */ import COM.ibm.eannounce.abr.util.XMLNotificationElem;
+/*    */ import COM.ibm.eannounce.abr.util.XMLValFromElem;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class ADSDELMODELCONVERTABR
+/*    */   extends XMLMQDelete
+/*    */ {
+/* 47 */   private static final XMLElem XMLMAP = (XMLElem)new XMLGroupElem("MODELCONVERT_DELETE");
+/*    */   static {
+/* 49 */     XMLMAP.addChild((XMLElem)new XMLFixedElem("ACTIVITY", "Delete"));
+/* 50 */     XMLMAP.addChild((XMLElem)new XMLNotificationElem("DTSOFABR"));
+/* 51 */     XMLMAP.addChild(new XMLElem("MODELCONVERTENTITYTYPE", "ENTITYTYPE"));
+/* 52 */     XMLMAP.addChild(new XMLElem("MODELCONVERTENTITYID", "ENTITYID"));
+/* 53 */     XMLMAP.addChild((XMLElem)new XMLValFromElem("DTSOFUPDATE"));
+/* 54 */     XMLMAP.addChild(new XMLElem("FROMMACHTYPE", "FROMMACHTYPE"));
+/* 55 */     XMLMAP.addChild(new XMLElem("FROMMODEL", "FROMMODEL"));
+/* 56 */     XMLMAP.addChild(new XMLElem("TOMACHTYPE", "TOMACHTYPE"));
+/* 57 */     XMLMAP.addChild(new XMLElem("TOMODEL", "TOMODEL"));
+/* 58 */     XMLMAP.addChild(new XMLElem("PDHDOMAIN", "PDHDOMAIN"));
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public XMLElem getXMLMap() {
+/* 65 */     return XMLMAP;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getMQCID() {
+/* 72 */     return "MODELCONVERT";
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getVersion() {
+/* 81 */     return "1.2";
+/*    */   }
+/*    */ }
 
-import COM.ibm.eannounce.abr.util.*;
 
-/**********************************************************************************
-*
-<MODELCONVERT_DELETE>		1
-<ACTIVITY>	</ACTIVITY>	2	MODELCONVERT	Activity
-<DTSOFABR>	</DTSOFABR>	2	MODELCONVERT	ABR Queued
-<MODELCONVERTENTITYTYPE>	</MODELCONVERTENTITYTYPE>	2	MODELCONVERT	ENTITYTYPE
-<MODELCONVERTENTITYID>	</MODELCONVERTENTITYID>	2	MODELCONVERT	ENTITYID
-<DTSOFUPDATE>	</DTSOFUPDATE>	2	MODELCONVERT	VALFROM
-<FROMMACHTYPE>	</FROMMACHTYPE>	2	MODELCONVERT	FROMMACHTYPE
-<FROMMODEL>	</FROMMODEL>	2	MODELCONVERT	FROMMODEL
-<TOMACHTYPE>	</TOMACHTYPE>	2	MODELCONVERT	TOMACHTYPE
-<TOMODEL>	</TOMODEL>	2	MODELCONVERT	TOMODEL
-<PDHDOMAIN>	</PDHDOMAIN>	2	MODELCONVERT	PDHDOMAIN
-	</MODELCONVERT_DELETE>	1
-
-
-*
-*/
-// ADSDELMODELCONVERTABR.java,v
-// Revision 1.2  2008/05/28 13:46:08  wendy
-// updates for spec "SG FS ABR ADS System Feed 20080528c.doc"
-//
-// Revision 1.1  2008/04/29 14:31:38  wendy
-// Init for
-//  -   CQ00003539-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC
-//  -   CQ00005096-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Add Category MM and Images
-//  -   CQ00005046-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Support CRAD in BHC
-//  -   CQ00005045-WI -  BHC 3.0 Support - Feed of ZIPSRSS product info to BHC - Upgrade/Conversion Support
-//  -   CQ00006862-WI  - BHC 3.0 Support - Support for Services Data UI
-//
-//
-public class ADSDELMODELCONVERTABR extends XMLMQDelete
-{
-    private static final XMLElem XMLMAP;
-
-    static {
-        XMLMAP = new XMLGroupElem("MODELCONVERT_DELETE");
-         // level2
-        XMLMAP.addChild(new XMLFixedElem("ACTIVITY", "Delete"));
-        XMLMAP.addChild(new XMLNotificationElem("DTSOFABR")); // pull from profile.endofday
-        XMLMAP.addChild(new XMLElem("MODELCONVERTENTITYTYPE","ENTITYTYPE"));
-        XMLMAP.addChild(new XMLElem("MODELCONVERTENTITYID","ENTITYID"));
-        XMLMAP.addChild(new XMLValFromElem("DTSOFUPDATE"));
-        XMLMAP.addChild(new XMLElem("FROMMACHTYPE","FROMMACHTYPE"));
-        XMLMAP.addChild(new XMLElem("FROMMODEL","FROMMODEL"));
-        XMLMAP.addChild(new XMLElem("TOMACHTYPE","TOMACHTYPE"));
-        XMLMAP.addChild(new XMLElem("TOMODEL","TOMODEL"));
-        XMLMAP.addChild(new XMLElem("PDHDOMAIN","PDHDOMAIN"));
-    }
-
-    /**********************************
-    * get xml object mapping
-    */
-    public XMLElem getXMLMap() {
-        return XMLMAP;
-    }
-
-    /**********************************
-    *
-	A.	MQ-Series CID
-    */
-    public String getMQCID() { return "MODELCONVERT"; }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getVersion()
-    {
-        return "1.2";
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\ADSDELMODELCONVERTABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

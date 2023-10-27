@@ -1,874 +1,871 @@
-// (c) Copyright International Business Machines Corporation, 2001
-// All Rights Reserved.
-//
-//  $Log: ReportFormatter.java,v $
-//  Revision 1.24  2008/03/19 19:08:04  wendy
-//  Clean up RSA warnings
-//
-//  Revision 1.23  2006/08/28 22:06:03  wendy
-//  MN29121594 fixes
-//
-//  Revision 1.22  2006/08/21 20:39:07  wendy
-//  Fixed null ptr for TIR6SVS6Z
-//
-//  Revision 1.21  2006/08/10 15:48:42  dave
-//  ok.. new formula
-//
-//  Revision 1.20  2006/08/10 15:42:03  dave
-//  trapping out of bounds
-//
-//  Revision 1.19  2006/08/10 15:24:29  dave
-//  more trace for out of bounds
-//
-//  Revision 1.18  2006/08/10 00:22:15  dave
-//  fixing boundary issue
-//
-//  Revision 1.17  2006/08/09 23:36:30  dave
-//  attempting to trap null pointer
-//
-//  Revision 1.16  2005/05/24 15:47:40  bala
-//  fix
-//
-//  Revision 1.15  2005/05/17 21:58:26  bala
-//  fixes for column wrapping
-//
-//  Revision 1.14  2004/01/12 18:33:25  bala
-//  Adding prettyPrint
-//
-//  Revision 1.13  2003/11/26 20:04:21  bala
-//  revert back to 1.11
-//
-//  Revision 1.12  2003/11/24 19:37:25  bala
-//  further refine sort and break combination by setting the first column for sorting. method  to suppress printing 1st column
-//
-//  Revision 1.11  2003/10/25 22:56:54  bala
-//  fix for breakcontents not being printed for break
-//
-//  Revision 1.10  2003/09/25 01:43:24  bala
-//  add Sorting capability
-//
-//  Revision 1.9  2003/06/11 00:58:02  bala
-//  adjustment to control breaks
-//
-//  Revision 1.8  2003/06/09 23:10:53  bala
-//  Final fix to controlbreak logic
-//
-//  Revision 1.7  2003/06/09 20:49:06  bala
-//  backing out changes
-//
-//  Revision 1.6  2003/06/09 19:35:32  bala
-//  debug
-//
-//  Revision 1.5  2003/06/09 19:25:48  bala
-//  more debugging
-//
-//  Revision 1.4  2003/06/09 18:38:24  bala
-//  more debugs
-//
-//  Revision 1.3  2003/06/09 18:19:49  bala
-//  debugging break line
-//
-//  Revision 1.2  2003/06/09 17:17:54  bala
-//  change to incorporate control breaks in reports
-//
-//  Revision 1.1.1.1  2003/06/03 19:02:25  dave
-//  new 1.1.1 abr
-//
-//  Revision 1.11  2002/12/14 00:58:33  bala
-//  print the "-" after the header
-//
-//  Revision 1.10  2002/12/12 00:53:21  bala
-//  print instances of multivalue flags in new row...also not to
-//  wrap a word in the middle if possible
-//
-//  Revision 1.9  2002/12/05 03:03:46  bala
-//  logic to suppress duplicate lines
-//
-//  Revision 1.8  2002/11/26 22:41:08  bala
-//  fixes
-//
-//  Revision 1.7  2002/11/16 01:50:30  bala
-//  offset to work at header level too
-//
-//  Revision 1.6  2002/11/14 00:47:12  bala
-//  Added setOffset to offset printing by offset spaces
-//
-//  Revision 1.5  2002/10/31 00:25:44  bala
-//  more fixes
-//
-//  Revision 1.4  2002/10/18 22:39:08  bala
-//  more fine tuning....ability to print rows without heading etc
-//
-//  Revision 1.3  2002/10/15 20:46:33  bala
-//  further cleaning up
-//
-//  Revision 1.2  2002/10/11 00:01:51  bala
-//  plug into the printwriter, format header, pretty print etc
-//
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.opicmpdh.transactions.OPICMABRItem;
+/*     */ import java.lang.reflect.Array;
+/*     */ import java.util.Arrays;
+/*     */ import java.util.Comparator;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.StringTokenizer;
+/*     */ import java.util.Vector;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class ReportFormatter
+/*     */ {
+/* 129 */   String[] m_strHeader = null;
+/* 130 */   String[][] m_strDetail = (String[][])null;
+/* 131 */   String[] m_strPadSpaces = null;
+/* 132 */   String m_strSpaces = "                                                                              ";
+/* 133 */   String m_strColSeparator = " ";
+/*     */   boolean m_bPrintHeader = true;
+/*     */   boolean m_bNoDupeLines = true;
+/* 136 */   Hashtable m_hNoDupeLines = new Hashtable<>();
+/* 137 */   int m_iSeparatorWidth = 0;
+/* 138 */   int m_iWidth = 0;
+/* 139 */   int[] m_iColWidths = null;
+/* 140 */   int[] m_iWrapColumn = null;
+/* 141 */   int iREPORTWIDTH = 72;
+/* 142 */   int m_iAvgWidth = 0;
+/*     */   
+/* 144 */   int m_iCurrHdrColumn = 0;
+/* 145 */   int m_iCurrDtlColumn = 0;
+/* 146 */   int m_iCurrHdrRow = 0;
+/* 147 */   int m_iCurrDtlRow = 0;
+/* 148 */   int m_iTotDetRows = 0;
+/* 149 */   int m_iOffsetLen = 0;
+/* 150 */   String m_strOffsetSpace = "";
+/* 151 */   StringTokenizer m_st = null;
+/* 152 */   OPICMABRItem m_abrItem = null;
+/* 153 */   final String BREAK_INDICATOR = "$$BREAKHERE$$";
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean m_bSortOutput = false;
+/*     */ 
+/*     */ 
+/*     */   
+/* 161 */   protected int[] m_iSortColumns = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setABRItem(OPICMABRItem paramOPICMABRItem) {
+/* 177 */     this.m_abrItem = paramOPICMABRItem;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setColumnSeparator(String paramString) {
+/* 193 */     this.m_strColSeparator = paramString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setReportWidth(int paramInt) {
+/* 203 */     this.m_iWidth = paramInt;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void calculateColumnWidths() {
+/* 213 */     this.m_iAvgWidth = this.iREPORTWIDTH / this.m_iColWidths.length;
+/*     */     
+/* 215 */     this.m_iWrapColumn = (int[])Array.newInstance(int.class, this.m_iColWidths.length);
+/* 216 */     this.m_strPadSpaces = (String[])Array.newInstance(String.class, this.m_iColWidths.length);
+/* 217 */     this.m_iSeparatorWidth = this.m_strColSeparator.length();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private int getColCount() {
+/* 240 */     return this.m_iColWidths.length;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void writeReport() {}
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addHeaderColumn(String paramString) {
+/* 257 */     this.m_strHeader[this.m_iCurrHdrColumn] = paramString;
+/* 258 */     this.m_iCurrHdrColumn++;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addDetailColumn(String paramString) {
+/* 268 */     if (this.m_strDetail == null) {
+/* 269 */       growDetailArray();
+/*     */     }
+/* 271 */     this.m_strDetail[this.m_iCurrDtlRow][this.m_iCurrDtlColumn] = paramString;
+/* 272 */     this.m_iCurrDtlColumn++;
+/* 273 */     if (this.m_iCurrDtlColumn > getColCount() - 1) {
+/* 274 */       this.m_iCurrDtlColumn = 0;
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addDetailRow(String paramString) {
+/* 285 */     this.m_iCurrDtlRow++;
+/* 286 */     this.m_iCurrDtlColumn = 0;
+/* 287 */     this.m_iTotDetRows++;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void growDetailArray() {
+/* 295 */     byte b = 0;
+/* 296 */     b = (this.m_iTotDetRows == 0) ? 100 : b;
+/* 297 */     String[][] arrayOfString = (String[][])Array.newInstance(String.class, new int[] { b * 2, this.m_iColWidths.length });
+/* 298 */     if (this.m_strDetail != null) {
+/* 299 */       System.arraycopy(this.m_strDetail, 0, arrayOfString, 0, this.m_strDetail.length);
+/*     */     }
+/* 301 */     this.m_strDetail = arrayOfString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setColWidth(int[] paramArrayOfint) {
+/* 312 */     this.m_iColWidths = paramArrayOfint;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setHeader(String[] paramArrayOfString) {
+/* 322 */     this.m_strHeader = paramArrayOfString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void printHeaders(boolean paramBoolean) {
+/* 332 */     this.m_bPrintHeader = paramBoolean;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setDetail(String[][] paramArrayOfString) {
+/* 342 */     this.m_strDetail = paramArrayOfString;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 347 */     if (paramArrayOfString != null) {
+/* 348 */       this.m_iTotDetRows = this.m_strDetail.length;
+/*     */     } else {
+/* 350 */       println("setDetail Simple.. someone passed a null parm.. no total rows...");
+/* 351 */       this.m_iTotDetRows = 0;
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setDetail(Vector<String> paramVector) {
+/* 362 */     byte b1 = 0;
+/* 363 */     byte b2 = 0;
+/* 364 */     this.m_iTotDetRows = 0;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 370 */     if (paramVector != null && paramVector.size() > 0 && this.m_iColWidths != null && this.m_iColWidths.length > 0) {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 376 */       int i = paramVector.size() / this.m_iColWidths.length;
+/* 377 */       if (paramVector.size() % this.m_iColWidths.length != 0) {
+/* 378 */         i++;
+/*     */       }
+/*     */       
+/* 381 */       String[][] arrayOfString = (String[][])Array.newInstance(String.class, new int[] { i, this.m_iColWidths.length });
+/* 382 */       this.m_strDetail = arrayOfString;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 387 */       for (b1 = 0; b1 < paramVector.size(); b1++) {
+/*     */         
+/* 389 */         if (this.m_iTotDetRows == this.m_strDetail.length) {
+/*     */           break;
+/*     */         }
+/*     */ 
+/*     */         
+/* 394 */         this.m_strDetail[this.m_iTotDetRows][b2++] = paramVector.elementAt(b1);
+/* 395 */         if (b2 == this.m_iColWidths.length) {
+/* 396 */           b2 = 0;
+/* 397 */           this.m_iTotDetRows++;
+/*     */         } 
+/*     */       } 
+/* 400 */     } else if (paramVector == null) {
+/* 401 */       this.m_strDetail = (String[][])null;
+/* 402 */       System.out.println("vDetail is null cannot perform a set Detail properly...");
+/* 403 */     } else if (paramVector.size() == 0) {
+/* 404 */       this.m_strDetail = (String[][])null;
+/* 405 */       System.out.println("vDetail has no elements.. cannot perform a set Detail properly...");
+/* 406 */     } else if (this.m_iColWidths == null) {
+/* 407 */       this.m_strDetail = (String[][])null;
+/* 408 */       System.out.println("m_iColWidths seems to be not set.. cannot perform a set Detail properly...");
+/* 409 */     } else if (this.m_iColWidths.length == 0) {
+/* 410 */       this.m_strDetail = (String[][])null;
+/* 411 */       System.out.println("m_iColWidths has no length.. cannot perform a set Detail properly...");
+/*     */     } else {
+/* 413 */       this.m_strDetail = (String[][])null;
+/*     */     } 
+/*     */     
+/* 416 */     if (this.m_bSortOutput) {
+/* 417 */       ColumnSorter columnSorter = new ColumnSorter(this.m_iSortColumns);
+/* 418 */       Arrays.sort(this.m_strDetail, columnSorter);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void printReport() {
+/* 427 */     byte b1 = 0;
+/* 428 */     byte b2 = 0;
+/* 429 */     this.m_hNoDupeLines = new Hashtable<>();
+/* 430 */     if (this.m_strDetail != null) {
+/* 431 */       calculateColumnWidths();
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 436 */       if (this.m_bPrintHeader) {
+/* 437 */         for (b1 = 0; b1 < this.m_strHeader.length; b1++) {
+/* 438 */           if (b1 == 0) {
+/* 439 */             print(this.m_strOffsetSpace);
+/*     */           }
+/* 441 */           if (b1 < this.m_strHeader.length - 1) {
+/* 442 */             print(this.m_strHeader[b1]);
+/* 443 */             if (this.m_strHeader[b1].length() < this.m_iColWidths[b1]) {
+/* 444 */               print(this.m_strSpaces.substring(0, this.m_iColWidths[b1] - this.m_strHeader[b1].length()));
+/*     */             }
+/*     */             
+/* 447 */             print(this.m_strColSeparator);
+/*     */           } else {
+/* 449 */             println(this.m_strHeader[b1]);
+/*     */           } 
+/*     */         } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 456 */         for (b1 = 0; b1 < this.m_strHeader.length; b1++) {
+/* 457 */           for (b2 = 0; b2 < this.m_iColWidths[b1]; b2++) {
+/* 458 */             if (b2 == 0) {
+/* 459 */               print(this.m_strOffsetSpace);
+/*     */             }
+/* 461 */             print("-");
+/*     */           } 
+/* 463 */           print(this.m_strColSeparator);
+/*     */         } 
+/* 465 */         println("");
+/*     */       } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 471 */       for (b1 = 0; b1 < this.m_iTotDetRows; b1++) {
+/* 472 */         if (!this.m_bNoDupeLines) {
+/* 473 */           printRow(this.m_strDetail[b1]);
+/* 474 */         } else if (!foundInPrint(this.m_strDetail[b1])) {
+/* 475 */           printRow(this.m_strDetail[b1]);
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private boolean foundInPrint(String[] paramArrayOfString) {
+/* 490 */     boolean bool = true;
+/* 491 */     String str = "";
+/* 492 */     byte b = 0;
+/* 493 */     for (b = 0; b < paramArrayOfString.length; b++) {
+/* 494 */       if (b == 0) {
+/* 495 */         str = paramArrayOfString[b];
+/*     */       } else {
+/* 497 */         str = str + "|" + paramArrayOfString[b];
+/*     */       } 
+/*     */     } 
+/* 500 */     if (!this.m_hNoDupeLines.containsKey(str)) {
+/* 501 */       bool = false;
+/* 502 */       this.m_hNoDupeLines.put(str, " ");
+/*     */     } 
+/* 504 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void printRow(String[] paramArrayOfString) {
+/* 515 */     boolean bool1 = false;
+/* 516 */     boolean bool2 = false;
+/*     */     
+/* 518 */     byte b = 0;
+/* 519 */     int i = 0;
+/* 520 */     int j = 0;
+/* 521 */     String str1 = " * ";
+/* 522 */     String str2 = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 527 */     for (b = 0; b < paramArrayOfString.length; b++) {
+/* 528 */       if (paramArrayOfString[b] == null) {
+/* 529 */         System.out.println("ERROR in ReportFormatter printRow element _strRow[" + b + "] was null");
+/*     */       } else {
+/*     */         
+/* 532 */         paramArrayOfString[b] = paramArrayOfString[b].trim();
+/*     */         
+/* 534 */         this.m_iWrapColumn[b] = 0;
+/*     */         
+/* 536 */         if (bool2) {
+/* 537 */           paramArrayOfString[b] = this.m_strSpaces.substring(0, this.m_iColWidths[b]);
+/*     */         }
+/*     */ 
+/*     */ 
+/*     */         
+/* 542 */         if (paramArrayOfString[b].indexOf("$$BREAKHERE$$") > -1) {
+/* 543 */           bool1 = false;
+/* 544 */           bool2 = true;
+/* 545 */           paramArrayOfString[b] = paramArrayOfString[b].substring(paramArrayOfString[b].indexOf("$$BREAKHERE$$") + "$$BREAKHERE$$".length());
+/*     */         }
+/* 547 */         else if (paramArrayOfString[b].length() > this.m_iColWidths[b] - this.m_iSeparatorWidth + 1) {
+/* 548 */           bool1 = true;
+/* 549 */           this.m_iWrapColumn[b] = 1;
+/*     */         } 
+/*     */       } 
+/* 552 */     }  if (bool1) {
+/* 553 */       while (bool1) {
+/* 554 */         for (b = 0; b < getColCount(); b++) {
+/* 555 */           if (b == 0) {
+/* 556 */             print(this.m_strOffsetSpace);
+/*     */           }
+/*     */ 
+/*     */           
+/* 560 */           if (this.m_iWrapColumn[b] == 1) {
+/* 561 */             j = paramArrayOfString[b].indexOf(str1);
+/* 562 */             if (j == 0) {
+/* 563 */               j = paramArrayOfString[b].indexOf(str1, str1.length() - 1);
+/*     */             }
+/*     */ 
+/*     */ 
+/*     */             
+/* 568 */             if (j < this.m_iColWidths[b] && j > 0) {
+/*     */               
+/* 570 */               str2 = paramArrayOfString[b].substring(0, j);
+/*     */             
+/*     */             }
+/*     */             else {
+/*     */               
+/* 575 */               this.m_st = new StringTokenizer(paramArrayOfString[b]);
+/* 576 */               str2 = "";
+/* 577 */               while (str2.length() < this.m_iColWidths[b] - this.m_iSeparatorWidth + 1 && this.m_st.hasMoreElements()) {
+/* 578 */                 str2 = str2 + ((str2.length() > 0) ? " " : "") + this.m_st.nextToken();
+/*     */               }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */               
+/* 584 */               if (str2.length() > this.m_iColWidths[b])
+/*     */               {
+/* 586 */                 if (str2.lastIndexOf(" ") > 0)
+/*     */                 {
+/* 588 */                   str2 = str2.substring(0, str2.lastIndexOf(" "));
+/*     */                 }
+/*     */               }
+/*     */             } 
+/*     */ 
+/*     */             
+/* 594 */             if (str2.length() > this.m_iColWidths[b]) {
+/* 595 */               str2 = paramArrayOfString[b].substring(0, this.m_iColWidths[b] - this.m_iSeparatorWidth + 1);
+/*     */             }
+/*     */ 
+/*     */             
+/* 599 */             print(str2);
+/* 600 */             print(this.m_strSpaces.substring(0, this.m_iColWidths[b] - this.m_iSeparatorWidth + str2.length() - 1) + this.m_strColSeparator);
+/*     */             
+/* 602 */             if (str2.length() < this.m_iColWidths[b]) {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */               
+/* 607 */               paramArrayOfString[b] = paramArrayOfString[b].substring(str2.length() + 1);
+/*     */             } else {
+/*     */               
+/* 610 */               paramArrayOfString[b] = paramArrayOfString[b].substring(str2.length());
+/*     */             } 
+/*     */             
+/* 613 */             if (paramArrayOfString[b].length() < this.m_iColWidths[b]) {
+/* 614 */               this.m_iWrapColumn[b] = 0;
+/*     */             }
+/*     */           } else {
+/*     */             
+/* 618 */             print(paramArrayOfString[b]);
+/* 619 */             print(this.m_strSpaces.substring(0, this.m_iColWidths[b] - paramArrayOfString[b].length() - this.m_iSeparatorWidth + 1) + this.m_strColSeparator);
+/* 620 */             paramArrayOfString[b] = this.m_strSpaces.substring(0, this.m_iColWidths[b] - this.m_iSeparatorWidth + 1);
+/*     */           } 
+/* 622 */           if (b == getColCount() - 1) {
+/* 623 */             println("");
+/*     */           }
+/*     */         } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 630 */         i = 0;
+/* 631 */         for (b = 0; b < paramArrayOfString.length; b++) {
+/* 632 */           i += this.m_iWrapColumn[b];
+/*     */         }
+/* 634 */         if (i == 0) {
+/* 635 */           bool1 = false;
+/*     */         }
+/*     */       } 
+/*     */ 
+/*     */ 
+/*     */       
+/* 641 */       for (b = 0; b < getColCount(); b++) {
+/* 642 */         if (b < getColCount() - 1) {
+/* 643 */           if (b == 0) {
+/* 644 */             print(this.m_strOffsetSpace);
+/*     */           }
+/*     */           
+/* 647 */           if (paramArrayOfString[b].length() <= this.m_iColWidths[b]) {
+/* 648 */             print(paramArrayOfString[b]);
+/* 649 */             print(this.m_strSpaces.substring(0, this.m_iColWidths[b] - paramArrayOfString[b].length() - this.m_iSeparatorWidth + 1) + this.m_strColSeparator);
+/*     */           } 
+/*     */         } else {
+/* 652 */           println(paramArrayOfString[b]);
+/*     */         } 
+/*     */       } 
+/*     */     } else {
+/* 656 */       for (b = 0; b < getColCount(); b++) {
+/* 657 */         if (b < getColCount() - 1) {
+/*     */           
+/* 659 */           if (b == 0) {
+/* 660 */             print(this.m_strOffsetSpace);
+/*     */           }
+/*     */           
+/* 663 */           if (paramArrayOfString[b].length() <= this.m_iColWidths[b]) {
+/*     */             
+/* 665 */             if (!bool2) {
+/* 666 */               print(paramArrayOfString[b]);
+/* 667 */               print(this.m_strSpaces.substring(0, this.m_iColWidths[b] - paramArrayOfString[b].length() - this.m_iSeparatorWidth + 1) + this.m_strColSeparator);
+/*     */             } else {
+/*     */               
+/* 670 */               prettyPrint(paramArrayOfString[b], 69);
+/*     */             } 
+/* 672 */           } else if (paramArrayOfString[b].length() > this.m_iColWidths[b]) {
+/* 673 */             if (bool2) {
+/*     */ 
+/*     */               
+/* 676 */               print(paramArrayOfString[b]);
+/*     */             } else {
+/* 678 */               println("WE SHOULDNT BE HERE!!");
+/*     */             } 
+/*     */           } 
+/*     */         } else {
+/* 682 */           println(paramArrayOfString[b]);
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setOffset(int paramInt) {
+/* 696 */     this.m_iOffsetLen = paramInt;
+/* 697 */     this.m_strOffsetSpace = "";
+/* 698 */     for (byte b = 0; b < paramInt; b++) {
+/* 699 */       this.m_strOffsetSpace += " ";
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setPrintDupeLines(boolean paramBoolean) {
+/* 710 */     this.m_bNoDupeLines = paramBoolean;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String getVersion() {
+/* 720 */     return new String("$Id: ReportFormatter.java,v 1.24 2008/03/19 19:08:04 wendy Exp $");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void print(String paramString) {
+/* 730 */     this.m_abrItem.print(paramString);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void println(String paramString) {
+/* 740 */     this.m_abrItem.println(paramString);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   static class ColumnSorter
+/*     */     implements Comparator
+/*     */   {
+/*     */     int[] m_columnIndex;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*     */     public ColumnSorter(int[] param1ArrayOfint) {
+/* 762 */       this.m_columnIndex = param1ArrayOfint;
+/*     */     }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*     */     public int compare(Object param1Object1, Object param1Object2) {
+/* 774 */       int i = 0;
+/* 775 */       byte b = 0;
+/* 776 */       String[] arrayOfString1 = (String[])param1Object1;
+/* 777 */       String[] arrayOfString2 = (String[])param1Object2;
+/*     */       try {
+/* 779 */         for (b = 0; b < this.m_columnIndex.length && !i; b++) {
+/* 780 */           String str1 = arrayOfString1[this.m_columnIndex[b]];
+/* 781 */           String str2 = arrayOfString2[this.m_columnIndex[b]];
+/* 782 */           if (str1 == null || str2 == null) {
+/* 783 */             System.out.println("ERROR in ReportFormatter compare element in array was null [" + this.m_columnIndex[b] + "] ");
+/*     */             break;
+/*     */           } 
+/* 786 */           i = str1.compareTo(str2);
+/*     */         } 
+/* 788 */       } catch (ArrayIndexOutOfBoundsException arrayIndexOutOfBoundsException) {
+/* 789 */         System.out.println("Error in ReportFormatter compare parameters: ArrayLength is " + arrayOfString1.length + " column parameter is " + this.m_columnIndex[b] + " " + arrayIndexOutOfBoundsException.getMessage());
+/* 790 */         arrayIndexOutOfBoundsException.printStackTrace();
+/*     */       } 
+/* 792 */       return i;
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setSortable(boolean paramBoolean) {
+/* 803 */     this.m_bSortOutput = paramBoolean;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setSortColumns(int[] paramArrayOfint) {
+/* 813 */     this.m_iSortColumns = paramArrayOfint;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void prettyPrint(String paramString, int paramInt) {
+/* 831 */     String str1 = null;
+/* 832 */     String str2 = null;
+/*     */     
+/* 834 */     int i = 0;
+/*     */ 
+/*     */     
+/* 837 */     StringTokenizer stringTokenizer = new StringTokenizer(paramString, "\n", false);
+/* 838 */     while (stringTokenizer.hasMoreElements()) {
+/* 839 */       str2 = stringTokenizer.nextToken();
+/* 840 */       if (str2.length() > paramInt) {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 845 */         while (str2.length() > paramInt) {
+/* 846 */           i = (str2.length() >= paramInt) ? paramInt : str2.length();
+/* 847 */           str1 = str2.substring(0, i);
+/* 848 */           if (!str1.substring(i - 1).equals(" "))
+/*     */           {
+/* 850 */             if (str1.lastIndexOf(" ") > 0)
+/*     */             {
+/* 852 */               str1 = str1.substring(0, str1.lastIndexOf(" "));
+/*     */             }
+/*     */           }
+/* 855 */           str2 = str2.substring(str1.length());
+/* 856 */           println(str1.trim());
+/*     */         } 
+/* 858 */         if (str2.trim().length() > 0)
+/* 859 */           println(str2.trim()); 
+/*     */         continue;
+/*     */       } 
+/* 862 */       println(str2.trim());
+/*     */     } 
+/*     */   }
+/*     */ }
 
 
-
-
-
-package COM.ibm.eannounce.abr.util;
-import java.lang.String;
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Vector;
-import java.util.Hashtable;
-import java.util.StringTokenizer;
-import COM.ibm.opicmpdh.transactions.OPICMABRItem;
-/**
- *  Description of the Class
- *
- *@author     Bala
- *@created    October 4, 2002
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\ReportFormatter.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class ReportFormatter {
-    String[] m_strHeader = null;
-    String[][] m_strDetail = null;
-    String[] m_strPadSpaces = null;
-    String m_strSpaces = "                                                                              ";
-    String m_strColSeparator = " ";
-    boolean m_bPrintHeader = true;
-    boolean m_bNoDupeLines = true;
-    Hashtable m_hNoDupeLines = new Hashtable();
-    int m_iSeparatorWidth = 0;
-    int m_iWidth = 0;
-    int m_iColWidths[] = null;
-    int m_iWrapColumn[] = null;
-    int iREPORTWIDTH = 72;
-    int m_iAvgWidth = 0;
-
-    int m_iCurrHdrColumn = 0;
-    int m_iCurrDtlColumn = 0;
-    int m_iCurrHdrRow = 0;
-    int m_iCurrDtlRow = 0;
-    int m_iTotDetRows = 0;
-    int m_iOffsetLen = 0;
-    String m_strOffsetSpace = "";
-    StringTokenizer m_st = null;
-    OPICMABRItem m_abrItem = null;
-    final String BREAK_INDICATOR = "$$BREAKHERE$$";
-    /**
-     *  Description of the Field
-     */
-    protected boolean m_bSortOutput = false;
-    /**
-     *  Description of the Field
-     */
-    protected int[] m_iSortColumns = null;
-
-
-    /**
-     *  Description of the Method
-     */
-    public ReportFormatter() {
-    }
-
-
-    /**
-     *  Sets the aBRItem attribute of the ReportFormatter object
-     *
-     *@param  _strSeparator  The new columnSeparator value
-     */
-      public void setABRItem(OPICMABRItem _abrI) {
-        m_abrItem = _abrI;
-      }
-
-
-    /**
-     *  Sets the aBRItem attribute of the ReportFormatter object
-     *
-     *@param  _strSeparator  The new columnSeparator value
-     */
-
-    /**
-     *  Sets the columnSeparator attribute of the ReportFormatter object
-     *
-     *@param  _strSeparator  The new columnSeparator value
-     */
-    public void setColumnSeparator(String _strSeparator) {
-        m_strColSeparator = _strSeparator;
-    }
-
-
-    /**
-     *  Sets the reportWidth attribute of the ReportFormatter object
-     *
-     *@param  _iWidth  The new reportWidth value
-     */
-    public void setReportWidth(int _iWidth) {
-        m_iWidth = _iWidth;
-    }
-
-
-    /**
-     *  calculateColumnWidths
-     */
-    private void calculateColumnWidths() {
-       // int iWidth = 0;
-      //  int i = 0;
-        m_iAvgWidth = iREPORTWIDTH / m_iColWidths.length;//get the width of each column
-
-        m_iWrapColumn = (int[]) Array.newInstance(int.class, m_iColWidths.length);// This will be used hold flag whether column has to be wrapped
-        m_strPadSpaces = (String[]) Array.newInstance(String.class, m_iColWidths.length);//Holds spaces to pad after each column
-        m_iSeparatorWidth = m_strColSeparator.length();
-
-    }
-
-
-    /**
-     *  Gets the rowCount attribute of the ReportFormatter object
-     *
-     *@return    The rowCount value
-     * /
-    private int getRowCount() {
-        //println("Report has " + m_strDetail.length + " rows");
-        return m_strDetail.length;
-    }*/
-
-
-    /**
-     *  Gets the colCount attribute of the ReportFormatter object
-     *
-     *@return    The colCount value
-     */
-    private int getColCount() {
-        //println("Report has "+m_iColWidths.length+" columns");
-        return m_iColWidths.length;
-    }
-
-
-    /**
-     *  Description of the Method
-     */
-    public void writeReport() {
-    }
-
-
-    /**
-     *  Adds a feature to the HeaderColumn attribute of the ReportFormatter object
-     *
-     *@param  _strColHeader  The feature to be added to the HeaderColumn attribute
-     */
-    public void addHeaderColumn(String _strColHeader) {
-        m_strHeader[m_iCurrHdrColumn] = _strColHeader;
-        m_iCurrHdrColumn++;
-    }
-
-
-    /**
-     *  Adds a feature to the DetailColumn attribute of the ReportFormatter object
-     *
-     *@param  _strColDetail  The feature to be added to the DetailColumn attribute
-     */
-    public void addDetailColumn(String _strColDetail) {
-        if (m_strDetail == null) {
-            growDetailArray();
-        }
-        m_strDetail[m_iCurrDtlRow][m_iCurrDtlColumn] = _strColDetail;
-        m_iCurrDtlColumn++;
-        if (m_iCurrDtlColumn > getColCount() - 1) {
-            m_iCurrDtlColumn = 0;
-        }
-    }
-
-
-    /**
-     *  Adds a feature to the DetailRow attribute of the ReportFormatter object
-     *
-     *@param  _strColDetail  The feature to be added to the DetailRow attribute
-     */
-    public void addDetailRow(String _strColDetail) {
-        m_iCurrDtlRow++;
-        m_iCurrDtlColumn = 0;
-        m_iTotDetRows++;
-    }
-
-
-    /**
-     *  Description of the Method
-     */
-    private void growDetailArray() {
-        int iRowIncrement = 0;
-        iRowIncrement = (m_iTotDetRows == 0 ? 100 : iRowIncrement);
-        String[][] strGrowDetail = (String[][]) Array.newInstance(String.class, new int[]{iRowIncrement * 2, m_iColWidths.length});//Initialize the Detail array
-        if (m_strDetail != null) {
-            System.arraycopy(m_strDetail, 0, strGrowDetail, 0, m_strDetail.length);
-        }
-        m_strDetail = strGrowDetail;
-        //println("Detail array has " + m_strDetail.length + " rows");
-    }
-
-
-    /**
-     *  Sets the colWidth attribute of the ReportFormatter object
-     *
-     *@param  _iColWidth  The new colWidth value
-     */
-    public void setColWidth(int[] _iColWidth) {
-        m_iColWidths = _iColWidth;
-    }
-
-
-    /**
-     *  Sets the header attribute of the ReportFormatter object
-     *
-     *@param  _strArrHeader  The new header value
-     */
-    public void setHeader(String[] _strArrHeader) {
-        m_strHeader = _strArrHeader;
-    }
-
-
-    /**
-     *  Description of the Method
-     *
-     *@param  _bPrint  Description of the Parameter
-     */
-    public void printHeaders(boolean _bPrint) {
-        m_bPrintHeader = _bPrint;
-    }
-
-
-    /**
-     *  Sets the detail attribute of the ReportFormatter object
-     *
-     *@param  _strArrDetail  The new detail value
-     */
-    public void setDetail(String[][] _strArrDetail) {
-        m_strDetail = _strArrDetail;
-
-        //
-        // DWB -- looking for a null pointer
-        //
-        if (_strArrDetail != null) {
-	        m_iTotDetRows = m_strDetail.length;
-	    } else {
-            println("setDetail Simple.. someone passed a null parm.. no total rows...");
-            m_iTotDetRows = 0;
-		}
-    }
-
-
-       /**
-        *  Sets the detail attribute of the ReportFormatter object
-        *
-        *@param  _vDetail  The new detail value
-        */
-       public void setDetail(Vector _vDetail) {
-           int i = 0;
-           int iCol = 0;
-           m_iTotDetRows = 0;
-           /*
-        *  We know the number of columns needed from the header
-        *  So calculate the number of rows given by dividing
-        *  vector size with number of columns in Header
-        */
-           if (_vDetail != null &&  _vDetail.size() > 0 &&  m_iColWidths != null && m_iColWidths.length > 0) {
-
- //              System.out.println("Detail is not null..size is "+_vDetail.size()+ " Creating an array of "+_vDetail.size() / m_iColWidths.length+","+ m_iColWidths.length);
- //  Better equation here.. we were getting 2/3 = 0 for rows.. (no rows).. we always need at least 1
- 			// TIR6SVS6Z this caused null in compare when vDetail.size is a multiple of m_iColWidths.length; one too many iRows
-               //int iRows = (_vDetail.size() == m_iColWidths.length ? 1 : (_vDetail.size() / m_iColWidths.length) + 1);
-               int iRows = (_vDetail.size() / m_iColWidths.length);
-               if ((_vDetail.size() % m_iColWidths.length)!=0) {
-				   iRows++;
-			   }
-
-               String[][] strGrowDetail = (String[][]) Array.newInstance(String.class, new int[]{iRows, m_iColWidths.length});//Initialize the Detail array
-               m_strDetail = strGrowDetail;
-
-               /*
-          *  Now fill the Array with the contents of the vector
-          */
-               for (i = 0; i < _vDetail.size(); i++) {
-//                 System.out.println("DAVE:" + m_strDetail[0].length + ";" + m_strDetail.length + " wid:" + iCol + ":len:" + m_iTotDetRows);
-     			    if (m_iTotDetRows == m_strDetail.length) {
-//         				System.out.println("We reached the end of the rows.. and we are done.. even though more data exists than it should");
-               		    break;
-   				   }
-
-                   m_strDetail[m_iTotDetRows][iCol++] = (String) _vDetail.elementAt(i);
-                   if (iCol == m_iColWidths.length) {//Reset the column and row when next column position = the length of the array
-                       iCol = 0;
-                       m_iTotDetRows++;
-                   }
-     			}
-           } else if (_vDetail == null) {
-	             m_strDetail = null;
-                 System.out.println("vDetail is null cannot perform a set Detail properly...");
-           } else if (_vDetail.size() == 0) {
-             	m_strDetail = null;
-             	System.out.println("vDetail has no elements.. cannot perform a set Detail properly...");
-           } else if (m_iColWidths == null) {
-	             m_strDetail = null;
-      			System.out.println("m_iColWidths seems to be not set.. cannot perform a set Detail properly...");
-           } else if (m_iColWidths.length == 0) {
-	             m_strDetail = null;
-      			System.out.println("m_iColWidths has no length.. cannot perform a set Detail properly...");
-            } else {
-               m_strDetail = null;
-           }
-
-           if (m_bSortOutput) {
-               ColumnSorter sortCol1 = new ColumnSorter(m_iSortColumns);
-               Arrays.sort(m_strDetail, sortCol1);
-           }
-       }
-
-
-    /**
-     *  Description of the Method
-     */
-    public void printReport() {
-        int i = 0;
-        int j = 0;
-        m_hNoDupeLines = new Hashtable();
-        if (m_strDetail != null) {
-            calculateColumnWidths();
-
-            /*
-       *  print Header
-       */
-            if (m_bPrintHeader) {
-                for (i = 0; i < m_strHeader.length; i++) {
-                    if (i == 0) {
-                        print(m_strOffsetSpace);
-                    }//Offset spaces from left border
-                    if (i < m_strHeader.length - 1) {
-                        print(m_strHeader[i]);
-                        if (m_strHeader[i].length() < m_iColWidths[i]) {
-                            print(m_strSpaces.substring(0, (m_iColWidths[i] - m_strHeader[i].length())));
-                            //print(m_strPadSpaces[i]);
-                        }
-                        print(m_strColSeparator);
-                    } else {
-                        println(m_strHeader[i]);
-                    }
-                }
-
-                /*
-         *  Print pretty lines
-         */
-                for (i = 0; i < m_strHeader.length; i++) {
-                    for (j = 0; j < m_iColWidths[i]; j++) {
-                        if (j == 0) {
-                            print(m_strOffsetSpace);
-                        }//Offset spaces from left border
-                        print("-");
-                    }
-                    print(m_strColSeparator);
-                }
-                println("");
-            }
-
-            /*
-       *  print Datail
-       */
-            for (i = 0; i < m_iTotDetRows; i++) {
-                if (!m_bNoDupeLines) {
-                    printRow(m_strDetail[i]);
-                } else if (!foundInPrint(m_strDetail[i])) {
-                    printRow(m_strDetail[i]);
-                }
-            }
-        }
-        //println("print complete!");
-    }
-
-
-    /**
-     *  Description of the Method
-     *
-     *@param  _strDetail  the RowString
-     *@return             boolean value
-     */
-    private boolean foundInPrint(String[] _strDetail) {
-        boolean bRetVal = true;
-        String strFind = "";
-        int k = 0;
-        for (k = 0; k < _strDetail.length; k++) {
-            if (k == 0) {
-                strFind = _strDetail[k];
-            } else {
-                strFind += "|" + _strDetail[k];
-            }
-        }
-        if (!m_hNoDupeLines.containsKey(strFind)) {
-            bRetVal = false;
-            m_hNoDupeLines.put(strFind, " ");//If not found, then add to the Hashtable
-        }
-        return bRetVal;
-    }
-
-
-    /**
-     *  Description of the Method
-     *
-     *@param  _strRow  Description of the Parameter
-     */
-
-    private void printRow(String[] _strRow) {
-        boolean bWrapRow = false;
-        boolean bBreakNow = false;
-      //  boolean bMFSeparator = false;
-        int i = 0;
-        int iTotWrapCol = 0;
-        int iStringWidth = 0;
-        String DELIM = " * ";
-        String strPrintString = null;
-
-        /*
-     *  First check whether the column has to be wrapped
-     */
-        for (i = 0; i < _strRow.length; i++) {
-			if (_strRow[i]==null){ // MN29121594
-				System.out.println("ERROR in ReportFormatter printRow element _strRow["+i+"] was null");
-				continue;
-			}
-            _strRow[i] = _strRow[i].trim();//remove all the pesky trailing and leading spaces bala
-
-            m_iWrapColumn[i] = 0;
-
-            if (bBreakNow) {//Stuff the rest of the columns with spaces
-                _strRow[i] = m_strSpaces.substring(0, m_iColWidths[i]);
-            } else {
-            }
-
-            //Check whether this row has a break tag
-            if (_strRow[i].indexOf(BREAK_INDICATOR) > -1) {
-                bWrapRow = false;
-                bBreakNow = true;
-                _strRow[i] = _strRow[i].substring(_strRow[i].indexOf(BREAK_INDICATOR) + BREAK_INDICATOR.length());
-//        _strRow[i] = _strRow[i].substring(BREAK_INDICATOR.length());          //Take the indicator out
-            } else if (_strRow[i].length() > m_iColWidths[i] - m_iSeparatorWidth + 1) {
-                bWrapRow = true;
-                m_iWrapColumn[i] = 1;
-            }
-        }
-        if (bWrapRow) {
-            while (bWrapRow) {
-                for (i = 0; i < getColCount(); i++) {
-                    if (i == 0) {
-                        print(m_strOffsetSpace);
-//print("Printing offset space :"+m_strOffsetSpace+":");
-                    }//Offset spaces from left border
-
-                    if (m_iWrapColumn[i] == 1) {//This column has to be wrapped
-                        iStringWidth = _strRow[i].indexOf(DELIM);//Check for multivalue flag separators
-                        if (iStringWidth == 0) {
-                            iStringWidth = _strRow[i].indexOf(DELIM, DELIM.length() - 1);
-                        }//Check for the next one
-//            println("Next separator found at "+iStringWidth);
-                        //bMFSeparator = iStringWidth == -1 ? false : true;
-                        //if (bMFSeparator) println("Multivalueflag separator found");
-                        if (iStringWidth < m_iColWidths[i] && !(iStringWidth <= 0)) {
-                            //Delimiter found in middle, print to delimiter
-                            strPrintString = _strRow[i].substring(0, iStringWidth);
-                        } else {//next delimiter could exceed width
-                            //Check whether value is > col width for column
-                            //Print to the word upto where the next word exceeds width., then print the next word on the next line
-                            //if multivalue separator found, start each instance of the mv in a new row
-                            m_st = new StringTokenizer(_strRow[i]);
-                            strPrintString = "";
-                            while ((strPrintString.length() < m_iColWidths[i] - m_iSeparatorWidth + 1) && m_st.hasMoreElements()) {
-                                strPrintString += (strPrintString.length()>0 ? " ":"") + m_st.nextToken();      //bala
-//println("String is now |" + strPrintString + "|");
-
-                            }
-                            //strPrintString = _strRow[i].substring(0, m_iColWidths[i] - m_iSeparatorWidth + 1);
-                            //strPrintString = strPrintString.trim();  bala
-                            if (strPrintString.length() > m_iColWidths[i]) {
-//            println("1. strPrintString.length() > m_iColWidths[i])");
-                                if (strPrintString.lastIndexOf(" ") > 0) {
-                                    //strPrintString = strPrintString.substring(0, strPrintString.lastIndexOf(" ")+1);//move to the last word
-                                    strPrintString = strPrintString.substring(0, strPrintString.lastIndexOf(" "));//move to the last word
-//println("After moving to last word " +strPrintString);
-                                }
-                            }
-                        }
-//println("Recalc String is now |"+strPrintString+"|");
-                        if (strPrintString.length() > m_iColWidths[i]) {
-                            strPrintString = _strRow[i].substring(0, m_iColWidths[i] - m_iSeparatorWidth + 1);
-                        }
-//println("Recalc String 1 is now |"+strPrintString+"|");
-
-                        print(strPrintString);
-                        print(m_strSpaces.substring(0, m_iColWidths[i] - (m_iSeparatorWidth + strPrintString.length() - 1)) + m_strColSeparator);
-
-                        if (strPrintString.length() < m_iColWidths[i]) {
-//println("strPrintString.length() < m_iColWidths[i])");
-//println("row is :"+_strRow[i]+":");
-//println("strPrintString is:"+strPrintString+":");
-//              _strRow[i] = _strRow[i].substring(strPrintString.trim().length() + 1);  bala
-                            _strRow[i] = _strRow[i].substring(strPrintString.length()+1);
-                        } else {
-// println("strPrintString.length() > m_iColWidths[i])");
-                            _strRow[i] = _strRow[i].substring(strPrintString.length());
-                        }
-//println("row is now|"+_strRow[i]);
-                        if (_strRow[i].length() < m_iColWidths[i]) {
-                            m_iWrapColumn[i] = 0;// Dont have to wrap this column again
-                        }
-                    } else {
-                        //Now you have to print and pad spaces if needed
-                        print(_strRow[i]);
-                        print(m_strSpaces.substring(0, (m_iColWidths[i] - _strRow[i].length() - m_iSeparatorWidth + 1)) + m_strColSeparator);
-                        _strRow[i] = m_strSpaces.substring(0, m_iColWidths[i] - m_iSeparatorWidth + 1);//Set the column to spaces so that it prints spaces in the next iteration
-                    }
-                    if (i == getColCount() - 1) {
-                        println("");
-                    }
-                }
-
-                /*
-         *  Check if any columns need wrapping
-         */
-                iTotWrapCol = 0;
-                for (i = 0; i < _strRow.length; i++) {
-                    iTotWrapCol += m_iWrapColumn[i];
-                }
-                if (iTotWrapCol == 0) {//means no column need to be wrapped
-                    bWrapRow = false;
-                }
-            }
-            /*
-       *  print the last row for wrap
-       */
-            for (i = 0; i < getColCount(); i++) {
-                if (i < getColCount() - 1) {
-                    if (i == 0) {
-                        print(m_strOffsetSpace);
-                    }//Offset spaces from left border
-
-                    if (_strRow[i].length() <= m_iColWidths[i]) {
-                        print(_strRow[i]);
-                        print(m_strSpaces.substring(0, (m_iColWidths[i] - _strRow[i].length() - m_iSeparatorWidth + 1)) + m_strColSeparator);
-                    }
-                } else {
-                    println(_strRow[i]);
-                }
-            }
-        } else {
-            for (i = 0; i < getColCount(); i++) {
-                if (i < getColCount() - 1) {//is this the last column?
-
-                    if (i == 0) {
-                        print(m_strOffsetSpace);
-                    }//Offset spaces from left border
-
-                    if (_strRow[i].length() <= m_iColWidths[i]) {
-
-                        if (!bBreakNow) {
-                            print(_strRow[i]);
-                            print(m_strSpaces.substring(0, (m_iColWidths[i] - _strRow[i].length() - m_iSeparatorWidth + 1)) + m_strColSeparator);
-                        } else {
-                            //print(_strRow[i]);
-                            prettyPrint(_strRow[i], 69);
-                        }
-                    } else if (_strRow[i].length() > m_iColWidths[i]) {//Now we have to wrap
-                        if (bBreakNow) {
-                            //print(_strRow[i].substring(BREAK_INDICATOR.length()));
-                            //print(_strRow[i].substring(_strRow[i].indexOf(BREAK_INDICATOR)+BREAK_INDICATOR.length()));
-                            print(_strRow[i]);
-                        } else {
-                            println("WE SHOULDNT BE HERE!!");
-                        }
-                    }
-                } else {
-                    println(_strRow[i]);
-                }
-
-            }
-        }
-
-    }
-
-    /**
-     *  Sets the offset attribute of the ReportFormatter object
-     *
-     *@param  _iOffset  The new offset value
-     */
-    public void setOffset(int _iOffset) {
-        m_iOffsetLen = _iOffset;
-        m_strOffsetSpace = "";
-        for (int i = 0; i < _iOffset; i++) {
-            m_strOffsetSpace += " ";
-        }
-    }
-
-
-    /**
-     *  Sets the printDupeLines attribute of the ReportFormatter object
-     *
-     *@param  _b  The new printDupeLines value
-     */
-    public void setPrintDupeLines(boolean _b) {
-        m_bNoDupeLines = _b;
-    }
-
-
-    /**
-     *  Gets the version attribute of the ReportFormatter class
-     *
-     *@return    The version value
-     */
-    public static String getVersion() {
-        return new String("$Id: ReportFormatter.java,v 1.24 2008/03/19 19:08:04 wendy Exp $");
-    }
-
-
-    /**
-     *  Description of the Method
-     *
-     *@param  _str  Description of the Parameter
-     */
-    private void print(String _str) {
-        m_abrItem.print(_str);
-    }
-
-
-    /**
-     *  Description of the Method
-     *
-     *@param  _str  Description of the Parameter
-     */
-    private void println(String _str) {
-        m_abrItem.println(_str);
-        //System.out.println(_str);
-    }
-
-
-
-    /**
-     *  Description of the Class
-     *
-     *@author     Administrator
-     *@created    October 25, 2003
-     */
-    static class ColumnSorter implements Comparator {
-        int[] m_columnIndex;
-
-
-        /**
-         *  Constructor for the ColumnSorter object
-         *
-         *@param  _icolumnIndex  Description of the Parameter
-         */
-        public ColumnSorter(int[] _icolumnIndex) {
-            this.m_columnIndex = _icolumnIndex;
-        }
-
-
-        /**
-         *  Description of the Method
-         *
-         *@param  o1  Description of the Parameter
-         *@param  o2  Description of the Parameter
-         *@return     Description of the Return Value
-         */
-        public int compare(Object o1, Object o2) {
-            int iresult = 0;
-            int i = 0;
-            String[] arr1 = (String[]) o1;
-            String[] arr2 = (String[]) o2;
-            try {
-                for (i = 0; i < m_columnIndex.length && iresult == 0; i++) {
-					String str1 = arr1[m_columnIndex[i]];
-					String str2 = arr2[m_columnIndex[i]];
-					if (str1 ==null || str2 ==null){ // TIR6SVS6Z
-						System.out.println("ERROR in ReportFormatter compare element in array was null ["+m_columnIndex[i]+"] ");
-						break;
-					}
-                    iresult = str1.compareTo(str2);
-                }
-            } catch (ArrayIndexOutOfBoundsException aie) {
-                System.out.println("Error in ReportFormatter compare parameters: ArrayLength is " + arr1.length + " column parameter is " + m_columnIndex[i] + " " + aie.getMessage());
-                aie.printStackTrace();
-            }
-            return iresult;
-        }
-    }
-
-
-    /**
-     *  Sets the sortable attribute of the ReportFormatter object
-     *
-     *@param  _b  The new sortable value
-     */
-    public void setSortable(boolean _b) {
-        m_bSortOutput = _b;
-    }
-
-
-    /**
-     *  Sets the sortColumns attribute of the ReportFormatter object
-     *
-     *@param  _i  The new sortColumns value
-     */
-    public void setSortColumns(int[] _i) {
-        m_iSortColumns = _i;
-    }
-
-
-    /**
-     *  This will format a string to print it within the specified width
-     *
-     *@param  _strPrint   Description of the Parameter
-     *@param  _iColWidth  Description of the Parameter
-     */
-    public void prettyPrint(String _strPrint, int _iColWidth) {
-        /*
-     *  things to check
-     *  * Length of the line
-     *  Splitting line in the middle of a word - split at previous word
-     *  next char after splitting line is a line feed -
-     */
-        //int iTotalLen = 0;
-        String strToPrint = null;
-        String strFromToken = null;
-       // boolean bPrintNewLine = false;
-        int iReadNext = 0;
-       // int i = 0;
-
-        StringTokenizer stString = new StringTokenizer(_strPrint, "\n", false);
-        while (stString.hasMoreElements()) {
-            strFromToken = stString.nextToken();
-            if (strFromToken.length() > _iColWidth) {
-                //iTotalLen = strFromToken.length();
-
-                //System.out.println("Length of this token is "+iTotalLen);
-
-                while (strFromToken.length() > _iColWidth) {
-                    iReadNext = (strFromToken.length() >= _iColWidth) ? _iColWidth : strFromToken.length();
-                    strToPrint = strFromToken.substring(0, iReadNext);
-                    if (!strToPrint.substring(iReadNext - 1).equals(" ")) {// no space found, Is this middle of a word?
-
-                        if (strToPrint.lastIndexOf(" ") <= 0) {//previous word not found or 1st char is space
-                        } else {
-                            strToPrint = strToPrint.substring(0, strToPrint.lastIndexOf(" "));//move to the last word
-                        }
-                    }
-                    strFromToken = strFromToken.substring(strToPrint.length());//Initialize the String to process
-                    println(strToPrint.trim());
-                }
-                if (strFromToken.trim().length() > 0) {
-                    println(strFromToken.trim());//Print the remaining stuff
-                }
-            } else {
-                println(strFromToken.trim());
-            }
-        }
-    }
-
-
-
-
-}
-
-
-
-

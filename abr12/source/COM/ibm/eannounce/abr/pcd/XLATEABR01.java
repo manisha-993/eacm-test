@@ -1,964 +1,969 @@
-//javac -classpath $HOME/abrgenerator/script/ibmwebas.jar:.:./db2java.zip:/usr/java_dev2/jre/lib/rt.jar:$HOME/generator/source/middleware.jar PokBaseABR.java > errors
-//
-// (c) Copyright International Business Machines Corporation, 2001
-// All Rights Reserved.
+/*     */ package COM.ibm.eannounce.abr.pcd;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.LockPDHEntityException;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.abr.util.UpdatePDHEntityException;
+/*     */ import COM.ibm.eannounce.objects.EANAttribute;
+/*     */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.MetaFlag;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
+/*     */ import COM.ibm.opicmpdh.objects.ControlBlock;
+/*     */ import COM.ibm.opicmpdh.objects.SingleFlag;
+/*     */ import COM.ibm.opicmpdh.translation.PackageID;
+/*     */ import COM.ibm.opicmpdh.translation.Translation;
+/*     */ import COM.ibm.opicmpdh.translation.TranslationDataRequest;
+/*     */ import COM.ibm.opicmpdh.translation.TranslationPackage;
+/*     */ import java.io.PrintWriter;
+/*     */ import java.io.StringWriter;
+/*     */ import java.util.Vector;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class XLATEABR01
+/*     */   extends PokBaseABR
+/*     */ {
+/* 141 */   public static final String ABR = new String("XLATEABR01");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 147 */   public static final String DEF_NOT_POPULATED_HTML = new String("** Not Populated **");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 152 */   public static final String NULL = new String("");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 157 */   public static final String XLATEGRP = new String("XLATEGRP");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 162 */   public static final String METAXLATEGRP = new String("METAXLATEGRP");
+/*     */ 
+/*     */ 
+/*     */   
+/* 166 */   public static final String XLATEGRP_DESC = new String("Translation Group");
+/*     */ 
+/*     */ 
+/*     */   
+/* 170 */   public static final String XLATEGRPSTATUS = new String("XLATEGRPSTATUS");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 175 */   public static final String METAXLATEGRPSTATUS = new String("METAXLATEGRPSTATUS");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 182 */   public static final String XLSTATUS2 = new String("XLSTATUS2");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 187 */   public static final String XLSTATUS3 = new String("XLSTATUS3");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 192 */   public static final String XLSTATUS4 = new String("XLSTATUS4");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 197 */   public static final String XLSTATUS5 = new String("XLSTATUS5");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 202 */   public static final String XLSTATUS6 = new String("XLSTATUS6");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 207 */   public static final String XLSTATUS7 = new String("XLSTATUS7");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 212 */   public static final String XLSTATUS8 = new String("XLSTATUS8");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 217 */   public static final String XLSTATUS9 = new String("XLSTATUS9");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 222 */   public static final String XLSTATUS10 = new String("XLSTATUS10");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 227 */   public static final String XLSTATUS11 = new String("XLSTATUS11");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 232 */   public static final String XLSTATUS12 = new String("XLSTATUS12");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 237 */   public static final String XLSTATUS13 = new String("XLSTATUS13");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 243 */   public static final String METAXLSTATUS2 = new String("METAXLSTATUS2");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 248 */   public static final String METAXLSTATUS3 = new String("METAXLSTATUS3");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 253 */   public static final String METAXLSTATUS4 = new String("METAXLSTATUS4");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 258 */   public static final String METAXLSTATUS5 = new String("METAXLSTATUS5");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 263 */   public static final String METAXLSTATUS6 = new String("METAXLSTATUS6");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 268 */   public static final String METAXLSTATUS7 = new String("METAXLSTATUS7");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 273 */   public static final String METAXLSTATUS8 = new String("METAXLSTATUS8");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 278 */   public static final String METAXLSTATUS9 = new String("METAXLSTATUS9");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 283 */   public static final String METAXLSTATUS10 = new String("METAXLSTATUS10");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 288 */   public static final String METAXLSTATUS11 = new String("METAXLSTATUS11");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 293 */   public static final String METAXLSTATUS12 = new String("METAXLSTATUS12");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 298 */   public static final String METAXLSTATUS13 = new String("METAXLSTATUS13");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 309 */   private final String m_strRelProMgmtValue = "F0030";
+/*     */   
+/* 311 */   private final String m_strRelProMgmtValue1 = "F0030";
+/*     */ 
+/*     */   
+/* 314 */   private final String m_strXLSTATUS2Value = "XL20";
+/*     */   
+/* 316 */   private final String m_strXLSTATUS3Value = "XL20";
+/*     */   
+/* 318 */   private final String m_strXLSTATUS4Value = "XL20";
+/*     */   
+/* 320 */   private final String m_strXLSTATUS5Value = "XL20";
+/*     */   
+/* 322 */   private final String m_strXLSTATUS6Value = "XL20";
+/*     */   
+/* 324 */   private final String m_strXLSTATUS7Value = "XL20";
+/*     */   
+/* 326 */   private final String m_strXLSTATUS8Value = "XL20";
+/*     */   
+/* 328 */   private final String m_strXLSTATUS9Value = "XL20";
+/*     */   
+/* 330 */   private final String m_strXLSTATUS10Value = "XL20";
+/*     */   
+/* 332 */   private final String m_strXLSTATUS11Value = "XL20";
+/*     */   
+/* 334 */   private final String m_strXLSTATUS12Value = "XL20";
+/*     */   
+/* 336 */   private final String m_strXLSTATUS13Value = "XL20";
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/*     */     try {
+/* 358 */       start_ABRBuild(false);
+/* 359 */       buildReportHeader();
+/* 360 */       setControlBlock();
+/* 361 */       logMessage("************ Root Entity Type and id " + 
+/*     */           
+/* 363 */           getEntityType() + ":" + 
+/*     */           
+/* 365 */           getEntityID());
+/* 366 */       setReturnCode(0);
+/*     */ 
+/*     */ 
+/*     */       
+/* 370 */       EntityGroup entityGroup = this.m_db.getEntityGroup(this.m_prof, this.m_abri.getEntityType(), "Edit");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 377 */       EntityItem entityItem = new EntityItem(entityGroup, this.m_prof, this.m_db, this.m_abri.getEntityType(), this.m_abri.getEntityID());
+/*     */ 
+/*     */       
+/* 380 */       EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("BILLINGCODE");
+/* 381 */       String str = "";
+/* 382 */       if (eANFlagAttribute != null) {
+/* 383 */         str = eANFlagAttribute.getFirstActiveFlagCode();
+/*     */       }
+/* 385 */       if (str.equals("PCD")) {
+/* 386 */         str = "";
+/*     */       }
+/*     */ 
+/*     */       
+/* 390 */       println("<b><tr><td class=\"PsgText\" width=\"100%\" >" + 
+/*     */           
+/* 392 */           getEntityType() + ":</b></td><b><td class=\"PsgText\" width=\"100%\">" + 
+/*     */           
+/* 394 */           getEntityID() + "</b></td>");
+/*     */       
+/* 396 */       printNavigateAttributes(entityItem, entityGroup, true);
+/*     */ 
+/*     */       
+/* 399 */       if (entityGroup.getEntityType().equals("XLATEGRP")) {
+/* 400 */         logMessage("**********Using Entity #1:" + getEntityType());
+/* 401 */         EANAttribute eANAttribute = entityItem.getAttribute("XLLANGUAGES");
+/*     */         
+/* 403 */         if (eANAttribute != null) {
+/*     */           
+/* 405 */           EANFlagAttribute eANFlagAttribute1 = (EANFlagAttribute)eANAttribute;
+/* 406 */           MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute1.get();
+/* 407 */           for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/* 408 */             if (arrayOfMetaFlag[b].isSelected()) {
+/* 409 */               String str1 = arrayOfMetaFlag[b].getFlagCode().trim();
+/* 410 */               logMessage("*************** sFlagClass: " + str1);
+/*     */               
+/* 412 */               if (str1.equals("")) {
+/* 413 */                 setReturnCode(-1);
+/* 414 */               } else if (str1.equals("2")) {
+/* 415 */                 setFlagValue(XLATEGRP, 
+/*     */                     
+/* 417 */                     getEntityID(), XLSTATUS2);
+/*     */               }
+/* 419 */               else if (str1.equals("3")) {
+/* 420 */                 setFlagValue(XLATEGRP, 
+/*     */                     
+/* 422 */                     getEntityID(), XLSTATUS3);
+/*     */               }
+/* 424 */               else if (str1.equals("4")) {
+/* 425 */                 setFlagValue(XLATEGRP, 
+/*     */                     
+/* 427 */                     getEntityID(), XLSTATUS4);
+/*     */               }
+/* 429 */               else if (str1.equals("5")) {
+/* 430 */                 setFlagValue(XLATEGRP, 
+/*     */                     
+/* 432 */                     getEntityID(), XLSTATUS5);
+/*     */               }
+/* 434 */               else if (str1.equals("6")) {
+/* 435 */                 setFlagValue(XLATEGRP, 
+/*     */                     
+/* 437 */                     getEntityID(), XLSTATUS6);
+/*     */               }
+/* 439 */               else if (str1.equals("7")) {
+/* 440 */                 setFlagValue(XLATEGRP, 
+/*     */                     
+/* 442 */                     getEntityID(), XLSTATUS7);
+/*     */               }
+/* 444 */               else if (str1.equals("8")) {
+/* 445 */                 setFlagValue(XLATEGRP, 
+/*     */                     
+/* 447 */                     getEntityID(), XLSTATUS8);
+/*     */               }
+/* 449 */               else if (str1.equals("9")) {
+/* 450 */                 setFlagValue(XLATEGRP, 
+/*     */                     
+/* 452 */                     getEntityID(), XLSTATUS9);
+/*     */               }
+/* 454 */               else if (str1.equals("10")) {
+/* 455 */                 setFlagValue(XLATEGRP, 
+/*     */                     
+/* 457 */                     getEntityID(), XLSTATUS10);
+/*     */               }
+/* 459 */               else if (str1.equals("11")) {
+/* 460 */                 setFlagValue(XLATEGRP, 
+/*     */                     
+/* 462 */                     getEntityID(), XLSTATUS11);
+/*     */               }
+/* 464 */               else if (str1.equals("12")) {
+/* 465 */                 setFlagValue(XLATEGRP, 
+/*     */                     
+/* 467 */                     getEntityID(), XLSTATUS12);
+/*     */               }
+/* 469 */               else if (str1.equals("13")) {
+/* 470 */                 setFlagValue(XLATEGRP, 
+/*     */                     
+/* 472 */                     getEntityID(), XLSTATUS13);
+/*     */               } 
+/*     */               
+/* 475 */               int i = Integer.parseInt(str1);
+/*     */ 
+/*     */ 
+/*     */               
+/* 479 */               PackageID packageID = new PackageID(getEntityType(), getEntityID(), i, "TRANSOUTBOUNDX" + i, this.m_strNow, str);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */               
+/* 484 */               logMessage("*************** pkID: " + packageID
+/* 485 */                   .toString());
+/*     */               
+/* 487 */               TranslationPackage translationPackage = Translation.generatePDHPackage(this.m_db, this.m_prof, packageID);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */               
+/* 497 */               Translation.putPDHPackage(this.m_db, this.m_prof, translationPackage);
+/*     */             }
+/*     */           
+/*     */           }
+/*     */         
+/*     */         } else {
+/*     */           
+/* 504 */           setReturnCode(-1);
+/* 505 */           println("*The Translation Package you're working with does not have any Requested Languages Selected");
+/*     */         } 
+/*     */ 
+/*     */         
+/* 509 */         if (getReturnCode() == 0) {
+/* 510 */           setFlagValue(XLATEGRP, getEntityID(), XLATEGRPSTATUS);
+/*     */         }
+/*     */       } else {
+/*     */         
+/* 514 */         logMessage("**********Using Entity #2:" + getEntityType());
+/* 515 */         EANAttribute eANAttribute = entityItem.getAttribute("XLLANGUAGES");
+/*     */         
+/* 517 */         if (eANAttribute != null) {
+/*     */           
+/* 519 */           EANFlagAttribute eANFlagAttribute1 = (EANFlagAttribute)eANAttribute;
+/* 520 */           MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute1.get();
+/* 521 */           for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/* 522 */             if (arrayOfMetaFlag[b].isSelected()) {
+/* 523 */               String str1 = arrayOfMetaFlag[b].getFlagCode().trim();
+/* 524 */               logMessage("***************   sFlagClass: " + str1);
+/*     */               
+/* 526 */               if (str1.equals("")) {
+/* 527 */                 setReturnCode(-1);
+/* 528 */               } else if (str1.equals("2")) {
+/* 529 */                 setFlagValue(METAXLATEGRP, 
+/*     */                     
+/* 531 */                     getEntityID(), METAXLSTATUS2);
+/*     */               }
+/* 533 */               else if (str1.equals("3")) {
+/* 534 */                 setFlagValue(METAXLATEGRP, 
+/*     */                     
+/* 536 */                     getEntityID(), METAXLSTATUS3);
+/*     */               }
+/* 538 */               else if (str1.equals("4")) {
+/* 539 */                 setFlagValue(METAXLATEGRP, 
+/*     */                     
+/* 541 */                     getEntityID(), METAXLSTATUS4);
+/*     */               }
+/* 543 */               else if (str1.equals("5")) {
+/*     */                 
+/* 545 */                 setFlagValue(METAXLATEGRP, 
+/*     */                     
+/* 547 */                     getEntityID(), METAXLSTATUS5);
+/*     */               }
+/* 549 */               else if (str1.equals("6")) {
+/* 550 */                 setFlagValue(METAXLATEGRP, 
+/*     */                     
+/* 552 */                     getEntityID(), METAXLSTATUS6);
+/*     */               }
+/* 554 */               else if (str1.equals("7")) {
+/* 555 */                 setFlagValue(METAXLATEGRP, 
+/*     */                     
+/* 557 */                     getEntityID(), METAXLSTATUS7);
+/*     */               }
+/* 559 */               else if (str1.equals("8")) {
+/* 560 */                 setFlagValue(METAXLATEGRP, 
+/*     */                     
+/* 562 */                     getEntityID(), METAXLSTATUS8);
+/*     */               }
+/* 564 */               else if (str1.equals("9")) {
+/* 565 */                 setFlagValue(METAXLATEGRP, 
+/*     */                     
+/* 567 */                     getEntityID(), METAXLSTATUS9);
+/*     */               }
+/* 569 */               else if (str1.equals("10")) {
+/* 570 */                 setFlagValue(METAXLATEGRP, 
+/*     */                     
+/* 572 */                     getEntityID(), METAXLSTATUS10);
+/*     */               }
+/* 574 */               else if (str1.equals("11")) {
+/* 575 */                 setFlagValue(METAXLATEGRP, 
+/*     */                     
+/* 577 */                     getEntityID(), METAXLSTATUS11);
+/*     */               }
+/* 579 */               else if (str1.equals("12")) {
+/* 580 */                 setFlagValue(METAXLATEGRP, 
+/*     */                     
+/* 582 */                     getEntityID(), METAXLSTATUS12);
+/*     */               }
+/* 584 */               else if (str1.equals("13")) {
+/* 585 */                 setFlagValue(METAXLATEGRP, 
+/*     */                     
+/* 587 */                     getEntityID(), METAXLSTATUS13);
+/*     */               } 
+/*     */               
+/* 590 */               int i = Integer.parseInt(str1);
+/*     */ 
+/*     */ 
+/*     */               
+/* 594 */               PackageID packageID = new PackageID(getEntityType(), getEntityID(), i, "TRANSOUTBOUNDX" + i, this.m_strNow, str);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */               
+/* 599 */               logMessage("***************   pkID: " + packageID
+/* 600 */                   .toString());
+/*     */               
+/* 602 */               TranslationPackage translationPackage = Translation.generatePDHPackage(this.m_db, this.m_prof, packageID);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */               
+/* 612 */               Translation.putPDHPackage(this.m_db, this.m_prof, translationPackage);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */               
+/* 617 */               TranslationDataRequest translationDataRequest = translationPackage.getDataRequest();
+/*     */             } 
+/*     */           } 
+/*     */         } else {
+/*     */           
+/* 622 */           setReturnCode(-1);
+/*     */         } 
+/*     */         
+/* 625 */         if (getReturnCode() == 0) {
+/* 626 */           setFlagValue(METAXLATEGRP, 
+/*     */               
+/* 628 */               getEntityID(), METAXLATEGRPSTATUS);
+/*     */         }
+/*     */       } 
+/*     */ 
+/*     */ 
+/*     */       
+/* 634 */       println("<br /><b>" + 
+/*     */           
+/* 636 */           buildMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 639 */               getABRDescription(), 
+/* 640 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }) + "</b>");
+/*     */       
+/* 643 */       log(
+/* 644 */           buildLogMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 647 */               getABRDescription(), 
+/* 648 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }));
+/* 650 */     } catch (LockPDHEntityException lockPDHEntityException) {
+/* 651 */       setReturnCode(-2);
+/* 652 */       println("<h3><font color=red>IAB1007E: Could not get soft lock.  Rule execution is terminated.<br />" + lockPDHEntityException
+/*     */ 
+/*     */ 
+/*     */           
+/* 656 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 658 */       logError(lockPDHEntityException.getMessage());
+/* 659 */     } catch (UpdatePDHEntityException updatePDHEntityException) {
+/* 660 */       setReturnCode(-2);
+/* 661 */       println("<h3><font color=red>UpdatePDH error: " + updatePDHEntityException
+/*     */           
+/* 663 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 665 */       logError(updatePDHEntityException.getMessage());
+/* 666 */     } catch (Exception exception) {
+/*     */       
+/* 668 */       println("Error in " + this.m_abri.getABRCode() + ":" + exception.getMessage());
+/* 669 */       println("" + exception);
+/*     */ 
+/*     */       
+/* 672 */       if (getABRReturnCode() != -2) {
+/* 673 */         setReturnCode(-3);
+/*     */       }
+/* 675 */       exception.printStackTrace();
+/*     */       
+/* 677 */       StringWriter stringWriter = new StringWriter();
+/* 678 */       exception.printStackTrace(new PrintWriter(stringWriter));
+/* 679 */       String str = stringWriter.toString();
+/* 680 */       println(str);
+/*     */       
+/* 682 */       logMessage("Error in " + this.m_abri
+/* 683 */           .getABRCode() + ":" + exception.getMessage());
+/* 684 */       logMessage("" + exception);
+/*     */ 
+/*     */       
+/* 687 */       if (getABRReturnCode() != -2) {
+/* 688 */         setReturnCode(-3);
+/*     */       
+/*     */       }
+/*     */     }
+/*     */     finally {
+/*     */       
+/* 694 */       setDGString(getABRReturnCode());
+/* 695 */       setDGRptName("XLATEABR01");
+/* 696 */       setDGRptClass("XLATEABR01");
+/* 697 */       printDGSubmitString();
+/*     */ 
+/*     */       
+/* 700 */       buildReportFooter();
+/*     */       
+/* 702 */       if (!isReadOnly()) {
+/* 703 */         clearSoftLock();
+/*     */       }
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getABREntityDesc(String paramString, int paramInt) {
+/* 717 */     return null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 727 */     return "<br /><br />";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getStyle() {
+/* 738 */     return "";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getRevision() {
+/* 747 */     return new String("$Revision: 1.63 $");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setControlBlock() {
+/* 754 */     this.m_strNow = getNow();
+/* 755 */     this.m_strForever = getForever();
+/* 756 */     this
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 763 */       .m_cbOn = new ControlBlock(this.m_strNow, this.m_strForever, this.m_strNow, this.m_strForever, this.m_prof.getOPWGID(), this.m_prof.getTranID());
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setFlagValue(String paramString1, int paramInt, String paramString2) {
+/* 781 */     String str = null;
+/*     */     
+/* 783 */     if (paramString2.equals(XLATEGRPSTATUS)) {
+/* 784 */       logMessage("****** XLATEGRPSTATUS set to: " + XLATEGRPSTATUS);
+/* 785 */       str = "F0030";
+/*     */     }
+/* 787 */     else if (paramString2.equals(METAXLATEGRPSTATUS)) {
+/*     */       
+/* 789 */       logMessage("****** METAXLATEGRPSTATUS set to: " + METAXLATEGRPSTATUS);
+/*     */       
+/* 791 */       str = "F0030";
+/*     */     }
+/* 793 */     else if (paramString2.equals(XLSTATUS2)) {
+/* 794 */       logMessage("****** XLSTATUS2 set to: " + XLSTATUS2);
+/* 795 */       str = "XL20";
+/*     */     }
+/* 797 */     else if (paramString2.equals(XLSTATUS3)) {
+/* 798 */       logMessage("****** XLSTATUS3 set to: " + XLSTATUS3);
+/* 799 */       str = "XL20";
+/*     */     }
+/* 801 */     else if (paramString2.equals(XLSTATUS4)) {
+/* 802 */       logMessage("****** XLSTATUS4 set to: " + XLSTATUS4);
+/* 803 */       str = "XL20";
+/*     */     }
+/* 805 */     else if (paramString2.equals(XLSTATUS5)) {
+/* 806 */       logMessage("****** XLSTATUS5 set to: " + XLSTATUS5);
+/* 807 */       str = "XL20";
+/*     */     }
+/* 809 */     else if (paramString2.equals(XLSTATUS6)) {
+/* 810 */       logMessage("****** XLSTATUS6 set to: " + XLSTATUS6);
+/* 811 */       str = "XL20";
+/*     */     }
+/* 813 */     else if (paramString2.equals(XLSTATUS7)) {
+/* 814 */       logMessage("****** XLSTATUS7 set to: " + XLSTATUS7);
+/* 815 */       str = "XL20";
+/*     */     }
+/* 817 */     else if (paramString2.equals(XLSTATUS8)) {
+/* 818 */       logMessage("****** XLSTATUS8 set to: " + XLSTATUS8);
+/* 819 */       str = "XL20";
+/*     */     }
+/* 821 */     else if (paramString2.equals(XLSTATUS9)) {
+/* 822 */       logMessage("****** XLSTATUS9 set to: " + XLSTATUS9);
+/* 823 */       str = "XL20";
+/*     */     }
+/* 825 */     else if (paramString2.equals(XLSTATUS10)) {
+/* 826 */       logMessage("****** sXLSTATUS10 set to: " + XLSTATUS10);
+/* 827 */       str = "XL20";
+/*     */     }
+/* 829 */     else if (paramString2.equals(XLSTATUS11)) {
+/* 830 */       logMessage("****** sXLSTATUS11 set to: " + XLSTATUS11);
+/* 831 */       str = "XL20";
+/*     */     }
+/* 833 */     else if (paramString2.equals(XLSTATUS12)) {
+/* 834 */       logMessage("****** sXLSTATUS12 set to: " + XLSTATUS12);
+/* 835 */       str = "XL20";
+/*     */     }
+/* 837 */     else if (paramString2.equals(XLSTATUS13)) {
+/* 838 */       logMessage("****** sXLSTATUS13 set to: " + XLSTATUS13);
+/* 839 */       str = "XL20";
+/*     */     }
+/* 841 */     else if (paramString2.equals(METAXLSTATUS2)) {
+/* 842 */       logMessage("****** sMETAXLSTATUS2 set to: " + METAXLSTATUS2);
+/* 843 */       str = "XL20";
+/*     */     }
+/* 845 */     else if (paramString2.equals(METAXLSTATUS3)) {
+/* 846 */       logMessage("****** sMETAXLSTATUS3 set to: " + METAXLSTATUS3);
+/* 847 */       str = "XL20";
+/*     */     }
+/* 849 */     else if (paramString2.equals(METAXLSTATUS4)) {
+/* 850 */       logMessage("****** sMETAXLSTATUS4 set to: " + METAXLSTATUS4);
+/* 851 */       str = "XL20";
+/*     */     }
+/* 853 */     else if (paramString2.equals(METAXLSTATUS5)) {
+/* 854 */       logMessage("****** sMETAXLSTATUS5 set to: " + METAXLSTATUS5);
+/* 855 */       str = "XL20";
+/*     */     }
+/* 857 */     else if (paramString2.equals(METAXLSTATUS6)) {
+/* 858 */       logMessage("****** sMETAXLSTATUS6 set to: " + METAXLSTATUS6);
+/* 859 */       str = "XL20";
+/*     */     }
+/* 861 */     else if (paramString2.equals(METAXLSTATUS7)) {
+/* 862 */       logMessage("****** sMETAXLSTATUS7 set to: " + METAXLSTATUS7);
+/* 863 */       str = "XL20";
+/*     */     }
+/* 865 */     else if (paramString2.equals(METAXLSTATUS8)) {
+/* 866 */       logMessage("****** sMETAXLSTATUS8 set to: " + METAXLSTATUS8);
+/* 867 */       str = "XL20";
+/*     */     }
+/* 869 */     else if (paramString2.equals(METAXLSTATUS9)) {
+/* 870 */       logMessage("****** sMETAXLSTATUS9 set to: " + METAXLSTATUS9);
+/* 871 */       str = "XL20";
+/*     */     }
+/* 873 */     else if (paramString2.equals(METAXLSTATUS10)) {
+/* 874 */       logMessage("****** sMETAXLSTATUS10 set to: " + METAXLSTATUS10);
+/* 875 */       str = "XL20";
+/*     */     }
+/* 877 */     else if (paramString2.equals(METAXLSTATUS11)) {
+/* 878 */       logMessage("****** sMETAXLSTATUS11 set to: " + METAXLSTATUS11);
+/* 879 */       str = "XL20";
+/*     */     }
+/* 881 */     else if (paramString2.equals(METAXLSTATUS12)) {
+/* 882 */       logMessage("****** sMETAXLSTATUS12 set to: " + METAXLSTATUS12);
+/* 883 */       str = "XL20";
+/*     */     }
+/* 885 */     else if (paramString2.equals(METAXLSTATUS13)) {
+/* 886 */       logMessage("****** sMETAXLSTATUS13 set to: " + METAXLSTATUS13);
+/* 887 */       str = "XL20";
+/*     */     }
+/*     */     else {
+/*     */       
+/* 891 */       str = null;
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */     
+/* 896 */     if (str != null) {
+/*     */       
+/*     */       try {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 904 */         EntityItem entityItem = new EntityItem(null, this.m_prof, getEntityType(), getEntityID());
+/*     */ 
+/*     */ 
+/*     */         
+/* 908 */         ReturnEntityKey returnEntityKey = new ReturnEntityKey(entityItem.getEntityType(), entityItem.getEntityID(), true);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 916 */         SingleFlag singleFlag = new SingleFlag(this.m_prof.getEnterprise(), returnEntityKey.getEntityType(), returnEntityKey.getEntityID(), paramString2, str, 1, this.m_cbOn);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 921 */         Vector<SingleFlag> vector = new Vector();
+/* 922 */         Vector<ReturnEntityKey> vector1 = new Vector();
+/*     */         
+/* 924 */         if (singleFlag != null) {
+/* 925 */           vector.addElement(singleFlag);
+/* 926 */           returnEntityKey.m_vctAttributes = vector;
+/* 927 */           vector1.addElement(returnEntityKey);
+/* 928 */           this.m_db.update(this.m_prof, vector1, false, false);
+/* 929 */           this.m_db.commit();
+/*     */         } 
+/* 931 */       } catch (MiddlewareException middlewareException) {
+/* 932 */         logMessage("setFlagValue: " + middlewareException.getMessage());
+/* 933 */       } catch (Exception exception) {
+/* 934 */         logMessage("setFlagValue: " + exception.getMessage());
+/*     */       } 
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void printPassMessage() {
+/* 943 */     println("<br /><b>send to Production Management</b><br /><br />");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String getVersion() {
+/* 952 */     return "$Id: XLATEABR01.java,v 1.63 2006/06/27 02:46:54 yang Exp $";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 961 */     return getVersion();
+/*     */   }
+/*     */ }
 
-// $Log: XLATEABR01.java,v $
-// Revision 1.63  2006/06/27 02:46:54  yang
-// adding abr print message
-//
-// Revision 1.62  2006/03/03 19:24:12  bala
-// remove reference to Constants.CSS
-//
-// Revision 1.61  2006/01/25 17:47:11  yang
-// Jtest changes
-//
-// Revision 1.60  2005/01/25 17:23:38  yang
-// updated log message
-//
-// Revision 1.59  2004/11/05 18:36:57  yang
-// update package ID
-//
-// Revision 1.58  2004/11/05 00:08:58  joan
-// adjust code for PackageID constructor change
-//
-// Revision 1.57  2003/11/07 01:23:24  yang
-// Adding setDGRptClass
-//
-// Revision 1.56  2003/09/18 19:31:48  yang
-// add bala stuff to finally {
-//
-// Revision 1.55  2003/09/11 23:33:14  bala
-// fix compile
-//
-// Revision 1.54  2003/09/11 23:20:02  bala
-// backout unintended commit
-//
-// Revision 1.53  2003/09/11 22:43:30  bala
-// add subscription sections to the abrs
-//
-// Revision 1.52  2003/08/21 21:41:58  yang
-// fix null pointer
-//
-// Revision 1.51  2003/08/21 21:23:15  yang
-// add log Message
-//
-// Revision 1.50  2003/08/18 22:11:40  yang
-// syntax
-//
-// Revision 1.49  2003/08/18 22:02:05  yang
-// syntax
-//
-// Revision 1.48  2003/08/18 21:44:16  yang
-// syntax
-//
-// Revision 1.47  2003/08/18 20:54:07  yang
-// added METAXLATEGRPSTATUS to update = Final
-//
-// Revision 1.46  2003/08/14 21:29:01  yang
-// syntax
-//
-// Revision 1.45  2003/08/14 20:48:44  yang
-// more syntax
-//
-// Revision 1.44  2003/08/14 20:36:32  yang
-// syntax
-//
-// Revision 1.43  2003/08/12 23:31:16  yang
-// updated setFlagValue
-//
-// Revision 1.42  2003/08/12 19:59:34  yang
-// more syntax
-//
-// Revision 1.41  2003/08/12 19:40:43  yang
-// syntax
-//
-// Revision 1.40  2003/08/08 19:38:34  dave
-// more changes to syntax
-//
-// Revision 1.39  2003/08/08 19:29:58  dave
-// syntax
-//
-// Revision 1.38  2003/08/08 19:25:38  dave
-// Fixeing XLATEABR01
-//
-// Revision 1.37  2003/08/02 00:40:40  bala
-// remove printDGSubmitString so that it prints only in the finally
-//
-// Revision 1.36  2003/08/01 22:34:46  bala
-// streamline printDGSubmitString moved it up to abstracttask
-//
-// Revision 1.35  2003/08/01 00:56:55  bala
-// fix the DGsubmit
-//
-// Revision 1.34  2003/08/01 00:19:27  bala
-// move up dgsubmit so that it prints first
-//
-// Revision 1.33  2003/07/31 22:38:19  bala
-// plug in DGsubmit header
-//
-// Revision 1.32  2003/07/17 19:17:27  yang
-// syntax
-//
-// Revision 1.31  2003/07/17 18:43:22  yang
-// addition log to pId
-//
-// Revision 1.30  2003/07/16 23:58:10  yang
-// adding log files
-//
-// Revision 1.29  2003/07/16 23:23:13  yang
-// Add putPDHPackage
-//
-// Revision 1.27  2003/07/15 20:52:02  yang
-// Adding log
-//
 
-package COM.ibm.eannounce.abr.pcd;
-
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.opicmpdh.objects.*;
-//import COM.ibm.opicmpdh.transactions.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.opicmpdh.translation.*;
-//import COM.ibm.opicmpdh.translation.Translation.*;
-import java.util.*;
-import java.io.*;
-//import java.sql.*;
-
-/**
- *  Description of the Class
- *
- *@author     Administrator
- *@created    August 1, 2003
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\pcd\XLATEABR01.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class XLATEABR01 extends PokBaseABR {
-  /**
-   *  Execute ABR.
-   */
-
-  //ABR
-  public final static String ABR = new String("XLATEABR01");
-
-  // Class constants
-  /**
-   *  Description of the Field
-   */
-  public final static String DEF_NOT_POPULATED_HTML =
-    new String("** Not Populated **");
-  /**
-   *  Description of the Field
-   */
-  public final static String NULL = new String("");
-
-  /**
-   *  Description of the Field
-   */
-  public final static String XLATEGRP = new String("XLATEGRP");
-  /**
-     * METAXLATEGRP
-     *
-     */
-    public final static String METAXLATEGRP = new String("METAXLATEGRP");
-  /**
-   *  Description of the Field
-   */
-  public final static String XLATEGRP_DESC = new String("Translation Group");
-  /**
-   *  Description of the Field
-   */
-  public final static String XLATEGRPSTATUS = new String("XLATEGRPSTATUS");
-  /**
-     * METAXLATEGRPSTATUS
-     *
-     */
-    public final static String METAXLATEGRPSTATUS =
-    new String("METAXLATEGRPSTATUS");
-
-  /**
-     * XLSTATUS2
-     *
-     */
-    public final static String XLSTATUS2 = new String("XLSTATUS2");
-  /**
-     * XLSTATUS3
-     *
-     */
-    public final static String XLSTATUS3 = new String("XLSTATUS3");
-  /**
-     * XLSTATUS4
-     *
-     */
-    public final static String XLSTATUS4 = new String("XLSTATUS4");
-  /**
-     * XLSTATUS5
-     *
-     */
-    public final static String XLSTATUS5 = new String("XLSTATUS5");
-  /**
-     * XLSTATUS6
-     *
-     */
-    public final static String XLSTATUS6 = new String("XLSTATUS6");
-  /**
-     * XLSTATUS7
-     *
-     */
-    public final static String XLSTATUS7 = new String("XLSTATUS7");
-  /**
-     * XLSTATUS8
-     *
-     */
-    public final static String XLSTATUS8 = new String("XLSTATUS8");
-  /**
-     * XLSTATUS9
-     *
-     */
-    public final static String XLSTATUS9 = new String("XLSTATUS9");
-  /**
-     * XLSTATUS10
-     *
-     */
-    public final static String XLSTATUS10 = new String("XLSTATUS10");
-  /**
-     * XLSTATUS11
-     *
-     */
-    public final static String XLSTATUS11 = new String("XLSTATUS11");
-  /**
-     * XLSTATUS12
-     *
-     */
-    public final static String XLSTATUS12 = new String("XLSTATUS12");
-  /**
-     * XLSTATUS13
-     *
-     */
-    public final static String XLSTATUS13 = new String("XLSTATUS13");
-
-  /**
-     * METAXLSTATUS2
-     *
-     */
-    public final static String METAXLSTATUS2 = new String("METAXLSTATUS2");
-  /**
-     * METAXLSTATUS3
-     *
-     */
-    public final static String METAXLSTATUS3 = new String("METAXLSTATUS3");
-  /**
-     * METAXLSTATUS4
-     *
-     */
-    public final static String METAXLSTATUS4 = new String("METAXLSTATUS4");
-  /**
-     * METAXLSTATUS5
-     *
-     */
-    public final static String METAXLSTATUS5 = new String("METAXLSTATUS5");
-  /**
-     * METAXLSTATUS6
-     *
-     */
-    public final static String METAXLSTATUS6 = new String("METAXLSTATUS6");
-  /**
-     * METAXLSTATUS7
-     *
-     */
-    public final static String METAXLSTATUS7 = new String("METAXLSTATUS7");
-  /**
-     * METAXLSTATUS8
-     *
-     */
-    public final static String METAXLSTATUS8 = new String("METAXLSTATUS8");
-  /**
-     * METAXLSTATUS9
-     *
-     */
-    public final static String METAXLSTATUS9 = new String("METAXLSTATUS9");
-  /**
-     * METAXLSTATUS10
-     *
-     */
-    public final static String METAXLSTATUS10 = new String("METAXLSTATUS10");
-  /**
-     * METAXLSTATUS11
-     *
-     */
-    public final static String METAXLSTATUS11 = new String("METAXLSTATUS11");
-  /**
-     * METAXLSTATUS12
-     *
-     */
-    public final static String METAXLSTATUS12 = new String("METAXLSTATUS12");
-  /**
-     * METAXLSTATUS13
-     *
-     */
-    public final static String METAXLSTATUS13 = new String("METAXLSTATUS13");
-
-  //private final String strStatus = null;
-  //private final String strXLLANGUAGES = null;
-
-  //private EntityGroup m_egParent = null; //XLATEGRP
-  //private EntityGroup m_egANNREV = null; //ANNREVIEW
-  //private EntityGroup m_egANNOP = null; //OP
-
-  //private EntityItem m_eiParent = null; //XLATEGRP
-
-  private final String m_strRelProMgmtValue = "F0030";
-  //XLATEGRPSTATUS  Ststus Attribute (Released to Production Management)
-  private final String m_strRelProMgmtValue1 = "F0030";
-  //METAXLATEGRPSTATUS  Ststus Attribute (Released to Production Management)
-
-  private final String m_strXLSTATUS2Value = "XL20";
-  //XLSTATUS2  Ststus Attribute (Awaiting Translation)
-  private final String m_strXLSTATUS3Value = "XL20";
-  //XLSTATUS3  Ststus Attribute (Awaiting Translation)
-  private final String m_strXLSTATUS4Value = "XL20";
-  //XLSTATUS4  Ststus Attribute (Awaiting Translation)
-  private final String m_strXLSTATUS5Value = "XL20";
-  //XLSTATUS5  Ststus Attribute (Awaiting Translation)
-  private final String m_strXLSTATUS6Value = "XL20";
-  //XLSTATUS6  Ststus Attribute (Awaiting Translation)
-  private final String m_strXLSTATUS7Value = "XL20";
-  //XLSTATUS7  Ststus Attribute (Awaiting Translation)
-  private final String m_strXLSTATUS8Value = "XL20";
-  //XLSTATUS8  Ststus Attribute (Awaiting Translation)
-  private final String m_strXLSTATUS9Value = "XL20";
-  //XLSTATUS9  Ststus Attribute (Awaiting Translation)
-  private final String m_strXLSTATUS10Value = "XL20";
-  //XLSTATUS10  Ststus Attribute (Awaiting Translation)
-  private final String m_strXLSTATUS11Value = "XL20";
-  //XLSTATUS10  Ststus Attribute (Awaiting Translation)
-  private final String m_strXLSTATUS12Value = "XL20";
-  //XLSTATUS10  Ststus Attribute (Awaiting Translation)
-  private final String m_strXLSTATUS13Value = "XL20";
-  //XLSTATUS10  Ststus Attribute (Awaiting Translation)
-
-  //private final boolean m_bPass = false;
-
-  /**
-   *  Description of the Method
-   */
-  public void execute_run() {
-    EntityGroup eg;
-    EntityItem ei;
-    EANFlagAttribute fa;
-    String strBillingCode;
-    EANAttribute att;
-    int isFlagClassID;
-    PackageID pkID;
-    TranslationPackage tpk;
-    TranslationDataRequest tdrThis;
-    StringWriter writer;
-    String x;
-    try {
-
-      start_ABRBuild(false);
-      buildReportHeader();
-      setControlBlock();
-      logMessage(
-        "************ Root Entity Type and id "
-          + getEntityType()
-          + ":"
-          + getEntityID());
-      setReturnCode(PASS);
-
-      // Lets get the entity information here
-      eg =
-        m_db.getEntityGroup(m_prof, m_abri.getEntityType(), "Edit");
-      ei =
-        new EntityItem(
-          eg,
-          m_prof,
-          m_db,
-          m_abri.getEntityType(),
-          m_abri.getEntityID());
-
-      fa =
-        (EANFlagAttribute) ei.getAttribute("BILLINGCODE");
-      strBillingCode = "";
-      if (fa != null) {
-        strBillingCode = fa.getFirstActiveFlagCode();
-      }
-      if (strBillingCode.equals("PCD")) {
-        strBillingCode = "";
-      }
-
-      //    logMessage("**********EntityItem: " + ei.dump(false));
-      println(
-        "<b><tr><td class=\"PsgText\" width=\"100%\" >"
-          + getEntityType()
-          + ":</b></td><b><td class=\"PsgText\" width=\"100%\">"
-          + getEntityID()
-          + "</b></td>");
-      printNavigateAttributes(ei, eg, true);
-      //    EntityItem _eiXLATEGRP = m_db.refreshEntityItem(m_prof, _eg, _ei);
-      //    logMessage("**********EntityItem _eiXLATEGRP: " + _eiXLATEGRP.dump(false));
-      if (eg.getEntityType().equals("XLATEGRP")) {
-        logMessage("**********Using Entity #1:" + getEntityType());
-        att = ei.getAttribute("XLLANGUAGES");
-
-        if (att != null) {
-
-          EANFlagAttribute ema = (EANFlagAttribute) att;
-          MetaFlag[] amf = (MetaFlag[]) ema.get();
-          for (int f = 0; f < amf.length; f++) {
-            if (amf[f].isSelected()) {
-              String sFlagClass = amf[f].getFlagCode().trim();
-              logMessage(
-                "*************** sFlagClass: " + sFlagClass);
-              if (sFlagClass.equals("")) {
-                setReturnCode(FAIL);
-              } else if (sFlagClass.equals("2")) {
-                setFlagValue(
-                  XLATEGRP,
-                  getEntityID(),
-                  XLSTATUS2);
-              } else if (sFlagClass.equals("3")) {
-                setFlagValue(
-                  XLATEGRP,
-                  getEntityID(),
-                  XLSTATUS3);
-              } else if (sFlagClass.equals("4")) {
-                setFlagValue(
-                  XLATEGRP,
-                  getEntityID(),
-                  XLSTATUS4);
-              } else if (sFlagClass.equals("5")) {
-                setFlagValue(
-                  XLATEGRP,
-                  getEntityID(),
-                  XLSTATUS5);
-              } else if (sFlagClass.equals("6")) {
-                setFlagValue(
-                  XLATEGRP,
-                  getEntityID(),
-                  XLSTATUS6);
-              } else if (sFlagClass.equals("7")) {
-                setFlagValue(
-                  XLATEGRP,
-                  getEntityID(),
-                  XLSTATUS7);
-              } else if (sFlagClass.equals("8")) {
-                setFlagValue(
-                  XLATEGRP,
-                  getEntityID(),
-                  XLSTATUS8);
-              } else if (sFlagClass.equals("9")) {
-                setFlagValue(
-                  XLATEGRP,
-                  getEntityID(),
-                  XLSTATUS9);
-              } else if (sFlagClass.equals("10")) {
-                setFlagValue(
-                  XLATEGRP,
-                  getEntityID(),
-                  XLSTATUS10);
-              } else if (sFlagClass.equals("11")) {
-                setFlagValue(
-                  XLATEGRP,
-                  getEntityID(),
-                  XLSTATUS11);
-              } else if (sFlagClass.equals("12")) {
-                setFlagValue(
-                  XLATEGRP,
-                  getEntityID(),
-                  XLSTATUS12);
-              } else if (sFlagClass.equals("13")) {
-                setFlagValue(
-                  XLATEGRP,
-                  getEntityID(),
-                  XLSTATUS13);
-              }
-              isFlagClassID = Integer.parseInt(sFlagClass);
-              pkID =
-                new PackageID(
-                  getEntityType(),
-                  getEntityID(),
-                  isFlagClassID,
-                  "TRANSOUTBOUNDX" + isFlagClassID,
-                  m_strNow,
-                  strBillingCode);
-              logMessage(
-                "*************** pkID: " + pkID.toString());
-              tpk =
-                Translation.generatePDHPackage(
-                  m_db,
-                  m_prof,
-                  pkID);
-              //          logMessage("*************** tpk: " + tpk.dump());
-              COM
-                .ibm
-                .opicmpdh
-                .translation
-                .Translation
-                .putPDHPackage(
-                m_db,
-                m_prof,
-                tpk);
-            }
-          }
-        } else {
-          setReturnCode(FAIL);
-          println("*The Translation Package you're working with does not have any Requested Languages Selected");
-
-        }
-
-        if (getReturnCode() == PASS) {
-          setFlagValue(XLATEGRP, getEntityID(), XLATEGRPSTATUS);
-        }
-
-      } else {
-        logMessage("**********Using Entity #2:" + getEntityType());
-        att = ei.getAttribute("XLLANGUAGES");
-
-        if (att != null) {
-
-          EANFlagAttribute ema = (EANFlagAttribute) att;
-          MetaFlag[] amf = (MetaFlag[]) ema.get();
-          for (int f = 0; f < amf.length; f++) {
-            if (amf[f].isSelected()) {
-              String sFlagClass = amf[f].getFlagCode().trim();
-              logMessage(
-                "***************   sFlagClass: " + sFlagClass);
-              if (sFlagClass.equals("")) {
-                setReturnCode(FAIL);
-              } else if (sFlagClass.equals("2")) {
-                setFlagValue(
-                  METAXLATEGRP,
-                  getEntityID(),
-                  METAXLSTATUS2);
-              } else if (sFlagClass.equals("3")) {
-                setFlagValue(
-                  METAXLATEGRP,
-                  getEntityID(),
-                  METAXLSTATUS3);
-              } else if (sFlagClass.equals("4")) {
-                setFlagValue(
-                  METAXLATEGRP,
-                  getEntityID(),
-                  METAXLSTATUS4);
-              } else if (sFlagClass.equals("5")) {
-                //System.out.println("We are getting here"+sFlagClass);
-                setFlagValue(
-                  METAXLATEGRP,
-                  getEntityID(),
-                  METAXLSTATUS5);
-              } else if (sFlagClass.equals("6")) {
-                setFlagValue(
-                  METAXLATEGRP,
-                  getEntityID(),
-                  METAXLSTATUS6);
-              } else if (sFlagClass.equals("7")) {
-                setFlagValue(
-                  METAXLATEGRP,
-                  getEntityID(),
-                  METAXLSTATUS7);
-              } else if (sFlagClass.equals("8")) {
-                setFlagValue(
-                  METAXLATEGRP,
-                  getEntityID(),
-                  METAXLSTATUS8);
-              } else if (sFlagClass.equals("9")) {
-                setFlagValue(
-                  METAXLATEGRP,
-                  getEntityID(),
-                  METAXLSTATUS9);
-              } else if (sFlagClass.equals("10")) {
-                setFlagValue(
-                  METAXLATEGRP,
-                  getEntityID(),
-                  METAXLSTATUS10);
-              } else if (sFlagClass.equals("11")) {
-                setFlagValue(
-                  METAXLATEGRP,
-                  getEntityID(),
-                  METAXLSTATUS11);
-              } else if (sFlagClass.equals("12")) {
-                setFlagValue(
-                  METAXLATEGRP,
-                  getEntityID(),
-                  METAXLSTATUS12);
-              } else if (sFlagClass.equals("13")) {
-                setFlagValue(
-                  METAXLATEGRP,
-                  getEntityID(),
-                  METAXLSTATUS13);
-              }
-              isFlagClassID = Integer.parseInt(sFlagClass);
-              pkID =
-                new PackageID(
-                  getEntityType(),
-                  getEntityID(),
-                  isFlagClassID,
-                  "TRANSOUTBOUNDX" + isFlagClassID,
-                  m_strNow,
-                  strBillingCode);
-              logMessage(
-                "***************   pkID: " + pkID.toString());
-              tpk =
-                Translation.generatePDHPackage(
-                  m_db,
-                  m_prof,
-                  pkID);
-              //                logMessage("***************   tpk: " + tpk.dump());
-              COM
-                .ibm
-                .opicmpdh
-                .translation
-                .Translation
-                .putPDHPackage(
-                m_db,
-                m_prof,
-                tpk);
-              tdrThis =
-                tpk.getDataRequest();
-              //                logMessage("***************   tpk.getDataRequest: " + tpk.getDataRequest());
-            }
-          }
-        } else {
-          setReturnCode(FAIL);
-        }
-
-        if (getReturnCode() == PASS) {
-          setFlagValue(
-            METAXLATEGRP,
-            getEntityID(),
-            METAXLATEGRPSTATUS);
-        }
-
-      }
-
-      println(
-        "<br /><b>"
-          + buildMessage(
-            MSG_IAB2016I,
-            new String[] {
-              getABRDescription(),
-              (getReturnCode() == PASS ? "Passed" : "Failed")})
-          + "</b>");
-
-      log(
-        buildLogMessage(
-          MSG_IAB2016I,
-          new String[] {
-            getABRDescription(),
-            (getReturnCode() == PASS ? "Passed" : "Failed")}));
-
-    } catch (LockPDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>"
-          + ERR_IAB1007E
-          + "<br />"
-          + le.getMessage()
-          + "</font></h3>");
-      logError(le.getMessage());
-    } catch (UpdatePDHEntityException le) {
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>UpdatePDH error: "
-          + le.getMessage()
-          + "</font></h3>");
-      logError(le.getMessage());
-    } catch (Exception exc) {
-
-      println("Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-      println("" + exc);
-
-      // don't overwrite an update exception
-      if (getABRReturnCode() != UPDATE_ERROR) {
-        setReturnCode(INTERNAL_ERROR);
-      }
-      exc.printStackTrace();
-
-      writer = new StringWriter();
-      exc.printStackTrace(new PrintWriter(writer));
-      x = writer.toString();
-      println(x);
-
-      logMessage(
-        "Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-      logMessage("" + exc);
-
-      // don't overwrite an update exception
-      if (getABRReturnCode() != UPDATE_ERROR) {
-        setReturnCode(INTERNAL_ERROR);
-      }
-    } finally {
-      //Everything is fine...so lets pass
-      //setReturnCode(PASS);
-      // set DG submit string
-      setDGString(getABRReturnCode());
-      setDGRptName("XLATEABR01"); //Set the report name
-      setDGRptClass("XLATEABR01"); //Set the report class
-      printDGSubmitString();
-      //Stuff into report for subscription and notification
-      // Tack on the DGString
-      buildReportFooter();
-      // make sure the lock is released
-      if (!isReadOnly()) {
-        clearSoftLock();
-      }
-    }
-
-  }
-
-  /**
-   *  Get the entity description to use in error messages
-   *
-   *@param  entityType  Description of the Parameter
-   *@param  entityId    Description of the Parameter
-   *@return             String
-   */
-  protected String getABREntityDesc(String entityType, int entityId) {
-    return null;
-  }
-
-  /**
-   *  Get ABR description
-   *
-   *@return    java.lang.String
-   */
-  public String getDescription() {
-    //return Constants.IAB3053I + "<br /><br />" + Constants.IAB3050I;
-    return "<br /><br />";
-  }
-
-  /**
-   *  Get any style that should be used for this page. Derived classes can
-   *  override this to set styles They must include the <style>...</style> tags
-   *
-   *@return    String
-   */
-  protected String getStyle() {
-    // Print out the PSG stylesheet
-    return "";
-  }
-
-  /**
-   *  Get the getRevision
-   *
-   *@return    java.lang.String
-   */
-  public String getRevision() {
-    return new String("$Revision: 1.63 $");
-  }
-
-  /**
-   *  Sets the controlBlock attribute of the XLATEABR01 object
-   */
-  public void setControlBlock() {
-    m_strNow = getNow();
-    m_strForever = getForever();
-    m_cbOn =
-      new ControlBlock(
-        m_strNow,
-        m_strForever,
-        m_strNow,
-        m_strForever,
-        m_prof.getOPWGID(),
-        m_prof.getTranID());
-  }
-
-  /**
-   *  Sets the flagValue attribute of the XLATEABR01 object
-   *
-   *@param  _sEntityType     The new flagValue value
-   *@param  _iEntityID       The new flagValue value
-   *@param  _sAttributeCode  The new flagValue value
-   */
-  public void setFlagValue(
-    String _sEntityType,
-    int _iEntityID,
-    String _sAttributeCode) {
-
-    //println("****** _sEntityType: " + _sEntityType);
-    //println("****** _iEntityID: " + _iEntityID);
-
-    String strAttributeValue = null;
-
-    if (_sAttributeCode.equals(XLATEGRPSTATUS)) {
-      logMessage("****** XLATEGRPSTATUS set to: " + XLATEGRPSTATUS);
-      strAttributeValue = m_strRelProMgmtValue;
-
-    } else if (_sAttributeCode.equals(METAXLATEGRPSTATUS)) {
-      //println("****** METAXLATEGRPSTATUS: " + _sAttributeCode);
-      logMessage(
-        "****** METAXLATEGRPSTATUS set to: " + METAXLATEGRPSTATUS);
-      strAttributeValue = m_strRelProMgmtValue1;
-
-    } else if (_sAttributeCode.equals(XLSTATUS2)) {
-      logMessage("****** XLSTATUS2 set to: " + XLSTATUS2);
-      strAttributeValue = m_strXLSTATUS2Value;
-
-    } else if (_sAttributeCode.equals(XLSTATUS3)) {
-      logMessage("****** XLSTATUS3 set to: " + XLSTATUS3);
-      strAttributeValue = m_strXLSTATUS3Value;
-
-    } else if (_sAttributeCode.equals(XLSTATUS4)) {
-      logMessage("****** XLSTATUS4 set to: " + XLSTATUS4);
-      strAttributeValue = m_strXLSTATUS4Value;
-
-    } else if (_sAttributeCode.equals(XLSTATUS5)) {
-      logMessage("****** XLSTATUS5 set to: " + XLSTATUS5);
-      strAttributeValue = m_strXLSTATUS5Value;
-
-    } else if (_sAttributeCode.equals(XLSTATUS6)) {
-      logMessage("****** XLSTATUS6 set to: " + XLSTATUS6);
-      strAttributeValue = m_strXLSTATUS6Value;
-
-    } else if (_sAttributeCode.equals(XLSTATUS7)) {
-      logMessage("****** XLSTATUS7 set to: " + XLSTATUS7);
-      strAttributeValue = m_strXLSTATUS7Value;
-
-    } else if (_sAttributeCode.equals(XLSTATUS8)) {
-      logMessage("****** XLSTATUS8 set to: " + XLSTATUS8);
-      strAttributeValue = m_strXLSTATUS8Value;
-
-    } else if (_sAttributeCode.equals(XLSTATUS9)) {
-      logMessage("****** XLSTATUS9 set to: " + XLSTATUS9);
-      strAttributeValue = m_strXLSTATUS9Value;
-
-    } else if (_sAttributeCode.equals(XLSTATUS10)) {
-      logMessage("****** sXLSTATUS10 set to: " + XLSTATUS10);
-      strAttributeValue = m_strXLSTATUS10Value;
-
-    } else if (_sAttributeCode.equals(XLSTATUS11)) {
-      logMessage("****** sXLSTATUS11 set to: " + XLSTATUS11);
-      strAttributeValue = m_strXLSTATUS11Value;
-
-    } else if (_sAttributeCode.equals(XLSTATUS12)) {
-      logMessage("****** sXLSTATUS12 set to: " + XLSTATUS12);
-      strAttributeValue = m_strXLSTATUS12Value;
-
-    } else if (_sAttributeCode.equals(XLSTATUS13)) {
-      logMessage("****** sXLSTATUS13 set to: " + XLSTATUS13);
-      strAttributeValue = m_strXLSTATUS13Value;
-
-    } else if (_sAttributeCode.equals(METAXLSTATUS2)) {
-      logMessage("****** sMETAXLSTATUS2 set to: " + METAXLSTATUS2);
-      strAttributeValue = m_strXLSTATUS2Value;
-
-    } else if (_sAttributeCode.equals(METAXLSTATUS3)) {
-      logMessage("****** sMETAXLSTATUS3 set to: " + METAXLSTATUS3);
-      strAttributeValue = m_strXLSTATUS3Value;
-
-    } else if (_sAttributeCode.equals(METAXLSTATUS4)) {
-      logMessage("****** sMETAXLSTATUS4 set to: " + METAXLSTATUS4);
-      strAttributeValue = m_strXLSTATUS4Value;
-
-    } else if (_sAttributeCode.equals(METAXLSTATUS5)) {
-      logMessage("****** sMETAXLSTATUS5 set to: " + METAXLSTATUS5);
-      strAttributeValue = m_strXLSTATUS5Value;
-
-    } else if (_sAttributeCode.equals(METAXLSTATUS6)) {
-      logMessage("****** sMETAXLSTATUS6 set to: " + METAXLSTATUS6);
-      strAttributeValue = m_strXLSTATUS6Value;
-
-    } else if (_sAttributeCode.equals(METAXLSTATUS7)) {
-      logMessage("****** sMETAXLSTATUS7 set to: " + METAXLSTATUS7);
-      strAttributeValue = m_strXLSTATUS7Value;
-
-    } else if (_sAttributeCode.equals(METAXLSTATUS8)) {
-      logMessage("****** sMETAXLSTATUS8 set to: " + METAXLSTATUS8);
-      strAttributeValue = m_strXLSTATUS8Value;
-
-    } else if (_sAttributeCode.equals(METAXLSTATUS9)) {
-      logMessage("****** sMETAXLSTATUS9 set to: " + METAXLSTATUS9);
-      strAttributeValue = m_strXLSTATUS9Value;
-
-    } else if (_sAttributeCode.equals(METAXLSTATUS10)) {
-      logMessage("****** sMETAXLSTATUS10 set to: " + METAXLSTATUS10);
-      strAttributeValue = m_strXLSTATUS10Value;
-
-    } else if (_sAttributeCode.equals(METAXLSTATUS11)) {
-      logMessage("****** sMETAXLSTATUS11 set to: " + METAXLSTATUS11);
-      strAttributeValue = m_strXLSTATUS11Value;
-
-    } else if (_sAttributeCode.equals(METAXLSTATUS12)) {
-      logMessage("****** sMETAXLSTATUS12 set to: " + METAXLSTATUS12);
-      strAttributeValue = m_strXLSTATUS12Value;
-
-    } else if (_sAttributeCode.equals(METAXLSTATUS13)) {
-      logMessage("****** sMETAXLSTATUS13 set to: " + METAXLSTATUS13);
-      strAttributeValue = m_strXLSTATUS13Value;
-
-    } else {
-
-      strAttributeValue = null;
-    }
-    //println("****** strAttributeValue set to: " + strAttributeValue);
-    //logMessage("****** strAttributeValue set to: " + strAttributeValue);
-
-    if (strAttributeValue != null) {
-      try {
-        //println("****** m_prof: " + m_prof);
-        EntityItem eiParm =
-          new EntityItem(
-            null,
-            m_prof,
-            getEntityType(),
-            getEntityID());
-        ReturnEntityKey rek =
-          new ReturnEntityKey(
-            eiParm.getEntityType(),
-            eiParm.getEntityID(),
-            true);
-
-        //println("****** m_cbOn: " + m_cbOn);
-        SingleFlag sf =
-          new SingleFlag(
-            m_prof.getEnterprise(),
-            rek.getEntityType(),
-            rek.getEntityID(),
-            _sAttributeCode,
-            strAttributeValue,
-            1,
-            m_cbOn);
-        Vector vctAtts = new Vector();
-        Vector vctReturnsEntityKeys = new Vector();
-
-        if (sf != null) {
-          vctAtts.addElement(sf);
-          rek.m_vctAttributes = vctAtts;
-          vctReturnsEntityKeys.addElement(rek);
-          m_db.update(m_prof, vctReturnsEntityKeys, false, false);
-          m_db.commit();
-        }
-      } catch (COM.ibm.opicmpdh.middleware.MiddlewareException e) {
-        logMessage("setFlagValue: " + e.getMessage());
-      } catch (Exception e) {
-        logMessage("setFlagValue: " + e.getMessage());
-      }
-    }
-  }
-
-  /**
-   *  Description of the Method
-   */
-  public void printPassMessage() {
-    println("<br /><b>send to Production Management</b><br /><br />");
-  }
-
-  /**
-   *  Gets the version attribute of the XLATEABR01 class
-   *
-   *@return    The version value
-   */
-  public static String getVersion() {
-    return ("$Id: XLATEABR01.java,v 1.63 2006/06/27 02:46:54 yang Exp $");
-  }
-
-  /**
-   *  Gets the aBRVersion attribute of the XLATEABR01 object
-   *
-   *@return    The aBRVersion value
-   */
-  public String getABRVersion() {
-    return getVersion();
-  }
-
-}

@@ -1,3364 +1,3370 @@
-//Licensed Materials -- Property of IBM
-// 
-// (C) Copyright IBM Corp. 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*      */ package COM.ibm.eannounce.abr.util;
+/*      */ 
+/*      */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*      */ import COM.ibm.eannounce.objects.EANFlagAttribute;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.MetaFlag;
+/*      */ import COM.ibm.eannounce.objects.SBRException;
+/*      */ import COM.ibm.opicmpdh.middleware.D;
+/*      */ import COM.ibm.opicmpdh.middleware.Database;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*      */ import COM.ibm.opicmpdh.middleware.ReturnDataResultSet;
+/*      */ import COM.ibm.opicmpdh.middleware.ReturnStatus;
+/*      */ import com.ibm.transform.oim.eacm.diff.DiffEntity;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.io.IOException;
+/*      */ import java.io.PrintWriter;
+/*      */ import java.io.StringWriter;
+/*      */ import java.rmi.RemoteException;
+/*      */ import java.sql.ResultSet;
+/*      */ import java.sql.SQLException;
+/*      */ import java.util.Collection;
+/*      */ import java.util.Enumeration;
+/*      */ import java.util.Hashtable;
+/*      */ import java.util.Iterator;
+/*      */ import java.util.TreeMap;
+/*      */ import java.util.Vector;
+/*      */ import org.w3c.dom.DOMException;
+/*      */ import org.w3c.dom.Document;
+/*      */ import org.w3c.dom.Element;
+/*      */ 
+/*      */ public class XMLTMFAVAILElem
+/*      */   extends XMLElem {
+/*   36 */   private String PRODSTRUCT = "PRODSTRUCT";
+/*      */   
+/*   38 */   private static XMLSLEORGGRPElem SLEORGGRP = new XMLSLEORGGRPElem();
+/*      */   public XMLTMFAVAILElem() {
+/*   40 */     super("AVAILABILITYELEMENT");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void addElements(Database paramDatabase, Hashtable paramHashtable, Document paramDocument, Element paramElement, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*   63 */     D.ebug(0, "Working on the item:" + this.nodeName);
+/*   64 */     TreeMap<Object, Object> treeMap = new TreeMap<>();
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*   72 */     boolean bool1 = false;
+/*   73 */     boolean bool2 = false;
+/*   74 */     boolean bool3 = false;
+/*   75 */     String str1 = "";
+/*   76 */     String str2 = "MODELAVAIL";
+/*   77 */     String str3 = "1980-01-01-00.00.00.000000";
+/*   78 */     boolean bool4 = true;
+/*      */ 
+/*      */     
+/*   81 */     boolean bool5 = paramDiffEntity.getEntityType().equals(this.PRODSTRUCT) ? true : false;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*   90 */     if (bool5) {
+/*   91 */       str1 = "OOFAVAIL";
+/*      */     } else {
+/*   93 */       str1 = "SWPRODSTRUCTAVAIL";
+/*      */     } 
+/*   95 */     boolean bool6 = false;
+/*   96 */     boolean bool7 = false;
+/*   97 */     bool6 = AvailUtil.iscompatmodel();
+/*      */     
+/*   99 */     if (!bool6) {
+/*      */       
+/*  101 */       String str = null;
+/*  102 */       str = (String)paramHashtable.get("_chSTATUS");
+/*  103 */       ABRUtil.append(paramStringBuffer, "the status is" + str + NEWLINE);
+/*  104 */       if ("0020".equals(str)) {
+/*  105 */         bool7 = true;
+/*      */       } else {
+/*  107 */         bool7 = false;
+/*      */       } 
+/*      */     } 
+/*      */     
+/*  111 */     Vector<DiffEntity> vector = getAvailOfAvailType(paramHashtable, str1, paramStringBuffer);
+/*  112 */     Vector vector1 = getAvailOfAvailType(paramHashtable, str2, paramStringBuffer);
+/*  113 */     EntityItem entityItem = paramDiffEntity.getPriorEntityItem();
+/*      */     
+/*  115 */     if (entityItem != null && str3.equals(entityItem.getProfile().getValOn())) {
+/*  116 */       bool4 = false;
+/*      */     }
+/*      */     
+/*  119 */     if (bool4) {
+/*  120 */       String str = getCtryAVAL(paramHashtable, paramDiffEntity, true, vector, paramStringBuffer);
+/*  121 */       if (str == null) {
+/*  122 */         bool3 = isDerivefromMODEL(paramHashtable, vector1, true, paramStringBuffer);
+/*  123 */         if (bool3) {
+/*      */           
+/*  125 */           if (bool5) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */             
+/*  132 */             Vector[] arrayOfVector = getFeatureCtryVector(paramHashtable, paramDiffEntity, paramStringBuffer);
+/*  133 */             Vector<DiffEntity> vector4 = getPlannedAvails(paramHashtable, vector1, paramStringBuffer);
+/*  134 */             for (byte b = 0; b < vector4.size(); b++) {
+/*  135 */               DiffEntity diffEntity = vector4.elementAt(b);
+/*  136 */               buildCtryAudRecs(treeMap, diffEntity, arrayOfVector, true, paramStringBuffer);
+/*      */             }
+/*      */           
+/*      */           }
+/*      */           else {
+/*      */             
+/*  142 */             Vector<DiffEntity> vector4 = getPlannedAvails(paramHashtable, vector1, paramStringBuffer);
+/*      */ 
+/*      */             
+/*  145 */             for (byte b = 0; b < vector4.size(); b++) {
+/*  146 */               DiffEntity diffEntity = vector4.elementAt(b);
+/*  147 */               buildCtryAudRecs(treeMap, diffEntity, (Vector[])null, true, paramStringBuffer);
+/*      */             }
+/*      */           
+/*      */           } 
+/*  151 */         } else if (bool5) {
+/*      */           
+/*  153 */           buildFeatureCtryAudRecs(paramHashtable, paramDiffEntity, treeMap, true, paramStringBuffer);
+/*      */         }
+/*      */         else {
+/*      */           
+/*  157 */           buildWWCtryAudRecs(paramHashtable, paramDiffEntity, treeMap, paramDatabase, true, paramStringBuffer);
+/*      */         
+/*      */         }
+/*      */ 
+/*      */       
+/*      */       }
+/*      */       else {
+/*      */ 
+/*      */         
+/*  166 */         buildBHCatlgorRecs(paramHashtable, treeMap, true, paramStringBuffer);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/*  176 */         Vector<DiffEntity> vector4 = new Vector();
+/*  177 */         if ("146".equals(str)) {
+/*  178 */           vector4 = vector;
+/*      */         } else {
+/*  180 */           vector4 = vector;
+/*      */         } 
+/*  182 */         for (byte b = 0; b < vector4.size(); b++) {
+/*  183 */           DiffEntity diffEntity = vector4.elementAt(b);
+/*  184 */           buildCtryAudRecs(treeMap, diffEntity, (Vector[])null, true, paramStringBuffer);
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */     
+/*  190 */     String str4 = getCtryAVAL(paramHashtable, paramDiffEntity, false, vector, paramStringBuffer);
+/*      */     
+/*  192 */     if (str4 == null) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  216 */       bool3 = isDerivefromMODEL(paramHashtable, vector1, false, paramStringBuffer);
+/*  217 */       if (bool3) {
+/*      */         
+/*  219 */         if (bool5) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */           
+/*  226 */           Vector[] arrayOfVector = getFeatureCtryVector(paramHashtable, paramDiffEntity, paramStringBuffer);
+/*  227 */           Vector<DiffEntity> vector4 = getPlannedAvails(paramHashtable, vector1, paramStringBuffer);
+/*  228 */           for (byte b = 0; b < vector4.size(); b++) {
+/*  229 */             DiffEntity diffEntity = vector4.elementAt(b);
+/*  230 */             buildCtryAudRecs(treeMap, diffEntity, arrayOfVector, false, paramStringBuffer);
+/*      */           }
+/*      */         
+/*      */         }
+/*      */         else {
+/*      */           
+/*  236 */           Vector<DiffEntity> vector4 = getPlannedAvails(paramHashtable, vector1, paramStringBuffer);
+/*      */ 
+/*      */           
+/*  239 */           for (byte b = 0; b < vector4.size(); b++) {
+/*  240 */             DiffEntity diffEntity = vector4.elementAt(b);
+/*  241 */             buildCtryAudRecs(treeMap, diffEntity, (Vector[])null, false, paramStringBuffer);
+/*      */           }
+/*      */         
+/*      */         } 
+/*  245 */       } else if (bool5) {
+/*      */         
+/*  247 */         buildFeatureCtryAudRecs(paramHashtable, paramDiffEntity, treeMap, false, paramStringBuffer);
+/*  248 */         bool1 = true;
+/*      */       }
+/*      */       else {
+/*      */         
+/*  252 */         buildWWCtryAudRecs(paramHashtable, paramDiffEntity, treeMap, paramDatabase, false, paramStringBuffer);
+/*  253 */         bool2 = true;
+/*      */       
+/*      */       }
+/*      */ 
+/*      */     
+/*      */     }
+/*      */     else {
+/*      */       
+/*  261 */       buildBHCatlgorRecs(paramHashtable, treeMap, false, paramStringBuffer);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  267 */       Vector<DiffEntity> vector4 = new Vector();
+/*  268 */       if ("146".equals(str4)) {
+/*  269 */         vector4 = vector;
+/*      */       } else {
+/*  271 */         vector4 = vector;
+/*      */       } 
+/*  273 */       for (byte b = 0; b < vector4.size(); b++) {
+/*  274 */         DiffEntity diffEntity = vector4.elementAt(b);
+/*  275 */         buildCtryAudRecs(treeMap, diffEntity, (Vector[])null, false, paramStringBuffer);
+/*      */       } 
+/*      */     } 
+/*      */ 
+/*      */     
+/*  280 */     Collection collection = treeMap.values();
+/*  281 */     Iterator<CtryAudRecord> iterator = collection.iterator();
+/*      */     
+/*  283 */     Hashtable hashtable = null;
+/*  284 */     if (iterator.hasNext() && (bool1 || bool2)) {
+/*  285 */       hashtable = searchSLORGNPLNTCODE(paramDatabase, paramDiffEntity.getCurrentEntityItem(), paramStringBuffer);
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  298 */     while (iterator.hasNext()) {
+/*  299 */       CtryAudRecord ctryAudRecord = iterator.next();
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  327 */       DiffEntity diffEntity1 = AvailUtil.getEntityForAttrs(paramHashtable, "AVAIL", vector, "AVAILTYPE", "146", "COUNTRYLIST", ctryAudRecord
+/*  328 */           .getCountry(), true, paramStringBuffer);
+/*  329 */       DiffEntity diffEntity2 = AvailUtil.getEntityForAttrs(paramHashtable, "AVAIL", vector, "AVAILTYPE", "146", "COUNTRYLIST", ctryAudRecord
+/*  330 */           .getCountry(), false, paramStringBuffer);
+/*      */       
+/*  332 */       DiffEntity diffEntity3 = AvailUtil.getEntityForAttrs(paramHashtable, "AVAIL", vector, "AVAILTYPE", "143", "COUNTRYLIST", ctryAudRecord
+/*  333 */           .getCountry(), false, paramStringBuffer);
+/*      */       
+/*  335 */       DiffEntity diffEntity4 = AvailUtil.getEntityForAttrs(paramHashtable, "AVAIL", vector, "AVAILTYPE", "149", "COUNTRYLIST", ctryAudRecord
+/*  336 */           .getCountry(), false, paramStringBuffer);
+/*      */       
+/*  338 */       DiffEntity diffEntity5 = AvailUtil.getEntityForAttrs(paramHashtable, "AVAIL", vector, "AVAILTYPE", "151", "COUNTRYLIST", ctryAudRecord
+/*  339 */           .getCountry(), false, paramStringBuffer);
+/*      */       
+/*  341 */       DiffEntity diffEntity6 = AvailUtil.getEntityForAttrs(paramHashtable, "AVAIL", vector, "AVAILTYPE", "200", "COUNTRYLIST", ctryAudRecord
+/*  342 */           .getCountry(), false, paramStringBuffer);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  354 */       DiffEntity diffEntity7 = AvailUtil.getEntityForAttrs(paramHashtable, "AVAIL", vector1, "AVAILTYPE", "146", "COUNTRYLIST", ctryAudRecord
+/*  355 */           .getCountry(), false, paramStringBuffer);
+/*      */       
+/*  357 */       DiffEntity diffEntity8 = AvailUtil.getEntityForAttrs(paramHashtable, "AVAIL", vector1, "AVAILTYPE", "149", "COUNTRYLIST", ctryAudRecord
+/*  358 */           .getCountry(), false, paramStringBuffer);
+/*      */       
+/*  360 */       DiffEntity diffEntity9 = AvailUtil.getEntityForAttrs(paramHashtable, "AVAIL", vector1, "AVAILTYPE", "151", "COUNTRYLIST", ctryAudRecord
+/*  361 */           .getCountry(), false, paramStringBuffer);
+/*      */       
+/*  363 */       DiffEntity diffEntity10 = AvailUtil.getEntityForAttrs(paramHashtable, "AVAIL", vector1, "AVAILTYPE", "200", "COUNTRYLIST", ctryAudRecord
+/*  364 */           .getCountry(), false, paramStringBuffer);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  370 */       Vector[] arrayOfVector = getFeatureCtryVector(paramHashtable, paramDiffEntity, paramStringBuffer);
+/*      */       
+/*  372 */       if (arrayOfVector == null) {
+/*  373 */         arrayOfVector = new Vector[2];
+/*      */       }
+/*      */ 
+/*      */       
+/*  377 */       DiffEntity diffEntity11 = getCatlgor(paramHashtable, ctryAudRecord.getCountry(), paramStringBuffer);
+/*      */       
+/*  379 */       DiffEntity[] arrayOfDiffEntity = new DiffEntity[2];
+/*  380 */       arrayOfDiffEntity[0] = diffEntity1;
+/*  381 */       arrayOfDiffEntity[1] = diffEntity2;
+/*      */ 
+/*      */       
+/*  384 */       ctryAudRecord.setAllFields(arrayOfDiffEntity, arrayOfVector, diffEntity11, paramDiffEntity, diffEntity3, diffEntity4, diffEntity5, diffEntity6, diffEntity8, diffEntity9, diffEntity10, diffEntity7, paramHashtable, bool7, bool6, paramStringBuffer);
+/*      */       
+/*  386 */       if (ctryAudRecord.isDisplayable() || ctryAudRecord.isrfrDisplayable()) {
+/*  387 */         if (bool1 || bool2) {
+/*  388 */           if (hashtable == null) {
+/*  389 */             hashtable = searchSLORGNPLNTCODE(paramDatabase, paramDiffEntity.getCurrentEntityItem(), paramStringBuffer);
+/*      */           }
+/*  391 */           createNodeSet(paramHashtable, paramDocument, paramElement, paramDiffEntity, ctryAudRecord, hashtable, paramStringBuffer);
+/*      */         }
+/*  393 */         else if (isPlannedAvail(ctryAudRecord.availDiff)) {
+/*  394 */           createNodeSet(paramHashtable, paramDocument, paramElement, paramDiffEntity, ctryAudRecord, paramStringBuffer);
+/*      */         
+/*      */         }
+/*      */         else {
+/*      */           
+/*  399 */           if (hashtable == null) {
+/*  400 */             hashtable = searchSLORGNPLNTCODE(paramDatabase, paramDiffEntity.getCurrentEntityItem(), paramStringBuffer);
+/*      */           }
+/*  402 */           createNodeSet(paramHashtable, paramDocument, paramElement, paramDiffEntity, ctryAudRecord, hashtable, paramStringBuffer);
+/*      */         }
+/*      */       
+/*      */       } else {
+/*      */         
+/*  407 */         ABRUtil.append(paramStringBuffer, "XMLTMFAVAILElem.addElements no changes found for " + ctryAudRecord + NEWLINE);
+/*      */       } 
+/*  409 */       ctryAudRecord.dereference();
+/*      */     } 
+/*      */ 
+/*      */     
+/*  413 */     if (hashtable != null) {
+/*  414 */       hashtable.clear();
+/*      */     }
+/*  416 */     treeMap.clear();
+/*  417 */     Vector vector2 = (Vector)paramHashtable.get("ANNOUNCEMENT");
+/*  418 */     Vector vector3 = (Vector)paramHashtable.get("AVAIL");
+/*  419 */     if (vector2 != null) {
+/*  420 */       vector2.clear();
+/*      */     }
+/*  422 */     if (vector3 != null)
+/*  423 */       vector3.clear(); 
+/*      */   }
+/*      */   
+/*      */   private Hashtable searchSLORGNPLNTCODE(Database paramDatabase, EntityItem paramEntityItem, StringBuffer paramStringBuffer) throws SQLException, MiddlewareException {
+/*  427 */     XMLSLEORGNPLNTCODESearchElem xMLSLEORGNPLNTCODESearchElem = new XMLSLEORGNPLNTCODESearchElem();
+/*  428 */     Hashtable<Object, Object> hashtable = new Hashtable<>();
+/*      */     try {
+/*  430 */       hashtable = xMLSLEORGNPLNTCODESearchElem.doSearch(paramDatabase, paramEntityItem, paramStringBuffer);
+/*  431 */     } catch (MiddlewareShutdownInProgressException middlewareShutdownInProgressException) {
+/*  432 */       middlewareShutdownInProgressException.printStackTrace();
+/*  433 */     } catch (SBRException sBRException) {
+/*  434 */       StringWriter stringWriter = new StringWriter();
+/*  435 */       sBRException.printStackTrace(new PrintWriter(stringWriter));
+/*  436 */       ABRUtil.append(paramStringBuffer, "XMLTMFAVAILElem.addElements search!! SBRException: " + stringWriter.getBuffer().toString() + NEWLINE);
+/*  437 */       sBRException.printStackTrace();
+/*      */     } 
+/*  439 */     ABRUtil.append(paramStringBuffer, "XMLTMFAVAILElem.addElements search!! " + NEWLINE);
+/*      */     
+/*  441 */     return hashtable;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean isPlannedAvail(DiffEntity paramDiffEntity) {
+/*  449 */     boolean bool = false;
+/*  450 */     if (paramDiffEntity == null) {
+/*  451 */       return false;
+/*      */     }
+/*  453 */     EntityItem entityItem1 = paramDiffEntity.getCurrentEntityItem();
+/*  454 */     EntityItem entityItem2 = paramDiffEntity.getPriorEntityItem();
+/*  455 */     if (paramDiffEntity.isDeleted()) {
+/*  456 */       EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute("AVAILTYPE");
+/*  457 */       if (eANFlagAttribute != null && eANFlagAttribute.isSelected("146")) {
+/*  458 */         bool = true;
+/*      */       }
+/*      */     } else {
+/*  461 */       EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute("AVAILTYPE");
+/*  462 */       if (eANFlagAttribute != null && eANFlagAttribute.isSelected("146")) {
+/*  463 */         bool = true;
+/*      */       }
+/*      */     } 
+/*      */     
+/*  467 */     return bool;
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private void buildWWCtryAudRecs(Hashtable paramHashtable, DiffEntity paramDiffEntity, TreeMap<String, CtryAudRecord> paramTreeMap, Database paramDatabase, boolean paramBoolean, StringBuffer paramStringBuffer) throws MiddlewareException, SQLException {
+/*  472 */     ReturnDataResultSet returnDataResultSet = null;
+/*  473 */     ResultSet resultSet = null;
+/*  474 */     ReturnStatus returnStatus = new ReturnStatus(-1);
+/*  475 */     String str = "SG";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  481 */     ABRUtil.append(paramStringBuffer, "buildWWCtryAudRecs at " + (paramBoolean ? "T1" : "T2") + " Time." + NEWLINE);
+/*      */     
+/*  483 */     if (paramDiffEntity != null) {
+/*  484 */       EntityItem entityItem = paramDiffEntity.getCurrentEntityItem();
+/*  485 */       str = entityItem.getProfile().getEnterprise();
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     try {
+/*  521 */       resultSet = paramDatabase.callGBL9999A(returnStatus, str, "GENAREASELECTION", "1999", "COUNTRYLIST");
+/*  522 */       returnDataResultSet = new ReturnDataResultSet(resultSet);
+/*      */     } finally {
+/*  524 */       if (resultSet != null) {
+/*  525 */         resultSet.close();
+/*  526 */         resultSet = null;
+/*      */       } 
+/*  528 */       paramDatabase.commit();
+/*  529 */       paramDatabase.freeStatement();
+/*  530 */       paramDatabase.isPending();
+/*      */     } 
+/*  532 */     if (paramBoolean) {
+/*  533 */       for (byte b = 0; b < returnDataResultSet.size(); b++) {
+/*  534 */         String str1 = returnDataResultSet.getColumn(b, 0).trim();
+/*  535 */         ABRUtil.append(paramStringBuffer, "CQ BHALM109267 derivefrommodel world wide counry " + str1 + NEWLINE);
+/*      */         
+/*  537 */         String str2 = str1;
+/*  538 */         if (!paramTreeMap.containsKey(str2)) {
+/*  539 */           CtryAudRecord ctryAudRecord = new CtryAudRecord(null, str1);
+/*      */ 
+/*      */ 
+/*      */           
+/*  543 */           ctryAudRecord.action = "Delete";
+/*  544 */           paramTreeMap.put(ctryAudRecord.getKey(), ctryAudRecord);
+/*      */         } 
+/*      */       } 
+/*      */     } else {
+/*      */       
+/*  549 */       for (byte b = 0; b < returnDataResultSet.size(); b++) {
+/*  550 */         String str1 = returnDataResultSet.getColumn(b, 0).trim();
+/*  551 */         ABRUtil.append(paramStringBuffer, "CQ BHALM109267 derivefrommodel world wide counry " + str1 + NEWLINE);
+/*      */         
+/*  553 */         String str2 = str1;
+/*  554 */         if (!paramTreeMap.containsKey(str2)) {
+/*  555 */           CtryAudRecord ctryAudRecord = new CtryAudRecord(null, str1);
+/*      */ 
+/*      */ 
+/*      */           
+/*  559 */           ctryAudRecord.action = "Update";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */           
+/*  567 */           paramTreeMap.put(ctryAudRecord.getKey(), ctryAudRecord);
+/*      */         } else {
+/*      */           
+/*  570 */           CtryAudRecord ctryAudRecord = paramTreeMap.get(str2);
+/*  571 */           ctryAudRecord.setUpdateAvail((DiffEntity)null);
+/*  572 */           ctryAudRecord.setAction("@@");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */           
+/*  580 */           ABRUtil.append(paramStringBuffer, "WARNING buildWWCtryAudRecs country" + str2 + "already exists, overwrite it. " + NEWLINE);
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void buildFeatureCtryAudRecs(Hashtable paramHashtable, DiffEntity paramDiffEntity, TreeMap<String, CtryAudRecord> paramTreeMap, boolean paramBoolean, StringBuffer paramStringBuffer) throws MiddlewareException {
+/*  594 */     Vector<DiffEntity> vector = (Vector)paramHashtable.get("FEATURE");
+/*  595 */     ABRUtil.append(paramStringBuffer, "buildT1FeatureCtryAudRecs at " + (paramBoolean ? "T1" : "T2") + " Time." + NEWLINE);
+/*  596 */     if (paramBoolean) {
+/*  597 */       for (byte b = 0; b < vector.size(); b++) {
+/*  598 */         DiffEntity diffEntity = vector.elementAt(b);
+/*  599 */         EntityItem entityItem = diffEntity.getPriorEntityItem();
+/*  600 */         if (!diffEntity.isNew()) {
+/*      */ 
+/*      */           
+/*  603 */           EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("COUNTRYLIST");
+/*  604 */           ABRUtil.append(paramStringBuffer, "buildFeatureCtryAudRecs for deleted/udpate feature: ctryAtt " + 
+/*  605 */               PokUtils.getAttributeFlagValue(entityItem, "COUNTRYLIST") + NEWLINE);
+/*  606 */           if (eANFlagAttribute != null) {
+/*  607 */             MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/*  608 */             for (byte b1 = 0; b1 < arrayOfMetaFlag.length; b1++) {
+/*      */               
+/*  610 */               if (arrayOfMetaFlag[b1].isSelected()) {
+/*  611 */                 String str1 = arrayOfMetaFlag[b1].getFlagCode();
+/*  612 */                 String str2 = str1;
+/*  613 */                 if (paramTreeMap.containsKey(str2)) {
+/*      */                   
+/*  615 */                   CtryAudRecord ctryAudRecord = (CtryAudRecord)paramTreeMap.get(str2);
+/*  616 */                   ABRUtil.append(paramStringBuffer, "WARNING buildFeatureCtryAudRecs for deleted/udpate " + diffEntity.getKey() + " " + str2 + " already exists, keeping orig " + ctryAudRecord + NEWLINE);
+/*      */                 } else {
+/*      */                   
+/*  619 */                   CtryAudRecord ctryAudRecord = new CtryAudRecord(null, str1);
+/*  620 */                   ctryAudRecord.setAction("Delete");
+/*  621 */                   paramTreeMap.put(ctryAudRecord.getKey(), ctryAudRecord);
+/*  622 */                   ABRUtil.append(paramStringBuffer, "buildFeatureCtryAudRecs for deleted/udpate:" + diffEntity.getKey() + " rec: " + ctryAudRecord
+/*  623 */                       .getKey() + NEWLINE);
+/*      */                 } 
+/*      */               } 
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } else {
+/*  631 */       for (byte b = 0; b < vector.size(); b++) {
+/*  632 */         DiffEntity diffEntity = vector.elementAt(b);
+/*  633 */         EntityItem entityItem = diffEntity.getCurrentEntityItem();
+/*  634 */         if (!diffEntity.isDeleted()) {
+/*      */ 
+/*      */           
+/*  637 */           EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("COUNTRYLIST");
+/*  638 */           ABRUtil.append(paramStringBuffer, "buildFeatureCtryAudRecs for new /udpated feature:  ctryAtt " + 
+/*  639 */               PokUtils.getAttributeFlagValue(entityItem, "COUNTRYLIST") + NEWLINE);
+/*  640 */           if (eANFlagAttribute != null) {
+/*  641 */             MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/*  642 */             for (byte b1 = 0; b1 < arrayOfMetaFlag.length; b1++) {
+/*      */               
+/*  644 */               if (arrayOfMetaFlag[b1].isSelected()) {
+/*  645 */                 String str1 = arrayOfMetaFlag[b1].getFlagCode();
+/*  646 */                 String str2 = str1;
+/*  647 */                 if (paramTreeMap.containsKey(str2)) {
+/*  648 */                   CtryAudRecord ctryAudRecord = paramTreeMap.get(str2);
+/*  649 */                   ABRUtil.append(paramStringBuffer, "WARNING buildFeatureCtryAudRecs for new /updated " + diffEntity.getKey() + " " + str2 + " already exists, replacing orig " + ctryAudRecord + NEWLINE);
+/*      */                   
+/*  651 */                   ctryAudRecord.setUpdateAvail((DiffEntity)null);
+/*  652 */                   ctryAudRecord.setAction("@@");
+/*      */                 } else {
+/*  654 */                   CtryAudRecord ctryAudRecord = new CtryAudRecord(null, str1);
+/*  655 */                   ctryAudRecord.setAction("Update");
+/*  656 */                   paramTreeMap.put(ctryAudRecord.getKey(), ctryAudRecord);
+/*  657 */                   ABRUtil.append(paramStringBuffer, "buildFeatureCtryAudRecs for new/ updated:" + diffEntity.getKey() + " rec: " + ctryAudRecord
+/*  658 */                       .getKey() + NEWLINE);
+/*      */                 } 
+/*      */               } 
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector[] getFeatureCtryVector(Hashtable paramHashtable, DiffEntity paramDiffEntity, StringBuffer paramStringBuffer) throws MiddlewareException {
+/*  676 */     Vector<String> vector1 = new Vector(1);
+/*  677 */     Vector<String> vector2 = new Vector(1);
+/*  678 */     Vector[] arrayOfVector = new Vector[2];
+/*  679 */     arrayOfVector[0] = vector2;
+/*  680 */     arrayOfVector[1] = vector1;
+/*  681 */     String str = "";
+/*  682 */     if ("PRODSTRUCT".equals(paramDiffEntity.getEntityType())) {
+/*  683 */       str = "FEATURE";
+/*  684 */     } else if ("SWPRODSTRUCT".equals(paramDiffEntity.getEntityType())) {
+/*  685 */       return null;
+/*      */     } 
+/*  687 */     Vector<DiffEntity> vector = (Vector)paramHashtable.get(str);
+/*      */     
+/*  689 */     for (byte b = 0; b < vector.size(); b++) {
+/*  690 */       DiffEntity diffEntity = vector.elementAt(b);
+/*  691 */       EntityItem entityItem1 = diffEntity.getCurrentEntityItem();
+/*  692 */       EntityItem entityItem2 = diffEntity.getPriorEntityItem();
+/*  693 */       if (entityItem2 != null) {
+/*      */ 
+/*      */         
+/*  696 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute("COUNTRYLIST");
+/*  697 */         ABRUtil.append(paramStringBuffer, "putFeatureCtryVector for deleted feature: ctryAtt " + 
+/*  698 */             PokUtils.getAttributeFlagValue(entityItem2, "COUNTRYLIST") + NEWLINE);
+/*  699 */         if (eANFlagAttribute != null) {
+/*  700 */           MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/*  701 */           for (byte b1 = 0; b1 < arrayOfMetaFlag.length; b1++) {
+/*      */             
+/*  703 */             if (arrayOfMetaFlag[b1].isSelected()) {
+/*  704 */               String str1 = arrayOfMetaFlag[b1].getFlagCode();
+/*  705 */               String str2 = str1;
+/*  706 */               if (!vector2.contains(str2)) {
+/*  707 */                 vector2.add(str2);
+/*      */               }
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*  713 */       if (entityItem1 != null) {
+/*      */ 
+/*      */         
+/*  716 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute("COUNTRYLIST");
+/*  717 */         ABRUtil.append(paramStringBuffer, "putFeatureCtryVector for new feature:  ctryAtt " + 
+/*  718 */             PokUtils.getAttributeFlagValue(entityItem1, "COUNTRYLIST") + NEWLINE);
+/*  719 */         if (eANFlagAttribute != null) {
+/*  720 */           MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/*  721 */           for (byte b1 = 0; b1 < arrayOfMetaFlag.length; b1++) {
+/*      */             
+/*  723 */             if (arrayOfMetaFlag[b1].isSelected()) {
+/*  724 */               String str1 = arrayOfMetaFlag[b1].getFlagCode();
+/*  725 */               String str2 = str1;
+/*  726 */               if (!vector1.contains(str2)) {
+/*  727 */                 vector1.add(str2);
+/*      */               }
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*  734 */     return arrayOfVector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createNodeSet(Hashtable paramHashtable, Document paramDocument, Element paramElement, DiffEntity paramDiffEntity, CtryAudRecord paramCtryAudRecord, StringBuffer paramStringBuffer) {
+/*  742 */     if (paramCtryAudRecord.isDisplayable()) {
+/*  743 */       Element element1 = paramDocument.createElement(this.nodeName);
+/*      */       
+/*  745 */       addXMLAttrs(element1);
+/*  746 */       paramElement.appendChild(element1);
+/*      */ 
+/*      */       
+/*  749 */       Element element2 = paramDocument.createElement("AVAILABILITYACTION");
+/*  750 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getAction()));
+/*  751 */       element1.appendChild(element2);
+/*  752 */       element2 = paramDocument.createElement("STATUS");
+/*  753 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getAvailStatus()));
+/*  754 */       element1.appendChild(element2);
+/*  755 */       element2 = paramDocument.createElement("COUNTRY_FC");
+/*  756 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getCountry()));
+/*  757 */       element1.appendChild(element2);
+/*  758 */       element2 = paramDocument.createElement("ANNDATE");
+/*  759 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getAnndate()));
+/*  760 */       element1.appendChild(element2);
+/*  761 */       element2 = paramDocument.createElement("ANNNUMBER");
+/*  762 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getAnnnumber()));
+/*  763 */       element1.appendChild(element2);
+/*  764 */       element2 = paramDocument.createElement("FIRSTORDER");
+/*  765 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getFirstorder()));
+/*  766 */       element1.appendChild(element2);
+/*  767 */       element2 = paramDocument.createElement("PLANNEDAVAILABILITY");
+/*  768 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getPlannedavailability()));
+/*  769 */       element1.appendChild(element2);
+/*  770 */       element2 = paramDocument.createElement("PUBFROM");
+/*  771 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getPubFrom()));
+/*  772 */       element1.appendChild(element2);
+/*  773 */       element2 = paramDocument.createElement("PUBTO");
+/*  774 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getPubTo()));
+/*  775 */       element1.appendChild(element2);
+/*  776 */       element2 = paramDocument.createElement("WDANNDATE");
+/*  777 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getWdanndate()));
+/*  778 */       element1.appendChild(element2);
+/*      */       
+/*  780 */       element2 = paramDocument.createElement("ENDOFMARKETANNNUMBER");
+/*  781 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getEomannnum()));
+/*  782 */       element1.appendChild(element2);
+/*  783 */       element2 = paramDocument.createElement("LASTORDER");
+/*  784 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getLastorder()));
+/*  785 */       element1.appendChild(element2);
+/*  786 */       element2 = paramDocument.createElement("EOSANNDATE");
+/*  787 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getEosanndate()));
+/*  788 */       element1.appendChild(element2);
+/*      */       
+/*  790 */       element2 = paramDocument.createElement("ENDOFSERVICEANNNUMBER");
+/*  791 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getEosannnum()));
+/*  792 */       element1.appendChild(element2);
+/*  793 */       element2 = paramDocument.createElement("ENDOFSERVICEDATE");
+/*  794 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getEndOfService()));
+/*  795 */       element1.appendChild(element2);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  803 */       SLEORGGRP.displayAVAILSLEORG(paramHashtable, paramDocument, element1, paramDiffEntity.getCurrentEntityItem(), paramCtryAudRecord.availDiff, null, paramCtryAudRecord.country, paramCtryAudRecord.action, paramStringBuffer);
+/*      */     } 
+/*      */     
+/*  806 */     if (paramCtryAudRecord.isrfrDisplayable()) {
+/*  807 */       Element element1 = paramDocument.createElement(this.nodeName);
+/*      */       
+/*  809 */       addXMLAttrs(element1);
+/*  810 */       paramElement.appendChild(element1);
+/*      */ 
+/*      */       
+/*  813 */       Element element2 = paramDocument.createElement("AVAILABILITYACTION");
+/*  814 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfraction()));
+/*  815 */       element1.appendChild(element2);
+/*  816 */       element2 = paramDocument.createElement("STATUS");
+/*  817 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfravailStatus()));
+/*  818 */       element1.appendChild(element2);
+/*  819 */       element2 = paramDocument.createElement("COUNTRY_FC");
+/*  820 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getCountry()));
+/*  821 */       element1.appendChild(element2);
+/*  822 */       element2 = paramDocument.createElement("ANNDATE");
+/*  823 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfranndate()));
+/*  824 */       element1.appendChild(element2);
+/*  825 */       element2 = paramDocument.createElement("ANNNUMBER");
+/*  826 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrannnumber()));
+/*  827 */       element1.appendChild(element2);
+/*  828 */       element2 = paramDocument.createElement("FIRSTORDER");
+/*  829 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrfirstorder()));
+/*  830 */       element1.appendChild(element2);
+/*  831 */       element2 = paramDocument.createElement("PLANNEDAVAILABILITY");
+/*  832 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrplannedavailability()));
+/*  833 */       element1.appendChild(element2);
+/*  834 */       element2 = paramDocument.createElement("PUBFROM");
+/*  835 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrpubfrom()));
+/*  836 */       element1.appendChild(element2);
+/*  837 */       element2 = paramDocument.createElement("PUBTO");
+/*  838 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrpubto()));
+/*  839 */       element1.appendChild(element2);
+/*  840 */       element2 = paramDocument.createElement("WDANNDATE");
+/*  841 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrwdanndate()));
+/*  842 */       element1.appendChild(element2);
+/*      */       
+/*  844 */       element2 = paramDocument.createElement("ENDOFMARKETANNNUMBER");
+/*  845 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getEomannnum()));
+/*  846 */       element1.appendChild(element2);
+/*  847 */       element2 = paramDocument.createElement("LASTORDER");
+/*  848 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrlastorder()));
+/*  849 */       element1.appendChild(element2);
+/*  850 */       element2 = paramDocument.createElement("EOSANNDATE");
+/*  851 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfreosanndate()));
+/*  852 */       element1.appendChild(element2);
+/*      */       
+/*  854 */       element2 = paramDocument.createElement("ENDOFSERVICEANNNUMBER");
+/*  855 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getEosannnum()));
+/*  856 */       element1.appendChild(element2);
+/*  857 */       element2 = paramDocument.createElement("ENDOFSERVICEDATE");
+/*  858 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrendofservice()));
+/*  859 */       element1.appendChild(element2);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  867 */       SLEORGGRP.displayAVAILSLEORG(paramHashtable, paramDocument, element1, paramDiffEntity.getCurrentEntityItem(), paramCtryAudRecord.availDiff, null, paramCtryAudRecord.country, paramCtryAudRecord.action, paramStringBuffer);
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createNodeSet(Hashtable paramHashtable1, Document paramDocument, Element paramElement, DiffEntity paramDiffEntity, CtryAudRecord paramCtryAudRecord, Hashtable paramHashtable2, StringBuffer paramStringBuffer) {
+/*  878 */     if (paramCtryAudRecord.isDisplayable()) {
+/*  879 */       Element element1 = paramDocument.createElement(this.nodeName);
+/*      */       
+/*  881 */       addXMLAttrs(element1);
+/*  882 */       paramElement.appendChild(element1);
+/*      */ 
+/*      */       
+/*  885 */       Element element2 = paramDocument.createElement("AVAILABILITYACTION");
+/*  886 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getAction()));
+/*  887 */       element1.appendChild(element2);
+/*  888 */       element2 = paramDocument.createElement("STATUS");
+/*  889 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getAvailStatus()));
+/*  890 */       element1.appendChild(element2);
+/*  891 */       element2 = paramDocument.createElement("COUNTRY_FC");
+/*  892 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getCountry()));
+/*  893 */       element1.appendChild(element2);
+/*  894 */       element2 = paramDocument.createElement("ANNDATE");
+/*  895 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getAnndate()));
+/*  896 */       element1.appendChild(element2);
+/*  897 */       element2 = paramDocument.createElement("ANNNUMBER");
+/*  898 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getAnnnumber()));
+/*  899 */       element1.appendChild(element2);
+/*  900 */       element2 = paramDocument.createElement("FIRSTORDER");
+/*  901 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getFirstorder()));
+/*  902 */       element1.appendChild(element2);
+/*  903 */       element2 = paramDocument.createElement("PLANNEDAVAILABILITY");
+/*  904 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getPlannedavailability()));
+/*  905 */       element1.appendChild(element2);
+/*  906 */       element2 = paramDocument.createElement("PUBFROM");
+/*  907 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getPubFrom()));
+/*  908 */       element1.appendChild(element2);
+/*  909 */       element2 = paramDocument.createElement("PUBTO");
+/*  910 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getPubTo()));
+/*  911 */       element1.appendChild(element2);
+/*  912 */       element2 = paramDocument.createElement("WDANNDATE");
+/*  913 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getWdanndate()));
+/*  914 */       element1.appendChild(element2);
+/*      */       
+/*  916 */       element2 = paramDocument.createElement("ENDOFMARKETANNNUMBER");
+/*  917 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getEomannnum()));
+/*  918 */       element1.appendChild(element2);
+/*  919 */       element2 = paramDocument.createElement("LASTORDER");
+/*  920 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getLastorder()));
+/*  921 */       element1.appendChild(element2);
+/*  922 */       element2 = paramDocument.createElement("EOSANNDATE");
+/*  923 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getEosanndate()));
+/*  924 */       element1.appendChild(element2);
+/*      */       
+/*  926 */       element2 = paramDocument.createElement("ENDOFSERVICEANNNUMBER");
+/*  927 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getEosannnum()));
+/*  928 */       element1.appendChild(element2);
+/*  929 */       element2 = paramDocument.createElement("ENDOFSERVICEDATE");
+/*  930 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getEndOfService()));
+/*  931 */       element1.appendChild(element2);
+/*      */       
+/*  933 */       createWorldWideAvilNote(paramDocument, paramCtryAudRecord, paramHashtable2, element1, paramStringBuffer);
+/*      */     } 
+/*  935 */     if (paramCtryAudRecord.isrfrDisplayable()) {
+/*  936 */       Element element1 = paramDocument.createElement(this.nodeName);
+/*      */       
+/*  938 */       addXMLAttrs(element1);
+/*  939 */       paramElement.appendChild(element1);
+/*      */ 
+/*      */       
+/*  942 */       Element element2 = paramDocument.createElement("AVAILABILITYACTION");
+/*  943 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfraction()));
+/*  944 */       element1.appendChild(element2);
+/*  945 */       element2 = paramDocument.createElement("STATUS");
+/*  946 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfravailStatus()));
+/*  947 */       element1.appendChild(element2);
+/*  948 */       element2 = paramDocument.createElement("COUNTRY_FC");
+/*  949 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getCountry()));
+/*  950 */       element1.appendChild(element2);
+/*  951 */       element2 = paramDocument.createElement("ANNDATE");
+/*  952 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfranndate()));
+/*  953 */       element1.appendChild(element2);
+/*  954 */       element2 = paramDocument.createElement("ANNNUMBER");
+/*  955 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrannnumber()));
+/*  956 */       element1.appendChild(element2);
+/*  957 */       element2 = paramDocument.createElement("FIRSTORDER");
+/*  958 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrfirstorder()));
+/*  959 */       element1.appendChild(element2);
+/*  960 */       element2 = paramDocument.createElement("PLANNEDAVAILABILITY");
+/*  961 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrplannedavailability()));
+/*  962 */       element1.appendChild(element2);
+/*  963 */       element2 = paramDocument.createElement("PUBFROM");
+/*  964 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrpubfrom()));
+/*  965 */       element1.appendChild(element2);
+/*  966 */       element2 = paramDocument.createElement("PUBTO");
+/*  967 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrpubto()));
+/*  968 */       element1.appendChild(element2);
+/*  969 */       element2 = paramDocument.createElement("WDANNDATE");
+/*  970 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrwdanndate()));
+/*  971 */       element1.appendChild(element2);
+/*      */       
+/*  973 */       element2 = paramDocument.createElement("ENDOFMARKETANNNUMBER");
+/*  974 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getEomannnum()));
+/*  975 */       element1.appendChild(element2);
+/*  976 */       element2 = paramDocument.createElement("LASTORDER");
+/*  977 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrlastorder()));
+/*  978 */       element1.appendChild(element2);
+/*  979 */       element2 = paramDocument.createElement("EOSANNDATE");
+/*  980 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfreosanndate()));
+/*  981 */       element1.appendChild(element2);
+/*      */       
+/*  983 */       element2 = paramDocument.createElement("ENDOFSERVICEANNNUMBER");
+/*  984 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getEosannnum()));
+/*  985 */       element1.appendChild(element2);
+/*  986 */       element2 = paramDocument.createElement("ENDOFSERVICEDATE");
+/*  987 */       element2.appendChild(paramDocument.createTextNode("" + paramCtryAudRecord.getRfrendofservice()));
+/*  988 */       element1.appendChild(element2);
+/*      */       
+/*  990 */       createWorldWideAvilNote(paramDocument, paramCtryAudRecord, paramHashtable2, element1, paramStringBuffer);
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void createWorldWideAvilNote(Document paramDocument, CtryAudRecord paramCtryAudRecord, Hashtable paramHashtable, Element paramElement, StringBuffer paramStringBuffer) throws DOMException {
+/* 1005 */     String str = paramCtryAudRecord.getCountry();
+/* 1006 */     Object object = paramHashtable.get(str);
+/* 1007 */     if (object != null && "Update".equals(paramCtryAudRecord.action)) {
+/*      */       
+/* 1009 */       Element element1 = paramDocument.createElement("SLEORGGRPLIST");
+/* 1010 */       paramElement.appendChild(element1);
+/* 1011 */       Vector[] arrayOfVector = (Vector[])paramHashtable.get(str);
+/* 1012 */       Hashtable hashtable = arrayOfVector[0].get(0);
+/* 1013 */       Enumeration<String> enumeration = hashtable.keys();
+/* 1014 */       Vector<String> vector1 = new Vector();
+/* 1015 */       while (enumeration.hasMoreElements()) {
+/* 1016 */         String str1 = enumeration.nextElement();
+/* 1017 */         str1 = str1.trim();
+/* 1018 */         if (vector1.contains(str1)) {
+/*      */           continue;
+/*      */         }
+/* 1021 */         vector1.add(str1);
+/* 1022 */         Element element4 = paramDocument.createElement("SLEORGGRPELEMENT");
+/* 1023 */         element1.appendChild(element4);
+/* 1024 */         Element element3 = paramDocument.createElement("SLEOORGGRPACTION");
+/* 1025 */         element3.appendChild(paramDocument.createTextNode("Update"));
+/* 1026 */         element4.appendChild(element3);
+/* 1027 */         element3 = paramDocument.createElement("SLEORGGRP");
+/* 1028 */         element3.appendChild(paramDocument.createTextNode("" + str1));
+/* 1029 */         element4.appendChild(element3);
+/*      */       } 
+/* 1031 */       vector1.clear();
+/*      */       
+/* 1033 */       Element element2 = paramDocument.createElement("SLEORGNPLNTCODELIST");
+/* 1034 */       paramElement.appendChild(element2);
+/* 1035 */       Vector<EntityItem> vector = arrayOfVector[1];
+/* 1036 */       Vector<String> vector2 = new Vector();
+/* 1037 */       for (byte b = 0; b < vector.size(); b++) {
+/* 1038 */         EntityItem entityItem = vector.get(b);
+/* 1039 */         String str1 = PokUtils.getAttributeValue(entityItem, "SLEORG", ", ", "", false);
+/* 1040 */         String str2 = PokUtils.getAttributeValue(entityItem, "PLNTCD", ", ", "", false);
+/* 1041 */         String str3 = str1 + str2;
+/* 1042 */         if (!vector2.contains(str3)) {
+/*      */ 
+/*      */           
+/* 1045 */           vector2.add(str3);
+/* 1046 */           Element element4 = paramDocument.createElement("SLEORGNPLNTCODEELEMENT");
+/* 1047 */           element2.appendChild(element4);
+/* 1048 */           Element element3 = paramDocument.createElement("SLEORGNPLNTCODEACTION");
+/* 1049 */           element3.appendChild(paramDocument.createTextNode("Update"));
+/* 1050 */           element4.appendChild(element3);
+/* 1051 */           element3 = paramDocument.createElement("SLEORG");
+/* 1052 */           element3.appendChild(paramDocument.createTextNode("" + str1));
+/* 1053 */           element4.appendChild(element3);
+/* 1054 */           element3 = paramDocument.createElement("PLNTCD");
+/* 1055 */           element3.appendChild(paramDocument.createTextNode("" + str2));
+/* 1056 */           element4.appendChild(element3);
+/*      */         } 
+/* 1058 */       }  vector2.clear();
+/*      */     } else {
+/*      */       
+/* 1061 */       Element element1 = paramDocument.createElement("SLEORGGRPLIST");
+/* 1062 */       paramElement.appendChild(element1);
+/*      */       
+/* 1064 */       Element element2 = paramDocument.createElement("SLEORGNPLNTCODELIST");
+/* 1065 */       paramElement.appendChild(element2);
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void buildCtryAudRecs(TreeMap<String, CtryAudRecord> paramTreeMap, DiffEntity paramDiffEntity, Vector[] paramArrayOfVector, boolean paramBoolean, StringBuffer paramStringBuffer) {
+/* 1133 */     ABRUtil.append(paramStringBuffer, "XMLTMFAVAILElem.buildCtryAudRecs " + (paramBoolean ? "T1 " : "T2 ") + paramDiffEntity.getKey() + NEWLINE);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1141 */     if (paramBoolean) {
+/* 1142 */       EntityItem entityItem = paramDiffEntity.getPriorEntityItem();
+/* 1143 */       if (!paramDiffEntity.isNew()) {
+/*      */         
+/* 1145 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("COUNTRYLIST");
+/* 1146 */         ABRUtil.append(paramStringBuffer, "XMLTMFAVAILElem.buildT1CtryAudRecs for delete/udpate avail: ctryAtt " + 
+/* 1147 */             PokUtils.getAttributeFlagValue(entityItem, "COUNTRYLIST") + NEWLINE);
+/* 1148 */         if (eANFlagAttribute != null) {
+/* 1149 */           MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 1150 */           for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/*      */             
+/* 1152 */             if (arrayOfMetaFlag[b].isSelected()) {
+/* 1153 */               String str1 = arrayOfMetaFlag[b].getFlagCode();
+/* 1154 */               String str2 = str1;
+/* 1155 */               if (paramTreeMap.containsKey(str2)) {
+/*      */                 
+/* 1157 */                 CtryAudRecord ctryAudRecord = (CtryAudRecord)paramTreeMap.get(str2);
+/* 1158 */                 ABRUtil.append(paramStringBuffer, "WARNING buildT1CtryAudRecs for delete/udpate" + paramDiffEntity.getKey() + " " + str2 + " already exists, keeping orig " + ctryAudRecord + NEWLINE);
+/*      */               
+/*      */               }
+/* 1161 */               else if (paramArrayOfVector != null && paramArrayOfVector[0].contains(str2)) {
+/* 1162 */                 CtryAudRecord ctryAudRecord = new CtryAudRecord(paramDiffEntity, str1);
+/* 1163 */                 ctryAudRecord.setAction("Delete");
+/* 1164 */                 paramTreeMap.put(ctryAudRecord.getKey(), ctryAudRecord);
+/* 1165 */                 ABRUtil.append(paramStringBuffer, "XMLTMFAVAILElem.buildT1CtryAudRecs for delete/udpate:" + paramDiffEntity.getKey() + " rec: " + ctryAudRecord
+/* 1166 */                     .getKey() + NEWLINE);
+/* 1167 */               } else if (paramArrayOfVector == null) {
+/* 1168 */                 CtryAudRecord ctryAudRecord = new CtryAudRecord(paramDiffEntity, str1);
+/* 1169 */                 ctryAudRecord.setAction("Delete");
+/* 1170 */                 paramTreeMap.put(ctryAudRecord.getKey(), ctryAudRecord);
+/* 1171 */                 ABRUtil.append(paramStringBuffer, "XMLTMFAVAILElem.buildT1CtryAudRecs for delete/udpate:" + paramDiffEntity.getKey() + " rec: " + ctryAudRecord
+/* 1172 */                     .getKey() + NEWLINE);
+/*      */               } 
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } else {
+/*      */       
+/* 1180 */       EntityItem entityItem = paramDiffEntity.getCurrentEntityItem();
+/* 1181 */       if (!paramDiffEntity.isDeleted()) {
+/*      */         
+/* 1183 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("COUNTRYLIST");
+/* 1184 */         ABRUtil.append(paramStringBuffer, "XMLTMFAVAILElem.buildCtryAudRecs for new/udpate avail:  ctryAtt and anncodeAtt " + 
+/* 1185 */             PokUtils.getAttributeFlagValue(entityItem, "COUNTRYLIST") + 
+/* 1186 */             PokUtils.getAttributeFlagValue(entityItem, "ANNCODENAME") + NEWLINE);
+/* 1187 */         if (eANFlagAttribute != null) {
+/* 1188 */           MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 1189 */           for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/*      */             
+/* 1191 */             if (arrayOfMetaFlag[b].isSelected()) {
+/* 1192 */               String str1 = arrayOfMetaFlag[b].getFlagCode();
+/* 1193 */               String str2 = str1;
+/* 1194 */               if (paramTreeMap.containsKey(str2)) {
+/* 1195 */                 CtryAudRecord ctryAudRecord = paramTreeMap.get(str2);
+/* 1196 */                 if (isPlannedAvail(paramDiffEntity) || "Delete".equals(ctryAudRecord.action)) {
+/* 1197 */                   ABRUtil.append(paramStringBuffer, "WARNING buildCtryAudRecs for new/update " + paramDiffEntity.getKey() + " " + str2 + " already exists, replacing orig " + ctryAudRecord + NEWLINE);
+/*      */                   
+/* 1199 */                   if ("Update".equals(ctryAudRecord.action)) {
+/* 1200 */                     ctryAudRecord.setUpdateAvail(paramDiffEntity);
+/*      */                   } else {
+/* 1202 */                     ctryAudRecord.setUpdateAvail(paramDiffEntity);
+/* 1203 */                     ctryAudRecord.setAction("@@");
+/*      */                   }
+/*      */                 
+/*      */                 } 
+/* 1207 */               } else if (paramArrayOfVector != null && paramArrayOfVector[1].contains(str2)) {
+/* 1208 */                 CtryAudRecord ctryAudRecord = new CtryAudRecord(paramDiffEntity, str1);
+/* 1209 */                 ctryAudRecord.setAction("Update");
+/* 1210 */                 paramTreeMap.put(ctryAudRecord.getKey(), ctryAudRecord);
+/* 1211 */                 ABRUtil.append(paramStringBuffer, "XMLTMFAVAILElem.buildCtryAudRecs for new/update:" + paramDiffEntity.getKey() + " rec: " + ctryAudRecord
+/* 1212 */                     .getKey() + NEWLINE);
+/* 1213 */               } else if (paramArrayOfVector == null) {
+/* 1214 */                 CtryAudRecord ctryAudRecord = new CtryAudRecord(paramDiffEntity, str1);
+/* 1215 */                 ctryAudRecord.setAction("Update");
+/* 1216 */                 paramTreeMap.put(ctryAudRecord.getKey(), ctryAudRecord);
+/* 1217 */                 ABRUtil.append(paramStringBuffer, "XMLTMFAVAILElem.buildCtryAudRecs for new/update:" + paramDiffEntity.getKey() + " rec: " + ctryAudRecord
+/* 1218 */                     .getKey() + NEWLINE);
+/*      */               } 
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void buildBHCatlgorRecs(Hashtable paramHashtable, TreeMap<String, CtryAudRecord> paramTreeMap, boolean paramBoolean, StringBuffer paramStringBuffer) {
+/* 1239 */     Vector<DiffEntity> vector = (Vector)paramHashtable.get("BHCATLGOR");
+/* 1240 */     String str = "COUNTRYLIST";
+/* 1241 */     ABRUtil.append(paramStringBuffer, "buildBHCatlgorRecs looking for T1" + paramBoolean + " in CATLGOR allVct.size:" + ((vector == null) ? "null" : ("" + vector
+/* 1242 */         .size())) + NEWLINE);
+/* 1243 */     if (vector != null) {
+/* 1244 */       if (paramBoolean)
+/* 1245 */       { for (byte b = 0; b < vector.size(); b++) {
+/* 1246 */           DiffEntity diffEntity = vector.elementAt(b);
+/* 1247 */           EntityItem entityItem = diffEntity.getPriorEntityItem();
+/*      */           
+/* 1249 */           if (!diffEntity.isNew()) {
+/* 1250 */             String str1 = PokUtils.getAttributeFlagValue(entityItem, "STATUS");
+/* 1251 */             if ("0020".equals(str1)) {
+/*      */ 
+/*      */               
+/* 1254 */               EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute(str);
+/* 1255 */               if (eANFlagAttribute != null) {
+/* 1256 */                 MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 1257 */                 for (byte b1 = 0; b1 < arrayOfMetaFlag.length; b1++) {
+/*      */                   
+/* 1259 */                   if (arrayOfMetaFlag[b1].isSelected()) {
+/* 1260 */                     String str2 = arrayOfMetaFlag[b1].getFlagCode();
+/* 1261 */                     String str3 = str2;
+/* 1262 */                     if (paramTreeMap.containsKey(str3)) {
+/*      */                       
+/* 1264 */                       CtryAudRecord ctryAudRecord = (CtryAudRecord)paramTreeMap.get(str3);
+/* 1265 */                       ABRUtil.append(paramStringBuffer, "WARNING buildBHCatlgorRecs for delete/udpate" + str3 + " already exists, keeping orig " + ctryAudRecord + NEWLINE);
+/*      */                     } else {
+/*      */                       
+/* 1268 */                       CtryAudRecord ctryAudRecord = new CtryAudRecord(null, str2);
+/* 1269 */                       ctryAudRecord.setAction("Delete");
+/* 1270 */                       paramTreeMap.put(ctryAudRecord.getKey(), ctryAudRecord);
+/* 1271 */                       ABRUtil.append(paramStringBuffer, "buildBHCatlgorRecs for delete/udpate rec: " + ctryAudRecord
+/* 1272 */                           .getKey() + NEWLINE);
+/*      */                     } 
+/*      */                   } 
+/*      */                 } 
+/*      */               } 
+/*      */             } 
+/*      */           } 
+/*      */         }  }
+/* 1280 */       else { for (byte b = 0; b < vector.size(); b++) {
+/* 1281 */           DiffEntity diffEntity = vector.elementAt(b);
+/* 1282 */           EntityItem entityItem = diffEntity.getCurrentEntityItem();
+/*      */           
+/* 1284 */           if (!diffEntity.isDeleted()) {
+/* 1285 */             String str1 = PokUtils.getAttributeFlagValue(entityItem, "STATUS");
+/* 1286 */             if ("0020".equals(str1)) {
+/*      */ 
+/*      */               
+/* 1289 */               EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute(str);
+/* 1290 */               if (eANFlagAttribute != null) {
+/* 1291 */                 MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANFlagAttribute.get();
+/* 1292 */                 for (byte b1 = 0; b1 < arrayOfMetaFlag.length; b1++) {
+/*      */                   
+/* 1294 */                   if (arrayOfMetaFlag[b1].isSelected()) {
+/* 1295 */                     String str2 = arrayOfMetaFlag[b1].getFlagCode();
+/* 1296 */                     String str3 = str2;
+/* 1297 */                     if (paramTreeMap.containsKey(str3)) {
+/* 1298 */                       CtryAudRecord ctryAudRecord = paramTreeMap.get(str3);
+/* 1299 */                       ctryAudRecord.setUpdateAvail((DiffEntity)null);
+/* 1300 */                       ctryAudRecord.setAction("@@");
+/* 1301 */                       ABRUtil.append(paramStringBuffer, "WARNING buildBHCatlgorRecs for new/update" + str3 + " already exists, replace orig with Update action" + ctryAudRecord + NEWLINE);
+/*      */                     } else {
+/*      */                       
+/* 1304 */                       CtryAudRecord ctryAudRecord = new CtryAudRecord(null, str2);
+/* 1305 */                       ctryAudRecord.setAction("Update");
+/* 1306 */                       paramTreeMap.put(ctryAudRecord.getKey(), ctryAudRecord);
+/* 1307 */                       ABRUtil.append(paramStringBuffer, "buildBHCatlgorRecs for new/udpate rec: " + ctryAudRecord
+/* 1308 */                           .getKey() + NEWLINE);
+/*      */                     } 
+/*      */                   } 
+/*      */                 } 
+/*      */               } 
+/*      */             } 
+/*      */           } 
+/*      */         }  }
+/*      */     
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector getPlannedAvails(Hashtable paramHashtable, Vector<DiffEntity> paramVector, StringBuffer paramStringBuffer) {
+/* 1323 */     Vector<DiffEntity> vector = new Vector(1);
+/* 1324 */     ABRUtil.append(paramStringBuffer, "XMLTMFAVAILElem.getPlannedAvails looking for AVAILTYPE:146 in AVAIL allVct.size:" + ((paramVector == null) ? "null" : ("" + paramVector
+/* 1325 */         .size())) + NEWLINE);
+/* 1326 */     if (paramVector == null) {
+/* 1327 */       return vector;
+/*      */     }
+/*      */ 
+/*      */     
+/* 1331 */     for (byte b = 0; b < paramVector.size(); b++) {
+/* 1332 */       DiffEntity diffEntity = paramVector.elementAt(b);
+/* 1333 */       EntityItem entityItem1 = diffEntity.getCurrentEntityItem();
+/* 1334 */       EntityItem entityItem2 = diffEntity.getPriorEntityItem();
+/* 1335 */       if (diffEntity.isDeleted()) {
+/* 1336 */         ABRUtil.append(paramStringBuffer, "XMLTMFAVAILElem.getPlannedAvails checking[" + b + "]: deleted " + diffEntity.getKey() + " AVAILTYPE: " + 
+/* 1337 */             PokUtils.getAttributeFlagValue(entityItem2, "AVAILTYPE") + NEWLINE);
+/* 1338 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute("AVAILTYPE");
+/* 1339 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected("146")) {
+/* 1340 */           vector.add(diffEntity);
+/*      */         }
+/*      */       } else {
+/* 1343 */         ABRUtil.append(paramStringBuffer, "XMLTMFAVAILElem.getPlannedAvails checking[" + b + "]:" + diffEntity.getKey() + " AVAILTYPE: " + 
+/* 1344 */             PokUtils.getAttributeFlagValue(entityItem1, "AVAILTYPE") + NEWLINE);
+/* 1345 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute("AVAILTYPE");
+/* 1346 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected("146")) {
+/* 1347 */           vector.add(diffEntity);
+/*      */         }
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 1352 */     return vector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getCtryAVAL(Hashtable paramHashtable, DiffEntity paramDiffEntity, boolean paramBoolean, Vector<DiffEntity> paramVector, StringBuffer paramStringBuffer) {
+/* 1515 */     String str1 = null;
+/* 1516 */     String str2 = null;
+/* 1517 */     DiffEntity diffEntity = null;
+/* 1518 */     Vector<DiffEntity> vector = (Vector)paramHashtable.get("MODEL");
+/* 1519 */     if (vector != null) {
+/* 1520 */       diffEntity = vector.elementAt(0);
+/*      */     }
+/* 1522 */     if (isOldData(paramHashtable, diffEntity, paramVector, paramStringBuffer, paramBoolean)) {
+/* 1523 */       ABRUtil.append(paramStringBuffer, "getCtryAVAL isOldData return null, skip to step 3.");
+/* 1524 */       return null;
+/*      */     } 
+/*      */     
+/* 1527 */     ABRUtil.append(paramStringBuffer, "getCtryAVAL looking for AVAILTYPE: 146,149 and 151 " + (paramBoolean ? "T1" : "T2") + " in AVAIL allVct.size:" + ((paramVector == null) ? "null" : ("" + paramVector
+/* 1528 */         .size())) + NEWLINE);
+/* 1529 */     if (paramVector != null) {
+/* 1530 */       if (paramBoolean) {
+/* 1531 */         for (byte b = 0; b < paramVector.size(); b++) {
+/* 1532 */           DiffEntity diffEntity1 = paramVector.elementAt(b);
+/* 1533 */           EntityItem entityItem = diffEntity1.getPriorEntityItem();
+/* 1534 */           if (!diffEntity1.isNew()) {
+/* 1535 */             ABRUtil.append(paramStringBuffer, "getCtryAVAL.getAvails checking[" + b + "]:Delete or Update" + diffEntity1
+/* 1536 */                 .getKey() + " AVAILTYPE: " + PokUtils.getAttributeFlagValue(entityItem, "AVAILTYPE") + NEWLINE);
+/*      */             
+/* 1538 */             EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("AVAILTYPE");
+/* 1539 */             if (eANFlagAttribute != null && (eANFlagAttribute.isSelected("146") || eANFlagAttribute.isSelected("149") || eANFlagAttribute.isSelected("151"))) {
+/* 1540 */               if (eANFlagAttribute.isSelected("146")) {
+/* 1541 */                 str2 = "146";
+/* 1542 */               } else if (eANFlagAttribute.isSelected("149")) {
+/* 1543 */                 str2 = "149";
+/*      */               } else {
+/* 1545 */                 str2 = "151";
+/*      */               } 
+/* 1547 */               if (str1 == null) {
+/* 1548 */                 str1 = str2;
+/*      */               }
+/* 1550 */               else if (str2.compareTo(str1) < 0) {
+/* 1551 */                 str1 = str2;
+/*      */               }
+/*      */             
+/*      */             }
+/*      */           
+/*      */           } 
+/*      */         } 
+/*      */       } else {
+/*      */         
+/* 1560 */         for (byte b = 0; b < paramVector.size(); b++) {
+/* 1561 */           DiffEntity diffEntity1 = paramVector.elementAt(b);
+/* 1562 */           EntityItem entityItem = diffEntity1.getCurrentEntityItem();
+/* 1563 */           if (!diffEntity1.isDeleted()) {
+/* 1564 */             ABRUtil.append(paramStringBuffer, "getCtryAVAL.getAvails checking[" + b + "]:New or Update" + diffEntity1
+/* 1565 */                 .getKey() + " AVAILTYPE: " + PokUtils.getAttributeFlagValue(entityItem, "AVAILTYPE") + NEWLINE);
+/*      */             
+/* 1567 */             EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("AVAILTYPE");
+/* 1568 */             if (eANFlagAttribute != null && (eANFlagAttribute.isSelected("146") || eANFlagAttribute.isSelected("149") || eANFlagAttribute.isSelected("151"))) {
+/* 1569 */               if (eANFlagAttribute.isSelected("146")) {
+/* 1570 */                 str2 = "146";
+/* 1571 */               } else if (eANFlagAttribute.isSelected("149")) {
+/* 1572 */                 str2 = "149";
+/*      */               } else {
+/* 1574 */                 str2 = "151";
+/*      */               } 
+/* 1576 */               if (str1 == null) {
+/* 1577 */                 str1 = str2;
+/*      */               }
+/* 1579 */               else if (str2.compareTo(str1) < 0) {
+/* 1580 */                 str1 = str2;
+/*      */               } 
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1597 */     return str1;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean isOldData(Hashtable paramHashtable, DiffEntity paramDiffEntity, Vector<DiffEntity> paramVector, StringBuffer paramStringBuffer, boolean paramBoolean) {
+/* 1616 */     boolean bool1 = false;
+/* 1617 */     boolean bool2 = false;
+/* 1618 */     String str = "2010-03-01";
+/* 1619 */     if (paramBoolean) {
+/* 1620 */       if (paramVector != null)
+/*      */       {
+/* 1622 */         for (byte b = 0; b < paramVector.size(); b++) {
+/* 1623 */           DiffEntity diffEntity = paramVector.elementAt(b);
+/* 1624 */           EntityItem entityItem = diffEntity.getPriorEntityItem();
+/*      */           
+/* 1626 */           if (!diffEntity.isNew()) {
+/* 1627 */             ABRUtil.append(paramStringBuffer, "T1 isOldData() getAvails checking[" + b + "]:New or Update" + diffEntity
+/* 1628 */                 .getKey() + " AVAILTYPE: " + PokUtils.getAttributeFlagValue(entityItem, "AVAILTYPE") + NEWLINE);
+/*      */             
+/* 1630 */             EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("AVAILTYPE");
+/* 1631 */             if (eANFlagAttribute != null && eANFlagAttribute.isSelected("146")) {
+/* 1632 */               bool1 = true;
+/*      */               
+/*      */               break;
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       }
+/*      */       
+/* 1640 */       if (paramDiffEntity != null) {
+/* 1641 */         EntityItem entityItem = paramDiffEntity.getPriorEntityItem();
+/* 1642 */         if (entityItem != null) {
+/* 1643 */           String str1 = PokUtils.getAttributeValue(entityItem, "ANNDATE", ", ", "@@", false);
+/* 1644 */           bool2 = (str1.compareTo(str) <= 0) ? true : false;
+/* 1645 */           ABRUtil.append(paramStringBuffer, "T1 isOldData() get model ANNDATE" + entityItem.getKey() + " ANNDATE: " + str1 + NEWLINE);
+/*      */         } 
+/*      */       } 
+/*      */     } else {
+/*      */       
+/* 1650 */       if (paramVector != null)
+/*      */       {
+/* 1652 */         for (byte b = 0; b < paramVector.size(); b++) {
+/* 1653 */           DiffEntity diffEntity = paramVector.elementAt(b);
+/* 1654 */           EntityItem entityItem = diffEntity.getCurrentEntityItem();
+/* 1655 */           if (!diffEntity.isDeleted()) {
+/* 1656 */             ABRUtil.append(paramStringBuffer, "T2 isOldData() getAvails checking[" + b + "]:New or Update" + diffEntity
+/* 1657 */                 .getKey() + " AVAILTYPE: " + PokUtils.getAttributeFlagValue(entityItem, "AVAILTYPE") + NEWLINE);
+/*      */             
+/* 1659 */             EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("AVAILTYPE");
+/* 1660 */             if (eANFlagAttribute != null && eANFlagAttribute.isSelected("146")) {
+/* 1661 */               bool1 = true;
+/*      */               
+/*      */               break;
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       }
+/* 1668 */       if (paramDiffEntity != null) {
+/* 1669 */         EntityItem entityItem = paramDiffEntity.getCurrentEntityItem();
+/* 1670 */         if (entityItem != null) {
+/* 1671 */           String str1 = PokUtils.getAttributeValue(entityItem, "ANNDATE", ", ", "@@", false);
+/* 1672 */           bool2 = (str1.compareTo(str) <= 0) ? true : false;
+/* 1673 */           ABRUtil.append(paramStringBuffer, "T2 isOldData() model ANNDATE" + entityItem.getKey() + " ANNDATE: " + str1 + NEWLINE);
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 1678 */     return (!bool1 && bool2);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean isDerivefromMODEL(Hashtable paramHashtable, Vector<DiffEntity> paramVector, boolean paramBoolean, StringBuffer paramStringBuffer) {
+/* 1695 */     boolean bool = false;
+/* 1696 */     ABRUtil.append(paramStringBuffer, "isDerivefromMODEL.getAvails looking for AVAILTYPE: 146 " + (paramBoolean ? "T1" : "T2") + " in AVAIL allVct.size:" + ((paramVector == null) ? "null" : ("" + paramVector
+/* 1697 */         .size())) + NEWLINE);
+/* 1698 */     if (paramVector != null) {
+/* 1699 */       if (paramBoolean) {
+/* 1700 */         for (byte b = 0; b < paramVector.size(); b++) {
+/* 1701 */           DiffEntity diffEntity = paramVector.elementAt(b);
+/* 1702 */           EntityItem entityItem = diffEntity.getPriorEntityItem();
+/* 1703 */           if (!diffEntity.isNew()) {
+/* 1704 */             ABRUtil.append(paramStringBuffer, "DerivefromModel.getAvails checking[" + b + "]:Delete or Update" + diffEntity
+/* 1705 */                 .getKey() + " AVAILTYPE: " + PokUtils.getAttributeFlagValue(entityItem, "AVAILTYPE") + NEWLINE);
+/*      */             
+/* 1707 */             EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("AVAILTYPE");
+/* 1708 */             if (eANFlagAttribute != null && eANFlagAttribute.isSelected("146")) {
+/* 1709 */               bool = true;
+/*      */               
+/*      */               break;
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } else {
+/* 1716 */         for (byte b = 0; b < paramVector.size(); b++) {
+/* 1717 */           DiffEntity diffEntity = paramVector.elementAt(b);
+/* 1718 */           EntityItem entityItem = diffEntity.getCurrentEntityItem();
+/* 1719 */           if (!diffEntity.isDeleted()) {
+/* 1720 */             ABRUtil.append(paramStringBuffer, "DerivefromModel.getAvails checking[" + b + "]:New or Update" + diffEntity
+/* 1721 */                 .getKey() + " AVAILTYPE: " + PokUtils.getAttributeFlagValue(entityItem, "AVAILTYPE") + NEWLINE);
+/*      */             
+/* 1723 */             EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("AVAILTYPE");
+/* 1724 */             if (eANFlagAttribute != null && eANFlagAttribute.isSelected("146")) {
+/* 1725 */               bool = true;
+/*      */               break;
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     }
+/* 1732 */     return bool;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Vector getAvailOfAvailType(Hashtable paramHashtable, String paramString, StringBuffer paramStringBuffer) {
+/* 1748 */     Vector<DiffEntity> vector1 = (Vector)paramHashtable.get("AVAIL");
+/*      */     
+/* 1750 */     Vector<DiffEntity> vector2 = new Vector(1);
+/* 1751 */     if (vector1 != null) {
+/* 1752 */       for (byte b = 0; b < vector1.size(); b++) {
+/* 1753 */         DiffEntity diffEntity = vector1.elementAt(b);
+/*      */         
+/* 1755 */         ABRUtil.append(paramStringBuffer, "getAvailOfAvailType looking for AVAIL type " + paramString + " there are " + vector1.size() + " AVAILs, " + diffEntity.getKey() + NEWLINE);
+/* 1756 */         if (diffEntity.isDeleted()) {
+/* 1757 */           EntityItem entityItem = diffEntity.getPriorEntityItem();
+/* 1758 */           if (entityItem.hasUpLinks()) {
+/* 1759 */             for (byte b1 = 0; b1 < entityItem.getUpLinkCount(); b1++) {
+/* 1760 */               EntityItem entityItem1 = (EntityItem)entityItem.getUpLink(b1);
+/*      */               
+/* 1762 */               if (entityItem1.getEntityType().equals(paramString)) {
+/* 1763 */                 vector2.add(diffEntity);
+/*      */                 break;
+/*      */               } 
+/*      */             } 
+/*      */           }
+/*      */         } else {
+/* 1769 */           EntityItem entityItem = diffEntity.getCurrentEntityItem();
+/* 1770 */           if (entityItem.hasUpLinks()) {
+/* 1771 */             for (byte b1 = 0; b1 < entityItem.getUpLinkCount(); b1++) {
+/* 1772 */               EntityItem entityItem1 = (EntityItem)entityItem.getUpLink(b1);
+/*      */               
+/* 1774 */               if (entityItem1.getEntityType().equals(paramString)) {
+/* 1775 */                 vector2.add(diffEntity);
+/*      */                 
+/*      */                 break;
+/*      */               } 
+/*      */             } 
+/*      */           }
+/*      */         } 
+/*      */       } 
+/*      */     }
+/* 1784 */     return vector2;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private DiffEntity getCatlgor(Hashtable paramHashtable, String paramString, StringBuffer paramStringBuffer) {
+/* 1803 */     DiffEntity diffEntity = null;
+/*      */     
+/* 1805 */     Vector<DiffEntity> vector = (Vector)paramHashtable.get("BHCATLGOR");
+/*      */     
+/* 1807 */     String str = "COUNTRYLIST";
+/* 1808 */     ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.getCatlgor looking for " + str + ":" + paramString + " in CATLGOR allVct.size:" + ((vector == null) ? "null" : ("" + vector
+/* 1809 */         .size())) + NEWLINE);
+/* 1810 */     if (vector == null) {
+/* 1811 */       return diffEntity;
+/*      */     }
+/*      */ 
+/*      */     
+/* 1815 */     for (byte b = 0; b < vector.size(); b++) {
+/* 1816 */       DiffEntity diffEntity1 = vector.elementAt(b);
+/* 1817 */       EntityItem entityItem1 = diffEntity1.getCurrentEntityItem();
+/* 1818 */       EntityItem entityItem2 = diffEntity1.getPriorEntityItem();
+/*      */       
+/* 1820 */       String str1 = PokUtils.getAttributeFlagValue(entityItem1, "STATUS");
+/* 1821 */       if ("0020".equals(str1))
+/*      */       {
+/*      */         
+/* 1824 */         if (diffEntity1.isDeleted()) {
+/* 1825 */           ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.getCatlgor checking[" + b + "]: deleted " + diffEntity1.getKey() + " " + str + ":" + 
+/* 1826 */               PokUtils.getAttributeFlagValue(entityItem2, str) + NEWLINE);
+/* 1827 */           EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute(str);
+/* 1828 */           if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString)) {
+/* 1829 */             diffEntity = diffEntity1;
+/*      */ 
+/*      */ 
+/*      */             
+/*      */             break;
+/*      */           } 
+/* 1835 */         } else if (diffEntity1.isNew()) {
+/* 1836 */           ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.getCatlgor checking[" + b + "]: new " + diffEntity1.getKey() + " " + str + ":" + 
+/* 1837 */               PokUtils.getAttributeFlagValue(entityItem1, str) + NEWLINE);
+/* 1838 */           EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute(str);
+/* 1839 */           if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString)) {
+/* 1840 */             diffEntity = diffEntity1;
+/*      */             
+/*      */             break;
+/*      */           } 
+/*      */         } else {
+/* 1845 */           ABRUtil.append(paramStringBuffer, "XMLCtryAudElem.getCatlgor checking[" + b + "]: current " + diffEntity1.getKey() + " " + str + ":" + 
+/* 1846 */               PokUtils.getAttributeFlagValue(entityItem1, str) + NEWLINE);
+/* 1847 */           EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute(str);
+/* 1848 */           if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString)) {
+/* 1849 */             diffEntity = diffEntity1;
+/*      */             
+/*      */             break;
+/*      */           } 
+/* 1853 */           eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute(str);
+/* 1854 */           if (eANFlagAttribute != null && eANFlagAttribute.isSelected(paramString)) {
+/* 1855 */             diffEntity = diffEntity1;
+/*      */             
+/*      */             break;
+/*      */           } 
+/*      */         } 
+/*      */       }
+/*      */     } 
+/*      */     
+/* 1863 */     return diffEntity;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private static class CtryAudRecord
+/*      */     extends CtryRecord
+/*      */   {
+/*      */     public String country;
+/*      */ 
+/*      */     
+/*      */     private DiffEntity availDiff;
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     CtryAudRecord(DiffEntity param1DiffEntity, String param1String) {
+/* 1879 */       super((String)null);
+/* 1880 */       this.country = param1String;
+/* 1881 */       this.availDiff = param1DiffEntity;
+/*      */     }
+/*      */     
+/*      */     void setUpdateAvail(DiffEntity param1DiffEntity) {
+/* 1885 */       this.availDiff = param1DiffEntity;
+/* 1886 */       setAction("Update");
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     void setAllFields(DiffEntity[] param1ArrayOfDiffEntity, Vector[] param1ArrayOfVector, DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, DiffEntity param1DiffEntity3, DiffEntity param1DiffEntity4, DiffEntity param1DiffEntity5, DiffEntity param1DiffEntity6, DiffEntity param1DiffEntity7, DiffEntity param1DiffEntity8, DiffEntity param1DiffEntity9, DiffEntity param1DiffEntity10, Hashtable param1Hashtable, boolean param1Boolean1, boolean param1Boolean2, StringBuffer param1StringBuffer) {
+/* 1924 */       this.availStatus = "0020";
+/* 1925 */       this.rfravailStatus = "0040";
+/*      */       
+/* 1927 */       ABRUtil.append(param1StringBuffer, "CtryRecord.setAllFields entered for country is belong to availDiff " + ((this.availDiff == null) ? "null" : this.availDiff.getKey()) + ". OFFAVAIL Planned AVAIL is " + ((param1ArrayOfDiffEntity[1] == null) ? "null" : param1ArrayOfDiffEntity[1].getKey()) + NEWLINE);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1932 */       String[] arrayOfString1 = deriveAnnDate(false, param1ArrayOfDiffEntity[1], param1DiffEntity2, param1DiffEntity10, param1ArrayOfVector, param1StringBuffer);
+/*      */ 
+/*      */       
+/* 1935 */       String[] arrayOfString2 = deriveAnnDate(true, param1ArrayOfDiffEntity[0], param1DiffEntity2, param1DiffEntity10, param1ArrayOfVector, param1StringBuffer);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1942 */       String[] arrayOfString3 = deriveAnnNumber(false, param1ArrayOfDiffEntity[1], param1StringBuffer);
+/*      */ 
+/*      */       
+/* 1945 */       String[] arrayOfString4 = deriveAnnNumber(true, param1ArrayOfDiffEntity[0], param1StringBuffer);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1955 */       String[] arrayOfString5 = deriveFIRSTORDER(false, param1ArrayOfDiffEntity[1], param1DiffEntity2, param1DiffEntity3, param1DiffEntity10, param1ArrayOfVector, param1StringBuffer);
+/*      */ 
+/*      */       
+/* 1958 */       String[] arrayOfString6 = deriveFIRSTORDER(true, param1ArrayOfDiffEntity[0], param1DiffEntity2, param1DiffEntity3, param1DiffEntity10, param1ArrayOfVector, param1StringBuffer);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1966 */       String[] arrayOfString7 = derivePLANNEDAVAILABILITY(false, param1ArrayOfDiffEntity[1], param1DiffEntity2, param1DiffEntity10, param1ArrayOfVector, param1StringBuffer);
+/*      */ 
+/*      */       
+/* 1969 */       String[] arrayOfString8 = derivePLANNEDAVAILABILITY(true, param1ArrayOfDiffEntity[0], param1DiffEntity2, param1DiffEntity10, param1ArrayOfVector, param1StringBuffer);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1976 */       String[] arrayOfString9 = derivePubFrom(false, param1ArrayOfDiffEntity[1], param1DiffEntity1, param1DiffEntity3, param1DiffEntity2, param1DiffEntity10, param1ArrayOfVector, param1StringBuffer);
+/*      */ 
+/*      */       
+/* 1979 */       String[] arrayOfString10 = derivePubFrom(true, param1ArrayOfDiffEntity[0], param1DiffEntity1, param1DiffEntity3, param1DiffEntity2, param1DiffEntity10, param1ArrayOfVector, param1StringBuffer);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1984 */       String[] arrayOfString11 = derivePubTo(false, param1DiffEntity1, param1DiffEntity2, param1DiffEntity4, param1DiffEntity10, param1DiffEntity7, param1ArrayOfVector, param1StringBuffer);
+/*      */ 
+/*      */       
+/* 1987 */       String[] arrayOfString12 = derivePubTo(true, param1DiffEntity1, param1DiffEntity2, param1DiffEntity4, param1DiffEntity10, param1DiffEntity7, param1ArrayOfVector, param1StringBuffer);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1993 */       String[] arrayOfString13 = deriveWDANNDATE(false, param1DiffEntity2, param1DiffEntity4, param1DiffEntity6, param1DiffEntity9, param1DiffEntity10, param1ArrayOfVector, param1StringBuffer);
+/*      */ 
+/*      */       
+/* 1996 */       String[] arrayOfString14 = deriveWDANNDATE(true, param1DiffEntity2, param1DiffEntity4, param1DiffEntity6, param1DiffEntity9, param1DiffEntity10, param1ArrayOfVector, param1StringBuffer);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 2001 */       String[] arrayOfString15 = deriveENDOFMARKETANNNUMBER(param1DiffEntity2, param1DiffEntity4, param1DiffEntity6, param1DiffEntity9, false, param1StringBuffer);
+/* 2002 */       String[] arrayOfString16 = deriveENDOFMARKETANNNUMBER(param1DiffEntity2, param1DiffEntity4, param1DiffEntity6, param1DiffEntity9, true, param1StringBuffer);
+/*      */ 
+/*      */       
+/* 2005 */       String[] arrayOfString17 = deriveLastOrder(false, param1DiffEntity1, param1DiffEntity2, param1DiffEntity4, param1DiffEntity7, param1DiffEntity10, param1ArrayOfVector, param1StringBuffer);
+/*      */ 
+/*      */       
+/* 2008 */       String[] arrayOfString18 = deriveLastOrder(true, param1DiffEntity1, param1DiffEntity2, param1DiffEntity4, param1DiffEntity7, param1DiffEntity10, param1ArrayOfVector, param1StringBuffer);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 2014 */       String[] arrayOfString19 = deriveENDOFSERVICEDATE(false, param1DiffEntity2, param1DiffEntity5, param1DiffEntity8, param1StringBuffer);
+/*      */ 
+/*      */       
+/* 2017 */       String[] arrayOfString20 = deriveENDOFSERVICEDATE(true, param1DiffEntity2, param1DiffEntity5, param1DiffEntity8, param1StringBuffer);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 2022 */       String[] arrayOfString21 = deriveEOSANNDATE(false, param1DiffEntity2, param1DiffEntity5, param1DiffEntity8, param1StringBuffer);
+/*      */ 
+/*      */       
+/* 2025 */       String[] arrayOfString22 = deriveEOSANNDATE(true, param1DiffEntity2, param1DiffEntity5, param1DiffEntity8, param1StringBuffer);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 2030 */       String[] arrayOfString23 = deriveENDOFSERVICEANNNUMBER(param1DiffEntity2, param1DiffEntity5, param1DiffEntity8, false, param1StringBuffer);
+/* 2031 */       String[] arrayOfString24 = deriveENDOFSERVICEANNNUMBER(param1DiffEntity2, param1DiffEntity5, param1DiffEntity8, true, param1StringBuffer);
+/*      */       
+/* 2033 */       handleResults(arrayOfString1, arrayOfString2, arrayOfString3, arrayOfString4, arrayOfString5, arrayOfString6, arrayOfString7, arrayOfString8, arrayOfString9, arrayOfString10, arrayOfString11, arrayOfString12, arrayOfString13, arrayOfString14, arrayOfString15, arrayOfString16, arrayOfString17, arrayOfString18, arrayOfString19, arrayOfString20, arrayOfString21, arrayOfString22, arrayOfString23, arrayOfString24, this.country, param1Boolean1, param1Boolean2, param1StringBuffer);
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] derivePubTo(boolean param1Boolean, DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, DiffEntity param1DiffEntity3, DiffEntity param1DiffEntity4, DiffEntity param1DiffEntity5, Vector[] param1ArrayOfVector, StringBuffer param1StringBuffer) {
+/* 2093 */       ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.derivePubTo  loAvailDiff: " + ((param1DiffEntity3 == null) ? "null" : param1DiffEntity3.getKey()) + " findT1:" + param1Boolean + NEWLINE);
+/*      */ 
+/*      */       
+/* 2096 */       String str1 = "@@";
+/* 2097 */       String str2 = "@@";
+/* 2098 */       String[] arrayOfString1 = new String[2];
+/*      */ 
+/*      */       
+/* 2101 */       String[] arrayOfString2 = new String[2];
+/* 2102 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2104 */         arrayOfString2 = AvailUtil.getBHcatlgorAttributeDate(param1Boolean, param1DiffEntity2, param1DiffEntity1, str1, str2, this.country, "PUBTO", param1StringBuffer);
+/* 2105 */         str1 = arrayOfString2[0];
+/* 2106 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2108 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2110 */         arrayOfString2 = AvailUtil.getAvailAttributeDate(param1Boolean, param1DiffEntity3, str1, str2, this.country, "EFFECTIVEDATE", param1StringBuffer);
+/* 2111 */         str1 = arrayOfString2[0];
+/* 2112 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 2115 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */ 
+/*      */ 
+/*      */         
+/* 2119 */         arrayOfString2 = AvailUtil.getProdstructAttributeDate(param1Boolean, param1DiffEntity2, param1DiffEntity5, param1ArrayOfVector, str1, str2, this.country, "WTHDRWEFFCTVDATE", param1StringBuffer);
+/* 2120 */         str1 = arrayOfString2[0];
+/* 2121 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 2124 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 2137 */         arrayOfString2 = getModelFeatureSpDate(param1Boolean, param1DiffEntity2, param1DiffEntity5, param1DiffEntity4, str1, str2, param1StringBuffer);
+/*      */         
+/* 2139 */         str1 = arrayOfString2[0];
+/* 2140 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2142 */       arrayOfString1[0] = str1;
+/* 2143 */       arrayOfString1[1] = str2;
+/* 2144 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] derivePubFrom(boolean param1Boolean, DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, DiffEntity param1DiffEntity3, DiffEntity param1DiffEntity4, DiffEntity param1DiffEntity5, Vector[] param1ArrayOfVector, StringBuffer param1StringBuffer) {
+/* 2166 */       String str1 = "@@";
+/* 2167 */       ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.derivePubFrom  catlgorDiff: " + ((param1DiffEntity2 == null) ? "null" : param1DiffEntity2
+/* 2168 */           .getKey()) + " findT1:" + param1Boolean + NEWLINE);
+/*      */       
+/* 2170 */       String str2 = "@@";
+/* 2171 */       String[] arrayOfString1 = new String[2];
+/*      */       
+/* 2173 */       String[] arrayOfString2 = new String[2];
+/* 2174 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2176 */         arrayOfString2 = AvailUtil.getBHcatlgorAttributeDate(param1Boolean, param1DiffEntity4, param1DiffEntity2, str1, str2, this.country, "PUBFROM", param1StringBuffer);
+/* 2177 */         str1 = arrayOfString2[0];
+/* 2178 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2180 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2182 */         arrayOfString2 = AvailUtil.getAvailAttributeDate(param1Boolean, param1DiffEntity3, str1, str2, this.country, "EFFECTIVEDATE", param1StringBuffer);
+/* 2183 */         str1 = arrayOfString2[0];
+/* 2184 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 2187 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */ 
+/*      */         
+/* 2190 */         arrayOfString2 = AvailUtil.getAvailAnnAttributeDate(param1Boolean, param1DiffEntity1, str1, str2, this.country, "ANNDATE", param1StringBuffer);
+/* 2191 */         str1 = arrayOfString2[0];
+/* 2192 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 2195 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2197 */         arrayOfString2 = AvailUtil.getAvailAttributeDate(param1Boolean, param1DiffEntity1, str1, str2, this.country, "EFFECTIVEDATE", param1StringBuffer);
+/* 2198 */         str1 = arrayOfString2[0];
+/* 2199 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 2202 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */ 
+/*      */         
+/* 2205 */         arrayOfString2 = AvailUtil.getProdstructAttributeDate(param1Boolean, param1DiffEntity4, param1DiffEntity5, param1ArrayOfVector, str1, str2, this.country, "ANNDATE", param1StringBuffer);
+/* 2206 */         str1 = arrayOfString2[0];
+/* 2207 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 2210 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */ 
+/*      */         
+/* 2213 */         arrayOfString2 = AvailUtil.getModelFeatureAttributeDate(param1Boolean, param1DiffEntity4, param1DiffEntity5, param1ArrayOfVector, str1, str2, this.country, "ANNDATE", "FIRSTANNDATE", param1StringBuffer);
+/* 2214 */         str1 = arrayOfString2[0];
+/* 2215 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2217 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */ 
+/*      */ 
+/*      */         
+/* 2221 */         arrayOfString2 = getSWprodCountryDate(param1Boolean, param1DiffEntity4, param1DiffEntity5, str1, str2, this.country, param1StringBuffer);
+/* 2222 */         str1 = arrayOfString2[0];
+/* 2223 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */ 
+/*      */       
+/* 2227 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2229 */         arrayOfString2 = AvailUtil.getSwprodModelAnnDate(param1Boolean, param1DiffEntity4, str1, str2, param1StringBuffer);
+/* 2230 */         str1 = arrayOfString2[0];
+/* 2231 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2233 */       arrayOfString1[0] = str1;
+/* 2234 */       arrayOfString1[1] = str2;
+/* 2235 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] getSWprodCountryDate(boolean param1Boolean, DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, String param1String1, String param1String2, String param1String3, StringBuffer param1StringBuffer) {
+/* 2248 */       String[] arrayOfString = new String[2];
+/*      */       
+/* 2250 */       EntityItem entityItem = AvailUtil.getEntityItem(param1Boolean, param1DiffEntity2);
+/*      */       
+/* 2252 */       if (entityItem != null) {
+/*      */         
+/* 2254 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("COUNTRYLIST");
+/* 2255 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected(param1String3)) {
+/* 2256 */           EntityItem entityItem1 = AvailUtil.getEntityItem(param1Boolean, param1DiffEntity1);
+/* 2257 */           if (entityItem1 != null && 
+/* 2258 */             param1DiffEntity1.getEntityType().equals("SWPRODSTRUCT"))
+/*      */           {
+/* 2260 */             if (entityItem1.hasDownLinks()) {
+/* 2261 */               for (byte b = 0; b < entityItem1.getDownLinkCount(); b++) {
+/* 2262 */                 EntityItem entityItem2 = (EntityItem)entityItem1.getDownLink(b);
+/* 2263 */                 if (entityItem2.getEntityType().equals("MODEL")) {
+/* 2264 */                   String str1 = PokUtils.getAttributeValue(entityItem2, "GENAVAILDATE", ", ", "@@", false);
+/* 2265 */                   String str2 = PokUtils.getAttributeFlagValue(entityItem2, "STATUS");
+/*      */                   
+/* 2267 */                   ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.derivePubFrom getting GENAVAILDATE from " + entityItem2.getKey() + " GENAVAILDATE is:" + param1String1 + NEWLINE);
+/*      */                   
+/* 2269 */                   if (str2 != null && str2.equals("0020") && "@@".equals(param1String1)) {
+/* 2270 */                     param1String1 = str1; break;
+/* 2271 */                   }  if (str2 != null && str2.equals("0040") && "@@".equals(param1String2)) {
+/* 2272 */                     param1String2 = str1;
+/*      */                   }
+/*      */                   
+/*      */                   break;
+/*      */                 } 
+/*      */               } 
+/*      */             }
+/*      */           }
+/*      */         } 
+/*      */       } 
+/* 2282 */       arrayOfString[0] = param1String1;
+/* 2283 */       arrayOfString[1] = param1String2;
+/* 2284 */       return arrayOfString;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveAnnNumber(boolean param1Boolean, DiffEntity param1DiffEntity, StringBuffer param1StringBuffer) {
+/* 2297 */       String str1 = "@@";
+/* 2298 */       String str2 = "@@";
+/* 2299 */       String[] arrayOfString1 = new String[2];
+/*      */       
+/* 2301 */       String[] arrayOfString2 = new String[2];
+/* 2302 */       ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveAnnNumber availDiff: " + ((param1DiffEntity == null) ? "null" : param1DiffEntity.getKey()) + "findT1:" + param1Boolean + NEWLINE);
+/*      */ 
+/*      */       
+/* 2305 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/* 2306 */         arrayOfString2 = AvailUtil.getAvailAnnAttributeDate(param1Boolean, param1DiffEntity, str1, str2, this.country, "ANNNUMBER", param1StringBuffer);
+/* 2307 */         str1 = arrayOfString2[0];
+/* 2308 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2310 */       arrayOfString1[0] = str1;
+/* 2311 */       arrayOfString1[1] = str2;
+/* 2312 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveAnnDate(boolean param1Boolean, DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, DiffEntity param1DiffEntity3, Vector[] param1ArrayOfVector, StringBuffer param1StringBuffer) {
+/* 2323 */       String str1 = "@@";
+/* 2324 */       String str2 = "@@";
+/* 2325 */       String[] arrayOfString1 = new String[2];
+/* 2326 */       String[] arrayOfString2 = new String[2];
+/*      */       
+/* 2328 */       ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveAnnDate availDiff: " + ((param1DiffEntity1 == null) ? "null" : param1DiffEntity1.getKey()) + " plModelAvailDiff: " + ((param1DiffEntity3 == null) ? "null" : param1DiffEntity3
+/* 2329 */           .getKey()) + "findT1:" + param1Boolean + NEWLINE);
+/*      */       
+/* 2331 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/* 2332 */         arrayOfString2 = AvailUtil.getAvailAnnAttributeDate(param1Boolean, param1DiffEntity1, str1, str2, this.country, "ANNDATE", param1StringBuffer);
+/* 2333 */         str1 = arrayOfString2[0];
+/* 2334 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2336 */       if ("@@".equals(str1) && "@@".equals(str2)) {
+/* 2337 */         arrayOfString2 = AvailUtil.getProdstructAttributeDate(param1Boolean, param1DiffEntity2, param1DiffEntity3, param1ArrayOfVector, str1, str2, this.country, "ANNDATE", param1StringBuffer);
+/* 2338 */         str1 = arrayOfString2[0];
+/* 2339 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2341 */       if ("@@".equals(str1) && "@@".equals(str2)) {
+/* 2342 */         arrayOfString2 = AvailUtil.getModelFeatureAttributeDate(param1Boolean, param1DiffEntity2, param1DiffEntity3, param1ArrayOfVector, str1, str2, this.country, "ANNDATE", "FIRSTANNDATE", param1StringBuffer);
+/* 2343 */         str1 = arrayOfString2[0];
+/* 2344 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2346 */       if ("@@".equals(str1) && "@@".equals(str2)) {
+/* 2347 */         arrayOfString2 = AvailUtil.getSwprodModelAnnDate(param1Boolean, param1DiffEntity2, str1, str2, param1StringBuffer);
+/* 2348 */         str1 = arrayOfString2[0];
+/* 2349 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 2352 */       arrayOfString1[0] = str1;
+/* 2353 */       arrayOfString1[1] = str2;
+/* 2354 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveFIRSTORDER(boolean param1Boolean, DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, DiffEntity param1DiffEntity3, DiffEntity param1DiffEntity4, Vector[] param1ArrayOfVector, StringBuffer param1StringBuffer) {
+/* 2374 */       String str1 = "@@";
+/* 2375 */       String str2 = "@@";
+/* 2376 */       String[] arrayOfString1 = new String[2];
+/*      */       
+/* 2378 */       ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveFIRSTORDER availDiff: " + ((param1DiffEntity1 == null) ? "null" : param1DiffEntity1.getKey()) + " foAvailDiff: " + ((param1DiffEntity3 == null) ? "null" : param1DiffEntity3
+/* 2379 */           .getKey()) + "findT1:" + param1Boolean + NEWLINE);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 2384 */       String[] arrayOfString2 = new String[2];
+/* 2385 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2387 */         arrayOfString2 = AvailUtil.getAvailAttributeDate(param1Boolean, param1DiffEntity3, str1, str2, this.country, "EFFECTIVEDATE", param1StringBuffer);
+/* 2388 */         str1 = arrayOfString2[0];
+/* 2389 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2391 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2393 */         arrayOfString2 = AvailUtil.getAvailAnnAttributeDate(param1Boolean, param1DiffEntity1, str1, str2, this.country, "ANNDATE", param1StringBuffer);
+/* 2394 */         str1 = arrayOfString2[0];
+/* 2395 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2397 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2399 */         arrayOfString2 = AvailUtil.getAvailAttributeDate(param1Boolean, param1DiffEntity1, str1, str2, this.country, "EFFECTIVEDATE", param1StringBuffer);
+/* 2400 */         str1 = arrayOfString2[0];
+/* 2401 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2403 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2405 */         arrayOfString2 = AvailUtil.getProdstructAttributeDate(param1Boolean, param1DiffEntity2, param1DiffEntity4, param1ArrayOfVector, str1, str2, this.country, "ANNDATE", param1StringBuffer);
+/* 2406 */         str1 = arrayOfString2[0];
+/* 2407 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2409 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2411 */         arrayOfString2 = AvailUtil.getModelFeatureAttributeDate(param1Boolean, param1DiffEntity2, param1DiffEntity4, param1ArrayOfVector, str1, str2, this.country, "ANNDATE", "FIRSTANNDATE", param1StringBuffer);
+/* 2412 */         str1 = arrayOfString2[0];
+/* 2413 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2415 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2417 */         arrayOfString2 = AvailUtil.getSwprodModelAnnDate(param1Boolean, param1DiffEntity2, str1, str2, param1StringBuffer);
+/* 2418 */         str1 = arrayOfString2[0];
+/* 2419 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2421 */       arrayOfString1[0] = str1;
+/* 2422 */       arrayOfString1[1] = str2;
+/* 2423 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] derivePLANNEDAVAILABILITY(boolean param1Boolean, DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, DiffEntity param1DiffEntity3, Vector[] param1ArrayOfVector, StringBuffer param1StringBuffer) {
+/* 2436 */       String str1 = "@@";
+/* 2437 */       String str2 = "@@";
+/* 2438 */       String[] arrayOfString1 = new String[2];
+/* 2439 */       ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.derivePLANNEDAVAILABILITY availDiff: " + ((param1DiffEntity1 == null) ? "null" : param1DiffEntity1
+/* 2440 */           .getKey()) + "findT1:" + param1Boolean + NEWLINE);
+/*      */       
+/* 2442 */       String[] arrayOfString2 = new String[2];
+/* 2443 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2445 */         arrayOfString2 = AvailUtil.getAvailAttributeDate(param1Boolean, param1DiffEntity1, str1, str2, this.country, "EFFECTIVEDATE", param1StringBuffer);
+/* 2446 */         str1 = arrayOfString2[0];
+/* 2447 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2449 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2451 */         arrayOfString2 = AvailUtil.getProdstructAttributeDate(param1Boolean, param1DiffEntity2, param1DiffEntity3, param1ArrayOfVector, str1, str2, this.country, "GENAVAILDATE", param1StringBuffer);
+/* 2452 */         str1 = arrayOfString2[0];
+/* 2453 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2455 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2457 */         arrayOfString2 = AvailUtil.getModelFeatureAttributeDate(param1Boolean, param1DiffEntity2, param1DiffEntity3, param1ArrayOfVector, str1, str2, this.country, "GENAVAILDATE", "GENAVAILDATE", param1StringBuffer);
+/* 2458 */         str1 = arrayOfString2[0];
+/* 2459 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2461 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2463 */         arrayOfString2 = getSwprodModelDate(param1Boolean, param1DiffEntity2, param1DiffEntity3, str1, str2, param1StringBuffer);
+/* 2464 */         str1 = arrayOfString2[0];
+/* 2465 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2467 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2469 */         arrayOfString2 = AvailUtil.getSwprodModelAnnDate(param1Boolean, param1DiffEntity2, str1, str2, param1StringBuffer);
+/* 2470 */         str1 = arrayOfString2[0];
+/* 2471 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2473 */       arrayOfString1[0] = str1;
+/* 2474 */       arrayOfString1[1] = str2;
+/* 2475 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     public String[] getSwprodModelDate(boolean param1Boolean, DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, String param1String1, String param1String2, StringBuffer param1StringBuffer) {
+/* 2488 */       String[] arrayOfString = new String[2];
+/* 2489 */       EntityItem entityItem = AvailUtil.getEntityItem(param1Boolean, param1DiffEntity2);
+/*      */       
+/* 2491 */       if (entityItem != null) {
+/* 2492 */         EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("COUNTRYLIST");
+/* 2493 */         if (eANFlagAttribute != null && eANFlagAttribute.isSelected(this.country)) {
+/* 2494 */           EntityItem entityItem1 = AvailUtil.getEntityItem(param1Boolean, param1DiffEntity1);
+/* 2495 */           if (entityItem1 != null)
+/*      */           {
+/* 2497 */             if (entityItem1.getEntityType().equals("SWPRODSTRUCT") && 
+/* 2498 */               entityItem1.hasDownLinks()) {
+/* 2499 */               for (byte b = 0; b < entityItem1.getDownLinkCount(); b++) {
+/* 2500 */                 EntityItem entityItem2 = (EntityItem)entityItem1.getDownLink(b);
+/* 2501 */                 if (entityItem2.getEntityType().equals("MODEL")) {
+/* 2502 */                   String str1 = PokUtils.getAttributeFlagValue(entityItem2, "STATUS");
+/*      */                   
+/* 2504 */                   String str2 = PokUtils.getAttributeValue(entityItem2, "GENAVAILDATE", ", ", "@@", false);
+/* 2505 */                   ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.derivePLANNEDAVAILABILITY getting GENAVAILDATE from " + entityItem2
+/* 2506 */                       .getKey() + " GENAVAILDATE is:" + param1String1 + NEWLINE);
+/*      */                   
+/* 2508 */                   if (str1 != null && str1.equals("0020") && "@@".equals(param1String1)) {
+/* 2509 */                     param1String1 = str2; break;
+/* 2510 */                   }  if (str1 != null && str1.equals("0040") && "@@".equals(param1String2)) {
+/* 2511 */                     param1String2 = str2;
+/*      */                   }
+/*      */                   
+/*      */                   break;
+/*      */                 } 
+/*      */               } 
+/*      */             }
+/*      */           }
+/*      */         } 
+/*      */       } 
+/*      */       
+/* 2522 */       arrayOfString[0] = param1String1;
+/* 2523 */       arrayOfString[1] = param1String2;
+/* 2524 */       return arrayOfString;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveWDANNDATE(boolean param1Boolean, DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, DiffEntity param1DiffEntity3, DiffEntity param1DiffEntity4, DiffEntity param1DiffEntity5, Vector[] param1ArrayOfVector, StringBuffer param1StringBuffer) {
+/* 2569 */       String str1 = "@@";
+/* 2570 */       String str2 = "@@";
+/* 2571 */       String[] arrayOfString1 = new String[2];
+/*      */       
+/* 2573 */       ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveWDANNDATE lastOrderAvailDiff: " + ((param1DiffEntity2 == null) ? "null" : param1DiffEntity2.getKey()) + "findT1:" + param1Boolean + NEWLINE);
+/*      */ 
+/*      */       
+/* 2576 */       String[] arrayOfString2 = new String[2];
+/* 2577 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2579 */         arrayOfString2 = AvailUtil.getAvailAnnAttributeDate(param1Boolean, param1DiffEntity2, str1, str2, this.country, "ANNDATE", param1StringBuffer);
+/* 2580 */         str1 = arrayOfString2[0];
+/* 2581 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 2584 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2586 */         arrayOfString2 = AvailUtil.getAvailAnnAttributeDate(param1Boolean, param1DiffEntity3, str1, str2, this.country, "ANNDATE", param1StringBuffer);
+/* 2587 */         str1 = arrayOfString2[0];
+/* 2588 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 2591 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */ 
+/*      */         
+/* 2594 */         arrayOfString2 = AvailUtil.getProdstructAttributeDate(param1Boolean, param1DiffEntity1, param1DiffEntity5, param1ArrayOfVector, str1, str2, this.country, "WITHDRAWDATE", param1StringBuffer);
+/* 2595 */         str1 = arrayOfString2[0];
+/* 2596 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 2599 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 2610 */         arrayOfString2 = getModelFeatureSpecialDate(param1Boolean, param1DiffEntity1, param1DiffEntity4, str1, str2, param1StringBuffer);
+/*      */         
+/* 2612 */         str1 = arrayOfString2[0];
+/* 2613 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 2616 */       arrayOfString1[0] = str1;
+/* 2617 */       arrayOfString1[1] = str2;
+/*      */       
+/* 2619 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveENDOFMARKETANNNUMBER(DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, DiffEntity param1DiffEntity3, DiffEntity param1DiffEntity4, boolean param1Boolean, StringBuffer param1StringBuffer) {
+/* 2627 */       String str1 = "@@";
+/* 2628 */       String str2 = "@@";
+/* 2629 */       String[] arrayOfString1 = new String[2];
+/* 2630 */       String[] arrayOfString2 = new String[2];
+/* 2631 */       ABRUtil.append(param1StringBuffer, "XMLAVAILElem.deriveEndOfMarketAnnNumber lastOrderAvailDiff: " + ((param1DiffEntity2 == null) ? "null" : param1DiffEntity2.getKey()) + "findT1:" + param1Boolean + NEWLINE);
+/*      */ 
+/*      */       
+/* 2634 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2636 */         arrayOfString2 = AvailUtil.getAvailAnnAttributeDate(param1Boolean, param1DiffEntity2, str1, str2, this.country, "ANNNUMBER", param1StringBuffer);
+/* 2637 */         str1 = arrayOfString2[0];
+/* 2638 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 2641 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2643 */         arrayOfString2 = AvailUtil.getAvailAnnAttributeDate(param1Boolean, param1DiffEntity3, str1, str2, this.country, "ANNNUMBER", param1StringBuffer);
+/* 2644 */         str1 = arrayOfString2[0];
+/* 2645 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 2648 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */ 
+/*      */         
+/* 2651 */         arrayOfString2 = getModelRelatedEOMANNNUM(param1Boolean, param1DiffEntity1, param1DiffEntity4, str1, str2, param1StringBuffer);
+/* 2652 */         str1 = arrayOfString2[0];
+/* 2653 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 2655 */       arrayOfString1[0] = str1;
+/* 2656 */       arrayOfString1[1] = str2;
+/* 2657 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     public String[] getModelRelatedEOMANNNUM(boolean param1Boolean, DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, String param1String1, String param1String2, StringBuffer param1StringBuffer) {
+/* 2672 */       String[] arrayOfString = new String[2];
+/* 2673 */       String str1 = "@@";
+/* 2674 */       String str2 = "@@";
+/*      */       
+/* 2676 */       EntityItem entityItem = AvailUtil.getEntityItem(param1Boolean, param1DiffEntity1);
+/*      */       
+/* 2678 */       if (entityItem != null) {
+/* 2679 */         boolean bool = false;
+/* 2680 */         if (param1DiffEntity1.getEntityType().equals("PRODSTRUCT") && 
+/* 2681 */           entityItem != null) {
+/* 2682 */           String str = PokUtils.getAttributeFlagValue(entityItem, "ORDERCODE");
+/* 2683 */           if (str != null && "5957".equals(str)) {
+/* 2684 */             bool = true;
+/*      */           }
+/*      */         } 
+/*      */ 
+/*      */         
+/* 2689 */         if (bool) {
+/* 2690 */           EntityItem entityItem1 = AvailUtil.getEntityItem(param1Boolean, param1DiffEntity2);
+/* 2691 */           if (entityItem1 != null) {
+/*      */             
+/* 2693 */             EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute("COUNTRYLIST");
+/* 2694 */             if (eANFlagAttribute != null && eANFlagAttribute.isSelected(this.country)) {
+/* 2695 */               Vector<EntityItem> vector = entityItem1.getDownLink();
+/* 2696 */               byte b = 0; if (b < vector.size()) {
+/* 2697 */                 EntityItem entityItem2 = vector.elementAt(b);
+/* 2698 */                 if (entityItem2.hasDownLinks() && entityItem2.getEntityType().equals("AVAILANNA")) {
+/* 2699 */                   Vector<EntityItem> vector1 = entityItem2.getDownLink();
+/* 2700 */                   EntityItem entityItem3 = vector1.elementAt(0);
+/* 2701 */                   str1 = PokUtils.getAttributeValue(entityItem3, "ANNNUMBER", ", ", "@@", false);
+/* 2702 */                   ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveEOMANNNUMBER looking for downlink of AVAILANNA : Announcement ANNNUMBER :" + str1 + NEWLINE);
+/*      */ 
+/*      */                   
+/* 2705 */                   if (!"@@".equals(str1)) {
+/* 2706 */                     str2 = PokUtils.getAttributeFlagValue(entityItem3, "STATUS");
+/*      */                   }
+/*      */                 } 
+/*      */               } 
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */ 
+/*      */ 
+/*      */         
+/* 2716 */         if (str2 != null && str2.equals("0020") && "@@".equals(param1String1)) {
+/* 2717 */           param1String1 = str1;
+/* 2718 */         } else if (str2 != null && str2.equals("0040") && "@@".equals(param1String2)) {
+/* 2719 */           param1String2 = str1;
+/*      */         } 
+/* 2721 */         ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveWDANNDATE thedate=" + param1String1 + ";rfrthedate=" + param1String2 + NEWLINE);
+/*      */       } 
+/* 2723 */       arrayOfString[0] = param1String1;
+/* 2724 */       arrayOfString[1] = param1String2;
+/* 2725 */       return arrayOfString;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     public String[] getModelFeatureSpecialDate(boolean param1Boolean, DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, String param1String1, String param1String2, StringBuffer param1StringBuffer) {
+/* 2740 */       String[] arrayOfString = new String[2];
+/* 2741 */       String str1 = "@@";
+/* 2742 */       String str2 = "@@";
+/*      */       
+/* 2744 */       EntityItem entityItem = AvailUtil.getEntityItem(param1Boolean, param1DiffEntity1);
+/*      */ 
+/*      */       
+/* 2747 */       if (entityItem != null) {
+/*      */ 
+/*      */         
+/* 2750 */         boolean bool = false;
+/* 2751 */         if (param1DiffEntity1.getEntityType().equals("PRODSTRUCT") && 
+/* 2752 */           entityItem != null) {
+/* 2753 */           String str = PokUtils.getAttributeFlagValue(entityItem, "ORDERCODE");
+/* 2754 */           if (str != null && "5957".equals(str)) {
+/* 2755 */             bool = true;
+/*      */           }
+/*      */         } 
+/*      */ 
+/*      */         
+/* 2760 */         if (bool) {
+/* 2761 */           if (entityItem.hasDownLinks()) {
+/* 2762 */             for (byte b = 0; b < entityItem.getDownLinkCount(); b++) {
+/* 2763 */               EntityItem entityItem2 = (EntityItem)entityItem.getDownLink(b);
+/* 2764 */               if (entityItem2.getEntityType().equals("MODEL")) {
+/* 2765 */                 str1 = PokUtils.getAttributeValue(entityItem2, "WITHDRAWDATE", ", ", "@@", false);
+/* 2766 */                 str2 = PokUtils.getAttributeFlagValue(entityItem2, "STATUS");
+/* 2767 */                 ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveWDANNDATE getting WITHDRAWDATE from " + entityItem2.getKey() + " WITHDRAWDATE is:" + str1 + NEWLINE);
+/*      */                 
+/*      */                 break;
+/*      */               } 
+/*      */             } 
+/*      */           }
+/* 2773 */           EntityItem entityItem1 = AvailUtil.getEntityItem(param1Boolean, param1DiffEntity2);
+/* 2774 */           if (entityItem1 != null) {
+/*      */             
+/* 2776 */             EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute("COUNTRYLIST");
+/* 2777 */             if (eANFlagAttribute != null && eANFlagAttribute.isSelected(this.country)) {
+/* 2778 */               Vector<EntityItem> vector = entityItem1.getDownLink();
+/* 2779 */               for (byte b = 0; b < vector.size(); b++) {
+/* 2780 */                 EntityItem entityItem2 = vector.elementAt(b);
+/* 2781 */                 if (entityItem2.hasDownLinks() && entityItem2.getEntityType().equals("AVAILANNA")) {
+/* 2782 */                   Vector<EntityItem> vector1 = entityItem2.getDownLink();
+/* 2783 */                   EntityItem entityItem3 = vector1.elementAt(0);
+/* 2784 */                   String str = PokUtils.getAttributeValue(entityItem3, "ANNDATE", ", ", "@@", false);
+/* 2785 */                   ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveWDANNDATE looking for downlink of AVAILANNA : Announcement ANNDATE :" + str + NEWLINE);
+/*      */ 
+/*      */                   
+/* 2788 */                   if (!"@@".equals(str)) {
+/* 2789 */                     if (!"@@".equals(str1)) {
+/*      */ 
+/*      */ 
+/*      */                       
+/* 2793 */                       if (str.compareTo(str1) < 0) {
+/* 2794 */                         str1 = str;
+/* 2795 */                         str2 = PokUtils.getAttributeFlagValue(entityItem3, "STATUS");
+/* 2796 */                         param1StringBuffer
+/* 2797 */                           .append("XMLTMFAVAILElem.deriveWDANNDATE getting WITHDRAWDATE from Min {MODEL.WITHDRAWDATE and ANNDATE|MODELAVAIL ANNOUNCEMENT.ANNDATE}, WITHDRAWDATE is:" + str1 + NEWLINE);
+/*      */                       } 
+/*      */                       break;
+/*      */                     } 
+/* 2801 */                     str1 = str;
+/* 2802 */                     str2 = PokUtils.getAttributeFlagValue(entityItem3, "STATUS");
+/*      */                   } 
+/*      */ 
+/*      */                   
+/*      */                   break;
+/*      */                 } 
+/*      */               } 
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */ 
+/*      */         
+/* 2814 */         if (param1DiffEntity1.getEntityType().equals("PRODSTRUCT")) {
+/* 2815 */           String str = PokUtils.getAttributeValue(entityItem, "WITHDRAWDATE", ", ", "@@", false);
+/* 2816 */           ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveWDANNDATE looking for PRODSTRUCT.WITHDRAWDATE " + entityItem.getKey() + str + NEWLINE);
+/*      */           
+/* 2818 */           if (!"@@".equals(str)) {
+/* 2819 */             if (!"@@".equals(str1)) {
+/*      */ 
+/*      */ 
+/*      */               
+/* 2823 */               if (str.compareTo(str1) < 0) {
+/* 2824 */                 str1 = str;
+/* 2825 */                 str2 = PokUtils.getAttributeFlagValue(entityItem, "STATUS");
+/* 2826 */                 param1StringBuffer
+/* 2827 */                   .append("XMLTMFAVAILElem.deriveWDANNDATE getting WITHDRAWDATE from Min {MODEL.WITHDRAWDATE and ANNDATE|MODELAVAIL ANNOUNCEMENT.ANNDATE and PRODSTRUCT. WITHDRAWDATE}, WITHDRAWDATE is:" + str1 + NEWLINE);
+/*      */               } 
+/*      */             } else {
+/*      */               
+/* 2831 */               str1 = str;
+/* 2832 */               str2 = PokUtils.getAttributeFlagValue(entityItem, "STATUS");
+/*      */             } 
+/*      */           }
+/*      */         } 
+/*      */         
+/* 2837 */         if (entityItem.hasUpLinks()) {
+/* 2838 */           for (byte b = 0; b < entityItem.getUpLinkCount(); b++) {
+/* 2839 */             EntityItem entityItem1 = (EntityItem)entityItem.getUpLink(b);
+/* 2840 */             if (entityItem1.getEntityType().equals("FEATURE") || entityItem1.getEntityType().equals("SWFEATURE")) {
+/* 2841 */               String str = PokUtils.getAttributeValue(entityItem1, "WITHDRAWANNDATE_T", ", ", "@@", false);
+/* 2842 */               ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveWDANNDATE getting WITHDRAWANNDATE_T from " + entityItem1.getKey() + " WITHDRAWANNDATE_T is:" + str + NEWLINE);
+/*      */               
+/* 2844 */               if (!"@@".equals(str)) {
+/* 2845 */                 if (!"@@".equals(str1)) {
+/*      */ 
+/*      */ 
+/*      */                   
+/* 2849 */                   if (str.compareTo(str1) < 0) {
+/* 2850 */                     str1 = str;
+/* 2851 */                     str2 = PokUtils.getAttributeFlagValue(entityItem1, "STATUS");
+/* 2852 */                     param1StringBuffer
+/* 2853 */                       .append("XMLTMFAVAILElem.deriveWDANNDATE getting WITHDRAWDATE from Min {MODEL.WITHDRAWDATE and FEATURE|SWFEATURE.WITHDRAWANNDATE_T}, WITHDRAWDATE is:" + str1 + NEWLINE);
+/*      */                   } 
+/*      */                   break;
+/*      */                 } 
+/* 2857 */                 str1 = str;
+/* 2858 */                 str2 = PokUtils.getAttributeFlagValue(entityItem1, "STATUS");
+/*      */               } 
+/*      */               
+/*      */               break;
+/*      */             } 
+/*      */           } 
+/*      */         }
+/*      */         
+/* 2866 */         if (str2 != null && str2.equals("0020") && "@@".equals(param1String1)) {
+/* 2867 */           param1String1 = str1;
+/* 2868 */         } else if (str2 != null && str2.equals("0040") && "@@".equals(param1String2)) {
+/* 2869 */           param1String2 = str1;
+/*      */         } 
+/* 2871 */         ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveWDANNDATE thedate=" + param1String1 + ";rfrthedate=" + param1String2 + NEWLINE);
+/*      */       } 
+/*      */       
+/* 2874 */       arrayOfString[0] = param1String1;
+/* 2875 */       arrayOfString[1] = param1String2;
+/* 2876 */       return arrayOfString;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveLastOrder(boolean param1Boolean, DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, DiffEntity param1DiffEntity3, DiffEntity param1DiffEntity4, DiffEntity param1DiffEntity5, Vector[] param1ArrayOfVector, StringBuffer param1StringBuffer) {
+/* 2887 */       ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveLastOrder  loAvailDiff: " + ((param1DiffEntity3 == null) ? "null" : param1DiffEntity3.getKey()) + " findT1:" + param1Boolean + NEWLINE);
+/*      */ 
+/*      */       
+/* 2890 */       String str1 = "@@";
+/* 2891 */       String str2 = "@@";
+/* 2892 */       String[] arrayOfString1 = new String[2];
+/*      */       
+/* 2894 */       String[] arrayOfString2 = new String[2];
+/* 2895 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 2897 */         arrayOfString2 = AvailUtil.getAvailAttributeDate(param1Boolean, param1DiffEntity3, str1, str2, this.country, "EFFECTIVEDATE", param1StringBuffer);
+/* 2898 */         str1 = arrayOfString2[0];
+/* 2899 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 2902 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */ 
+/*      */         
+/* 2905 */         arrayOfString2 = AvailUtil.getProdstructAttributeDate(param1Boolean, param1DiffEntity2, param1DiffEntity4, param1ArrayOfVector, str1, str2, this.country, "WTHDRWEFFCTVDATE", param1StringBuffer);
+/* 2906 */         str1 = arrayOfString2[0];
+/* 2907 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 2910 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 2923 */         arrayOfString2 = getModelFeatureSpDate(param1Boolean, param1DiffEntity2, param1DiffEntity4, param1DiffEntity5, str1, str2, param1StringBuffer);
+/* 2924 */         str1 = arrayOfString2[0];
+/* 2925 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 2928 */       arrayOfString1[0] = str1;
+/* 2929 */       arrayOfString1[1] = str2;
+/* 2930 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] getModelFeatureSpDate(boolean param1Boolean, DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, DiffEntity param1DiffEntity3, String param1String1, String param1String2, StringBuffer param1StringBuffer) {
+/* 2944 */       String[] arrayOfString = new String[2];
+/* 2945 */       String str1 = "@@";
+/* 2946 */       String str2 = "@@";
+/*      */ 
+/*      */       
+/* 2949 */       EntityItem entityItem = AvailUtil.getEntityItem(param1Boolean, param1DiffEntity1);
+/*      */       
+/* 2951 */       if (entityItem != null) {
+/*      */ 
+/*      */         
+/* 2954 */         boolean bool = false;
+/* 2955 */         if (param1DiffEntity1.getEntityType().equals("PRODSTRUCT") && 
+/* 2956 */           entityItem != null) {
+/* 2957 */           String str = PokUtils.getAttributeFlagValue(entityItem, "ORDERCODE");
+/* 2958 */           if (str != null && "5957".equals(str)) {
+/* 2959 */             bool = true;
+/*      */           }
+/*      */         } 
+/*      */ 
+/*      */ 
+/*      */         
+/* 2965 */         if (bool) {
+/* 2966 */           EntityItem entityItem1 = AvailUtil.getEntityItem(param1Boolean, param1DiffEntity3);
+/* 2967 */           if (entityItem.hasDownLinks()) {
+/* 2968 */             for (byte b = 0; b < entityItem.getDownLinkCount(); b++) {
+/* 2969 */               EntityItem entityItem3 = (EntityItem)entityItem.getDownLink(b);
+/* 2970 */               if (entityItem1 != null) {
+/* 2971 */                 EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute("COUNTRYLIST");
+/* 2972 */                 if (eANFlagAttribute != null && eANFlagAttribute.isSelected(this.country) && 
+/* 2973 */                   entityItem3.getEntityType().equals("MODEL")) {
+/* 2974 */                   str1 = PokUtils.getAttributeValue(entityItem3, "WTHDRWEFFCTVDATE", ", ", "@@", false);
+/* 2975 */                   str2 = PokUtils.getAttributeFlagValue(entityItem3, "STATUS");
+/* 2976 */                   ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveLastOrder getting WTHDRWEFFCTVDATE from " + entityItem3.getKey() + " PubTo is:" + str1 + NEWLINE);
+/*      */                   
+/*      */                   break;
+/*      */                 } 
+/*      */               } 
+/*      */             } 
+/*      */           }
+/*      */           
+/* 2984 */           EntityItem entityItem2 = AvailUtil.getEntityItem(param1Boolean, param1DiffEntity2);
+/* 2985 */           if (entityItem2 != null) {
+/*      */             
+/* 2987 */             EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem2.getAttribute("COUNTRYLIST");
+/* 2988 */             if (eANFlagAttribute != null && eANFlagAttribute.isSelected(this.country)) {
+/* 2989 */               String str = PokUtils.getAttributeValue(entityItem2, "EFFECTIVEDATE", ", ", "@@", false);
+/* 2990 */               ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveLastOrder lomodelavail entityDate: " + entityItem2 + NEWLINE);
+/* 2991 */               if (!"@@".equals(str)) {
+/* 2992 */                 if (!"@@".equals(str1)) {
+/*      */ 
+/*      */ 
+/*      */                   
+/* 2996 */                   if (str.compareTo(str1) < 0) {
+/* 2997 */                     str1 = str;
+/* 2998 */                     str2 = PokUtils.getAttributeFlagValue(entityItem2, "STATUS");
+/* 2999 */                     param1StringBuffer
+/* 3000 */                       .append("XMLTMFAVAILElem.deriveLastOrder getting PubTo from Min {MODEL.WTHDRWEFFCTVDATE and AVAIL.EFFECTIVEDATE MODELAVAIL.AVAIL}, PubTo is:" + str1 + NEWLINE);
+/*      */                   } 
+/*      */                 } else {
+/*      */                   
+/* 3004 */                   str1 = str;
+/* 3005 */                   str2 = PokUtils.getAttributeFlagValue(entityItem2, "STATUS");
+/*      */                 } 
+/*      */               }
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */ 
+/*      */         
+/* 3013 */         if (param1DiffEntity1 != null && param1DiffEntity1.getEntityType().equals("PRODSTRUCT")) {
+/* 3014 */           String str = PokUtils.getAttributeValue(entityItem, "WTHDRWEFFCTVDATE", ", ", "@@", false);
+/* 3015 */           ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveLastOrder looking for PRODSTRUCT.WTHDRWEFFCTVDATE" + entityItem.getKey() + str + NEWLINE);
+/*      */           
+/* 3017 */           if (!"@@".equals(str)) {
+/* 3018 */             if (!"@@".equals(str1)) {
+/*      */ 
+/*      */               
+/* 3021 */               if (str.compareTo(str1) < 0) {
+/* 3022 */                 str1 = str;
+/* 3023 */                 str2 = PokUtils.getAttributeFlagValue(entityItem, "STATUS");
+/* 3024 */                 param1StringBuffer
+/* 3025 */                   .append("XMLTMFAVAILElem.deriveLastOrder getting PubTo from Min {PRODSTRUCT.WITHDRAWDATE and MODEL.WTHDRWEFFCTVDATE and ANNOUNCEMENT.ANNDATE MODELAVAIL}, PubTo is:" + str1 + NEWLINE);
+/*      */               } 
+/*      */             } else {
+/*      */               
+/* 3029 */               str1 = str;
+/* 3030 */               str2 = PokUtils.getAttributeFlagValue(entityItem, "STATUS");
+/*      */             } 
+/*      */           }
+/*      */         } 
+/*      */         
+/* 3035 */         if (entityItem.hasUpLinks()) {
+/* 3036 */           for (byte b = 0; b < entityItem.getUpLinkCount(); b++) {
+/* 3037 */             EntityItem entityItem1 = (EntityItem)entityItem.getUpLink(b);
+/* 3038 */             if (entityItem1.getEntityType().equals("FEATURE") || entityItem1.getEntityType().equals("SWFEATURE")) {
+/* 3039 */               String str = PokUtils.getAttributeValue(entityItem1, "WITHDRAWDATEEFF_T", ", ", "@@", false);
+/* 3040 */               ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveLastOrder getting WITHDRAWDATEEFF_T from " + entityItem1.getKey() + " PubTo is:" + str + NEWLINE);
+/*      */               
+/* 3042 */               if (!"@@".equals(str)) {
+/* 3043 */                 if (!"@@".equals(str1)) {
+/*      */ 
+/*      */ 
+/*      */                   
+/* 3047 */                   if (str.compareTo(str1) < 0) {
+/* 3048 */                     str1 = str;
+/* 3049 */                     str2 = PokUtils.getAttributeFlagValue(entityItem1, "STATUS");
+/* 3050 */                     param1StringBuffer
+/* 3051 */                       .append("XMLTMFAVAILElem.deriveLastOrder getting PubTo from Min {MODEL.WTHDRWEFFCTVDATE and AVAIL.EFFECTIVEDATE MODELAVAIL and FEATURE|SWFEATURE.WITHDRAWDATEEFF_T}, PubTo is:" + str1 + NEWLINE);
+/*      */                   } 
+/*      */                   break;
+/*      */                 } 
+/* 3055 */                 str1 = str;
+/* 3056 */                 str2 = PokUtils.getAttributeFlagValue(entityItem1, "STATUS");
+/*      */               } 
+/*      */               
+/*      */               break;
+/*      */             } 
+/*      */           } 
+/*      */         }
+/*      */         
+/* 3064 */         if (str2 != null && str2.equals("0020") && "@@".equals(param1String1)) {
+/* 3065 */           param1String1 = str1;
+/* 3066 */         } else if (str2 != null && str2.equals("0040") && "@@".equals(param1String2)) {
+/* 3067 */           param1String2 = str1;
+/*      */         } 
+/* 3069 */         ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveLastOrder thedate=" + param1String1 + ";rfrthedate=" + param1String2 + NEWLINE);
+/*      */       } 
+/* 3071 */       arrayOfString[0] = param1String1;
+/* 3072 */       arrayOfString[1] = param1String2;
+/* 3073 */       return arrayOfString;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveEOSANNDATE(boolean param1Boolean, DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, DiffEntity param1DiffEntity3, StringBuffer param1StringBuffer) {
+/* 3085 */       String str1 = "@@";
+/* 3086 */       String str2 = "@@";
+/* 3087 */       String[] arrayOfString1 = new String[2];
+/* 3088 */       ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveEOSANNDATE endAvailDiff: " + ((param1DiffEntity2 == null) ? "null" : param1DiffEntity2.getKey()) + "findT1:" + param1Boolean + NEWLINE);
+/*      */       
+/* 3090 */       String[] arrayOfString2 = new String[2];
+/*      */       
+/* 3092 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/* 3093 */         arrayOfString2 = AvailUtil.getAvailAnnAttributeDate(param1Boolean, param1DiffEntity2, str1, str2, this.country, "ANNDATE", param1StringBuffer);
+/* 3094 */         str1 = arrayOfString2[0];
+/* 3095 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 3097 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/* 3098 */         arrayOfString2 = getModelFeatureEOSDate(param1Boolean, param1DiffEntity1, param1DiffEntity3, str1, str2, param1StringBuffer);
+/* 3099 */         str1 = arrayOfString2[0];
+/* 3100 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 3102 */       arrayOfString1[0] = str1;
+/* 3103 */       arrayOfString1[1] = str2;
+/* 3104 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] getModelFeatureEOSDate(boolean param1Boolean, DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, String param1String1, String param1String2, StringBuffer param1StringBuffer) {
+/* 3117 */       String[] arrayOfString = new String[2];
+/* 3118 */       EntityItem entityItem1 = AvailUtil.getEntityItem(param1Boolean, param1DiffEntity2);
+/* 3119 */       EntityItem entityItem2 = AvailUtil.getEntityItem(param1Boolean, param1DiffEntity1);
+/*      */ 
+/*      */       
+/* 3122 */       if (entityItem1 != null && entityItem2 != null) {
+/*      */         
+/* 3124 */         boolean bool = false;
+/*      */ 
+/*      */         
+/* 3127 */         if (param1DiffEntity1.getEntityType().equals("PRODSTRUCT")) {
+/* 3128 */           EntityItem entityItem = AvailUtil.getEntityItem(param1Boolean, param1DiffEntity1);
+/* 3129 */           if (entityItem != null) {
+/* 3130 */             String str = PokUtils.getAttributeFlagValue(entityItem, "ORDERCODE");
+/* 3131 */             if (str != null && "5957".equals(str)) {
+/* 3132 */               bool = true;
+/*      */             }
+/*      */           }
+/*      */         
+/* 3136 */         } else if (param1DiffEntity1.getEntityType().equals("SWPRODSTRUCT")) {
+/* 3137 */           bool = true;
+/*      */         } 
+/* 3139 */         if (bool) {
+/*      */           
+/* 3141 */           EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute("COUNTRYLIST");
+/* 3142 */           if (eANFlagAttribute != null && eANFlagAttribute.isSelected(this.country)) {
+/* 3143 */             Vector<EntityItem> vector = entityItem1.getDownLink();
+/* 3144 */             for (byte b = 0; b < vector.size(); b++) {
+/* 3145 */               EntityItem entityItem = vector.elementAt(b);
+/* 3146 */               if (entityItem.hasDownLinks() && entityItem.getEntityType().equals("AVAILANNA")) {
+/* 3147 */                 Vector<EntityItem> vector1 = entityItem.getDownLink();
+/* 3148 */                 EntityItem entityItem3 = vector1.elementAt(0);
+/* 3149 */                 String str1 = PokUtils.getAttributeValue(entityItem3, "ANNDATE", ", ", "@@", false);
+/* 3150 */                 ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveEOSANNDATE looking for MODELAVAIL downlink of AVAILANNA : Announcement " + (
+/* 3151 */                     (vector1.size() > 1) ? ("There were multiple ANNOUNCEMENTS returned, using first one." + entityItem3
+/* 3152 */                     .getKey()) : entityItem3.getKey()) + NEWLINE);
+/* 3153 */                 String str2 = PokUtils.getAttributeFlagValue(entityItem3, "ANNSTATUS");
+/* 3154 */                 if (str2 != null && str2.equals("0020") && "@@".equals(param1String1)) {
+/* 3155 */                   param1String1 = str1;
+/* 3156 */                 } else if (str2 != null && str2.equals("0040") && "@@".equals(param1String2)) {
+/* 3157 */                   param1String2 = str1;
+/*      */                 } 
+/*      */               } 
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/* 3164 */       arrayOfString[0] = param1String1;
+/* 3165 */       arrayOfString[1] = param1String2;
+/* 3166 */       return arrayOfString;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveENDOFSERVICEANNNUMBER(DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, DiffEntity param1DiffEntity3, boolean param1Boolean, StringBuffer param1StringBuffer) {
+/* 3176 */       String str1 = "@@";
+/* 3177 */       String str2 = "@@";
+/* 3178 */       String[] arrayOfString1 = new String[2];
+/* 3179 */       ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveEOSANNDATE endAvailDiff: " + ((param1DiffEntity2 == null) ? "null" : param1DiffEntity2.getKey()) + "findT1:" + param1Boolean + NEWLINE);
+/*      */       
+/* 3181 */       String[] arrayOfString2 = new String[2];
+/*      */       
+/* 3183 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/* 3184 */         arrayOfString2 = AvailUtil.getAvailAnnAttributeDate(param1Boolean, param1DiffEntity2, str1, str2, this.country, "ANNNUMBER", param1StringBuffer);
+/* 3185 */         str1 = arrayOfString2[0];
+/* 3186 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 3188 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/* 3189 */         arrayOfString2 = getModelRelatedEOSANNNUM(param1Boolean, param1DiffEntity1, param1DiffEntity3, str1, str2, param1StringBuffer);
+/* 3190 */         str1 = arrayOfString2[0];
+/* 3191 */         str2 = arrayOfString2[1];
+/*      */       } 
+/* 3193 */       arrayOfString1[0] = str1;
+/* 3194 */       arrayOfString1[1] = str2;
+/* 3195 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] getModelRelatedEOSANNNUM(boolean param1Boolean, DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, String param1String1, String param1String2, StringBuffer param1StringBuffer) {
+/* 3210 */       String[] arrayOfString = new String[2];
+/* 3211 */       EntityItem entityItem1 = AvailUtil.getEntityItem(param1Boolean, param1DiffEntity2);
+/* 3212 */       EntityItem entityItem2 = AvailUtil.getEntityItem(param1Boolean, param1DiffEntity1);
+/*      */ 
+/*      */       
+/* 3215 */       if (entityItem1 != null && entityItem2 != null) {
+/*      */         
+/* 3217 */         boolean bool = false;
+/*      */ 
+/*      */         
+/* 3220 */         if (param1DiffEntity1.getEntityType().equals("PRODSTRUCT")) {
+/* 3221 */           EntityItem entityItem = AvailUtil.getEntityItem(param1Boolean, param1DiffEntity1);
+/* 3222 */           if (entityItem != null) {
+/* 3223 */             String str = PokUtils.getAttributeFlagValue(entityItem, "ORDERCODE");
+/* 3224 */             if (str != null && "5957".equals(str)) {
+/* 3225 */               bool = true;
+/*      */             }
+/*      */           }
+/*      */         
+/* 3229 */         } else if (param1DiffEntity1.getEntityType().equals("SWPRODSTRUCT")) {
+/* 3230 */           bool = true;
+/*      */         } 
+/* 3232 */         if (bool) {
+/*      */           
+/* 3234 */           EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem1.getAttribute("COUNTRYLIST");
+/* 3235 */           if (eANFlagAttribute != null && eANFlagAttribute.isSelected(this.country)) {
+/* 3236 */             Vector<EntityItem> vector = entityItem1.getDownLink();
+/* 3237 */             for (byte b = 0; b < vector.size(); b++) {
+/* 3238 */               EntityItem entityItem = vector.elementAt(b);
+/* 3239 */               if (entityItem.hasDownLinks() && entityItem.getEntityType().equals("AVAILANNA")) {
+/* 3240 */                 Vector<EntityItem> vector1 = entityItem.getDownLink();
+/* 3241 */                 EntityItem entityItem3 = vector1.elementAt(0);
+/* 3242 */                 String str1 = PokUtils.getAttributeValue(entityItem3, "ANNNUMBER", ", ", "@@", false);
+/* 3243 */                 ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveEOSANNNUM looking for MODELAVAIL downlink of AVAILANNA : Announcement " + (
+/* 3244 */                     (vector1.size() > 1) ? ("There were multiple ANNOUNCEMENTS returned, using first one." + entityItem3
+/* 3245 */                     .getKey()) : entityItem3.getKey()) + NEWLINE);
+/* 3246 */                 String str2 = PokUtils.getAttributeFlagValue(entityItem3, "ANNSTATUS");
+/* 3247 */                 if (str2 != null && str2.equals("0020") && "@@".equals(param1String1)) {
+/* 3248 */                   param1String1 = str1;
+/* 3249 */                 } else if (str2 != null && str2.equals("0040") && "@@".equals(param1String2)) {
+/* 3250 */                   param1String2 = str1;
+/*      */                 } 
+/*      */               } 
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/* 3257 */       arrayOfString[0] = param1String1;
+/* 3258 */       arrayOfString[1] = param1String2;
+/* 3259 */       return arrayOfString;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] deriveENDOFSERVICEDATE(boolean param1Boolean, DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, DiffEntity param1DiffEntity3, StringBuffer param1StringBuffer) {
+/* 3269 */       String str1 = "@@";
+/* 3270 */       String str2 = "@@";
+/* 3271 */       ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveENDOFSERVICEDATE endAvailDiff: " + ((param1DiffEntity2 == null) ? "null" : param1DiffEntity2.getKey()) + "findT1:" + param1Boolean + NEWLINE);
+/*      */ 
+/*      */       
+/* 3274 */       String[] arrayOfString1 = new String[2];
+/*      */       
+/* 3276 */       String[] arrayOfString2 = new String[2];
+/* 3277 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 3279 */         arrayOfString2 = AvailUtil.getAvailAttributeDate(param1Boolean, param1DiffEntity2, str1, str2, this.country, "EFFECTIVEDATE", param1StringBuffer);
+/* 3280 */         str1 = arrayOfString2[0];
+/* 3281 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 3284 */       if ("@@".equals(str1) || "@@".equals(str2)) {
+/*      */         
+/* 3286 */         arrayOfString2 = getModelFeatureENDSDate(param1Boolean, param1DiffEntity1, param1DiffEntity3, str1, str2, param1StringBuffer);
+/* 3287 */         str1 = arrayOfString2[0];
+/* 3288 */         str2 = arrayOfString2[1];
+/*      */       } 
+/*      */       
+/* 3291 */       arrayOfString1[0] = str1;
+/* 3292 */       arrayOfString1[1] = str2;
+/* 3293 */       return arrayOfString1;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     private String[] getModelFeatureENDSDate(boolean param1Boolean, DiffEntity param1DiffEntity1, DiffEntity param1DiffEntity2, String param1String1, String param1String2, StringBuffer param1StringBuffer) {
+/* 3307 */       String[] arrayOfString = new String[2];
+/* 3308 */       EntityItem entityItem = AvailUtil.getEntityItem(param1Boolean, param1DiffEntity2);
+/*      */ 
+/*      */ 
+/*      */       
+/* 3312 */       if (entityItem != null) {
+/*      */         
+/* 3314 */         boolean bool = false;
+/*      */ 
+/*      */         
+/* 3317 */         if (param1DiffEntity1.getEntityType().equals("PRODSTRUCT")) {
+/* 3318 */           EntityItem entityItem1 = AvailUtil.getEntityItem(param1Boolean, param1DiffEntity1);
+/* 3319 */           if (entityItem1 != null) {
+/* 3320 */             String str = PokUtils.getAttributeFlagValue(entityItem1, "ORDERCODE");
+/* 3321 */             if (str != null && "5957".equals(str)) {
+/* 3322 */               bool = true;
+/*      */             }
+/*      */           }
+/*      */         
+/* 3326 */         } else if (param1DiffEntity1.getEntityType().equals("SWPRODSTRUCT")) {
+/* 3327 */           bool = true;
+/*      */         } 
+/* 3329 */         if (bool) {
+/*      */           
+/* 3331 */           EANFlagAttribute eANFlagAttribute = (EANFlagAttribute)entityItem.getAttribute("COUNTRYLIST");
+/* 3332 */           if (eANFlagAttribute != null && eANFlagAttribute.isSelected(this.country)) {
+/* 3333 */             String str1 = PokUtils.getAttributeValue(entityItem, "EFFECTIVEDATE", ", ", "@@", false);
+/* 3334 */             String str2 = PokUtils.getAttributeFlagValue(entityItem, "STATUS");
+/* 3335 */             if (str2 != null && str2.equals("0020") && "@@".equals(param1String1)) {
+/* 3336 */               param1String1 = str1;
+/* 3337 */             } else if (str2 != null && str2.equals("0040") && "@@".equals(param1String2)) {
+/* 3338 */               param1String2 = str1;
+/*      */             } 
+/* 3340 */             ABRUtil.append(param1StringBuffer, "XMLTMFAVAILElem.deriveENDOFSERVICEDATE endAvailDiff MODELAVAIL, thedate: " + param1String1 + NEWLINE);
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/* 3344 */       arrayOfString[0] = param1String1;
+/* 3345 */       arrayOfString[1] = param1String2;
+/* 3346 */       return arrayOfString;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     String getCountry() {
+/* 3352 */       return this.country;
+/*      */     }
+/*      */     
+/*      */     String getKey() {
+/* 3356 */       return this.country;
+/*      */     }
+/*      */ 
+/*      */     
+/*      */     public String toString() {
+/* 3361 */       return (this.availDiff != null) ? (this.availDiff.getKey() + " action:" + this.action) : "There is no AVAIL! ";
+/*      */     }
+/*      */   }
+/*      */ }
 
-package COM.ibm.eannounce.abr.util;
 
-
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.objects.*;
-
-import org.w3c.dom.*;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
-
-import com.ibm.transform.oim.eacm.diff.*;
-import com.ibm.transform.oim.eacm.util.*;
-
-/*******************************************************************************
- * Constructor for <AVAILABILITYLIST> elements <AVAILABILITYLIST> 2
- * <AVAILABILITYELEMENT> 3 <AVAILABILITYACTION> </AVAILABILITYACTION> 4 derived
- * AvailabilityAction <STATUS> </STATUS> 4 AVAIL STATUS <COUNTRY_FC>
- * </COUNTRY_FC> 4 AVAIL COUNTRYLIST <ANNDATE> </ANNDATE> 4 <ANNNUMBER>
- * </ANNNUMBER> 4 <FIRSTORDER> </FIRSTORDER> 4 <PLANNEDAVAILABILITY>
- * </PLANNEDAVAILABILITY> 4 <PUBFROM> </PUBFROM> 4 <PUBTO> </PUBTO> 4
- * <WDANNDATE> </WDANNDATE> 4 <LASTORDER> </LASTORDER> 4 <EOSANNDATE>
- * </EOSANNDATE> 4 <ENDOFSERVICEDATE> </ENDOFSERVICEDATE> 4 AVAIL EFFECTIVEDATE
- * </AVAILABILITYELEMENT> 3 </AVAILABILITYLIST> 2
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\XMLTMFAVAILElem.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class XMLTMFAVAILElem extends XMLElem {
-	
-	private String PRODSTRUCT ="PRODSTRUCT";
-	
-	private static XMLSLEORGGRPElem SLEORGGRP = new XMLSLEORGGRPElem();
-	public XMLTMFAVAILElem() {
-		super("AVAILABILITYELEMENT");
-	}
-
-	/***************************************************************************
-	 * @param dbCurrent
-	 *            Database
-	 * @param table
-	 *            Hashtable of Vectors of DiffEntity
-	 * @param document
-	 *            Document needed to create nodes
-	 * @param parent
-	 *            Element node to add this node too
-	 * @param parentItem
-	 *            DiffEntity - parent to use if path is specified in
-	 *            XMLGroupElem, item to use otherwise
-	 * @param debugSb
-	 *            StringBuffer for debug output
-	 */
-	public void addElements(Database dbCurrent, Hashtable table, Document document, Element parent, DiffEntity parentItem,
-		StringBuffer debugSb) throws COM.ibm.eannounce.objects.EANBusinessRuleException, java.sql.SQLException,
-		COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException, COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-		java.rmi.RemoteException, java.io.IOException, COM.ibm.opicmpdh.middleware.MiddlewareException,
-		COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException {
-		D.ebug(D.EBUG_ERR,"Working on the item:"+nodeName);
-		TreeMap ctryAudElemMap = new TreeMap();
-		// if there is no Planed Avail, build records for all world wide
-		// countries
-		// If an AVAIL is not found for the PRODSTRUCT, 
-		//then generate <AVAILABILITYELEMENT> ID 41.00 for each country in the intersection 
-		// of MODEL: MODELAVAIL-d: AVAIL.COUNTRYLIST where AVAILTYPE = planned Availability
-		// and of FEATURE.COUNTRYLIST. If the MODEL does not have an AVAIL of type planned Availability 
-		// then use FEATURE.COUNTRYLIST.
-		boolean isfeacnty = false;
-		boolean isAvailcnty = false;
-		boolean isDerivefromMODEL = false;
-		String tmfavailType = "";
-		String modavailType = "MODELAVAIL";	
-	    String m_strEpoch = "1980-01-01-00.00.00.000000";
-	    boolean isDelta = true;
-	    String availofType;
-	    
-		boolean isPRODSTRUCT = parentItem.getEntityType().equals(PRODSTRUCT)?true:false;
-			// make a change according to BH FS ABR XML System Feed Mapping 20130508.doc 
-//		   Consider the following scenario:
-//		    1.	A MODEL was IDLed as old data (ANNDATA <20010301  and hence does not have aPlanned Availability . When it is moved toFinal, XML is generated with an < AVAILABILITYELEMENT> for every country in countrylist.
-//			2.	A year later, the MODEL is moved fromFinal  toChange Request. Then aPlanned Availability with a STATUS =Draft is added to the MODEL with a Countrylist ofGermany.
-//			3.	The MODEL is returned to a STATUS ofReady for Review; however, since it was onceFinal, no data is generated.
-//			4.	The MODEL is returned to a STATUS ofFinal. Since there is an AVAIL with a STATUS =Draft, then XML is NOT generated since there is not an AVAIL with a STATUS =Final.
-//			5.	The AVAIL is moved to a STATUS ofFinal. Delta XML will be generated. Since at T1, the Countrylist is defined to be World Wide and at T2 the Countrylist isGermany, then an <AVAILABILITYELEMENT> has to be generated for the World Wide list of Countries. All Countries exceptGermany will have <AVAILABILITYACTION> set toDelete. <AVAILABILITYACTION> will be set toUpdate forGermany.
-//			6.	If there is a BHCATLGOR with Countrylist ofGermany andChina, onlyGermany will be considered since it is the only valid Country at T2.
-		if (isPRODSTRUCT){
-			tmfavailType = "OOFAVAIL";	
-		} else{
-			tmfavailType = "SWPRODSTRUCTAVAIL";
-		}
-		boolean compatModel = false;
-	    boolean isExistfinal = false;
-	    compatModel = AvailUtil.iscompatmodel();
-		
-	    if(!compatModel){
-	    	//new added(xml status)
-    		String status = null;
-    		status = (String) table.get("_chSTATUS");
-    		ABRUtil.append(debugSb,"the status is" + status + NEWLINE);
-    		if(STATUS_FINAL.equals(status)){
-    			isExistfinal = true;
-    		}else{
-    			isExistfinal = false;
-    		}
-		}
-		    
-		Vector tmfAvailVct = getAvailOfAvailType(table,tmfavailType,debugSb);
-		Vector modallVct = getAvailOfAvailType(table,modavailType,debugSb);	
-		EntityItem priorItem = parentItem.getPriorEntityItem();
-	    //ABRUtil.append(debugSb,"XMLTMFAVAILElem.addElements priorItem is " + (priorItem == null?" is null":"not null")+ " profileT1 valOn: " + priorItem.getProfile().getValOn()+ NEWLINE);
-		if (priorItem != null && m_strEpoch.equals(priorItem.getProfile().getValOn())){
-			isDelta = false;
-		}
-		//if is Delta XML, then build Delete Countrylist.
-		if (isDelta){
-		    availofType = getCtryAVAL(table, parentItem, true, tmfAvailVct, debugSb);
-	    	if (availofType == null) {    				    		
-	    		isDerivefromMODEL = isDerivefromMODEL(table,modallVct,true,debugSb);
-	    		if (isDerivefromMODEL){				
-					//case for the PRODSTRUCT that get the avail from the MODEL
-					if(isPRODSTRUCT){
-//							boolean hasDeleProdAvail = buildDeleteProdCtryAudRecs(table, parentItem, ctryAudElemMap, debugSb);
-						// Why there is boolean avariable hasDeleProdAvail, Because if it's true it means that at T1 time, there is Prodstruct->Planed AVAIL,
-						// COUNTRY_FC at T1 is from Prodstruct->Planed AVAIL.Countrylist, But at T2 time COUNTRY_FC is from MODEL->Planed AVAIL.Countrylist, to 
-						// avoid missing country, all countrylist of Model->planedavail.countrylist at T2 should be showed with status is 'UPDATE'
-						// get all AVAILs where AVAILTYPE="Planned Availability" (146) - some
-						// may be deleted
-						Vector[] feaCtry = getFeatureCtryVector(table, parentItem, debugSb);
-						Vector plnAvlVct = getPlannedAvails(table, modallVct, debugSb);
-						for (int i = 0; i < plnAvlVct.size(); i++) {
-							DiffEntity availDiff = (DiffEntity) plnAvlVct.elementAt(i);
-							buildCtryAudRecs(ctryAudElemMap, availDiff, feaCtry, true, debugSb);
-						}// end each planned avail
-					}else{
-						//case for the SWPRODSTRUCT that get the avail from the MODEL
-	                    //SWPRODSTRUCT don't nedd to consider FEATURE.COUNTRYLIST.					
-						//Vector[] feaCtry = getFeatureCtryVector(table, parentItem, debugSb);
-						Vector plnAvlVct = getPlannedAvails(table, modallVct, debugSb);
-						//Vector[] availCtry = getSWPRODSTRUCTModelAvailCtryVector(table, plnAvlVct, debugSb);
-						
-						for (int i = 0; i < plnAvlVct.size(); i++) {
-							DiffEntity availDiff = (DiffEntity) plnAvlVct.elementAt(i);
-							buildCtryAudRecs(ctryAudElemMap, availDiff, null, true, debugSb);
-						}// en
-					}
-	    		}else{
-	    			if(isPRODSTRUCT){
-						//build countries from FEATURE.countrylist
-	    				buildFeatureCtryAudRecs(table, parentItem, ctryAudElemMap, true, debugSb);
-					}else{
-						//build countries from avail.countrylist
-						//for all World Wide Countries with values from MODEL attributes
-						buildWWCtryAudRecs(table, parentItem, ctryAudElemMap, dbCurrent, true, debugSb);					
-					}
-						
-				}
-	    		
-	    	}else{
-                //according to BH FS ABR XML System Feed Mapping 20130614.doc 
-	    		//Bing add 
-	    		//2 .The aggregated (UNION) of the countries found forAvailability(AVAIL)Country List(COUNTRYLIST)for all Availability Type(AVAILTYPE) that matches the earlier STATUS filtering criteria and the UNION of anyCatalog Overrides(BHCATLGOR)Country List(COUNTRYLIST).
-	    		buildBHCatlgorRecs(table, ctryAudElemMap, true, debugSb);
-	    		
-	    		
-	    		// get all AVAILs where AVAILTYPE="Planned Availability" (146) - some
-				// may be deleted
-				// according to BH FS ABR XML System Feed Mapping 20121001.doc 
-	    		
-	    		//Bing add 6/28/2013 BH FS ABR XML System Feed Mapping 20130614.doc
-	    		//The countrylist of AVAIL is the sub set of countrylist of Planed AVAIL. so Countrylist of Planed AVAIL can instead of the union of All AVAIL types, 
-	    		//For the filter of the AVAIL, it need get the union of All AVAIL types 
-	    		Vector AvailVct = new Vector();
-	    		if ("146".equals(availofType)){
-	    			AvailVct = tmfAvailVct;//getAVAILofType(table, tmfAvailVct, availofType, debugSb);
-	    		}else {
-	    			AvailVct = tmfAvailVct;
-	    		}				
-				for (int i = 0; i < AvailVct.size(); i++) {
-					DiffEntity availDiff = (DiffEntity) AvailVct.elementAt(i);
-					buildCtryAudRecs(ctryAudElemMap, availDiff, null, true, debugSb);
-				}// end each planned avail
-	    		
-	    	}	
-		}		
-    	//Begin build T2 country records change false to true 
-		availofType = getCtryAVAL(table, parentItem, false, tmfAvailVct, debugSb);
-	    //availofType = getCtryAVAL(table, parentItem, false, tmfAvailVct, debugSb);
-		if (availofType == null) {
-			//CQ BHALM109267 SWPRODSTRUCT may not have an AVAIL of typelanned Availablity if it is older than 0100301
-			/**
-			 * BH FS ABR XML System Feed Mapping 20120711.doc P88
-			 * If an AVAIL is not found for the SWPRODSTRUCT, then generate <AVAILABILITYELEMENT> ID 38.00 for each country found in the first one that applies:
-				with values from MODEL attributes as the follows:
-				ID 78.00 <ANNDATE> = ANNDATE
-				ID 78.10 <ANNNUMBER> = empty
-				ID 79.00 <FIRSTORDER> = ANNDATE
-				ID 80.00 <PLANNEDAVAILABILITY> = ANNDATE
-				ID 81.00 <PUBFROM> = ANNDATE
-				ID 83.00 <PUBTO> = WTHDRWEFFCTVDATE
-				ID 85.00 <WDANNDATE> = WITHDRAWDATE
-				ID 86.00 <LASTORDER> = WTHDRWEFFCTVDATE
-				ID 87.00 <EOSANNDATE> = empty
-				ID 88.00 <ENDOFSERVICEDATE> = empty
-				
-			  @@ CQ BHALM109267 get the date
-			  case 1: If an AVAIL is found for the SWPRODSTRUCT( PRODSTRUCT ),  the AVAIL(the blue color in the text)  get from OOFAVAIL-d: or SWPRODSTRUCTAVAIL-d
-    		  case 2: If an AVAIL is not found for the SWPRODSTRUCT( PRODSTRUCT) and MODEL: MODELAVAIL-d: AVAIL where AVAILTYPE =lanned Availability exists ,  
-			   then the AVAIL(the blue color in the text) get from MODELAVAIL-d: AVAIL 
-			  From Rupal : IF AVAIL is not found at SWPRODSTRUCT but MODEL.AVAIL  where AVAILTYPE="Planned Availability"  exists. Avail data get from MODEL.AVAIL-d:AVAIL.
-
-			 */
-			isDerivefromMODEL = isDerivefromMODEL(table,modallVct,false,debugSb);
-			if (isDerivefromMODEL){				
-				//case for the PRODSTRUCT that get the avail from the MODEL
-				if(isPRODSTRUCT){
-					//boolean hasDeleProdAvail = buildDeleteProdCtryAudRecs(table, parentItem, ctryAudElemMap, debugSb);
-					// Why there is boolean avariable hasDeleProdAvail, Because if it's true it means that at T1 time, there is Prodstruct->Planed AVAIL,
-					// COUNTRY_FC at T1 is from Prodstruct->Planed AVAIL.Countrylist, But at T2 time COUNTRY_FC is from MODEL->Planed AVAIL.Countrylist, to 
-					// avoid missing country, all countrylist of Model->planedavail.countrylist at T2 should be showed with status is 'UPDATE'
-					// get all AVAILs where AVAILTYPE="Planned Availability" (146) - some
-					// may be deleted
-					Vector[] feaCtry = getFeatureCtryVector(table, parentItem, debugSb);
-					Vector plnAvlVct = getPlannedAvails(table, modallVct, debugSb);
-					for (int i = 0; i < plnAvlVct.size(); i++) {
-						DiffEntity availDiff = (DiffEntity) plnAvlVct.elementAt(i);
-						buildCtryAudRecs(ctryAudElemMap, availDiff, feaCtry, false, debugSb);
-					}// end each planned avail
-				}else{
-					//case for the SWPRODSTRUCT that get the avail from the MODEL
-                    //SWPRODSTRUCT don't nedd to consider FEATURE.COUNTRYLIST.
-					//Vector[] feaCtry = getFeatureCtryVector(table, parentItem, debugSb);
-					Vector plnAvlVct = getPlannedAvails(table, modallVct, debugSb);
-					//Vector[] availCtry = getSWPRODSTRUCTModelAvailCtryVector(table, plnAvlVct, debugSb);
-					
-					for (int i = 0; i < plnAvlVct.size(); i++) {
-						DiffEntity availDiff = (DiffEntity) plnAvlVct.elementAt(i);
-						buildCtryAudRecs(ctryAudElemMap, availDiff, null, false, debugSb);
-					}// end each planned avail					
-				}				
-			}else{	
-				if(isPRODSTRUCT){
-					//build countries from FEATURE.countrylist
-					buildFeatureCtryAudRecs(table, parentItem, ctryAudElemMap, false, debugSb);
-					isfeacnty = true;
-				}else{
-					//build countries from avail.countrylist
-					//for all World Wide Countries with values from MODEL attributes
-					buildWWCtryAudRecs(table, parentItem, ctryAudElemMap, dbCurrent, false, debugSb);
-					isAvailcnty = true;					
-				}
-			}
-			
-		} else {	
-//			according to BH FS ABR XML System Feed Mapping 20130614.doc 
-    		//Bing add 
-    		//2 .The aggregated (UNION) of the countries found forAvailability(AVAIL)Country List(COUNTRYLIST)for all Availability Type(AVAILTYPE) that matches the earlier STATUS filtering criteria and the UNION of anyCatalog Overrides(BHCATLGOR)Country List(COUNTRYLIST).
-    		buildBHCatlgorRecs(table, ctryAudElemMap, false, debugSb);
-			// get all AVAILs where AVAILTYPE="Planned Availability" (146) - some
-			// may be deleted
-			// according to BH FS ABR XML System Feed Mapping 20121001.doc 
-    		//Bing add 6/28/2013 BH FS ABR XML System Feed Mapping 20130614.doc
-    		//The countrylist of AVAIL is the sub set of countrylist of Planed AVAIL. so Countrylist of Planed AVAIL can instead of the union of All AVAIL types, 
-    		Vector AvailVct = new Vector();
-    		if ("146".equals(availofType)){
-    			AvailVct = tmfAvailVct;//getAVAILofType(table, tmfAvailVct, availofType, debugSb);
-    		}else {
-    			AvailVct = tmfAvailVct;
-    		}				
-			for (int i = 0; i < AvailVct.size(); i++) {
-				DiffEntity availDiff = (DiffEntity) AvailVct.elementAt(i);
-				buildCtryAudRecs(ctryAudElemMap, availDiff, null, false, debugSb);
-			}// end each planned avail
-		}
-		// output the elements
-//		Vector mdlAudVct[] = getModelAudience(parentItem, debugSb);
-		Collection ctryrecs = ctryAudElemMap.values();
-		Iterator itr = ctryrecs.iterator();
-		//add WorldWide search
-		Hashtable xmltable = null;
-		if(itr.hasNext() && (isfeacnty || isAvailcnty)){
-			xmltable = searchSLORGNPLNTCODE( dbCurrent, parentItem.getCurrentEntityItem(),  debugSb);
-			
-//			XMLSLEORGNPLNTCODESearchElem search = new XMLSLEORGNPLNTCODESearchElem();			
-//			try {
-//				xmltable = search.doSearch(dbCurrent, parentItem.getCurrentEntityItem(), debugSb);
-//			} catch (SBRException exc) {
-//				java.io.StringWriter exBuf = new java.io.StringWriter();
-//				exc.printStackTrace(new java.io.PrintWriter(exBuf));
-//				ABRUtil.append(debugSb,"XMLTMFAVAILElem.addElements search!! SBRException: "+exBuf.getBuffer().toString()+ NEWLINE);
-//				throw new MiddlewareException("Error :  doSearch XMLSLEORGNPLNTCODESearchElem.java");				
-//			}			
-		}
-		//add WorldWide search end
-		while (itr.hasNext()) {
-			CtryAudRecord ctryAudRec = (CtryAudRecord) itr.next();
-			// Rows marked as Delete do not need further updating and the Action
-			// should not be changed by further updating.
-			//if (!ctryAudRec.isDeleted()) {	
-				
-				// updated based on onte 2013-1-18 Wayne:
-//				There are two cases where a TMF would not have a'Planned Availability'
-//				RPQ (aka Special Bid) - this would not have any AVAILs
-//				Old Data is where the MODEL.ANNDATE < '20100301'  - this may have other AVAILs (e.g.'Last Order'
-//
-//
-//				From the spec (note: since this is for a TMF (PRODSTRUCT), the second item is the one that applies. In the case of Old Data where there isn't a'Planned Availability' but there is a'Last Order', there would be an <AVAILABILITYELEMENT> based on #2 and the'Last Order' avails would provide dates whenever a country in the COUNTRYLIST exists for a country FROM #2.)
-//
-//				The list of countries for <COUNTRY_FC) is based on the following in priority order (i.e. the first one that is applicable is used):
-//				1. The aggregated of the countries found for 'Availability' (AVAIL) 'Country List' (COUNTRYLIST) where Availability Type (AVAILTYPE) equals one of the following in priority order:
-//				'Planned Availability' (146)
-//				'Last Order' (149)
-//				'End of Service' (151)
-//				2.	For PRODSTRUCT
-//				The intersection of the following if not empty:
-//				MODELAVAIL-d: AVAIL.COUNTRYLIST where AVAILTYPE = 'Planned Availability' (146)
-//				FEATURE.COUNTRYLIST
-//				FEATURE.COUNTRYLIST
-//				3.	For SWPRODSTRUCT 
-//				MODELAVAIL-d: AVAIL.COUNTRYLIST where AVAILTYPE = 'Planned Availability' (146)
-//				World Wide (i.e. all countries)
-				//In case 2, still using LastOrder AVAIL from TMF-AVAIL.			
-//				 find firstorder avail for this country
-			DiffEntity plaAvailDiffT1 = AvailUtil.getEntityForAttrs(table, "AVAIL", tmfAvailVct, "AVAILTYPE", "146", "COUNTRYLIST", ctryAudRec
-				.getCountry(), true, debugSb);	
-			DiffEntity plaAvailDiff = AvailUtil.getEntityForAttrs(table, "AVAIL", tmfAvailVct, "AVAILTYPE", "146", "COUNTRYLIST", ctryAudRec
-				.getCountry(), false, debugSb);	
-			// find firstorder avail for this country
-			DiffEntity foAvailDiff = AvailUtil.getEntityForAttrs(table, "AVAIL", tmfAvailVct, "AVAILTYPE", "143", "COUNTRYLIST", ctryAudRec
-				.getCountry(), false, debugSb);
-			// find lastorder avail for this country
-			DiffEntity loAvailDiff = AvailUtil.getEntityForAttrs(table, "AVAIL", tmfAvailVct, "AVAILTYPE", "149", "COUNTRYLIST", ctryAudRec
-				.getCountry(), false, debugSb);
-			// find 'End of Service' (151) for this country
-			DiffEntity endAvailDiff = AvailUtil.getEntityForAttrs(table, "AVAIL", tmfAvailVct, "AVAILTYPE", "151", "COUNTRYLIST", ctryAudRec
-				.getCountry(), false, debugSb);
-			//find 'End of Marketing' (200) for this country 
-			DiffEntity endMktAvailDiff = AvailUtil.getEntityForAttrs(table, "AVAIL", tmfAvailVct, "AVAILTYPE", "200", "COUNTRYLIST", ctryAudRec
-				.getCountry(), false, debugSb);
-			//Why using MODEL.AVAIL (149), because doc BH FS ABR XML System Feed Mapping20121001.doc page 99:
-			//ID 46.00 <PUBTO> 4.	Min of the following three that are applicable
-//				1)	First of the following two
-//				a)	MODELAVAIL-d: AVAIL.EFFECTIVEDATE where AVAILTYPE = last Order(149)
-//				By the AVAIL.COUNTRYLIST
-//				b)	MODEL. WTHDRWEFFCTVDATE;
-//				By AVAIL.COUNTRYLIST where AVAILTYPE = planned Availability(146)
-//				2)	SWFEATURE. WITHDRAWDATEEFF_T; 
-//				Applies to all Countries that get this far
-//				3)	FEATURE. WITHDRAWDATEEFF_T
-//				By FEATURE.COUNTRYLIST
-			DiffEntity plModelAvailDiff = AvailUtil.getEntityForAttrs(table, "AVAIL", modallVct, "AVAILTYPE", "146", "COUNTRYLIST", ctryAudRec
-				.getCountry(), false, debugSb);
-			
-			DiffEntity loModelAvailDiff = AvailUtil.getEntityForAttrs(table, "AVAIL", modallVct, "AVAILTYPE", "149", "COUNTRYLIST", ctryAudRec
-				.getCountry(), false, debugSb);
-			// find 'End of Service' (151) for this country
-			DiffEntity endModelAvailDiff = AvailUtil.getEntityForAttrs(table, "AVAIL", modallVct, "AVAILTYPE", "151", "COUNTRYLIST", ctryAudRec
-				.getCountry(), false, debugSb);
-			//find 'End of Marketing' (200) for this country 
-			DiffEntity endModelMktAvailDiff = AvailUtil.getEntityForAttrs(table, "AVAIL", modallVct, "AVAILTYPE", "200", "COUNTRYLIST", ctryAudRec
-				.getCountry(), false, debugSb);
-			
-			//because need deirve<PUBTO> 3.PRODSTRUCT. WTHDRWEFFCTVDATE applicable countries are intersection of feature and avail. so need feature countrylist here.
-			//3.	PRODSTRUCT. WTHDRWEFFCTVDATE
-			//The applicable countries are the intersection of the MODEL AVAIL.COUNTRYLIST where AVAILTYPE = last Order(149). and the FEATURE.COUNTRYLIST.
-
-			Vector[] feaCtry = getFeatureCtryVector(table, parentItem, debugSb);
-			
-			if(feaCtry==null){
-				feaCtry = new Vector[2];
-			}				
-			// find catlgor for this country is equal to
-			// CATLGOR.OFFCOUNTRY and PRODSTRUCT.AUDIEC
-			DiffEntity catlgorDiff = getCatlgor(table, ctryAudRec.getCountry(), debugSb);
-			//if country a both exist at T1 and T2, but from the different Planed AVAI. the old approach could not find ANNDATE at T1. so get T1 Planed avail for each country.
-			DiffEntity[] plaAvailDiffs = new DiffEntity[2];
-			plaAvailDiffs[0] = plaAvailDiffT1;
-			plaAvailDiffs[1] = plaAvailDiff;
-			
-			
-			ctryAudRec.setAllFields(plaAvailDiffs, feaCtry, catlgorDiff, parentItem, foAvailDiff, loAvailDiff, endAvailDiff, endMktAvailDiff, loModelAvailDiff, endModelAvailDiff, endModelMktAvailDiff, plModelAvailDiff, table,  isExistfinal,  compatModel, debugSb);
-		//}
-		    if (ctryAudRec.isDisplayable()||ctryAudRec.isrfrDisplayable()) {
-				if(isfeacnty ||isAvailcnty){
-					if (xmltable == null){
-					    xmltable = searchSLORGNPLNTCODE( dbCurrent, parentItem.getCurrentEntityItem(),  debugSb);
-					}
-					createNodeSet(table, document, parent, parentItem, ctryAudRec, xmltable, debugSb);
-				}else{
-					if (isPlannedAvail(ctryAudRec.availDiff)){
-						createNodeSet(table, document, parent, parentItem, ctryAudRec, debugSb);
-					} else {
-						//1If there isn’t an AVAIL where AVAILTYPE=Planned Availability(146) then retrieve all SLEORGNPLNTCODE entities where SLEORGNPLNTCODE.MODCATG equals 
-						//a.MODEL.COFCAT if MODEL.COFCAT =Hardware or Software
-						//.....
-						if (xmltable == null){
-						    xmltable = searchSLORGNPLNTCODE( dbCurrent, parentItem.getCurrentEntityItem(),  debugSb);
-						}  						
-						createNodeSet(table, document, parent, parentItem, ctryAudRec, xmltable, debugSb);
-						
-					}    		
-				}
-			} else {
-				ABRUtil.append(debugSb,"XMLTMFAVAILElem.addElements no changes found for " + ctryAudRec + NEWLINE);
-			}
-			ctryAudRec.dereference();
-		}
-
-		// release memory
-		if (xmltable != null){
-			xmltable.clear();	
-		}
-		ctryAudElemMap.clear();
-		Vector annVct = (Vector) table.get("ANNOUNCEMENT");
-		Vector availVct = (Vector) table.get("AVAIL");
-		if (annVct != null) {
-			annVct.clear();
-		}
-		if (availVct != null) {
-			availVct.clear();
-		}
-	}
-   private Hashtable searchSLORGNPLNTCODE(Database dbCurrent, EntityItem item, StringBuffer debugSb) throws SQLException, MiddlewareException{
-    	XMLSLEORGNPLNTCODESearchElem search = new XMLSLEORGNPLNTCODESearchElem();
-    	Hashtable xmltable = new Hashtable();
-    	try {
-    		xmltable = search.doSearch(dbCurrent, item, debugSb);
-    	} catch (MiddlewareShutdownInProgressException e) {
-    		e.printStackTrace();
-    	} catch (SBRException exc) {
-    		java.io.StringWriter exBuf = new java.io.StringWriter();
-    		exc.printStackTrace(new java.io.PrintWriter(exBuf));
-    		ABRUtil.append(debugSb,"XMLTMFAVAILElem.addElements search!! SBRException: "+exBuf.getBuffer().toString()+ NEWLINE);
-    		exc.printStackTrace();				
-    	}
-    	ABRUtil.append(debugSb,"XMLTMFAVAILElem.addElements search!! " + NEWLINE);
-        
-    	return xmltable;
-    }
-	 /********************
-	    * get planned avails - availtype cant be changed
-	    */
-    private boolean isPlannedAvail(DiffEntity diffitem)
-    {
-
-    	boolean result = false;
-        if (diffitem==null){
-			return false;
-		}
-		EntityItem curritem = diffitem.getCurrentEntityItem();
-		EntityItem prioritem = diffitem.getPriorEntityItem();
-		if (diffitem.isDeleted()){
-			EANFlagAttribute fAtt = (EANFlagAttribute)prioritem.getAttribute("AVAILTYPE");
-			if (fAtt!= null && fAtt.isSelected("146")){
-				result = true;
-			}
-		}else{
-			EANFlagAttribute fAtt = (EANFlagAttribute)curritem.getAttribute("AVAILTYPE");
-			if (fAtt!= null && fAtt.isSelected("146")){
-				result = true;
-			}
-		}
-
-		return result;
-	}
-
-	private void buildWWCtryAudRecs(Hashtable table,  DiffEntity parentItem, TreeMap ctryAudElemMap, Database dbCurrent, boolean T1, StringBuffer debugSb)
-		throws MiddlewareException, SQLException {
-		ReturnDataResultSet rdrs = null;
-        ResultSet rs = null;
-        ReturnStatus returnStatus = new ReturnStatus(-1);
-        String strEnterprise = "SG";
-//        String anndate = CHEAT;
-//        String withdrawanndate = CHEAT;
-//        String withdrawdate = CHEAT;
-//        EntityItem item = null;
-//        EntityItem curritem = null;          
-        ABRUtil.append(debugSb,"buildWWCtryAudRecs at " + (T1?"T1":"T2")  + " Time."+ NEWLINE);
-        
-        if (parentItem != null){
-        	EntityItem curritem = parentItem.getCurrentEntityItem();
-		    strEnterprise = curritem.getProfile().getEnterprise();
-        }
-//        if (parentItem != null){
-//        	item = parentItem.getCurrentEntityItem();
-//			if (item.hasDownLinks()) {
-//				for (int i = 0; i < item.getDownLinkCount(); i++) {
-//					EntityItem entity = (EntityItem) item.getDownLink(i);
-//					if (entity.getEntityType().equals("MODEL")) {
-//						curritem = entity;
-//						break;
-//					}
-//				}
-//			} 
-//			if (item.hasUpLinks()) {
-//				for (int i = 0; i < item.getUpLinkCount(); i++) {
-//					EntityItem entity = (EntityItem) item.getUpLink(i);
-//					if (entity.getEntityType().equals("SWFEATURE")) {
-//						withdrawanndate = PokUtils.getAttributeValue(entity, "WITHDRAWANNDATE_T", ", ", CHEAT, false);
-//					    withdrawdate = PokUtils.getAttributeValue(entity, "WITHDRAWDATEEFF_T", ", ", CHEAT, false);
-//						break;
-//					}
-//				}
-//			}
-//        	if (curritem != null){
-//        		strEnterprise = curritem.getProfile().getEnterprise();
-//    			anndate = PokUtils.getAttributeValue(curritem, "ANNDATE",", ", CHEAT, false);
-////    		    withdrawanndate = PokUtils.getAttributeValue(curritem, "WTHDRWEFFCTVDATE",", ", CHEAT, false);
-////    		    withdrawdate = PokUtils.getAttributeValue(curritem, "WITHDRAWDATE",", ", CHEAT, false);
-//    		   }
-//        	
-//        	 ABRUtil.append(debugSb,"buildWWCtryAudRecs anndate from Model, withdrawanndte/withdrawdate from SWFEATURE "  + curritem.getKey() + " thedate: "
-//					+ anndate + " withdrawanndate: " + withdrawanndate +  " withdrawdate: " + withdrawdate +NEWLINE);
-//        }
-		
-		try {
-			 // for all World Wide Countries 
-			 rs = dbCurrent.callGBL9999A(returnStatus, strEnterprise, "GENAREASELECTION","1999","COUNTRYLIST");
-			 rdrs = new ReturnDataResultSet(rs);
-		    } finally {
-			if (rs != null){
-				rs.close();
-				rs = null;
-			}
-			dbCurrent.commit();
-			dbCurrent.freeStatement();
-			dbCurrent.isPending();
-		}
-		if (T1){
-			for (int iii = 0; iii < rdrs.size(); iii++) {
-				String country = rdrs.getColumn(iii, 0).trim();
-				ABRUtil.append(debugSb,"CQ BHALM109267 derivefrommodel world wide counry "+ country +NEWLINE);
-				
-				String mapkey = country;
-				if (!ctryAudElemMap.containsKey(mapkey)){
-					CtryAudRecord ctryAudRec = new CtryAudRecord(null, country);
-					//For the the case of - If there isn't an AVAIL where AVAILTYPE="Planned Availability" (146) and ANNDATE < '20100301' - 
-	                //ANNNUMBER  is empty
-					//PLANNEDAVAILABILITY is MODEL.ANNDATE 
-					ctryAudRec.action = DELETE_ACTIVITY;	
-					ctryAudElemMap.put(ctryAudRec.getKey(),ctryAudRec);
-				}
-			}			
-			
-		} else {
-			for (int iii = 0; iii < rdrs.size(); iii++) {
-				String country = rdrs.getColumn(iii, 0).trim();
-				ABRUtil.append(debugSb,"CQ BHALM109267 derivefrommodel world wide counry "+ country +NEWLINE);
-				
-				String mapkey = country;
-				if (!ctryAudElemMap.containsKey(mapkey)){
-					CtryAudRecord ctryAudRec = new CtryAudRecord(null, country);
-					//For the the case of - If there isn't an AVAIL where AVAILTYPE="Planned Availability" (146) and ANNDATE < '20100301' - 
-	                //ANNNUMBER  is empty
-//					//PLANNEDAVAILABILITY is MODEL.ANNDATE 
-					ctryAudRec.action = UPDATE_ACTIVITY;
-//					ctryAudRec.anndate = anndate;
-//					ctryAudRec.firstorder = anndate;
-//					ctryAudRec.plannedavailability = anndate;
-//					ctryAudRec.pubfrom = anndate;
-//					ctryAudRec.pubto = withdrawdate;
-//					ctryAudRec.wdanndate = withdrawanndate;
-//					ctryAudRec.lastorder = withdrawdate;		
-					ctryAudElemMap.put(ctryAudRec.getKey(),ctryAudRec);					
-				} else{
-					//overwrite it
-					CtryAudRecord rec = (CtryAudRecord) ctryAudElemMap.get(mapkey);
-					rec.setUpdateAvail(null);
-					rec.setAction(CHEAT);
-//					rec.anndate = anndate;
-//					rec.firstorder = anndate;
-//					rec.plannedavailability = anndate;
-//					rec.pubfrom = anndate;
-//					rec.pubto = withdrawdate;
-//					rec.wdanndate = withdrawanndate;
-//					rec.lastorder = withdrawdate;					
-					ABRUtil.append(debugSb,"WARNING buildWWCtryAudRecs country" + mapkey + "already exists, overwrite it. " + NEWLINE);				
-				}				
-			}			
-		}		
-	}
-	/**
-	 * @param dbCurrent
-	 * @param ctryAudElemMap
-	 * @param debugSb
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	private void buildFeatureCtryAudRecs(Hashtable table,  DiffEntity parentItem, TreeMap ctryAudElemMap, boolean T1, StringBuffer debugSb)
-		throws MiddlewareException {
-		Vector allVct = (Vector) table.get("FEATURE");
-		ABRUtil.append(debugSb,"buildT1FeatureCtryAudRecs at " + (T1?"T1":"T2")  + " Time."+ NEWLINE);
-		if (T1){
-			for (int ii=0; ii<allVct.size(); ii++){
-				DiffEntity feaDiff = (DiffEntity)allVct.elementAt(ii);
-				EntityItem prioritem = feaDiff.getPriorEntityItem();
-				if (!feaDiff.isNew()) { // If the AVAIL was deleted, set Action
-					// = Delete
-					// mark all records as delete
-					EANFlagAttribute ctryAtt = (EANFlagAttribute) prioritem.getAttribute("COUNTRYLIST");
-					ABRUtil.append(debugSb,"buildFeatureCtryAudRecs for deleted/udpate feature: ctryAtt "
-						+ PokUtils.getAttributeFlagValue(prioritem, "COUNTRYLIST") + NEWLINE);
-					if (ctryAtt != null) {
-						MetaFlag[] mfArray = (MetaFlag[]) ctryAtt.get();
-						for (int im = 0; im < mfArray.length; im++) {
-							// get selection
-							if (mfArray[im].isSelected()) {
-								String ctryVal = mfArray[im].getFlagCode();
-								String mapkey = ctryVal;
-								if (ctryAudElemMap.containsKey(mapkey)) {
-									// dont overwrite
-									CtryAudRecord rec = (CtryAudRecord) ctryAudElemMap.get(mapkey);
-									ABRUtil.append(debugSb,"WARNING buildFeatureCtryAudRecs for deleted/udpate " + feaDiff.getKey() + " " + mapkey
-										+ " already exists, keeping orig " + rec + NEWLINE);
-								} else {
-									CtryAudRecord ctryAudRec = new CtryAudRecord(null, ctryVal);
-									ctryAudRec.setAction(DELETE_ACTIVITY);
-									ctryAudElemMap.put(ctryAudRec.getKey(), ctryAudRec);
-									ABRUtil.append(debugSb,"buildFeatureCtryAudRecs for deleted/udpate:" + feaDiff.getKey() + " rec: "
-										+ ctryAudRec.getKey() + NEWLINE);
-								}
-							}
-						}
-					}	
-				} 
-			}
-		}else {
-			for (int ii=0; ii<allVct.size(); ii++){
-				DiffEntity feaDiff = (DiffEntity)allVct.elementAt(ii);
-				EntityItem curritem = feaDiff.getCurrentEntityItem();
-				if (!feaDiff.isDeleted()) { // If the AVAIL was added or updated,
-					// set Action = Update
-					// mark all records as update
-					EANFlagAttribute ctryAtt = (EANFlagAttribute) curritem.getAttribute("COUNTRYLIST");
-					ABRUtil.append(debugSb,"buildFeatureCtryAudRecs for new /udpated feature:  ctryAtt "
-						+ PokUtils.getAttributeFlagValue(curritem, "COUNTRYLIST") + NEWLINE);
-					if (ctryAtt != null) {
-						MetaFlag[] mfArray = (MetaFlag[]) ctryAtt.get();
-						for (int im = 0; im < mfArray.length; im++) {
-							// get selection
-							if (mfArray[im].isSelected()) {
-								String ctryVal = mfArray[im].getFlagCode();
-								String mapkey = ctryVal;
-								if (ctryAudElemMap.containsKey(mapkey)) {
-									CtryAudRecord rec = (CtryAudRecord) ctryAudElemMap.get(mapkey);
-									ABRUtil.append(debugSb,"WARNING buildFeatureCtryAudRecs for new /updated " + feaDiff.getKey() + " " + mapkey
-										+ " already exists, replacing orig " + rec + NEWLINE);
-									rec.setUpdateAvail(null);
-									rec.setAction(CHEAT);
-								} else {
-									CtryAudRecord ctryAudRec = new CtryAudRecord(null, ctryVal);
-									ctryAudRec.setAction(UPDATE_ACTIVITY);
-									ctryAudElemMap.put(ctryAudRec.getKey(), ctryAudRec);
-									ABRUtil.append(debugSb,"buildFeatureCtryAudRecs for new/ updated:" + feaDiff.getKey() + " rec: "
-										+ ctryAudRec.getKey() + NEWLINE);
-								}
-							}
-						}
-					}
-				} // end avail existed at both t1 and t2					
-			}		
-		}			
-	}
-	/**
-	 * @param dbCurrent
-	 * @param ctryAudElemMap
-	 * @param debugSb
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	private Vector[] getFeatureCtryVector(Hashtable table, DiffEntity parentItem, StringBuffer debugSb)
-		throws MiddlewareException {
-		Vector currFeaVct = new Vector(1);
-		Vector prevFeaVct = new Vector(1);
-		Vector vct[] = new Vector[2];
-		vct[0] = prevFeaVct;
-		vct[1] = currFeaVct;
-		String type = "";
-		if ("PRODSTRUCT".equals(parentItem.getEntityType())){
-			type = "FEATURE";
-		}else if ("SWPRODSTRUCT".equals(parentItem.getEntityType())){
-			return null;
-	    }
-		Vector allVct = (Vector) table.get(type);
-		
-		for (int ii=0; ii<allVct.size(); ii++){
-			DiffEntity feaDiff = (DiffEntity)allVct.elementAt(ii);
-			EntityItem curritem = feaDiff.getCurrentEntityItem();
-			EntityItem prioritem = feaDiff.getPriorEntityItem();
-			if (prioritem != null) { 
-				// = Delete
-				// mark all records as delete
-				EANFlagAttribute ctryAtt = (EANFlagAttribute) prioritem.getAttribute("COUNTRYLIST");
-				ABRUtil.append(debugSb,"putFeatureCtryVector for deleted feature: ctryAtt "
-					+ PokUtils.getAttributeFlagValue(prioritem, "COUNTRYLIST") + NEWLINE);
-				if (ctryAtt != null) {
-					MetaFlag[] mfArray = (MetaFlag[]) ctryAtt.get();
-					for (int im = 0; im < mfArray.length; im++) {
-						// get selection
-						if (mfArray[im].isSelected()) {
-							String ctryVal = mfArray[im].getFlagCode();
-							String mapkey = ctryVal;
-							if (!prevFeaVct.contains(mapkey)) {
-								prevFeaVct.add(mapkey);
-							} 
-						}
-					}
-				}
-			} 
-			if (curritem != null) { // If the AVAIL was added or updated,
-				// set Action = Update
-				// mark all records as update
-				EANFlagAttribute ctryAtt = (EANFlagAttribute) curritem.getAttribute("COUNTRYLIST");
-				ABRUtil.append(debugSb,"putFeatureCtryVector for new feature:  ctryAtt "
-					+ PokUtils.getAttributeFlagValue(curritem, "COUNTRYLIST") + NEWLINE);
-				if (ctryAtt != null) {
-					MetaFlag[] mfArray = (MetaFlag[]) ctryAtt.get();
-					for (int im = 0; im < mfArray.length; im++) {
-						// get selection
-						if (mfArray[im].isSelected()) {
-							String ctryVal = mfArray[im].getFlagCode();
-							String mapkey = ctryVal;
-							if (!currFeaVct.contains(mapkey)) {
-								currFeaVct.add(mapkey);
-							} 
-						}
-					}
-				}
-			} 
-		}
-		return vct;
-	}
-
-	/***************************************************************************
-	 * create the nodes for this ctry|audience record
-	 */
-	private void createNodeSet(Hashtable table,Document document, Element parent,DiffEntity parentItem, CtryAudRecord ctryAudRec, StringBuffer debugSb) {
-		
-		if(ctryAudRec.isDisplayable()){
-			Element elem = (Element) document.createElement(nodeName); // create
-			// COUNTRYAUDIENCEELEMENT
-			addXMLAttrs(elem);
-			parent.appendChild(elem);
-			
-			// add child nodes
-			Element child = (Element) document.createElement("AVAILABILITYACTION");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getAction()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("STATUS");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getAvailStatus()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("COUNTRY_FC");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getCountry()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("ANNDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getAnndate()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("ANNNUMBER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getAnnnumber()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("FIRSTORDER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getFirstorder()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("PLANNEDAVAILABILITY");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getPlannedavailability()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("PUBFROM");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getPubFrom()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("PUBTO");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getPubTo()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("WDANNDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getWdanndate()));
-			elem.appendChild(child);
-			//Story 1865979 Withdrawal RFA Number generation
-			child = (Element) document.createElement("ENDOFMARKETANNNUMBER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getEomannnum()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("LASTORDER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getLastorder()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("EOSANNDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getEosanndate()));
-			elem.appendChild(child);
-			//Story 1865979 Withdrawal RFA Number generation
-			child = (Element) document.createElement("ENDOFSERVICEANNNUMBER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getEosannnum()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("ENDOFSERVICEDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getEndOfService()));
-			elem.appendChild(child);
-			//add SLEORGGRP
-			//if("SWPRODSTRUCT".equals(parentItem.getEntityType())){
-			//SLEORGGRP.displayAVAILSLEORG(table, document, elem, parentItem.getCurrentEntityItem(), ctryAudRec.availDiff, "D:SWPRODSTRUCTAVAIL:D:AVAIL:D:AVAILSLEORGA:D", ctryAudRec.country, ctryAudRec.action, debugSb);
-			//}
-			//else{
-			//SLEORGGRP.displayAVAILSLEORG(table, document, elem, parentItem.getCurrentEntityItem(), ctryAudRec.availDiff, "D:OOFAVAIL:D:AVAIL:D:AVAILSLEORGA:D", ctryAudRec.country, ctryAudRec.action, debugSb);
-			//}
-			SLEORGGRP.displayAVAILSLEORG(table, document, elem, parentItem.getCurrentEntityItem(), ctryAudRec.availDiff, null, ctryAudRec.country, ctryAudRec.action, debugSb);
-		}
-		
-		if(ctryAudRec.isrfrDisplayable()){
-			Element elem = (Element) document.createElement(nodeName); // create
-																		// COUNTRYAUDIENCEELEMENT
-			addXMLAttrs(elem);
-			parent.appendChild(elem);
-	
-			// add child nodes
-			Element child = (Element) document.createElement("AVAILABILITYACTION");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfraction()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("STATUS");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfravailStatus()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("COUNTRY_FC");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getCountry()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("ANNDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfranndate()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("ANNNUMBER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrannnumber()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("FIRSTORDER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrfirstorder()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("PLANNEDAVAILABILITY");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrplannedavailability()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("PUBFROM");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrpubfrom()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("PUBTO");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrpubto()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("WDANNDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrwdanndate()));
-			elem.appendChild(child);
-			//Story 1865979 Withdrawal RFA Number generation
-			child = (Element) document.createElement("ENDOFMARKETANNNUMBER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getEomannnum()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("LASTORDER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrlastorder()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("EOSANNDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfreosanndate()));
-			elem.appendChild(child);
-			//Story 1865979 Withdrawal RFA Number generation
-			child = (Element) document.createElement("ENDOFSERVICEANNNUMBER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getEosannnum()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("ENDOFSERVICEDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrendofservice()));
-			elem.appendChild(child);
-			//add SLEORGGRP
-			//if("SWPRODSTRUCT".equals(parentItem.getEntityType())){
-			//SLEORGGRP.displayAVAILSLEORG(table, document, elem, parentItem.getCurrentEntityItem(), ctryAudRec.availDiff, "D:SWPRODSTRUCTAVAIL:D:AVAIL:D:AVAILSLEORGA:D", ctryAudRec.country, ctryAudRec.action, debugSb);
-			//}
-			//else{
-			//SLEORGGRP.displayAVAILSLEORG(table, document, elem, parentItem.getCurrentEntityItem(), ctryAudRec.availDiff, "D:OOFAVAIL:D:AVAIL:D:AVAILSLEORGA:D", ctryAudRec.country, ctryAudRec.action, debugSb);
-			//}
-			SLEORGGRP.displayAVAILSLEORG(table, document, elem, parentItem.getCurrentEntityItem(), ctryAudRec.availDiff, null, ctryAudRec.country, ctryAudRec.action, debugSb);
-		}
-	
-	
-	}
-	
-	/***************************************************************************
-	 * create the nodes for this ctry|audience record
-	 */
-	private void createNodeSet(Hashtable table,Document document, Element parent,DiffEntity parentItem, CtryAudRecord ctryAudRec, Hashtable xmltable, StringBuffer debugSb) {
-		
-		if(ctryAudRec.isDisplayable()){
-			Element elem = (Element) document.createElement(nodeName); // create
-			// COUNTRYAUDIENCEELEMENT
-			addXMLAttrs(elem);
-			parent.appendChild(elem);
-			
-			// add child nodes
-			Element child = (Element) document.createElement("AVAILABILITYACTION");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getAction()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("STATUS");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getAvailStatus()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("COUNTRY_FC");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getCountry()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("ANNDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getAnndate()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("ANNNUMBER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getAnnnumber()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("FIRSTORDER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getFirstorder()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("PLANNEDAVAILABILITY");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getPlannedavailability()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("PUBFROM");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getPubFrom()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("PUBTO");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getPubTo()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("WDANNDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getWdanndate()));
-			elem.appendChild(child);
-			//Story 1865979 Withdrawal RFA Number generation
-			child = (Element) document.createElement("ENDOFMARKETANNNUMBER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getEomannnum()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("LASTORDER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getLastorder()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("EOSANNDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getEosanndate()));
-			elem.appendChild(child);
-			//Story 1865979 Withdrawal RFA Number generation
-			child = (Element) document.createElement("ENDOFSERVICEANNNUMBER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getEosannnum()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("ENDOFSERVICEDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getEndOfService()));
-			elem.appendChild(child);
-			//add createWorldWideAvilNote
-			createWorldWideAvilNote(document, ctryAudRec, xmltable, elem, debugSb);
-		}
-		if(ctryAudRec.isrfrDisplayable()){
-			Element elem = (Element) document.createElement(nodeName); // create
-																		// COUNTRYAUDIENCEELEMENT
-			addXMLAttrs(elem);
-			parent.appendChild(elem);
-	
-			// add child nodes
-			Element child = (Element) document.createElement("AVAILABILITYACTION");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfraction()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("STATUS");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfravailStatus()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("COUNTRY_FC");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getCountry()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("ANNDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfranndate()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("ANNNUMBER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrannnumber()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("FIRSTORDER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrfirstorder()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("PLANNEDAVAILABILITY");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrplannedavailability()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("PUBFROM");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrpubfrom()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("PUBTO");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrpubto()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("WDANNDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrwdanndate()));
-			elem.appendChild(child);
-			//Story 1865979 Withdrawal RFA Number generation
-			child = (Element) document.createElement("ENDOFMARKETANNNUMBER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getEomannnum()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("LASTORDER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrlastorder()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("EOSANNDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfreosanndate()));
-			elem.appendChild(child);
-			//Story 1865979 Withdrawal RFA Number generation
-			child = (Element) document.createElement("ENDOFSERVICEANNNUMBER");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getEosannnum()));
-			elem.appendChild(child);
-			child = (Element) document.createElement("ENDOFSERVICEDATE");
-			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrendofservice()));
-			elem.appendChild(child);
-	 		//add createWorldWideAvilNote
-	 		createWorldWideAvilNote(document, ctryAudRec, xmltable, elem, debugSb);
-		}
-	}
-	
-	/**
-	 * this method work for Feature.countrylist, only show when action is Update. 
-	 * update the duplicate SLEORGGRP in the SLEORGGRPLIST
-	 * @param document
-	 * @param ctryAudRec
-	 * @param xmltable
-	 * @param elem
-	 * @throws DOMException
-	 */
-	private void createWorldWideAvilNote(Document document, CtryAudRecord ctryAudRec, Hashtable xmltable, Element elem, StringBuffer debugSb) throws DOMException {
-		Element child;
-		String wwcry = ctryAudRec.getCountry();
-		Object sop_cry = (Object)xmltable.get(wwcry);
-		if(sop_cry!=null && UPDATE_ACTIVITY.equals(ctryAudRec.action)){
-			//SLEORGGRPLIST
-			Element SLEORGGRPLISTElement = (Element) document.createElement("SLEORGGRPLIST");
-			elem.appendChild(SLEORGGRPLISTElement);
-			Vector vct[] = (Vector[])xmltable.get(wwcry);
-			Hashtable SLEORGGRP = (Hashtable)vct[0].get(0);
-			Enumeration egroup = SLEORGGRP.keys();
-			Vector multiVector = new Vector();
-			while (egroup.hasMoreElements()) {
-				String key = (String) egroup.nextElement();
-				key = key.trim();
-				if(multiVector.contains(key)){
-					continue;
-				}
-				multiVector.add(key);
-				Element childElement = (Element) document.createElement("SLEORGGRPELEMENT");
-				SLEORGGRPLISTElement.appendChild(childElement);
-				child = (Element) document.createElement("SLEOORGGRPACTION");
-				child.appendChild(document.createTextNode("" + UPDATE_ACTIVITY));
-				childElement.appendChild(child);
-				child = (Element) document.createElement("SLEORGGRP");
-				child.appendChild(document.createTextNode("" + key));
-				childElement.appendChild(child);
-			}
-			multiVector.clear();
-			//SLEORGNPLNTCODELIST
-			Element SLEORGNPLNTCODELISTElement = (Element) document.createElement("SLEORGNPLNTCODELIST");
-			elem.appendChild(SLEORGNPLNTCODELISTElement);
-			Vector entityVector = vct[1];
-			Vector duplVector = new Vector();
-			for(int i=0;i<entityVector.size();i++){
-				EntityItem entity = (EntityItem)entityVector.get(i);
-				String sleorg = PokUtils.getAttributeValue(entity, "SLEORG",", ", "", false);
-				String plntcd = PokUtils.getAttributeValue(entity, "PLNTCD",", ", "", false);
-				String key = sleorg + plntcd;
-				if(duplVector.contains(key)){
-					continue;
-				}
-				duplVector.add(key);
-				Element childElement = (Element) document.createElement("SLEORGNPLNTCODEELEMENT");
-				SLEORGNPLNTCODELISTElement.appendChild(childElement);
-				child = (Element) document.createElement("SLEORGNPLNTCODEACTION");
-				child.appendChild(document.createTextNode("" + UPDATE_ACTIVITY));
-				childElement.appendChild(child);
-				child = (Element) document.createElement("SLEORG");				
-				child.appendChild(document.createTextNode("" + sleorg));
-				childElement.appendChild(child);
-				child = (Element) document.createElement("PLNTCD");				
-				child.appendChild(document.createTextNode("" + plntcd));
-				childElement.appendChild(child);		
-			}
-			duplVector.clear();
-		}else{
-			//SLEORGGRPLIST
-			Element SLEORGGRPLISTElement = (Element) document.createElement("SLEORGGRPLIST");
-			elem.appendChild(SLEORGGRPLISTElement);
-			//SLEORGNPLNTCODELIST
-			Element SLEORGNPLNTCODELISTElement = (Element) document.createElement("SLEORGNPLNTCODELIST");
-			elem.appendChild(SLEORGNPLNTCODELISTElement);
-		}
-	}
-
-//	/***************************************************************************
-//	 * get audience values from t1 and t2 for this model, do it once and use for
-//	 * each avail
-//	 */
-//	private Vector[] getModelAudience(DiffEntity modelDiff, StringBuffer debugSb) {
-//		ABRUtil.append(debugSb,"XMLCtryAudElem.getModelAudience for " + modelDiff.getKey() + NEWLINE);
-//
-//		EANFlagAttribute audienceAtt = (EANFlagAttribute) modelDiff.getCurrentEntityItem().getAttribute("AUDIEN");
-//		Vector currAudVct = new Vector(1);
-//		Vector prevAudVct = new Vector(1);
-//		Vector vct[] = new Vector[2];
-//		vct[0] = currAudVct;
-//		vct[1] = prevAudVct;
-//		ABRUtil.append(debugSb,"XMLCtryAudElem.getModelAudience cur audienceAtt " + audienceAtt + NEWLINE);
-//		if (audienceAtt != null) {
-//			MetaFlag[] mfArray = (MetaFlag[]) audienceAtt.get();
-//			for (int i = 0; i < mfArray.length; i++) {
-//				// get selection
-//				if (mfArray[i].isSelected()) {
-//					currAudVct.addElement(mfArray[i].toString()); // this is
-//																	// long desc
-//				}
-//			}
-//		}
-//
-//		if (!modelDiff.isNew()) {
-//			audienceAtt = (EANFlagAttribute) modelDiff.getPriorEntityItem().getAttribute("AUDIEN");
-//			ABRUtil.append(debugSb,"XMLCtryAudElem.getModelAudience new audienceAtt " + audienceAtt + NEWLINE);
-//			if (audienceAtt != null) {
-//				MetaFlag[] mfArray = (MetaFlag[]) audienceAtt.get();
-//				for (int i = 0; i < mfArray.length; i++) {
-//					// get selection
-//					if (mfArray[i].isSelected()) {
-//						prevAudVct.addElement(mfArray[i].toString()); // this
-//																		// is
-//																		// long
-//																		// desc
-//					}
-//				}
-//			}
-//		}
-//
-//		return vct;
-//	}
-
-	/**
-	 * ****************** this method has changed for BH. Create rows in the
-	 * table as follows: Insert one row for each Audience in MODEL.AUDIEN & each
-	 * Country in AVAIL.COUNTRYLIST where AVAILTYPE = 146 If the AVAIL was
-	 * deleted, set Action = Delete If the AVAIL was added or updated, set
-	 * Action = Update
-	 * 
-	 * If AVAIL.COUNTRYLIST has a country added, set that row's Action = Update
-	 * If AVAIL.COUNTRYLIST has a country deleted, set that row's Action =
-	 * Delete
-	 * 
-	 * Note: Rows marked as Delete do not need further updating and the Action
-	 * should not be changed by further updating. If any of the following steps
-	 * have data that do not match an existing row in this table, ignore that
-	 * data.
-	 */
-
-	private void buildCtryAudRecs(TreeMap ctryAudElemMap, DiffEntity availDiff, Vector[] feaCtry, boolean T1, StringBuffer debugSb) {
-
-		ABRUtil.append(debugSb,"XMLTMFAVAILElem.buildCtryAudRecs " + (T1?"T1 ":"T2 ") + availDiff.getKey() + NEWLINE);
-		
-
-		// must account for AVAILa to have had US, CANADA at T1, and just CANADA
-		// at T2 and a new
-		// AVAILb to have US at T2
-		// only delete action if ctry or aud was removed at t2!!! allow update
-		// to override it
-		if (T1){
-			EntityItem prioritem = availDiff.getPriorEntityItem();
-			if (!availDiff.isNew()) { // If the AVAIL was deleted, set Action										// = Delete
-				// mark all records as delete
-				EANFlagAttribute ctryAtt = (EANFlagAttribute) prioritem.getAttribute("COUNTRYLIST");
-				ABRUtil.append(debugSb,"XMLTMFAVAILElem.buildT1CtryAudRecs for delete/udpate avail: ctryAtt "
-					+ PokUtils.getAttributeFlagValue(prioritem, "COUNTRYLIST") + NEWLINE);
-				if (ctryAtt != null) {
-					MetaFlag[] mfArray = (MetaFlag[]) ctryAtt.get();
-					for (int im = 0; im < mfArray.length; im++) {
-						// get selection
-						if (mfArray[im].isSelected()) {
-							String ctryVal = mfArray[im].getFlagCode();
-							String mapkey = ctryVal;
-							if (ctryAudElemMap.containsKey(mapkey)) {
-								// dont overwrite
-								CtryAudRecord rec = (CtryAudRecord) ctryAudElemMap.get(mapkey);
-								ABRUtil.append(debugSb,"WARNING buildT1CtryAudRecs for delete/udpate" + availDiff.getKey() + " " + mapkey
-									+ " already exists, keeping orig " + rec + NEWLINE);
-							} else {
-								if (feaCtry != null && feaCtry[0].contains(mapkey) ){
-									CtryAudRecord ctryAudRec = new CtryAudRecord(availDiff, ctryVal);
-									ctryAudRec.setAction(DELETE_ACTIVITY);
-									ctryAudElemMap.put(ctryAudRec.getKey(), ctryAudRec);
-									ABRUtil.append(debugSb,"XMLTMFAVAILElem.buildT1CtryAudRecs for delete/udpate:" + availDiff.getKey() + " rec: "
-										+ ctryAudRec.getKey() + NEWLINE);
-								} else if (feaCtry == null){
-									CtryAudRecord ctryAudRec = new CtryAudRecord(availDiff, ctryVal);
-									ctryAudRec.setAction(DELETE_ACTIVITY);
-									ctryAudElemMap.put(ctryAudRec.getKey(), ctryAudRec);
-									ABRUtil.append(debugSb,"XMLTMFAVAILElem.buildT1CtryAudRecs for delete/udpate:" + availDiff.getKey() + " rec: "
-										+ ctryAudRec.getKey() + NEWLINE);
-								}															
-							}
-						}
-					}
-				}
-			} 
-		} else{
-			EntityItem curritem = availDiff.getCurrentEntityItem();
-			if (!availDiff.isDeleted()){ //If the AVAIL was added or updated, set Action = Update
-				// mark all records as update			
-				EANFlagAttribute ctryAtt = (EANFlagAttribute)curritem.getAttribute("COUNTRYLIST");
-				ABRUtil.append(debugSb,"XMLTMFAVAILElem.buildCtryAudRecs for new/udpate avail:  ctryAtt and anncodeAtt "+
-						PokUtils.getAttributeFlagValue(curritem, "COUNTRYLIST")+ 
-				        PokUtils.getAttributeFlagValue(curritem, "ANNCODENAME") +NEWLINE);
-				if (ctryAtt!=null){
-					MetaFlag[] mfArray = (MetaFlag[]) ctryAtt.get();
-					for (int im = 0; im < mfArray.length; im++){
-						// get selection
-						if (mfArray[im].isSelected()) {
-							String ctryVal = mfArray[im].getFlagCode();					
-								String mapkey = ctryVal;
-								if (ctryAudElemMap.containsKey(mapkey)){
-									CtryAudRecord rec = (CtryAudRecord)ctryAudElemMap.get(mapkey);
-									if (isPlannedAvail(availDiff) || DELETE_ACTIVITY.equals(rec.action)){
-										ABRUtil.append(debugSb,"WARNING buildCtryAudRecs for new/update "+availDiff.getKey()+
-											" "+mapkey+" already exists, replacing orig "+rec+NEWLINE);
-										if(UPDATE_ACTIVITY.equals(rec.action)){
-											rec.setUpdateAvail(availDiff);
-										}else{
-											rec.setUpdateAvail(availDiff);
-											rec.setAction(CHEAT);
-										}
-									}
-								}else{
-									if (feaCtry != null && feaCtry[1].contains(mapkey) ){
-										CtryAudRecord ctryAudRec = new CtryAudRecord(availDiff, ctryVal);
-										ctryAudRec.setAction(UPDATE_ACTIVITY);
-										ctryAudElemMap.put(ctryAudRec.getKey(),ctryAudRec);
-										ABRUtil.append(debugSb,"XMLTMFAVAILElem.buildCtryAudRecs for new/update:"+availDiff.getKey()+" rec: "+
-										ctryAudRec.getKey() + NEWLINE);										
-									}else if (feaCtry == null){
-										CtryAudRecord ctryAudRec = new CtryAudRecord(availDiff, ctryVal);
-										ctryAudRec.setAction(UPDATE_ACTIVITY);
-										ctryAudElemMap.put(ctryAudRec.getKey(),ctryAudRec);
-										ABRUtil.append(debugSb,"XMLTMFAVAILElem.buildCtryAudRecs for new/update:"+availDiff.getKey()+" rec: "+
-										ctryAudRec.getKey() + NEWLINE);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	/**
-	 * BH FS ABR XML System Feed Mapping 20130614.doc
-	 * build BHCATLGOR.countrylist in AVAILBILITYLIST Country_fc.
-	 * AVAIL.COUNTRYLIST. In other words, the list of countries is the UNION of COUNTRLIST for all AVAILs and the UNION of anyCatalog Overrides(BHCATLGOR Country List(COUNTRYLIST
-	 * @param ctryAudElemMap
-	 * @param T1
-	 * @param debugSb
-	 */
-	
-	private void buildBHCatlgorRecs(Hashtable table, TreeMap ctryAudElemMap, boolean T1, StringBuffer debugSb) {
-
-		Vector allVct = (Vector) table.get("BHCATLGOR");
-		String attrCode2 = BHCOUNTRYLIST; // need flag code
-		ABRUtil.append(debugSb,"buildBHCatlgorRecs looking for T1" +  T1 + " in CATLGOR allVct.size:"
-			+ (allVct == null ? "null" : "" + allVct.size()) + NEWLINE);
-		if (allVct != null) {
-			if (T1){
-				for (int i = 0; i < allVct.size(); i++) {
-					DiffEntity diffitem = (DiffEntity) allVct.elementAt(i);
-					EntityItem item = diffitem.getPriorEntityItem();
-					//add the check of the status of BHCATLGOR
-					if (!diffitem.isNew()) {
-						String BHStatus  = PokUtils.getAttributeFlagValue(item,"STATUS");
-						if(!STATUS_FINAL.equals(BHStatus)){
-							continue;
-						}
-						EANFlagAttribute ctryAtt = (EANFlagAttribute) item.getAttribute(attrCode2);
-						if (ctryAtt != null) {
-							MetaFlag[] mfArray = (MetaFlag[]) ctryAtt.get();
-							for (int im = 0; im < mfArray.length; im++) {
-								// get selection
-								if (mfArray[im].isSelected()) {
-									String ctryVal = mfArray[im].getFlagCode();
-									String mapkey = ctryVal;
-									if (ctryAudElemMap.containsKey(mapkey)) {
-										// dont overwrite
-										CtryAudRecord rec = (CtryAudRecord) ctryAudElemMap.get(mapkey);
-										ABRUtil.append(debugSb,"WARNING buildBHCatlgorRecs for delete/udpate" + mapkey
-											+ " already exists, keeping orig " + rec + NEWLINE);
-									}else{
-							            CtryAudRecord ctryAudRec = new CtryAudRecord(null, ctryVal);
-										ctryAudRec.setAction(DELETE_ACTIVITY);
-										ctryAudElemMap.put(ctryAudRec.getKey(), ctryAudRec);
-										ABRUtil.append(debugSb,"buildBHCatlgorRecs for delete/udpate rec: "
-											+ ctryAudRec.getKey() + NEWLINE);														
-									}
-								}
-							}
-						}
-					}
-				}			
-			} else{
-				for (int i = 0; i < allVct.size(); i++) {
-					DiffEntity diffitem = (DiffEntity) allVct.elementAt(i);
-					EntityItem item = diffitem.getCurrentEntityItem();
-					//add the check of the status of BHCATLGOR
-					if (!diffitem.isDeleted()) {
-						String BHStatus  = PokUtils.getAttributeFlagValue(item,"STATUS");
-						if(!STATUS_FINAL.equals(BHStatus)){
-							continue;
-						}
-						EANFlagAttribute ctryAtt = (EANFlagAttribute) item.getAttribute(attrCode2);
-						if (ctryAtt != null) {
-							MetaFlag[] mfArray = (MetaFlag[]) ctryAtt.get();
-							for (int im = 0; im < mfArray.length; im++) {
-								// get selection
-								if (mfArray[im].isSelected()) {
-									String ctryVal = mfArray[im].getFlagCode();
-									String mapkey = ctryVal;
-									if (ctryAudElemMap.containsKey(mapkey)) {
-										CtryAudRecord rec = (CtryAudRecord) ctryAudElemMap.get(mapkey);
-										rec.setUpdateAvail(null);
-										rec.setAction(CHEAT);
-										ABRUtil.append(debugSb,"WARNING buildBHCatlgorRecs for new/update" + mapkey
-											+ " already exists, replace orig with Update action" + rec + NEWLINE);
-									}else{
-							            CtryAudRecord ctryAudRec = new CtryAudRecord(null, ctryVal);
-										ctryAudRec.setAction(UPDATE_ACTIVITY);
-										ctryAudElemMap.put(ctryAudRec.getKey(), ctryAudRec);
-										ABRUtil.append(debugSb,"buildBHCatlgorRecs for new/udpate rec: "
-											+ ctryAudRec.getKey() + NEWLINE);														
-									}
-								}
-							}
-						}
-					}
-				}								
-			}
-		}				
-	}
-	
-	/***************************************************************************
-	 * get planned avails - availtype cant be changed
-	 */
-	private Vector getPlannedAvails(Hashtable table, Vector allVct, StringBuffer debugSb) {
-		Vector avlVct = new Vector(1);
-		ABRUtil.append(debugSb,"XMLTMFAVAILElem.getPlannedAvails looking for AVAILTYPE:146 in AVAIL" + " allVct.size:"
-			+ (allVct == null ? "null" : "" + allVct.size()) + NEWLINE);
-		if (allVct == null) {
-			return avlVct;
-		}
-
-		// find those of specified type
-		for (int i = 0; i < allVct.size(); i++) {
-			DiffEntity diffitem = (DiffEntity) allVct.elementAt(i);
-			EntityItem curritem = diffitem.getCurrentEntityItem();
-			EntityItem prioritem = diffitem.getPriorEntityItem();
-			if (diffitem.isDeleted()) {
-				ABRUtil.append(debugSb,"XMLTMFAVAILElem.getPlannedAvails checking[" + i + "]: deleted " + diffitem.getKey() + " AVAILTYPE: "
-					+ PokUtils.getAttributeFlagValue(prioritem, "AVAILTYPE") + NEWLINE);
-				EANFlagAttribute fAtt = (EANFlagAttribute) prioritem.getAttribute("AVAILTYPE");
-				if (fAtt != null && fAtt.isSelected("146")) {
-					avlVct.add(diffitem);
-				}
-			} else {
-				ABRUtil.append(debugSb,"XMLTMFAVAILElem.getPlannedAvails checking[" + i + "]:" + diffitem.getKey() + " AVAILTYPE: "
-					+ PokUtils.getAttributeFlagValue(curritem, "AVAILTYPE") + NEWLINE);
-				EANFlagAttribute fAtt = (EANFlagAttribute) curritem.getAttribute("AVAILTYPE");
-				if (fAtt != null && fAtt.isSelected("146")) {
-					avlVct.add(diffitem);
-				}
-			}
-		}
-
-		return avlVct;
-	}
-	
-
-	/***************************************************************************
-	 * get planned avails and last order avali and end service avail  - availtype cant be changed
-	 * 1.	The aggregated of the countries found for Availability (AVAIL) Country List (COUNTRYLIST) where Availability Type (AVAILTYPE) equals one of the following in priority order:
-	 * 1. planed avail
-	 * 2. LastOrder avail
-	 * 3. End of service avail
-	 * availofType is "146"|"149"|"151"
-	 */
-//	private Vector getAVAILofType(Hashtable table, Vector allVct, String availofType, StringBuffer debugSb) {
-//		Vector avlVct = new Vector(1);
-//		ABRUtil.append(debugSb,"XMLTMFAVAILElem looking for AVAILTYPE " +  availofType  + " allVct.size:"
-//			+ (allVct == null ? "null" : "" + allVct.size()) + NEWLINE);
-//		if (allVct == null) {
-//			return avlVct;
-//		}
-//
-//		// find those of specified type
-//		for (int i = 0; i < allVct.size(); i++) {
-//			DiffEntity diffitem = (DiffEntity) allVct.elementAt(i);
-//			EntityItem curritem = diffitem.getCurrentEntityItem();
-//			EntityItem prioritem = diffitem.getPriorEntityItem();
-//			if (diffitem.isDeleted()) {
-//				ABRUtil.append(debugSb,"XMLTMFAVAILElem checking[" + i + "]: deleted " + diffitem.getKey() + " AVAILTYPE: "
-//					+ PokUtils.getAttributeFlagValue(prioritem, "AVAILTYPE") + NEWLINE);
-//				EANFlagAttribute fAtt = (EANFlagAttribute) prioritem.getAttribute("AVAILTYPE");
-//				if (fAtt != null && (fAtt.isSelected(availofType))) {
-//					avlVct.add(diffitem);
-//				}
-//			} else {
-//				ABRUtil.append(debugSb,"XMLAVAILElem checking[" + i + "]: update or new " + diffitem.getKey() + " AVAILTYPE: "
-//					+ PokUtils.getAttributeFlagValue(curritem, "AVAILTYPE") + NEWLINE);
-//				EANFlagAttribute fAtt = (EANFlagAttribute) curritem.getAttribute("AVAILTYPE");
-//				if (fAtt != null && fAtt.isSelected(availofType)) {
-//					avlVct.add(diffitem);
-//				}
-//			}
-//		}
-//
-//		return avlVct;
-//	}
-
-
-//	/***************************************************************************
-//	 * get entity with specified values - should only be one could be two if one
-//	 * was deleted and one was added, but the added one will override and be an
-//	 * 'update'
-//	 */
-//	private DiffEntity getEntityForAttrs(Hashtable table, String etype, Vector allVct, String attrCode, String attrVal, String attrCode2,
-//		String attrVal2, boolean T1, StringBuffer debugSb) {
-//		DiffEntity diffEntity = null;
-//		ABRUtil.append(debugSb,"XMLTMFAVAILElem.getEntityForAttrs  at T1 "  + T1 +" looking for " + attrCode + ":" + attrVal + " and " + attrCode2 + ":"
-//			+ attrVal2 + " in " + etype + " allVct.size:" + (allVct == null ? "null" : "" + allVct.size()) + NEWLINE);
-//		if (allVct == null) {
-//			return diffEntity;
-//		}
-//		if (T1){
-//			// find those of specified type
-//			for (int i = 0; i < allVct.size(); i++) {
-//				DiffEntity diffitem = (DiffEntity) allVct.elementAt(i);
-//				EntityItem prioritem = diffitem.getPriorEntityItem();
-//				if (!diffitem.isNew()) {
-//					ABRUtil.append(debugSb,"XMLTMFAVAILElem.getEntityForAttrs checking[" + i + "]: deleted/update " + diffitem.getKey() + " "
-//						+ attrCode + ":" + PokUtils.getAttributeFlagValue(prioritem, attrCode) + " " + attrCode2 + ":"
-//						+ PokUtils.getAttributeFlagValue(prioritem, attrCode2) + NEWLINE);
-//					EANFlagAttribute fAtt = (EANFlagAttribute) prioritem.getAttribute(attrCode);
-//					if (fAtt != null && fAtt.isSelected(attrVal)) {
-//						fAtt = (EANFlagAttribute) prioritem.getAttribute(attrCode2);
-//						if (fAtt != null && fAtt.isSelected(attrVal2)) {
-//							diffEntity = diffitem; // keep looking for one that is
-//													// not deleted
-//						}
-//					}
-//				}
-//			}			
-//		}else{
-//			// find those of specified type
-//			for (int i = 0; i < allVct.size(); i++) {
-//				DiffEntity diffitem = (DiffEntity) allVct.elementAt(i);
-//				EntityItem curritem = diffitem.getCurrentEntityItem();
-//				EntityItem prioritem = diffitem.getPriorEntityItem();
-//				if (diffitem.isDeleted()) {
-//					ABRUtil.append(debugSb,"XMLTMFAVAILElem.getEntityForAttrs checking[" + i + "]: deleted " + diffitem.getKey() + " "
-//						+ attrCode + ":" + PokUtils.getAttributeFlagValue(prioritem, attrCode) + " " + attrCode2 + ":"
-//						+ PokUtils.getAttributeFlagValue(prioritem, attrCode2) + NEWLINE);
-//					EANFlagAttribute fAtt = (EANFlagAttribute) prioritem.getAttribute(attrCode);
-//					if (fAtt != null && fAtt.isSelected(attrVal)) {
-//						fAtt = (EANFlagAttribute) prioritem.getAttribute(attrCode2);
-//						if (fAtt != null && fAtt.isSelected(attrVal2)) {
-//							diffEntity = diffitem; // keep looking for one that is
-//													// not deleted
-//						}
-//					}
-//				} else {
-//					if (diffitem.isNew()) {
-//						ABRUtil.append(debugSb,"XMLTMFAVAILElem.getEntityForAttrs checking[" + i + "]: new " + diffitem.getKey() + " "
-//							+ attrCode + ":" + PokUtils.getAttributeFlagValue(curritem, attrCode) + " " + attrCode2 + ":"
-//							+ PokUtils.getAttributeFlagValue(curritem, attrCode2) + NEWLINE);
-//						EANFlagAttribute fAtt = (EANFlagAttribute) curritem.getAttribute(attrCode);
-//						if (fAtt != null && fAtt.isSelected(attrVal)) {
-//							fAtt = (EANFlagAttribute) curritem.getAttribute(attrCode2);
-//							if (fAtt != null && fAtt.isSelected(attrVal2)) {
-//								diffEntity = diffitem;
-//								break;
-//							}
-//						}
-//					} else {
-//						// must check to see if the prior item had a match too
-//						ABRUtil.append(debugSb,"XMLTMFAVAILElem.getEntityForAttrs checking[" + i + "]: current " + diffitem.getKey() + " "
-//							+ attrCode + ":" + PokUtils.getAttributeFlagValue(curritem, attrCode) + " " + attrCode2 + ":"
-//							+ PokUtils.getAttributeFlagValue(curritem, attrCode2) + NEWLINE);
-//						EANFlagAttribute fAtt = (EANFlagAttribute) curritem.getAttribute(attrCode);
-//						if (fAtt != null && fAtt.isSelected(attrVal)) {
-//							fAtt = (EANFlagAttribute) curritem.getAttribute(attrCode2);
-//							if (fAtt != null && fAtt.isSelected(attrVal2)) {
-//								diffEntity = diffitem;
-//								break;
-//							}
-//						}
-//						ABRUtil.append(debugSb,"XMLTMFAVAILElem.getEntityForAttrs checking[" + i + "]: prior " + diffitem.getKey() + " "
-//							+ attrCode + ":" + PokUtils.getAttributeFlagValue(prioritem, attrCode) + " " + attrCode2 + ":"
-//							+ PokUtils.getAttributeFlagValue(prioritem, attrCode2) + NEWLINE);
-//						fAtt = (EANFlagAttribute) prioritem.getAttribute(attrCode);
-//						if (fAtt != null && fAtt.isSelected(attrVal)) {
-//							fAtt = (EANFlagAttribute) prioritem.getAttribute(attrCode2);
-//							if (fAtt != null && fAtt.isSelected(attrVal2)) {
-//								diffEntity = diffitem;
-//								// break; see if there is another that is current
-//							}
-//						}
-//					}
-//				}
-//			}
-//		}
-//		
-//
-//		return diffEntity;
-//	}
-
-	/***************************************************************************
-	 * return Boolean check If there isn  an AVAIL where AVAILTYPE="Planned
-	 * Availability" (146)
-	 * 
-	 * @param table
-	 *            Hashtable that contain all the entities.
-	 * @param availtype
-	 *            AVAIL.AVAILTYPE
-	 * @param debugSb
-	 *            StringBuffer logo output.
-	 * 
-	 * If there isn  an AVAIL where AVAILTYPE="Planned Availability" (146) then
-	 * from TMF attributes Note: Condition1 is there isn't an Planned Avail.
-	 * Bing new added 6/27/2013  BH FS ABR XML System Feed Mapping 20130614.doc
-	 * 1 If MODEL.ANNDATE <= 2010-03-01  AND there is no Availability (AVAIL) where Availability Type (AVAILTYPE) = Planned Availability (146), then skip to step 3.
-       2 The aggregated (UNION) of the countries found for Availability (AVAIL) Country List (COUNTRYLIST) for all Availability Type (AVAILTYPE) that matches the earlier STATUS filtering criteria and the UNION of any Catalog Overrides (BHCATLGOR) Country List (COUNTRYLIST)..
-
-	 * 
-	 * 
-	 */
-	private String getCtryAVAL(Hashtable table, DiffEntity parentItem, boolean T1, Vector allVct, StringBuffer debugSb) {
-		String result = null;
-		String temp = null;
-		DiffEntity modeldiff = null;
-		Vector modelVct = (Vector) table.get("MODEL");
-		if (modelVct != null) {		
-		    modeldiff = (DiffEntity) modelVct.elementAt(0);
-		}
-		if (isOldData(table, modeldiff,  allVct,  debugSb, T1)){
-			ABRUtil.append(debugSb,"getCtryAVAL isOldData return null, skip to step 3.");
-			return null;
-		}
-		
-		ABRUtil.append(debugSb,"getCtryAVAL looking for AVAILTYPE: 146,149 and 151 " + (T1?"T1":"T2") + " in AVAIL" + " allVct.size:"
-			+ (allVct == null ? "null" : "" + allVct.size()) + NEWLINE);				
-		if (allVct != null) {	
-			if (T1){
-				for (int i = 0; i < allVct.size(); i++) {
-					DiffEntity diffitem = (DiffEntity) allVct.elementAt(i);
-					EntityItem prioritem = diffitem.getPriorEntityItem();
-					if (!diffitem.isNew()) {
-						ABRUtil.append(debugSb,"getCtryAVAL.getAvails checking[" + i + "]:Delete or Update"
-							+ diffitem.getKey() + " AVAILTYPE: " + PokUtils.getAttributeFlagValue(prioritem, "AVAILTYPE")
-							+ NEWLINE);
-						EANFlagAttribute fAtt = (EANFlagAttribute) prioritem.getAttribute("AVAILTYPE");
-						if (fAtt != null && (fAtt.isSelected("146")||fAtt.isSelected("149")||fAtt.isSelected("151"))) {
-							if (fAtt.isSelected("146")){
-								temp = "146";
-							}else if (fAtt.isSelected("149")){
-								temp = "149";
-							}else{
-								temp = "151";
-							}
-							if (result == null){
-                                result = temp;
-							}else {
-								if (temp.compareTo(result)<0){
-									result = temp;
-								}
-								
-							}
-						
-						}
-					}
-				}
-			}else{
-				for (int i = 0; i < allVct.size(); i++) {
-					DiffEntity diffitem = (DiffEntity) allVct.elementAt(i);
-					EntityItem curritem = diffitem.getCurrentEntityItem();
-					if (!diffitem.isDeleted()) {
-						ABRUtil.append(debugSb,"getCtryAVAL.getAvails checking[" + i + "]:New or Update"
-							+ diffitem.getKey() + " AVAILTYPE: " + PokUtils.getAttributeFlagValue(curritem, "AVAILTYPE")
-							+ NEWLINE);
-						EANFlagAttribute fAtt = (EANFlagAttribute) curritem.getAttribute("AVAILTYPE");
-						if (fAtt != null && (fAtt.isSelected("146")||fAtt.isSelected("149")||fAtt.isSelected("151"))) {
-							if (fAtt.isSelected("146")){
-								temp = "146";
-							}else if (fAtt.isSelected("149")){
-								temp = "149";
-							}else{
-								temp = "151";
-							}
-							if (result == null){
-                                result = temp;
-							}else {
-								if (temp.compareTo(result)<0){
-									result = temp;
-								}
-								
-							}
-						
-						}
-					}
-				}
-			}						
-		}
-		//CQ BHALM109267 SWPRODSTRUCT may not have an AVAIL of type planned Availablity if it is older than 20100301
-		//start
-//		if (parentItem.getEntityType().equals("SWPRODSTRUCT")){
-//			ABRUtil.append(debugSb,"There must has a planed AVAIL for SWPRODSTRUCT, otherwise there is no xml report!" + NEWLINE);
-//			return false;
-//		}
-		//end
-		return result;
-	}
-	  /********************
-	 *  return Boolean check If there isn't an AVAIL where AVAILTYPE="Planned Availability" (146), and ANNDATE less than "20100301"   
-	 *  @param table  
-	 *         Hashtable that contain all the entities.
-	 *  @param availtype 
-	 *         AVAIL.AVAILTYPE 
-	 *  @param debugSb
-	 *         StringBuffer logo output.
-	 *         
-	 *  If there isn't an AVAIL where AVAILTYPE="Planned Availability" (146), and ANNDATE <  0100301 then
-	 *  from MODEL attributes
-	 *  Note:
-	 *  Condition1 is there isn't an Planned Avail.  
-	 *  Condition2 is Model.ANNDATE <  0100301 - removed based on BH FS ABR XML System Feed Mapping 20120612.doc
-	 *  Bing new added 6/28/2013
-	 **/
-	private boolean isOldData(Hashtable table, DiffEntity parentItem, Vector tmfAvailVct, StringBuffer debugSb, boolean T1) {
-		boolean condition1 = false;
-		boolean condition2 = false;
-		String ANNDATE_Fix = "2010-03-01";		
-		if (T1){
-			if (tmfAvailVct != null) {
-				// find those of specified type
-				for (int i = 0; i < tmfAvailVct.size(); i++) {
-					DiffEntity diffitem = (DiffEntity) tmfAvailVct.elementAt(i);
-					EntityItem prioritem = diffitem.getPriorEntityItem();
-					//ABRUtil.append(debugSb,"debug4 "+ T1 + "difftiem is: " +( diffitem.isNew()?" is new":" is not new")+ NEWLINE);
-					if (!diffitem.isNew()) {
-						ABRUtil.append(debugSb,"T1 isOldData() getAvails checking[" + i + "]:New or Update"
-							+ diffitem.getKey() + " AVAILTYPE: " + PokUtils.getAttributeFlagValue(prioritem, "AVAILTYPE")
-							+ NEWLINE);
-						EANFlagAttribute fAtt = (EANFlagAttribute) prioritem.getAttribute("AVAILTYPE");
-						if (fAtt != null && fAtt.isSelected("146")) {
-							condition1 = true;
-							break;
-						}
-					}
-				}
-			}
-//			//BH FS ABR XML System Feed Mapping 20130426.doc add For GA offerings, normally an Availability (AVAIL) of type Planned Availability is required; however, 
-			//if it is is Old Data (i.e. MODEL.ANNDATE <20100301), then it will be considered World Wide (i.e. all of the Countries in COUNTRYLIST). 
-			if (parentItem != null){
-				EntityItem priorItem = parentItem.getPriorEntityItem();
-				if (priorItem != null) {
-					String anndate = PokUtils.getAttributeValue(priorItem, "ANNDATE", ", ", CHEAT, false);
-					condition2 = anndate.compareTo(ANNDATE_Fix) <= 0;
-					ABRUtil.append(debugSb,"T1 isOldData() get model ANNDATE" + priorItem.getKey() + " ANNDATE: " + anndate
-						+ NEWLINE);
-				}	
-			}		
-		}else {
-			if (tmfAvailVct != null) {
-			// find those of specified type
-				for (int i = 0; i < tmfAvailVct.size(); i++) {
-					DiffEntity diffitem = (DiffEntity) tmfAvailVct.elementAt(i);
-					EntityItem curritem = diffitem.getCurrentEntityItem();
-					if (!diffitem.isDeleted()) {
-						ABRUtil.append(debugSb,"T2 isOldData() getAvails checking[" + i + "]:New or Update"
-							+ diffitem.getKey() + " AVAILTYPE: " + PokUtils.getAttributeFlagValue(curritem, "AVAILTYPE")
-							+ NEWLINE);
-						EANFlagAttribute fAtt = (EANFlagAttribute) curritem.getAttribute("AVAILTYPE");
-						if (fAtt != null && fAtt.isSelected("146")) {
-							condition1 = true;
-							break;
-						}
-					}
-			    }
-			}
-	        //BH FS ABR XML System Feed Mapping 20130426.doc add For GA offerings, normally an Availability (AVAIL) of type Planned Availability is required; however, if it is is Old Data (i.e. MODEL.ANNDATE <20100301), then it will be considered World Wide (i.e. all of the Countries in COUNTRYLIST). 
-			if (parentItem != null){
-				EntityItem curritem = parentItem.getCurrentEntityItem();
-				if (curritem != null) {
-					String anndate = PokUtils.getAttributeValue(curritem, "ANNDATE", ", ", CHEAT, false);
-					condition2 = anndate.compareTo(ANNDATE_Fix) <= 0;
-					ABRUtil.append(debugSb,"T2 isOldData() model ANNDATE" + curritem.getKey() + " ANNDATE: " + anndate
-						+ NEWLINE);
-					}
-			}
-		}
-		return (!condition1) && condition2;				
-	}
-	/***************************************************************************
-	 * return Boolean check If there isn  an AVAIL where AVAILTYPE="Planned
-	 * Availability" (146)
-	 * 
-	 * @param table
-	 *            Hashtable that contain all the entities.
-	 * @param availtype
-	 *            AVAIL.AVAILTYPE
-	 * @param debugSb
-	 *            StringBuffer logo output.
-	 * 
-	 * If there isn  an AVAIL where AVAILTYPE="Planned Availability" (146) then
-	 * from MODEL attributes Note: Condition1 is there isn't an Planned Avail.
-	 */
-	private boolean isDerivefromMODEL(Hashtable table, Vector allVct, boolean T1, StringBuffer debugSb) {
-		boolean condition1 = false;		
-		ABRUtil.append(debugSb,"isDerivefromMODEL.getAvails looking for AVAILTYPE: 146 " + (T1?"T1":"T2") + " in AVAIL" + " allVct.size:"
-			+ (allVct == null ? "null" : "" + allVct.size()) + NEWLINE);
-		if (allVct != null) {
-			if (T1){
-				for (int i = 0; i < allVct.size(); i++) {
-					DiffEntity diffitem = (DiffEntity) allVct.elementAt(i);
-					EntityItem prioritem = diffitem.getPriorEntityItem();
-					if (!diffitem.isNew()) {
-						ABRUtil.append(debugSb,"DerivefromModel.getAvails checking[" + i + "]:Delete or Update"
-							+ diffitem.getKey() + " AVAILTYPE: " + PokUtils.getAttributeFlagValue(prioritem, "AVAILTYPE")
-							+ NEWLINE);
-						EANFlagAttribute fAtt = (EANFlagAttribute) prioritem.getAttribute("AVAILTYPE");
-						if (fAtt != null && fAtt.isSelected("146")) {
-							condition1 = true;
-							break;
-						}
-					}
-				}						
-			}else{
-//				 find those of specified type
-				for (int i = 0; i < allVct.size(); i++) {
-					DiffEntity diffitem = (DiffEntity) allVct.elementAt(i);
-					EntityItem curritem = diffitem.getCurrentEntityItem();
-					if (!diffitem.isDeleted()) {
-						ABRUtil.append(debugSb,"DerivefromModel.getAvails checking[" + i + "]:New or Update"
-							+ diffitem.getKey() + " AVAILTYPE: " + PokUtils.getAttributeFlagValue(curritem, "AVAILTYPE")
-							+ NEWLINE);
-						EANFlagAttribute fAtt = (EANFlagAttribute) curritem.getAttribute("AVAILTYPE");
-						if (fAtt != null && fAtt.isSelected("146")) {
-							condition1 = true;
-							break;
-						}
-					}
-				}				
-			}
-		}
-		return condition1;
-	}
-	/**
-	 * availType: MODELAVAIL
-	 *            OOFAVAIL
-	 *            SWPRODSTRUCTAVAIL
-	 *            
-	 *                      
-	 * 
-	 * @param table
-	 * @param isfromLSEOModel
-	 * @param debugSb
-	 * @return
-	 */
-    private Vector getAvailOfAvailType(Hashtable table,String availType,StringBuffer debugSb){
-		
-		Vector allVct = (Vector) table.get("AVAIL");
-		//printTable(table, debugSb);
-		Vector overrideVct = new Vector(1); 
-		if (allVct != null) {
-			for (int i = 0; i < allVct.size(); i++) {
-				DiffEntity diffitem = (DiffEntity) allVct.elementAt(i);
-				//ABRUtil.append(debugSb,"getAvailOfAvailType diffitem.toString():" + diffitem.toString() + NEWLINE);
-				ABRUtil.append(debugSb,"getAvailOfAvailType looking for AVAIL type " + availType + " there are " + allVct.size() +" AVAILs, " +  diffitem.getKey() +NEWLINE);
-				if (diffitem.isDeleted()){
-					EntityItem priorItem = diffitem.getPriorEntityItem();
-					if (priorItem.hasUpLinks()) {
-						for (int ii = 0; ii < priorItem.getUpLinkCount(); ii++) {
-							EntityItem entity = (EntityItem) priorItem.getUpLink(ii);
-							//ABRUtil.append(debugSb,"getAvailOfAvailType priorItem.getUpLink type:" + entity.getEntityType() + NEWLINE);
-							if (entity.getEntityType().equals(availType)) {
-								overrideVct.add(diffitem);
-								break;
-							}
-						}
-					}
-				} else{
-					EntityItem currItem = diffitem.getCurrentEntityItem();
-					if (currItem.hasUpLinks()) {
-						for (int ii = 0; ii < currItem.getUpLinkCount(); ii++) {
-							EntityItem entity = (EntityItem) currItem.getUpLink(ii);
-							//ABRUtil.append(debugSb,"getAvailOfAvailType currItem.getUpLink type:" + entity.getEntityType() + NEWLINE);
-							if (entity.getEntityType().equals(availType)) {
-								overrideVct.add(diffitem);
-								break;
-							}
-						}
-					}					
-				}
-						
-			}
-		}
-		return overrideVct;		
-	}
-	
-	/***************************************************************************
-	 * CATAUDIENCE CBP Catalog - Business Partner Catalog - Business Partner
-	 * CATAUDIENCE CIR Catalog - Indirect/Reseller Catalog - Indirect/Reseller
-	 * CATAUDIENCE LE LE Direct LE Direct CATAUDIENCE None None None CATAUDIENCE
-	 * Shop Public Public
-	 * 
-	 * AUDIEN 100 SDI Channel AUDIEN 10046 Catalog - Business Partner Catalog -
-	 * Business Partner AUDIEN 10048 Catalog - Indirect/Reseller Catalog -
-	 * Indirect/Reseller AUDIEN 10054 Public Public AUDIEN 10055 None None
-	 * AUDIEN 10062 LE Direct LE Direct AUDIEN 10067 DAC/MAX DAC/MAX get entity
-	 * with specified values - should only be one could be two if one was
-	 * deleted and one was added, but the added one will override and be an
-	 * 'update'
-	 */
-	private DiffEntity getCatlgor(Hashtable table, String attrVal2, StringBuffer debugSb) {
-		// remove the check of the CATLGOR Audience 2012-08-24
-		DiffEntity diffEntity = null;
-	    //RCQ00222829 change  CATLGOR to BHCATLGOR base on the doc BH FS ABR XML System Feed Mapping 20130214.doc		
-		Vector allVct = (Vector) table.get("BHCATLGOR");
-//		String attrCode2 = "OFFCOUNTRY"; // need flag code
-		String attrCode2 = BHCOUNTRYLIST; // need flag code
-		ABRUtil.append(debugSb,"XMLCtryAudElem.getCatlgor looking for " + attrCode2 + ":" + attrVal2 + " in CATLGOR allVct.size:"
-			+ (allVct == null ? "null" : "" + allVct.size()) + NEWLINE);
-		if (allVct == null) {
-			return diffEntity;
-		}
-
-		// find those of specified type
-		diffloop: for (int i = 0; i < allVct.size(); i++) {
-			DiffEntity diffitem = (DiffEntity) allVct.elementAt(i);
-			EntityItem curritem = diffitem.getCurrentEntityItem();
-			EntityItem prioritem = diffitem.getPriorEntityItem();
-			//add the check of the status of BHCATLGOR
-			String BHStatus  = PokUtils.getAttributeFlagValue(curritem,"STATUS");
-			if(!STATUS_FINAL.equals(BHStatus)){
-				continue;
-			}
-			if (diffitem.isDeleted()) {
-				ABRUtil.append(debugSb,"XMLCtryAudElem.getCatlgor checking[" + i + "]: deleted " + diffitem.getKey() + " " + attrCode2 + ":"
-					+ PokUtils.getAttributeFlagValue(prioritem, attrCode2) + NEWLINE);
-				EANFlagAttribute fAtt2 = (EANFlagAttribute) prioritem.getAttribute(attrCode2);
-				if (fAtt2 != null && fAtt2.isSelected(attrVal2)) {
-					diffEntity = diffitem; // keep looking for one
-					// that is not deleted
-					break;
-				}
-				
-			} else {
-				if (diffitem.isNew()) {
-					ABRUtil.append(debugSb,"XMLCtryAudElem.getCatlgor checking[" + i + "]: new " + diffitem.getKey() + " " + attrCode2 + ":"
-							+ PokUtils.getAttributeFlagValue(curritem, attrCode2) + NEWLINE);
-					EANFlagAttribute fAtt2 = (EANFlagAttribute) curritem.getAttribute(attrCode2);
-					if (fAtt2 != null && fAtt2.isSelected(attrVal2)) {
-						diffEntity = diffitem;
-						break diffloop;
-					}
-				} else {
-					// must check to see if the prior item had a match too
-					ABRUtil.append(debugSb,"XMLCtryAudElem.getCatlgor checking[" + i + "]: current " + diffitem.getKey() + " " + attrCode2 + ":"
-						+ PokUtils.getAttributeFlagValue(curritem, attrCode2) + NEWLINE);
-					EANFlagAttribute fAtt2 = (EANFlagAttribute) curritem.getAttribute(attrCode2);
-					if (fAtt2 != null && fAtt2.isSelected(attrVal2)) {
-						diffEntity = diffitem;
-						break diffloop;
-					}
-					
-					fAtt2 = (EANFlagAttribute) prioritem.getAttribute(attrCode2);
-					if (fAtt2 != null && fAtt2.isSelected(attrVal2)) {
-						diffEntity = diffitem;
-						break; // see if there is another that is
-								// current
-					}
-				}
-			}
-		}
-
-		return diffEntity;
-	}
-
-	/***************************************************************************
-	 * one for every AVAIL.COUNTRYLIST where availtype='planned availbility(146)
-	 * include the avails (delete,new and update)
-	 * 
-	 */
-	private static class CtryAudRecord extends CtryRecord {
-		
-		
-		public String country;
-		private DiffEntity availDiff;
-
-
-		CtryAudRecord(DiffEntity diffitem, String ctry) {
-			super(null);
-			country = ctry;
-			availDiff = diffitem;
-		}
-
-		void setUpdateAvail(DiffEntity avl) {
-			availDiff = avl;// allow replacement
-			setAction(UPDATE_ACTIVITY);
-		}
-		
-		
-		/***********************************************************************
-		 * a) ID 42.00 <ANNDATE> 1. ANNOUNCEMENT.ANNDATE 2. PRODSTRUCT.ANNDATE
-		 * 3. Max{MODEL.ANNDATE; FEATURE.FIRSTANNDATE} OR MODEL.ANNDATE if
-		 * SWFEATURE). b) ID 42.10 <ANNNUMBER> 1. ANNOUNCEMENT.ANNNUMBR from the
-		 * ANNOUNCEMENT used for the preceding token <ANNDATE> 2. empty
-		 * 
-		 * c) ID 43.00 <FIRSTORDER> 1. AVAIL.EFFECTIVEDATE where AVAILTYPE
-		 * first Order2. ANNOUNCEMENT.ANNDATE 3. PRODSTRUCT.GENAVAILDATE 4.
-		 * MODEL.GENAVAILDATE d) ID 44.00 <PLANNEDAVAILABILITY> 1.
-		 * AVAIL.EFFECTIVEDATE where AVAILTYPE planned Availability2.
-		 * PRODSTRUCT.GENAVAILDATE 3. Max{FEATURE.GENAVAILDATE;
-		 * MODEL.GENAVAILDATE} e) ID 45.00 <PUBFROM> 1. ANNOUNCEMENT.ANNDATE 2.
-		 * PRODSTRUCT.ANNDATE 3. Max{MODEL.ANNDATE; FEATURE.FIRSTANNDATE} OR
-		 * MODEL.ANNDATE if SWFEATURE).
-		 * 
-		 * f) ID 46.00 <PUBTO> 1. AVAIL.EFFECTIVEDATE where AVAILTYPE =last
-		 * Order 2. PRODSTRUCT. WTHDRWEFFCTVDATE 3. Min(MODEL.
-		 * WTHDRWEFFCTVDATE; SWFEATURE. WITHDRAWDATEEFF_T; FEATURE.
-		 * WITHDRAWDATEEFF_T} g) ID 47.00 <WDANNDATE> 1. ANNOUNCEMENT.ANNDATE
-		 * where AVAIL.AVAILTYPE = last Order2. PRODSTRUCT. WITHDRAWDATE 3.
-		 * Min{MODEL. WITHDRAWDATE; FEATURE. WITHDRAWANNDATE_T; SWFEATURE.
-		 * WITHDRAWANNDATE_T} h) ID 48.00 <LASTORDER> Same as <PUBTO> i) ID
-		 * 49.00 <EOSANNDATE> Empty
-		 * 
-		 * j) ID 50.00 <ENDOFSERVICEDATE> Empty
-		 * 
-		 * 		vct[0] = prevFeaVct;
-		 *      vct[1] = currFeaVct;
-		 */
-		void setAllFields(DiffEntity[] diffPlanavail, Vector[] feaCtry, DiffEntity catlgorDiff, DiffEntity parentItem, DiffEntity foAvailDiff, DiffEntity loAvailDiff,
-			DiffEntity endAvailDiff, DiffEntity endMktAvailDiff, DiffEntity loModelAvailDiff, DiffEntity endModelAvailDiff, DiffEntity endModelMktAvailDiff, DiffEntity plModelAvailDiff, Hashtable table,  boolean isExistfinal, boolean compatModel, StringBuffer debugSb) {
-			
-			
-//			 set STATUS
-			availStatus = "0020";
-            rfravailStatus = "0040";
-			
-			ABRUtil.append(debugSb,"CtryRecord.setAllFields entered for country is belong to availDiff " + (availDiff == null ? "null" : availDiff.getKey()) + ". OFFAVAIL Planned AVAIL is " +  (diffPlanavail[1] == null ? "null" : diffPlanavail[1].getKey())
-				+ NEWLINE);
-			// ANNDATE is ANNOUNCEMENT.ANNDATE for the AVAIL where
-			// AVAIL.AVAILTYPE = planned Availability(146).
-			// If prodstruct has no Planed AVAIL, then  pass unll into availDiff. anndate gose to prodstruct.anndate. 
-			String[] anndates = deriveAnnDate(false, diffPlanavail[1], parentItem, plModelAvailDiff, feaCtry, debugSb);
-//			anndate = anndates[0];
-//			rfranndate = anndates[1];			 
-			String[] anndatesT1 = deriveAnnDate(true, diffPlanavail[0], parentItem, plModelAvailDiff, feaCtry, debugSb);
-//			anndateT1 = anndatesT1[0];
-//			rfranndateT1 = anndatesT1[1];						 
-
-
-			// ANNNUMBER is ANNOUNCEMENT.ANNNUMBER for the AVAIL where
-			// AVAIL.AVAILTYPE = planned Availability(146).
-			String[] annnumbers = deriveAnnNumber(false, diffPlanavail[1], debugSb);
-//			annnumber = annnumbers[0];
-//			rfrannnumber = annnumbers[1];
-			String[] annnumbersT1 = deriveAnnNumber(true, diffPlanavail[0], debugSb);
-//			annnumberT1 = annnumbersT1[0];
-//			rfrannnumberT1 = annnumbersT1[1];
-			
-			
-
-			// FIRSTORDER - should be AVAIL.EFFECTIVEDATE where AVAILTYPE = 143
-			// or null.
-			
-			// update firstorder , if planed avail from MODEL, then ignore it. go to next priority.
-			String[] firstorders = deriveFIRSTORDER(false, diffPlanavail[1], parentItem, foAvailDiff,  plModelAvailDiff, feaCtry, debugSb);
-//			firstorder = firstorders[0];
-//			rfrfirstorder = firstorders[1];			                         
-			String[] firstordersT1 = deriveFIRSTORDER(true, diffPlanavail[0], parentItem, foAvailDiff,  plModelAvailDiff, feaCtry, debugSb);
-//			firstorderT1 = firstordersT1[0];
-//			rfrfirstorderT1 = firstordersT1[1];
-			
-			
-			// LASTORDER is equal to PUBTO.
-			// PLANNEDAVAILABILITY is AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE
-			// = "Planned Availability" (146)
-			String[] plannedavailabilitys = derivePLANNEDAVAILABILITY(false, diffPlanavail[1], parentItem, plModelAvailDiff, feaCtry, debugSb);
-//			plannedavailability = plannedavailabilitys[0];
-//			rfrplannedavailability = plannedavailabilitys[1];
-			String[] plannedavailabilitysT1 = derivePLANNEDAVAILABILITY(true, diffPlanavail[0], parentItem, plModelAvailDiff, feaCtry, debugSb);
-//			plannedavailabilityT1 = plannedavailabilitysT1[0];
-//			rfrplannedavailabilityT1 = plannedavailabilitysT1[1];
-			
-
-			// set PUBFROM
-			//udpate derivePubFrom  if planedavail from Model , then gose to next priority. 
-			String[] pubfroms = derivePubFrom(false, diffPlanavail[1], catlgorDiff, foAvailDiff, parentItem, plModelAvailDiff, feaCtry, debugSb);
-//			pubfrom = pubfroms[0];
-//			rfrpubfrom = pubfroms[1];
-		    String[] pubfromsT1 = derivePubFrom(true, diffPlanavail[0], catlgorDiff, foAvailDiff, parentItem, plModelAvailDiff, feaCtry, debugSb);
-//		    pubfromT1 = pubfromsT1[0];
-//		    rfrpubfromT1 = pubfromsT1[1];
-
-			// set PUBTO
-			String[] pubtos = derivePubTo(false, catlgorDiff, parentItem, loAvailDiff, plModelAvailDiff, loModelAvailDiff, feaCtry, debugSb);
-//			pubto = pubtos[0];
-//		    rfrpubto = pubtos[1];
-			String[] pubtosT1 = derivePubTo(true, catlgorDiff, parentItem, loAvailDiff, plModelAvailDiff, loModelAvailDiff, feaCtry, debugSb);
-//			pubtoT1 = pubtosT1[0];
-//		    rfrpubtoT1 = pubtosT1[1];
-			
-
-			// set WDANNDATE
-			String[] wdanndates = deriveWDANNDATE(false, parentItem, loAvailDiff, endMktAvailDiff, endModelMktAvailDiff, plModelAvailDiff, feaCtry, debugSb);
-//			wdanndate =wdanndates[0];
-//			rfrwdanndate = wdanndates[1];			
-			String[] wdanndatesT1 = deriveWDANNDATE(true, parentItem, loAvailDiff, endMktAvailDiff, endModelMktAvailDiff, plModelAvailDiff, feaCtry, debugSb);
-//			wdanndateT1 =wdanndatesT1[0];
-//			rfrwdanndateT1 = wdanndatesT1[1];
-//				
-			// set ENDOFMARKETANNNUMBER Story 1865979 Withdrawal RFA Number generation
-            String[] eomannnums = deriveENDOFMARKETANNNUMBER(parentItem, loAvailDiff, endMktAvailDiff, endModelMktAvailDiff, false, debugSb);
-            String[] eomannnumsT1 = deriveENDOFMARKETANNNUMBER(parentItem, loAvailDiff, endMktAvailDiff, endModelMktAvailDiff, true, debugSb);
-
-			// set LASTORDER
-			String[] lastorders = deriveLastOrder(false, catlgorDiff, parentItem, loAvailDiff, loModelAvailDiff, plModelAvailDiff, feaCtry, debugSb);
-//			lastorder = lastorders[0];
-//			rfrlastorder = lastorders[1];
-			String[] lastordersT1 = deriveLastOrder(true, catlgorDiff, parentItem, loAvailDiff, loModelAvailDiff, plModelAvailDiff, feaCtry, debugSb);
-//			lastorderT1 = lastordersT1[0];
-//			rfrlastorderT1 = lastordersT1[1];
-
-			
-			//setENDOFSERVICEDATE
-			String[] endofservices = deriveENDOFSERVICEDATE(false, parentItem, endAvailDiff, endModelAvailDiff, debugSb);
-//			endofservice = endofservices[0];
-//			rfrendofservice = endofservices[1];			              
-			String[] endofservicesT1 = deriveENDOFSERVICEDATE(true, parentItem, endAvailDiff, endModelAvailDiff, debugSb);
-//			endofserviceT1 = endofservicesT1[0];
-//			rfrendofserviceT1 = endofservicesT1[1];
-
-			//setEOSANNDATE
-			String[] eosanndates = deriveEOSANNDATE(false, parentItem, endAvailDiff, endModelAvailDiff, debugSb);
-//			eosanndate= eosanndates[0];
-//			rfreosanndate = eosanndates[1];			
-			String[] eosanndatesT1 = deriveEOSANNDATE(true, parentItem, endAvailDiff, endModelAvailDiff, debugSb);
-//			eosanndateT1 = eosanndatesT1[0];
-//			rfreosanndateT1 = eosanndatesT1[1];
-			
-			//set ENDOFSERVICEANNNUMBER Story 1865979 Withdrawal RFA Number generation
-            String[] eosannnums = deriveENDOFSERVICEANNNUMBER(parentItem, endAvailDiff, endModelAvailDiff, false, debugSb);
-            String[] eosannnumsT1 = deriveENDOFSERVICEANNNUMBER(parentItem, endAvailDiff, endModelAvailDiff, true, debugSb);
-            
-			handleResults(anndates, anndatesT1, annnumbers, annnumbersT1,firstorders, firstordersT1,
-			              plannedavailabilitys, plannedavailabilitysT1, pubfroms,pubfromsT1, pubtos,  pubtosT1,
-			              wdanndates,  wdanndatesT1, eomannnums, eomannnumsT1, lastorders,  lastordersT1,  endofservices,  endofservicesT1,
-			               eosanndates,  eosanndatesT1, eosannnums, eosannnumsT1, country,  isExistfinal,  compatModel,  debugSb);
-			
-
-			
-			//comment out this part, it may not correct. becuase availDiff in SLEORGGRP.hasChanges() may not planed avail, it 's the avalil that the country come from. 
-//			boolean SLEORGGRPChaned = false;
-//			add SLEORGGRP
-//			if("SWPRODSTRUCT".equals(parentItem.getEntityType())){
-//				SLEORGGRPChaned	= SLEORGGRP.hasChanges(table, parentItem.getCurrentEntityItem(), availDiff, "D:SWPRODSTRUCTAVAIL:D:AVAIL:D:AVAILSLEORGA:D", country, debugSb);
-//			}
-//			else{
-//				SLEORGGRPChaned	= SLEORGGRP.hasChanges(table, parentItem.getCurrentEntityItem(), availDiff, "D:OOFAVAIL:D:AVAIL:D:AVAILSLEORGA:D", country, debugSb);
-//			}
-//			SLEORGGRPChaned	= SLEORGGRP.hasChanges(table, parentItem.getCurrentEntityItem(), availDiff, null, country, debugSb);
-//			if (SLEORGGRPChaned) {
-//				if(existfnialT2){
-//					setAction(UPDATE_ACTIVITY);
-//					setrfrAction(UPDATE_ACTIVITY);
-//				}else{
-//					setrfrAction(UPDATE_ACTIVITY);
-//				}
-//			}
-		}
-
-	
-		
-		/***********************************************************************
-		 old: * ID 46.00 <PUBTO> 0. PRODSTRUCTCATLGOR-d: CATLGOR.PUBTO or
-		 * SWPRODSTRCATLGOR-d. CATLGOR.PUBTO 1. AVAIL.EFFECTIVEDATE where
-		 * AVAILTYPE = last Order2. PRODSTRUCT. WTHDRWEFFCTVDATE 3.
-		 * Min(MODEL. WTHDRWEFFCTVDATE; SWFEATURE. WITHDRAWDATEEFF_T; FEATURE.
-		 * WITHDRAWDATEEFF_T}
-		 
-		 New: BH FS XML Feed Mapping20121001.doc
-		  f)	ID 46.00 <PUBTO>
-			1.	PRODSTRUCTCATLGOR-d: CATLGOR.PUBTO or
-			SWPRODSTRCATLGOR-d. CATLGOR.PUBTO
-			By country found in CATLGOR. OFFCOUNTRY
-			2.	OOFAVAIL-d: AVAIL.EFFECTIVEDATE where AVAILTYPE = last Order(149).
-			By country found in AVAIL.COUNTRYLIST
-			3.	PRODSTRUCT. WTHDRWEFFCTVDATE
-			The applicable countries are the intersection of the MODEL AVAIL.COUNTRYLIST where AVAILTYPE = last Order(149). and the FEATURE.COUNTRYLIST.
-			4.	Min of the following three that are applicable
-			1)	First of the following two
-			a)	MODELAVAIL-d: AVAIL.EFFECTIVEDATE where AVAILTYPE = last Order(149)
-			By the AVAIL.COUNTRYLIST
-			b)	MODEL. WTHDRWEFFCTVDATE;
-			By AVAIL.COUNTRYLIST where AVAILTYPE = planned Availability(146)
-			2)	SWFEATURE. WITHDRAWDATEEFF_T; 
-			Applies to all Countries that get this far
-			3)	FEATURE. WITHDRAWDATEEFF_T
-			By FEATURE.COUNTRYLIST
-			5.	empty
-
-		 */
-		private String[] derivePubTo(boolean findT1, DiffEntity catlgorDiff, DiffEntity parentDiff, DiffEntity loAvailDiff, DiffEntity plModelAvailDiff, DiffEntity loModelAvailDiff,
-			Vector[] feaCtry, StringBuffer debugSb) {
-			ABRUtil.append(debugSb,"XMLTMFAVAILElem.derivePubTo " + " loAvailDiff: " + (loAvailDiff == null ? "null" : loAvailDiff.getKey())
-				+ " findT1:" + findT1 + NEWLINE);
-
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String sReturn[] = new String[2];
-			//TODO
-			
-			String temps[] = new String[2];
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//get the catlgorDiff PUBTO date
-				temps = AvailUtil.getBHcatlgorAttributeDate(findT1, parentDiff, catlgorDiff, thedate, rfrthedate, country, "PUBTO", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//get the loAvailDiff EFFECTIVEDATE date
-				temps = AvailUtil.getAvailAttributeDate(findT1, loAvailDiff, thedate, rfrthedate, country, "EFFECTIVEDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-//				3.	PRODSTRUCT. WTHDRWEFFCTVDATE
-//				The applicable countries are the intersection of the MODEL AVAIL.COUNTRYLIST where AVAILTYPE = last Order (149). and the FEATURE.COUNTRYLIST.
-//             feaCtry[0] is priorCountrylist.
-				temps = AvailUtil.getProdstructAttributeDate(findT1, parentDiff, loModelAvailDiff, feaCtry, thedate, rfrthedate,country, "WTHDRWEFFCTVDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}	
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-//				4.	Min of the following four that are applicable
-//				1)	If PRODSTUCT.ORDERCODE =Initial(5957), then 
-//				First of the following two
-//				a)	MODELAVAIL-d: AVAIL.EFFECTIVEDATE where AVAILTYPE = Last Order (149)
-//				By the AVAIL.COUNTRYLIST
-//				b)	MODEL. WTHDRWEFFCTVDATE;
-//				By AVAIL.COUNTRYLIST where AVAILTYPE = Planned Availability(146)
-//				2)	PRODSTRUCT. WTHDRWEFFCTVDATE
-//				3)	SWFEATURE. WITHDRAWDATEEFF_T 
-//				Applies to all Countries that get this far
-//				4)	FEATURE. WITHDRAWDATEEFF_T
-//				By FEATURE.COUNTRYLIST
-				temps = getModelFeatureSpDate(findT1, parentDiff, loModelAvailDiff, plModelAvailDiff, thedate, rfrthedate, debugSb);
-				//temps = getSpecialDate(findT1,parentDiff, plModelAvailDiff, loModelAvailDiff,thedate, rfrthedate, debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			sReturn[0]= thedate;
-			sReturn[1]= rfrthedate;
-			return sReturn;
-		}
-
-		/***********************************************************************
-		 * 0. PRODSTRUCTCATLGOR-d: CATLGOR.PUBFROM or SWPRODSTRCATLGOR-d:
-		 * CATLGOR.PUBFROM 1. ANNOUNCEMENT.ANNDATE 2. PRODSTRUCT.ANNDATE 3.
-		 * Max{MODEL.ANNDATE; FEATURE.FIRSTANNDATE} OR MODEL.ANNDATE if
-		 * SWFEATURE).
-		 // update as following sequence
-		  e)	ID 45.00 <PUBFROM>
-			1.	PRODSTRUCTCATLGOR-d: CATLGOR.PUBFROM or
-			SWPRODSTRCATLGOR-d: CATLGOR.PUBFROM
-			2.	OOFAVAIL-d: AVAIL.EFFECTIVEDATE where AVAILTYPE = first Orderor
-			SWPRODSTRUCTAVAIL-d: AVAIL.EFFECTIVEDATE where AVAILTYPE = first Order
-			3.	ANNOUNCEMENT.ANNDATE for the AVAIL where AVAILTYPE = planned Availability(146). 
-			See step 4 for the AVAIL path.
-			4.	OOFAVAIL-d: AVAIL.EFFECTIVEDATE where AVAILTYPE = planned Availabilityor
-			SWPRODSTRUCTAVAIL-d: AVAIL.EFFECTIVEDATE where AVAILTYPE = plaanned Availability
-			5.	PRODSTRUCT.ANNDATE
-			6.	Max{MODEL.ANNDATE; FEATURE.FIRSTANNDATE} OR MODEL.ANNDATE if SWFEATURE).
-		 */
-		private String[] derivePubFrom(boolean findT1, DiffEntity availDiff, DiffEntity catlgorDiff, DiffEntity foAvailDiff, DiffEntity parentDiff, DiffEntity plModelAvailDiff, Vector feaCtry[], StringBuffer debugSb) {
-			String thedate = CHEAT;
-			ABRUtil.append(debugSb,"XMLTMFAVAILElem.derivePubFrom " + " catlgorDiff: "
-					+ (catlgorDiff == null ? "null" : catlgorDiff.getKey()) + " findT1:" + findT1 + NEWLINE);
-			
-			String rfrthedate = CHEAT;
-			String sReturn[] = new String[2];
-			
-			String temps[] = new String[2];
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//1 find current derivation
-				temps = AvailUtil.getBHcatlgorAttributeDate(findT1, parentDiff, catlgorDiff, thedate, rfrthedate, country, "PUBFROM", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//2 20120117  add
-				temps = AvailUtil.getAvailAttributeDate(findT1, foAvailDiff, thedate, rfrthedate, country, "EFFECTIVEDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//3 try to get it from ANNOUNCEMENT.ANNDATE for the AVAIL
-				// where AVAIL.AVAILTYPE = "Planned Availability" (146).
-				temps = AvailUtil.getAvailAnnAttributeDate(findT1, availDiff, thedate, rfrthedate, country, "ANNDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//4 20120117  add
-				temps = AvailUtil.getAvailAttributeDate(findT1, availDiff, thedate, rfrthedate, country, "EFFECTIVEDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//5.	IF PRODSTRUCT, PRODSTRUCT.ANNDATE 
-				//The applicable countries are the intersection of the MODEL’s AVAIL.COUNTRYLIST and the FEATURE.COUNTRYLIST.
-				temps = AvailUtil.getProdstructAttributeDate(findT1, parentDiff, plModelAvailDiff, feaCtry, thedate, rfrthedate,country, "ANNDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				// 6. IF PRODSTRUCT, Max{MODEL.ANNDATE; FEATURE.FIRSTANNDATE}
-				//The applicable countries are the intersection of the MODEL’s AVAIL.COUNTRYLIST and the FEATURE.COUNTRYLIST.
-				temps = AvailUtil.getModelFeatureAttributeDate(findT1, parentDiff, plModelAvailDiff, feaCtry, thedate, rfrthedate, country, "ANNDATE","FIRSTANNDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				// this is new added BH FS ABR XML System Feed Mapping 20121001.doc page 98:
-//				7.	IF SWPRODSTUCT IF SWPRODSTRUCT, MODEL.GENAVAILDATE
-//				The applicable countries is the MODEL  AVAIL.COUNTRYLIST
-				temps = getSWprodCountryDate(findT1,parentDiff,plModelAvailDiff, thedate,rfrthedate,country, debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-				
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//8.IF SWPRODSTRUCT THEN MODEL.ANNDATE - If the MODEL does not have any AVAILs where AVAILTYPE =Planned Availability, then it is World Wide (i.e. all countries) 
-				temps = AvailUtil.getSwprodModelAnnDate(findT1, parentDiff, thedate, rfrthedate, debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			sReturn[0]= thedate;
-			sReturn[1]= rfrthedate;
-			return sReturn;
-		}
-
-		/**
-		 * @param parentDiff
-		 * @param plModelAvailDiff
-		 * @param thedate
-		 * @param debugSb
-		 * @return
-		 */
-		private String[] getSWprodCountryDate(boolean findT1, DiffEntity parentDiff,
-				DiffEntity plModelAvailDiff, String thedate, String rfrthedate, String country, 
-				StringBuffer debugSb) {
-			String[] sReturn = new String[2];
-			
-			EntityItem plModelitem = AvailUtil.getEntityItem(findT1, plModelAvailDiff);
-			
-			if (plModelitem != null ) {
-				//EntityItem plModelitem = plModelAvailDiff.getPriorEntityItem();
-				EANFlagAttribute fAtt = (EANFlagAttribute) plModelitem.getAttribute("COUNTRYLIST");
-				if (fAtt != null && fAtt.isSelected(country)) {
-					EntityItem item = AvailUtil.getEntityItem(findT1, parentDiff);
-					if (item != null) {
-						if (parentDiff.getEntityType().equals("SWPRODSTRUCT")){
-							//EntityItem item = parentDiff.getPriorEntityItem();							
-							if (item.hasDownLinks()) {
-								for (int i = 0; i < item.getDownLinkCount(); i++) {
-									EntityItem entity = (EntityItem) item.getDownLink(i);
-									if (entity.getEntityType().equals("MODEL")) {
-										String entityDate = PokUtils.getAttributeValue(entity, "GENAVAILDATE", ", ", CHEAT, false);
-										String entityStatus = PokUtils.getAttributeFlagValue(entity, "STATUS");
-										
-										ABRUtil.append(debugSb,"XMLTMFAVAILElem.derivePubFrom getting GENAVAILDATE from " + entity.getKey()
-											+ " GENAVAILDATE is:" + thedate + NEWLINE);
-										if (entityStatus != null && entityStatus.equals("0020") && CHEAT.equals(thedate)){
-											thedate = entityDate;
-										} else if (entityStatus != null && entityStatus.equals("0040") && CHEAT.equals(rfrthedate)){
-											rfrthedate = entityDate;
-										}
-										break;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			sReturn[0]= thedate;
-			sReturn[1]= rfrthedate;
-			return sReturn;
-		}
-		
-
-		
-
-		/***********************************************************************
-		 * <ANNNUMBER> 1. ANNNUMBER is ANNOUNCEMENT.ANNNUMBER for the AVAIL
-		 * where AVAIL.AVAILTYPE = planned Availability (146). 2. Empty (aka
-		 * Null)
-		 * 
-		 */
-		private String[] deriveAnnNumber(boolean findT1, DiffEntity availDiff, StringBuffer debugSb) {
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String anns[] = new String[2];			
-			
-			String temps[] = new String[2];
-			ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveAnnNumber availDiff: " + (availDiff == null ? "null" : availDiff.getKey())
-			 + "findT1:" + findT1 + NEWLINE);	
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				temps = AvailUtil.getAvailAnnAttributeDate(findT1, availDiff, thedate, rfrthedate, country, "ANNNUMBER", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}			
-			anns[0] = thedate;
-			anns[1] = rfrthedate;
-			return anns;
-		}
-		
-
-
-		/***********************************************************************
-		 * <ANNDATE> 1. ANNNUMBER is ANNOUNCEMENT.ANNDATE for the AVAIL where
-		 * AVAIL.AVAILTYPE = planned Availability (146). 2. Empty (aka Null)
-		 * 
-		 */
-		private String[] deriveAnnDate(boolean findT1, DiffEntity availDiff, DiffEntity parentDiff, DiffEntity plModelAvailDiff, Vector feaCtry[], StringBuffer debugSb) {
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String anns[] = new String[2];						
-			String temps[] = new String[2];
-			
-			ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveAnnDate availDiff: " + (availDiff == null ? "null" : availDiff.getKey())
-				+ " plModelAvailDiff: " + (plModelAvailDiff == null ? "null" : plModelAvailDiff.getKey()) + "findT1:" + findT1 + NEWLINE);	
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				temps = AvailUtil.getAvailAnnAttributeDate(findT1, availDiff, thedate, rfrthedate, country, "ANNDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}			
-			if (CHEAT.equals(thedate) && CHEAT.equals(rfrthedate)) {
-				temps = AvailUtil.getProdstructAttributeDate(findT1, parentDiff, plModelAvailDiff, feaCtry, thedate, rfrthedate,country, "ANNDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}			
-			if (CHEAT.equals(thedate) && CHEAT.equals(rfrthedate)) {
-				temps = AvailUtil.getModelFeatureAttributeDate(findT1, parentDiff, plModelAvailDiff, feaCtry, thedate, rfrthedate, country, "ANNDATE","FIRSTANNDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			if (CHEAT.equals(thedate) && CHEAT.equals(rfrthedate)) {
-				temps = AvailUtil.getSwprodModelAnnDate(findT1, parentDiff, thedate, rfrthedate, debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			anns[0] = thedate;
-			anns[1] = rfrthedate;
-			return anns;
-		}
-		
-
-		
-
-		/***********************************************************************
-		 * <FIRSTORDER> 1. AVAIL.EFFECTIVEDATE where AVAILTYPE first Order 2.
-		 * ANNOUNCEMENT.ANNDATE 3. PRODSTRUCT.GENAVAILDATE 4. MODEL.GENAVAILDATE
-		
-		// UPDATE as following sequence according to doc 20120117.doc
-		c)	ID 43.00 <FIRSTORDER>
-		1.	OOFAVAIL-d: or SWPRODSTRUCTAVAIL-d: then AVAIL.EFFECTIVEDATE for the AVAIL where AVAILTYPE =first Order  
-		2.	OOFAVAIL-d: or SWPRODSTRUCTAVAIL-d: then AVAILANNA-d: ANNOUNCEMENT.ANNDATE for the AVAIL where AVAILTYPE = planned Availability (146). 
-		3.	OOFAVAIL-d: or SWPRODSTRUCTAVAIL-d: then AVAIL.EFFECTIVEDATE for the AVAIL where AVAILTYPE = planned Availability  
-		4.	PRODSTRUCT.ANNDATE
-		5.	Max{MODEL.ANNDATE; FEATURE.FIRSTANNDATE} or MODEL.ANNDATE
-		6.	empty
-        */
-		private String[] deriveFIRSTORDER(boolean findT1, DiffEntity availDiff, DiffEntity parentDiff, DiffEntity foAvailDiff, DiffEntity plModelAvailDiff, Vector feaCtry[], StringBuffer debugSb) {
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String fos[] = new String[2];	
-			
-			ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveFIRSTORDER availDiff: " + (availDiff == null ? "null" : availDiff.getKey())
-				+ " foAvailDiff: " + (foAvailDiff == null ? "null" : foAvailDiff.getKey()) + "findT1:" + findT1 + NEWLINE);	
-			
-			//TODO
-			//TODO
-			
-			String temps[] = new String[2];
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//1.get the first order avail effective date
-				temps = AvailUtil.getAvailAttributeDate(findT1, foAvailDiff, thedate, rfrthedate, country, "EFFECTIVEDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//2.get the plan avail effective announcement date
-				temps = AvailUtil.getAvailAnnAttributeDate(findT1, availDiff, thedate, rfrthedate, country, "ANNDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//3.get the plan avail efftive date
-				temps = AvailUtil.getAvailAttributeDate(findT1, availDiff, thedate, rfrthedate, country, "EFFECTIVEDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//4.get the Prodstruct ann date
-				temps = AvailUtil.getProdstructAttributeDate(findT1, parentDiff, plModelAvailDiff, feaCtry, thedate, rfrthedate,country, "ANNDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//5.get the 
-				temps = AvailUtil.getModelFeatureAttributeDate(findT1, parentDiff, plModelAvailDiff, feaCtry, thedate, rfrthedate, country, "ANNDATE","FIRSTANNDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//6.get the swprodstruct --> model ann date
-				temps = AvailUtil.getSwprodModelAnnDate(findT1, parentDiff, thedate, rfrthedate, debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			fos[0] = thedate;
-			fos[1] = rfrthedate;
-			return fos;
-		}
-
-
-		
-		
-		/***********************************************************************
-		 * <PLANNEDAVAILABILITY> 
-		 * 1. AVAIL.EFFECTIVEDATE where AVAILTYPE planned Availability 
-		 * 2. PRODSTRUCT.GENAVAILDATE 
-		 * 3. Max{FEATURE.GENAVAILDATE; MODEL.GENAVAILDATE}
-		 */
-		private String[] derivePLANNEDAVAILABILITY(boolean findT1, DiffEntity availDiff, DiffEntity parentDiff, DiffEntity plModelAvailDiff, Vector feaCtry[], StringBuffer debugSb) {
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String plans[] = new String[2];
-			ABRUtil.append(debugSb,"XMLTMFAVAILElem.derivePLANNEDAVAILABILITY availDiff: "
-				+ (availDiff == null ? "null" : availDiff.getKey()) + "findT1:" + findT1 + NEWLINE);
-			
-			String temps[] = new String[2];
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//get the plan avail effective date
-				temps = AvailUtil.getAvailAttributeDate(findT1, availDiff, thedate, rfrthedate, country, "EFFECTIVEDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//get the plan avail effective date
-				temps = AvailUtil.getProdstructAttributeDate(findT1, parentDiff, plModelAvailDiff, feaCtry, thedate, rfrthedate,country, "GENAVAILDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//get the 
-				temps = AvailUtil.getModelFeatureAttributeDate(findT1, parentDiff, plModelAvailDiff, feaCtry, thedate, rfrthedate, country, "GENAVAILDATE","GENAVAILDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//get the 
-				temps = getSwprodModelDate(findT1, parentDiff, plModelAvailDiff, thedate, rfrthedate, debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//get the 
-				temps = AvailUtil.getSwprodModelAnnDate(findT1, parentDiff, thedate, rfrthedate, debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			plans[0] = thedate;
-			plans[1] = rfrthedate;
-			return plans;
-		}	
-
-		/**
-		 * @param parentDiff
-		 * @param plModelAvailDiff
-		 * @param thedate
-		 * @param debugSb
-		 * @return
-		 */
-		public String[] getSwprodModelDate(boolean findT1, DiffEntity parentDiff,
-				DiffEntity plModelAvailDiff, String thedate, String rfrthedate,
-				StringBuffer debugSb) {
-			String[] sReturn = new String[2];
-			EntityItem plModelitem = AvailUtil.getEntityItem(findT1, plModelAvailDiff);
-			
-			if (plModelitem != null) {				
-				EANFlagAttribute fAtt = (EANFlagAttribute) plModelitem.getAttribute("COUNTRYLIST");
-				if (fAtt != null && fAtt.isSelected(country)) {
-					EntityItem item = AvailUtil.getEntityItem(findT1, parentDiff);
-					if (item != null) {
-						//EntityItem item = parentDiff.getPriorEntityItem();
-						if (item.getEntityType().equals("SWPRODSTRUCT")){
-							if (item.hasDownLinks()) {
-								for (int i = 0; i < item.getDownLinkCount(); i++) {
-									EntityItem entity = (EntityItem) item.getDownLink(i);
-									if (entity.getEntityType().equals("MODEL")) {
-										String modelstatus = PokUtils.getAttributeFlagValue(entity, "STATUS");
-										
-										String modelDate = PokUtils.getAttributeValue(entity, "GENAVAILDATE", ", ", CHEAT, false);
-										ABRUtil.append(debugSb,"XMLTMFAVAILElem.derivePLANNEDAVAILABILITY getting GENAVAILDATE from "
-											+ entity.getKey() + " GENAVAILDATE is:" + thedate + NEWLINE);
-										//TODO
-										if (modelstatus != null && modelstatus.equals("0020") && CHEAT.equals(thedate)){
-											thedate = modelDate;
-										} else if (modelstatus != null && modelstatus.equals("0040") && CHEAT.equals(rfrthedate)){
-											rfrthedate = modelDate;
-										}
-										
-										break;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			sReturn[0]= thedate;
-			sReturn[1]= rfrthedate;
-			return sReturn;
-		}
-
-
-		/***********************************************************************
-		 Old:* ID 47.00 <WDANNDATE> 1. ANNOUNCEMENT.ANNDATE where AVAIL.AVAILTYPE =
-		 * last Order 2. PRODSTRUCT. WITHDRAWDATE 3. Min{MODEL. WITHDRAWDATE;
-		 * FEATURE. WITHDRAWANNDATE_T; SWFEATURE. WITHDRAWANNDATE_T}
-		 // update according to doc 20120117.doc
-		 1.	ANNOUNCEMENT.ANNDATE where AVAIL.AVAILTYPE = end of Marketing
-		 New: logic according to doc 20131001.doc
-		 1.	AVAILANNA-d: ANNOUNCEMENT.ANNDATE where AVAIL.AVAILTYPE = end of Marketing AND ANNOUNCEMENT.ANNTYPE = end Of Life - Withdrawal from mktg (14).
-		Since a PRODSTRUCT (SWPRODSTRUCT) can have multiple AVAILs each of which can be in a different ANNOUNCEMENT, this may vary by ANNOUNCEMENT which is applicable for a set of countries found in ANNOUNCEMENT.COUNTRYLIST.
-		2.	PRODSTRUCT. WITHDRAWDATE
-		The applicable countries are the intersection of the MODEL  AVAIL.COUNTRYLIST where AVAILTYPE = planned Availability (146) and the FEATURE.COUNTRYLIST.
-		3.	Min of the following three
-		1)	First of the following two
-		a)	The child MODELAVAIL-d: AVAILANNA-d: ANNOUNCEMENT.ANNDATE where AVAIL.AVAILTYPE = end of Marketing AND ANNOUNCEMENT.ANNTYPE = end Of Life - Withdrawal from mktg (14). ANNOUNCEMENT.COUNTRYLIST
-		b)	MODEL. WITHDRAWDATE
-		2)	SWFEATURE. WITHDRAWANNDATE_T
-		Applies to all Countries that get this far
-		3)	FEATURE. WITHDRAWANNDATE_T 
-		By FEATURE.COUNTRYLIST
-		4.	 empty.
-		update at 20181105
-		1.	AVAILANNA-d: ANNOUNCEMENT.ANNDATE where AVAIL.AVAILTYPE = last Order AND ANNOUNCEMENT.ANNTYPE = end Of Life - Withdrawal from mktg (14).
-		Since a PRODSTRUCT (SWPRODSTRUCT) can have multiple AVAILs each of which can be in a different ANNOUNCEMENT, this may vary by ANNOUNCEMENT which is applicable for a set of countries found in ANNOUNCEMENT.COUNTRYLIST.
-		2.	AVAILANNA-d: ANNOUNCEMENT.ANNDATE where AVAIL.AVAILTYPE = end of Marketing AND ANNOUNCEMENT.ANNTYPE = end Of Life - Withdrawal from mktg (14).
-		Since a PRODSTRUCT (SWPRODSTRUCT) can have multiple AVAILs each of which can be in a different ANNOUNCEMENT, this may vary by ANNOUNCEMENT which is applicable for a set of countries found in ANNOUNCEMENT.COUNTRYLIST.
-		3.	PRODSTRUCT. WITHDRAWDATE
-		The applicable countries are the intersection of the MODEL  AVAIL.COUNTRYLIST where AVAILTYPE = planned Availability (146) and the FEATURE.COUNTRYLIST.
-		4.	Min of the following three
-		1)	First of the following two
-		a)	The child MODELAVAIL-d: AVAILANNA-d: ANNOUNCEMENT.ANNDATE where AVAIL.AVAILTYPE = end of Marketing AND ANNOUNCEMENT.ANNTYPE = end Of Life - Withdrawal from mktg (14). ANNOUNCEMENT.COUNTRYLIST
-		b)	MODEL. WITHDRAWDATE
-		2)	SWFEATURE. WITHDRAWANNDATE_T
-		Applies to all Countries that get this far
-		3)	FEATURE. WITHDRAWANNDATE_T 
-		By FEATURE.COUNTRYLIST
-		5.	 empty.
-		 */
-		private String[] deriveWDANNDATE(boolean findT1, DiffEntity parentDiff, DiffEntity loAvailDiff, DiffEntity endMktAvailDiff, DiffEntity endModelMktAvailDiff, 
-				DiffEntity plModelAvailDiff, Vector[] feaCtry, StringBuffer debugSb) {
-			
-			
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String wdDate[] = new String[2];
-			
-			ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveWDANNDATE lastOrderAvailDiff: " + (loAvailDiff == null ? "null" : loAvailDiff.getKey())
-				+ "findT1:" + findT1 + NEWLINE);
-			
-			String temps[] = new String[2];
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//get the lastOrderAvailDiff effective announcement date
-				temps = AvailUtil.getAvailAnnAttributeDate(findT1, loAvailDiff, thedate, rfrthedate, country, "ANNDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//get the endMktAvailDiff effective announcement date
-				temps = AvailUtil.getAvailAnnAttributeDate(findT1, endMktAvailDiff, thedate, rfrthedate, country, "ANNDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				// 2.	PRODSTRUCT. WITHDRAWDATE date
-				//The applicable countries are the intersection of the MODEL  AVAIL.COUNTRYLIST where AVAILTYPE = planned Availability (146) and the FEATURE.COUNTRYLIST.
-				temps = AvailUtil.getProdstructAttributeDate(findT1, parentDiff, plModelAvailDiff, feaCtry, thedate, rfrthedate, country, "WITHDRAWDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-//				3.	Min of the following four that are applicable
-//				1)	If PRODSTUCT.ORDERCODE = initial (5957), then
-//				First of the following two
-//				a)	The child MODELAVAIL-d: AVAILANNA-d: ANNOUNCEMENT.ANNDATE where AVAIL.AVAILTYPE = end of Marketing AND ANNOUNCEMENT.ANNTYPE = end Of Life - Withdrawal from mktg (14). ANNOUNCEMENT.COUNTRYLIST
-//				b)	MODEL. WITHDRAWDATE
-//				2)	PRODSTRUCT. WITHDRAWDATE
-//				3)	SWFEATURE. WITHDRAWANNDATE_T
-//				Applies to all Countries that get this far
-//				4)	FEATURE. WITHDRAWANNDATE_T 
-//				By FEATURE.COUNTRYLIST
-				temps = getModelFeatureSpecialDate(findT1, parentDiff,
-						endModelMktAvailDiff, thedate, rfrthedate, debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			wdDate[0] = thedate;
-			wdDate[1] = rfrthedate;
-			
-			return wdDate;
-		}
-		/****************************
-		 * <ENDOFMARKETANNNUMBER>
-		 1.	ANNOUNCEMENT.ANNNUMBR from the ANNOUNCEMENT used for the preceding token < WDANNDATE >
-		 2.	Empty (aka Null)
-		 */
-		private String[] deriveENDOFMARKETANNNUMBER(DiffEntity parentDiff, DiffEntity loAvailDiff, DiffEntity endMktAvailDiff, DiffEntity endModelMktAvailDiff, boolean findT1, StringBuffer debugSb){
-			String thedate = CHEAT;			
-			String rfrthedate = CHEAT;
-			String returns[] = new String[2];
-			String temps[] = new String[2];
-			ABRUtil.append(debugSb,"XMLAVAILElem.deriveEndOfMarketAnnNumber lastOrderAvailDiff: " + (loAvailDiff == null ? "null" : loAvailDiff.getKey())
-                + "findT1:" + findT1 + NEWLINE);
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//get the AVAIL(146)--> ANNOUNCEMENT.ANNNUMBER
-				temps = AvailUtil.getAvailAnnAttributeDate(findT1, loAvailDiff, thedate, rfrthedate, country, "ANNNUMBER", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//get the AVAIL(146)--> ANNOUNCEMENT.ANNNUMBER
-				temps = AvailUtil.getAvailAnnAttributeDate(findT1, endMktAvailDiff, thedate, rfrthedate, country, "ANNNUMBER", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-//				If PRODSTUCT.ORDERCODE = initial (5957), 
-//				The child MODELAVAIL-d: AVAILANNA-d: ANNOUNCEMENT.ANNNUMBER where AVAIL.AVAILTYPE = end of Marketing AND ANNOUNCEMENT.ANNTYPE = end Of Life - Withdrawal from mktg (14). ANNOUNCEMENT.COUNTRYLIST
-				temps = getModelRelatedEOMANNNUM(findT1, parentDiff, endModelMktAvailDiff, thedate, rfrthedate, debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			returns[0] = thedate;
-			returns[1] = rfrthedate;
-			return returns;
-		}
-		/**
-		 * 
-		 * @param findT1
-		 * @param parentDiff
-		 * @param endModelMktAvailDiff
-		 * @param thedate
-		 * @param rfrthedate
-		 * @param debugSb
-		 * @return
-		 */
-		public String[] getModelRelatedEOMANNNUM(boolean findT1,
-				DiffEntity parentDiff, DiffEntity endModelMktAvailDiff,
-				String thedate, String rfrthedate, StringBuffer debugSb) {
-			String[] sReturn = new String[2];
-			String entityDate = CHEAT;
-			String dateSelfStatus = CHEAT;
-			
-			EntityItem item = AvailUtil.getEntityItem(findT1, parentDiff);
-						
-			if (item != null) {
-			    boolean flag = false;
-				if (parentDiff.getEntityType().equals("PRODSTRUCT")){
-					if(item != null){
-						String ordercode = PokUtils.getAttributeFlagValue(item, "ORDERCODE");
-						if (ordercode != null && "5957".equals(ordercode)){
-							flag = true;																							
-						}
-					}
-				}
-				
-				if (flag){					
-					EntityItem modelitem = AvailUtil.getEntityItem(findT1, endModelMktAvailDiff);
-				    if (modelitem != null) {
-						//EntityItem modelitem = endModelMktAvailDiff.getCurrentEntityItem();
-						EANFlagAttribute fAtt = (EANFlagAttribute) modelitem.getAttribute("COUNTRYLIST");
-						if (fAtt != null && fAtt.isSelected(country)) {
-							Vector relatorVec = modelitem.getDownLink();
-							for (int ii = 0; ii < relatorVec.size(); ii++) {
-								EntityItem availanna = (EntityItem) relatorVec.elementAt(ii);
-								if (availanna.hasDownLinks() && availanna.getEntityType().equals("AVAILANNA")) {
-									Vector annVct = availanna.getDownLink();
-									EntityItem anna = (EntityItem) annVct.elementAt(0);
-									entityDate = PokUtils.getAttributeValue(anna, "ANNNUMBER", ", ", CHEAT, false);
-									ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveEOMANNNUMBER looking for downlink of AVAILANNA : Announcement "
-										    + "ANNNUMBER :" + entityDate + NEWLINE);
-									
-									if (!CHEAT.equals(entityDate)) {																			
-											dateSelfStatus = PokUtils.getAttributeFlagValue(anna, "STATUS");
-										}
-									}
-									break;
-								}
-									
-							}
-						
-						}
-					}					
-				if (dateSelfStatus != null && dateSelfStatus.equals("0020") && CHEAT.equals(thedate)){
-					thedate = entityDate;
-				} else if (dateSelfStatus != null && dateSelfStatus.equals("0040") && CHEAT.equals(rfrthedate)){
-					rfrthedate = entityDate;
-				}
-				ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveWDANNDATE thedate=" + thedate +";rfrthedate=" + rfrthedate  + NEWLINE);	
-			}	
-			sReturn[0]= thedate;
-			sReturn[1]= rfrthedate;
-			return sReturn;
-		}
-
-		/**
-		 * TODO need double check 
-		 * @param parentDiff
-		 * @param endModelMktAvailDiff
-		 * @param thedate
-		 * @param debugSb
-		 * @return
-		 */
-		public String[] getModelFeatureSpecialDate(boolean findT1, DiffEntity parentDiff,
-				DiffEntity endModelMktAvailDiff, String thedate, String rfrthedate,
-				StringBuffer debugSb) {
-			
-			String[] sReturn = new String[2];
-			String entityDate = CHEAT;
-			String dateSelfStatus = CHEAT;
-			
-			EntityItem item = AvailUtil.getEntityItem(findT1, parentDiff);
-			
-			
-			if (item != null) {
-				//String parentstatus = PokUtils.getAttributeFlagValue(item, "STATUS");
-				//EntityItem item = parentDiff.getPriorEntityItem();
-			    boolean flag = false;
-				if (parentDiff.getEntityType().equals("PRODSTRUCT")){
-					if(item != null){
-						String ordercode = PokUtils.getAttributeFlagValue(item, "ORDERCODE");
-						if (ordercode != null && "5957".equals(ordercode)){
-							flag = true;																							
-						}
-					}
-				}
-				
-				if (flag){
-					if (item.hasDownLinks()) {
-						for (int i = 0; i < item.getDownLinkCount(); i++) {
-							EntityItem entity = (EntityItem) item.getDownLink(i);
-							if (entity.getEntityType().equals("MODEL")) {
-								entityDate = PokUtils.getAttributeValue(entity, "WITHDRAWDATE", ", ", CHEAT, false);
-								dateSelfStatus = PokUtils.getAttributeFlagValue(entity, "STATUS");
-								ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveWDANNDATE getting WITHDRAWDATE from " + entity.getKey()
-									+ " WITHDRAWDATE is:" + entityDate + NEWLINE);
-								break;
-							}
-						}
-					}
-					EntityItem modelitem = AvailUtil.getEntityItem(findT1, endModelMktAvailDiff);
-				    if (modelitem != null) {
-						//EntityItem modelitem = endModelMktAvailDiff.getCurrentEntityItem();
-						EANFlagAttribute fAtt = (EANFlagAttribute) modelitem.getAttribute("COUNTRYLIST");
-						if (fAtt != null && fAtt.isSelected(country)) {
-							Vector relatorVec = modelitem.getDownLink();
-							for (int ii = 0; ii < relatorVec.size(); ii++) {
-								EntityItem availanna = (EntityItem) relatorVec.elementAt(ii);
-								if (availanna.hasDownLinks() && availanna.getEntityType().equals("AVAILANNA")) {
-									Vector annVct = availanna.getDownLink();
-									EntityItem anna = (EntityItem) annVct.elementAt(0);
-									String modeldate = PokUtils.getAttributeValue(anna, "ANNDATE", ", ", CHEAT, false);
-									ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveWDANNDATE looking for downlink of AVAILANNA : Announcement "
-										    + "ANNDATE :" + modeldate + NEWLINE);
-									
-									if (!CHEAT.equals(modeldate)) {
-										if (!CHEAT.equals(entityDate)) {
-											// find the mix date between
-											// model.anndate and
-											// feature.firstanndate
-											if (modeldate.compareTo(entityDate) < 0) {
-												entityDate = modeldate;
-												dateSelfStatus = PokUtils.getAttributeFlagValue(anna, "STATUS");
-												debugSb
-													.append("XMLTMFAVAILElem.deriveWDANNDATE getting WITHDRAWDATE from Min {MODEL.WITHDRAWDATE and ANNDATE|MODELAVAIL ANNOUNCEMENT.ANNDATE}, WITHDRAWDATE is:"
-														+ entityDate + NEWLINE);
-											}
-										} else {
-											entityDate = modeldate;
-											dateSelfStatus = PokUtils.getAttributeFlagValue(anna, "STATUS");
-										}
-									}
-									break;
-								}
-									
-							}
-						
-						}
-					}	
-				}
-				//New added 2)	PRODSTRUCT. WITHDRAWDATE
-				if (parentDiff.getEntityType().equals("PRODSTRUCT")) {
-					String date = PokUtils.getAttributeValue(item, "WITHDRAWDATE", ", ", CHEAT, false);
-					ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveWDANNDATE looking for PRODSTRUCT.WITHDRAWDATE " + item.getKey()
-						+ date + NEWLINE);
-					if (!CHEAT.equals(date)) {
-						if (!CHEAT.equals(entityDate)) {
-							// find the mix date between
-							// model.anndate and
-							// feature.firstanndate
-							if (date.compareTo(entityDate) < 0) {
-								entityDate = date;
-								dateSelfStatus = PokUtils.getAttributeFlagValue(item, "STATUS");
-								debugSb
-									.append("XMLTMFAVAILElem.deriveWDANNDATE getting WITHDRAWDATE from Min {MODEL.WITHDRAWDATE and ANNDATE|MODELAVAIL ANNOUNCEMENT.ANNDATE and PRODSTRUCT. WITHDRAWDATE}, WITHDRAWDATE is:"
-										+ entityDate + NEWLINE);
-							}
-						} else {
-							entityDate = date;
-							dateSelfStatus = PokUtils.getAttributeFlagValue(item, "STATUS");
-						}
-					}	
-				}	
-
-				if (item.hasUpLinks()) {
-					for (int i = 0; i < item.getUpLinkCount(); i++) {
-						EntityItem entity = (EntityItem) item.getUpLink(i);
-						if (entity.getEntityType().equals("FEATURE") || entity.getEntityType().equals("SWFEATURE")) {
-							String date = PokUtils.getAttributeValue(entity, "WITHDRAWANNDATE_T", ", ", CHEAT, false);
-							ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveWDANNDATE getting WITHDRAWANNDATE_T from " + entity.getKey()
-								+ " WITHDRAWANNDATE_T is:" + date + NEWLINE);
-							if (!CHEAT.equals(date)) {
-								if (!CHEAT.equals(entityDate)) {
-									// find the mix date between
-									// model.anndate and
-									// feature.firstanndate
-									if (date.compareTo(entityDate) < 0) {
-										entityDate = date;
-										dateSelfStatus = PokUtils.getAttributeFlagValue(entity, "STATUS");
-										debugSb
-											.append("XMLTMFAVAILElem.deriveWDANNDATE getting WITHDRAWDATE from Min {MODEL.WITHDRAWDATE and FEATURE|SWFEATURE.WITHDRAWANNDATE_T}, WITHDRAWDATE is:"
-												+ entityDate + NEWLINE);
-									}
-								} else {
-									entityDate = date;
-									dateSelfStatus = PokUtils.getAttributeFlagValue(entity, "STATUS");
-								}
-							}
-							break;
-						}
-					}
-				}
-				//
-				if (dateSelfStatus != null && dateSelfStatus.equals("0020") && CHEAT.equals(thedate)){
-					thedate = entityDate;
-				} else if (dateSelfStatus != null && dateSelfStatus.equals("0040") && CHEAT.equals(rfrthedate)){
-					rfrthedate = entityDate;
-				}
-				ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveWDANNDATE thedate=" + thedate +";rfrthedate=" + rfrthedate  + NEWLINE);	
-		    }		
-			
-			sReturn[0]= thedate;
-			sReturn[1]= rfrthedate;
-			return sReturn;
-		}
-		
-
-		/***********************************************************************
-		 * h)	ID 48.00 <LASTORDER>
-           Same as <PUBTO> except skip the first one in the list (i.e. CATLGOR does not apply)
-		 * 
-		 */
-		private String[] deriveLastOrder(boolean findT1, DiffEntity catlgorDiff, DiffEntity parentDiff,  DiffEntity loAvailDiff, DiffEntity loModelAvailDiff,  DiffEntity plModelAvailDiff,
-			Vector[] feaCtry, StringBuffer debugSb) {
-			ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveLastOrder " + " loAvailDiff: " + (loAvailDiff == null ? "null" : loAvailDiff.getKey())
-					+ " findT1:" + findT1 + NEWLINE);
-
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String lastOrders[] = new String[2];
-			
-			String temps[] = new String[2];
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//get the last order avail effective date
-				temps = AvailUtil.getAvailAttributeDate(findT1, loAvailDiff, thedate, rfrthedate, country, "EFFECTIVEDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				// 2.	PRODSTRUCT. WTHDRWEFFCTVDATE date
-				//The applicable countries are the intersection of the MODEL  AVAIL.COUNTRYLIST where AVAILTYPE = Last Order (149) and the FEATURE.COUNTRYLIST.
-				temps = AvailUtil.getProdstructAttributeDate(findT1, parentDiff, loModelAvailDiff, feaCtry, thedate, rfrthedate, country, "WTHDRWEFFCTVDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-//				4.	Min of the following four that are applicable
-//				1)	If PRODSTUCT.ORDERCODE =Initial(5957), then 
-//				First of the following two
-//				a)	MODELAVAIL-d: AVAIL.EFFECTIVEDATE where AVAILTYPE = Last Order (149)
-//				By the AVAIL.COUNTRYLIST
-//				b)	MODEL. WTHDRWEFFCTVDATE;
-//				By AVAIL.COUNTRYLIST where AVAILTYPE = Planned Availability(146)
-//				2)	PRODSTRUCT. WTHDRWEFFCTVDATE
-//				3)	SWFEATURE. WITHDRAWDATEEFF_T 
-//				Applies to all Countries that get this far
-//				4)	FEATURE. WITHDRAWDATEEFF_T
-//				By FEATURE.COUNTRYLIST
-				temps = getModelFeatureSpDate(findT1, parentDiff, loModelAvailDiff, plModelAvailDiff, thedate, rfrthedate, debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			lastOrders[0]= thedate;
-			lastOrders[1]= rfrthedate;
-			return lastOrders;
-		}
-
-		/**
-		 * TODO need double check the value
-		 * @param parentDiff
-		 * @param loModelAvailDiff
-		 * @param thedate
-		 * @param debugSb
-		 * @return
-		 */
-		private String[] getModelFeatureSpDate(boolean findT1, DiffEntity parentDiff,
-				DiffEntity loModelAvailDiff, DiffEntity plModelAvailDiff,String thedate, String rfrthedate,
-				StringBuffer debugSb) {
-			String[] sReturn = new String[2];
-			String entityDate = CHEAT;
-			String dateSelfStatus = CHEAT;
-			
-			
-			EntityItem item = AvailUtil.getEntityItem(findT1, parentDiff);
-			
-			if (item != null) {
-				//EntityItem item = parentDiff.getPriorEntityItem();
-				//String parentstatus = PokUtils.getAttributeFlagValue(item, "STATUS");
-			    boolean flag = false;
-				if (parentDiff.getEntityType().equals("PRODSTRUCT")){
-					if(item != null){
-						String ordercode = PokUtils.getAttributeFlagValue(item, "ORDERCODE");
-						if (ordercode != null && "5957".equals(ordercode)){
-							flag = true;																							
-						}
-					}
-				}
-				
-
-				if (flag){
-					EntityItem plModelAvailitem = AvailUtil.getEntityItem(findT1, plModelAvailDiff);
-					if (item.hasDownLinks()) {
-						for (int i = 0; i < item.getDownLinkCount(); i++) {
-							EntityItem entity = (EntityItem) item.getDownLink(i);
-							if(plModelAvailitem!=null){
-								EANFlagAttribute fAtt = (EANFlagAttribute) plModelAvailitem.getAttribute("COUNTRYLIST");
-								if (fAtt != null && fAtt.isSelected(country)) {
-									if (entity.getEntityType().equals("MODEL")) {
-										entityDate = PokUtils.getAttributeValue(entity, "WTHDRWEFFCTVDATE", ", ", CHEAT, false);
-										dateSelfStatus = PokUtils.getAttributeFlagValue(entity, "STATUS");
-										ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveLastOrder getting WTHDRWEFFCTVDATE from " + entity.getKey()
-											+ " PubTo is:" + entityDate + NEWLINE);
-										break;
-									}
-								}
-							}							
-						}
-					}
-					EntityItem loModelitem = AvailUtil.getEntityItem(findT1, loModelAvailDiff);
-					if (loModelitem != null) {
-						//EntityItem loModelitem = loModelAvailDiff.getCurrentEntityItem();
-						EANFlagAttribute fAtt = (EANFlagAttribute) loModelitem.getAttribute("COUNTRYLIST");
-						if (fAtt != null && fAtt.isSelected(country)) {
-							String lomodelDate = PokUtils.getAttributeValue(loModelitem, "EFFECTIVEDATE", ", ", CHEAT, false);
-							ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveLastOrder lomodelavail entityDate: " + loModelitem + NEWLINE);
-							if (!CHEAT.equals(lomodelDate)) {
-								if (!CHEAT.equals(entityDate)) {
-									// find the mix date between
-									// model.anndate and
-									// feature.firstanndate
-									if (lomodelDate.compareTo(entityDate) < 0) {
-										entityDate = lomodelDate;
-										dateSelfStatus = PokUtils.getAttributeFlagValue(loModelitem, "STATUS");
-										debugSb
-											.append("XMLTMFAVAILElem.deriveLastOrder getting PubTo from Min {MODEL.WTHDRWEFFCTVDATE and AVAIL.EFFECTIVEDATE MODELAVAIL.AVAIL}, PubTo is:"
-												+ entityDate + NEWLINE);
-									}
-								} else {
-									entityDate = lomodelDate;
-									dateSelfStatus = PokUtils.getAttributeFlagValue(loModelitem, "STATUS");
-								}
-							}
-						}
-					}																
-				}
-				//add 2)	PRODSTRUCT. WITHDRAWDATE
-	
-				if (parentDiff != null && parentDiff.getEntityType().equals("PRODSTRUCT")) {
-					String date = PokUtils.getAttributeValue(item, "WTHDRWEFFCTVDATE", ", ", CHEAT, false);
-					ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveLastOrder looking for PRODSTRUCT.WTHDRWEFFCTVDATE" + item.getKey()
-						+ date + NEWLINE);
-					if (!CHEAT.equals(date)) {
-						if (!CHEAT.equals(entityDate)) {
-							// find the mix date between
-							//  entityDate and date
-							if (date.compareTo(entityDate) < 0) {
-								entityDate = date;
-								dateSelfStatus = PokUtils.getAttributeFlagValue(item, "STATUS");
-								debugSb
-									.append("XMLTMFAVAILElem.deriveLastOrder getting PubTo from Min {PRODSTRUCT.WITHDRAWDATE and MODEL.WTHDRWEFFCTVDATE and ANNOUNCEMENT.ANNDATE MODELAVAIL}, PubTo is:"
-										+ entityDate + NEWLINE);
-							}
-						} else {
-							entityDate = date;
-							dateSelfStatus = PokUtils.getAttributeFlagValue(item, "STATUS");
-						}
-					}							
-				}
-									
-				if (item.hasUpLinks()) {
-					for (int i = 0; i < item.getUpLinkCount(); i++) {
-						EntityItem entity = (EntityItem) item.getUpLink(i);
-						if (entity.getEntityType().equals("FEATURE") || entity.getEntityType().equals("SWFEATURE")) {
-							String date = PokUtils.getAttributeValue(entity, "WITHDRAWDATEEFF_T", ", ", CHEAT, false);
-							ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveLastOrder getting WITHDRAWDATEEFF_T from " + entity.getKey()
-								+ " PubTo is:" + date + NEWLINE);
-							if (!CHEAT.equals(date)) {
-								if (!CHEAT.equals(entityDate)) {
-									// find the mix date between
-									// model.anndate and
-									// feature.firstanndate
-									if (date.compareTo(entityDate) < 0) {
-										entityDate = date;
-										dateSelfStatus = PokUtils.getAttributeFlagValue(entity, "STATUS");
-										debugSb
-											.append("XMLTMFAVAILElem.deriveLastOrder getting PubTo from Min {MODEL.WTHDRWEFFCTVDATE and AVAIL.EFFECTIVEDATE MODELAVAIL and FEATURE|SWFEATURE.WITHDRAWDATEEFF_T}, PubTo is:"
-												+ entityDate + NEWLINE);
-									}
-								} else {
-									entityDate = date;
-									dateSelfStatus = PokUtils.getAttributeFlagValue(entity, "STATUS");
-								}
-							}
-							break;
-						}
-					}
-				}		
-				//
-				if (dateSelfStatus != null && dateSelfStatus.equals("0020") && CHEAT.equals(thedate)){
-					thedate = entityDate;
-				} else if (dateSelfStatus != null && dateSelfStatus.equals("0040") && CHEAT.equals(rfrthedate)){
-					rfrthedate = entityDate;
-				}
-				ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveLastOrder thedate=" + thedate +";rfrthedate=" + rfrthedate  + NEWLINE);
-			}
-			sReturn[0]= thedate;
-			sReturn[1]= rfrthedate;
-			return sReturn;
-		}
-		
-		
-		
-//		i)	ID 49.00 <EOSANNDATE>
-//		1.	OOFAVAIL-d: OR SWPRODSTRUCTAVAIL-d: then AVAILANNA-d: ANNOUNCEMENT.ANNDATE where AVAIL.AVAILTYPE = end of Service (151) and ANNOUNCEMENT = end Of Life  Discontinuance of Service (13).
-//		2.	IF PRODSRTRUCT.ORDERCODE = initial (5957) THEN PRODSTRUCT-d:  MODELAVAIL-d: AVAILANNA-d: ANNOUNCEMENT.ANNDATE where AVAIL.AVAILTYPE = end of Service (151) and ANNOUNCEMENT = end Of Life  Discontinuance of Service (13).
-//		3.	SWPRODSTRUCT-d: MODELAVAIL-d: AVAILANNA-d: ANNOUNCEMENT.ANNDATE where AVAIL.AVAILTYPE = end of Service (151) and ANNOUNCEMENT = end Of Life  Discontinuance of Service (13).
-//		4.	Empty
-
-		private String[] deriveEOSANNDATE(boolean findT1, DiffEntity parentDiff, DiffEntity endAvailDiff, DiffEntity endModelAvailDiff, StringBuffer debugSb) {
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String sReturn[] = new String[2];
-			ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveEOSANNDATE endAvailDiff: " + (endAvailDiff == null ? "null" : endAvailDiff.getKey())
-				+ "findT1:" + findT1 + NEWLINE);
-			String temps[] = new String[2];
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				temps = AvailUtil.getAvailAnnAttributeDate(findT1, endAvailDiff, thedate, rfrthedate, country, "ANNDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				temps = getModelFeatureEOSDate(findT1,parentDiff, endModelAvailDiff, thedate,rfrthedate, debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			sReturn[0] = thedate;
-			sReturn[1] = rfrthedate;
-			return sReturn;
-		}
-
-		/**
-		 * @param parentDiff
-		 * @param endModelAvailDiff
-		 * @param thedate
-		 * @param debugSb
-		 * @return
-		 */
-		private String[] getModelFeatureEOSDate(boolean findT1, DiffEntity parentDiff,
-				DiffEntity endModelAvailDiff, String thedate, String rfrthedate,
-				StringBuffer debugSb) {
-			String[] sReturn = new String[2];
-			EntityItem item = AvailUtil.getEntityItem(findT1, endModelAvailDiff);
-			EntityItem parentItem = AvailUtil.getEntityItem(findT1, parentDiff);
-			
-			
-			if (item != null && parentItem!=null) {
-				//String parentstatus = PokUtils.getAttributeFlagValue(parentItem, "STATUS");
-				boolean flag = false;
-				//2.	IF PRODSRTRUCT.ORDERCODE = Initial (5957) THEN PRODSTRUCT-d:  MODELAVAIL-d: AVAILANNA-d: ANNOUNCEMENT.ANNDATE 
-				//		where AVAIL.AVAILTYPE = End of Service(151) and ANNOUNCEMENT = End Of Life  Discontinuance of Service(13).
-				if (parentDiff.getEntityType().equals("PRODSTRUCT")){
-					EntityItem pitem = AvailUtil.getEntityItem(findT1, parentDiff);
-					if(pitem!=null){
-						String ordercode = PokUtils.getAttributeFlagValue(pitem, "ORDERCODE");
-						if (ordercode != null && "5957".equals(ordercode)){
-							flag = true;																							
-						}
-					}
-										
-				} else if (parentDiff.getEntityType().equals("SWPRODSTRUCT")){
-					flag = true;
-				}
-				if (flag){
-					//EntityItem item = endModelAvailDiff.getPriorEntityItem();
-					EANFlagAttribute fAtt = (EANFlagAttribute) item.getAttribute("COUNTRYLIST");
-					if (fAtt != null && fAtt.isSelected(country)) {
-						Vector relatorVec = item.getDownLink();
-						for (int ii = 0; ii < relatorVec.size(); ii++) {
-							EntityItem availanna = (EntityItem) relatorVec.elementAt(ii);
-							if (availanna.hasDownLinks() && availanna.getEntityType().equals("AVAILANNA")) {
-								Vector annVct = availanna.getDownLink();
-								EntityItem anna = (EntityItem) annVct.elementAt(0);
-								String anndate = PokUtils.getAttributeValue(anna, "ANNDATE", ", ", CHEAT, false);
-								ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveEOSANNDATE looking for MODELAVAIL downlink of AVAILANNA : Announcement "
-									+ (annVct.size() > 1 ? "There were multiple ANNOUNCEMENTS returned, using first one."
-										+ anna.getKey() : anna.getKey()) + NEWLINE);
-								String annstatus = PokUtils.getAttributeFlagValue(anna, "ANNSTATUS");
-								if (annstatus != null && annstatus.equals("0020") && CHEAT.equals(thedate)){
-									thedate = anndate;
-								} else if (annstatus != null && annstatus.equals("0040") && CHEAT.equals(rfrthedate)){
-									rfrthedate = anndate;
-								}
-							}
-						}
-					}															
-				}
-			}
-			sReturn[0]= thedate;
-			sReturn[1]= rfrthedate;
-			return sReturn;			
-		}
-		
-//		m)	<ENDOFSERVICEANNNUMBER>
-//		1.	OOFAVAIL-d: OR SWPRODSTRUCTAVAIL-d: then AVAILANNA-d: ANNOUNCEMENT.ANNDATE where AVAIL.AVAILTYPE = end of Service (151) and ANNOUNCEMENT = end Of Life  Discontinuance of Service (13).
-//		2.	IF PRODSRTRUCT.ORDERCODE = initial (5957) THEN PRODSTRUCT-d:  MODELAVAIL-d: AVAILANNA-d: ANNOUNCEMENT.ANNDATE where AVAIL.AVAILTYPE = end of Service (151) and ANNOUNCEMENT = end Of Life  Discontinuance of Service (13).
-//		3.	SWPRODSTRUCT-d: MODELAVAIL-d: AVAILANNA-d: ANNOUNCEMENT.ANNDATE where AVAIL.AVAILTYPE = end of Service (151) and ANNOUNCEMENT = end Of Life  Discontinuance of Service (13).
-//		4.	Empty
-		private String[] deriveENDOFSERVICEANNNUMBER( DiffEntity parentDiff, DiffEntity endAvailDiff, DiffEntity endModelAvailDiff,
-				boolean findT1, StringBuffer debugSb) {
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			String sReturn[] = new String[2];
-			ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveEOSANNDATE endAvailDiff: " + (endAvailDiff == null ? "null" : endAvailDiff.getKey())
-				+ "findT1:" + findT1 + NEWLINE);
-			String temps[] = new String[2];
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				temps = AvailUtil.getAvailAnnAttributeDate(findT1, endAvailDiff, thedate, rfrthedate, country, "ANNNUMBER", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				temps = getModelRelatedEOSANNNUM(findT1,parentDiff, endModelAvailDiff, thedate,rfrthedate, debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			sReturn[0] = thedate;
-			sReturn[1] = rfrthedate;
-			return sReturn;
-		}
-		/**
-		 * 
-		 * @param findT1
-		 * @param parentDiff
-		 * @param endModelAvailDiff
-		 * @param thedate
-		 * @param rfrthedate
-		 * @param debugSb
-		 * @return
-		 */
-		private String[] getModelRelatedEOSANNNUM(boolean findT1,
-				DiffEntity parentDiff, DiffEntity endModelAvailDiff,
-				String thedate, String rfrthedate, StringBuffer debugSb) {
-			String[] sReturn = new String[2];
-			EntityItem item = AvailUtil.getEntityItem(findT1, endModelAvailDiff);
-			EntityItem parentItem = AvailUtil.getEntityItem(findT1, parentDiff);
-			
-			
-			if (item != null && parentItem!=null) {
-				//String parentstatus = PokUtils.getAttributeFlagValue(parentItem, "STATUS");
-				boolean flag = false;
-				//2.	IF PRODSRTRUCT.ORDERCODE = Initial (5957) THEN PRODSTRUCT-d:  MODELAVAIL-d: AVAILANNA-d: ANNOUNCEMENT.ANNDATE 
-				//		where AVAIL.AVAILTYPE = End of Service(151) and ANNOUNCEMENT = End Of Life  Discontinuance of Service(13).
-				if (parentDiff.getEntityType().equals("PRODSTRUCT")){
-					EntityItem pitem = AvailUtil.getEntityItem(findT1, parentDiff);
-					if(pitem!=null){
-						String ordercode = PokUtils.getAttributeFlagValue(pitem, "ORDERCODE");
-						if (ordercode != null && "5957".equals(ordercode)){
-							flag = true;																							
-						}
-					}
-										
-				} else if (parentDiff.getEntityType().equals("SWPRODSTRUCT")){
-					flag = true;
-				}
-				if (flag){
-					//EntityItem item = endModelAvailDiff.getPriorEntityItem();
-					EANFlagAttribute fAtt = (EANFlagAttribute) item.getAttribute("COUNTRYLIST");
-					if (fAtt != null && fAtt.isSelected(country)) {
-						Vector relatorVec = item.getDownLink();
-						for (int ii = 0; ii < relatorVec.size(); ii++) {
-							EntityItem availanna = (EntityItem) relatorVec.elementAt(ii);
-							if (availanna.hasDownLinks() && availanna.getEntityType().equals("AVAILANNA")) {
-								Vector annVct = availanna.getDownLink();
-								EntityItem anna = (EntityItem) annVct.elementAt(0);
-								String annnum = PokUtils.getAttributeValue(anna, "ANNNUMBER", ", ", CHEAT, false);
-								ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveEOSANNNUM looking for MODELAVAIL downlink of AVAILANNA : Announcement "
-									+ (annVct.size() > 1 ? "There were multiple ANNOUNCEMENTS returned, using first one."
-										+ anna.getKey() : anna.getKey()) + NEWLINE);
-								String annstatus = PokUtils.getAttributeFlagValue(anna, "ANNSTATUS");
-								if (annstatus != null && annstatus.equals("0020") && CHEAT.equals(thedate)){
-									thedate = annnum;
-								} else if (annstatus != null && annstatus.equals("0040") && CHEAT.equals(rfrthedate)){
-									rfrthedate = annnum;
-								}
-							}
-						}
-					}															
-				}
-			}
-			sReturn[0]= thedate;
-			sReturn[1]= rfrthedate;
-			return sReturn;	
-		}
-		
-//		j)	ID 50.00 <ENDOFSERVICEDATE> 
-//		1.	OOFAVAIL-d: OR SWPRODSTRUCTAVAIL-d: AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = end of Service (151).
-//		2.	IF PRODSRTRUCT.ORDERCODE = initial (5957) THEN PRODSTRUCT-d:  MODELAVAIL-d: AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = end of Service (151).
-//		3.	SWPRODSTRUCT-d: MODELAVAIL-d: AVAIL.EFFECTIVEDATE where AVAIL.AVAILTYPE = end of Service (151). 
-//		4.	Empty
-
-		private String[] deriveENDOFSERVICEDATE(boolean findT1, DiffEntity parentDiff, DiffEntity endAvailDiff, DiffEntity endModelAvailDiff, StringBuffer debugSb) {
-			String thedate = CHEAT;
-			String rfrthedate = CHEAT;
-			ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveENDOFSERVICEDATE endAvailDiff: " + (endAvailDiff == null ? "null" : endAvailDiff.getKey())
-				+ "findT1:" + findT1 + NEWLINE);
-			
-			String[] sReturn = new String[2];
-			
-			String temps[] = new String[2];
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//get the plan avail effective date
-				temps = AvailUtil.getAvailAttributeDate(findT1, endAvailDiff, thedate, rfrthedate, country, "EFFECTIVEDATE", debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
-				//get the plan avail effective date
-				temps = getModelFeatureENDSDate(findT1,parentDiff, endModelAvailDiff, thedate,rfrthedate, debugSb);
-				thedate = temps[0];
-				rfrthedate = temps[1];
-			}
-			
-			sReturn[0]= thedate;
-			sReturn[1]= rfrthedate;
-			return sReturn;	 
-			
-		}
-		
-		/**
-		 * @param parentDiff
-		 * @param endModelAvailDiff
-		 * @param thedate
-		 * @param debugSb
-		 * @return
-		 */
-		private String[] getModelFeatureENDSDate(boolean findT1, DiffEntity parentDiff,
-				DiffEntity endModelAvailDiff, String thedate, String rfrthedate,
-				StringBuffer debugSb) {
-			String[] sReturn = new String[2];
-			EntityItem item = AvailUtil.getEntityItem(findT1, endModelAvailDiff);
-			
-			//EntityItem parentItem = AvailUtil.getEntityItem(findT1, parentDiff);
-			
-			if (item != null) {
-				//String parentstatus = PokUtils.getAttributeFlagValue(parentItem, "STATUS");
-				boolean flag = false;
-				//2.	IF PRODSRTRUCT.ORDERCODE = Initial (5957) THEN PRODSTRUCT-d:  MODELAVAIL-d: AVAILANNA-d: ANNOUNCEMENT.ANNDATE 
-				//		where AVAIL.AVAILTYPE = End of Service(151) and ANNOUNCEMENT = End Of Life  Discontinuance of Service(13).
-				if (parentDiff.getEntityType().equals("PRODSTRUCT")){
-					EntityItem pitem = AvailUtil.getEntityItem(findT1, parentDiff);
-					if(pitem!=null){
-						String ordercode = PokUtils.getAttributeFlagValue(pitem, "ORDERCODE");
-						if (ordercode != null && "5957".equals(ordercode)){
-							flag = true;																							
-						}
-					}
-										
-				} else if (parentDiff.getEntityType().equals("SWPRODSTRUCT")){
-					flag = true;
-				}
-				if (flag){
-					//EntityItem item = endModelAvailDiff.getCurrentEntityItem();
-					EANFlagAttribute fAtt = (EANFlagAttribute) item.getAttribute("COUNTRYLIST");
-					if (fAtt != null && fAtt.isSelected(country)) {
-						String effdate = PokUtils.getAttributeValue(item, "EFFECTIVEDATE", ", ", CHEAT, false);
-						String effstatus = PokUtils.getAttributeFlagValue(item, "STATUS");
-						if (effstatus != null && effstatus.equals("0020") && CHEAT.equals(thedate)){
-							thedate = effdate;
-						} else if (effstatus != null && effstatus.equals("0040") && CHEAT.equals(rfrthedate)){
-							rfrthedate = effdate;
-						}						
-						ABRUtil.append(debugSb,"XMLTMFAVAILElem.deriveENDOFSERVICEDATE endAvailDiff MODELAVAIL, thedate: " + thedate + NEWLINE);
-					}																			
-				}				
-			}
-			sReturn[0]= thedate;
-			sReturn[1]= rfrthedate;
-			return sReturn;			
-		}
-		
-		
-
-		String getCountry() {
-			return country;
-		}
-
-		String getKey() {
-			return country;
-		}
-
-
-		public String toString() {
-			return (availDiff!=null?availDiff.getKey()+ " action:" + action:"There is no AVAIL! ");
-		}
-	}
-}

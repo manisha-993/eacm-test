@@ -1,354 +1,358 @@
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *   Module Name: XMLIDLFileGen.java
- *
- *   Copyright  : COPYRIGHT IBM CORPORATION, 2013
- *                LICENSED MATERIAL - PROGRAM PROPERTY OF IBM
- *                REFER TO COPYRIGHT INSTRUCTION FORM#G120-2083
- *                RESTRICTED MATERIALS OF IBM
- *                IBM CONFIDENTIAL
- *
- *   Version: 1.0
- *
- *   Functional Description: 
- *   A standalone Java program needs to be written to read messages from an MQSeries queue and write them to a file.
- *   
- *   Component : 
- *   Author(s) Name(s): Will
- *   Date of Creation: Jan 10, 2013
- *   Languages/APIs Used: Java
- *   Compiler/JDK Used: JDK 1.3, 1.4
- *   Production Operating System: AIX 4.x, Windows
- *   Production Dependencies: JDK 1.3 or greater
- *
- *   Change History:
- *   Author(s)     Date	        Change #    Description
- *   -----------   ----------   ---------   ---------------------------------------------
- *   Will   Jan 10, 2013     RQ          Initial code 
- *   
- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/*     */ package COM.ibm.eannounce.abr.ln.adsxmlbh1;
+/*     */ 
+/*     */ import com.ibm.eacm.AES256Utils;
+/*     */ import com.ibm.mq.MQEnvironment;
+/*     */ import com.ibm.mq.MQException;
+/*     */ import com.ibm.mq.MQGetMessageOptions;
+/*     */ import com.ibm.mq.MQMessage;
+/*     */ import com.ibm.mq.MQQueue;
+/*     */ import com.ibm.mq.MQQueueManager;
+/*     */ import java.io.BufferedWriter;
+/*     */ import java.io.File;
+/*     */ import java.io.FileNotFoundException;
+/*     */ import java.io.FileOutputStream;
+/*     */ import java.io.IOException;
+/*     */ import java.io.OutputStreamWriter;
+/*     */ import java.io.UnsupportedEncodingException;
+/*     */ import java.security.MessageDigest;
+/*     */ import java.sql.Timestamp;
+/*     */ import java.text.SimpleDateFormat;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.MissingResourceException;
+/*     */ import java.util.ResourceBundle;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class XMLIDLFileGen
+/*     */ {
+/*  95 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/*  96 */   static final String NEWLINE = new String(FOOL_JTEST);
+/*     */   private ResourceBundle rsbd;
+/*  98 */   private String reportfile = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public XMLIDLFileGen(ResourceBundle paramResourceBundle) {
+/* 105 */     this.rsbd = paramResourceBundle;
+/*     */   }
+/*     */   
+/*     */   private void setReportFile(String paramString) {
+/* 109 */     this.reportfile = paramString;
+/*     */   }
+/*     */   
+/*     */   private void log(String paramString) {
+/* 113 */     saveDataToFile(this.reportfile, paramString, true);
+/*     */   }
+/*     */   
+/*     */   private String getValfromProperties(String paramString) {
+/*     */     try {
+/* 118 */       return this.rsbd.getString(paramString);
+/* 119 */     } catch (MissingResourceException missingResourceException) {
+/* 120 */       log(paramString + " is not existed in properties file. ");
+/*     */       
+/* 122 */       return null;
+/*     */     } 
+/*     */   }
+/*     */   
+/*     */   public void getMsgToFile() {
+/* 127 */     String str1 = "IDL_";
+/* 128 */     String str2 = "./report/";
+/*     */     try {
+/* 130 */       str1 = this.rsbd.getString("FILE_PREFIX");
+/* 131 */       str2 = this.rsbd.getString("FILE_PATH");
+/* 132 */     } catch (Exception exception) {}
+/* 133 */     if (!(new File(str2)).exists()) {
+/* 134 */       (new File(str2)).mkdir();
+/*     */     }
+/* 136 */     String str3 = getCurrentTimestamp();
+/* 137 */     String str4 = str2 + str1.trim() + "." + str3 + ".REPORT";
+/* 138 */     setReportFile(str4);
+/*     */ 
+/*     */ 
+/*     */     
+/* 142 */     String str5 = getValfromProperties("MQUSERID");
+/* 143 */     String str6 = getValfromProperties("MQPASSWORD");
+/* 144 */     String str7 = getValfromProperties("MQPORT");
+/* 145 */     String str8 = getValfromProperties("MQHOSTNAME");
+/* 146 */     String str9 = getValfromProperties("MQCHANNEL");
+/* 147 */     String str10 = getValfromProperties("MQMANAGER");
+/* 148 */     String str11 = getValfromProperties("MQQUEUE");
+/* 149 */     String str12 = getValfromProperties("MQSSL");
+/* 150 */     String str13 = getValfromProperties("KSTORE");
+/* 151 */     String str14 = getValfromProperties("KSPASSWORD");
+/* 152 */     String str15 = getValfromProperties("TSTORE");
+/* 153 */     String str16 = getValfromProperties("TSPASSWORD");
+/*     */ 
+/*     */     
+/* 156 */     String str17 = getValfromProperties("MSGMAX_IN_FILE");
+/* 157 */     if (str17 == null || str17.trim().length() == 0) {
+/* 158 */       str17 = "0";
+/*     */     }
+/* 160 */     int i = Integer.parseInt(str17);
+/*     */     
+/* 162 */     if (str5 != null && str5.length() > 0) {
+/* 163 */       MQEnvironment.userID = str5;
+/*     */     }
+/* 165 */     if (str6 != null && str6.length() > 0) {
+/* 166 */       MQEnvironment.password = AES256Utils.decrypt(str6);
+/*     */     }
+/* 168 */     if (str7 != null && str7.length() > 0) {
+/* 169 */       MQEnvironment.port = Integer.parseInt(str7);
+/*     */     }
+/* 171 */     if (str12 != null && str12.length() > 0) {
+/* 172 */       MQEnvironment.sslCipherSuite = str12;
+/* 173 */       if (str13 != null && str13.length() > 0) {
+/* 174 */         System.setProperty("javax.net.ssl.keyStore", str13);
+/*     */       }
+/* 176 */       if (str14 != null && str14.length() > 0) {
+/* 177 */         System.setProperty("javax.net.ssl.keyStorePassword", 
+/* 178 */             AES256Utils.decrypt(str14));
+/*     */       }
+/* 180 */       if (str15 != null && str15.length() > 0) {
+/* 181 */         System.setProperty("javax.net.ssl.trustStore", str15);
+/*     */       }
+/* 183 */       if (str16 != null && str16.length() > 0) {
+/* 184 */         System.setProperty("javax.net.ssl.trustStorePassword", 
+/* 185 */             AES256Utils.decrypt(str16));
+/*     */       }
+/*     */     } 
+/*     */     
+/* 189 */     log("MQ Infor:" + str5 + ":" + str6 + ":" + str7 + ":" + str8 + ":" + str9 + ":" + str10 + ":" + str11);
+/*     */ 
+/*     */ 
+/*     */     
+/* 193 */     MQEnvironment.hostname = str8;
+/*     */ 
+/*     */ 
+/*     */     
+/* 197 */     MQEnvironment.channel = str9;
+/*     */     
+/* 199 */     MQEnvironment.properties.put("transport", "MQSeries");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*     */     try {
+/* 206 */       log("***Starting to get MQ***");
+/* 207 */       log("Creating a connection to the queue manager");
+/*     */       
+/* 209 */       MQQueueManager mQQueueManager = new MQQueueManager(str10);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 215 */       char c = '•';
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 220 */       MQQueue mQQueue = mQQueueManager.accessQueue(str11, c, null, null, null);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 226 */       MQGetMessageOptions mQGetMessageOptions = new MQGetMessageOptions();
+/* 227 */       mQGetMessageOptions.options = 8193;
+/* 228 */       if (mQQueue.getCurrentDepth() > 0) {
+/*     */         
+/* 230 */         Hashtable<Object, Object> hashtable = new Hashtable<>();
+/* 231 */         MessageDigest messageDigest = null;
+/*     */         try {
+/* 233 */           messageDigest = MessageDigest.getInstance("SHA-256");
+/* 234 */         } catch (Exception exception) {
+/* 235 */           log(exception.getMessage());
+/*     */         } 
+/* 237 */         while (mQQueue.getCurrentDepth() > 0) {
+/* 238 */           MQMessage mQMessage = new MQMessage();
+/*     */ 
+/*     */           
+/* 241 */           mQQueue.get(mQMessage, mQGetMessageOptions);
+/* 242 */           String str18 = mQMessage.readLine();
+/*     */           
+/* 244 */           String str19 = str1.trim() + "_" + mQMessage.applicationIdData.trim() + "." + str3;
+/* 245 */           String str20 = str2 + str19;
+/*     */           
+/* 247 */           if (!(new File(str20)).exists()) {
+/* 248 */             (new File(str20)).createNewFile();
+/* 249 */             String str = str19 + " START";
+/* 250 */             saveDataToFile(str20, str, false);
+/*     */           } 
+/* 252 */           byte[] arrayOfByte1 = (str18 + NEWLINE).getBytes("UTF-8");
+/* 253 */           messageDigest.update(arrayOfByte1);
+/* 254 */           saveDataToFile(str20, str18, true);
+/* 255 */           Object object = hashtable.get(str20);
+/* 256 */           int j = 0;
+/* 257 */           if (object != null) {
+/* 258 */             j = ((Integer)object).intValue();
+/*     */           }
+/* 260 */           j++;
+/*     */ 
+/*     */           
+/* 263 */           hashtable.put(str20, new Integer(j));
+/* 264 */           if (i != 0 && j >= i) {
+/* 265 */             log(str19 + " Reach the defined max count: " + i);
+/*     */             break;
+/*     */           } 
+/*     */         } 
+/* 269 */         byte[] arrayOfByte = messageDigest.digest();
+/*     */ 
+/*     */         
+/* 272 */         StringBuffer stringBuffer = new StringBuffer("");
+/* 273 */         for (byte b = 0; b < arrayOfByte.length; b++) {
+/* 274 */           stringBuffer.append(Integer.toString((arrayOfByte[b] & 0xFF) + 256, 16).substring(1));
+/*     */         }
+/*     */         
+/* 277 */         for (String str18 : hashtable.keySet()) {
+/*     */           
+/* 279 */           int j = ((Integer)hashtable.get(str18)).intValue();
+/* 280 */           String str19 = (j + 2) + " " + stringBuffer.toString();
+/* 281 */           saveDataToFile(str18, str19, true);
+/* 282 */           log(str18 + " " + str19);
+/*     */         } 
+/*     */       } else {
+/* 285 */         log("***No Messge in the MQ***");
+/*     */       } 
+/*     */       
+/* 288 */       log("Closing the queue");
+/* 289 */       mQQueue.close();
+/*     */ 
+/*     */       
+/* 292 */       mQQueueManager.commit();
+/* 293 */       mQQueueManager.disconnect();
+/*     */     }
+/* 295 */     catch (MQException mQException) {
+/* 296 */       log("Error: An MQSeries error occurred : Completion code " + mQException.completionCode + " Reason code " + mQException.reasonCode);
+/*     */     }
+/* 298 */     catch (IOException iOException) {
+/* 299 */       log("Error: An error occurred whilst writing to the message buffer: " + iOException);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public void saveDataToFile(String paramString1, String paramString2, boolean paramBoolean) {
+/* 305 */     BufferedWriter bufferedWriter = null;
+/*     */     try {
+/* 307 */       bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(paramString1, paramBoolean), "UTF-8"));
+/*     */       
+/* 309 */       bufferedWriter.write(paramString2 + NEWLINE);
+/* 310 */     } catch (UnsupportedEncodingException unsupportedEncodingException) {
+/* 311 */       unsupportedEncodingException.printStackTrace();
+/* 312 */     } catch (FileNotFoundException fileNotFoundException) {
+/* 313 */       fileNotFoundException.printStackTrace();
+/* 314 */     } catch (IOException iOException) {
+/* 315 */       iOException.printStackTrace();
+/*     */     } finally {
+/*     */       try {
+/* 318 */         if (bufferedWriter != null)
+/* 319 */           bufferedWriter.close(); 
+/* 320 */       } catch (IOException iOException) {
+/* 321 */         iOException.printStackTrace();
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */   
+/*     */   private String getCurrentTimestamp() {
+/* 327 */     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+/* 328 */     String str = "";
+/* 329 */     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd.HH.mm.ss.SSS");
+/*     */     try {
+/* 331 */       str = simpleDateFormat.format(timestamp);
+/* 332 */     } catch (Exception exception) {
+/* 333 */       exception.printStackTrace();
+/*     */     } 
+/* 335 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static void main(String[] paramArrayOfString) {
+/* 342 */     String str = "IDLFILEGen";
+/* 343 */     if (paramArrayOfString.length > 0) {
+/* 344 */       str = paramArrayOfString[0];
+/*     */     } else {
+/* 346 */       System.out.println("Use the defalut properties file - IDLFILEGen.properties");
+/*     */     } 
+/* 348 */     ResourceBundle resourceBundle = ResourceBundle.getBundle(str);
+/* 349 */     XMLIDLFileGen xMLIDLFileGen = new XMLIDLFileGen(resourceBundle);
+/* 350 */     xMLIDLFileGen.getMsgToFile();
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.ln.adsxmlbh1;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.security.MessageDigest;
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.ResourceBundle;
-
-import com.ibm.eacm.AES256Utils;
-import com.ibm.mq.MQC;
-import com.ibm.mq.MQEnvironment;
-import com.ibm.mq.MQException;
-import com.ibm.mq.MQGetMessageOptions;
-import com.ibm.mq.MQMessage;
-import com.ibm.mq.MQQueue;
-import com.ibm.mq.MQQueueManager;
-
-/**
- * The queue name to be read from specified in property file
-The path and filename prefix for the file to be created specified in property file May want to be able to put entity type or XML message type in the filename?
-Optionally the property file can contain a maximum number of messages to be written to file
-File is created in path specified, filename is filename prefix || "." || current timestamp.   If file already exists, program terminates and writes message to report file
-Report file created in same path, filename is filename prefix || "." || current timestamp ||".REPORT"
-
-Conceptual Program Flow - I haven't included all the possible places where errors can occur.
-
-Program tests whether queue can be accessed and whether it has any messages in it.
-	If access fails or no messages, write appropriate message to report file and terminate.
-Write Header Record to file.  Header record contains filename || " START"
-Record Count = 0
-Initialize Hash Total Follow up - we need an algorithm to create hash total based on records in file.  Does Wendy's FTP program include hash total?  Is there an reusable algorithm/Java routine available?
-Do while (messages on queue) and (Record Count for any one msg type < Max records if specified in property file)
-	Read message
-	Write message as single line to file  Possible problem - can we write multibyte data to an ASCII file?
-	Record count = Record count + 1
-	Add record to Hash Total as per algorithm
-End Do
-Record Count = Record Count + 2 (include header and trailer record in count
-Write trailer record to file.  Trailer record is Record Count || " " || Hash Total
-Write success message to Report file
-
-For overall architecture:
-
-EACM BHFEED User uses IDL function to send messages to local EACM queue.
-Standalone program is invoked ( how invoked??  Via command line?  Scheduled somehow? Is it "Catcher" that terminates at some point?)
-EACM User reads report file to validate all records were sent via IDL were processed by program
-EACM User / development / operations use SFTP to send file to destination
-
-For ASCA purposes, write a desk procedure to cover details of this manual flow.
-
- * @author Will
- *
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\ln\adsxmlbh1\XMLIDLFileGen.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class XMLIDLFileGen {
-	
-    private static final char[] FOOL_JTEST = {'\n'};
-    static final String NEWLINE = new String(FOOL_JTEST);
-	private ResourceBundle rsbd;
-	private String reportfile=null;
-	
-	/**
-	 * @param rsbd
-	 */
-	public XMLIDLFileGen(ResourceBundle rsbd) {
-		super();
-		this.rsbd = rsbd;		
-	}
-	
-	private void setReportFile(String filename){
-		reportfile = filename;
-	}
-	
-	private void log(String log){
-		saveDataToFile(reportfile, log, true);
-	}
-	
-	private String getValfromProperties(String key) {
-		try {
-			return rsbd.getString(key);
-		} catch (java.util.MissingResourceException e) {
-			log(key + " is not existed in properties file. ");
-		}
-		return null;
-	}
-
-	public void getMsgToFile() {
-		
-		String file_prefix = "IDL_";
-		String filepath = "./report/";
-		try{
-			file_prefix = (String) rsbd.getString("FILE_PREFIX");		
-			filepath = (String) rsbd.getString("FILE_PATH");	
-		}catch(Exception e){}
-		if(!new File(filepath).exists()){
-			new File(filepath).mkdir();
-		}
-		String currentTimestamp = getCurrentTimestamp();
-		String report = filepath+file_prefix.trim()+"."+currentTimestamp + ".REPORT";
-		this.setReportFile(report);
-	
-		// Set up MQSeries environment
-		// get the name of your host to connect to
-		String strUserId = (String) getValfromProperties( "MQUSERID");
-		String strPassWord = (String) getValfromProperties("MQPASSWORD");
-		String strPort = (String) getValfromProperties( "MQPORT");
-		String strHostName = (String) getValfromProperties("MQHOSTNAME");
-		String strChannel = (String) getValfromProperties("MQCHANNEL");
-		String strMQManager = (String) getValfromProperties("MQMANAGER");
-		String strMQQueue = (String) getValfromProperties( "MQQUEUE");
-		String strSSL = (String) getValfromProperties( "MQSSL");
-		String strKStore = (String) getValfromProperties( "KSTORE");
-		String strKSPassword = (String) getValfromProperties("KSPASSWORD");
-		String strTStore = (String) getValfromProperties( "TSTORE");
-		String strTSPassword = (String)getValfromProperties("TSPASSWORD");
-		
-	
-		String strMsgMax = (String) getValfromProperties("MSGMAX_IN_FILE");
-		if (strMsgMax == null || strMsgMax.trim().length() == 0) {
-			strMsgMax = "0";
-		}
-		int max = Integer.parseInt(strMsgMax);
-		
-		if (strUserId != null && strUserId.length() > 0) {
-			MQEnvironment.userID = strUserId;
-		}
-		if (strPassWord != null && strPassWord.length() > 0) {
-			MQEnvironment.password = AES256Utils.decrypt(strPassWord);
-		}
-		if (strPort != null && strPort.length() > 0) {
-			MQEnvironment.port = Integer.parseInt(strPort);
-		}
-		if (strSSL != null && strSSL.length() > 0) {
-			MQEnvironment.sslCipherSuite = strSSL;
-			if (strKStore != null && strKStore.length() > 0) {
-				System.setProperty("javax.net.ssl.keyStore", strKStore);
-			}
-			if (strKSPassword != null && strKSPassword.length() > 0) {
-				System.setProperty("javax.net.ssl.keyStorePassword",
-						AES256Utils.decrypt(strKSPassword));
-			}
-			if (strTStore != null && strTStore.length() > 0) {
-				System.setProperty("javax.net.ssl.trustStore", strTStore);
-			}
-			if (strTSPassword != null && strTSPassword.length() > 0) {
-				System.setProperty("javax.net.ssl.trustStorePassword",
-						AES256Utils.decrypt(strTSPassword));
-			}
-		}
-
-		log("MQ Infor:" + strUserId + ":" + strPassWord
-				+ ":" + strPort + ":" + strHostName + ":" + strChannel + ":"
-				+ strMQManager + ":" + strMQQueue);
-
-		MQEnvironment.hostname = strHostName;
-		// define name of channel for client to use.
-		// Note. assumes MQSeries Server is listening on the default
-		// TCPIP port of 1414
-		MQEnvironment.channel = strChannel;
-
-		MQEnvironment.properties.put(MQC.TRANSPORT_PROPERTY,// Set TCP/IP or
-				// server
-				MQC.TRANSPORT_MQSERIES);// Connection
-		
-		try {
-			// define name of queue manager object to connect to.
-			// Create a connection to the queue manager
-			log("***Starting to get MQ***");
-			log("Creating a connection to the queue manager");
-			
-			MQQueueManager qMgr = new MQQueueManager(strMQManager);
-
-			// Set up the options on the queue we wish to open...
-			// Note. All MQSeries Options are prefixed with MQC in Java.
-			// int openOptions = MQC.MQOO_INPUT_AS_Q_DEF | MQC.MQOO_OUTPUT ;
-
-			int openOptions = MQC.MQOO_FAIL_IF_QUIESCING
-					| MQC.MQOO_INPUT_SHARED | MQC.MQOO_INQUIRE;
-
-			// Now specify the queue that we wish to open, and the open
-			// options...
-			MQQueue local_queue = qMgr.accessQueue(strMQQueue, openOptions,
-					null, // default q manager
-					null, // no dynamic q name
-					null); // no alternate user id
-
-			// Set the get message options...
-			MQGetMessageOptions gmo = new MQGetMessageOptions(); // accept
-			gmo.options = MQC.MQGMO_WAIT | MQC.MQGMO_FAIL_IF_QUIESCING;
-			if(local_queue.getCurrentDepth() > 0){			
-			
-				Hashtable countTab = new Hashtable();
-				MessageDigest md = null;
-				try{
-					md = MessageDigest.getInstance("SHA-256");
-				}catch(Exception e){
-					log(e.getMessage());
-				}
-				while (local_queue.getCurrentDepth() > 0) {
-					MQMessage retrievedMessage = new MQMessage();
-					// And prove we have the message by displaying the UTF message text	
-					
-					local_queue.get(retrievedMessage, gmo);
-					String msgText = retrievedMessage.readLine();
-					
-					String filename = file_prefix.trim()+"_"+retrievedMessage.applicationIdData.trim()+"."+currentTimestamp;
-					String fullfilename = filepath + filename;
-					
-					if(!(new File(fullfilename).exists())){		
-						new File(fullfilename).createNewFile();
-						String header = filename + " START";
-						saveDataToFile(fullfilename,header,false);
-					}
-					byte[] dataBytes = (msgText+NEWLINE).getBytes("UTF-8");
-					md.update(dataBytes);
-					saveDataToFile(fullfilename,msgText,true);
-					Object obj = countTab.get(fullfilename);
-					int count = 0;
-					if(obj != null){
-						count = ((Integer)obj).intValue();
-					}				
-					count++;
-					
-					//TODO add hash count + match the hash count in the end user
-					countTab.put(fullfilename, new Integer(count));
-					if(max!=0 && count >= max) {
-						log(filename+" Reach the defined max count: " + max);
-						break;
-					}		
-				}
-				byte[] mdbytes = md.digest();
-				 
-			    //convert the byte to hex format
-			    StringBuffer sb = new StringBuffer("");
-			    for (int i = 0; i < mdbytes.length; i++) {
-			    	sb.append(Integer.toString((mdbytes[i] & 0xff) + 0x100, 16).substring(1));
-			    }		 
-			    
-				for (Iterator keys = countTab.keySet().iterator(); keys.hasNext();) {
-					String key = (String) keys.next();
-					int count=((Integer)(countTab.get(key))).intValue();
-					String tailer = (count+2) + " " +sb.toString();
-					saveDataToFile(key,tailer,true);
-					log(key+ " " + tailer);
-				}
-			}else{
-				log("***No Messge in the MQ***");
-			}
-			// Close the queue
-			log("Closing the queue");
-			local_queue.close();
-
-			// Disconnect from the queue manager
-			qMgr.commit();
-			qMgr.disconnect();	
-
-		} catch (MQException ex) {
-			log("Error: An MQSeries error occurred : Completion code "
-					+ ex.completionCode + " Reason code " + ex.reasonCode);			
-		} catch (java.io.IOException ex) {
-			log("Error: An error occurred whilst writing to the message buffer: "
-									+ ex);			
-		}
-	}
-	
-	public void saveDataToFile(String FileName, String Data, boolean append) {		
-		Writer out = null;
-		try {
-			out = new BufferedWriter(new OutputStreamWriter(
-					new FileOutputStream(FileName, append), "UTF-8"));
-			out.write(Data + NEWLINE);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if(out != null)
-					out.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	private String getCurrentTimestamp(){
-		Timestamp ts = new Timestamp(System.currentTimeMillis());  
-        String tsStr = "";  
-        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd.HH.mm.ss.SSS");  
-        try { 
-            tsStr = sdf.format(ts); 
-        } catch (Exception e) {  
-            e.printStackTrace();  
-        }  
-        return tsStr;
-	}
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		String propFile = "IDLFILEGen";
-		if(args.length > 0){
-			propFile = args[0];
-		}else{
-			System.out.println("Use the defalut properties file - IDLFILEGen.properties");
-		}
-		ResourceBundle rsBundleMQ = ResourceBundle.getBundle(propFile);
-		XMLIDLFileGen gen = new XMLIDLFileGen(rsBundleMQ);
-		gen.getMsgToFile();
-
-	}
-
-}

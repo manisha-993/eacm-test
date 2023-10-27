@@ -1,790 +1,796 @@
-/**
- * <pre>
- * (c) Copyright International Business Machines Corporation, 2004
- * All Rights Reserved.
- *
- * CR0629041824
- *
- * CHECK  1
- *  Before the Variant status can change to Ready for Review, the following relators must exist:
- *
- *  Only 1 (Quantity = 1)           One or more (Quantity >=1)
- *  MB: through VARSBB, SBBMB           SBB: through VARSBB
- *  PP: through VARSBB, SBBPP
- *  DD: through VARDD
- *  CTO Parent: through CTOVAR
- *  CPG: through CPGVAR
- *  WAR: through VARWAR
- *
- * CHECK 2
- *  Slot Check: For each PSL (through VARSBB, SBBPSL), there should be a corresponding PSLAVAIL (through VARPSLAVAIL).
- * There is an association between PSL and PSLAVAIL, attribute SLOTAVAILTYPE, to find the corresponding PSL and PSLAVAIL.
- * Note, PSL elements are not required. If no PSL elements are linked, this check should pass (there should not be any
- * PSLAVAIL elements linked as well).
- *
- * NOTE: Each PSL that is linked to an SBB must have a PSLAVAIL associated with it.  Each PSLAVAIL, there should be
- * at least one of the associated PSL with a link to an SBB, 0 is fail, 1 or more is pass
- *
- * CHECK 3
- *  Bay Check: For each PBY (through VARSBB, SBBPBY), there should be a corresponding PBYAVAIL (through VARPBYAVAIL).
- * There is an association between PBY and PBYAVAIL, attribute BAYAVAILTYPE, to find the corresponding PBY and PBYAVAIL.
- * Note, PBY elements are not required. If no PBY elements are linked, this check should pass (there should not be any
- * PBYAVAIL elements linked as well).
- *
- * NOTE: Each PBY that is linked to an SBB must have a PBYAVAIL associated with it.  Each PBYAVAIL, there should be at
- * least one of the associated PBY with a link to an SBB, 0 is fail, 1 or more is pass
- *
- * $Log: VARABR004.java,v $
- * Revision 1.8  2005/10/06 14:59:17  wendy
- * Conform to new jtest config
- *
- * Revision 1.7  2005/04/19 18:57:12  chris
- * Roll back CR4220
- *
- * Revision 1.2  2004/09/20 12:13:14  wendy
- * Added check for status=ready for review
- *
- * Revision 1.1  2004/09/03 13:19:38  wendy
- * Init for CR0629041824
- *
- *
- * </pre>
- *
- *@author     Wendy Stimpson
- *@created    August 23, 2004
+/*     */ package COM.ibm.eannounce.abr.psg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.objects.EANEntity;
+/*     */ import COM.ibm.eannounce.objects.EANList;
+/*     */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.WorkflowActionItem;
+/*     */ import COM.ibm.eannounce.objects.WorkflowException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import java.io.PrintWriter;
+/*     */ import java.io.StringWriter;
+/*     */ import java.sql.SQLException;
+/*     */ import java.text.MessageFormat;
+/*     */ import java.util.Locale;
+/*     */ import java.util.ResourceBundle;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class VARABR004
+/*     */   extends PokBaseABR
+/*     */ {
+/*  76 */   private ResourceBundle bundle = null;
+/*     */   
+/*  78 */   private StringBuffer rptSb = new StringBuffer();
+/*  79 */   private StringBuffer traceSb = new StringBuffer();
+/*     */   
+/*  81 */   private final String Error_MISSING = "<p>VARABR004 cannot pass because there is no &quot;{0}&quot; entity linked to the Variant.</p>";
+/*  82 */   private final String Error_TOO_MANY = "<p>VARABR004 cannot pass because there is more than one &quot;{0}&quot; entity linked to the Variant.</p>";
+/*  83 */   private final String Error_TOO_MANY_LINKS = "<p>VARABR004 cannot pass because there is more than one &quot;{0}&quot; relator linked to the Variant.</p>";
+/*  84 */   private final String Check1_PASSED = "<p>Check 1 - Passed</p>";
+/*  85 */   private final String Check2_PASSED = "<p>Check 2 - Passed</p>";
+/*  86 */   private final String Check3_PASSED = "<p>Check 3 - Passed</p>";
+/*  87 */   private final String Error_PSL = "<p>VARABR004 cannot Pass because there is a PSL but no PSLAVAIL, or there is a PSLAVAIL but no PSL, or the SLOTAVAILTYPE does not match.</p>";
+/*  88 */   private final String Error_PBY = "<p>VARABR004 cannot Pass because there is a PBY but no PBYAVAIL, or there is a PBYAVAIL but no PBY, or the BAYAVAILTYPE does not match.</p>";
+/*  89 */   private final String Error_VARSTATUS = "<p>VARABR004 cannot Pass because Status is not Ready for Review.</p>";
+/*  90 */   private final String OK_MSG = "<p>All checks are valid.</p>";
+/*  91 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/*  92 */   static final String NEWLINE = new String(FOOL_JTEST);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/* 100 */     String str1 = "";
+/* 101 */     String str2 = "<html><head><title>{0} {1}</title></head>" + NEWLINE + "<body><h1>{0}: {1}</h1>" + NEWLINE + "<p><b>Date: </b>{2}<br/>" + NEWLINE + "<b>User: </b>{3} ({4})<br />" + NEWLINE + "<b>Description: </b>{5}</p>" + NEWLINE + "<!-- {6} -->";
+/*     */ 
+/*     */ 
+/*     */     
+/* 105 */     MessageFormat messageFormat = new MessageFormat((this.bundle == null) ? str2 : this.bundle.getString("HEADER"));
+/* 106 */     String[] arrayOfString = new String[10];
+/*     */     try {
+/* 108 */       String str = null;
+/*     */       
+/* 110 */       start_ABRBuild();
+/*     */       
+/* 112 */       this
+/* 113 */         .bundle = ResourceBundle.getBundle(
+/* 114 */           getClass().getName(), 
+/* 115 */           getLocale(this.m_prof.getReadLanguage().getNLSID()));
+/*     */       
+/* 117 */       this.traceSb.append("VARABR004 entered for " + getEntityType() + ":" + getEntityID());
+/*     */       
+/* 119 */       this.traceSb.append(NEWLINE + "EntityList contains the following entities: ");
+/* 120 */       for (byte b = 0; b < this.m_elist.getEntityGroupCount(); b++) {
+/* 121 */         EntityGroup entityGroup = this.m_elist.getEntityGroup(b);
+/* 122 */         this.traceSb.append(NEWLINE + entityGroup.getEntityType() + " : " + entityGroup.getEntityItemCount() + " entity items. ");
+/* 123 */         if (entityGroup.getEntityItemCount() > 0) {
+/* 124 */           this.traceSb.append("IDs(");
+/* 125 */           for (byte b1 = 0; b1 < entityGroup.getEntityItemCount(); b1++) {
+/* 126 */             this.traceSb.append(" " + entityGroup.getEntityItem(b1).getEntityID());
+/*     */           }
+/* 128 */           this.traceSb.append(")");
+/*     */         } 
+/*     */       } 
+/* 131 */       this.traceSb.append(NEWLINE);
+/*     */ 
+/*     */       
+/* 134 */       str1 = getNavigationName();
+/*     */ 
+/*     */       
+/* 137 */       if (this.m_elist.getEntityGroupCount() == 0) {
+/* 138 */         throw new Exception("EntityList did not have any groups. Verify that extract is defined.");
+/*     */       }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 158 */       this.rptSb.append("<h3>" + this.m_elist
+/* 159 */           .getParentEntityGroup().getLongDescription() + " PN: " + 
+/* 160 */           getAttributeValue(getRootEntityType(), getRootEntityID(), "OFFERINGPNUMB") + "</h3>" + NEWLINE);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 165 */       str = getAttributeFlagEnabledValue(getRootEntityType(), getRootEntityID(), "VARSTATUS", "");
+/* 166 */       boolean bool = str.equals("0040");
+/* 167 */       if (!bool) {
+/* 168 */         this.rptSb.append((this.bundle == null) ? "<p>VARABR004 cannot Pass because Status is not Ready for Review.</p>" : (this.bundle.getString("Error_VARSTATUS") + NEWLINE));
+/*     */       }
+/*     */ 
+/*     */       
+/* 172 */       if (!checkRelators()) {
+/* 173 */         bool = false;
+/*     */       } else {
+/*     */         
+/* 176 */         this.rptSb.append((this.bundle == null) ? "<p>Check 1 - Passed</p>" : (this.bundle.getString("Check1_PASSED") + NEWLINE));
+/*     */       } 
+/*     */ 
+/*     */       
+/* 180 */       if (!checkSlots()) {
+/* 181 */         this.rptSb.append((this.bundle == null) ? "<p>VARABR004 cannot Pass because there is a PSL but no PSLAVAIL, or there is a PSLAVAIL but no PSL, or the SLOTAVAILTYPE does not match.</p>" : (this.bundle.getString("Error_PSL") + NEWLINE));
+/* 182 */         bool = false;
+/*     */       } else {
+/*     */         
+/* 185 */         this.rptSb.append((this.bundle == null) ? "<p>Check 2 - Passed</p>" : (this.bundle.getString("Check2_PASSED") + NEWLINE));
+/*     */       } 
+/*     */ 
+/*     */       
+/* 189 */       if (!checkBays()) {
+/* 190 */         this.rptSb.append((this.bundle == null) ? "<p>VARABR004 cannot Pass because there is a PBY but no PBYAVAIL, or there is a PBYAVAIL but no PBY, or the BAYAVAILTYPE does not match.</p>" : (this.bundle.getString("Error_PBY") + NEWLINE));
+/* 191 */         bool = false;
+/*     */       } else {
+/*     */         
+/* 194 */         this.rptSb.append((this.bundle == null) ? "<p>Check 3 - Passed</p>" : (this.bundle.getString("Check3_PASSED") + NEWLINE));
+/*     */       } 
+/*     */ 
+/*     */       
+/* 198 */       if (bool) {
+/*     */         
+/* 200 */         triggerWorkFlow("WFVARFINAL");
+/*     */         
+/* 202 */         setReturnCode(0);
+/*     */         
+/* 204 */         this.rptSb.append((this.bundle == null) ? "<p>All checks are valid.</p>" : (this.bundle.getString("OK_MSG") + NEWLINE));
+/*     */       } else {
+/* 206 */         setReturnCode(-1);
+/*     */       }
+/*     */     
+/* 209 */     } catch (Exception exception) {
+/* 210 */       StringWriter stringWriter = new StringWriter();
+/*     */       
+/* 212 */       String str3 = "<h3><font color=red>Error: {0}</font></h3>";
+/* 213 */       String str4 = "<pre>{0}</pre>";
+/* 214 */       messageFormat = new MessageFormat((this.bundle == null) ? str3 : this.bundle.getString("Error_EXCEPTION"));
+/* 215 */       arrayOfString = new String[1];
+/* 216 */       setReturnCode(-1);
+/* 217 */       exception.printStackTrace(new PrintWriter(stringWriter));
+/* 218 */       arrayOfString[0] = exception.getMessage();
+/* 219 */       this.rptSb.append(messageFormat.format(arrayOfString) + NEWLINE);
+/* 220 */       messageFormat = new MessageFormat((this.bundle == null) ? str4 : this.bundle.getString("Error_STACKTRACE"));
+/* 221 */       arrayOfString[0] = stringWriter.getBuffer().toString();
+/* 222 */       this.rptSb.append(messageFormat.format(arrayOfString) + NEWLINE);
+/* 223 */       logError("Exception: " + exception.getMessage());
+/* 224 */       logError(stringWriter.getBuffer().toString());
+/*     */     } finally {
+/*     */       
+/* 227 */       setDGTitle(str1);
+/* 228 */       setDGRptName(getShortClassName(getClass()));
+/* 229 */       setDGRptClass("WWABR");
+/*     */       
+/* 231 */       if (!isReadOnly()) {
+/* 232 */         clearSoftLock();
+/*     */       }
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */     
+/* 238 */     arrayOfString[0] = getShortClassName(getClass());
+/* 239 */     arrayOfString[1] = str1 + ((getReturnCode() == 0) ? " Passed" : " Failed");
+/* 240 */     arrayOfString[2] = getNow();
+/* 241 */     arrayOfString[3] = this.m_prof.getOPName();
+/* 242 */     arrayOfString[4] = this.m_prof.getRoleDescription();
+/* 243 */     arrayOfString[5] = getDescription();
+/* 244 */     arrayOfString[6] = getABRVersion();
+/* 245 */     this.rptSb.insert(0, messageFormat.format(arrayOfString));
+/* 246 */     this.rptSb.append("<!-- DEBUG: " + this.traceSb.toString() + " -->" + NEWLINE);
+/*     */     
+/* 248 */     println(this.rptSb.toString());
+/* 249 */     printDGSubmitString();
+/* 250 */     buildReportFooter();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private boolean checkRelators() {
+/* 265 */     boolean bool = true;
+/*     */ 
+/*     */     
+/* 268 */     String[] arrayOfString1 = { "VARDD", "CTOVAR", "CPGVAR", "VARWAR", "SBBMB", "SBBPP" };
+/*     */     
+/* 270 */     String[] arrayOfString2 = { "DD", "CTO", "CPG", "WAR", "MB", "PP" };
+/* 271 */     for (byte b = 0; b < arrayOfString2.length; b++) {
+/* 272 */       EntityGroup entityGroup1 = this.m_elist.getEntityGroup(arrayOfString2[b]);
+/* 273 */       EntityGroup entityGroup2 = this.m_elist.getEntityGroup(arrayOfString1[b]);
+/* 274 */       if (entityGroup1 != null && entityGroup2 != null) {
+/* 275 */         bool = (checkSingleRelator(entityGroup1, entityGroup2) && bool) ? true : false;
+/*     */       } else {
+/* 277 */         if (entityGroup1 == null) {
+/* 278 */           this.traceSb.append(NEWLINE + "ERROR: " + arrayOfString2[b] + " EntityGroup not found");
+/*     */         } else {
+/* 280 */           this.traceSb.append(NEWLINE + "ERROR: " + arrayOfString1[b] + " Relator EntityGroup not found");
+/*     */         } 
+/* 282 */         bool = false;
+/*     */       } 
+/*     */     } 
+/*     */ 
+/*     */     
+/* 287 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("SBB");
+/* 288 */     if (entityGroup != null) {
+/* 289 */       if (entityGroup.getEntityItemCount() == 0) {
+/* 290 */         MessageFormat messageFormat = new MessageFormat((this.bundle == null) ? "<p>VARABR004 cannot pass because there is no &quot;{0}&quot; entity linked to the Variant.</p>" : this.bundle.getString("Error_MISSING"));
+/* 291 */         String[] arrayOfString = new String[1];
+/* 292 */         bool = false;
+/* 293 */         arrayOfString[0] = entityGroup.getLongDescription();
+/* 294 */         this.rptSb.append(messageFormat.format(arrayOfString) + NEWLINE);
+/* 295 */         this.traceSb.append(NEWLINE + "FAIL: " + entityGroup.getEntityType() + " is invalid, has " + entityGroup.getEntityItemCount() + " entities.");
+/*     */       } else {
+/* 297 */         this.traceSb.append(NEWLINE + "PASS: " + entityGroup.getEntityType() + " EntityGroup is valid (has 1 or more)");
+/*     */       } 
+/*     */     } else {
+/* 300 */       this.traceSb.append(NEWLINE + "ERROR: SBB EntityGroup not found");
+/* 301 */       bool = false;
+/*     */     } 
+/*     */     
+/* 304 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private boolean checkSingleRelator(EntityGroup paramEntityGroup1, EntityGroup paramEntityGroup2) {
+/* 311 */     boolean bool = false;
+/* 312 */     MessageFormat messageFormat = null;
+/* 313 */     String[] arrayOfString = new String[1];
+/*     */     
+/* 315 */     switch (paramEntityGroup1.getEntityItemCount())
+/*     */     { case 0:
+/* 317 */         messageFormat = new MessageFormat((this.bundle == null) ? "<p>VARABR004 cannot pass because there is no &quot;{0}&quot; entity linked to the Variant.</p>" : this.bundle.getString("Error_MISSING"));
+/* 318 */         arrayOfString[0] = paramEntityGroup1.getLongDescription();
+/* 319 */         this.rptSb.append(messageFormat.format(arrayOfString) + NEWLINE);
+/* 320 */         this.traceSb.append(NEWLINE + "FAIL: " + paramEntityGroup1.getEntityType() + " is invalid, has " + paramEntityGroup1.getEntityItemCount() + " entities.");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 343 */         return bool;case 1: if (paramEntityGroup2.getEntityItemCount() == 1) { this.traceSb.append(NEWLINE + "PASS: " + paramEntityGroup1.getEntityType() + " EntityGroup is valid (has 1)"); bool = true; } else { messageFormat = new MessageFormat((this.bundle == null) ? "<p>VARABR004 cannot pass because there is more than one &quot;{0}&quot; relator linked to the Variant.</p>" : this.bundle.getString("Error_TOO_MANY_LINKS")); arrayOfString[0] = paramEntityGroup2.getLongDescription(); this.rptSb.append(messageFormat.format(arrayOfString) + NEWLINE); this.traceSb.append(NEWLINE + "FAIL: " + paramEntityGroup2.getEntityType() + " is invalid, has " + paramEntityGroup2.getEntityItemCount() + " entities."); }  return bool; }  messageFormat = new MessageFormat((this.bundle == null) ? "<p>VARABR004 cannot pass because there is more than one &quot;{0}&quot; entity linked to the Variant.</p>" : this.bundle.getString("Error_TOO_MANY")); arrayOfString[0] = paramEntityGroup1.getLongDescription(); this.rptSb.append(messageFormat.format(arrayOfString) + NEWLINE); this.traceSb.append(NEWLINE + "FAIL: " + paramEntityGroup1.getEntityType() + " is invalid, has " + paramEntityGroup1.getEntityItemCount() + " entities."); return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private boolean checkSlots() {
+/* 360 */     String str1 = "SLOTAVAILTYPE";
+/* 361 */     String str2 = "PSLAVAILABILITYA";
+/* 362 */     String str3 = "PSL";
+/* 363 */     boolean bool = false;
+/* 364 */     this.traceSb.append(NEWLINE + NEWLINE + "****CheckSlots ******** ");
+/*     */ 
+/*     */ 
+/*     */     
+/* 368 */     EntityGroup entityGroup1 = this.m_elist.getEntityGroup("SBBPSL");
+/* 369 */     EntityGroup entityGroup2 = this.m_elist.getEntityGroup("PSLAVAIL");
+/* 370 */     if (entityGroup1 == null) {
+/* 371 */       this.traceSb.append(NEWLINE + "ERROR: SBBPSL EntityGroup not found");
+/*     */     
+/*     */     }
+/* 374 */     else if (entityGroup2 == null) {
+/* 375 */       this.traceSb.append(NEWLINE + "ERROR: PSLAVAIL EntityGroup not found");
+/*     */ 
+/*     */     
+/*     */     }
+/* 379 */     else if (entityGroup1.getEntityItemCount() == 0 && entityGroup2
+/* 380 */       .getEntityItemCount() == 0) {
+/* 381 */       this.traceSb.append(NEWLINE + "PASS: No PSLAVAIL or SBBPSL pulled by extract.");
+/* 382 */       bool = true;
+/*     */     }
+/*     */     else {
+/*     */       
+/* 386 */       bool = checkForAvail(entityGroup1, str2, str3, str1);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 391 */       bool = (checkForRelator(entityGroup1
+/* 392 */           .getEntityType(), entityGroup2, str2, str3, str1) && bool);
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 401 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private boolean checkBays() {
+/* 418 */     boolean bool = false;
+/* 419 */     String str1 = "BAYAVAILTYPE";
+/* 420 */     String str2 = "PBYAVAILABILITYA";
+/* 421 */     String str3 = "PBY";
+/* 422 */     this.traceSb.append(NEWLINE + NEWLINE + "****CheckBays ******** ");
+/*     */ 
+/*     */ 
+/*     */     
+/* 426 */     EntityGroup entityGroup1 = this.m_elist.getEntityGroup("SBBPBY");
+/* 427 */     EntityGroup entityGroup2 = this.m_elist.getEntityGroup("PBYAVAIL");
+/* 428 */     if (entityGroup1 == null) {
+/* 429 */       this.traceSb.append(NEWLINE + "ERROR: SBBPBY EntityGroup not found");
+/*     */     
+/*     */     }
+/* 432 */     else if (entityGroup2 == null) {
+/* 433 */       this.traceSb.append(NEWLINE + "ERROR: PBYAVAIL EntityGroup not found");
+/*     */ 
+/*     */     
+/*     */     }
+/* 437 */     else if (entityGroup1.getEntityItemCount() == 0 && entityGroup2
+/* 438 */       .getEntityItemCount() == 0) {
+/* 439 */       this.traceSb.append(NEWLINE + "PASS: No PBYAVAIL or SBBPBY pulled by extract.");
+/* 440 */       bool = true;
+/*     */     } else {
+/*     */       
+/* 443 */       bool = checkForAvail(entityGroup1, str2, str3, str1);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 448 */       bool = (checkForRelator(entityGroup1
+/* 449 */           .getEntityType(), entityGroup2, str2, str3, str1) && bool);
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 458 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private boolean checkForAvail(EntityGroup paramEntityGroup, String paramString1, String paramString2, String paramString3) {
+/* 478 */     boolean bool = true;
+/*     */     
+/* 480 */     this.traceSb.append(NEWLINE + "checkForAvail: Checking " + paramString2 + " pulled thru " + paramEntityGroup
+/*     */ 
+/*     */ 
+/*     */         
+/* 484 */         .getEntityType() + " for Association to " + paramString1);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 489 */     byte b = 0;
+/* 490 */     for (; b < paramEntityGroup.getEntityItemCount(); 
+/* 491 */       b++) {
+/*     */       
+/* 493 */       EntityItem entityItem = paramEntityGroup.getEntityItem(b);
+/* 494 */       this.traceSb.append(NEWLINE + "Relator " + entityItem.getEntityType() + ":" + entityItem.getEntityID());
+/* 495 */       for (byte b1 = 0; b1 < entityItem.getDownLinkCount(); b1++) {
+/* 496 */         EANEntity eANEntity = entityItem.getDownLink(b1);
+/*     */         
+/* 498 */         if (eANEntity.getEntityType().equals(paramString2)) {
+/* 499 */           boolean bool1 = false;
+/* 500 */           this.traceSb.append(NEWLINE + "  Entity " + eANEntity.getEntityType() + ":" + eANEntity.getEntityID());
+/* 501 */           this.traceSb.append(" " + paramString3 + ": " + getAttributeValue(eANEntity.getEntityType(), eANEntity.getEntityID(), paramString3));
+/*     */           
+/* 503 */           for (byte b2 = 0; b2 < eANEntity.getUpLinkCount(); b2++) {
+/* 504 */             EANEntity eANEntity1 = eANEntity.getUpLink(b2);
+/*     */             
+/* 506 */             if (eANEntity1.getEntityType().equals(paramString1)) {
+/* 507 */               this.traceSb.append(NEWLINE + "    uplink (assoc) " + eANEntity1.getEntityType() + ":" + eANEntity1.getEntityID());
+/*     */ 
+/*     */ 
+/*     */               
+/* 511 */               bool1 = true;
+/* 512 */               byte b3 = 0;
+/* 513 */               for (; b3 < eANEntity1.getUpLinkCount(); 
+/* 514 */                 b3++) {
+/*     */ 
+/*     */                 
+/* 517 */                 EANEntity eANEntity2 = eANEntity1.getUpLink(b3);
+/* 518 */                 this.traceSb.append(NEWLINE + "      uplink (entity) " + eANEntity2.getEntityType() + ":" + eANEntity2.getEntityID());
+/* 519 */                 this.traceSb.append(" " + paramString3 + ": " + getAttributeValue(eANEntity2.getEntityType(), eANEntity2.getEntityID(), paramString3));
+/* 520 */                 this.traceSb.append(NEWLINE + "PASS: " + eANEntity
+/*     */                     
+/* 522 */                     .getEntityType() + ":" + eANEntity
+/*     */                     
+/* 524 */                     .getEntityID() + " was linked thru " + entityItem
+/*     */                     
+/* 526 */                     .getEntityType() + ":" + entityItem
+/* 527 */                     .getEntityID() + " AND was associated thru " + eANEntity1
+/*     */                     
+/* 529 */                     .getEntityType() + ":" + eANEntity1
+/*     */                     
+/* 531 */                     .getEntityID() + " to " + eANEntity2
+/*     */                     
+/* 533 */                     .getEntityType() + ":" + eANEntity2
+/*     */                     
+/* 535 */                     .getEntityID());
+/*     */               } 
+/*     */             } 
+/*     */           } 
+/* 539 */           if (!bool1) {
+/* 540 */             bool = false;
+/* 541 */             this.traceSb.append(NEWLINE + "FAIL: " + eANEntity
+/*     */                 
+/* 543 */                 .getEntityType() + ":" + eANEntity
+/*     */                 
+/* 545 */                 .getEntityID() + " " + paramString3 + ": " + 
+/*     */ 
+/*     */ 
+/*     */                 
+/* 549 */                 getAttributeValue(eANEntity.getEntityType(), eANEntity.getEntityID(), paramString3) + " was linked thru " + entityItem
+/*     */                 
+/* 551 */                 .getEntityType() + ":" + entityItem
+/*     */                 
+/* 553 */                 .getEntityID() + " BUT was not associated to " + paramString1);
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 563 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private boolean checkForRelator(String paramString1, EntityGroup paramEntityGroup, String paramString2, String paramString3, String paramString4) {
+/* 586 */     boolean bool = true;
+/*     */     
+/* 588 */     String str = paramEntityGroup.getEntityType();
+/* 589 */     this.traceSb.append("checkForRelator: Checking " + str + " thru Association " + paramString2 + " for " + paramString3 + " linked thru " + paramString1);
+/*     */     
+/* 591 */     for (byte b = 0; b < paramEntityGroup.getEntityItemCount(); b++) {
+/*     */       
+/* 593 */       boolean bool1 = false;
+/* 594 */       EntityItem entityItem = paramEntityGroup.getEntityItem(b);
+/* 595 */       this.traceSb.append(NEWLINE + "Entity " + entityItem.getEntityType() + ":" + entityItem.getEntityID());
+/* 596 */       this.traceSb.append(" " + paramString4 + ": " + getAttributeValue(entityItem.getEntityType(), entityItem.getEntityID(), paramString4));
+/*     */ 
+/*     */ 
+/*     */       
+/* 600 */       for (byte b1 = 0; b1 < entityItem.getDownLinkCount(); b1++) {
+/* 601 */         EANEntity eANEntity = entityItem.getDownLink(b1);
+/* 602 */         if (eANEntity.getEntityType().equals(paramString2)) {
+/* 603 */           this.traceSb.append(NEWLINE + "  downLink (assoc) " + eANEntity.getEntityType() + ":" + eANEntity.getEntityID());
+/*     */           
+/* 605 */           for (byte b2 = 0; b2 < eANEntity.getDownLinkCount(); b2++) {
+/* 606 */             EANEntity eANEntity1 = eANEntity.getDownLink(b2);
+/* 607 */             if (eANEntity1.getEntityType().equals(paramString3)) {
+/* 608 */               boolean bool2 = false;
+/*     */               
+/* 610 */               this.traceSb.append(NEWLINE + "    downlink (entity) " + eANEntity1.getEntityType() + ":" + eANEntity1.getEntityID());
+/* 611 */               this.traceSb.append(" " + paramString4 + ": " + getAttributeValue(eANEntity1.getEntityType(), eANEntity1.getEntityID(), paramString4));
+/*     */               
+/* 613 */               for (byte b3 = 0; b3 < eANEntity1.getUpLinkCount(); b3++) {
+/* 614 */                 EANEntity eANEntity2 = eANEntity1.getUpLink(b3);
+/* 615 */                 if (eANEntity2
+/* 616 */                   .getEntityType()
+/* 617 */                   .equals(paramString1)) {
+/* 618 */                   this.traceSb.append(NEWLINE + "      uplink (relator?) " + eANEntity2.getEntityType() + ":" + eANEntity2.getEntityID());
+/* 619 */                   bool2 = true;
+/* 620 */                   bool1 = true;
+/* 621 */                   this.traceSb.append(NEWLINE + "PASS: " + eANEntity1
+/*     */                       
+/* 623 */                       .getEntityType() + ":" + eANEntity1
+/*     */                       
+/* 625 */                       .getEntityID() + " was associated thru " + eANEntity
+/*     */                       
+/* 627 */                       .getEntityType() + ":" + eANEntity
+/*     */                       
+/* 629 */                       .getEntityID() + " to " + entityItem
+/*     */                       
+/* 631 */                       .getEntityType() + ":" + entityItem
+/*     */                       
+/* 633 */                       .getEntityID() + " AND was linked to " + eANEntity2
+/*     */                       
+/* 635 */                       .getEntityType() + ":" + eANEntity2
+/*     */                       
+/* 637 */                       .getEntityID());
+/*     */                 } 
+/*     */               } 
+/* 640 */               if (!bool2) {
+/* 641 */                 this.traceSb.append(NEWLINE + "INFO: " + eANEntity1
+/*     */                     
+/* 643 */                     .getEntityType() + ":" + eANEntity1
+/*     */                     
+/* 645 */                     .getEntityID() + " was associated thru " + eANEntity
+/*     */                     
+/* 647 */                     .getEntityType() + ":" + eANEntity
+/*     */                     
+/* 649 */                     .getEntityID() + " to " + entityItem
+/*     */                     
+/* 651 */                     .getEntityType() + ":" + entityItem
+/*     */                     
+/* 653 */                     .getEntityID() + " BUT was not linked to " + paramString1);
+/*     */               }
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */ 
+/*     */       
+/* 661 */       if (!bool1) {
+/*     */         
+/* 663 */         bool = false;
+/* 664 */         this.traceSb.append(NEWLINE + "FAIL: NO " + paramString1 + " links found thru " + paramString2 + " for " + entityItem
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */             
+/* 670 */             .getEntityType() + ":" + entityItem
+/*     */             
+/* 672 */             .getEntityID() + " " + paramString4 + ": " + 
+/*     */ 
+/*     */ 
+/*     */             
+/* 676 */             getAttributeValue(entityItem.getEntityType(), entityItem.getEntityID(), paramString4));
+/*     */       } 
+/*     */     } 
+/*     */ 
+/*     */     
+/* 681 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void triggerWorkFlow(String paramString) throws SQLException, MiddlewareException, WorkflowException, MiddlewareShutdownInProgressException {
+/* 700 */     EntityGroup entityGroup = this.m_elist.getParentEntityGroup();
+/* 701 */     EntityItem[] arrayOfEntityItem = new EntityItem[1];
+/* 702 */     WorkflowActionItem workflowActionItem = new WorkflowActionItem(null, this.m_db, this.m_prof, paramString);
+/* 703 */     arrayOfEntityItem[0] = entityGroup.getEntityItem(0);
+/* 704 */     workflowActionItem.setEntityItems(arrayOfEntityItem);
+/* 705 */     this.m_db.executeAction(this.m_prof, workflowActionItem);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String getNavigationName() throws SQLException, MiddlewareException {
+/* 715 */     StringBuffer stringBuffer = new StringBuffer();
+/*     */     
+/* 717 */     EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, getRootEntityType(), "Navigate");
+/* 718 */     EANList eANList = entityGroup.getMetaAttribute();
+/*     */     
+/* 720 */     for (byte b = 0; b < eANList.size(); b++) {
+/* 721 */       EANMetaAttribute eANMetaAttribute = (EANMetaAttribute)eANList.getAt(b);
+/* 722 */       stringBuffer.append(
+/* 723 */           getAttributeValue(
+/* 724 */             getRootEntityType(), 
+/* 725 */             getRootEntityID(), eANMetaAttribute
+/* 726 */             .getAttributeCode()));
+/* 727 */       stringBuffer.append(" ");
+/*     */     } 
+/*     */     
+/* 730 */     return stringBuffer.toString();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 739 */     String str = "Variant Required Element Verification.";
+/* 740 */     if (this.bundle != null) {
+/* 741 */       str = this.bundle.getString("DESCRIPTION");
+/*     */     }
+/*     */     
+/* 744 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 753 */     return "$Revision: 1.8 $";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private Locale getLocale(int paramInt) {
+/* 762 */     Locale locale = null;
+/* 763 */     switch (paramInt)
+/*     */     { case 1:
+/* 765 */         locale = Locale.US;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 788 */         return locale;case 2: locale = Locale.GERMAN; return locale;case 3: locale = Locale.ITALIAN; return locale;case 4: locale = Locale.JAPANESE; return locale;case 5: locale = Locale.FRENCH; return locale;case 6: locale = new Locale("es", "ES"); return locale;case 7: locale = Locale.UK; return locale; }  locale = Locale.US; return locale;
+/*     */   }
+/*     */ }
+
+
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\psg\VARABR004.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-
-
-package COM.ibm.eannounce.abr.psg;
-
-
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-
-import java.util.*;
-import java.text.*;
-
-
-/**
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- *
- * @author Administrator
- */
-public class VARABR004 extends PokBaseABR {
-    private ResourceBundle bundle = null;
-
-    private StringBuffer rptSb = new StringBuffer();
-    private StringBuffer traceSb = new StringBuffer();
-
-    private final String Error_MISSING = "<p>VARABR004 cannot pass because there is no &quot;{0}&quot; entity linked to the Variant.</p>"; //$NON-NLS-1$
-    private final String Error_TOO_MANY = "<p>VARABR004 cannot pass because there is more than one &quot;{0}&quot; entity linked to the Variant.</p>"; //$NON-NLS-1$
-    private final String Error_TOO_MANY_LINKS="<p>VARABR004 cannot pass because there is more than one &quot;{0}&quot; relator linked to the Variant.</p>";//$NON-NLS-1$
-    private final String Check1_PASSED = "<p>Check 1 - Passed</p>"; //$NON-NLS-1$
-    private final String Check2_PASSED = "<p>Check 2 - Passed</p>"; //$NON-NLS-1$
-    private final String Check3_PASSED = "<p>Check 3 - Passed</p>"; //$NON-NLS-1$
-    private final String Error_PSL = "<p>VARABR004 cannot Pass because there is a PSL but no PSLAVAIL, or there is a PSLAVAIL but no PSL, or the SLOTAVAILTYPE does not match.</p>"; //$NON-NLS-1$
-    private final String Error_PBY = "<p>VARABR004 cannot Pass because there is a PBY but no PBYAVAIL, or there is a PBYAVAIL but no PBY, or the BAYAVAILTYPE does not match.</p>"; //$NON-NLS-1$
-    private final String Error_VARSTATUS = "<p>VARABR004 cannot Pass because Status is not Ready for Review.</p>"; //$NON-NLS-1$
-    private final String OK_MSG = "<p>All checks are valid.</p>"; //$NON-NLS-1$
-    private static final char[] FOOL_JTEST = {'\n'};
-    static final String NEWLINE = new String(FOOL_JTEST);
-
-    /**
-     *  Execute ABR.
-     * Check for required relators and also slot/slotavail and bay/bayavail relationships
-     *
-     */
-    public void execute_run() {
-        String navName = ""; //$NON-NLS-1$
-        String HEADER = "<html><head><title>{0} {1}</title></head>"+NEWLINE+"<body><h1>{0}: {1}</h1>"+
-        NEWLINE+"<p><b>Date: </b>{2}<br/>"+NEWLINE+"<b>User: </b>{3} ({4})<br />"+NEWLINE+"<b>Description: </b>{5}</p>"+NEWLINE+"<!-- {6} -->"; //$NON-NLS-1$
-
-        // Insert Header into beginning of report
-        MessageFormat msgf = new MessageFormat(bundle == null ? HEADER : bundle.getString("HEADER")); //$NON-NLS-1$
-        Object[] args = new String[10];
-        try {
-            String varStatus = null;
-            boolean success;
-            start_ABRBuild();
-
-            bundle =
-                ResourceBundle.getBundle(
-                    this.getClass().getName(),
-                    getLocale(m_prof.getReadLanguage().getNLSID()));
-
-            traceSb.append("VARABR004 entered for " + getEntityType() + ":" + getEntityID()); //$NON-NLS-1$  //$NON-NLS-2$
-            // debug display list of groups
-            traceSb.append(NEWLINE+"EntityList contains the following entities: "); //$NON-NLS-1$
-            for (int i = 0; i < m_elist.getEntityGroupCount(); i++) {
-                EntityGroup eg = m_elist.getEntityGroup(i);
-                traceSb.append(NEWLINE + eg.getEntityType() + " : " + eg.getEntityItemCount() + " entity items. "); //$NON-NLS-1$  //$NON-NLS-2$  //$NON-NLS-3$
-                if (eg.getEntityItemCount() > 0) {
-                    traceSb.append("IDs("); //$NON-NLS-1$
-                    for (int e = 0; e < eg.getEntityItemCount(); e++) {
-                        traceSb.append(" " + eg.getEntityItem(e).getEntityID()); //$NON-NLS-1$
-                    }
-                    traceSb.append(")"); //$NON-NLS-1$
-                }
-            }
-            traceSb.append(NEWLINE); //$NON-NLS-1$
-
-            // NAME is navigate attributes
-            navName = getNavigationName();
-
-            // if VE is not defined, throw exception
-            if (m_elist.getEntityGroupCount() == 0) {
-                throw new Exception("EntityList did not have any groups. Verify that extract is defined."); //$NON-NLS-1$
-            }
-
-            /*
-                The report should show:
-                Header
-                ABR name VARABR004
-                Date Generated
-                Who last changed the entity ==> openid ==> userid and role
-                Description: Variant Required Element Verification
-
-            Body
-            VARIANT PN: OFFERINGPNUMB
-            Fail statement:
-            Check 1- Passed, or VARABR004 cannot Pass because there is no XXX entity linked.
-            Check 2- Passed, or VARABR004 cannot Pass because there is a PSL but no PSLAVAIL, or there is a PSLAVAIL but no PSL, or the SLOTAVAILTYPE does not match.
-            Check 3- Passed, or VARABR004 cannot Pass because there is a PBY but no PBYAVAIL, or there is a PBYAVAIL but no PBY, or the BAYAVAILTYPE does not match.
-
-            */
-
-            rptSb.append("<h3>" + //$NON-NLS-1$
-                m_elist.getParentEntityGroup().getLongDescription() + " PN: " + //$NON-NLS-1$
-                getAttributeValue(getRootEntityType(), getRootEntityID(), "OFFERINGPNUMB") //$NON-NLS-1$
-                +"</h3>"+NEWLINE); //$NON-NLS-1$
-
-            //from Amy,  I prefer to add the check into abr004 that must be in R4R, else fail.
-            //Change Request [0050] Draft [0010] Final [0020] Ready for Review [0040]
-            varStatus = getAttributeFlagEnabledValue(getRootEntityType(), getRootEntityID(), "VARSTATUS", ""); //$NON-NLS-1$  //$NON-NLS-2$
-            success = varStatus.equals("0040"); //$NON-NLS-1$
-            if (!success) {
-                rptSb.append(bundle == null ? Error_VARSTATUS : bundle.getString("Error_VARSTATUS") + NEWLINE); //$NON-NLS-1$  //$NON-NLS-2$
-            }
-
-            // check for relators, msgs will be added to rptsb
-            if (!checkRelators()) {
-                success = false;
-            }
-            else {
-                rptSb.append(bundle == null ? Check1_PASSED : bundle.getString("Check1_PASSED") +NEWLINE); //$NON-NLS-1$  //$NON-NLS-2$
-            }
-
-            // check for slots
-            if (!checkSlots()) {
-                rptSb.append(bundle == null ? Error_PSL : bundle.getString("Error_PSL") + NEWLINE); //$NON-NLS-1$  //$NON-NLS-2$
-                success = false;
-            }
-            else {
-                rptSb.append(bundle == null ? Check2_PASSED : bundle.getString("Check2_PASSED") + NEWLINE); //$NON-NLS-1$  //$NON-NLS-2$
-            }
-
-            // check for bays
-            if (!checkBays()) {
-                rptSb.append(bundle == null ? Error_PBY : bundle.getString("Error_PBY") + NEWLINE); //$NON-NLS-1$  //$NON-NLS-2$
-                success = false;
-            }
-            else {
-                rptSb.append(bundle == null ? Check3_PASSED : bundle.getString("Check3_PASSED") +NEWLINE); //$NON-NLS-1$  //$NON-NLS-2$
-            }
-
-            // rptSb will have error msg if failure occurred
-            if (success) {
-                // set VARSTATUS to final
-                triggerWorkFlow("WFVARFINAL");
-
-                setReturnCode(PASS);
-
-                rptSb.append(bundle == null ? OK_MSG : bundle.getString("OK_MSG") + NEWLINE); //$NON-NLS-1$  //$NON-NLS-2$
-            } else {
-                setReturnCode(FAIL);
-            }
-        }
-        catch (Exception exc) {
-            java.io.StringWriter exBuf = new java.io.StringWriter();
-            // Put exception into document
-            String Error_EXCEPTION = "<h3><font color=red>Error: {0}</font></h3>"; //$NON-NLS-1$
-            String Error_STACKTRACE = "<pre>{0}</pre>"; //$NON-NLS-1$
-            msgf = new MessageFormat(bundle == null ? Error_EXCEPTION : bundle.getString("Error_EXCEPTION")); //$NON-NLS-1$
-            args = new String[1];
-            setReturnCode(FAIL);
-            exc.printStackTrace(new java.io.PrintWriter(exBuf));
-            args[0] = exc.getMessage();
-            rptSb.append(msgf.format(args) + NEWLINE); //$NON-NLS-1$
-            msgf = new MessageFormat(bundle == null ? Error_STACKTRACE : bundle.getString("Error_STACKTRACE")); //$NON-NLS-1$
-            args[0] = exBuf.getBuffer().toString();
-            rptSb.append(msgf.format(args) + NEWLINE); //$NON-NLS-1$
-            logError("Exception: " + exc.getMessage()); //$NON-NLS-1$
-            logError(exBuf.getBuffer().toString());
-        }
-        finally {
-            setDGTitle(navName);
-            setDGRptName(getShortClassName(getClass()));
-            setDGRptClass("WWABR"); // Amy says same as OFABR001  //$NON-NLS-1$
-            // make sure the lock is released
-            if (!isReadOnly()) {
-                clearSoftLock();
-            }
-        }
-
-        // Print everything up to </html>
-
-        args[0] = getShortClassName(getClass());
-        args[1] = navName + ((getReturnCode() == PASS) ? " Passed" : " Failed"); //$NON-NLS-1$  //$NON-NLS-2$
-        args[2] = getNow();
-        args[3] = m_prof.getOPName();
-        args[4] = m_prof.getRoleDescription();
-        args[5] = getDescription();
-        args[6] = getABRVersion();
-        rptSb.insert(0, msgf.format(args));
-        rptSb.append("<!-- DEBUG: " + traceSb.toString() + " -->"+NEWLINE); //$NON-NLS-1$  //$NON-NLS-2$
-
-        println(rptSb.toString()); // Output the Report
-        printDGSubmitString();
-        buildReportFooter(); // Print </html>
-    }
-
-    /**********************************************************************************
-    *  Verify the correct number of entities are linked, build report string with errors
-    Only 1 (Quantity = 1)               One or more (Quantity >=1)
-    MB: through VARSBB, SBBMB           SBB: through VARSBB
-    PP: through VARSBB, SBBPP
-    DD: through VARDD
-    CTO Parent: through CTOVAR
-    CPG: through CPGVAR
-    WAR: through VARWAR
-    *@return  true if all checks are valid
-    */
-    private boolean checkRelators() {
-        boolean success = true;
-        EntityGroup eg, reg;
-
-        String[] rTypes = new String[] { "VARDD", "CTOVAR", "CPGVAR", "VARWAR", "SBBMB", "SBBPP" }; //$NON-NLS-1$  //$NON-NLS-2$  //$NON-NLS-3$  //$NON-NLS-4$  //$NON-NLS-5$  //$NON-NLS-6$
-        // check for single relator DD, CTO, CPG, WAR, MB, PP
-        String[] eTypes = new String[] { "DD", "CTO", "CPG", "WAR", "MB", "PP" }; //$NON-NLS-1$  //$NON-NLS-2$  //$NON-NLS-3$  //$NON-NLS-4$  //$NON-NLS-5$  //$NON-NLS-6$
-        for (int i = 0; i < eTypes.length; i++) {
-            eg = m_elist.getEntityGroup(eTypes[i]);
-            reg = m_elist.getEntityGroup(rTypes[i]); //TIR USRO-R-NMHR-6AXL75 spec clarified, can't link same one more than once
-            if (eg != null && reg !=null) {
-                success = checkSingleRelator(eg, reg) && success;
-            } else {
-                if (eg == null){
-                    traceSb.append(NEWLINE+"ERROR: " + eTypes[i] + " EntityGroup not found"); //$NON-NLS-1$  //$NON-NLS-2$
-                }else {
-                    traceSb.append(NEWLINE+"ERROR: " + rTypes[i] + " Relator EntityGroup not found"); //$NON-NLS-1$  //$NON-NLS-2$
-                }
-                success = false;
-            }
-        }
-
-        // check for 1 or more SBB
-        eg = m_elist.getEntityGroup("SBB"); //$NON-NLS-1$
-        if (eg != null) {
-            if (eg.getEntityItemCount() == 0) {
-                MessageFormat msgf = new MessageFormat(bundle == null ? Error_MISSING : bundle.getString("Error_MISSING")); //$NON-NLS-1$
-                Object[] args = new String[1];
-                success = false;
-                args[0] = eg.getLongDescription();
-                rptSb.append(msgf.format(args) + NEWLINE); //$NON-NLS-1$
-                traceSb.append(NEWLINE+"FAIL: " + eg.getEntityType() + " is invalid, has " + eg.getEntityItemCount() + " entities."); //$NON-NLS-1$  //$NON-NLS-2$  //$NON-NLS-3$
-            } else {
-                traceSb.append(NEWLINE+"PASS: " + eg.getEntityType() + " EntityGroup is valid (has 1 or more)"); //$NON-NLS-1$  //$NON-NLS-2$
-            }
-        } else {
-            traceSb.append(NEWLINE+"ERROR: SBB EntityGroup not found"); //$NON-NLS-1$
-            success = false;
-        }
-
-        return success;
-    }
-    /**********************************************************************************
-    *  Verify there is 1 and only 1 entity linked, build report string with errors
-    *@return  true if all checks are valid
-    */
-    private boolean checkSingleRelator(EntityGroup eg, EntityGroup reg) {
-        boolean success = false;
-        MessageFormat msgf = null;
-        Object[] args = new String[1];
-
-        switch (eg.getEntityItemCount()) {
-        case 0 :
-            msgf = new MessageFormat(bundle == null ? Error_MISSING : bundle.getString("Error_MISSING")); //$NON-NLS-1$
-            args[0] = eg.getLongDescription();
-            rptSb.append(msgf.format(args) + NEWLINE); //$NON-NLS-1$
-            traceSb.append(NEWLINE+"FAIL: " + eg.getEntityType() + " is invalid, has " + eg.getEntityItemCount() + " entities."); //$NON-NLS-1$  //$NON-NLS-2$  //$NON-NLS-3$
-            break;
-        case 1 :    // only one linked
-            // now check for same entity getting linked more than once
-            if (reg.getEntityItemCount()==1) {
-                traceSb.append(NEWLINE+"PASS: " + eg.getEntityType() + " EntityGroup is valid (has 1)"); //$NON-NLS-1$  //$NON-NLS-2$
-                success = true;
-            }
-            else{
-                msgf = new MessageFormat(bundle == null ? Error_TOO_MANY_LINKS : bundle.getString("Error_TOO_MANY_LINKS")); //$NON-NLS-1$
-                args[0] = reg.getLongDescription();
-                rptSb.append(msgf.format(args) + NEWLINE); //$NON-NLS-1$
-                traceSb.append(NEWLINE+"FAIL: " + reg.getEntityType() + " is invalid, has " + reg.getEntityItemCount() + " entities."); //$NON-NLS-1$  //$NON-NLS-2$  //$NON-NLS-3$
-            }
-            break;
-        default :
-            msgf = new MessageFormat(bundle == null ? Error_TOO_MANY : bundle.getString("Error_TOO_MANY")); //$NON-NLS-1$
-            args[0] = eg.getLongDescription();
-            rptSb.append(msgf.format(args) + NEWLINE); //$NON-NLS-1$
-            traceSb.append(NEWLINE+"FAIL: " + eg.getEntityType() + " is invalid, has " + eg.getEntityItemCount() + " entities."); //$NON-NLS-1$  //$NON-NLS-2$  //$NON-NLS-3$
-            break;
-        }
-
-        return success;
-    }
-
-    /**********************************************************************************
-    *  Slot Check: For each PSL (through VARSBB, SBBPSL), there should be a corresponding PSLAVAIL
-    * (through VARPSLAVAIL). There is an association between PSLAVAIL and PSL, attribute SLOTAVAILTYPE,
-    * to find the corresponding PSL and PSLAVAIL. Note, PSL elements are not required. If no PSL elements
-    * are linked, this check should pass (there should not be any PSLAVAIL elements linked as well).
-    *
-    *   VAR->VARSBB->SBB->SBBPSL->PSL
-    *   VAR->VARPSLAVAIL->PSLAVAIL--->PSLAVAILABILITYA--->PSL
-    *
-    *@return  true if all checks are valid
-    */
-    private boolean checkSlots() {
-        EntityGroup relatorGrp;
-        EntityGroup availGrp;
-        String attrCode = "SLOTAVAILTYPE"; //$NON-NLS-1$
-        String assocName = "PSLAVAILABILITYA"; //$NON-NLS-1$
-        String entityType = "PSL"; //$NON-NLS-1$
-        boolean success = false;
-        traceSb.append(NEWLINE+NEWLINE+"****CheckSlots ******** "); //$NON-NLS-1$
-
-        // get all PSL thru SBBPSL, can't go directly to the group because there may be some PSL
-        // that only came thru PSLAVAILABILITYA
-        relatorGrp = m_elist.getEntityGroup("SBBPSL"); //$NON-NLS-1$
-        availGrp = m_elist.getEntityGroup("PSLAVAIL"); //$NON-NLS-1$
-        if (relatorGrp == null) {
-            traceSb.append(NEWLINE+"ERROR: SBBPSL EntityGroup not found"); //$NON-NLS-1$
-        }
-        else {
-            if (availGrp == null) {
-                traceSb.append(NEWLINE+"ERROR: PSLAVAIL EntityGroup not found"); //$NON-NLS-1$
-            }else {
-
-                // PSL are not required.. no SBBPSL would exist or PSLAVAIL to match
-                if (relatorGrp.getEntityItemCount() == 0
-                    && availGrp.getEntityItemCount() == 0) {
-                    traceSb.append(NEWLINE+"PASS: No PSLAVAIL or SBBPSL pulled by extract."); //$NON-NLS-1$
-                    success = true;
-                }
-                else {
-                    // each PSL linked thru SBBPSL must have a assoc to a PSLAVAIL thru PSLAVAILABILITYA
-                    success = checkForAvail(relatorGrp, assocName, entityType, attrCode);
-
-                    // each PSLAVAIL will have a SLOTAVAILTYPE value that matches all PSL.SLOTAVAILTYPE associated with it
-                    // at least one PSL must be linked to an SBBPSL
-                    success =
-                        checkForRelator(
-                            relatorGrp.getEntityType(),
-                            availGrp,
-                            assocName,
-                            entityType,
-                            attrCode)
-                        && success;
-                }
-            }
-        }
-        return success;
-    }
-
-    /**********************************************************************************
-    *  Bay Check: For each PBY (through VARSBB, SBBPBY), there should be a corresponding PBYAVAIL
-    * (through VARPBYAVAIL). There is an association between PBYAVAIL and PBY, attribute BAYAVAILTYPE,
-    * to find the corresponding PBY and PBYAVAIL. Note, PBY elements are not required. If no PBY elements
-    * are linked, this check should pass (there should not be any PBYAVAIL elements linked as well).
-    *
-    *   VAR->VARSBB->SBB->SBBPBY->PBY
-    *   VAR->VARPBYAVAIL->PBYAVAIL--->PBYAVAILABILITYA--->PBY
-    *
-    *@return  true if all checks are valid
-    */
-    private boolean checkBays() {
-        EntityGroup relatorGrp;
-        EntityGroup availGrp;
-        boolean success =false;
-        String attrCode = "BAYAVAILTYPE"; // for PBY only  //$NON-NLS-1$
-        String assocName = "PBYAVAILABILITYA"; //$NON-NLS-1$
-        String entityType = "PBY"; //$NON-NLS-1$
-        traceSb.append(NEWLINE+NEWLINE+"****CheckBays ******** "); //$NON-NLS-1$
-
-        // get all PBY thru SBBPBY, can't go directly to the group because there may be some PBY
-        // that only came thru PBYAVAILABILITYA
-        relatorGrp = m_elist.getEntityGroup("SBBPBY"); //$NON-NLS-1$
-        availGrp = m_elist.getEntityGroup("PBYAVAIL"); //$NON-NLS-1$
-        if (relatorGrp == null) {
-            traceSb.append(NEWLINE+"ERROR: SBBPBY EntityGroup not found"); //$NON-NLS-1$
-        }
-        else {
-            if (availGrp == null) {
-                traceSb.append(NEWLINE+"ERROR: PBYAVAIL EntityGroup not found"); //$NON-NLS-1$
-            }else {
-
-                // PBY are not required.. no SBBPBY would exist or PBYAVAIL to match
-                if (relatorGrp.getEntityItemCount() == 0
-                    && availGrp.getEntityItemCount() == 0) {
-                    traceSb.append(NEWLINE+"PASS: No PBYAVAIL or SBBPBY pulled by extract."); //$NON-NLS-1$
-                    success= true;
-                }else {
-                    // each PBY linked thru SBBPBY must have a assoc to a PBYAVAIL thru PBYAVAILABILITYA
-                    success = checkForAvail(relatorGrp, assocName, entityType, attrCode);
-
-                    // each PBYAVAIL will have a BAYAVAILTYPE value that matches all PBY.BAYAVAILTYPE associated with it
-                    // at least one PBY must be linked to an SBBPBY
-                    success =
-                        checkForRelator(
-                            relatorGrp.getEntityType(),
-                            availGrp,
-                            assocName,
-                            entityType,
-                            attrCode)
-                        && success;
-                }
-            }
-        }
-        return success;
-    }
-
-    /**********************************************************************************
-    *  Check that there is an Association defined for each entity linked to the relator group
-    * For example, the PSL entity group will have PSL pulled thru SBBPSL and thru the
-    * PSLAVAIL--->PSLAVAILABILITYA--->PSL association.  Only the PSL pulled thru SBBPSL require
-    * an assocation to a PSLAVAIL.  Look at each PSL thru SBBPSL to find a PSLAVAILABILITYA uplink.
-    *
-    *@param   relatorGrp    EntityGroup with SBBPSL or SBBPBY relators
-    *@param   assocName     String with Association name to find as an uplink PSLAVAILABILITYA or PBYAVAILABILITYA
-    *@param   checkEntityType   String with entity type PSL or PBY that must be linked and associated
-    *@param   attrCode      String with attribute code, debug info only
-    *@return  true if all linked entities have associations
-    */
-    private boolean checkForAvail(
-        EntityGroup relatorGrp,
-        String assocName,
-        String checkEntityType,
-        String attrCode) {
-        boolean success = true;
-
-        traceSb.append(
-            NEWLINE+"checkForAvail: Checking " + //$NON-NLS-1$
-            checkEntityType +
-            " pulled thru " + //$NON-NLS-1$
-            relatorGrp.getEntityType() +
-            " for Association to " + //$NON-NLS-1$
-            assocName);
-
-        // check each PSL linked to SBBPSL for association to a PSLAVAIL
-        for (int ie = 0;
-            ie < relatorGrp.getEntityItemCount();
-            ie++) // start with SBBPSL group
-        {
-            EntityItem entityLink = relatorGrp.getEntityItem(ie);
-            traceSb.append(NEWLINE+"Relator " + entityLink.getEntityType() + ":" + entityLink.getEntityID()); //$NON-NLS-1$  //$NON-NLS-2$
-            for (int di = 0; di < entityLink.getDownLinkCount(); di++) {
-                EANEntity entityItem = entityLink.getDownLink(di);
-                // look for PSL, really can't be anything else here
-                if (entityItem.getEntityType().equals(checkEntityType)) {
-                    boolean assocFnd = false;
-                    traceSb.append(NEWLINE+"  Entity " + entityItem.getEntityType() + ":" + entityItem.getEntityID()); //$NON-NLS-1$  //$NON-NLS-2$
-                    traceSb.append(" " + attrCode + ": " + getAttributeValue(entityItem.getEntityType(), entityItem.getEntityID(), attrCode)); //$NON-NLS-1$  //$NON-NLS-2$
-                    // look for PSLAVAILABILITYA
-                    for (int ui = 0; ui < entityItem.getUpLinkCount(); ui++) {
-                        EANEntity entityAssoc = entityItem.getUpLink(ui);
-                        // PSLAVAILABILITYA
-                        if (entityAssoc.getEntityType().equals(assocName)) {
-                            traceSb.append(NEWLINE+"    uplink (assoc) " + entityAssoc.getEntityType() + ":" + entityAssoc.getEntityID()); //$NON-NLS-1$  //$NON-NLS-2$
-                            // the only place this can go is to the PSLAVAIL (or PBYAVAIL)
-                            // Associations are only built Down, so this can only exist if
-                            // the extract traveled down the VAR->VARPSLAVAIL->PSLAVAIL--->PSLAVAILABILITYA path
-                            assocFnd = true;
-                            for (int a = 0;
-                                a < entityAssoc.getUpLinkCount();
-                                a++) // PSLAVAIL
-                            {
-                                EANEntity entityAvail =
-                                    entityAssoc.getUpLink(a);
-                                traceSb.append(NEWLINE+"      uplink (entity) " + entityAvail.getEntityType() + ":" + entityAvail.getEntityID()); //$NON-NLS-1$  //$NON-NLS-2$
-                                traceSb.append(" " + attrCode + ": " + getAttributeValue(entityAvail.getEntityType(), entityAvail.getEntityID(), attrCode)); //$NON-NLS-1$  //$NON-NLS-2$
-                                traceSb.append(
-                                    NEWLINE+"PASS: " + //$NON-NLS-1$
-                                    entityItem.getEntityType() +
-                                    ":" + //$NON-NLS-1$
-                                    entityItem.getEntityID() +
-                                    " was linked thru " + //$NON-NLS-1$
-                                    entityLink.getEntityType() +
-                                    ":" + entityLink.getEntityID() +
-                                    " AND was associated thru " + //$NON-NLS-1$
-                                    entityAssoc.getEntityType() +
-                                    ":" + //$NON-NLS-1$
-                                    entityAssoc.getEntityID() +
-                                    " to " + //$NON-NLS-1$
-                                    entityAvail.getEntityType() +
-                                    ":" + //$NON-NLS-1$
-                                    entityAvail.getEntityID());
-                            }
-                        }
-                    }
-                    if (!assocFnd) {
-                        success = false;
-                        traceSb.append(
-                            NEWLINE+"FAIL: " +  //$NON-NLS-1$
-                            entityItem.getEntityType() +
-                            ":" +  //$NON-NLS-1$
-                            entityItem.getEntityID() +
-                            " " +  //$NON-NLS-1$
-                            attrCode +
-                            ": " +  //$NON-NLS-1$
-                            getAttributeValue(entityItem.getEntityType(), entityItem.getEntityID(), attrCode) +
-                            " was linked thru " + //$NON-NLS-1$
-                            entityLink.getEntityType() +
-                            ":" +  //$NON-NLS-1$
-                            entityLink.getEntityID() +
-                            " BUT was not associated to " + //$NON-NLS-1$
-                            assocName);
-
-                        //rptSb.append();
-                    }
-                } // entity is checkEntityType (PSL or PBY)
-            }
-        }
-
-        return success;
-    }
-
-    /**********************************************************************************
-    *  Check that there is at least one entity linked to the relator for each AVAIL
-    * For example, the PSLAVAIL entity group will be associated to PSL pulled thru PSLAVAILABILITYA.
-    * One PSLAVAIL and the associated PSL will share the same SLOTAVAILTYPE value, yet all the PSL
-    * may not be linked back to an SBB.  As long as one of these associated PSL is linked, the
-    * check is valid.
-    *
-    *@param   relatorName   Relator type .. SBBPSL or SBBPBY relators
-    *@param   availGrp      EntityGroup with PSLAVAIL or PBYAVAIL entities
-    *@param   assocName     String with Association name to find as an uplink PSLAVAILABILITYA or PBYAVAILABILITYA
-    *@param   checkEntityType   String with entity type PSL or PBY that must be linked and associated
-    *@param   attrCode      String with attribute code, debug info only
-    *@return  true if each PSLAVAIL or PBYAVAIL has at least one associated PSL or PBY linked to an SBBPSL or SBBPBY
-    */
-    private boolean checkForRelator(
-        String relatorName,
-        EntityGroup availGrp,
-        String assocName,
-        String checkEntityType,
-        String attrCode) {
-        boolean success = true;
-
-        String availName = availGrp.getEntityType();
-        traceSb.append("checkForRelator: Checking " + availName + " thru Association " + assocName + " for " + checkEntityType + " linked thru " + relatorName); //$NON-NLS-1$  //$NON-NLS-2$  //$NON-NLS-3$  //$NON-NLS-4$
-        // check all PSLAVAIL for at least one PSL linked to SBBPSL also
-        for (int ie = 0; ie < availGrp.getEntityItemCount(); ie++) {
-            // PSLAVAIL
-            boolean relFound = false;
-            EntityItem entityItem = availGrp.getEntityItem(ie);
-            traceSb.append(NEWLINE+"Entity " + entityItem.getEntityType() + ":" + entityItem.getEntityID()); //$NON-NLS-1$  //$NON-NLS-2$
-            traceSb.append(" " + attrCode + ": " + getAttributeValue(entityItem.getEntityType(), entityItem.getEntityID(), attrCode)); //$NON-NLS-1$  //$NON-NLS-2$
-
-            // the association may pull extra PSL, as long as one is linked back to an SBB, this PSLAVAIL is valid
-            // PSLAVAILABILITYA
-            for (int di = 0; di < entityItem.getDownLinkCount(); di++) {
-                EANEntity entityAssoc = entityItem.getDownLink(di);
-                if (entityAssoc.getEntityType().equals(assocName)) {
-                    traceSb.append(NEWLINE+"  downLink (assoc) " + entityAssoc.getEntityType() + ":" + entityAssoc.getEntityID()); //$NON-NLS-1$  //$NON-NLS-2$
-                    // look for PSL
-                    for (int d2 = 0; d2 < entityAssoc.getDownLinkCount(); d2++) { // PSL
-                        EANEntity entity = entityAssoc.getDownLink(d2);
-                        if (entity.getEntityType().equals(checkEntityType)) {
-                            boolean rel2Found = false;
-                            // one PSL here must also be linked to SBBPSL
-                            traceSb.append(NEWLINE+"    downlink (entity) " + entity.getEntityType() + ":" + entity.getEntityID()); //+" uplink cnt: "+entity.getUpLinkCount());  //$NON-NLS-1$  //$NON-NLS-2$
-                            traceSb.append(" " + attrCode + ": " + getAttributeValue(entity.getEntityType(), entity.getEntityID(), attrCode)); //$NON-NLS-1$  //$NON-NLS-2$
-                            // look for any uplink to SBBPSL
-                            for (int ui = 0; ui < entity.getUpLinkCount(); ui++) {
-                                EANEntity relator = entity.getUpLink(ui);
-                                if (relator
-                                    .getEntityType()
-                                    .equals(relatorName)) {
-                                    traceSb.append(NEWLINE+"      uplink (relator?) " + relator.getEntityType() + ":" + relator.getEntityID()); //$NON-NLS-1$  //$NON-NLS-2$
-                                    rel2Found = true;
-                                    relFound = true;
-                                    traceSb.append(
-                                        NEWLINE+"PASS: " +  //$NON-NLS-1$
-                                        entity.getEntityType() +
-                                        ":" + //$NON-NLS-1$
-                                        entity.getEntityID() +
-                                        " was associated thru " + //$NON-NLS-1$
-                                        entityAssoc.getEntityType() +
-                                        ":" + //$NON-NLS-1$
-                                        entityAssoc.getEntityID() +
-                                        " to " + //$NON-NLS-1$
-                                        entityItem.getEntityType() +
-                                        ":" + //$NON-NLS-1$
-                                        entityItem.getEntityID() +
-                                        " AND was linked to " + //$NON-NLS-1$
-                                        relator.getEntityType() +
-                                        ":" + //$NON-NLS-1$
-                                        relator.getEntityID());
-                                }
-                            }
-                            if (!rel2Found) {
-                                traceSb.append(
-                                    NEWLINE+"INFO: " +  //$NON-NLS-1$
-                                    entity.getEntityType() +
-                                    ":" +  //$NON-NLS-1$
-                                    entity.getEntityID() +
-                                    " was associated thru " + //$NON-NLS-1$
-                                    entityAssoc.getEntityType() +
-                                    ":" +  //$NON-NLS-1$
-                                    entityAssoc.getEntityID() +
-                                    " to " + //$NON-NLS-1$
-                                    entityItem.getEntityType() +
-                                    ":" +  //$NON-NLS-1$
-                                    entityItem.getEntityID() +
-                                    " BUT was not linked to " + //$NON-NLS-1$
-                                    relatorName);
-                            }
-                        }
-                    }
-                }
-            }
-            if (!relFound) {
-                // a SBBPSL relator was not found for any of the associated PSL
-                success = false;
-                traceSb.append(
-                    NEWLINE+"FAIL: NO " + //$NON-NLS-1$
-                    relatorName +
-                    " links found thru " + //$NON-NLS-1$
-                    assocName +
-                    " for " +  //$NON-NLS-1$
-                    entityItem.getEntityType() +
-                    ":" +  //$NON-NLS-1$
-                    entityItem.getEntityID() + //$NON-NLS-1$
-                    " " +  //$NON-NLS-1$
-                    attrCode +
-                    ": " +  //$NON-NLS-1$
-                    getAttributeValue(entityItem.getEntityType(), entityItem.getEntityID(), attrCode)); //$NON-NLS-1$
-                // rptSb.append();
-            }
-        }
-
-        return success;
-    }
-
-    /**********************************************
-     *  Triggers the specified workflow to advance VARSTATUS
-     *
-     * @param actionName Name of the workflow action.
-     * @exception  java.sql.SQLException
-     * @exception  COM.ibm.opicmpdh.middleware.MiddlewareException
-     * @exception  COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-     * @exception  COM.ibm.eannounce.objects.WorkflowException
-     */
-    private void triggerWorkFlow(String actionName)
-        throws
-    java.sql.SQLException,
-    COM.ibm.opicmpdh.middleware.MiddlewareException,
-    COM.ibm.eannounce.objects.WorkflowException,
-    COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {
-        EntityGroup eg = m_elist.getParentEntityGroup();
-        EntityItem[] aItems = new EntityItem[1];
-        WorkflowActionItem wfai = new WorkflowActionItem(null, m_db, m_prof, actionName);
-        aItems[0] = eg.getEntityItem(0);
-        wfai.setEntityItems(aItems);
-        m_db.executeAction(m_prof, wfai);
-    }
-
-    /**********************************************************************************
-    *  Get Name based on navigation attributes
-    *
-    *@return    java.lang.String
-    */
-    private String getNavigationName()
-        throws java.sql.SQLException, MiddlewareException {
-        StringBuffer navName = new StringBuffer();
-        // NAME is navigate attributes
-        EntityGroup eg = new EntityGroup(null, m_db, m_prof, getRootEntityType(), "Navigate"); //$NON-NLS-1$
-        EANList metaList = eg.getMetaAttribute();
-        // iterator does not maintain navigate order
-        for (int ii = 0; ii < metaList.size(); ii++) {
-            EANMetaAttribute ma = (EANMetaAttribute) metaList.getAt(ii);
-            navName.append(
-                getAttributeValue(
-                    getRootEntityType(),
-                    getRootEntityID(),
-                    ma.getAttributeCode()));
-            navName.append(" "); //$NON-NLS-1$
-        }
-
-        return navName.toString();
-    }
-
-    /***********************************************
-    *  Get ABR description
-    *
-    *@return    java.lang.String
-    */
-    public String getDescription() {
-        String desc = "Variant Required Element Verification."; //$NON-NLS-1$
-        if (bundle != null) {
-            desc = bundle.getString("DESCRIPTION"); //$NON-NLS-1$
-        }
-
-        return desc;
-    }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return    java.lang.String
-    */
-    public String getABRVersion() {
-        return "$Revision: 1.8 $";
-    }
-
-    /***********************************************
-    *  Get the locale for resource file
-    *
-    *@return   Locale based on nlsid
-    */
-    private Locale getLocale(int nlsID) {
-        Locale locale = null;
-        switch (nlsID) {
-        case 1 :
-            locale = Locale.US;
-            break;
-        case 2 :
-            locale = Locale.GERMAN;
-            break;
-        case 3 :
-            locale = Locale.ITALIAN;
-            break;
-        case 4 :
-            locale = Locale.JAPANESE;
-            break;
-        case 5 :
-            locale = Locale.FRENCH;
-            break;
-        case 6 :
-            locale = new Locale("es", "ES"); //$NON-NLS-1$  //$NON-NLS-2$
-            break;
-        case 7 :
-            locale = Locale.UK;
-            break;
-        default :
-            locale = Locale.US;
-        }
-        return locale;
-    }
-}

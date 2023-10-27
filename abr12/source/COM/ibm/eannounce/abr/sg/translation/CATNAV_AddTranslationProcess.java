@@ -1,24 +1,29 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2007, 2008  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.abr.sg.translation;
+/*    */ package COM.ibm.eannounce.abr.sg.translation;
+/*    */ 
+/*    */ import java.util.Date;
+/*    */ import java.util.Map;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class CATNAV_AddTranslationProcess
+/*    */   extends AddTranslationProcess
+/*    */ {
+/*    */   public boolean isValid(EntityHandler paramEntityHandler, Date paramDate) throws Exception {
+/* 17 */     Map map = paramEntityHandler.getAttributes(new String[] { "CATPUBLISH" });
+/* 18 */     if ("Yes".equals(map.get("CATPUBLISH"))) {
+/* 19 */       return true;
+/*    */     }
+/* 21 */     return false;
+/*    */   }
+/*    */ }
 
-import java.util.Date;
-import java.util.Map;
 
-public class CATNAV_AddTranslationProcess extends AddTranslationProcess {
-
-	public boolean isValid(EntityHandler entityHandler, Date targetDate)
-			throws Exception {
-		Map attributes = entityHandler
-				.getAttributes(new String[] { "CATPUBLISH" });
-		if ("Yes".equals(attributes.get("CATPUBLISH"))) {
-			return true;
-		}
-		return false;
-	}
-
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\translation\CATNAV_AddTranslationProcess.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

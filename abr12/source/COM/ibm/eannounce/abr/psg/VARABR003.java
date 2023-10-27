@@ -1,423 +1,428 @@
-/**
- * <pre>
- * (c) Copyright International Business Machines Corporation, 2004
- * All Rights Reserved.
- *
- * CR0629041824
- *
- * 1.   VARABR003
- *  a)  Variant Setup Verification
- *      ABR is triggered by
- *          Workflow action Set Status to Ready for Review
- *          Change Catalog Editing Status to Ready for Review
- *
- * CHECK  1
- *  Before the Variant status can change to Ready for Review, the following relators must exist:
- *      Only 1 (Quantity = 1)   One or more (Quantity >=1)
- *          DD: through VARDD       SBB: through VARSBB
- *          CTO Parent: through CTOVAR
- *          CPG: through CPGVAR
- *
- *  b)  DG Criteria
- *      On Pass:  none
- *      On Fail: Last Editor
- *
- *  c)  VE Definition
- *
- *  Find the VAR for which this ABR was invoked
- * Level    Dir Parent  Relator Child
- *  0           VAR
- *  0       D   VAR     VARDD   DD
- *  0       D   VAR     VARSBB  SBB
- *  0       U   CTO     CTOVAR  VAR
- *  0       U   CPG     CPGVAR  VAR
- *
- * d)   Triggered by:  State transition
- *  Entity:     VAR
- *  Attribute:  VARSTATUS
- *  Action: Set Status to Ready for Review
- *  e)  ABR Logic
- *  CHECK  1
- *      If 1 and only 1 VARDD & CTOVAR & CPGVAR exist,
- *      And if at least 1 VARSBB exists,
- *      Then set VARABR003 Status to PASS
- *      Else,
- *          Set VARABR003 Status to Fail,
- *
- *  f)  Report
- *      The report should show:
- *          Header
- *          ABR name VARABR003
- *          Date Generated
- *          Who last changed the entity ==> openid ==> userid and role
- *          Description: Variant Setup Verification
- *      Body
- *          VARIANT PN: OFFERINGPNUMB
- *          Fail statement: VARABR003 cannot pass because there is no XXX entity linked to the Variant.
- *          Or
- *          VARABR003 cannot pass because there is more than 1 XXX entity linked to the Variant.
- *
- * $Log: VARABR003.java,v $
- * Revision 1.5  2006/01/24 22:15:51  yang
- * Jtest changes
- *
- * Revision 1.4  2005/10/06 14:59:17  wendy
- * Conform to new jtest config
- *
- * Revision 1.3  2005/02/08 18:29:11  joan
- * changes for Jtest
- *
- * Revision 1.2  2005/01/31 16:30:07  joan
- * make changes for Jtest
- *
- * Revision 1.1  2004/09/03 13:19:38  wendy
- * Init for CR0629041824
- *
- *
- * </pre>
- *
- *@author     Wendy Stimpson
- *@created    August 16, 2004
+/*     */ package COM.ibm.eannounce.abr.psg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.objects.EANList;
+/*     */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.WorkflowActionItem;
+/*     */ import COM.ibm.eannounce.objects.WorkflowException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import java.io.PrintWriter;
+/*     */ import java.io.StringWriter;
+/*     */ import java.sql.SQLException;
+/*     */ import java.text.MessageFormat;
+/*     */ import java.util.Locale;
+/*     */ import java.util.ResourceBundle;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class VARABR003
+/*     */   extends PokBaseABR
+/*     */ {
+/*  99 */   private ResourceBundle bundle = null;
+/*     */   
+/* 101 */   private StringBuffer rptSb = new StringBuffer();
+/* 102 */   private StringBuffer traceSb = new StringBuffer();
+/*     */   
+/*     */   private static final String MISSING = "<p>VARABR003 cannot pass because there is no &quot;{0}&quot; entity linked to the Variant.</p>";
+/*     */   private static final String TOO_MANY = "<p>VARABR003 cannot pass because there is more than one &quot;{0}&quot; entity linked to the Variant.</p>";
+/* 106 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/* 107 */   static final String NEWLINE = new String(FOOL_JTEST);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/* 121 */     String str1 = "<html><head><title>{0} {1}</title></head>" + NEWLINE + "<body><h1>{0}: {1}</h1>" + NEWLINE + "<p><b>Date: </b>{2}<br/>" + NEWLINE + "<b>User: </b>{3} ({4})<br />" + NEWLINE + "<b>Description: </b>{5}</p>" + NEWLINE + "<!-- {6} -->";
+/*     */ 
+/*     */     
+/* 124 */     String[] arrayOfString = new String[10];
+/* 125 */     MessageFormat messageFormat = null;
+/* 126 */     String str2 = "";
+/*     */     try {
+/* 128 */       start_ABRBuild();
+/*     */       
+/* 130 */       this.bundle = ResourceBundle.getBundle(getClass().getName(), getLocale(this.m_prof.getReadLanguage().getNLSID()));
+/*     */       
+/* 132 */       this.traceSb.append("VARABR003 entered for " + getEntityType() + ":" + getEntityID());
+/*     */       
+/* 134 */       this.traceSb.append(NEWLINE + "EntityList contains the following entities: ");
+/* 135 */       for (byte b = 0; b < this.m_elist.getEntityGroupCount(); b++) {
+/*     */         
+/* 137 */         EntityGroup entityGroup = this.m_elist.getEntityGroup(b);
+/* 138 */         this.traceSb.append(NEWLINE + entityGroup.getEntityType() + " : " + entityGroup.getEntityItemCount() + " entity items. ");
+/* 139 */         if (entityGroup.getEntityItemCount() > 0) {
+/*     */           
+/* 141 */           this.traceSb.append("IDs(");
+/* 142 */           for (byte b1 = 0; b1 < entityGroup.getEntityItemCount(); b1++) {
+/* 143 */             this.traceSb.append(" " + entityGroup.getEntityItem(b1).getEntityID());
+/*     */           }
+/* 145 */           this.traceSb.append(")");
+/*     */         } 
+/*     */       } 
+/* 148 */       this.traceSb.append(NEWLINE);
+/*     */ 
+/*     */       
+/* 151 */       str2 = getNavigationName();
+/*     */ 
+/*     */       
+/* 154 */       if (this.m_elist.getEntityGroupCount() == 0) {
+/* 155 */         throw new Exception("EntityList did not have any groups. Verify that extract is defined.");
+/*     */       }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 172 */       this.rptSb.append("<h3>" + this.m_elist
+/* 173 */           .getParentEntityGroup().getLongDescription() + " PN: " + 
+/* 174 */           getAttributeValue(getRootEntityType(), getRootEntityID(), "OFFERINGPNUMB") + "</h3>" + NEWLINE);
+/*     */ 
+/*     */       
+/* 177 */       if (verifyVAR()) {
+/*     */         
+/* 179 */         String str = "<p>All relators are valid.</p>";
+/*     */         
+/* 181 */         triggerWorkFlow("WFVARRFR");
+/* 182 */         setReturnCode(0);
+/* 183 */         this.rptSb.append((this.bundle == null) ? str : (this.bundle.getString("OK_MSG") + NEWLINE));
+/*     */       } else {
+/*     */         
+/* 186 */         setReturnCode(-1);
+/*     */       }
+/*     */     
+/* 189 */     } catch (Exception exception) {
+/*     */       
+/* 191 */       String str3 = "<h3><font color=red>Error: {0}</font></h3>";
+/* 192 */       String str4 = "<pre>{0}</pre>";
+/* 193 */       StringWriter stringWriter = new StringWriter();
+/* 194 */       messageFormat = new MessageFormat((this.bundle == null) ? str3 : this.bundle.getString("Error_EXCEPTION"));
+/* 195 */       exception.printStackTrace(new PrintWriter(stringWriter));
+/*     */       
+/* 197 */       arrayOfString[0] = exception.getMessage();
+/* 198 */       this.rptSb.append(messageFormat.format(arrayOfString));
+/* 199 */       messageFormat = new MessageFormat((this.bundle == null) ? str4 : this.bundle.getString("Error_STACKTRACE"));
+/* 200 */       arrayOfString[0] = stringWriter.getBuffer().toString();
+/* 201 */       this.rptSb.append(messageFormat.format(arrayOfString));
+/* 202 */       logError("Exception: " + exception.getMessage());
+/* 203 */       logError(stringWriter.getBuffer().toString());
+/* 204 */       setReturnCode(-1);
+/*     */     }
+/*     */     finally {
+/*     */       
+/* 208 */       setDGTitle(str2);
+/* 209 */       setDGRptName(getShortClassName(getClass()));
+/* 210 */       setDGRptClass("WWABR");
+/*     */       
+/* 212 */       if (!isReadOnly()) {
+/* 213 */         clearSoftLock();
+/*     */       }
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 220 */     messageFormat = new MessageFormat((this.bundle == null) ? str1 : this.bundle.getString("HEADER"));
+/* 221 */     arrayOfString[0] = getShortClassName(getClass());
+/* 222 */     arrayOfString[1] = str2 + ((getReturnCode() == 0) ? " Passed" : " Failed");
+/* 223 */     arrayOfString[2] = getNow();
+/* 224 */     arrayOfString[3] = this.m_prof.getOPName();
+/* 225 */     arrayOfString[4] = this.m_prof.getRoleDescription();
+/* 226 */     arrayOfString[5] = getDescription();
+/* 227 */     arrayOfString[6] = getABRVersion();
+/* 228 */     this.rptSb.insert(0, messageFormat.format(arrayOfString) + NEWLINE);
+/* 229 */     this.rptSb.append("<!-- DEBUG: " + this.traceSb.toString() + " -->" + NEWLINE);
+/*     */     
+/* 231 */     println(this.rptSb.toString());
+/* 232 */     printDGSubmitString();
+/* 233 */     buildReportFooter();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private boolean verifyVAR() {
+/* 242 */     boolean bool = true;
+/*     */ 
+/*     */     
+/* 245 */     String[] arrayOfString = { "DD", "CTO", "CPG" };
+/* 246 */     for (byte b = 0; b < arrayOfString.length; b++) {
+/*     */       
+/* 248 */       EntityGroup entityGroup1 = this.m_elist.getEntityGroup(arrayOfString[b]);
+/* 249 */       if (entityGroup1 != null) {
+/*     */         
+/* 251 */         bool = (checkSingleRelator(entityGroup1) && bool) ? true : false;
+/*     */       }
+/*     */       else {
+/*     */         
+/* 255 */         this.traceSb.append(NEWLINE + "ERROR: " + arrayOfString[b] + " EntityGroup not found");
+/* 256 */         bool = false;
+/*     */       } 
+/*     */     } 
+/*     */ 
+/*     */     
+/* 261 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("SBB");
+/* 262 */     if (entityGroup != null) {
+/*     */       
+/* 264 */       if (entityGroup.getEntityItemCount() == 0)
+/*     */       {
+/* 266 */         MessageFormat messageFormat = new MessageFormat((this.bundle == null) ? "<p>VARABR003 cannot pass because there is no &quot;{0}&quot; entity linked to the Variant.</p>" : this.bundle.getString("Error_MISSING"));
+/* 267 */         String[] arrayOfString1 = new String[1];
+/* 268 */         bool = false;
+/* 269 */         arrayOfString1[0] = entityGroup.getLongDescription();
+/* 270 */         this.rptSb.append(messageFormat.format(arrayOfString1) + NEWLINE);
+/* 271 */         this.traceSb.append(NEWLINE + "FAIL: " + entityGroup.getEntityType() + " is invalid, has " + entityGroup.getEntityItemCount() + " entities.");
+/*     */       }
+/*     */       else
+/*     */       {
+/* 275 */         this.traceSb.append(NEWLINE + entityGroup.getEntityType() + " EntityGroup is valid (has 1 or more)");
+/*     */       }
+/*     */     
+/*     */     } else {
+/*     */       
+/* 280 */       this.traceSb.append(NEWLINE + "ERROR: SBB EntityGroup not found");
+/* 281 */       bool = false;
+/*     */     } 
+/*     */     
+/* 284 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private boolean checkSingleRelator(EntityGroup paramEntityGroup) {
+/* 292 */     boolean bool = false;
+/* 293 */     MessageFormat messageFormat = null;
+/* 294 */     String[] arrayOfString = new String[1];
+/*     */     
+/* 296 */     switch (paramEntityGroup.getEntityItemCount())
+/*     */     
+/*     */     { case 0:
+/* 299 */         messageFormat = new MessageFormat((this.bundle == null) ? "<p>VARABR003 cannot pass because there is no &quot;{0}&quot; entity linked to the Variant.</p>" : this.bundle.getString("Error_MISSING"));
+/* 300 */         arrayOfString[0] = paramEntityGroup.getLongDescription();
+/* 301 */         this.rptSb.append(messageFormat.format(arrayOfString) + NEWLINE);
+/* 302 */         this.traceSb.append(NEWLINE + "FAIL: " + paramEntityGroup.getEntityType() + " is invalid, has " + paramEntityGroup.getEntityItemCount() + " entities.");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 316 */         return bool;case 1: this.traceSb.append(NEWLINE + paramEntityGroup.getEntityType() + " EntityGroup is valid (has 1)"); bool = true; return bool; }  messageFormat = new MessageFormat((this.bundle == null) ? "<p>VARABR003 cannot pass because there is more than one &quot;{0}&quot; entity linked to the Variant.</p>" : this.bundle.getString("Error_TOO_MANY")); arrayOfString[0] = paramEntityGroup.getLongDescription(); this.rptSb.append(messageFormat.format(arrayOfString) + NEWLINE); this.traceSb.append(NEWLINE + "FAIL: " + paramEntityGroup.getEntityType() + " is invalid, has " + paramEntityGroup.getEntityItemCount() + " entities."); return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void triggerWorkFlow(String paramString) throws SQLException, MiddlewareException, WorkflowException, MiddlewareShutdownInProgressException {
+/* 336 */     EntityGroup entityGroup = this.m_elist.getParentEntityGroup();
+/* 337 */     EntityItem[] arrayOfEntityItem = new EntityItem[1];
+/* 338 */     arrayOfEntityItem[0] = entityGroup.getEntityItem(0);
+/* 339 */     WorkflowActionItem workflowActionItem = new WorkflowActionItem(null, this.m_db, this.m_prof, paramString);
+/* 340 */     workflowActionItem.setEntityItems(arrayOfEntityItem);
+/* 341 */     this.m_db.executeAction(this.m_prof, workflowActionItem);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String getNavigationName() throws SQLException, MiddlewareException {
+/* 351 */     StringBuffer stringBuffer = new StringBuffer();
+/*     */     
+/* 353 */     EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, getRootEntityType(), "Navigate");
+/* 354 */     EANList eANList = entityGroup.getMetaAttribute();
+/* 355 */     for (byte b = 0; b < eANList.size(); b++) {
+/*     */       
+/* 357 */       EANMetaAttribute eANMetaAttribute = (EANMetaAttribute)eANList.getAt(b);
+/* 358 */       stringBuffer.append(getAttributeValue(getRootEntityType(), getRootEntityID(), eANMetaAttribute.getAttributeCode()));
+/* 359 */       stringBuffer.append(" ");
+/*     */     } 
+/*     */     
+/* 362 */     return stringBuffer.toString();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 371 */     String str = "Variant Setup Verification.";
+/* 372 */     if (this.bundle != null) {
+/* 373 */       str = this.bundle.getString("DESCRIPTION");
+/*     */     }
+/*     */     
+/* 376 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 385 */     return "$Revision: 1.5 $";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private Locale getLocale(int paramInt) {
+/* 395 */     Locale locale = null;
+/* 396 */     switch (paramInt)
+/*     */     { case 1:
+/* 398 */         locale = Locale.US;
+/*     */       case 2:
+/* 400 */         locale = Locale.GERMAN;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 420 */         return locale;case 3: locale = Locale.ITALIAN; return locale;case 4: locale = Locale.JAPANESE; return locale;case 5: locale = Locale.FRENCH; return locale;case 6: locale = new Locale("es", "ES"); return locale;case 7: locale = Locale.UK; return locale; }  locale = Locale.US; return locale;
+/*     */   }
+/*     */ }
+
+
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\psg\VARABR003.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-package COM.ibm.eannounce.abr.psg;
-
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-
-import java.util.*;
-import java.text.*;
-
-/**
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- *
- * @author Administrator
- */
-public class VARABR003 extends PokBaseABR
-{
-    private ResourceBundle bundle = null;
-
-    private StringBuffer rptSb = new StringBuffer();
-    private StringBuffer traceSb = new StringBuffer();
-
-    private static final String MISSING="<p>VARABR003 cannot pass because there is no &quot;{0}&quot; entity linked to the Variant.</p>";
-    private static final String TOO_MANY="<p>VARABR003 cannot pass because there is more than one &quot;{0}&quot; entity linked to the Variant.</p>";
-    private static final char[] FOOL_JTEST = {'\n'};
-    static final String NEWLINE = new String(FOOL_JTEST);
-
-    /**
-     *  Execute ABR.
-     *If 1 and only 1 VARDD & CTOVAR & CPGVAR exist,
-     *     And if at least 1 VARSBB exists,
-     *Then set VARABR003 Status to PASS
-     *
-     *Else,
-     *     Set VARABR003 Status to Fail,
-     *
-     */
-    public void execute_run()
-    {
-        String HEADER =
-            "<html><head><title>{0} {1}</title></head>"+NEWLINE+"<body><h1>{0}: {1}</h1>"+NEWLINE+
-            "<p><b>Date: </b>{2}<br/>"+NEWLINE+"<b>User: </b>{3} ({4})<br />"+NEWLINE+"<b>Description: </b>{5}</p>"+NEWLINE+"<!-- {6} -->";
-        Object[] args = new String[10];
-        MessageFormat msgf = null;
-        String navName = "";
-        try {
-            start_ABRBuild();
-
-            bundle = ResourceBundle.getBundle(this.getClass().getName(), getLocale(m_prof.getReadLanguage().getNLSID()));
-
-            traceSb.append("VARABR003 entered for "+getEntityType()+":"+getEntityID());
-            // debug display list of groups
-            traceSb.append(NEWLINE+"EntityList contains the following entities: ");
-            for (int i=0; i<m_elist.getEntityGroupCount(); i++)
-            {
-                EntityGroup eg =m_elist.getEntityGroup(i);
-                traceSb.append(NEWLINE+eg.getEntityType()+" : "+eg.getEntityItemCount()+" entity items. ");
-                if (eg.getEntityItemCount()>0)
-                {
-                    traceSb.append("IDs(");
-                    for (int e=0; e<eg.getEntityItemCount(); e++) {
-                        traceSb.append(" "+eg.getEntityItem(e).getEntityID());
-                    }
-                    traceSb.append(")");
-                }
-            }
-            traceSb.append(NEWLINE);
-
-            // NAME is navigate attributes
-            navName = getNavigationName();
-
-            // if VE is not defined, throw exception
-            if (m_elist.getEntityGroupCount()==0) {
-                throw new Exception("EntityList did not have any groups. Verify that extract is defined.");
-            }
-
-/*
-    The report should show:
-    Header
-    ABR name VARABR003
-    Date Generated
-    Who last changed the entity ==> openid ==> userid and role
-    Description: Variant Setup Verification
-
-Body
-VARIANT PN: OFFERINGPNUMB
-Fail statement: VARABR003 cannot pass because there is no XXX entity linked to the Variant.
-Or
-VARABR003 cannot pass because there is more than 1 XXX entity linked to the Variant.
-*/
-            rptSb.append("<h3>"+
-                m_elist.getParentEntityGroup().getLongDescription()+" PN: "+
-                getAttributeValue(getRootEntityType(), getRootEntityID(), "OFFERINGPNUMB")
-                +"</h3>"+NEWLINE);
-
-            if(verifyVAR())  // rptSb will have error msg if failure occurred
-            {
-                String OK_MSG="<p>All relators are valid.</p>";
-                // set VARSTATUS to ready for review
-                triggerWorkFlow("WFVARRFR");
-                setReturnCode(PASS);
-                rptSb.append(bundle==null?OK_MSG:bundle.getString("OK_MSG")+NEWLINE);
-            }
-            else {
-                setReturnCode(FAIL);
-            }
-        }
-        catch (Exception exc)
-        {
-            String Error_EXCEPTION="<h3><font color=red>Error: {0}</font></h3>";
-            String Error_STACKTRACE="<pre>{0}</pre>";
-            java.io.StringWriter exBuf = new java.io.StringWriter();
-            msgf = new MessageFormat(bundle==null?Error_EXCEPTION:bundle.getString("Error_EXCEPTION"));
-            exc.printStackTrace(new java.io.PrintWriter(exBuf));
-            // Put exception into document
-            args[0] = exc.getMessage();
-            rptSb.append(msgf.format(args));
-            msgf = new MessageFormat(bundle==null?Error_STACKTRACE:bundle.getString("Error_STACKTRACE"));
-            args[0] = exBuf.getBuffer().toString();
-            rptSb.append(msgf.format(args));
-            logError("Exception: "+exc.getMessage());
-            logError(exBuf.getBuffer().toString());
-            setReturnCode(FAIL);
-        }
-        finally
-        {
-            setDGTitle(navName);
-            setDGRptName(getShortClassName(getClass()));
-            setDGRptClass("WWABR");  // Amy says same as OFABR001
-            // make sure the lock is released
-            if (!isReadOnly()) {
-                clearSoftLock();
-            }
-        }
-
-        // Print everything up to </html>
-
-        // Insert Header into beginning of report
-        msgf = new MessageFormat(bundle==null?HEADER:bundle.getString("HEADER"));
-        args[0] = getShortClassName(getClass());
-        args[1] = navName+((getReturnCode() == PASS) ? " Passed" : " Failed");
-        args[2] = getNow();
-        args[3] = m_prof.getOPName();
-        args[4] = m_prof.getRoleDescription();
-        args[5] = getDescription();
-        args[6] = getABRVersion();
-        rptSb.insert(0, msgf.format(args)+NEWLINE);
-        rptSb.append("<!-- DEBUG: "+traceSb.toString()+" -->"+NEWLINE);
-
-        println(rptSb.toString()); // Output the Report
-        printDGSubmitString();
-        buildReportFooter();    // Print </html>
-    }
-
-    /**********************************************************************************
-    *  Verify the correct number of entities are linked, build report string with errors
-    *@return  true if all checks are valid
-    */
-    private boolean verifyVAR()
-    {
-        boolean success = true;
-        EntityGroup eg;
-        // check for single relator DD, CTO and CPG
-        String[] eTypes = new String[] { "DD", "CTO", "CPG" };
-        for (int i=0; i<eTypes.length; i++)
-        {
-            eg = m_elist.getEntityGroup(eTypes[i]);
-            if (eg!=null)
-            {
-                success = checkSingleRelator(eg) && success;
-            }
-            else
-            {
-                traceSb.append(NEWLINE+"ERROR: "+eTypes[i]+" EntityGroup not found");
-                success = false;
-            }
-        }
-
-        // check for 1 or more SBB
-        eg = m_elist.getEntityGroup("SBB");
-        if (eg!=null)
-        {
-            if (eg.getEntityItemCount()==0)
-            {
-                MessageFormat msgf = new MessageFormat(bundle==null?MISSING:bundle.getString("Error_MISSING"));
-                Object[] args = new String[1];
-                success = false;
-                args[0] = eg.getLongDescription();
-                rptSb.append(msgf.format(args)+NEWLINE);
-                traceSb.append(NEWLINE+"FAIL: "+eg.getEntityType()+" is invalid, has "+eg.getEntityItemCount()+" entities.");
-            }
-            else
-            {
-                traceSb.append(NEWLINE+eg.getEntityType()+" EntityGroup is valid (has 1 or more)");
-            }
-        }
-        else
-        {
-            traceSb.append(NEWLINE+"ERROR: SBB EntityGroup not found");
-            success = false;
-        }
-
-        return success;
-    }
-    /**********************************************************************************
-    *  Verify there is 1 and only 1 entity linked, build report string with errors
-    *@return  true if all checks are valid
-    */
-    private boolean checkSingleRelator(EntityGroup eg)
-    {
-        boolean success = false;
-        MessageFormat msgf = null;
-        Object[] args = new String[1];
-
-        switch(eg.getEntityItemCount())
-        {
-        case 0:
-            msgf = new MessageFormat(bundle==null?MISSING:bundle.getString("Error_MISSING"));
-            args[0] = eg.getLongDescription();
-            rptSb.append(msgf.format(args)+NEWLINE);
-            traceSb.append(NEWLINE+"FAIL: "+eg.getEntityType()+" is invalid, has "+eg.getEntityItemCount()+" entities.");
-            break;
-        case 1:
-            traceSb.append(NEWLINE+eg.getEntityType()+" EntityGroup is valid (has 1)");
-            success = true;
-            break;
-        default:
-            msgf = new MessageFormat(bundle==null?TOO_MANY:bundle.getString("Error_TOO_MANY"));
-            args[0] = eg.getLongDescription();
-            rptSb.append(msgf.format(args)+NEWLINE);
-            traceSb.append(NEWLINE+"FAIL: "+eg.getEntityType()+" is invalid, has "+eg.getEntityItemCount()+" entities.");
-            break;
-        }
-
-        return success;
-    }
-
-    /**********************************************
-     *  Triggers the specified workflow to advance VARSTATUS
-     *
-     * @param actionName Name of the workflow action.
-     * @exception  java.sql.SQLException
-     * @exception  COM.ibm.opicmpdh.middleware.MiddlewareException
-     * @exception  COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-     * @exception  COM.ibm.eannounce.objects.WorkflowException
-     */
-    private void triggerWorkFlow(String actionName)
-    throws
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.eannounce.objects.WorkflowException,
-        COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {
-        WorkflowActionItem wfai;
-        EntityGroup eg = m_elist.getParentEntityGroup();
-        EntityItem[] aItems = new EntityItem[1];
-        aItems[0] = eg.getEntityItem(0);
-        wfai = new WorkflowActionItem(null, m_db, m_prof, actionName);
-        wfai.setEntityItems(aItems);
-        m_db.executeAction(m_prof, wfai);
-    }
-
-    /**********************************************************************************
-    *  Get Name based on navigation attributes
-    *
-    *@return    java.lang.String
-    */
-    private String getNavigationName() throws java.sql.SQLException, MiddlewareException
-    {
-        StringBuffer navName = new StringBuffer();
-        // NAME is navigate attributes
-        EntityGroup eg =  new EntityGroup(null, m_db, m_prof, getRootEntityType(), "Navigate");
-        EANList metaList = eg.getMetaAttribute(); // iterator does not maintain navigate order
-        for (int ii=0; ii<metaList.size(); ii++)
-        {
-            EANMetaAttribute ma = (EANMetaAttribute)metaList.getAt(ii);
-            navName.append(getAttributeValue(getRootEntityType(), getRootEntityID(), ma.getAttributeCode()));
-            navName.append(" ");
-        }
-
-        return navName.toString();
-    }
-
-    /***********************************************
-    *  Get ABR description
-    *
-    *@return    java.lang.String
-    */
-    public String getDescription() {
-        String desc =  "Variant Setup Verification.";
-        if (bundle!=null) {
-            desc = bundle.getString("DESCRIPTION");
-        }
-
-        return desc;
-    }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return    java.lang.String
-    */
-    public String getABRVersion() {
-        return "$Revision: 1.5 $";
-    }
-
-    /***********************************************
-    *  Get the locale for resource file
-    *
-    *@return   Locale based on nlsid
-    */
-    private Locale getLocale(int nlsID)
-    {
-        Locale locale = null;
-        switch (nlsID) {
-        case 1:
-            locale = Locale.US;
-        case 2:
-            locale = Locale.GERMAN;
-            break;
-        case 3:
-            locale = Locale.ITALIAN;
-            break;
-        case 4:
-            locale = Locale.JAPANESE;
-            break;
-        case 5:
-            locale = Locale.FRENCH;
-            break;
-        case 6:
-            locale = new Locale("es", "ES");
-            break;
-        case 7:
-            locale = Locale.UK;
-            break;
-        default:
-            locale = Locale.US;
-        }
-        return locale;
-    }
-
-}

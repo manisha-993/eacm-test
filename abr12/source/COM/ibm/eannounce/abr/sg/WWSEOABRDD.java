@@ -1,2749 +1,2754 @@
-//Licensed Materials -- Property of IBM
+/*      */ package COM.ibm.eannounce.abr.sg;
+/*      */ 
+/*      */ import COM.ibm.eannounce.abr.util.EACustom;
+/*      */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*      */ import COM.ibm.eannounce.objects.EANAttribute;
+/*      */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*      */ import COM.ibm.eannounce.objects.EANEntity;
+/*      */ import COM.ibm.eannounce.objects.EANList;
+/*      */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*      */ import COM.ibm.eannounce.objects.EANMetaFlagAttribute;
+/*      */ import COM.ibm.eannounce.objects.EntityGroup;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.EntityList;
+/*      */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*      */ import COM.ibm.eannounce.objects.MetaFlag;
+/*      */ import COM.ibm.eannounce.objects.PDGUtility;
+/*      */ import COM.ibm.eannounce.objects.SBRException;
+/*      */ import COM.ibm.opicmpdh.middleware.DatePackage;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*      */ import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
+/*      */ import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+/*      */ import COM.ibm.opicmpdh.objects.SingleFlag;
+/*      */ import COM.ibm.opicmpdh.transactions.OPICMList;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.io.PrintWriter;
+/*      */ import java.io.StringWriter;
+/*      */ import java.rmi.RemoteException;
+/*      */ import java.sql.SQLException;
+/*      */ import java.text.MessageFormat;
+/*      */ import java.util.Enumeration;
+/*      */ import java.util.HashSet;
+/*      */ import java.util.Hashtable;
+/*      */ import java.util.Iterator;
+/*      */ import java.util.Locale;
+/*      */ import java.util.ResourceBundle;
+/*      */ import java.util.Set;
+/*      */ import java.util.StringTokenizer;
+/*      */ import java.util.Vector;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public class WWSEOABRDD
+/*      */   extends PokBaseABR
+/*      */ {
+/*  134 */   private StringBuffer rptSb = new StringBuffer();
+/*  135 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/*  136 */   private static final String NEWLINE = new String(FOOL_JTEST);
+/*      */   
+/*      */   private static final String INDENT1 = "&nbsp;&nbsp;";
+/*      */   
+/*      */   private static final String DELIMITER = "|";
+/*      */   
+/*      */   private static final long KB = 1000L;
+/*      */   private static final long MB = 1000000L;
+/*      */   private static final long GB = 1000000000L;
+/*      */   private static final String HARDWARE = "100";
+/*      */   private static final String SYSTEM = "126";
+/*      */   private static final String DRAWER = "162";
+/*      */   private static final String BASE = "150";
+/*      */   private static final String PLANAR_SLOTAVAIL = "0020";
+/*      */   private static final String MEMORYCARD_SLOTAVAIL = "0010";
+/*      */   private static final String EXPDUNIT_SLOTAVAIL = "0030";
+/*      */   private static final String SYSTEM_UNIT_BASE = "273";
+/*      */   private static final String CUSTOMER_FEATURE_CHOICE = "230";
+/*      */   private static final String UNSELECTED_FEAT_ATTACHMNT = "240";
+/*      */   private static final String SELECTABLE_FEAT_MECH = "238";
+/*      */   private static final String STATUS_FINAL = "0020";
+/*      */   private static final String STATUS_R4REVIEW = "0040";
+/*      */   private static final String FOREVER_DATE = "9999-12-31";
+/*      */   private static final String ABR_INPROCESS = "0050";
+/*      */   private static final String ABR_QUEUED = "0020";
+/*      */   private static final String LIFECYCLE_Develop = "LF02";
+/*      */   private static final String LIFECYCLE_Plan = "LF01";
+/*  163 */   private ResourceBundle rsBundle = null;
+/*  164 */   private PDGUtility pdgUtil = new PDGUtility();
+/*  165 */   private OPICMList derivedDataAttList = new OPICMList();
+/*  166 */   private Hashtable metaTbl = new Hashtable<>();
+/*  167 */   private int totAvailBay = 0;
+/*  168 */   private int totAvailCardSlot = 0;
+/*  169 */   private Object[] args = (Object[])new String[10];
+/*      */   
+/*  171 */   private Hashtable fcElemTbl = new Hashtable<>();
+/*  172 */   private Vector errMsgVct = new Vector(1);
+/*  173 */   private String strNow = null;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void execute_run() {
+/*  186 */     String str1 = "<head>" + EACustom.getMetaTags(getDescription()) + NEWLINE + EACustom.getCSS() + NEWLINE + EACustom.getTitle("{0} {1}") + NEWLINE + "</head>" + NEWLINE + "<body id=\"ibm-com\">" + EACustom.getMastheadDiv() + NEWLINE + "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE + "<p><b>Date: </b>{2}<br /><b>User: </b>{3} ({4})<br /><b>Description: </b>{5}</p>" + NEWLINE + "<!-- {6} -->" + NEWLINE;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  192 */     String str2 = "";
+/*      */     
+/*  194 */     println(EACustom.getDocTypeHtml());
+/*      */ 
+/*      */     
+/*      */     try {
+/*  198 */       start_ABRBuild();
+/*      */       
+/*  200 */       this.rsBundle = ResourceBundle.getBundle(getClass().getName(), getLocale(this.m_prof.getReadLanguage().getNLSID()));
+/*      */       
+/*  202 */       EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*  203 */       addDebug("WWSEOABRDD entered for " + entityItem.getKey() + " extract " + this.m_abri
+/*  204 */           .getVEName() + NEWLINE + PokUtils.outputList(this.m_elist));
+/*      */ 
+/*      */       
+/*  207 */       setReturnCode(0);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  213 */       str2 = getNavigationName(entityItem);
+/*      */       
+/*  215 */       this.rptSb.append("<h2>" + this.m_elist.getParentEntityGroup().getLongDescription() + " " + str2 + "</h2>" + NEWLINE);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  220 */       addHeading(3, " Domain and Model verification:");
+/*  221 */       verifyDomainAndModel(entityItem);
+/*  222 */       if (getReturnCode() == 0) {
+/*      */ 
+/*      */         
+/*  225 */         performChecking(entityItem);
+/*      */         
+/*  227 */         this.strNow = this.m_db.getDates().getNow().substring(0, 10);
+/*      */ 
+/*      */         
+/*  230 */         updateDerivedDataEntity(entityItem);
+/*      */         
+/*  232 */         if (getReturnCode() == 0)
+/*      */         {
+/*  234 */           postProcess(entityItem);
+/*      */           
+/*  236 */           String str = this.rsBundle.getString("SUCCESS");
+/*  237 */           this.args[0] = this.m_elist.getEntityGroup("DERIVEDDATA").getLongDescription();
+/*  238 */           MessageFormat messageFormat1 = new MessageFormat(str);
+/*  239 */           this.rptSb.append("<p>" + messageFormat1.format(this.args) + "</p>" + NEWLINE);
+/*      */         }
+/*      */       
+/*      */       } 
+/*  243 */     } catch (Throwable throwable) {
+/*      */       
+/*  245 */       StringWriter stringWriter = new StringWriter();
+/*  246 */       String str3 = "<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
+/*  247 */       String str4 = "<pre>{0}</pre>";
+/*  248 */       MessageFormat messageFormat1 = new MessageFormat(str3);
+/*  249 */       setReturnCode(-1);
+/*  250 */       throwable.printStackTrace(new PrintWriter(stringWriter));
+/*      */       
+/*  252 */       this.args[0] = throwable.getMessage();
+/*  253 */       this.rptSb.append(messageFormat1.format(this.args) + NEWLINE);
+/*  254 */       messageFormat1 = new MessageFormat(str4);
+/*  255 */       this.args[0] = stringWriter.getBuffer().toString();
+/*  256 */       this.rptSb.append(messageFormat1.format(this.args) + NEWLINE);
+/*  257 */       logError("Exception: " + throwable.getMessage());
+/*  258 */       logError(stringWriter.getBuffer().toString());
+/*      */     }
+/*      */     finally {
+/*      */       
+/*  262 */       cleanUp();
+/*  263 */       setDGTitle(str2);
+/*  264 */       setDGRptName(getShortClassName(getClass()));
+/*  265 */       setDGRptClass("WWSEOABRDD");
+/*      */       
+/*  267 */       if (!isReadOnly()) {
+/*  268 */         clearSoftLock();
+/*      */       }
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/*  274 */     MessageFormat messageFormat = new MessageFormat(str1);
+/*  275 */     this.args[0] = getShortClassName(getClass());
+/*  276 */     this.args[1] = str2 + ((getReturnCode() == 0) ? " Passed" : " Failed");
+/*  277 */     this.args[2] = getNow();
+/*  278 */     this.args[3] = this.m_prof.getOPName();
+/*  279 */     this.args[4] = this.m_prof.getRoleDescription();
+/*  280 */     this.args[5] = getDescription();
+/*  281 */     this.args[6] = getABRVersion();
+/*      */     
+/*  283 */     this.rptSb.insert(0, messageFormat.format(this.args) + NEWLINE);
+/*      */     
+/*  285 */     println(this.rptSb.toString());
+/*  286 */     printDGSubmitString();
+/*  287 */     println(EACustom.getTOUDiv());
+/*  288 */     buildReportFooter();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void postProcess(EntityItem paramEntityItem) throws MiddlewareRequestException, SQLException, MiddlewareException, RemoteException, MiddlewareShutdownInProgressException, EANBusinessRuleException {
+/*  319 */     String str1 = PokUtils.getAttributeFlagValue(paramEntityItem, "STATUS");
+/*  320 */     String str2 = PokUtils.getAttributeFlagValue(paramEntityItem, "LIFECYCLE");
+/*  321 */     if (str2 == null || str2.length() == 0) {
+/*  322 */       str2 = "LF01";
+/*      */     }
+/*  324 */     addDebug("postProcess: " + paramEntityItem.getKey() + " status " + str1 + " lifecycle " + str2);
+/*      */     
+/*  326 */     if ("0020".equals(str1) || ("0040"
+/*  327 */       .equals(str1) && ("LF01"
+/*  328 */       .equals(str2) || "LF02"
+/*  329 */       .equals(str2)))) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  335 */       boolean bool = "0020".equals(str1);
+/*      */ 
+/*      */       
+/*  338 */       EntityList entityList = this.m_db.getEntityList(this.m_prof, new ExtractActionItem(null, this.m_db, this.m_prof, "DQVEWWSEOLSEO"), new EntityItem[] { paramEntityItem });
+/*      */ 
+/*      */ 
+/*      */       
+/*  342 */       addDebug("postProcess DQVEWWSEOLSEO: " + PokUtils.outputList(entityList));
+/*  343 */       Vector vector = new Vector();
+/*  344 */       String str3 = getQueuedValueForItem("ADSABRSTATUS");
+/*  345 */       String str4 = getRFRQueuedValueForItem("ADSABRSTATUS");
+/*  346 */       EntityGroup entityGroup = entityList.getEntityGroup("LSEO");
+/*  347 */       for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/*  348 */         EntityItem entityItem = entityGroup.getEntityItem(b);
+/*  349 */         str1 = PokUtils.getAttributeFlagValue(entityItem, "STATUS");
+/*  350 */         String str = PokUtils.getAttributeValue(entityItem, "LSEOUNPUBDATEMTRGT", "", "9999-12-31", false);
+/*  351 */         addDebug("postProcess: " + entityItem.getKey() + " status " + str1 + " wdDate " + str);
+/*      */         
+/*  353 */         if (this.strNow.compareTo(str) < 0) {
+/*      */           
+/*  355 */           if ("0020".equals(str1)) {
+/*  356 */             if (bool) {
+/*      */               
+/*  358 */               setFlagValue("ADSABRSTATUS", str3, entityItem, vector);
+/*      */             } else {
+/*  360 */               addDebug("postProcess: skipping final " + entityItem.getKey() + " wwseo is not final");
+/*      */             } 
+/*  362 */           } else if ("0040".equals(str1)) {
+/*      */ 
+/*      */ 
+/*      */             
+/*  366 */             str2 = PokUtils.getAttributeFlagValue(entityItem, "LIFECYCLE");
+/*  367 */             addDebug("postProcess: " + entityItem.getKey() + " lifecycle " + str2);
+/*  368 */             if (str2 == null || str2.length() == 0) {
+/*  369 */               str2 = "LF01";
+/*      */             }
+/*  371 */             if ("LF01".equals(str2) || "LF02"
+/*  372 */               .equals(str2)) {
+/*      */               
+/*  374 */               setFlagValue("ADSABRSTATUS", str4, entityItem, vector);
+/*      */             } else {
+/*  376 */               addDebug("postProcess: skipping rfr " + entityItem.getKey() + " lifecycle is not plan or develop");
+/*      */             } 
+/*      */           } 
+/*      */         } else {
+/*  380 */           addDebug("postProcess: skipping withdrawn " + entityItem.getKey());
+/*      */         } 
+/*      */       } 
+/*      */       
+/*  384 */       if (vector.size() > 0) {
+/*  385 */         updatePDH(vector);
+/*      */       }
+/*  387 */       entityList.dereference();
+/*      */       return;
+/*      */     } 
+/*      */     addDebug("postProcess: " + paramEntityItem.getKey() + " status and/or lifecycle criteria not met");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void updatePDH(Vector paramVector) throws SQLException, MiddlewareException, RemoteException, MiddlewareShutdownInProgressException, EANBusinessRuleException {
+/*  401 */     logMessage(getDescription() + " updating PDH");
+/*  402 */     addDebug("updatePDH entered for vctReturnsEntityKeys: " + paramVector.size());
+/*      */     
+/*      */     try {
+/*  405 */       this.m_db.update(this.m_prof, paramVector, false, false);
+/*      */     } finally {
+/*      */       
+/*  408 */       paramVector.clear();
+/*  409 */       this.m_db.commit();
+/*  410 */       this.m_db.freeStatement();
+/*  411 */       this.m_db.isPending("finally after updatePDH");
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addOutput(String paramString) {
+/*  418 */     this.rptSb.append("<p>" + paramString + "</p>" + NEWLINE);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getQueuedValueForItem(String paramString) {
+/*  426 */     String str1 = "LSEOABRSTATUS";
+/*  427 */     String str2 = "_queuedValue";
+/*  428 */     return ABRServerProperties.getValue(str1, "_" + paramString + str2, "0020");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getRFRQueuedValueForItem(String paramString) {
+/*  437 */     String str1 = "LSEOABRSTATUS";
+/*  438 */     String str2 = "_RFRqueuedValue";
+/*  439 */     return ABRServerProperties.getValue(str1, "_" + paramString + str2, "0020");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setFlagValue(String paramString1, String paramString2, EntityItem paramEntityItem, Vector<ReturnEntityKey> paramVector) throws SQLException, MiddlewareException {
+/*  455 */     addDebug("setFlagValue entered " + paramEntityItem.getKey() + " for " + paramString1 + " set to: " + paramString2);
+/*      */ 
+/*      */     
+/*  458 */     if (paramString2 != null && paramString2.trim().length() == 0) {
+/*  459 */       addDebug("setFlagValue: " + paramString1 + " was blank for " + paramEntityItem.getKey() + ", it will be ignored");
+/*      */       
+/*      */       return;
+/*      */     } 
+/*      */     
+/*  464 */     String str = PokUtils.getAttributeFlagValue(paramEntityItem, paramString1);
+/*  465 */     if (paramString2.equals(str)) {
+/*  466 */       addDebug("setFlagValue: " + paramString1 + " was already set to " + str + " for " + paramEntityItem.getKey() + ", nothing to do");
+/*      */       
+/*      */       return;
+/*      */     } 
+/*      */     
+/*  471 */     checkForInProcess(paramEntityItem, paramString1);
+/*      */     
+/*  473 */     if (this.m_cbOn == null) {
+/*  474 */       setControlBlock();
+/*      */     }
+/*      */     
+/*  477 */     ReturnEntityKey returnEntityKey = new ReturnEntityKey(paramEntityItem.getEntityType(), paramEntityItem.getEntityID(), true);
+/*  478 */     returnEntityKey.m_vctAttributes = new Vector();
+/*  479 */     paramVector.addElement(returnEntityKey);
+/*      */     
+/*  481 */     SingleFlag singleFlag = new SingleFlag(this.m_prof.getEnterprise(), paramEntityItem.getEntityType(), paramEntityItem.getEntityID(), paramString1, paramString2, 1, this.m_cbOn);
+/*      */ 
+/*      */     
+/*  484 */     returnEntityKey.m_vctAttributes.addElement(singleFlag);
+/*      */ 
+/*      */     
+/*  487 */     MessageFormat messageFormat = new MessageFormat(this.rsBundle.getString("ATTR_SET"));
+/*      */     
+/*  489 */     this.args[0] = PokUtils.getAttributeDescription(paramEntityItem.getEntityGroup(), paramString1, paramString1);
+/*  490 */     this.args[1] = paramString2;
+/*      */     
+/*  492 */     EANMetaFlagAttribute eANMetaFlagAttribute = (EANMetaFlagAttribute)paramEntityItem.getEntityGroup().getMetaAttribute(paramString1);
+/*  493 */     if (eANMetaFlagAttribute != null) {
+/*  494 */       MetaFlag metaFlag = eANMetaFlagAttribute.getMetaFlag(paramString2);
+/*  495 */       if (metaFlag != null) {
+/*  496 */         this.args[1] = metaFlag.toString();
+/*      */       }
+/*      */     } else {
+/*  499 */       addDebug("Error: " + paramString1 + " not found in META for " + paramEntityItem.getEntityType());
+/*      */     } 
+/*      */     
+/*  502 */     this.args[2] = paramEntityItem.getEntityGroup().getLongDescription();
+/*  503 */     this.args[3] = getNavigationName(paramEntityItem);
+/*      */     
+/*  505 */     addOutput(messageFormat.format(this.args));
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkForInProcess(EntityItem paramEntityItem, String paramString) {
+/*      */     try {
+/*  516 */       byte b = 0;
+/*      */       
+/*  518 */       String str = PokUtils.getAttributeFlagValue(paramEntityItem, paramString);
+/*      */       
+/*  520 */       addDebug("checkForInProcess:  entered " + paramEntityItem.getKey() + " " + paramString + " is " + str);
+/*      */       
+/*  522 */       if ("0050".equals(str)) {
+/*  523 */         DatePackage datePackage = this.m_db.getDates();
+/*      */         
+/*  525 */         this.m_prof.setValOnEffOn(datePackage.getEndOfDay(), datePackage.getEndOfDay());
+/*      */         
+/*  527 */         while ("0050".equals(str) && b < 20) {
+/*  528 */           b++;
+/*  529 */           addDebug("checkForInProcess: " + paramString + " is " + str + " sleeping 30 secs");
+/*  530 */           Thread.sleep(30000L);
+/*      */           
+/*  532 */           EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, paramEntityItem.getEntityType(), "Edit", false);
+/*  533 */           EntityItem entityItem = new EntityItem(entityGroup, this.m_prof, this.m_db, paramEntityItem.getEntityType(), paramEntityItem.getEntityID());
+/*  534 */           str = PokUtils.getAttributeFlagValue(entityItem, paramString);
+/*  535 */           addDebug("checkForInProcess: " + paramString + " is now " + str + " after sleeping");
+/*      */         } 
+/*      */       } 
+/*  538 */     } catch (Exception exception) {
+/*  539 */       System.err.println("Exception in checkForInProcess " + exception);
+/*  540 */       exception.printStackTrace();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void verifyDomainAndModel(EntityItem paramEntityItem) throws MiddlewareRequestException, SQLException, MiddlewareException {
+/*  556 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("MODEL");
+/*      */ 
+/*      */ 
+/*      */     
+/*  560 */     EntityItem entityItem = null;
+/*  561 */     EntityList entityList = null;
+/*  562 */     boolean bool = false;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  567 */     if (entityGroup.getEntityItemCount() == 0) {
+/*      */       
+/*  569 */       entityList = this.m_db.getEntityList(this.m_prof, new ExtractActionItem(null, this.m_db, this.m_prof, "WWSEODDABRVE2"), new EntityItem[] { paramEntityItem });
+/*      */ 
+/*      */       
+/*  572 */       entityGroup = entityList.getEntityGroup("MODEL");
+/*  573 */       addDebug("DEBUG WWSEODDABRVE2: " + PokUtils.outputList(entityList));
+/*      */     } 
+/*      */     
+/*  576 */     entityItem = entityGroup.getEntityItem(0);
+/*      */     
+/*  578 */     String str1 = getAttributeFlagEnabledValue(entityItem, "COFCAT");
+/*  579 */     String str2 = getAttributeFlagEnabledValue(entityItem, "COFSUBCAT");
+/*  580 */     String str3 = getAttributeFlagEnabledValue(entityItem, "COFGRP");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  585 */     bool = ("100".equals(str1) && ("126".equals(str2) || "162".equals(str2)) && "150".equals(str3)) ? true : false;
+/*      */     
+/*  587 */     if (!bool) {
+/*  588 */       this.args[0] = entityItem.getEntityGroup().getLongDescription();
+/*  589 */       printError("MODEL_CLASSIFICATION_ERROR", this.args);
+/*  590 */       print3a(entityItem);
+/*      */     } else {
+/*  592 */       checkDomain(paramEntityItem);
+/*      */     } 
+/*      */     
+/*  595 */     if (entityList != null) {
+/*  596 */       entityList.dereference();
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private void addDebug(String paramString) {
+/*  602 */     this.rptSb.append("<!-- " + paramString + " -->" + NEWLINE);
+/*      */   }
+/*      */   
+/*      */   private void addHeading(int paramInt, String paramString) {
+/*  606 */     this.rptSb.append("<h" + paramInt + ">" + paramString + "</h" + paramInt + ">" + NEWLINE);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkDomain(EntityItem paramEntityItem) {
+/*  616 */     boolean bool = false;
+/*  617 */     String str = ABRServerProperties.getDomains(this.m_abri.getABRCode());
+/*  618 */     addDebug("domainNeedsChecks pdhdomains needing checks: " + str);
+/*  619 */     if (str.equals("all")) {
+/*  620 */       bool = true;
+/*      */     } else {
+/*  622 */       HashSet<String> hashSet = new HashSet();
+/*  623 */       StringTokenizer stringTokenizer = new StringTokenizer(str, ",");
+/*  624 */       while (stringTokenizer.hasMoreTokens()) {
+/*  625 */         hashSet.add(stringTokenizer.nextToken());
+/*      */       }
+/*  627 */       bool = PokUtils.contains(paramEntityItem, "PDHDOMAIN", hashSet);
+/*  628 */       hashSet.clear();
+/*      */     } 
+/*      */     
+/*  631 */     if (!bool) {
+/*  632 */       addDebug("PDHDOMAIN did not include " + str + ", [" + 
+/*  633 */           PokUtils.getAttributeValue(paramEntityItem, "PDHDOMAIN", ", ", "", false) + "]");
+/*  634 */       this.args[0] = paramEntityItem.getEntityGroup().getLongDescription();
+/*  635 */       this.args[1] = PokUtils.getAttributeValue(paramEntityItem, "PDHDOMAIN", ", ", "", false);
+/*  636 */       printError("DOMAIN_ERROR", this.args);
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected String getNavigationName(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/*  647 */     StringBuffer stringBuffer = new StringBuffer();
+/*      */ 
+/*      */ 
+/*      */     
+/*  651 */     EANList eANList = (EANList)this.metaTbl.get(paramEntityItem.getEntityType());
+/*  652 */     if (eANList == null) {
+/*      */       
+/*  654 */       EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, paramEntityItem.getEntityType(), "Navigate");
+/*  655 */       eANList = entityGroup.getMetaAttribute();
+/*  656 */       this.metaTbl.put(paramEntityItem.getEntityType(), eANList);
+/*      */     } 
+/*  658 */     for (byte b = 0; b < eANList.size(); b++) {
+/*      */       
+/*  660 */       EANMetaAttribute eANMetaAttribute = (EANMetaAttribute)eANList.getAt(b);
+/*  661 */       stringBuffer.append(PokUtils.getAttributeValue(paramEntityItem, eANMetaAttribute.getAttributeCode(), ", ", "", false));
+/*  662 */       if (b + 1 < eANList.size()) {
+/*  663 */         stringBuffer.append(" ");
+/*      */       }
+/*      */     } 
+/*      */     
+/*  667 */     return stringBuffer.toString().trim();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private static Vector getAllLinkedEntities(EntityItem paramEntityItem, String paramString1, String paramString2) {
+/*  684 */     Vector vector = new Vector(1);
+/*  685 */     getLinkedEntities(paramEntityItem, paramString1, paramString2, vector);
+/*  686 */     return vector;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getLD_NDN(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/*  698 */     return paramEntityItem.getEntityGroup().getLongDescription() + " &quot;" + getNavigationName(paramEntityItem) + "&quot;";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private static void getLinkedEntities(EntityItem paramEntityItem, String paramString1, String paramString2, Vector<EANEntity> paramVector) {
+/*  713 */     if (paramEntityItem != null) {
+/*      */       byte b;
+/*  715 */       for (b = 0; b < paramEntityItem.getUpLinkCount(); b++) {
+/*      */         
+/*  717 */         EANEntity eANEntity = paramEntityItem.getUpLink(b);
+/*  718 */         if (eANEntity.getEntityType().equals(paramString1))
+/*      */         {
+/*      */           
+/*  721 */           for (byte b1 = 0; b1 < eANEntity.getUpLinkCount(); b1++) {
+/*      */             
+/*  723 */             EANEntity eANEntity1 = eANEntity.getUpLink(b1);
+/*  724 */             if (eANEntity1.getEntityType().equals(paramString2)) {
+/*  725 */               paramVector.addElement(eANEntity1);
+/*      */             }
+/*      */           } 
+/*      */         }
+/*      */       } 
+/*      */       
+/*  731 */       for (b = 0; b < paramEntityItem.getDownLinkCount(); b++) {
+/*      */         
+/*  733 */         EANEntity eANEntity = paramEntityItem.getDownLink(b);
+/*  734 */         if (eANEntity.getEntityType().equals(paramString1))
+/*      */         {
+/*      */           
+/*  737 */           for (byte b1 = 0; b1 < eANEntity.getDownLinkCount(); b1++) {
+/*      */             
+/*  739 */             EANEntity eANEntity1 = eANEntity.getDownLink(b1);
+/*  740 */             if (eANEntity1.getEntityType().equals(paramString2)) {
+/*  741 */               paramVector.addElement(eANEntity1);
+/*      */             }
+/*      */           } 
+/*      */         }
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getDescription() {
+/*  755 */     return "The ABR will derive a subset of the attributes for the WWSEO DERIVEDDATA and the available SLOTs and available BAYs.";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getABRVersion() {
+/*  765 */     return "1.29";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void performChecking(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/*  777 */     addHeading(3, this.m_elist.getEntityGroup("SLOTSAVAIL").getLongDescription() + " verification:");
+/*  778 */     Hashtable hashtable = verifySlotsAvail(paramEntityItem);
+/*  779 */     Vector vector = new Vector();
+/*      */     
+/*  781 */     addDebug("-----------------");
+/*  782 */     getElements();
+/*      */ 
+/*      */     
+/*  785 */     addDebug("-----------------");
+/*  786 */     addHeading(3, this.m_elist.getEntityGroup("PLANAR").getLongDescription() + " checks:");
+/*  787 */     checkPlanar(hashtable, vector);
+/*      */ 
+/*      */     
+/*  790 */     addDebug("-----------------");
+/*  791 */     addHeading(3, this.m_elist.getEntityGroup("MEMORYCARD").getLongDescription() + " checks:");
+/*  792 */     checkMemoryCard(hashtable, vector);
+/*      */ 
+/*      */     
+/*  795 */     addDebug("-----------------");
+/*  796 */     addHeading(3, this.m_elist.getEntityGroup("EXPDUNIT").getLongDescription() + " checks:");
+/*  797 */     checkExpansionUnit(hashtable, vector);
+/*      */ 
+/*      */     
+/*  800 */     addHeading(3, this.m_elist.getEntityGroup("MECHPKG").getLongDescription() + " checks:");
+/*  801 */     addDebug("-----------------");
+/*  802 */     checkMechPkg(paramEntityItem);
+/*      */ 
+/*      */     
+/*  805 */     addHeading(3, this.m_elist.getEntityGroup("SLOTSAVAIL").getLongDescription() + " checks:");
+/*  806 */     Enumeration<String> enumeration = hashtable.keys();
+/*  807 */     while (enumeration.hasMoreElements()) {
+/*  808 */       String str = enumeration.nextElement();
+/*  809 */       if (vector.contains(str)) {
+/*      */         continue;
+/*      */       }
+/*  812 */       EntityItem entityItem = (EntityItem)hashtable.get(str);
+/*  813 */       addDebug("performChecking: No match found for " + entityItem.getKey() + " with " + str);
+/*      */ 
+/*      */ 
+/*      */       
+/*  817 */       this.args[0] = entityItem.getEntityGroup().getLongDescription();
+/*  818 */       this.args[1] = PokUtils.getAttributeDescription(entityItem.getEntityGroup(), "ELEMENTTYPE", "ELEMENTTYPE");
+/*  819 */       this.args[2] = PokUtils.getAttributeDescription(entityItem.getEntityGroup(), "SLOTTYPE", "SLOTTYPE");
+/*  820 */       this.args[3] = PokUtils.getAttributeDescription(entityItem.getEntityGroup(), "SLOTSZE", "SLOTSZE");
+/*      */       
+/*  822 */       printError("INVALID_SLOTAVAIL_ERROR", this.args);
+/*  823 */       print3a(entityItem);
+/*      */     } 
+/*      */     
+/*  826 */     vector.clear();
+/*  827 */     hashtable.clear();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Hashtable verifySlotsAvail(EntityItem paramEntityItem) {
+/*  837 */     Vector<EntityItem> vector = getAllLinkedEntities(paramEntityItem, "WWSEOSLOTSAVAIL", "SLOTSAVAIL");
+/*  838 */     addDebug("verifySlotsAvail: Found " + vector.size() + " SLOTSAVAIL for " + paramEntityItem.getKey());
+/*      */ 
+/*      */     
+/*  841 */     Hashtable<Object, Object> hashtable = new Hashtable<>();
+/*  842 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("SLOTSAVAIL");
+/*  843 */     for (byte b = 0; b < vector.size(); b++) {
+/*  844 */       EntityItem entityItem = vector.elementAt(b);
+/*  845 */       String str1 = getAttributeFlagEnabledValue(entityItem, "ELEMENTTYPE");
+/*  846 */       String str2 = getAttributeFlagEnabledValue(entityItem, "SLOTTYPE");
+/*  847 */       String str3 = getAttributeFlagEnabledValue(entityItem, "SLOTSZE");
+/*  848 */       addDebug("verifySlotsAvail: Checking " + entityItem.getKey() + " elemtype: " + str1 + " slotType: " + str2 + " slotSze: " + str3);
+/*      */       
+/*  850 */       if (str1 == null) {
+/*      */ 
+/*      */ 
+/*      */         
+/*  854 */         this.args[0] = entityGroup.getLongDescription();
+/*  855 */         this.args[1] = PokUtils.getAttributeDescription(entityGroup, "ELEMENTTYPE", "ELEMENTTYPE");
+/*  856 */         printError("ATTR_EMPTY_ERR", this.args);
+/*  857 */         print3a(entityItem);
+/*  858 */       } else if (str2 == null) {
+/*      */ 
+/*      */ 
+/*      */         
+/*  862 */         this.args[0] = entityGroup.getLongDescription();
+/*  863 */         this.args[1] = PokUtils.getAttributeDescription(entityGroup, "SLOTTYPE", "SLOTTYPE");
+/*  864 */         printError("ATTR_EMPTY_ERR", this.args);
+/*  865 */         print3a(entityItem);
+/*  866 */       } else if (str3 == null) {
+/*      */ 
+/*      */ 
+/*      */         
+/*  870 */         this.args[0] = entityGroup.getLongDescription();
+/*  871 */         this.args[1] = PokUtils.getAttributeDescription(entityGroup, "SLOTSZE", "SLOTSZE");
+/*  872 */         printError("ATTR_EMPTY_ERR", this.args);
+/*  873 */         print3a(entityItem);
+/*      */       } else {
+/*  875 */         EntityItem entityItem1 = (EntityItem)hashtable.get(str1 + str2 + str3);
+/*  876 */         if (entityItem1 != null) {
+/*      */ 
+/*      */ 
+/*      */           
+/*  880 */           this.args[0] = entityGroup.getLongDescription();
+/*  881 */           this.args[1] = PokUtils.getAttributeDescription(entityGroup, "ELEMENTTYPE", "ELEMENTTYPE");
+/*  882 */           this.args[2] = PokUtils.getAttributeDescription(entityGroup, "SLOTTYPE", "SLOTTYPE");
+/*  883 */           this.args[3] = PokUtils.getAttributeDescription(entityGroup, "SLOTSZE", "SLOTSZE");
+/*      */           
+/*  885 */           printError("DUPLICATE_SLOTAVAIL_ERROR", this.args);
+/*  886 */           print3a(entityItem, false);
+/*  887 */           print3a(entityItem1);
+/*      */         } else {
+/*  889 */           hashtable.put(str1 + str2 + str3, entityItem);
+/*      */           
+/*  891 */           String str = PokUtils.getAttributeValue(entityItem, "SLOTAVAIL", "", "0", false);
+/*  892 */           int i = Integer.parseInt(str);
+/*  893 */           this.totAvailCardSlot += i;
+/*  894 */           addDebug("verifySlotsAvail: Adding " + entityItem.getKey() + " SLOTAVAIL:" + str + " to total:" + this.totAvailCardSlot);
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */     
+/*  899 */     vector.clear();
+/*      */     
+/*  901 */     return hashtable;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void getElements() {
+/*  910 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("WWSEOPRODSTRUCT");
+/*      */     
+/*  912 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/*  913 */       EntityItem entityItem1 = entityGroup.getEntityItem(b);
+/*  914 */       EntityItem entityItem2 = (EntityItem)entityItem1.getDownLink(0);
+/*      */       
+/*  916 */       for (byte b1 = 0; b1 < entityItem2.getUpLinkCount(); b1++) {
+/*  917 */         EntityItem entityItem = (EntityItem)entityItem2.getUpLink(b1);
+/*  918 */         if (entityItem.getEntityType().equals("FEATURE")) {
+/*  919 */           EntityItem entityItem3 = entityItem;
+/*  920 */           addDebug("getElements: Checking " + entityItem1.getKey() + " " + entityItem2.getKey() + " " + entityItem3
+/*  921 */               .getKey());
+/*  922 */           for (byte b2 = 0; b2 < entityItem3.getDownLinkCount(); b2++) {
+/*  923 */             EntityItem entityItem4 = (EntityItem)entityItem3.getDownLink(b2);
+/*  924 */             if (!entityItem4.getEntityType().equals("PRODSTRUCT"))
+/*      */             {
+/*      */               
+/*  927 */               for (byte b3 = 0; b3 < entityItem4.getDownLinkCount(); b3++) {
+/*  928 */                 EntityItem entityItem5 = (EntityItem)entityItem4.getDownLink(b3);
+/*  929 */                 FCElement fCElement = new FCElement(entityItem1, entityItem2, entityItem3, entityItem4, entityItem5);
+/*  930 */                 addDebug("getElements: Created " + fCElement + " confqty:" + fCElement.getConfQty() + " qty:" + fCElement.getQty());
+/*  931 */                 Vector<FCElement> vector = (Vector)this.fcElemTbl.get(entityItem5.getEntityType());
+/*  932 */                 if (vector == null) {
+/*  933 */                   vector = new Vector(1);
+/*  934 */                   this.fcElemTbl.put(entityItem5.getEntityType(), vector);
+/*      */                 } 
+/*  936 */                 vector.addElement(fCElement);
+/*      */               } 
+/*      */             }
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkPlanar(Hashtable paramHashtable, Vector paramVector) throws SQLException, MiddlewareException {
+/*  971 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("PLANAR");
+/*  972 */     if (entityGroup.getEntityItemCount() == 0) {
+/*      */ 
+/*      */       
+/*  975 */       this.args[0] = entityGroup.getLongDescription();
+/*      */       
+/*  977 */       printError("ELEM_NOTFOUND_ERROR", this.args, true);
+/*      */ 
+/*      */     
+/*      */     }
+/*      */     else {
+/*      */ 
+/*      */       
+/*  984 */       Vector<FCElement> vector = (Vector)this.fcElemTbl.get("PLANAR");
+/*  985 */       addDebug("checkPlanar entered for " + vector.size() + " PLANAR");
+/*  986 */       for (byte b = 0; b < vector.size(); b++) {
+/*  987 */         FCElement fCElement = vector.elementAt(b);
+/*  988 */         EntityItem entityItem = fCElement.getElement();
+/*  989 */         Vector vector1 = PokUtils.getAllLinkedEntities(entityItem, "PLANARSLOT", "SLOT");
+/*  990 */         String str = PokUtils.getAttributeValue(entityItem, "TOTCARDSLOT", "", "0", false);
+/*  991 */         if (vector1.size() == 0) {
+/*  992 */           addDebug("checkPlanar " + entityItem.getKey() + " did not have any SLOTs TOTCARDSLOT=" + str);
+/*  993 */           if (!str.equals("0")) {
+/*      */             
+/*  995 */             this.args[0] = entityGroup.getLongDescription();
+/*  996 */             this.args[1] = this.m_elist.getEntityGroup("SLOT").getLongDescription();
+/*  997 */             this.args[2] = PokUtils.getAttributeDescription(entityGroup, "TOTCARDSLOT", "TOTCARDSLOT");
+/*  998 */             printError("INVALID_TOTCARDSLOT_ERR", this.args);
+/*  999 */             print3a(entityItem);
+/*      */           } else {
+/* 1001 */             addHeading(4, getLD_NDN(entityItem) + " has No SLOTs");
+/*      */           } 
+/*      */         } else {
+/*      */           
+/* 1005 */           int i = Integer.parseInt(str);
+/* 1006 */           int j = fCElement.checkSlots(paramHashtable, "0020", paramVector);
+/* 1007 */           addDebug("checkplanar: " + fCElement.getElement().getKey() + ".TOTCARDSLOT=" + i + " totalSlotTot:" + j);
+/*      */ 
+/*      */           
+/* 1010 */           if (j > i) {
+/* 1011 */             String str1 = fCElement.getElement().getKey() + ":SLOT";
+/*      */             
+/* 1013 */             if (!this.errMsgVct.contains(str1)) {
+/* 1014 */               this.errMsgVct.add(str1);
+/* 1015 */               this.args[0] = this.m_elist.getEntityGroup("SLOT").getLongDescription();
+/* 1016 */               this.args[1] = this.m_elist.getEntityGroup("PLANAR").getLongDescription();
+/* 1017 */               printError("TOO_MANY_CHILDREN_ERR", this.args);
+/* 1018 */               print3a(fCElement.getElement());
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkMemoryCard(Hashtable paramHashtable, Vector paramVector) throws SQLException, MiddlewareException {
+/* 1104 */     Vector<FCElement> vector = (Vector)this.fcElemTbl.get("MEMORYCARD");
+/* 1105 */     addDebug("checkMemoryCard entered for " + ((vector == null) ? 0 : vector.size()) + " MEMORYCARD");
+/* 1106 */     if (vector != null) {
+/* 1107 */       for (byte b = 0; b < vector.size(); b++) {
+/* 1108 */         FCElement fCElement = vector.elementAt(b);
+/* 1109 */         EntityItem entityItem = fCElement.getElement();
+/*      */         
+/* 1111 */         String str = PokUtils.getAttributeValue(entityItem, "MEMRYCRDTOTALSLOTS", "", "0", false);
+/* 1112 */         int i = Integer.parseInt(str);
+/* 1113 */         int j = fCElement.checkSlots(paramHashtable, "0010", paramVector);
+/* 1114 */         addDebug("checkMemoryCard " + entityItem.getKey() + ".MEMRYCRDTOTALSLOTS=" + i + " slotTotal:" + j);
+/* 1115 */         if (j > i) {
+/* 1116 */           this.args[0] = this.m_elist.getEntityGroup("SLOT").getLongDescription();
+/* 1117 */           this.args[1] = this.m_elist.getEntityGroup("MEMORYCARD").getLongDescription();
+/* 1118 */           printError("TOO_MANY_CHILDREN_ERR", this.args);
+/* 1119 */           print3a(entityItem);
+/*      */         } 
+/*      */       } 
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkExpansionUnit(Hashtable paramHashtable, Vector paramVector) throws SQLException, MiddlewareException {
+/* 1137 */     Vector<FCElement> vector = (Vector)this.fcElemTbl.get("EXPDUNIT");
+/* 1138 */     addDebug("checkExpansionUnit entered for " + ((vector == null) ? 0 : vector.size()) + " EXPDUNIT");
+/* 1139 */     if (vector != null) {
+/* 1140 */       for (byte b = 0; b < vector.size(); b++) {
+/* 1141 */         FCElement fCElement = vector.elementAt(b);
+/* 1142 */         EntityItem entityItem = fCElement.getElement();
+/*      */         
+/* 1144 */         String str = PokUtils.getAttributeValue(entityItem, "EXPNDUNITSOLTSTOT", "", "0", false);
+/* 1145 */         int i = Integer.parseInt(str);
+/*      */         
+/* 1147 */         int j = fCElement.checkSlots(paramHashtable, "0030", paramVector);
+/* 1148 */         addDebug("checkExpansionUnit " + entityItem.getKey() + ".EXPNDUNITSOLTSTOT=" + i + " slotTotal " + j);
+/* 1149 */         if (j > i) {
+/* 1150 */           this.args[0] = this.m_elist.getEntityGroup("SLOT").getLongDescription();
+/* 1151 */           this.args[1] = this.m_elist.getEntityGroup("EXPDUNIT").getLongDescription();
+/* 1152 */           printError("TOO_MANY_CHILDREN_ERR", this.args);
+/* 1153 */           print3a(entityItem);
+/*      */         } 
+/*      */       } 
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void checkMechPkg(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 1190 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("BAYSAVAIL");
+/*      */     
+/* 1192 */     Hashtable hashtable = verifyBaysAvail(paramEntityItem);
+/* 1193 */     Vector vector = new Vector();
+/*      */     
+/* 1195 */     Vector<FCElement> vector1 = new Vector(1);
+/* 1196 */     Vector<FCElement> vector2 = new Vector();
+/* 1197 */     Vector<FCElement> vector3 = (Vector)this.fcElemTbl.get("MECHPKG");
+/* 1198 */     addDebug("checkMechPkg: entered for " + ((vector3 == null) ? 0 : vector3.size()) + " MECHPKG");
+/* 1199 */     if (vector3 != null) {
+/* 1200 */       for (byte b1 = 0; b1 < vector3.size(); b1++) {
+/* 1201 */         FCElement fCElement = vector3.elementAt(b1);
+/* 1202 */         EntityItem entityItem1 = fCElement.getElement();
+/* 1203 */         EntityItem entityItem2 = fCElement.getFeature();
+/* 1204 */         String str = getAttributeFlagEnabledValue(entityItem2, "HWFCCAT");
+/* 1205 */         if ("273".equals(str) || "230"
+/* 1206 */           .equals(str) || "240"
+/* 1207 */           .equals(str) || "238"
+/* 1208 */           .equals(str)) {
+/* 1209 */           vector2.addElement(fCElement);
+/* 1210 */           if ("273".equals(str)) {
+/* 1211 */             vector1.add(fCElement);
+/*      */ 
+/*      */           
+/*      */           }
+/*      */         
+/*      */         }
+/*      */         else {
+/*      */ 
+/*      */           
+/* 1220 */           addDebug("checkMechPkg: " + entityItem2.getKey() + " had " + entityItem1.getKey() + " but HWFCCAT was " + 
+/* 1221 */               PokUtils.getAttributeValue(entityItem2, "HWFCCAT", "", "", false));
+/* 1222 */           this.args[0] = this.m_elist.getEntityGroup("MECHPKG").getLongDescription();
+/* 1223 */           printError("INVALID_HWFCCAT_ERR", this.args, true);
+/* 1224 */           print3b(entityItem2, entityItem1);
+/* 1225 */           this.rptSb.append("</p>" + NEWLINE);
+/*      */         } 
+/*      */       } 
+/*      */     }
+/*      */     
+/* 1230 */     if (vector2.size() == 0) {
+/*      */ 
+/*      */ 
+/*      */       
+/* 1234 */       this.args[0] = this.m_elist.getEntityGroup("MECHPKG").getLongDescription();
+/*      */       
+/* 1236 */       printError("ELEM_NOTFOUND_ERROR", this.args, true);
+/*      */     } 
+/* 1238 */     if (vector1.size() > 1) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/* 1243 */       this.args[0] = this.m_elist.getEntityGroup("MECHPKG").getLongDescription();
+/* 1244 */       printError("MAX_1_ERROR", this.args);
+/* 1245 */       for (byte b1 = 0; b1 < vector1.size(); b1++) {
+/* 1246 */         FCElement fCElement = vector1.elementAt(b1);
+/* 1247 */         print3b(fCElement.getFeature(), fCElement.getElement());
+/*      */       } 
+/* 1249 */       this.rptSb.append("</p>" + NEWLINE);
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1258 */     for (byte b = 0; b < vector2.size(); b++) {
+/* 1259 */       FCElement fCElement = vector2.elementAt(b);
+/* 1260 */       Vector<EntityItem> vector4 = getAllLinkedEntities(fCElement.getElement(), "MECHPKGBAY", "BAY");
+/* 1261 */       if (vector4.size() > 0) {
+/* 1262 */         String str = PokUtils.getAttributeValue(fCElement.getElement(), "TOTBAY", "", "0", false);
+/* 1263 */         int i = Integer.parseInt(str);
+/*      */         
+/* 1265 */         int j = fCElement.checkBays(hashtable, vector);
+/* 1266 */         addDebug("checkMechPkg: " + fCElement + " TOTBAY=" + str + " totalBayTot=" + j);
+/* 1267 */         if (j > i) {
+/* 1268 */           this.args[0] = this.m_elist.getEntityGroup("BAY").getLongDescription();
+/* 1269 */           this.args[1] = fCElement.getElement().getEntityGroup().getLongDescription();
+/* 1270 */           printError("TOO_MANY_CHILDREN_ERR", this.args);
+/* 1271 */           print3a(fCElement.getElement(), false);
+/* 1272 */           for (byte b1 = 0; b1 < vector4.size(); b1++) {
+/* 1273 */             print3a(vector4.get(b1), false);
+/*      */           }
+/*      */           
+/* 1276 */           this.rptSb.append("</p>" + NEWLINE);
+/*      */         } 
+/*      */       } 
+/* 1279 */       vector4.clear();
+/*      */     } 
+/*      */ 
+/*      */     
+/* 1283 */     for (Enumeration<String> enumeration = hashtable.keys(); enumeration.hasMoreElements(); ) {
+/*      */       
+/* 1285 */       String str = enumeration.nextElement();
+/* 1286 */       if (vector.contains(str)) {
+/*      */         continue;
+/*      */       }
+/*      */       
+/* 1290 */       EntityItem entityItem = (EntityItem)hashtable.get(str);
+/* 1291 */       EntityGroup entityGroup1 = this.m_elist.getEntityGroup("BAY");
+/* 1292 */       this.args[0] = entityGroup.getLongDescription();
+/* 1293 */       this.args[1] = PokUtils.getAttributeDescription(entityGroup1, "BAYTYPE", "BAYTYPE");
+/* 1294 */       this.args[2] = PokUtils.getAttributeDescription(entityGroup1, "ACCSS", "ACCSS");
+/* 1295 */       this.args[3] = PokUtils.getAttributeDescription(entityGroup1, "BAYFF", "BAYFF");
+/*      */       
+/* 1297 */       printError("INVALID_BAYSAVAIL_ERROR", this.args);
+/* 1298 */       print3a(entityItem);
+/* 1299 */       addDebug("No BAY for " + entityItem.getKey() + " " + str);
+/*      */     } 
+/*      */     
+/* 1302 */     vector.clear();
+/* 1303 */     vector2.clear();
+/* 1304 */     hashtable.clear();
+/* 1305 */     vector1.clear();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Hashtable verifyBaysAvail(EntityItem paramEntityItem) {
+/* 1314 */     Vector<EntityItem> vector = getAllLinkedEntities(paramEntityItem, "WWSEOBAYSAVAIL", "BAYSAVAIL");
+/* 1315 */     addDebug("verifyBaysAvail: Found " + vector.size() + " BAYSAVAIL for " + paramEntityItem.getKey());
+/*      */ 
+/*      */ 
+/*      */     
+/* 1319 */     Hashtable<Object, Object> hashtable = new Hashtable<>();
+/* 1320 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("BAYSAVAIL");
+/* 1321 */     for (byte b = 0; b < vector.size(); b++) {
+/* 1322 */       EntityItem entityItem = vector.elementAt(b);
+/* 1323 */       String str1 = getAttributeFlagEnabledValue(entityItem, "BAYAVAILTYPE");
+/* 1324 */       String str2 = getAttributeFlagEnabledValue(entityItem, "ACCSS");
+/* 1325 */       String str3 = getAttributeFlagEnabledValue(entityItem, "BAYFF");
+/*      */       
+/* 1327 */       addDebug("verifyBaysAvail: Checking " + entityItem.getKey() + " bayAvailType: " + str1 + " bayAccss: " + str2 + " bayFF:" + str3);
+/* 1328 */       if (str1 == null || str2 == null || str3 == null) {
+/*      */ 
+/*      */ 
+/*      */         
+/* 1332 */         this.args[0] = entityGroup.getLongDescription();
+/* 1333 */         if (str1 == null) {
+/* 1334 */           this.args[1] = PokUtils.getAttributeDescription(entityGroup, "BAYAVAILTYPE", "BAYAVAILTYPE");
+/* 1335 */           printError("ATTR_EMPTY_ERR", this.args);
+/*      */         } 
+/* 1337 */         if (str2 == null) {
+/* 1338 */           this.args[1] = PokUtils.getAttributeDescription(entityGroup, "ACCSS", "ACCSS");
+/* 1339 */           printError("ATTR_EMPTY_ERR", this.args);
+/*      */         } 
+/* 1341 */         if (str3 == null) {
+/* 1342 */           this.args[1] = PokUtils.getAttributeDescription(entityGroup, "BAYFF", "BAYFF");
+/* 1343 */           printError("ATTR_EMPTY_ERR", this.args);
+/*      */         } 
+/* 1345 */         print3a(entityItem);
+/*      */       } else {
+/*      */         
+/* 1348 */         String str = str1 + str2 + str3;
+/* 1349 */         EntityItem entityItem1 = (EntityItem)hashtable.get(str);
+/* 1350 */         if (entityItem1 != null) {
+/*      */           
+/* 1352 */           this.args[0] = entityGroup.getLongDescription();
+/* 1353 */           this.args[1] = PokUtils.getAttributeDescription(entityGroup, "BAYAVAILTYPE", "BAYAVAILTYPE");
+/* 1354 */           this.args[2] = PokUtils.getAttributeDescription(entityGroup, "ACCSS", "ACCSS");
+/* 1355 */           this.args[3] = PokUtils.getAttributeDescription(entityGroup, "BAYFF", "BAYFF");
+/*      */           
+/* 1357 */           printError("DUPLICATE_BAYSAVAIL_ERROR", this.args);
+/* 1358 */           print3a(entityItem, false);
+/* 1359 */           print3a(entityItem1);
+/*      */         }
+/*      */         else {
+/*      */           
+/* 1363 */           String str4 = PokUtils.getAttributeValue(entityItem, "BAYAVAIL", "", "0", false);
+/* 1364 */           hashtable.put(str, entityItem);
+/* 1365 */           int i = Integer.parseInt(str4);
+/* 1366 */           this.totAvailBay += i;
+/* 1367 */           addDebug("verifyBaysAvail: Adding " + entityItem.getKey() + " BAYAVAIL:" + str4 + " to total:" + this.totAvailBay);
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/* 1371 */     vector.clear();
+/* 1372 */     return hashtable;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void updateDerivedDataEntity(EntityItem paramEntityItem) throws MiddlewareRequestException, SQLException, MiddlewareException, MiddlewareShutdownInProgressException, SBRException {
+/* 1391 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("DERIVEDDATA");
+/* 1392 */     if (entityGroup.getEntityItemCount() == 0) {
+/*      */       
+/* 1394 */       EntityItem entityItem = createDerivedDataEntity(paramEntityItem);
+/*      */ 
+/*      */       
+/* 1397 */       setDerivedData(entityItem);
+/*      */     }
+/* 1399 */     else if (entityGroup.getEntityItemCount() == 1) {
+/* 1400 */       EntityItem entityItem = entityGroup.getEntityItem(0);
+/*      */       
+/* 1402 */       setDerivedData(entityItem);
+/*      */     }
+/* 1404 */     else if (entityGroup.getEntityItemCount() > 1) {
+/*      */       
+/* 1406 */       this.args[0] = entityGroup.getLongDescription();
+/* 1407 */       printError("MAX_1_ERROR", this.args);
+/* 1408 */       for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/* 1409 */         print3a(entityGroup.getEntityItem(b), false);
+/*      */       }
+/* 1411 */       this.rptSb.append("</p>" + NEWLINE);
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private EntityItem createDerivedDataEntity(EntityItem paramEntityItem) throws MiddlewareRequestException, SQLException, MiddlewareException, MiddlewareShutdownInProgressException, SBRException {
+/* 1434 */     EntityItem entityItem = null;
+/*      */     
+/*      */     try {
+/* 1437 */       EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, "DERIVEDDATA", "Edit", false);
+/* 1438 */       String str1 = PokUtils.getAttributeValue(paramEntityItem, "COMNAME", "", "", false);
+/* 1439 */       String str2 = getAttributeFlagValue(paramEntityItem, "PDHDOMAIN", ",");
+/*      */       
+/* 1441 */       this.derivedDataAttList.put("DERIVEDDATA:COMNAME", "COMNAME=" + str1);
+/* 1442 */       this.derivedDataAttList.put("DERIVEDDATA:PDHDOMAIN", "PDHDOMAIN=" + str2);
+/*      */       
+/* 1444 */       entityItem = this.pdgUtil.createEntity(this.m_db, this.m_prof, "DERIVEDDATA", this.derivedDataAttList);
+/*      */       
+/* 1446 */       entityItem = new EntityItem(entityGroup, this.m_prof, this.m_db, entityItem.getEntityType(), entityItem.getEntityID());
+/* 1447 */       this.pdgUtil.linkEntities(this.m_db, this.m_prof, paramEntityItem, new EntityItem[] { entityItem }, "WWSEODERIVEDDATA");
+/*      */     } finally {
+/* 1449 */       this.derivedDataAttList.remove("DERIVEDDATA:COMNAME");
+/* 1450 */       this.derivedDataAttList.remove("DERIVEDDATA:PDHDOMAIN");
+/*      */     } 
+/* 1452 */     return entityItem;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setDerivedData(EntityItem paramEntityItem) throws MiddlewareRequestException, MiddlewareException, SQLException, SBRException {
+/* 1465 */     addDebug("-----------------");
+/* 1466 */     getDDAvailSlotsTotalSlots();
+/* 1467 */     addDebug("-----------------");
+/* 1468 */     getDDAvailBaysTotalBays();
+/* 1469 */     addDebug("-----------------");
+/* 1470 */     getDDMemoryRAMStandard();
+/* 1471 */     addDebug("-----------------");
+/* 1472 */     getDDTotalL2CacheStandard();
+/* 1473 */     addDebug("-----------------");
+/* 1474 */     getDDNoOfProcStandard();
+/* 1475 */     addDebug("-----------------");
+/* 1476 */     getDDNoOfInstHardDrvs();
+/* 1477 */     addDebug("-----------------");
+/*      */     
+/* 1479 */     displayDD();
+/*      */     
+/* 1481 */     this.pdgUtil.updateAttribute(this.m_db, this.m_prof, paramEntityItem, this.derivedDataAttList);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void getDDAvailSlotsTotalSlots() {
+/* 1497 */     this.derivedDataAttList.put("DERIVEDDATA:TOTAVAILCARDSLOT", "TOTAVAILCARDSLOT=" + this.totAvailCardSlot);
+/* 1498 */     addDebug("Calculate TOTDERIVEDSLOT");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1505 */     int i = getSlotCardCount("MEMORYCARD", "MEMRYCRDTOTALSLOTS") + getSlotCardCount("PLANAR", "TOTCARDSLOT") + getSlotCardCount("EXPDUNIT", "TOTCARDSLOT");
+/*      */     
+/* 1507 */     this.derivedDataAttList.put("DERIVEDDATA:TOTDERIVEDSLOT", "TOTDERIVEDSLOT=" + i);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private int getSlotCardCount(String paramString1, String paramString2) {
+/* 1516 */     int i = 0;
+/* 1517 */     Vector<FCElement> vector = (Vector)this.fcElemTbl.get(paramString1);
+/* 1518 */     addDebug("getSlotCardCount for " + ((vector == null) ? 0 : vector.size()) + " " + paramString1);
+/* 1519 */     if (vector != null) {
+/* 1520 */       for (byte b = 0; b < vector.size(); b++) {
+/* 1521 */         FCElement fCElement = vector.elementAt(b);
+/* 1522 */         EntityItem entityItem = fCElement.getElement();
+/*      */         
+/* 1524 */         EANMetaAttribute eANMetaAttribute = entityItem.getEntityGroup().getMetaAttribute(paramString2);
+/* 1525 */         if (eANMetaAttribute == null) {
+/* 1526 */           setReturnCode(-1);
+/* 1527 */           this.rptSb.append("<p><span style=\"color:#c00; font-weight:bold;\">Attribute &quot;" + paramString2 + "&quot; NOT found in &quot;" + entityItem
+/*      */               
+/* 1529 */               .getEntityType() + "&quot; META data.</span></p>");
+/* 1530 */           return 0;
+/*      */         } 
+/*      */         
+/* 1533 */         String str = PokUtils.getAttributeValue(entityItem, paramString2, "", "0", false);
+/* 1534 */         int j = Integer.parseInt(str);
+/* 1535 */         int k = fCElement.getQuantity();
+/* 1536 */         addDebug("getSlotCardCount[" + b + "]: " + fCElement + " " + paramString2 + ":" + j + " qty:" + k + " element total:" + (j * k));
+/*      */         
+/* 1538 */         i += j * k;
+/*      */       } 
+/*      */     }
+/* 1541 */     return i;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void getDDAvailBaysTotalBays() {
+/* 1555 */     this.derivedDataAttList.put("DERIVEDDATA:TOTAVAILBAY", "TOTAVAILBAY=" + this.totAvailBay);
+/*      */     
+/* 1557 */     int i = 0;
+/* 1558 */     Vector<FCElement> vector = (Vector)this.fcElemTbl.get("MECHPKG");
+/* 1559 */     addDebug("Calculate TOTDERIVEDBAY for " + ((vector == null) ? 0 : vector.size()) + " MECHPKG");
+/* 1560 */     if (vector != null) {
+/* 1561 */       for (byte b = 0; b < vector.size(); b++) {
+/* 1562 */         FCElement fCElement = vector.elementAt(b);
+/* 1563 */         EntityItem entityItem = fCElement.getElement();
+/* 1564 */         String str = PokUtils.getAttributeValue(entityItem, "TOTBAY", "", "0", false);
+/* 1565 */         int j = Integer.parseInt(str);
+/* 1566 */         int k = fCElement.getQuantity();
+/* 1567 */         i += j * k;
+/* 1568 */         addDebug(fCElement + " TOTBAY:" + j + " qty:" + k + " totderivedbay:" + i);
+/*      */       } 
+/*      */     }
+/* 1571 */     this.derivedDataAttList.put("DERIVEDDATA:TOTDERIVEDBAY", "TOTDERIVEDBAY=" + i);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void getDDMemoryRAMStandard() {
+/* 1646 */     long l1 = 0L;
+/* 1647 */     long l2 = 0L;
+/*      */     
+/* 1649 */     String str1 = "";
+/* 1650 */     String str2 = "0";
+/* 1651 */     String str3 = "";
+/*      */ 
+/*      */     
+/* 1654 */     Vector<FCElement> vector = (Vector)this.fcElemTbl.get("MEMORY");
+/* 1655 */     addDebug("Calculate MEMRYRAMSTD for " + ((vector == null) ? 0 : vector.size()) + " MEMORY");
+/* 1656 */     if (vector != null) {
+/* 1657 */       for (byte b = 0; b < vector.size(); b++) {
+/* 1658 */         FCElement fCElement = vector.elementAt(b);
+/* 1659 */         addDebug("checking memory for " + fCElement);
+/* 1660 */         EntityItem entityItem = fCElement.getElement();
+/* 1661 */         String str4 = PokUtils.getAttributeValue(entityItem, "MEMRYCAP", "", "0", false);
+/* 1662 */         String str5 = PokUtils.getAttributeValue(entityItem, "CAPUNIT", "", "", false);
+/* 1663 */         addDebug(entityItem.getKey() + " MEMRYCAP=" + str4 + " CAPUNIT=" + str5 + " quantity:" + fCElement.getQuantity());
+/*      */         
+/* 1665 */         int i = Integer.parseInt(str4);
+/* 1666 */         if (i > 0) {
+/* 1667 */           if ("".equals(str5) || "--"
+/* 1668 */             .equals(str5) || "M"
+/* 1669 */             .equals(str5)) {
+/*      */ 
+/*      */             
+/* 1672 */             this.args[0] = entityItem.getEntityGroup().getLongDescription();
+/* 1673 */             this.args[1] = PokUtils.getAttributeDescription(entityItem.getEntityGroup(), "MEMRYCAP", "MEMRYCAP");
+/* 1674 */             printError("INVALID_FLAG_VALUE_ERR", this.args);
+/* 1675 */             print3b(fCElement.getFeature(), entityItem);
+/* 1676 */             this.rptSb.append("</p>" + NEWLINE);
+/*      */           } else {
+/* 1678 */             str5 = str5.trim().toUpperCase();
+/* 1679 */             l1 = getUnit(str5, "MEMORY.CAPUNIT", entityItem);
+/* 1680 */             l2 += (fCElement.getQuantity() * i) * l1;
+/*      */           } 
+/*      */         }
+/*      */       } 
+/*      */     }
+/*      */ 
+/*      */     
+/* 1687 */     if (l2 > 0L) {
+/* 1688 */       str2 = convertResultToString(l2);
+/* 1689 */       str1 = getUnitStr(l2);
+/* 1690 */       addDebug("Total memory bytes: " + l2 + " converted:" + str2 + " units " + str1);
+/*      */ 
+/*      */       
+/* 1693 */       str3 = getFlagCodeForDesc("MEMRYRAMSTDUNIT", str1);
+/*      */       
+/* 1695 */       if (null == str3)
+/*      */       {
+/* 1697 */         EntityGroup entityGroup = this.m_elist.getEntityGroup("DERIVEDDATA");
+/*      */         
+/* 1699 */         str3 = "0030";
+/* 1700 */         str2 = "0";
+/* 1701 */         this.args[0] = entityGroup.getLongDescription();
+/* 1702 */         this.args[1] = PokUtils.getAttributeDescription(entityGroup, "MEMRYRAMSTDUNIT", "MEMRYRAMSTDUNIT");
+/* 1703 */         this.args[2] = str1;
+/* 1704 */         printError("INVALID_FLAGS_ERR", this.args, true);
+/*      */       }
+/*      */     
+/*      */     } else {
+/*      */       
+/* 1709 */       str3 = getFlagCodeForDesc("MEMRYRAMSTDUNIT", "MB");
+/* 1710 */       if (null == str3) {
+/*      */         
+/* 1712 */         EntityGroup entityGroup = this.m_elist.getEntityGroup("DERIVEDDATA");
+/* 1713 */         str3 = "0030";
+/* 1714 */         this.args[0] = entityGroup.getLongDescription();
+/* 1715 */         this.args[1] = PokUtils.getAttributeDescription(entityGroup, "MEMRYRAMSTDUNIT", "MEMRYRAMSTDUNIT");
+/* 1716 */         this.args[2] = str1;
+/* 1717 */         printError("INVALID_FLAGS_ERR", this.args, true);
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 1721 */     this.derivedDataAttList.put("DERIVEDDATA:MEMRYRAMSTD", "MEMRYRAMSTD=" + str2);
+/* 1722 */     this.derivedDataAttList.put("DERIVEDDATA:MEMRYRAMSTDUNIT", "MEMRYRAMSTDUNIT=" + str3);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/* 1752 */   private String procL2CacheStr = null;
+/* 1753 */   private String procL2CacheUnitStr = null;
+/*      */ 
+/*      */   
+/*      */   private void getDDTotalL2CacheStandard() {
+/* 1757 */     String str1 = "";
+/* 1758 */     String str2 = "";
+/*      */ 
+/*      */     
+/* 1761 */     Vector<FCElement> vector = (Vector)this.fcElemTbl.get("PROC");
+/* 1762 */     addDebug("Calculate TOTL2CACHESTD for " + ((vector == null) ? 0 : vector.size()) + " PROC");
+/* 1763 */     if (vector != null) {
+/* 1764 */       for (byte b = 0; b < vector.size(); b++) {
+/*      */ 
+/*      */ 
+/*      */         
+/* 1768 */         FCElement fCElement = vector.elementAt(b);
+/* 1769 */         checkProcL2Cache(fCElement);
+/*      */       } 
+/*      */     }
+/*      */     
+/* 1773 */     if (this.procL2CacheStr == null) {
+/* 1774 */       this.procL2CacheStr = "0";
+/*      */     }
+/* 1776 */     if (this.procL2CacheUnitStr == null) {
+/* 1777 */       this.procL2CacheUnitStr = "KB";
+/*      */     }
+/*      */     
+/* 1780 */     str1 = getFlagCodeForDesc("TOTL2CACHESTD", this.procL2CacheStr);
+/* 1781 */     if (null == str1) {
+/* 1782 */       EntityGroup entityGroup = this.m_elist.getEntityGroup("DERIVEDDATA");
+/* 1783 */       str1 = "0010";
+/* 1784 */       this.args[0] = entityGroup.getLongDescription();
+/* 1785 */       this.args[1] = PokUtils.getAttributeDescription(entityGroup, "TOTL2CACHESTD", "TOTL2CACHESTD");
+/* 1786 */       this.args[2] = this.procL2CacheStr;
+/* 1787 */       printError("INVALID_FLAGS_ERR", this.args, true);
+/*      */     } 
+/*      */     
+/* 1790 */     str2 = getFlagCodeForDesc("TOTL2CACHESTDUNIT", this.procL2CacheUnitStr);
+/* 1791 */     if (null == str2) {
+/* 1792 */       EntityGroup entityGroup = this.m_elist.getEntityGroup("DERIVEDDATA");
+/* 1793 */       str2 = "0010";
+/* 1794 */       this.args[0] = entityGroup.getLongDescription();
+/* 1795 */       this.args[1] = PokUtils.getAttributeDescription(entityGroup, "TOTL2CACHESTDUNIT", "TOTL2CACHESTDUNIT");
+/* 1796 */       this.args[2] = this.procL2CacheUnitStr;
+/* 1797 */       printError("INVALID_FLAGS_ERR", this.args, true);
+/*      */     } 
+/*      */     
+/* 1800 */     this.derivedDataAttList.put("DERIVEDDATA:TOTL2CACHESTD", "TOTL2CACHESTD=" + str1);
+/* 1801 */     this.derivedDataAttList.put("DERIVEDDATA:TOTL2CACHESTDUNIT", "TOTL2CACHESTDUNIT=" + str2);
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private void checkProcL2Cache(FCElement paramFCElement) {
+/* 1806 */     addDebug("checkProcL2Cache entered for " + paramFCElement);
+/* 1807 */     EntityItem entityItem1 = paramFCElement.getElement();
+/* 1808 */     EntityItem entityItem2 = paramFCElement.getFeature();
+/* 1809 */     String str1 = PokUtils.getAttributeValue(entityItem1, "PROCL2CACHE", "", "0", false);
+/* 1810 */     String str2 = PokUtils.getAttributeValue(entityItem1, "PROCL2CACHEUNIT", "", "", false);
+/* 1811 */     addDebug(entityItem1.getKey() + " PROCL2CACHE=" + str1 + " PROCL2CACHEUNIT " + str2);
+/*      */ 
+/*      */     
+/* 1814 */     if ("".equals(str2)) {
+/*      */ 
+/*      */       
+/* 1817 */       EntityGroup entityGroup = entityItem1.getEntityGroup();
+/* 1818 */       this.args[0] = entityGroup.getLongDescription();
+/* 1819 */       this.args[1] = PokUtils.getAttributeDescription(entityGroup, "PROCL2CACHEUNIT", "PROCL2CACHEUNIT");
+/* 1820 */       printError("ATTR_EMPTY_ERR", this.args);
+/* 1821 */       print3b(paramFCElement.getFeature(), entityItem1);
+/* 1822 */       this.rptSb.append("</p>" + NEWLINE);
+/* 1823 */       str2 = "KB";
+/*      */     } 
+/* 1825 */     if (this.procL2CacheUnitStr == null) {
+/* 1826 */       this.procL2CacheStr = str1;
+/* 1827 */       this.procL2CacheUnitStr = str2.trim().toUpperCase();
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     }
+/* 1833 */     else if (!str1.equals(this.procL2CacheStr) || 
+/* 1834 */       !str2.equals(this.procL2CacheUnitStr)) {
+/*      */       
+/* 1836 */       this.args[0] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "PROCL2CACHE", "PROCL2CACHE");
+/* 1837 */       this.args[1] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "PROCL2CACHEUNIT", "PROCL2CACHEUNIT");
+/* 1838 */       this.args[2] = this.m_elist.getEntityGroup("PROC").getLongDescription();
+/* 1839 */       printError("INVALID_L2CACHE_ERR", this.args);
+/* 1840 */       print3b(entityItem2, entityItem1);
+/* 1841 */       this.rptSb.append("</p>" + NEWLINE);
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1846 */     Vector<EntityItem> vector = getAllLinkedEntities(entityItem2, "FEATUREPROC", "PROC");
+/* 1847 */     if (vector.size() > 1) {
+/* 1848 */       entityItem1 = vector.get(0);
+/* 1849 */       String str = entityItem2.getKey() + ":PROC";
+/* 1850 */       if (!this.errMsgVct.contains(str)) {
+/* 1851 */         this.errMsgVct.add(str);
+/* 1852 */         this.args[0] = this.m_elist.getEntityGroup("PROC").getLongDescription();
+/* 1853 */         this.args[1] = this.m_elist.getEntityGroup("FEATURE").getLongDescription();
+/* 1854 */         printError("TOO_MANY_CHILDREN_ERR", this.args);
+/* 1855 */         print3b(entityItem2, entityItem1);
+/* 1856 */         addDebug(entityItem2.getKey() + " Too many PROC: " + entityItem1.getKey());
+/*      */         
+/* 1858 */         for (byte b = 1; b < vector.size(); b++) {
+/* 1859 */           entityItem1 = vector.get(b);
+/* 1860 */           print3a(entityItem1, false);
+/* 1861 */           addDebug(entityItem2.getKey() + " Too many PROC: " + entityItem1.getKey());
+/*      */         } 
+/* 1863 */         this.rptSb.append("</p>" + NEWLINE);
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 1867 */     vector.clear();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private long getUnit(String paramString1, String paramString2, EntityItem paramEntityItem) {
+/* 1879 */     long l = 0L;
+/*      */     
+/* 1881 */     if ("KB".equals(paramString1)) {
+/* 1882 */       l = 1000L;
+/*      */     }
+/* 1884 */     else if ("MB".equals(paramString1)) {
+/* 1885 */       l = 1000000L;
+/*      */     }
+/* 1887 */     else if ("GB".equals(paramString1)) {
+/* 1888 */       l = 1000000000L;
+/*      */     } else {
+/*      */       
+/* 1891 */       this.args[0] = paramString2;
+/*      */       
+/* 1893 */       MessageFormat messageFormat = new MessageFormat(this.rsBundle.getString("INVALID_UNIT"));
+/* 1894 */       this.rptSb.append("<p>" + messageFormat.format(this.args) + "<br />" + NEWLINE);
+/* 1895 */       print3a(paramEntityItem);
+/*      */     } 
+/*      */     
+/* 1898 */     return l;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String convertResultToString(long paramLong) {
+/* 1916 */     String str = Long.toString(paramLong);
+/* 1917 */     int i = str.length();
+/*      */     
+/* 1919 */     if (paramLong >= 1000000000L) {
+/* 1920 */       str = str.substring(0, i - 8);
+/* 1921 */       i = str.length();
+/* 1922 */       str = str.substring(0, i - 1) + "." + str.substring(i - 1);
+/*      */     }
+/* 1924 */     else if (paramLong >= 1000000L) {
+/* 1925 */       str = str.substring(0, i - 5);
+/* 1926 */       i = str.length();
+/* 1927 */       str = str.substring(0, i - 1) + "." + str.substring(i - 1);
+/*      */     }
+/* 1929 */     else if (paramLong >= 1000L) {
+/* 1930 */       str = str.substring(0, i - 2);
+/* 1931 */       i = str.length();
+/* 1932 */       str = str.substring(0, i - 1) + "." + str.substring(i - 1);
+/*      */     } 
+/*      */     
+/* 1935 */     i = str.length();
+/* 1936 */     if (str.lastIndexOf("0") == i - 1) {
+/* 1937 */       str = str.substring(0, i - 2);
+/*      */     }
+/*      */     
+/* 1940 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getUnitStr(long paramLong) {
+/* 1950 */     String str = "";
+/*      */     
+/* 1952 */     if (paramLong >= 1000000000L) {
+/* 1953 */       str = "GB";
+/*      */     }
+/* 1955 */     else if (paramLong >= 1000000L) {
+/* 1956 */       str = "MB";
+/*      */     }
+/* 1958 */     else if (paramLong >= 1000L) {
+/* 1959 */       str = "KB";
+/*      */     } 
+/*      */     
+/* 1962 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void getDDNoOfProcStandard() {
+/* 1994 */     int i = 0;
+/* 1995 */     int j = 0;
+/* 1996 */     int k = 0;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 2001 */     Vector<FCElement> vector = (Vector)this.fcElemTbl.get("PROC");
+/* 2002 */     addDebug("Calculate NOOFPROCSTD for " + ((vector == null) ? 0 : vector.size()) + " PROC");
+/* 2003 */     if (vector != null) {
+/* 2004 */       for (byte b = 0; b < vector.size(); b++) {
+/* 2005 */         FCElement fCElement = vector.elementAt(b);
+/* 2006 */         i += fCElement.getQuantity();
+/* 2007 */         addDebug("checking PROC[" + b + "] for " + fCElement + " quantity:" + fCElement.getQuantity() + " noOfProcStandard:" + i);
+/*      */       } 
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */     
+/* 2013 */     vector = (Vector<FCElement>)this.fcElemTbl.get("EXPDUNIT");
+/* 2014 */     addDebug("Calculate qtysum1 for " + ((vector == null) ? 0 : vector.size()) + " EXPDUNIT");
+/* 2015 */     if (vector != null) {
+/* 2016 */       for (byte b = 0; b < vector.size(); b++) {
+/* 2017 */         FCElement fCElement = vector.elementAt(b);
+/* 2018 */         addDebug("checking EXPDUNIT[" + b + "] for " + fCElement);
+/*      */         
+/* 2020 */         EANMetaAttribute eANMetaAttribute = fCElement.getElement().getEntityGroup().getMetaAttribute("NOOFPROCMAX");
+/* 2021 */         if (eANMetaAttribute == null) {
+/* 2022 */           setReturnCode(-1);
+/* 2023 */           this.rptSb.append("<p><span style=\"color:#c00; font-weight:bold;\">Attribute &quot;NOOFPROCMAX&quot; NOT found in &quot;" + fCElement
+/*      */               
+/* 2025 */               .getElement().getEntityType() + "&quot; META data.</span></p>");
+/* 2026 */           j = 0;
+/*      */           break;
+/*      */         } 
+/* 2029 */         String str = PokUtils.getAttributeValue(fCElement.getElement(), "NOOFPROCMAX", "", "0", false);
+/* 2030 */         int m = Integer.parseInt(str);
+/* 2031 */         j += fCElement.getQuantity() * m;
+/* 2032 */         addDebug(fCElement.getElement().getKey() + " NOOFPROCMAX=" + str + " quantity:" + fCElement.getQuantity() + " procQtySum1=" + j);
+/*      */       } 
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */     
+/* 2038 */     vector = (Vector<FCElement>)this.fcElemTbl.get("PLANAR");
+/* 2039 */     addDebug("Calculate qtysum2 for " + ((vector == null) ? 0 : vector.size()) + " PLANAR");
+/* 2040 */     if (vector != null) {
+/* 2041 */       for (byte b = 0; b < vector.size(); b++) {
+/* 2042 */         FCElement fCElement = vector.elementAt(b);
+/* 2043 */         addDebug("checking PLANAR[" + b + "] for " + fCElement);
+/* 2044 */         String str = PokUtils.getAttributeValue(fCElement.getElement(), "NOOFPROCMAX", "", "0", false);
+/* 2045 */         int m = Integer.parseInt(str);
+/* 2046 */         k += fCElement.getQuantity() * m;
+/* 2047 */         addDebug(fCElement.getElement().getKey() + " NOOFPROCMAX=" + str + " quantity:" + fCElement
+/* 2048 */             .getQuantity() + " procQtySum2=" + k);
+/*      */       } 
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 2056 */     if (i > j + k) {
+/* 2057 */       EntityGroup entityGroup = this.m_elist.getEntityGroup("DERIVEDDATA");
+/* 2058 */       this.args[0] = entityGroup.getLongDescription();
+/* 2059 */       this.args[1] = PokUtils.getAttributeDescription(entityGroup, "NOOFPROCSTD", "NOOFPROCSTD");
+/* 2060 */       entityGroup = this.m_elist.getEntityGroup("PLANAR");
+/* 2061 */       this.args[2] = entityGroup.getLongDescription();
+/* 2062 */       this.args[3] = PokUtils.getAttributeDescription(entityGroup, "NOOFPROCMAX", "NOOFPROCMAX");
+/* 2063 */       entityGroup = this.m_elist.getEntityGroup("EXPDUNIT");
+/* 2064 */       this.args[4] = entityGroup.getLongDescription();
+/* 2065 */       this.args[5] = PokUtils.getAttributeDescription(entityGroup, "NOOFPROCMAX", "NOOFPROCMAX");
+/* 2066 */       printError("NOOFPROCSTD_1_ERROR", this.args);
+/* 2067 */       vector = (Vector<FCElement>)this.fcElemTbl.get("PLANAR");
+/* 2068 */       if (vector != null) {
+/* 2069 */         for (byte b = 0; b < vector.size(); b++) {
+/* 2070 */           FCElement fCElement = vector.elementAt(b);
+/* 2071 */           print3b(fCElement.getFeature(), fCElement.getElement());
+/*      */         } 
+/*      */       }
+/* 2074 */       vector = (Vector<FCElement>)this.fcElemTbl.get("EXPDUNIT");
+/* 2075 */       if (vector != null) {
+/* 2076 */         for (byte b = 0; b < vector.size(); b++) {
+/* 2077 */           FCElement fCElement = vector.elementAt(b);
+/* 2078 */           print3b(fCElement.getFeature(), fCElement.getElement());
+/*      */         } 
+/*      */       }
+/* 2081 */       vector = (Vector<FCElement>)this.fcElemTbl.get("PROC");
+/* 2082 */       if (vector != null) {
+/* 2083 */         for (byte b = 0; b < vector.size(); b++) {
+/* 2084 */           FCElement fCElement = vector.elementAt(b);
+/* 2085 */           print3b(fCElement.getFeature(), fCElement.getElement());
+/*      */         } 
+/*      */       }
+/*      */       
+/* 2089 */       this.rptSb.append("</p>" + NEWLINE);
+/*      */     } 
+/*      */ 
+/*      */     
+/* 2093 */     this.derivedDataAttList.put("DERIVEDDATA:NOOFPROCSTD", "NOOFPROCSTD=" + i);
+/*      */     
+/* 2095 */     this.derivedDataAttList.put("DERIVEDDATA:NOOFPROCMAX", "NOOFPROCMAX=" + (j + k));
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void getDDNoOfInstHardDrvs() {
+/* 2113 */     int i = 0;
+/* 2114 */     Vector<FCElement> vector = (Vector)this.fcElemTbl.get("HDD");
+/* 2115 */     addDebug("Calculate NOOFINSTHARDDRVS for " + ((vector == null) ? 0 : vector.size()) + " HDD");
+/* 2116 */     if (vector != null) {
+/* 2117 */       for (byte b = 0; b < vector.size(); b++) {
+/* 2118 */         FCElement fCElement = vector.elementAt(b);
+/* 2119 */         EntityItem entityItem = fCElement.getElement();
+/* 2120 */         String str = PokUtils.getAttributeValue(entityItem, "HDDCAP", "", "0", false);
+/* 2121 */         float f = Float.parseFloat(str);
+/* 2122 */         if (f > 0.0F) {
+/* 2123 */           i += fCElement.getQuantity();
+/*      */         }
+/* 2125 */         addDebug(entityItem.getKey() + ".HDDCAP=" + f + " quantity: " + fCElement.getQuantity() + " noOfInstHardDrvs: " + i);
+/*      */       } 
+/*      */     }
+/*      */ 
+/*      */     
+/* 2130 */     this.derivedDataAttList.put("DERIVEDDATA:NOOFINSTHARDDRVS", "NOOFINSTHARDDRVS=" + i);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getNavigationNameWithoutCountryList(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 2140 */     StringBuffer stringBuffer = new StringBuffer();
+/*      */     
+/* 2142 */     EANList eANList = (EANList)this.metaTbl.get(paramEntityItem.getEntityType());
+/* 2143 */     if (eANList == null) {
+/*      */       
+/* 2145 */       EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, paramEntityItem.getEntityType(), "Navigate");
+/* 2146 */       eANList = entityGroup.getMetaAttribute();
+/* 2147 */       this.metaTbl.put(paramEntityItem.getEntityType(), eANList);
+/*      */     } 
+/* 2149 */     for (byte b = 0; b < eANList.size(); b++) {
+/*      */       
+/* 2151 */       EANMetaAttribute eANMetaAttribute = (EANMetaAttribute)eANList.getAt(b);
+/* 2152 */       if (!"COUNTRYLIST".equals(eANMetaAttribute.getAttributeCode())) {
+/*      */         
+/* 2154 */         if (stringBuffer.length() > 0) {
+/* 2155 */           stringBuffer.append(", ");
+/*      */         }
+/* 2157 */         stringBuffer.append(PokUtils.getAttributeValue(paramEntityItem, eANMetaAttribute.getAttributeCode(), "|", "", false));
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 2161 */     return stringBuffer.toString();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void print3a(EntityItem paramEntityItem, boolean paramBoolean) {
+/* 2175 */     StringBuffer stringBuffer = new StringBuffer("&nbsp;&nbsp;");
+/* 2176 */     String str = paramEntityItem.getEntityType();
+/* 2177 */     stringBuffer.append(paramEntityItem.getEntityGroup().getLongDescription());
+/*      */     
+/*      */     try {
+/* 2180 */       str = getNavigationNameWithoutCountryList(paramEntityItem);
+/* 2181 */     } catch (Exception exception) {
+/* 2182 */       logMessage("print3a: " + paramEntityItem.getKey() + " Got exception " + exception);
+/* 2183 */       exception.printStackTrace();
+/*      */     } 
+/*      */     
+/* 2186 */     stringBuffer.append(" " + str);
+/* 2187 */     if (paramBoolean) {
+/* 2188 */       stringBuffer.append("</p>" + NEWLINE);
+/*      */     } else {
+/*      */       
+/* 2191 */       stringBuffer.append("<br />" + NEWLINE);
+/*      */     } 
+/*      */     
+/* 2194 */     this.rptSb.append(stringBuffer.toString());
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void print3a(EntityItem paramEntityItem) {
+/* 2207 */     print3a(paramEntityItem, true);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void print3b(EntityItem paramEntityItem1, EntityItem paramEntityItem2) {
+/* 2221 */     StringBuffer stringBuffer = new StringBuffer("&nbsp;&nbsp;");
+/* 2222 */     String str = paramEntityItem2.getEntityType();
+/* 2223 */     stringBuffer.append(paramEntityItem1.getEntityGroup().getLongDescription() + " " + 
+/* 2224 */         PokUtils.getAttributeValue(paramEntityItem1, "FEATURECODE", ", ", "", false));
+/*      */     
+/* 2226 */     stringBuffer.append(": " + paramEntityItem2.getEntityGroup().getLongDescription());
+/*      */     
+/*      */     try {
+/* 2229 */       str = getNavigationNameWithoutCountryList(paramEntityItem2);
+/* 2230 */     } catch (Exception exception) {
+/* 2231 */       logMessage("print3b: Got exception " + exception);
+/*      */     } 
+/*      */     
+/* 2234 */     stringBuffer.append(": " + str + "<br />" + NEWLINE);
+/*      */     
+/* 2236 */     this.rptSb.append(stringBuffer.toString());
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getFlagCodeForDesc(String paramString1, String paramString2) {
+/* 2248 */     String str = null;
+/*      */     
+/* 2250 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("DERIVEDDATA");
+/* 2251 */     EANMetaFlagAttribute eANMetaFlagAttribute = (EANMetaFlagAttribute)entityGroup.getMetaAttribute(paramString1);
+/*      */     
+/* 2253 */     if (null == eANMetaFlagAttribute) {
+/*      */       
+/* 2255 */       String str1 = this.rsBundle.getString("BAD_META");
+/* 2256 */       this.args[0] = "DERIVEDDATA." + paramString1;
+/* 2257 */       MessageFormat messageFormat = new MessageFormat(str1);
+/* 2258 */       this.rptSb.append("<p>" + messageFormat.format(this.args) + "</p>" + NEWLINE);
+/*      */     } else {
+/*      */       
+/* 2261 */       for (byte b = 0; b < eANMetaFlagAttribute.getMetaFlagCount(); b++) {
+/* 2262 */         MetaFlag metaFlag = eANMetaFlagAttribute.getMetaFlag(b);
+/* 2263 */         String str1 = metaFlag.toString().trim().toUpperCase();
+/*      */         
+/* 2265 */         if (paramString2.equals(str1)) {
+/* 2266 */           str = metaFlag.getFlagCode();
+/*      */           
+/*      */           break;
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 2273 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Locale getLocale(int paramInt) {
+/* 2283 */     Locale locale = null;
+/* 2284 */     switch (paramInt)
+/*      */     
+/*      */     { case 1:
+/* 2287 */         locale = Locale.US;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/* 2311 */         return locale;case 2: locale = Locale.GERMAN; return locale;case 3: locale = Locale.ITALIAN; return locale;case 4: locale = Locale.JAPANESE; return locale;case 5: locale = Locale.FRENCH; return locale;case 6: locale = new Locale("es", "ES"); return locale;case 7: locale = Locale.UK; return locale; }  locale = Locale.US; return locale;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public static String getAttributeFlagValue(EntityItem paramEntityItem, String paramString1, String paramString2) {
+/* 2324 */     EANMetaAttribute eANMetaAttribute = paramEntityItem.getEntityGroup().getMetaAttribute(paramString1);
+/*      */     
+/* 2326 */     EANAttribute eANAttribute = paramEntityItem.getAttribute(paramString1);
+/* 2327 */     String str = null;
+/* 2328 */     if (eANAttribute != null && 
+/* 2329 */       eANAttribute instanceof COM.ibm.eannounce.objects.EANFlagAttribute) {
+/*      */       
+/* 2331 */       StringBuffer stringBuffer = new StringBuffer();
+/*      */ 
+/*      */       
+/* 2334 */       MetaFlag[] arrayOfMetaFlag = (MetaFlag[])eANAttribute.get();
+/* 2335 */       for (byte b = 0; b < arrayOfMetaFlag.length; b++) {
+/*      */ 
+/*      */         
+/* 2338 */         if (arrayOfMetaFlag[b].isSelected()) {
+/*      */           
+/* 2340 */           if (stringBuffer.length() > 0)
+/* 2341 */             stringBuffer.append(paramString2); 
+/* 2342 */           stringBuffer.append(arrayOfMetaFlag[b].getFlagCode());
+/* 2343 */           if (eANMetaAttribute.getAttributeType().equals("U"))
+/*      */             break; 
+/*      */         } 
+/*      */       } 
+/* 2347 */       str = stringBuffer.toString();
+/*      */     } 
+/*      */ 
+/*      */     
+/* 2351 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void displayDD() {
+/* 2360 */     Set set = this.derivedDataAttList.keySet();
+/* 2361 */     Iterator<String> iterator = set.iterator();
+/*      */     
+/* 2363 */     this.rptSb.append("<!-- Content of derivedDataAttList" + NEWLINE);
+/* 2364 */     while (iterator.hasNext()) {
+/*      */       
+/* 2366 */       String str = iterator.next();
+/* 2367 */       this.rptSb.append(str + ", " + this.derivedDataAttList.get(str) + NEWLINE);
+/*      */     } 
+/* 2369 */     this.rptSb.append("-->" + NEWLINE);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void cleanUp() {
+/* 2378 */     if (this.fcElemTbl != null) {
+/* 2379 */       for (Enumeration<Vector> enumeration = this.fcElemTbl.elements(); enumeration.hasMoreElements(); ) {
+/* 2380 */         Vector<FCElement> vector = enumeration.nextElement();
+/* 2381 */         for (byte b = 0; b < vector.size(); b++) {
+/* 2382 */           FCElement fCElement = vector.elementAt(b);
+/* 2383 */           fCElement.dereference();
+/*      */         } 
+/* 2385 */         vector.clear();
+/*      */       } 
+/* 2387 */       this.fcElemTbl.clear();
+/* 2388 */       this.fcElemTbl = null;
+/*      */     } 
+/*      */     
+/* 2391 */     this.errMsgVct.clear();
+/* 2392 */     this.errMsgVct = null;
+/* 2393 */     this.pdgUtil = null;
+/* 2394 */     this.derivedDataAttList.clear();
+/* 2395 */     this.derivedDataAttList = null;
+/* 2396 */     this.metaTbl.clear();
+/* 2397 */     this.metaTbl = null;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void printError(String paramString, Object[] paramArrayOfObject) {
+/* 2409 */     printError(paramString, paramArrayOfObject, false);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void printError(String paramString, Object[] paramArrayOfObject, boolean paramBoolean) {
+/* 2419 */     String str = this.rsBundle.getString(paramString);
+/* 2420 */     MessageFormat messageFormat = new MessageFormat(str);
+/* 2421 */     this.rptSb.append("<p>" + messageFormat.format(paramArrayOfObject));
+/* 2422 */     if (paramBoolean) {
+/* 2423 */       this.rptSb.append("</p>" + NEWLINE);
+/*      */     } else {
+/* 2425 */       this.rptSb.append("<br />" + NEWLINE);
+/*      */     } 
+/* 2427 */     setReturnCode(-1);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private class FCElement
+/*      */   {
+/*      */     protected String key;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 2461 */     private int confQty = 1;
+/* 2462 */     private int qty = 1;
+/* 2463 */     private EntityItem elementItem = null;
+/* 2464 */     private EntityItem featureItem = null;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     FCElement(EntityItem param1EntityItem1, EntityItem param1EntityItem2, EntityItem param1EntityItem3, EntityItem param1EntityItem4, EntityItem param1EntityItem5) {
+/* 2475 */       this.key = param1EntityItem1.getKey() + ":" + param1EntityItem2.getKey() + ":" + param1EntityItem3.getKey() + ":" + param1EntityItem4.getKey() + ":" + param1EntityItem5.getKey();
+/* 2476 */       this.elementItem = param1EntityItem5;
+/* 2477 */       this.featureItem = param1EntityItem3;
+/*      */       
+/* 2479 */       String str = PokUtils.getAttributeValue(param1EntityItem1, "CONFQTY", "", "1", false);
+/* 2480 */       this.confQty = Integer.parseInt(str);
+/*      */       
+/* 2482 */       EANMetaAttribute eANMetaAttribute = param1EntityItem4.getEntityGroup().getMetaAttribute("QTY");
+/* 2483 */       if (eANMetaAttribute == null) {
+/* 2484 */         WWSEOABRDD.this.addDebug("QTY not found in meta for " + param1EntityItem4.getKey());
+/*      */       } else {
+/*      */         
+/* 2487 */         str = PokUtils.getAttributeValue(param1EntityItem4, "QTY", "", "1", false);
+/* 2488 */         this.qty = Integer.parseInt(str);
+/*      */       } 
+/*      */     }
+/*      */     
+/*      */     void dereference() {
+/* 2493 */       this.key = null;
+/* 2494 */       this.elementItem = null;
+/* 2495 */       this.featureItem = null;
+/*      */     }
+/* 2497 */     EntityItem getElement() { return this.elementItem; } EntityItem getFeature() {
+/* 2498 */       return this.featureItem;
+/*      */     } int getQuantity() {
+/* 2500 */       return this.confQty * this.qty;
+/*      */     }
+/* 2502 */     int getConfQty() { return this.confQty; } int getQty() {
+/* 2503 */       return this.qty;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     int checkSlots(Hashtable param1Hashtable, String param1String, Vector<String> param1Vector) throws SQLException, MiddlewareException {
+/* 2524 */       int i = 0;
+/* 2525 */       String str1 = "SLOTQTY";
+/* 2526 */       Hashtable<Object, Object> hashtable = new Hashtable<>();
+/* 2527 */       WWSEOABRDD.this.addDebug("checkSlots: entered for " + this);
+/* 2528 */       String str2 = WWSEOABRDD.this.getLD_NDN(getElement());
+/* 2529 */       if (getElement().getDownLinkCount() > 0) {
+/*      */         
+/* 2531 */         str2 = str2 + " " + ((EntityItem)getElement().getDownLink(0)).getEntityGroup().getLongDescription() + " checks:";
+/*      */       } else {
+/* 2533 */         str2 = str2 + " has No SLOTs";
+/*      */       } 
+/* 2535 */       WWSEOABRDD.this.addHeading(4, str2);
+/*      */ 
+/*      */       
+/* 2538 */       for (byte b = 0; b < getElement().getDownLinkCount(); b++) {
+/* 2539 */         EntityItem entityItem = (EntityItem)getElement().getDownLink(b);
+/* 2540 */         EANMetaAttribute eANMetaAttribute = entityItem.getEntityGroup().getMetaAttribute(str1);
+/* 2541 */         if (eANMetaAttribute == null) {
+/*      */           
+/* 2543 */           WWSEOABRDD.this.addDebug("checkSlots[" + b + "]: " + getElement().getKey() + ":" + entityItem.getKey() + " 'Quantity' not found in meta");
+/*      */         } else {
+/* 2545 */           String str = PokUtils.getAttributeValue(entityItem, str1, "", "1", false);
+/* 2546 */           WWSEOABRDD.this.addDebug("checkSlots[" + b + "]: " + getElement().getKey() + ":" + entityItem.getKey() + " qty: " + str);
+/* 2547 */           int j = Integer.parseInt(str);
+/* 2548 */           if (j > 1) {
+/* 2549 */             WWSEOABRDD.this.addDebug("checkSlots: Error qty>1 qty: " + str + " on " + entityItem.getKey());
+/* 2550 */             EntityItem entityItem1 = (EntityItem)entityItem.getDownLink(0);
+/*      */ 
+/*      */ 
+/*      */             
+/* 2554 */             WWSEOABRDD.this.args[0] = entityItem1.getEntityGroup().getLongDescription();
+/* 2555 */             WWSEOABRDD.this.printError("INVALID_QTY_ERROR", WWSEOABRDD.this.args);
+/* 2556 */             WWSEOABRDD.this.print3b(getFeature(), getElement());
+/* 2557 */             WWSEOABRDD.this.print3a(entityItem1);
+/*      */           } 
+/*      */         } 
+/* 2560 */         for (byte b1 = 0; b1 < entityItem.getDownLinkCount(); b1++) {
+/* 2561 */           EntityItem entityItem1 = (EntityItem)entityItem.getDownLink(b1);
+/*      */           
+/* 2563 */           String str3 = WWSEOABRDD.this.getAttributeFlagEnabledValue(entityItem1, "SLOTTYPE");
+/* 2564 */           String str4 = WWSEOABRDD.this.getAttributeFlagEnabledValue(entityItem1, "SLOTSZE");
+/*      */           
+/* 2566 */           WWSEOABRDD.this.addDebug("checkSlots: Checking " + getElement().getKey() + ":" + entityItem.getKey() + ":" + entityItem1
+/* 2567 */               .getKey() + " slotType:" + str3 + " slotSze:" + str4);
+/* 2568 */           if (str3 == null) {
+/*      */ 
+/*      */ 
+/*      */             
+/* 2572 */             WWSEOABRDD.this.args[0] = entityItem1.getEntityGroup().getLongDescription();
+/* 2573 */             WWSEOABRDD.this.args[1] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "SLOTTYPE", "SLOTTYPE");
+/* 2574 */             WWSEOABRDD.this.printError("ATTR_EMPTY_ERR", WWSEOABRDD.this.args);
+/* 2575 */             WWSEOABRDD.this.print3a(entityItem1);
+/* 2576 */           } else if (str4 == null) {
+/*      */ 
+/*      */ 
+/*      */             
+/* 2580 */             WWSEOABRDD.this.args[0] = entityItem1.getEntityGroup().getLongDescription();
+/* 2581 */             WWSEOABRDD.this.args[1] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "SLOTSZE", "SLOTSZE");
+/* 2582 */             WWSEOABRDD.this.printError("ATTR_EMPTY_ERR", WWSEOABRDD.this.args);
+/* 2583 */             WWSEOABRDD.this.print3a(entityItem1);
+/*      */           } else {
+/* 2585 */             EntityItem entityItem2 = (EntityItem)hashtable.get(str3 + str4);
+/* 2586 */             if (entityItem2 == null) {
+/* 2587 */               hashtable.put(str3 + str4, entityItem1);
+/* 2588 */               EntityItem entityItem3 = (EntityItem)param1Hashtable.get(param1String + str3 + str4);
+/* 2589 */               if (entityItem3 == null) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */                 
+/* 2594 */                 WWSEOABRDD.this.args[0] = WWSEOABRDD.this.m_elist.getEntityGroup("SLOTSAVAIL").getLongDescription();
+/* 2595 */                 WWSEOABRDD.this.args[1] = PokUtils.getAttributeDescription(WWSEOABRDD.this.m_elist.getEntityGroup("SLOTSAVAIL"), "ELEMENTTYPE", "ELEMENTTYPE");
+/* 2596 */                 WWSEOABRDD.this.args[2] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "SLOTTYPE", "SLOTTYPE");
+/* 2597 */                 WWSEOABRDD.this.args[3] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "SLOTSZE", "SLOTSZE");
+/*      */                 
+/* 2599 */                 WWSEOABRDD.this.printError("NO_SLOTSAVAIL_ERROR", WWSEOABRDD.this.args);
+/* 2600 */                 WWSEOABRDD.this.print3b(getFeature(), getElement());
+/* 2601 */                 WWSEOABRDD.this.print3a(entityItem1);
+/*      */               } else {
+/* 2603 */                 param1Vector.add(param1String + str3 + str4);
+/* 2604 */                 String str = PokUtils.getAttributeValue(entityItem1, "SLOTTOT", "", "0", false);
+/* 2605 */                 int j = Integer.parseInt(str);
+/* 2606 */                 i += j;
+/* 2607 */                 WWSEOABRDD.this.addDebug("checkSlots: adding " + entityItem1.getKey() + ".SLOTTOT=" + str + " totalSlotTot:" + i);
+/*      */               }
+/*      */             
+/*      */             } else {
+/*      */               
+/* 2612 */               WWSEOABRDD.this.args[0] = entityItem1.getEntityGroup().getLongDescription();
+/* 2613 */               WWSEOABRDD.this.args[1] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "SLOTTYPE", "SLOTTYPE");
+/* 2614 */               WWSEOABRDD.this.args[2] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "SLOTSZE", "SLOTSZE");
+/*      */               
+/* 2616 */               WWSEOABRDD.this.printError("DUPLICATE_SLOT_ERROR", WWSEOABRDD.this.args);
+/* 2617 */               WWSEOABRDD.this.print3b(getFeature(), getElement());
+/* 2618 */               WWSEOABRDD.this.print3a(entityItem1, false);
+/* 2619 */               WWSEOABRDD.this.print3a(entityItem2);
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */       
+/* 2625 */       hashtable.clear();
+/* 2626 */       return i;
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*      */     int checkBays(Hashtable param1Hashtable, Vector<String> param1Vector) throws SQLException, MiddlewareException {
+/* 2638 */       int i = 0;
+/* 2639 */       String str1 = "BAYQTY";
+/* 2640 */       Hashtable<Object, Object> hashtable = new Hashtable<>();
+/* 2641 */       WWSEOABRDD.this.addDebug("checkBays: entered for " + this);
+/* 2642 */       String str2 = WWSEOABRDD.this.getLD_NDN(getElement());
+/* 2643 */       if (getElement().getDownLinkCount() > 0) {
+/*      */         
+/* 2645 */         str2 = str2 + " " + ((EntityItem)getElement().getDownLink(0)).getEntityGroup().getLongDescription() + " checks:";
+/*      */       } else {
+/* 2647 */         str2 = str2 + " has No BAYs";
+/*      */       } 
+/* 2649 */       WWSEOABRDD.this.addHeading(4, str2);
+/*      */       
+/* 2651 */       for (byte b = 0; b < getElement().getDownLinkCount(); b++) {
+/* 2652 */         EntityItem entityItem = (EntityItem)getElement().getDownLink(b);
+/* 2653 */         String str = PokUtils.getAttributeValue(entityItem, str1, "", "1", false);
+/* 2654 */         WWSEOABRDD.this.addDebug("checkBays[" + b + "]: " + getElement().getKey() + ":" + entityItem.getKey() + " qty: " + str);
+/* 2655 */         int j = Integer.parseInt(str);
+/* 2656 */         if (j > 1) {
+/* 2657 */           WWSEOABRDD.this.addDebug("checkBays: Error qty>1 qty: " + str + " on " + entityItem.getKey());
+/* 2658 */           EntityItem entityItem1 = (EntityItem)entityItem.getDownLink(0);
+/*      */ 
+/*      */           
+/* 2661 */           WWSEOABRDD.this.args[0] = entityItem1.getEntityGroup().getLongDescription();
+/* 2662 */           WWSEOABRDD.this.printError("INVALID_QTY_ERROR", WWSEOABRDD.this.args);
+/* 2663 */           WWSEOABRDD.this.print3b(getFeature(), getElement());
+/* 2664 */           WWSEOABRDD.this.print3a(entityItem1);
+/*      */         } 
+/*      */         
+/* 2667 */         for (byte b1 = 0; b1 < entityItem.getDownLinkCount(); b1++) {
+/* 2668 */           EntityItem entityItem1 = (EntityItem)entityItem.getDownLink(b1);
+/*      */           
+/* 2670 */           String str3 = WWSEOABRDD.this.getAttributeFlagEnabledValue(entityItem1, "BAYTYPE");
+/* 2671 */           String str4 = WWSEOABRDD.this.getAttributeFlagEnabledValue(entityItem1, "ACCSS");
+/* 2672 */           String str5 = WWSEOABRDD.this.getAttributeFlagEnabledValue(entityItem1, "BAYFF");
+/*      */           
+/* 2674 */           WWSEOABRDD.this.addDebug("checkBays: Checking " + getElement().getKey() + " " + entityItem.getKey() + " " + entityItem1
+/* 2675 */               .getKey() + " bayType:" + str3 + " bayAccss:" + str4 + " bayFF:" + str5);
+/* 2676 */           if (str3 == null || str4 == null || str5 == null) {
+/*      */ 
+/*      */ 
+/*      */             
+/* 2680 */             WWSEOABRDD.this.args[0] = entityItem1.getEntityGroup().getLongDescription();
+/* 2681 */             if (str3 == null) {
+/* 2682 */               WWSEOABRDD.this.args[1] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "BAYTYPE", "BAYTYPE");
+/* 2683 */               WWSEOABRDD.this.printError("ATTR_EMPTY_ERR", WWSEOABRDD.this.args);
+/*      */             } 
+/* 2685 */             if (str4 == null) {
+/* 2686 */               WWSEOABRDD.this.args[1] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "ACCSS", "ACCSS");
+/* 2687 */               WWSEOABRDD.this.printError("ATTR_EMPTY_ERR", WWSEOABRDD.this.args);
+/*      */             } 
+/* 2689 */             if (str5 == null) {
+/* 2690 */               WWSEOABRDD.this.args[1] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "BAYFF", "BAYFF");
+/* 2691 */               WWSEOABRDD.this.printError("ATTR_EMPTY_ERR", WWSEOABRDD.this.args);
+/*      */             } 
+/* 2693 */             WWSEOABRDD.this.print3a(entityItem1);
+/*      */           } else {
+/*      */             
+/* 2696 */             String str6 = str3 + str4 + str5;
+/* 2697 */             EntityItem entityItem2 = (EntityItem)hashtable.get(str6);
+/* 2698 */             if (entityItem2 == null) {
+/* 2699 */               hashtable.put(str6, entityItem1);
+/* 2700 */               EntityItem entityItem3 = (EntityItem)param1Hashtable.get(str6);
+/* 2701 */               if (entityItem3 == null) {
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */                 
+/* 2706 */                 WWSEOABRDD.this.args[0] = WWSEOABRDD.this.m_elist.getEntityGroup("BAYSAVAIL").getLongDescription();
+/* 2707 */                 WWSEOABRDD.this.args[1] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "BAYTYPE", "BAYTYPE");
+/* 2708 */                 WWSEOABRDD.this.args[2] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "ACCSS", "ACCSS");
+/* 2709 */                 WWSEOABRDD.this.args[3] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "BAYFF", "BAYFF");
+/*      */ 
+/*      */                 
+/* 2712 */                 WWSEOABRDD.this.printError("NO_BAYSAVAIL_ERROR", WWSEOABRDD.this.args);
+/* 2713 */                 WWSEOABRDD.this.print3b(getFeature(), getElement());
+/* 2714 */                 WWSEOABRDD.this.print3a(entityItem1);
+/*      */               } else {
+/* 2716 */                 param1Vector.add(str6);
+/* 2717 */                 String str7 = PokUtils.getAttributeValue(entityItem1, "BAYTOT", "", "0", false);
+/* 2718 */                 int k = Integer.parseInt(str7);
+/* 2719 */                 i += k;
+/* 2720 */                 WWSEOABRDD.this.addDebug("checkBays: adding " + entityItem1.getKey() + ".BAYTOT=" + str7 + " totalBayTot:" + i);
+/*      */               
+/*      */               }
+/*      */             
+/*      */             }
+/*      */             else {
+/*      */               
+/* 2727 */               WWSEOABRDD.this.args[0] = entityItem1.getEntityGroup().getLongDescription();
+/* 2728 */               WWSEOABRDD.this.args[1] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "BAYTYPE", "BAYTYPE");
+/* 2729 */               WWSEOABRDD.this.args[2] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "ACCSS", "ACCSS");
+/* 2730 */               WWSEOABRDD.this.args[3] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "BAYFF", "BAYFF");
+/*      */ 
+/*      */               
+/* 2733 */               WWSEOABRDD.this.printError("DUPLICATE_BAYS_ERROR", WWSEOABRDD.this.args);
+/* 2734 */               WWSEOABRDD.this.print3b(getFeature(), getElement());
+/* 2735 */               WWSEOABRDD.this.print3a(entityItem1, false);
+/* 2736 */               WWSEOABRDD.this.print3a(entityItem2);
+/*      */             } 
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/* 2741 */       hashtable.clear();
+/* 2742 */       return i;
+/*      */     }
+/*      */     public String toString() {
+/* 2745 */       return this.key;
+/*      */     }
+/*      */   }
+/*      */ }
 
-//(C) Copyright IBM Corp. 2005, 2011  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
 
-/**
-WWSEOABRDD_class=COM.ibm.eannounce.abr.sg.WWSEOABRDD
-WWSEOABRDD_enabled=true
-WWSEOABRDD_idler_class=A
-WWSEOABRDD_keepfile=true
-WWSEOABRDD_read_only=true
-WWSEOABRDD_report_type=DGTYPE01
-WWSEOABRDD_vename=WWSEODDABRVE
-WWSEOABRDD_CAT1=RPTCLASS.WWSEOABRDD
-WWSEOABRDD_CAT2=WWSEO.PDHDOMAIN
-WWSEOABRDD_CAT3=RPTSTATUS
-WWSEOABRDD_CAT4=SER.SERNAM
-WWSEOABRDD_SUBSCRVE=WWDERDATASNVE
-
- *
- * WWSEOABRDD.java,v
- * Revision 1.25  2010/06/24 19:27:03  wendy
- * updates for BH FS ABR Derived Data Derivation 20100317.doc
- *
- * Revision 1.24  2008/08/22 12:20:45  wendy
- * Added more debug
- *
- * Revision 1.23  2008/08/15 13:09:16  wendy
- * CQ00001974-WI - LCM with GX1 - Move attributes from TECHINFO to DERIVEDDATA
- *
- * Revision 1.22  2008/01/30 19:39:17  wendy
- * Cleanup RSA warnings
- *
- * Revision 1.21  2006/05/24 19:23:19  wendy
- * Correct msg when Procs exist but no Planar exists
- *
- * Revision 1.20  2006/03/23 21:16:56  wendy
- * more error handling
- *
- * Revision 1.19  2006/03/23 16:29:15  wendy
- * Updated error msgs
- *
- * Revision 1.18  2006/03/23 00:27:58  wendy
- * removed bad character from description
- *
- * Revision 1.17  2006/03/23 00:24:57  wendy
- * Corrected error msg
- *
- * Revision 1.16  2006/03/23 00:09:34  wendy
- * More logic and msg changes
- *
- * Revision 1.15  2006/03/21 21:36:07  wendy
- * Split VE, added more debug output, changed logic, more work needed
- *
- * Revision 1.14  2006/03/19 04:44:08  anhtuan
- * Per Wayne MEMORY.CAPUNIT can not be KB. If MEMORY.CAPUNIT = KB then print error message and nav name of MEMORY entity.
- *
- * Revision 1.13  2006/03/16 18:26:38  anhtuan
- * set hddCAP to type float.
- *
- * Revision 1.12  2006/03/14 20:45:38  anhtuan
- * Updated specs 30b FS xSeries Derived Data Derivation ABR 20060314.doc: RAM Sockets Available is no longer derived
- *
- * Revision 1.11  2006/03/09 16:32:31  anhtuan
- * TIR USRO-R-LBAR-6LYQNB.
- *
- * Revision 1.10  2006/02/28 19:13:20  anhtuan
- * Updated specs for CR0130064137. New attributes: BAYAVAILTYPE, ACCSS, BAYFF.
- *
- * Revision 1.9  2006/02/25 21:23:58  anhtuan
- * Remove redundant stuff.
- *
- * Revision 1.8  2006/02/23 03:33:53  anhtuan
- * AHE compliant.
- *
- * Revision 1.7  2006/02/22 04:00:59  anhtuan
- * Use PokUtils.
- *
- * Revision 1.6  2006/02/02 16:45:36  anhtuan
- * Fix.
- *
- * Revision 1.5  2006/01/27 16:29:41  anhtuan
- * Check for null values of COFCAT, COFSUBCAT, COFGRP.
- *
- * Revision 1.4  2006/01/26 15:03:13  anhtuan
- * AHE copyright.
- *
- * Revision 1.3  2006/01/26 04:24:17  anhtuan
- * Fixes.
- *
- * Revision 1.1  2005/09/08 15:56:09  anhtuan
- * Initial version.
- *
- *
- *
- *
- * </pre>
- *
- * @author     Anhtuan Nguyen
- * @created    August 30, 2005
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\WWSEOABRDD.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-package COM.ibm.eannounce.abr.sg;
-
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.opicmpdh.objects.SingleFlag;
-import COM.ibm.opicmpdh.transactions.*;
-
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-
-import com.ibm.transform.oim.eacm.util.*;
-
-import java.util.*;
-import java.rmi.RemoteException;
-import java.sql.SQLException;
-import java.text.*;
-
-/**********************************************************************************
- * WWSEOABRDD class
- * 
- * BH FS ABR Derived Data Derivation 20110517b.doc
- * queue lseo.adsabrstatus based on wwseo.status and lifecycle
- * "The Derived Data ABR will be enhanced to queue LSEO�s that are children of the affected WWSEO to 
- * generate XML to be feed downstream if needed."
- * 
- *BH FS ABR Derived Data Derivation 20100715c.doc
- *RCQ00129135 Planars no longer need slots
- *
- * From spec "SG FS ABR Derived Data Derivation 20080814.doc"
- */
-public class WWSEOABRDD extends PokBaseABR
-{
-	private StringBuffer rptSb = new StringBuffer();
-	private static final char[] FOOL_JTEST = {'\n'};
-	private static final String NEWLINE = new String(FOOL_JTEST);
-	private static final String INDENT1 = "&nbsp;&nbsp;";
-	private static final String DELIMITER = "|";
-	private static final long KB = 1000L;
-	private static final long MB = 1000000L;
-	private static final long GB = 1000000000L;
-	private static final String HARDWARE = "100";
-	private static final String SYSTEM = "126";
-	private static final String DRAWER = "162";
-	private static final String BASE = "150";
-	private static final String PLANAR_SLOTAVAIL = "0020";
-	private static final String MEMORYCARD_SLOTAVAIL = "0010";
-	private static final String EXPDUNIT_SLOTAVAIL = "0030";
-
-	private static final String SYSTEM_UNIT_BASE="273";
-	private static final String CUSTOMER_FEATURE_CHOICE="230";
-	private static final String UNSELECTED_FEAT_ATTACHMNT="240";
-	private static final String SELECTABLE_FEAT_MECH="238";
-
-	private static final String STATUS_FINAL = "0020";
-	private static final String STATUS_R4REVIEW   = "0040";
-	private final static String FOREVER_DATE = "9999-12-31";
-	private static final String ABR_INPROCESS = "0050";
-	private static final String ABR_QUEUED = "0020";
-	private static final String LIFECYCLE_Develop	= "LF02";// LIFECYCLE	=	"Develop" (LF02)
-	private static final String LIFECYCLE_Plan = "LF01";// LIFECYCLE	=	LF01	Plan
-
-	private ResourceBundle rsBundle = null;
-	private PDGUtility pdgUtil = new PDGUtility();
-	private OPICMList derivedDataAttList = new OPICMList();
-	private Hashtable metaTbl = new Hashtable();
-	private int totAvailBay = 0;
-	private int totAvailCardSlot = 0;
-	private Object[] args = new String[10];
-
-	private Hashtable fcElemTbl = new Hashtable();
-	private Vector errMsgVct = new Vector(1); // prevent duplicate error msgs to user
-	private String strNow=null;
-
-	/**
-	 *  Execute ABR.
-	 *
-	 */
-	public void execute_run()
-	{
-		String HEADER = "<head>"+
-		EACustom.getMetaTags(getDescription()) + NEWLINE +
-		EACustom.getCSS() + NEWLINE +
-		EACustom.getTitle("{0} {1}") + NEWLINE +
-		"</head>" + NEWLINE + "<body id=\"ibm-com\">" +
-		EACustom.getMastheadDiv() + NEWLINE +
-		"<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE+
-		"<p><b>Date: </b>{2}<br /><b>User: </b>{3} ({4})<br /><b>Description: </b>{5}</p>"+NEWLINE+
-		"<!-- {6} -->" + NEWLINE;
-
-		MessageFormat msgf;
-		String navName = "";
-
-		println(EACustom.getDocTypeHtml()); //Output the doctype and html
-
-		try
-		{
-			start_ABRBuild();
-
-			rsBundle = ResourceBundle.getBundle(this.getClass().getName(), getLocale(m_prof.getReadLanguage().getNLSID()));
-
-			EntityItem wwseoEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-			addDebug("WWSEOABRDD entered for " + wwseoEntity.getKey()+" extract "+
-					m_abri.getVEName()+	NEWLINE + PokUtils.outputList(m_elist));
-
-			//Default set to pass
-			setReturnCode(PASS);
-
-//			fixme remove this.. avoid msgs to test userid
-//setCreateDGEntity(false);   
-
-			//NAME is navigate attributes
-			navName = getNavigationName(wwseoEntity);
-
-			rptSb.append("<h2>"+m_elist.getParentEntityGroup().getLongDescription()+" "+navName+ "</h2>" + NEWLINE);
-
-			// m_elist this will have a MODEL if FEATUREs are linked
-			// to the WWSEO, there will be only one because only FEATUREs linked to a particular
-			// MODEL can be linked to a WWSEO
-			addHeading(3," Domain and Model verification:");
-			verifyDomainAndModel(wwseoEntity);  
-			if (getReturnCode()==PASS)//only create/update DD for MODEL with 100 = HW, 126 = System, 150 = Base
-			{
-				//Perform checking
-				performChecking(wwseoEntity);
-
-				strNow = m_db.getDates().getNow().substring(0, 10);
-
-				//Update DERIVEDDATA
-				updateDerivedDataEntity(wwseoEntity);
-
-				if(getReturnCode()==PASS) {
-					//X.	Post Processing
-					postProcess(wwseoEntity);
-
-					String msg = rsBundle.getString("SUCCESS");
-					args[0] = m_elist.getEntityGroup("DERIVEDDATA").getLongDescription();
-					msgf = new MessageFormat(msg);
-					rptSb.append("<p>"+msgf.format(args) + "</p>" + NEWLINE);
-				}
-			}
-		}
-		catch(Throwable exc)
-		{
-			java.io.StringWriter exBuf = new java.io.StringWriter();
-			String Error_EXCEPTION="<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
-			String Error_STACKTRACE="<pre>{0}</pre>";
-			msgf = new MessageFormat(Error_EXCEPTION);
-			setReturnCode(FAIL);
-			exc.printStackTrace(new java.io.PrintWriter(exBuf));
-			// Put exception into document
-			args[0] = exc.getMessage();
-			rptSb.append(msgf.format(args) + NEWLINE);
-			msgf = new MessageFormat(Error_STACKTRACE);
-			args[0] = exBuf.getBuffer().toString();
-			rptSb.append(msgf.format(args) + NEWLINE);
-			logError("Exception: "+exc.getMessage());
-			logError(exBuf.getBuffer().toString());
-		}
-		finally
-		{
-			cleanUp();
-			setDGTitle(navName);
-			setDGRptName(getShortClassName(getClass()));
-			setDGRptClass("WWSEOABRDD");
-			// make sure the lock is released
-			if(!isReadOnly()) {
-				clearSoftLock();
-			}
-		}
-
-		//Print everything up to </html>
-		//Insert Header into beginning of report
-		msgf = new MessageFormat(HEADER);
-		args[0] = getShortClassName(getClass());
-		args[1] = navName + ((getReturnCode() == PASS) ? " Passed" : " Failed");
-		args[2] = getNow();
-		args[3] = m_prof.getOPName();
-		args[4] = m_prof.getRoleDescription();
-		args[5] = getDescription();
-		args[6] = getABRVersion();
-
-		rptSb.insert(0, msgf.format(args) + NEWLINE);
-
-		println(rptSb.toString()); // Output the Report
-		printDGSubmitString();
-		println(EACustom.getTOUDiv());
-		buildReportFooter(); // Print </html>
-	}
-
-	/**
-	 * X.	Post Processing
-	 * 
-	 * If this ABR is successful and makes a change to Derived Product Data (DERIVEDDATA), then there may be a 
-	 * need to queue the XML generation for LSEOs that are children of this WW Single Entity Offering (WWSEO).
-	 * 
-	 * All children LSEO of the WWSEO where the LSEO�s �Unpublish Date � Target� (LSEOUNPUBDATEMTRGT) > NOW() 
-	 * need to be handled based on the STATUS of the WWSEO and LSEO as follows:
-	 * 1.	WW Single Entity Offering (WWSEO) Status (STATUS) is "Ready for Review" (0040) and 
-	 * �Life Cycle� (LIFECYCLE) = "Develop" (LF02)  | "Plan" (LF01)
-	 * �	If the LSEO �Life Cycle� (LIFECYCLE) = "Develop" (LF02) | "Plan" (LF01) and 
-	 * 		�Status� (STATUS) = "Ready for Review" (0040), then set ADS XML Feed ABR (ADSABRSTATUS) = &ADSFEEDRFR.
-	 * 2.	WW Single Entity Offering (WWSEO) Status (STATUS) is Final (0020) 
-	 * �	If the LSEO �Life Cycle� (LIFECYCLE) = "Develop" (LF02) | "Plan" (LF01) and 
-	 * 		�Status� (STATUS) = "Ready for Review" (0040), then set ADS XML Feed ABR (ADSABRSTATUS) = &ADSFEEDRFR.
-	 * �	If the LSEO �Status� (STATUS) = "Final" (0020), then set ADS XML Feed ABR (ADSABRSTATUS) = &ADSFEED.
-	 * 
-	 * The ABR�s property file should provide the values for &ADSFEEDRFR and &ADSFEED.
-	 * 
-	 * @param wwseoItem
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws RemoteException
-	 * @throws MiddlewareShutdownInProgressException
-	 * @throws EANBusinessRuleException
-	 */
-	private void postProcess(EntityItem wwseoItem) throws MiddlewareRequestException, SQLException, MiddlewareException, RemoteException, MiddlewareShutdownInProgressException, EANBusinessRuleException{
-		String status = PokUtils.getAttributeFlagValue(wwseoItem, "STATUS");
-		String lifecycle = PokUtils.getAttributeFlagValue(wwseoItem, "LIFECYCLE");
-		if (lifecycle==null || lifecycle.length()==0){
-			lifecycle = LIFECYCLE_Plan;
-		}
-		addDebug("postProcess: "+wwseoItem.getKey()+" status "+status+" lifecycle "+lifecycle);
-
-		if(STATUS_FINAL.equals(status) || 	//2.	WW Single Entity Offering (WWSEO) Status (STATUS) is Final (0020) 
-				(STATUS_R4REVIEW.equals(status) && //1.	WW Single Entity Offering (WWSEO) Status (STATUS) is "Ready for Review" (0040) and 
-						(LIFECYCLE_Plan.equals(lifecycle) ||   // �Life Cycle� (LIFECYCLE) = "Develop" (LF02)  | "Plan" (LF01)
-								LIFECYCLE_Develop.equals(lifecycle)))){ 
-		}else{
-			addDebug("postProcess: "+wwseoItem.getKey()+" status and/or lifecycle criteria not met");
-			return;
-		}
-
-		boolean queueFinal = STATUS_FINAL.equals(status); // only queue final lseo if wwseo is final
-
-		// pull VE - only goes to LSEO
-		EntityList lseolist = m_db.getEntityList(m_prof,
-				new ExtractActionItem(null, m_db, m_prof, "DQVEWWSEOLSEO"),
-				new EntityItem[] { wwseoItem });
-
-		addDebug("postProcess DQVEWWSEOLSEO: "+PokUtils.outputList(lseolist));
-		Vector vctReturnsEntityKeys = new Vector();
-		String queuedValue = getQueuedValueForItem("ADSABRSTATUS");
-		String rfrqueuedValue = getRFRQueuedValueForItem("ADSABRSTATUS");
-		EntityGroup lseoGrp = lseolist.getEntityGroup("LSEO");
-		for (int g=0; g<lseoGrp.getEntityItemCount(); g++){
-			EntityItem lseo = lseoGrp.getEntityItem(g);
-			status = PokUtils.getAttributeFlagValue(lseo, "STATUS");
-			String wdDate = PokUtils.getAttributeValue(lseo, "LSEOUNPUBDATEMTRGT", "", FOREVER_DATE, false);
-			addDebug("postProcess: "+lseo.getKey()+" status "+status+" wdDate "+wdDate);
-			//	LSEO�s �Unpublish Date � Target� (LSEOUNPUBDATEMTRGT) > NOW() 
-			if(strNow.compareTo(wdDate)<0){
-				//	If the LSEO �Status� (STATUS) = "Final" (0020), 
-				if(STATUS_FINAL.equals(status)){
-					if(queueFinal){ // 2.	WW Single Entity Offering (WWSEO) Status (STATUS) is Final (0020) 
-						// then set ADS XML Feed ABR (ADSABRSTATUS) = &ADSFEED.
-						setFlagValue("ADSABRSTATUS", queuedValue,lseo,vctReturnsEntityKeys);
-					}else{
-						addDebug("postProcess: skipping final "+lseo.getKey()+" wwseo is not final");
-					}
-				}else if (STATUS_R4REVIEW.equals(status)){
-					//If the LSEO �Life Cycle� (LIFECYCLE) = "Develop" (LF02) | "Plan" (LF01) and 
-					//�Status� (STATUS) = "Ready for Review" (0040), 
-					// check lifecycle
-					lifecycle = PokUtils.getAttributeFlagValue(lseo, "LIFECYCLE");
-					addDebug("postProcess: "+lseo.getKey()+" lifecycle "+lifecycle);
-					if (lifecycle==null || lifecycle.length()==0){
-						lifecycle = LIFECYCLE_Plan;
-					}
-					if (LIFECYCLE_Plan.equals(lifecycle) ||  // first time moving to RFR
-							LIFECYCLE_Develop.equals(lifecycle)){ // been RFR before
-						//then set ADS XML Feed ABR (ADSABRSTATUS) = &ADSFEEDRFR.
-						setFlagValue("ADSABRSTATUS", rfrqueuedValue,lseo,vctReturnsEntityKeys);
-					}else{
-						addDebug("postProcess: skipping rfr "+lseo.getKey()+" lifecycle is not plan or develop");
-					}
-				}
-			}else{
-				addDebug("postProcess: skipping withdrawn "+lseo.getKey());
-			}
-		}
-
-		if(vctReturnsEntityKeys.size()>0){
-			updatePDH(vctReturnsEntityKeys);
-		}
-		lseolist.dereference();
-	}
-
-	/***********************************************
-	 * Update the PDH with the values in the vector, do all at once
-	 *
-	 */
-	private void updatePDH(Vector vctReturnsEntityKeys)
-	throws java.sql.SQLException,
-	COM.ibm.opicmpdh.middleware.MiddlewareException,
-	java.rmi.RemoteException,
-	COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException,
-	COM.ibm.eannounce.objects.EANBusinessRuleException
-	{
-		logMessage(getDescription()+" updating PDH");
-		addDebug("updatePDH entered for vctReturnsEntityKeys: "+vctReturnsEntityKeys.size());
-
-		try {
-			m_db.update(m_prof, vctReturnsEntityKeys, false, false);
-		}
-		finally {
-			vctReturnsEntityKeys.clear();
-			m_db.commit();
-			m_db.freeStatement();
-			m_db.isPending("finally after updatePDH");
-		}
-	}
-
-	/**********************************
-	 * stringbuffer used for report output
-	 */
-	private void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
-
-	/**
-	 * @param attrcode
-	 * @return
-	 */
-	private String getQueuedValueForItem(String attrcode){
-		// get queued value from properties for that
-		String abrAttrCode = "LSEOABRSTATUS";
-		String queueKey = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.QUEUEDVALUE;
-		return COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue(abrAttrCode,
-				"_"+attrcode+queueKey,ABR_QUEUED);
-	}
-	/**
-	 * @param attrcode
-	 * @return
-	 */
-	private String getRFRQueuedValueForItem(String attrcode){
-		// get rfrqueued value from properties for that
-		String abrAttrCode = "LSEOABRSTATUS";
-		String queueKey = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.RFRQUEUEDVALUE;
-		return COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getValue(abrAttrCode,
-				"_"+attrcode+queueKey,ABR_QUEUED);
-	}
-	/***********************************************
-	 *  Sets the specified Flag Attribute on the specified Entity
-	 *
-	 * @param strAttributeCode
-	 * @param strAttributeValue
-	 * @param item
-	 * @param vctReturnsEntityKeys
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	private void setFlagValue(String strAttributeCode, String strAttributeValue,
-			EntityItem item, Vector vctReturnsEntityKeys) throws SQLException, MiddlewareException
-	{
-		addDebug("setFlagValue entered "+item.getKey()+" for "+strAttributeCode+" set to: " +
-				strAttributeValue);
-		
-		if (strAttributeValue!=null && strAttributeValue.trim().length()==0) {
-			addDebug("setFlagValue: "+strAttributeCode+" was blank for "+item.getKey()+", it will be ignored");
-			return;
-		}
-
-		//get the current value
-		String curval = PokUtils.getAttributeFlagValue(item,strAttributeCode);
-		if (strAttributeValue.equals(curval)){
-			addDebug("setFlagValue: "+strAttributeCode+" was already set to "+curval+" for "+item.getKey()+", nothing to do");
-			return;
-		}
-
-		// if the specified abr is inprocess, wait
-		checkForInProcess(item,strAttributeCode);
-
-		if (m_cbOn==null){
-			setControlBlock(); // needed for attribute updates
-		}
-
-		ReturnEntityKey rek = new ReturnEntityKey(item.getEntityType(),item.getEntityID(), true);
-		rek.m_vctAttributes = new Vector();
-		vctReturnsEntityKeys.addElement(rek);
-
-		SingleFlag sf = new SingleFlag (m_prof.getEnterprise(), item.getEntityType(), item.getEntityID(),
-				strAttributeCode, strAttributeValue, 1, m_cbOn);
-
-		rek.m_vctAttributes.addElement(sf);
-
-		//ATTR_SET = {0} was set to {1} for {2} {3}
-		MessageFormat msgf = new MessageFormat(rsBundle.getString("ATTR_SET"));
-
-		args[0] = PokUtils.getAttributeDescription(item.getEntityGroup(), strAttributeCode, strAttributeCode);
-		args[1] = strAttributeValue;
-		// get flag description
-		EANMetaFlagAttribute mfa = (EANMetaFlagAttribute) item.getEntityGroup().getMetaAttribute(strAttributeCode);
-		if (mfa!=null){
-			MetaFlag mf = mfa.getMetaFlag(strAttributeValue);
-			if (mf!=null){
-				args[1] = mf.toString();
-			}
-		}else{
-			addDebug("Error: "+strAttributeCode+" not found in META for "+item.getEntityType());
-		}
-
-		args[2] = item.getEntityGroup().getLongDescription();
-		args[3] = getNavigationName(item);
-
-		addOutput(msgf.format(args));
-	}
-
-	/**
-	 * if the specified abr is inprocess, wait
-	 * 
-	 * @param item
-	 * @param strAttributeCode
-	 */
-	private void checkForInProcess(EntityItem item,String strAttributeCode){
-		try{
-			int maxTries = 0;
-			String curval = // doesnt work on 'A' type attr getAttributeFlagEnabledValue(item,strAttributeCode);
-				PokUtils.getAttributeFlagValue(item,strAttributeCode);
-
-			addDebug("checkForInProcess:  entered "+item.getKey()+" "+strAttributeCode+" is "+curval);
-
-			if (ABR_INPROCESS.equals(curval)){
-				DatePackage dpNow = m_db.getDates();
-				// get current updates by setting to endofday
-				m_prof.setValOnEffOn(dpNow.getEndOfDay(),dpNow.getEndOfDay());
-
-				while(ABR_INPROCESS.equals(curval) && maxTries<20){ // allow 10 minutes
-					maxTries++;
-					addDebug("checkForInProcess: "+strAttributeCode+" is "+curval+" sleeping 30 secs");
-					Thread.sleep(30000);
-					// get entity again
-					EntityGroup eg = new EntityGroup(null,m_db, m_prof, item.getEntityType(), "Edit", false);
-					EntityItem curItem = new EntityItem(eg, m_prof, m_db, item.getEntityType(), item.getEntityID());
-					curval = PokUtils.getAttributeFlagValue(curItem,strAttributeCode);
-					addDebug("checkForInProcess: "+strAttributeCode+" is now "+curval+" after sleeping");
-				}
-			}
-		}catch(Exception exc){
-			System.err.println("Exception in checkForInProcess "+exc);
-			exc.printStackTrace();
-		}
-	}
-
-	/**********************************************************************************
-	 * This ABR will only consider WWSEOs where PDHDOMAIN = xSeries (0050) | (0390) �Converged Products� 
-	 * and the parent MODEL is classified:
-	 * 	COFCAT = Hardware (100)
-	 * 	COFSUBCAT = System (126) | Drawer (162)
-	 * 	COFGRP = Base (150)
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 * @throws MiddlewareRequestException 
-	 */
-	private void verifyDomainAndModel(EntityItem rootItem) throws MiddlewareRequestException, SQLException, MiddlewareException
-	{
-		EntityGroup mdlGrp = m_elist.getEntityGroup("MODEL");
-		String modelCOFCAT;
-		String modelCOFSUBCAT;
-		String modelCOFGRP;
-		EntityItem modelItem = null;
-		EntityList list = null;
-		boolean isok = false;		
-
-		// this will have a MODEL if FEATUREs are linked
-		// to the WWSEO, there will be only one because only FEATUREs linked to a particular
-		// MODEL can be linked to a WWSEO
-		if(mdlGrp.getEntityItemCount() == 0) {
-			// pull second VE to do classification check - only goes to MODEL
-			list = m_db.getEntityList(m_prof,
-					new ExtractActionItem(null, m_db, m_prof, "WWSEODDABRVE2"),
-					new EntityItem[] { rootItem });
-			mdlGrp = list.getEntityGroup("MODEL");
-			addDebug("DEBUG WWSEODDABRVE2: "+PokUtils.outputList(list));
-		}
-
-		modelItem = mdlGrp.getEntityItem(0);
-
-		modelCOFCAT = getAttributeFlagEnabledValue(modelItem, "COFCAT");
-		modelCOFSUBCAT = getAttributeFlagEnabledValue(modelItem, "COFSUBCAT");
-		modelCOFGRP = getAttributeFlagEnabledValue(modelItem, "COFGRP");
-
-		//100 = HW, 126 = System, 150 = Base
-		isok= (HARDWARE.equals(modelCOFCAT) && 
-				(SYSTEM.equals(modelCOFSUBCAT) || DRAWER.equals(modelCOFSUBCAT)) && 
-				BASE.equals(modelCOFGRP));
-
-		if (!isok) {
-			args[0] = modelItem.getEntityGroup().getLongDescription();
-			printError("MODEL_CLASSIFICATION_ERROR",args);  // "Error - {0} classification is not HW-(System|Drawer)-Base.
-			print3a(modelItem);
-		}else{
-			checkDomain(rootItem);
-		}
-
-		if (list !=null) {
-			list.dereference();
-		}
-	}
-	/**********************************
-	 * stringbuffer used for report output
-	 */
-	private void addDebug(String msg) { rptSb.append("<!-- "+msg+" -->"+NEWLINE);}	
-	/**********************************
-	 * stringbuffer used for report output
-	 */
-	private void addHeading(int level, String msg) { rptSb.append("<h"+level+">"+msg+"</h"+level+">"+NEWLINE);}
-
-	/*************************************************************************************
-	 * Check the PDHDOMAIN
-	 * xseries and converged prod need DQ checks in the ABRs but the other domains like iseries don't
-	 * because those Brands do not want any checking, they do not use STATUS, they want no process
-	 * 
-	 */
-	private void checkDomain(EntityItem rootEntity)
-	{
-		boolean bdomainInList = false;
-		String domains = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getDomains(m_abri.getABRCode());
-		addDebug("domainNeedsChecks pdhdomains needing checks: "+domains);
-		if (domains.equals("all")){
-			bdomainInList = true;
-		}else{
-			Set testSet = new HashSet();
-			StringTokenizer st1 = new StringTokenizer(domains,",");
-			while (st1.hasMoreTokens()) {
-				testSet.add(st1.nextToken());
-			}
-			bdomainInList = PokUtils.contains(rootEntity, "PDHDOMAIN", testSet);
-			testSet.clear();
-		}
-
-		if (!bdomainInList){
-			addDebug("PDHDOMAIN did not include "+domains+", ["+
-					PokUtils.getAttributeValue(rootEntity, "PDHDOMAIN",", ", "", false)+"]");
-			args[0] = rootEntity.getEntityGroup().getLongDescription();
-			args[1] = PokUtils.getAttributeValue(rootEntity, "PDHDOMAIN",", ", "", false);
-			printError("DOMAIN_ERROR",args);  // DOMAIN_ERROR = Error - &quot;{0}&quot; {1} Domain is not supported.
-		}
-	}
-
-	/**********************************************************************************
-	 *  Get Name based on navigation attributes for specified entity
-	 *
-	 *@return java.lang.String
-	 */
-	protected String getNavigationName(EntityItem theItem) throws java.sql.SQLException, MiddlewareException
-	{
-		StringBuffer navName = new StringBuffer();
-
-		// NAME is navigate attributes
-		// check hashtable to see if we already got this meta
-		EANList metaList = (EANList)metaTbl.get(theItem.getEntityType());
-		if (metaList==null)
-		{
-			EntityGroup eg = new EntityGroup(null, m_db, m_prof, theItem.getEntityType(), "Navigate");
-			metaList = eg.getMetaAttribute();  // iterator does not maintain navigate order
-			metaTbl.put(theItem.getEntityType(), metaList);
-		}
-		for (int ii=0; ii<metaList.size(); ii++)
-		{
-			EANMetaAttribute ma = (EANMetaAttribute)metaList.getAt(ii);
-			navName.append(PokUtils.getAttributeValue(theItem, ma.getAttributeCode(),", ", "", false));
-			if (ii+1<metaList.size()){
-				navName.append(" ");
-			}
-		}
-
-		return navName.toString().trim();
-	}
-
-	/********************************************************************************
-	 * Find entities of the destination type linked to the EntityItems in the source
-	 * vector through the specified link type.  Both uplinks and downlinks are checked
-	 * though only one will contain a match.
-	 * All objects in the source Vector must be EntityItems of the same entity type
-	 *
-	 * @param entityItem EntityItem
-	 * @param linkType   String Association or Relator type linking the entities
-	 * @param destType   String EntityType to match
-	 * @returns Vector of EntityItems
-	 */
-	private static Vector getAllLinkedEntities(EntityItem entityItem, String linkType, String destType)
-	{
-		// find entities thru 'linkType' relators
-		Vector destVct = new Vector(1);
-		getLinkedEntities(entityItem, linkType, destType, destVct);
-		return destVct;
-	}
-	//------------------------------------------------------
-	// get string for messages
-	/**************************************
-	 * Get long description and navigation name for specified entity
-	 * @param item
-	 * @return
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	private String getLD_NDN(EntityItem item) throws SQLException, MiddlewareException    {
-		return item.getEntityGroup().getLongDescription()+" &quot;"+getNavigationName(item)+"&quot;";
-	}
-	/********************************************************************************
-	 * Find entities of the destination type linked to the specified EntityItem through
-	 * the specified link type.  Both uplinks and downlinks are checked though only
-	 * one will contain a match. Report ALL duplicates!
-	 *
-	 * @param entityItem EntityItem
-	 * @param linkType   String Association or Relator type linking the entities
-	 * @param destType   String EntityType to match
-	 * @param destVct    Vector EntityItems found are returned in this vector
-	 */
-	private static void getLinkedEntities(EntityItem entityItem, String linkType, String destType,
-			Vector destVct)
-	{
-		if (entityItem!=null) {
-			// see if this relator is used as an uplink
-			for (int ui=0; ui<entityItem.getUpLinkCount(); ui++)
-			{
-				EANEntity entityLink = entityItem.getUpLink(ui);
-				if (entityLink.getEntityType().equals(linkType))
-				{
-					// check for destination entity as an uplink
-					for (int i=0; i<entityLink.getUpLinkCount(); i++)
-					{
-						EANEntity entity = entityLink.getUpLink(i);
-						if (entity.getEntityType().equals(destType)) {
-							destVct.addElement(entity); }
-					}
-				}
-			}
-
-			// see if this relator is used as a downlink
-			for (int ui=0; ui<entityItem.getDownLinkCount(); ui++)
-			{
-				EANEntity entityLink = entityItem.getDownLink(ui);
-				if (entityLink.getEntityType().equals(linkType))
-				{
-					// check for destination entity as a downlink
-					for (int i=0; i<entityLink.getDownLinkCount(); i++)
-					{
-						EANEntity entity = entityLink.getDownLink(i);
-						if (entity.getEntityType().equals(destType)) {
-							destVct.addElement(entity); }
-					}
-				}
-			}
-		}
-	}
-
-	/***********************************************
-	 * Get ABR description
-	 *
-	 * @return java.lang.String
-	 */
-	public String getDescription()
-	{
-		return "The ABR will derive a subset of the attributes for the WWSEO DERIVEDDATA and the available SLOTs and available BAYs.";
-	}
-
-	/***********************************************
-	 * Get the version
-	 *
-	 * @return java.lang.String
-	 */
-	public String getABRVersion()
-	{
-		return "1.29";
-	}
-
-	/***********************************************
-	 *  Perform checking on the slotsavail, planar, memory card, expansion unit and mechanical pkg
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 *
-	 */
-	private void performChecking(EntityItem wwseoEntity) throws SQLException, MiddlewareException
-	{
-		// check SLOTSAVAIL
-		addHeading(3,m_elist.getEntityGroup("SLOTSAVAIL").getLongDescription()+" verification:");
-		Hashtable slotsAvailTbl = verifySlotsAvail(wwseoEntity);
-		Vector matchedSlotVct = new Vector();
-		// get all elements
-		addDebug("-----------------");
-		getElements();
-
-		// check PLANAR
-		addDebug("-----------------");
-		addHeading(3,m_elist.getEntityGroup("PLANAR").getLongDescription()+" checks:");
-		checkPlanar(slotsAvailTbl,matchedSlotVct);
-
-		// check memory card 
-		addDebug("-----------------");
-		addHeading(3,m_elist.getEntityGroup("MEMORYCARD").getLongDescription()+" checks:");
-		checkMemoryCard(slotsAvailTbl,matchedSlotVct);
-
-		// check expansion unit
-		addDebug("-----------------");
-		addHeading(3,m_elist.getEntityGroup("EXPDUNIT").getLongDescription()+" checks:");
-		checkExpansionUnit(slotsAvailTbl,matchedSlotVct);
-
-		// check mechanical pkg
-		addHeading(3,m_elist.getEntityGroup("MECHPKG").getLongDescription()+" checks:");
-		addDebug("-----------------");
-		checkMechPkg(wwseoEntity);
-
-		// check for values that did not have a match
-		addHeading(3,m_elist.getEntityGroup("SLOTSAVAIL").getLongDescription()+" checks:");
-		Enumeration eNum = slotsAvailTbl.keys();
-		while (eNum.hasMoreElements()){
-			String key = (String)eNum.nextElement();
-			if (matchedSlotVct.contains(key)){
-				continue;
-			}
-			EntityItem slotsAvailItem = (EntityItem)slotsAvailTbl.get(key);
-			addDebug("performChecking: No match found for "+slotsAvailItem.getKey()+" with "+key);
-			//If a SLOTSAVAIL of a given ELEMENTTYPE & SLOTTYPE for which there is no corresponding ELEMENTTYPE & SLOT.SLOTTYPE, then report an error.
-			//Error Text:  A SLOTSAVAIL exists for a non-existent ELEMENTTYPE & SLOTTYPE
-			//Line 3a:  SLOTSAVAIL
-			args[0] = slotsAvailItem.getEntityGroup().getLongDescription();
-			args[1] = PokUtils.getAttributeDescription(slotsAvailItem.getEntityGroup(), "ELEMENTTYPE", "ELEMENTTYPE");
-			args[2] = PokUtils.getAttributeDescription(slotsAvailItem.getEntityGroup(), "SLOTTYPE", "SLOTTYPE");
-			args[3] = PokUtils.getAttributeDescription(slotsAvailItem.getEntityGroup(), "SLOTSZE", "SLOTSZE");
-			//INVALID_SLOTAVAIL_ERROR = Error - A &quot;{0}&quot; exists for a non-existent &quot;{1}&quot; and &quot;{2}&quot; and &quot;{3}&quot;.
-			printError("INVALID_SLOTAVAIL_ERROR",args);
-			print3a(slotsAvailItem);
-		}
-
-		matchedSlotVct.clear();
-		slotsAvailTbl.clear();
-	}
-
-	/**
-	 * Verify SLOTSAVAIL have values for ELEMENTTYPE and SLOTTYPE and that there are no duplicates
-	 * @param wwseoEntity
-	 * @return Hashtable with key=elementtype+slottype flag codes, value is the SLOTSAVAIL item
-	 */
-	private Hashtable verifySlotsAvail(EntityItem wwseoEntity){
-		// get all duplicate links too		
-		Vector slotsAvailVector = getAllLinkedEntities(wwseoEntity, "WWSEOSLOTSAVAIL", "SLOTSAVAIL");
-		addDebug("verifySlotsAvail: Found "+slotsAvailVector.size()+" SLOTSAVAIL for "+wwseoEntity.getKey());
-
-		// look at all slotsavail, must have elementtype and slottype and be unique combinations
-		Hashtable slotsAvailTbl = new Hashtable();
-		EntityGroup slotsAvailGrp = m_elist.getEntityGroup("SLOTSAVAIL"); 
-		for (int i=0; i<slotsAvailVector.size(); i++) {
-			EntityItem slotsAvail = (EntityItem)slotsAvailVector.elementAt(i);
-			String elementType = getAttributeFlagEnabledValue(slotsAvail, "ELEMENTTYPE");
-			String slotType = getAttributeFlagEnabledValue(slotsAvail, "SLOTTYPE");
-			String slotSze = getAttributeFlagEnabledValue(slotsAvail, "SLOTSZE");
-			addDebug("verifySlotsAvail: Checking "+slotsAvail.getKey()+" elemtype: "+elementType+
-					" slotType: "+slotType+" slotSze: "+slotSze);
-			if(elementType==null){ // if not set then this is an error
-				//If a SLOTSAVAIL does not have an ELEMENTTYPE specified, report an error.
-				// Error Text:  SLOTSAVAIL ELEMENTTYPE is empty.
-				// Line 3a: SLOTSAVAIL
-				args[0] = slotsAvailGrp.getLongDescription();
-				args[1] = PokUtils.getAttributeDescription(slotsAvailGrp, "ELEMENTTYPE", "ELEMENTTYPE");
-				printError("ATTR_EMPTY_ERR",args); //Error - {0} {1} is empty.
-				print3a(slotsAvail);
-			}else if(slotType==null){ // if not set then this is an error
-				//If a SLOTSAVAIL does not have an SLOTTYPE specified, report an error.
-				// Error Text:  SLOTSAVAIL SLOTTYPE is empty.
-				// Line 3a: SLOTSAVAIL
-				args[0] = slotsAvailGrp.getLongDescription();
-				args[1] = PokUtils.getAttributeDescription(slotsAvailGrp, "SLOTTYPE", "SLOTTYPE");
-				printError("ATTR_EMPTY_ERR",args); //Error - {0} {1} is empty.
-				print3a(slotsAvail);
-			}else if(slotSze==null){ // if not set then this is an error
-				//If a SLOTSAVAIL does not have an SLOTSZE specified, report an error.
-				// Error Text:  SLOTSAVAIL SLOTSZE is empty.
-				// Line 3a: SLOTSAVAIL
-				args[0] = slotsAvailGrp.getLongDescription();
-				args[1] = PokUtils.getAttributeDescription(slotsAvailGrp, "SLOTSZE", "SLOTSZE");
-				printError("ATTR_EMPTY_ERR",args); //Error - {0} {1} is empty.
-				print3a(slotsAvail);
-			}else {
-				EntityItem item = (EntityItem)slotsAvailTbl.get(elementType+slotType+slotSze);
-				if (item != null) {
-					//If there is more than one SLOTSAVAIL of a given ELEMENTTYPE & SLOTTYPE, then report an error.
-					//Error Text:  More than one SLOTSAVAIL of a given ELEMENTTYPE & SLOTTYPE
-					//Line 3a:  SLOTSAVAIL
-					args[0] = slotsAvailGrp.getLongDescription();
-					args[1] = PokUtils.getAttributeDescription(slotsAvailGrp, "ELEMENTTYPE", "ELEMENTTYPE");
-					args[2] = PokUtils.getAttributeDescription(slotsAvailGrp, "SLOTTYPE", "SLOTTYPE");
-					args[3] = PokUtils.getAttributeDescription(slotsAvailGrp, "SLOTSZE", "SLOTSZE");
-					//DUPLICATE_SLOTAVAIL_ERROR = Error - More than one &quot;{0}&quot; of a given &quot;{1}&quot; and &quot;{2}&quot; and &quot;{3}&quot; found. 
-					printError("DUPLICATE_SLOTAVAIL_ERROR",args); 
-					print3a(slotsAvail, false);	
-					print3a(item);
-				}else{
-					slotsAvailTbl.put(elementType+slotType+slotSze,slotsAvail);
-					//For the WWSEO, set DERIVEDDATA.TOTAVAILCARDSLOT equal to the sum SLOTSAVAIL.SLOTAVAIL
-					String slotAvailStr = PokUtils.getAttributeValue(slotsAvail, "SLOTAVAIL", "", "0", false);
-					int slotAvail = Integer.parseInt(slotAvailStr);					
-					totAvailCardSlot += slotAvail;
-					addDebug("verifySlotsAvail: Adding "+slotsAvail.getKey()+" SLOTAVAIL:"+slotAvailStr+" to total:"+totAvailCardSlot);
-				}
-			}				
-		}	
-		// release memory
-		slotsAvailVector.clear();
-
-		return slotsAvailTbl;
-	}
-
-	/***********************************************
-	 *  Get all elements and the path to them for this WWSEO
-	 *
-	 */
-	private void getElements()
-	{
-		EntityGroup wwseopsGrp = m_elist.getEntityGroup("WWSEOPRODSTRUCT");
-		// get all the features  WWSEOPRODSTRUCT->PRODSTRUCT<-FEATURE
-		for (int i=0; i<wwseopsGrp.getEntityItemCount(); i++){
-			EntityItem wwseoprodstructItem = wwseopsGrp.getEntityItem(i);
-			EntityItem prodstructItem = (EntityItem) wwseoprodstructItem.getDownLink(0);
-
-			for(int pi = 0; pi < prodstructItem.getUpLinkCount(); pi++)	{
-				EntityItem eai = (EntityItem)prodstructItem.getUpLink(pi);
-				if(eai.getEntityType().equals("FEATURE")) {
-					EntityItem featureItem = (EntityItem)eai; 
-					addDebug("getElements: Checking "+wwseoprodstructItem.getKey()+" "+prodstructItem.getKey()+
-							" "+featureItem.getKey());  				
-					for (int f=0; f<featureItem.getDownLinkCount(); f++){
-						EntityItem elemRel = (EntityItem)featureItem.getDownLink(f);
-						if (elemRel.getEntityType().equals("PRODSTRUCT")){
-							continue;
-						}
-						for (int e=0; e<elemRel.getDownLinkCount(); e++){
-							EntityItem elem = (EntityItem)elemRel.getDownLink(e);
-							FCElement fcelem = new FCElement(wwseoprodstructItem,prodstructItem,featureItem,elemRel,elem);
-							addDebug("getElements: Created "+fcelem+" confqty:"+fcelem.getConfQty()+" qty:"+fcelem.getQty());
-							Vector vct = (Vector)fcElemTbl.get(elem.getEntityType());
-							if (vct ==null){
-								vct = new Vector(1);
-								fcElemTbl.put(elem.getEntityType(), vct);
-							}
-							vct.addElement(fcelem);
-						}    					
-					}
-				}
-			}
-		}
-	}
-
-	/***********************************************
-	 * Check PLANAR
-	 * A WWSEO should have exactly one PLANAR and the PLANAR should have one or more SLOTs. 
-	 * A PLANAR may be shared across multiple FEATUREs
-	 * 
-	 * it must have 1 or more SLOTs
-	 * If the WWSEO does not have any PLANAR, then report an error.
-	 * Error Text:  There is no PLANAR.
-	 * Note:  Line 3a & Line 3b are not applicable
-	 * 
-	 * If the WWSEO has more than one PLANAR, then report an error
-	 * Error Text:  More than one PLANAR
-	 * Line 3a:  PLANAR
-	 * 
-	 * If the PLANAR does not have any SLOTs, then assume SLOT.SLOTTOT = 0 AND PLANAR.TOTCARDSLOT = 0. 
-	 * If PLANAR.TOTCARDSLOT <> 0, report an error.
-	 * Error Text: PLANAR does not have any SLOT but PLANAR.TOTCARDSLOT is not 0.
-	 * Line 3a: PLANAR
-	 * deleted this check
-	 * RCQ00129135 Planars no longer need slots
-	 * If the WWSEO has one PLANAR and the PLANAR does not have any SLOTs, then report an error.
-	 * Error Text:  The PLANAR does not have any SLOT
-	 * Line 3a:  PLANAR
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 */
-	private void checkPlanar(Hashtable slotsAvailTbl, Vector matchedSlotVct) throws SQLException, MiddlewareException{
-		EntityGroup planarGrp = m_elist.getEntityGroup("PLANAR");
-		if(planarGrp.getEntityItemCount() == 0) {
-			//If the WWSEO does not have any PLANAR, then report an error.
-			//Error Text:  There is no PLANAR.
-			args[0] = planarGrp.getLongDescription();
-			//ELEM_NOTFOUND_ERROR = Error - There is no &quot;{0}&quot; found.
-			printError("ELEM_NOTFOUND_ERROR",args, true); 
-		}
-		else {//BH FS ABR Derived Data Derivation 20130514.doc
-//			A WWSEO should have one or more PLANARs and each PLANAR should have one or more SLOTs. A PLANAR may be shared across multiple FEATUREs.
-			//For each PLANAR, if the sum of its SLOT.SLOTTOT is greater than PLANAR.TOTCARDSLOT, then report an error.
-//			Error Text:  Too many SLOT for the PLANAR
-//			Line 3a:  PLANAR
-			Vector planarVct = (Vector)fcElemTbl.get("PLANAR");     
-			addDebug("checkPlanar entered for "+planarVct.size()+" PLANAR");
-			for (int i=0; i<planarVct.size(); i++){
-				FCElement fce = (FCElement)planarVct.elementAt(i);
-				EntityItem plannarItem = fce.getElement();
-				Vector slotV = PokUtils.getAllLinkedEntities(plannarItem, "PLANARSLOT", "SLOT");
-				String planarTotCardSlotStr = PokUtils.getAttributeValue(plannarItem, "TOTCARDSLOT" , "", "0", false);
-				if(slotV.size() == 0){					
-					addDebug("checkPlanar "+plannarItem.getKey()+" did not have any SLOTs TOTCARDSLOT="+planarTotCardSlotStr);
-					if(!planarTotCardSlotStr.equals("0")){
-						//INVALID_TOTCARDSLOT_ERR = <b>Error</b> - &quot;{0}&quot; does not have any {1} but {2} is not 0.
-						args[0] = planarGrp.getLongDescription();
-						args[1] = m_elist.getEntityGroup("SLOT").getLongDescription();
-						args[2] = PokUtils.getAttributeDescription(planarGrp, "TOTCARDSLOT", "TOTCARDSLOT");
-						printError("INVALID_TOTCARDSLOT_ERR",args); 
-						print3a(plannarItem); 
-					}else{
-						addHeading(4,getLD_NDN(plannarItem)+" has No SLOTs");
-					}
-				}else{				
-					// Check if the sum of its SLOT.SLOTTOT is greater than PLANAR.TOTCARDSLOT				
-					int planarTotCardSlot = Integer.parseInt(planarTotCardSlotStr);
-					int totalSlotTot = fce.checkSlots(slotsAvailTbl,PLANAR_SLOTAVAIL, matchedSlotVct);
-					addDebug("checkplanar: " + fce.getElement().getKey()
-							+ ".TOTCARDSLOT=" + planarTotCardSlot
-							+ " totalSlotTot:" + totalSlotTot);
-					if (totalSlotTot > planarTotCardSlot) {
-						String errmsgkey = fce.getElement().getKey() + ":SLOT";
-						// same planar linked twice, prevent 2 err msgs
-						if (!errMsgVct.contains(errmsgkey)) {
-							errMsgVct.add(errmsgkey);
-							args[0] = m_elist.getEntityGroup("SLOT").getLongDescription();
-							args[1] = m_elist.getEntityGroup("PLANAR").getLongDescription();
-							printError("TOO_MANY_CHILDREN_ERR", args); //Error - Too many {0} for the {1}.
-							print3a(fce.getElement());
-						}
-					}// end of if(totalSlotTot > planarTotCardSlot)
-				}
-			}
-			
-		}
-		
-		//comment below 
-//		else if(planarGrp.getEntityItemCount() == 1){
-//			EntityGroup planarSlotGrp = m_elist.getEntityGroup("PLANARSLOT");
-//			if (planarSlotGrp.getEntityItemCount()==0){
-//				//RCQ00129135 Planars no longer need slots
-//				//If the WWSEO has one PLANAR and the PLANAR does not have any SLOTs, then report an error.
-//				// Error Text:  The PLANAR does not have any SLOT
-//				// Line 3a:  PLANAR
-//				//	args[0] = planarGrp.getLongDescription();
-//				//	args[1] = m_elist.getEntityGroup("SLOT").getLongDescription();
-//				//	printError("MISSING_CHILD_ERROR",args); //Error - The {0} does not have any {1}.
-//				//	print3a(planarGrp.getEntityItem(0));    
-//				//If the PLANAR does not have any SLOTs, but PLANAR.TOTCARDSLOT <> 0, report an error.
-//				// Error Text:  PLANAR does not have any Slot but PLANAR.TOTCARDSLOT is not 0.
-//				// Line 3a: PLANAR
-//				String planarTotCardSlotStr = PokUtils.getAttributeValue(planarGrp.getEntityItem(0), "TOTCARDSLOT" , "", "0", false);
-//				addDebug("checkPlanar "+planarGrp.getEntityItem(0).getKey()+" did not have any SLOTs TOTCARDSLOT="+planarTotCardSlotStr);
-//				if(!planarTotCardSlotStr.equals("0")){
-//					//INVALID_TOTCARDSLOT_ERR = <b>Error</b> - &quot;{0}&quot; does not have any {1} but {2} is not 0.
-//					args[0] = planarGrp.getLongDescription();
-//					args[1] = m_elist.getEntityGroup("SLOT").getLongDescription();
-//					args[2] = PokUtils.getAttributeDescription(planarGrp, "TOTCARDSLOT", "TOTCARDSLOT");
-//					printError("INVALID_TOTCARDSLOT_ERR",args); 
-//					print3a(planarGrp.getEntityItem(0)); 
-//				}else{
-//					addHeading(4,getLD_NDN(planarGrp.getEntityItem(0))+" has No SLOTs");
-//				}
-//			}else{                       		
-//				Vector planarVct = (Vector)fcElemTbl.get("PLANAR");     
-//				addDebug("checkPlanar entered for "+planarVct.size()+" PLANAR");
-//				for (int i=0; i<planarVct.size(); i++){
-//					FCElement fce = (FCElement)planarVct.elementAt(i);
-//
-//					//Check if the sum of its SLOT.SLOTTOT is greater than PLANAR.TOTCARDSLOT
-//					String planarTotCardSlotStr = PokUtils.getAttributeValue(fce.getElement(), "TOTCARDSLOT" , "", "0", false);
-//					int planarTotCardSlot = Integer.parseInt(planarTotCardSlotStr);
-//					int totalSlotTot = fce.checkSlots(slotsAvailTbl, PLANAR_SLOTAVAIL,matchedSlotVct);
-//					addDebug("checkplanar: "+fce.getElement().getKey()+ ".TOTCARDSLOT="+planarTotCardSlot+" totalSlotTot:"+totalSlotTot);
-//					if(totalSlotTot > planarTotCardSlot)
-//					{
-//						String errmsgkey = fce.getElement().getKey()+":SLOT";
-//						// same planar linked twice, prevent 2 err msgs
-//						if (!errMsgVct.contains(errmsgkey)){
-//							errMsgVct.add(errmsgkey);
-//							args[0] = m_elist.getEntityGroup("SLOT").getLongDescription();
-//							args[1] = m_elist.getEntityGroup("PLANAR").getLongDescription();
-//							printError("TOO_MANY_CHILDREN_ERR",args); //Error - Too many {0} for the {1}.
-//							print3a(fce.getElement());
-//						}
-//					}//end of if(totalSlotTot > planarTotCardSlot) 
-//				}
-//			}
-//		}
-//		else {
-//			//If the WWSEO has more than one PLANAR, then report an error
-//			//Error Text:  More than one PLANAR
-//			//Line 3a:  PLANAR
-//			args[0] = planarGrp.getLongDescription();
-//			printError("MAX_1_ERROR",args); //Error - More than one {0}.
-//			for(int i = 0; i < planarGrp.getEntityItemCount(); i++) {
-//				print3a(planarGrp.getEntityItem(i),false);
-//			}
-//			rptSb.append("</p>" + NEWLINE);
-//		}
-	}
-
-	/***********************************************
-	 * A WWSEO may also have MEMORYCARD which may have zero or more SLOTs. 
-	 * 
-	 * For each MEMORYCARD, if the sum of its SLOT.SLOTTOT is greater than MEMORYCARD.MEMRYCRDTOTALSLOTS, 
-	 * then report an error.
-	 * Error Text:  Too many SLOT for the MEMORYCARD
-	 * Line 3a:  MEMORYCARD
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 */
-	private void checkMemoryCard(Hashtable slotsAvailTbl, Vector matchedSlotVct) throws SQLException, MiddlewareException
-	{
-		Vector mcVct = (Vector)fcElemTbl.get("MEMORYCARD");
-		addDebug("checkMemoryCard entered for "+(mcVct==null?0:mcVct.size())+" MEMORYCARD");
-		if (mcVct != null){
-			for (int i=0; i<mcVct.size(); i++){
-				FCElement fce = (FCElement)mcVct.elementAt(i);
-				EntityItem memItem = fce.getElement();
-				// Check if the sum of its SLOT.SLOTTOT is greater than MEMORYCARD.MEMRYCRDTOTALSLOTS
-				String mcTotCardSlotStr = PokUtils.getAttributeValue(memItem, "MEMRYCRDTOTALSLOTS" , "", "0", false);
-				int mcTotCardSlot = Integer.parseInt(mcTotCardSlotStr);
-				int slotTotal = fce.checkSlots(slotsAvailTbl, MEMORYCARD_SLOTAVAIL, matchedSlotVct);
-				addDebug("checkMemoryCard "+memItem.getKey()+ ".MEMRYCRDTOTALSLOTS="+mcTotCardSlot+" slotTotal:"+slotTotal);
-				if(slotTotal > mcTotCardSlot){
-					args[0] = m_elist.getEntityGroup("SLOT").getLongDescription();
-					args[1] = m_elist.getEntityGroup("MEMORYCARD").getLongDescription();
-					printError("TOO_MANY_CHILDREN_ERR",args); //Error - Too many {0} for the {1}.
-					print3a(memItem);
-				}
-			}
-		}
-	}    
-
-	/***********************************************
-	 * A WWSEO may also have EXPDUNIT which may have zero or more SLOTs.
-	 * 
-	 * For each EXPDUNIT, if the sum of its SLOT.SLOTTOT is greater than EXPDUNIT.EXPNDUNITSOLTSTOT 
-	 * then report an error.
-	 * Error Text:  Too many SLOT for the EXPDUNIT
-	 * Line 3a:  EXPDUNIT
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 */
-	private void checkExpansionUnit(Hashtable slotsAvailTbl, Vector matchedSlotVct) throws SQLException, MiddlewareException
-	{
-		Vector mcVct = (Vector)fcElemTbl.get("EXPDUNIT");
-		addDebug("checkExpansionUnit entered for "+(mcVct==null?0:mcVct.size())+" EXPDUNIT");
-		if (mcVct != null){
-			for (int i=0; i<mcVct.size(); i++){
-				FCElement fce = (FCElement)mcVct.elementAt(i);
-				EntityItem expItem = fce.getElement();
-				// Check if the sum of its SLOT.SLOTTOT is greater than EXPDUNIT.EXPNDUNITSOLTSTOT
-				String mcTotCardSlotStr = PokUtils.getAttributeValue(expItem, "EXPNDUNITSOLTSTOT" , "", "0", false);
-				int mcTotCardSlot = Integer.parseInt(mcTotCardSlotStr);
-
-				int slotTotal = fce.checkSlots(slotsAvailTbl, EXPDUNIT_SLOTAVAIL, matchedSlotVct);
-				addDebug("checkExpansionUnit "+expItem.getKey()+ ".EXPNDUNITSOLTSTOT="+mcTotCardSlot+" slotTotal "+slotTotal);
-				if(slotTotal > mcTotCardSlot){
-					args[0] = m_elist.getEntityGroup("SLOT").getLongDescription();
-					args[1] = m_elist.getEntityGroup("EXPDUNIT").getLongDescription();
-					printError("TOO_MANY_CHILDREN_ERR",args); //Error - Too many {0} for the {1}.
-					print3a(expItem);
-				}
-			}
-		}
-	}  
-	/***********************************************
-	 * Check MECHPKG
-	 * A WWSEO has FEATUREs (found via WWSEOPRODSTRUCT to PRODSTRUCT to FEATURE). 
-	 * Some FEATUREs have MECHPKGs which have BAYs. 
-	 * 
-	 * There must be one or more MECHPKG and it must be linked to
-	 * �	Zero or one Features where HW Feature Category (HWFCCAT) = �System Unit Base� (273)
-	 * �Logical AND/OR�
-	 * �	Zero or more Features where HW Feature Category (HWFCCAT) = �Selectable Feature Mechanical� (238).
-	 * �Logical AND/OR�
-	 * �	Zero or more Features where HW Feature Category (HWFCCAT) = �Unselected Feature Attachment� (240)
-	 * �Logical AND/OR�
-	 * �	Zero or more Features where HW Feature Category (HWFCCAT) = �Customer Feature Choice� (230)
-	 * 
-	 * If no MECHPKG (i.e. zero) are found then report an error.
-	 * Error Text:	No MECHPKG found.
-	 * 
-	 * If more than one MECHPKG where HW Feature Category (HWFCCAT) = �System Unit Base� (273) is found that 
-	 * meet this criteria, then report an error.
-	 * Error Text:  	More than one MECHPKG.
-	 * Line 3b: 		MECHPKG    
-	 *
-	 *If a MECHPKG is linked to a FEATURE where HW Feature Category (HWFCCAT) not in �System Unit Base� (273);
-	 * �Selectable Feature Mechanical� (238); �Unselected Feature Attachment� (240); 
-	 * �Customer Feature Choice� (230), then report an error.
-	 * 	Error Text:	MECHPKG linked to an invalid Feature Category
-	 * 	Line 3b:	MECHPKG
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 */
-	private void checkMechPkg(EntityItem wwseoEntity) throws SQLException, MiddlewareException
-	{
-		EntityGroup baysAvailGrp = m_elist.getEntityGroup("BAYSAVAIL");
-		// check the bays and accumulate totals
-		Hashtable baysAvailTbl = verifyBaysAvail(wwseoEntity);
-		Vector matchedBaysVct = new Vector();
-
-		Vector sysUnitBaseVct = new Vector(1);
-		Vector mechPkgVector = new Vector();
-		Vector mcVct = (Vector)fcElemTbl.get("MECHPKG");
-		addDebug("checkMechPkg: entered for "+(mcVct==null?0:mcVct.size())+" MECHPKG");
-		if (mcVct != null){
-			for (int i=0; i<mcVct.size(); i++){
-				FCElement fce = (FCElement)mcVct.elementAt(i);
-				EntityItem mechpkg = fce.getElement();
-				EntityItem featItem = fce.getFeature();
-				String category = getAttributeFlagEnabledValue(featItem, "HWFCCAT");
-				if (SYSTEM_UNIT_BASE.equals(category) ||
-						CUSTOMER_FEATURE_CHOICE.equals(category) ||
-						UNSELECTED_FEAT_ATTACHMNT.equals(category) ||
-						SELECTABLE_FEAT_MECH.equals(category)) {
-					mechPkgVector.addElement(fce);
-					if(SYSTEM_UNIT_BASE.equals(category)){
-						sysUnitBaseVct.add(fce);
-					}
-				}else{
-					//If a MECHPKG is linked to a FEATURE where HW Feature Category (HWFCCAT) not in �System Unit Base� (273);
-					// �Selectable Feature Mechanical� (238); �Unselected Feature Attachment� (240); 
-					// �Customer Feature Choice� (230), then report an error.
-					// 	Error Text:	MECHPKG linked to an invalid Feature Category
-					// 	Line 3b:	MECHPKG
-					//INVALID_HWFCCAT_ERR = Error - &quot;{0}&quot; linked to an invalid Feature Category
-					addDebug("checkMechPkg: "+featItem.getKey()+" had "+mechpkg.getKey()+" but HWFCCAT was "+
-							PokUtils.getAttributeValue(featItem, "HWFCCAT", "", "", false));
-					args[0] = m_elist.getEntityGroup("MECHPKG").getLongDescription();
-					printError("INVALID_HWFCCAT_ERR",args,true);
-					print3b(featItem,mechpkg);
-					rptSb.append("</p>" + NEWLINE);
-				}
-			}
-		}    	
-
-		if (mechPkgVector.size()==0){
-			//If no MECHPKG (i.e. zero) are found then report an error.
-			//Error Text:	No MECHPKG found.
-			//Line 3b:		MECHPKG
-			args[0] = m_elist.getEntityGroup("MECHPKG").getLongDescription();
-			//ELEM_NOTFOUND_ERROR = Error - There is no &quot;{0}&quot; found.
-			printError("ELEM_NOTFOUND_ERROR",args,true);
-		}
-		if (sysUnitBaseVct.size()>1){
-			// If more than one MECHPKG where HW Feature Category (HWFCCAT) = �System Unit Base� (273) is found that 
-			//meet this criteria, then report an error.
-			//Error Text:  	More than one MECHPKG.
-			//Line 3b: 		MECHPKG  
-			args[0] = m_elist.getEntityGroup("MECHPKG").getLongDescription();
-			printError("MAX_1_ERROR",args); //Error - More than one {0}.
-			for(int i = 0; i < sysUnitBaseVct.size(); i++) {
-				FCElement fce = (FCElement)sysUnitBaseVct.elementAt(i);
-				print3b(fce.getFeature(), fce.getElement());
-			}
-			rptSb.append("</p>" + NEWLINE);
-		}
-
-		/**
-		 * D.	MECHPKG BAY
-		 * For the MECHPKG, if the sum of its BAY.BAYTOT is greater than MECHPKG.TOTBAY, then report an error.
-		 * Error Text:  Too many BAY for the MECHPKG
-		 * Line 3a:  MECHPKG
-		 */
-		for (int i=0; i<mechPkgVector.size(); i++){
-			FCElement fce = (FCElement)mechPkgVector.elementAt(i);
-			Vector bayVct = getAllLinkedEntities(fce.getElement(),"MECHPKGBAY","BAY");
-			if (bayVct.size()>0){    			  
-				String mechPkgTotBayStr = PokUtils.getAttributeValue(fce.getElement(), "TOTBAY", "", "0", false);
-				int mechPkgTotBay = Integer.parseInt(mechPkgTotBayStr);
-				// check for matching baysavail or duplicate bays
-				int totalBayTot = fce.checkBays(baysAvailTbl, matchedBaysVct);
-				addDebug("checkMechPkg: "+fce+" TOTBAY="+mechPkgTotBayStr+" totalBayTot="+totalBayTot);
-				if(totalBayTot > mechPkgTotBay) {
-					args[0] = m_elist.getEntityGroup("BAY").getLongDescription();
-					args[1] = fce.getElement().getEntityGroup().getLongDescription();
-					printError("TOO_MANY_CHILDREN_ERR",args); //Error - Too many {0} for the {1}.
-					print3a(fce.getElement(),false);        			  
-					for(int b = 0; b < bayVct.size(); b++){
-						print3a((EntityItem) bayVct.get(b),false);
-					}
-
-					rptSb.append("</p>" + NEWLINE);
-				}//end of if(totalBayTot > mechPkgTotBay)    			  
-			}
-			bayVct.clear();
-		}
-
-		//Check if a BAYSAVAIL exists for a non-existent BAY.BAYTYPE+BAY.ACCSS+BAY.BAYFF
-		for (Enumeration eNum = baysAvailTbl.keys(); eNum.hasMoreElements();)
-		{
-			String bayInfo = (String) eNum.nextElement();
-			if (matchedBaysVct.contains(bayInfo)){
-				continue;
-			}
-
-			EntityItem baysAvailItem = (EntityItem)baysAvailTbl.get(bayInfo);
-			EntityGroup bgrp = m_elist.getEntityGroup("BAY");
-			args[0] = baysAvailGrp.getLongDescription();
-			args[1] = PokUtils.getAttributeDescription(bgrp, "BAYTYPE", "BAYTYPE");
-			args[2] = PokUtils.getAttributeDescription(bgrp, "ACCSS", "ACCSS");		  
-			args[3] = PokUtils.getAttributeDescription(bgrp, "BAYFF", "BAYFF");
-			//INVALID_BAYSAVAIL_ERROR = Error - A &quot;{0}&quot; exists for a non-existent &quot;{1}&quot; and &quot;{2}&quot; and &quot;{3}&quot;.
-			printError("INVALID_BAYSAVAIL_ERROR",args); 
-			print3a(baysAvailItem);
-			addDebug("No BAY for "+baysAvailItem.getKey()+" "+bayInfo);
-		}
-
-		matchedBaysVct.clear();
-		mechPkgVector.clear();
-		baysAvailTbl.clear();
-		sysUnitBaseVct.clear();
-	}
-
-	/***********************************************
-	 * Check BAYSAVAIL for duplicate types and also accumulate totAvailBay for deriveddata
-	 *
-	 */
-	private Hashtable verifyBaysAvail(EntityItem wwseoEntity){
-		// get all duplicate links too		
-		Vector baysAvailVector = getAllLinkedEntities(wwseoEntity, "WWSEOBAYSAVAIL", "BAYSAVAIL");
-		addDebug("verifyBaysAvail: Found "+baysAvailVector.size()+" BAYSAVAIL for "+wwseoEntity.getKey());
-
-		//Check if more than one BAYSAVAIL of a given BAYAVAILTYPE+ACCSS+BAYFF
-		// BAYAVAILTYPE+ACCSS+BAYFF must be unique
-		Hashtable bayAvailHs = new Hashtable();
-		EntityGroup baysAvailGrp = m_elist.getEntityGroup("BAYSAVAIL"); 
-		for (int i=0; i<baysAvailVector.size(); i++) {
-			EntityItem baysAvailItem = (EntityItem)baysAvailVector.elementAt(i);      
-			String bayAvailType = getAttributeFlagEnabledValue(baysAvailItem, "BAYAVAILTYPE"); // use flag value
-			String bayAccss = getAttributeFlagEnabledValue(baysAvailItem, "ACCSS"); // use flag value
-			String bayFF = getAttributeFlagEnabledValue(baysAvailItem, "BAYFF"); // use flag value
-			String bayInfo;
-			addDebug("verifyBaysAvail: Checking "+baysAvailItem.getKey()+" bayAvailType: "+bayAvailType+" bayAccss: "+bayAccss+" bayFF:"+bayFF);
-			if (bayAvailType == null ||
-					bayAccss == null ||
-					bayFF == null) {
-
-				args[0] = baysAvailGrp.getLongDescription();
-				if (bayAvailType==null){
-					args[1] = PokUtils.getAttributeDescription(baysAvailGrp, "BAYAVAILTYPE", "BAYAVAILTYPE");
-					printError("ATTR_EMPTY_ERR",args); //Error - {0} {1} is empty.
-				}
-				if (bayAccss==null){
-					args[1] = PokUtils.getAttributeDescription(baysAvailGrp, "ACCSS", "ACCSS");
-					printError("ATTR_EMPTY_ERR",args); //Error - {0} {1} is empty.
-				}
-				if (bayFF==null){
-					args[1] = PokUtils.getAttributeDescription(baysAvailGrp, "BAYFF", "BAYFF");
-					printError("ATTR_EMPTY_ERR",args); //Error - {0} {1} is empty.
-				}
-				print3a(baysAvailItem);
-				continue;
-			}
-			bayInfo = bayAvailType +bayAccss + bayFF;
-			EntityItem item = (EntityItem)bayAvailHs.get(bayInfo);
-			if (item != null){
-				//Found duplicate BAYAVAILTYPE+ACCSS+BAYFF skip duplicates in TOTAVAILBAY count
-				args[0] = baysAvailGrp.getLongDescription();
-				args[1] = PokUtils.getAttributeDescription(baysAvailGrp, "BAYAVAILTYPE", "BAYAVAILTYPE");
-				args[2] = PokUtils.getAttributeDescription(baysAvailGrp, "ACCSS", "ACCSS");
-				args[3] = PokUtils.getAttributeDescription(baysAvailGrp, "BAYFF", "BAYFF");
-				//DUPLICATE_BAYSAVAIL_ERROR = Error - More than one &quot;{0}&quot; of a given &quot;{1}&quot; and &quot;{2}&quot; and &quot;{3}&quot; found. 
-				printError("DUPLICATE_BAYSAVAIL_ERROR",args); 
-				print3a(baysAvailItem, false);
-				print3a(item);
-			}
-			else{
-				//For the WWSEO, set DERIVEDDATA.TOTAVAILBAY equal to the sum BAYSAVAIL.BAYAVAIL
-				String bayAvailStr = PokUtils.getAttributeValue(baysAvailItem, "BAYAVAIL", "", "0", false);
-				bayAvailHs.put(bayInfo,baysAvailItem);
-				int bayAvail = Integer.parseInt(bayAvailStr);
-				totAvailBay += bayAvail;
-				addDebug("verifyBaysAvail: Adding "+baysAvailItem.getKey()+" BAYAVAIL:"+bayAvailStr+" to total:"+totAvailBay);
-			}
-		}
-
-		baysAvailVector.clear();
-		return bayAvailHs;
-	}
-
-	/***********************************************
-	 *  A WWSEO has at most one DERIVEDDATA. If there are none, the ABR will create one. 
-	 *  If there is one, the ABR will update it. 
-	 *  
-	 *  If there is more than one DERIVEDDATA, then report an error.
-	 *  Error Text:  More than one DERIVEDDATA
-	 *  Line 3a:  DERIVEDDATA
-	 * @throws SBRException 
-	 * @throws MiddlewareShutdownInProgressException 
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 * @throws MiddlewareRequestException 
-	 */
-	private void updateDerivedDataEntity(EntityItem wwseoEntity) throws MiddlewareRequestException, 
-	SQLException, MiddlewareException, MiddlewareShutdownInProgressException, SBRException
-	{
-		EntityGroup ddGrp = m_elist.getEntityGroup("DERIVEDDATA");
-		if (ddGrp.getEntityItemCount()==0) {
-			//No DERIVEDDATA found so go ahead and create one
-			EntityItem derivedDataItem = createDerivedDataEntity(wwseoEntity);
-
-			//set derived data for DERIVEDDATA
-			setDerivedData(derivedDataItem);    
-		}
-		else if(ddGrp.getEntityItemCount() == 1) {
-			EntityItem derivedDataItem = ddGrp.getEntityItem(0);
-			//set derived data for DERIVEDDATA
-			setDerivedData(derivedDataItem);
-		}
-		else if(ddGrp.getEntityItemCount() > 1) {
-			//Report an error
-			args[0] = ddGrp.getLongDescription();
-			printError("MAX_1_ERROR",args); //Error - More than one {0}.
-			for(int i = 0; i < ddGrp.getEntityItemCount(); i++) {
-				print3a(ddGrp.getEntityItem(i), false);
-			}
-			rptSb.append("</p>" + NEWLINE);
-		}
-	}
-
-	/***********************************************
-	 * Create DERIVEDDATA and link it to WWSEO
-	 * Derived Data (DERIVEDDATA) is a child of WWSEO. There maybe zero or one of these. 
-	 * If there is one, then update it. If one does not exist, create it.
-	 * 
-	 * If the ABR creates a DERIVEDDATA, the following attributes are created:
-	 * 	COMNAME = WWSEO.COMNAME
-	 * 	PDHDOMAIN=WWSEO.PDHDOMAIN
-	 * 
-	 * @throws MiddlewareException 
-	 * @throws SQLException 
-	 * @throws MiddlewareRequestException 
-	 * @throws SBRException 
-	 * @throws MiddlewareShutdownInProgressException 
-	 * @return EntityItem
-	 */
-	private EntityItem createDerivedDataEntity(EntityItem rootEntity) throws MiddlewareRequestException, 
-	SQLException, MiddlewareException, MiddlewareShutdownInProgressException, SBRException
-	{
-		EntityItem derivedDataItem = null;
-		try
-		{
-			EntityGroup egDD = new EntityGroup(null, m_db, m_prof, "DERIVEDDATA", "Edit", false);
-			String comName = PokUtils.getAttributeValue(rootEntity, "COMNAME", "", "", false);
-			String pdhDomain = getAttributeFlagValue(rootEntity, "PDHDOMAIN", ",");
-
-			derivedDataAttList.put("DERIVEDDATA:COMNAME", "COMNAME=" + comName);
-			derivedDataAttList.put("DERIVEDDATA:PDHDOMAIN", "PDHDOMAIN=" + pdhDomain);
-
-			derivedDataItem = pdgUtil.createEntity(m_db, m_prof, "DERIVEDDATA", derivedDataAttList);
-			//m_prof = pdgUtil.setProfValOnEffOn(m_db, m_prof);
-			derivedDataItem = new EntityItem(egDD, m_prof, m_db, derivedDataItem.getEntityType(), derivedDataItem.getEntityID());
-			pdgUtil.linkEntities(m_db, m_prof, rootEntity, new EntityItem[]{derivedDataItem}, "WWSEODERIVEDDATA");
-		}finally{
-			derivedDataAttList.remove("DERIVEDDATA:COMNAME");
-			derivedDataAttList.remove("DERIVEDDATA:PDHDOMAIN");
-		}
-		return derivedDataItem;
-	}
-
-	/***********************************************
-	 * set derived data for DERIVEDDATA entity
-	 * @throws SBRException 
-	 * @throws SQLException 
-	 * @throws MiddlewareException 
-	 * @throws MiddlewareRequestException 
-	 *
-	 */
-	private void setDerivedData(EntityItem derivedDataItem) throws MiddlewareRequestException, MiddlewareException, SQLException, SBRException
-	{
-		addDebug("-----------------");
-		getDDAvailSlotsTotalSlots();
-		addDebug("-----------------");
-		getDDAvailBaysTotalBays();
-		addDebug("-----------------");
-		getDDMemoryRAMStandard();
-		addDebug("-----------------");
-		getDDTotalL2CacheStandard();
-		addDebug("-----------------");
-		getDDNoOfProcStandard(); 
-		addDebug("-----------------");
-		getDDNoOfInstHardDrvs();
-		addDebug("-----------------");
-
-		displayDD();
-
-		pdgUtil.updateAttribute(m_db, m_prof, derivedDataItem, derivedDataAttList);
-	}
-
-	/***
-	 * A.	Available Slots and Total Slots
-	 * 
-	 * For the WWSEO, set DERIVEDDATA.TOTAVAILCARDSLOT equal to the sum SLOTSAVAIL.SLOTAVAIL
-	 * 
-	 * For the WWSEO, set DERIVEDDATA.TOTDERIVEDSLOT equal to the sum of
-	 * �	WWSEOPRODSTRUCT.CONFQTY * FEATUREMEMORYCARD.QTY * MEMORYCARD.MEMRYCRDTOTALSLOTS
-	 * �	WWSEOPRODSTRUCT.CONFQTY * FEATUREPLANAR.QTY * PLANAR.TOTCARDSLOT
-	 * �	WWSEOPRODSTRUCT.CONFQTY * EXPDUNIT.TOTCARDSLOT
-	 */
-	private void getDDAvailSlotsTotalSlots(){
-		//For the WWSEO, set DERIVEDDATA.TOTAVAILCARDSLOT equal to the sum SLOTSAVAIL.SLOTAVAIL
-		// this should be set no matter what
-		derivedDataAttList.put("DERIVEDDATA:TOTAVAILCARDSLOT", "TOTAVAILCARDSLOT=" + totAvailCardSlot);
-		addDebug("Calculate TOTDERIVEDSLOT");
-		//For the WWSEO, set DERIVEDDATA.TOTDERIVEDSLOT equal to the sum of
-		//�	WWSEOPRODSTRUCT.CONFQTY * FEATUREMEMORYCARD.QTY * MEMORYCARD.MEMRYCRDTOTALSLOTS
-		//�	WWSEOPRODSTRUCT.CONFQTY * FEATUREPLANAR.QTY * PLANAR.TOTCARDSLOT
-		//�	WWSEOPRODSTRUCT.CONFQTY * EXPDUNIT.TOTCARDSLOT
-		int totderivedslot = getSlotCardCount("MEMORYCARD",  "MEMRYCRDTOTALSLOTS") +
-		getSlotCardCount("PLANAR",  "TOTCARDSLOT")+
-		getSlotCardCount("EXPDUNIT",  "TOTCARDSLOT");
-
-		derivedDataAttList.put("DERIVEDDATA:TOTDERIVEDSLOT", "TOTDERIVEDSLOT=" + totderivedslot);
-	}
-	/****
-	 * Accumulate slot count for the specified element type
-	 * @param elemType
-	 * @param elemAttr
-	 * @return int
-	 */
-	private int getSlotCardCount(String elemType, String elemAttr){
-		int totderivedslot = 0;
-		Vector vct = (Vector)fcElemTbl.get(elemType);
-		addDebug("getSlotCardCount for "+(vct==null?0:vct.size())+" "+elemType);
-		if (vct != null){
-			for (int i=0; i<vct.size(); i++){
-				FCElement fce = (FCElement)vct.elementAt(i);
-				EntityItem elemItem = fce.getElement();
-				// EXPDUNIT.TOTCARDSLOT was missing from meta 
-				EANMetaAttribute metaAttr = elemItem.getEntityGroup().getMetaAttribute(elemAttr);
-				if (metaAttr==null) {
-					setReturnCode(FAIL);
-					rptSb.append("<p><span style=\"color:#c00; font-weight:bold;\">Attribute &quot;"+
-							elemAttr+"&quot; NOT found in &quot;"+
-							elemItem.getEntityType()+"&quot; META data.</span></p>");
-					return 0; 
-				}
-
-				String totCardSlotStr = PokUtils.getAttributeValue(elemItem, elemAttr , "", "0", false);
-				int totCardSlot = Integer.parseInt(totCardSlotStr);
-				int count = fce.getQuantity();
-				addDebug("getSlotCardCount["+i+"]: "+fce+ " "+elemAttr+":"+totCardSlot+" qty:"+count+
-						" element total:"+(totCardSlot*count));
-				totderivedslot+=(totCardSlot*count);
-			}
-		}   
-		return totderivedslot;
-	}
-	/****
-	 * B.	Available Bays and Total Bays
-	 * 
-	 * For the WWSEO, set DERIVEDDATA.TOTAVAILBAY equal to the sum BAYSAVAIL.BAYAVAIL
-	 * 
-	 * For the WWSEO, set DERIVEDDATA.TOTDERIVEDBAY equal to the sum of  
-	 * WWSEOPRODSTRUCT.CONFQTY * FEATUREMECHPKG.QTY * MECHPKG.TOTBAY for all instances of MECHPKG.
-	 */
-	private void getDDAvailBaysTotalBays(){
-		// DERIVEDDATA.TOTAVAILBAY equal to the sum of BAYSAVAIL.BAYAVAIL, but duplicate types need to
-		// be skipped, this was done when mechpkg was checked
-		// this should be set no matter what
-		derivedDataAttList.put("DERIVEDDATA:TOTAVAILBAY", "TOTAVAILBAY=" + totAvailBay);
-
-		int totderivedbay = 0;
-		Vector vct = (Vector)fcElemTbl.get("MECHPKG");
-		addDebug("Calculate TOTDERIVEDBAY for "+(vct==null?0:vct.size())+" MECHPKG");
-		if (vct != null){
-			for (int i=0; i<vct.size(); i++){
-				FCElement fce = (FCElement)vct.elementAt(i);
-				EntityItem elemItem = fce.getElement();
-				String totBayStr = PokUtils.getAttributeValue(elemItem, "TOTBAY" , "", "0", false);
-				int totBay = Integer.parseInt(totBayStr);
-				int count = fce.getQuantity();
-				totderivedbay+=(totBay*count);
-				addDebug(fce+ " TOTBAY:"+totBay+" qty:"+count+" totderivedbay:"+totderivedbay);
-			}
-		}   
-		derivedDataAttList.put("DERIVEDDATA:TOTDERIVEDBAY", "TOTDERIVEDBAY=" + totderivedbay);	        
-	}
-	/***********************************************
-	 * Get derived data for DERIVEDDATA.MEMRYRAMSTD and DERIVEDDATA.MEMRYRAMSTDUNIT
-	 * MEMRYRAMSTDUNIT	0030	MB
-	 * MEMRYRAMSTDUNIT	0040	GB
-	 * 
-	 * CAPUNIT			C0010	MB
-	 * CAPUNIT			C0030	--  bad migration value
-	 * CAPUNIT			C0040	GB
-	 * CAPUNIT			C0050	kB
-	 * CAPUNIT			D0020	M   bad migration value
-	 * 
-	 * the data has MEMORY.CAPUNIT=kB. According to 30b Data Model Meta Load 20060316.xls file flag values of
-	 * CAPUNIT are kB, MB, and GB.
-	 * Wendy - that attribute will continue to have the allowed value kB; however, you should never see it.
-	 * If you get an allowed value that you do not recognize and if there is no math required,
-	 * then continue with the value as is and try to update derived data. If derived data does not have
-	 * the required allowed value - report an error showing the value needed. Similarly, if you get a value
-	 * like kB and math is required, then report an error.
-	 * 
-	 * C.	Memory Standard
-	 * This calculation must consider the following possibilities
-	 * 1.	WWSEOPRODSTRUCT.CONFQTY
-	 * 2.	Multiple FEATUREs with one or more children of type MEMORY
-	 * 
-	 * e.g. WWSEOPRODSTRUCT.CONFQTY = 2 and a FEATURE with two children of type MEMORY where 
-	 * MEMORY.MEMRYCAP = 2 and MEMORY.CAPUNIT = GB. The derived data would give 8 GB.
-	 * 
-	 * Used for calculation:
-	 * 	MEMORY.MEMRYCAP
-	 * 	MEMORY.CAPUNIT
-	 * 
-	 * Calculation result:
-	 * 	DERIVEDDATA.MEMRYRAMSTD
-	 * 	DERIVEDDATA.MEMRYRAMSTDUNIT
-	 * 
-	 * If MEMORY.CAPUNIT is empty, set to �M� or ��� then report an error.
-	 * Error Text:  MEMORY CAPUNIT is empty or invalid flag value.
-	 * Line 3b: MEMORY
-	 * 
-	 * WWSEOPRODSTRUCT.CONFQTY (Qty in example below) is the Configured Quantity of a FEATURE that when 
-	 * described by MEMORY is considered in the calculations. The Capacity Units (CAPUNIT) must also be 
-	 * used in the calculations.
-	 * 
-	 * If there are no MEMORY, then MEMRYRAMSTD = 0 and MEMRYRAMSTDUNIT = MB.
-	 * The following example is for explanation purposes and may not represent a real offering.
-	 * Qty	Feature	Memory	memrycap	capunit
-	 * 1		123456	512MB	512			MB
-	 * 2		234567	256MB	256			MB
-	 * 
-	 * In this example, the DERIVEDDATA
-	 * 	MEMRYRAMSTD = 1
-	 * 	MEMRYRAMSTDUNIT = GB
-	 * 
-	 * The calculation should use integer arithmetic and must consider the units as:
-	 * �	GB = 1,000 * MB
-	 * 
-	 * The calculation is:
-	 * Qty = (1 * 512) + (2 * 256) = 1,024 MB
-	 * 
-	 * The units are then established as follows:
-	 * This approach ensures that the inaccuracy of floating point does not produce undesirable results. 
-	 * Convert to a character string and use the integer result for the comparison. Use the first criterion 
-	 * that matches.
-	 * If result > 1,000 then remove the right most two characters and place the decimal point to the left 
-	 * of the right most character. The units = GB.
-	 * If the right most character is �0� (zero), remove the right most 2 characters (i.e. there is no fraction, 
-	 * therefore remove the decimal point and the fraction).
-	 * 
-	 * Note:  KB is not an allowed value in 3.0b (the only allowed values are MB and GB).
-	 * 
-	 */
-	private void getDDMemoryRAMStandard()
-	{
-		long memoryCapUnit = 0L;
-		long memoryRAMStandard = 0L;
-
-		String tempStr = "";
-		String memoryRAMStandardStr = "0";
-		String memoryRAMStandardUnitStr = "";
-
-		// get all the memory elements
-		Vector vct = (Vector)fcElemTbl.get("MEMORY");
-		addDebug("Calculate MEMRYRAMSTD for "+(vct==null?0:vct.size())+" MEMORY");
-		if (vct != null){
-			for (int i=0; i<vct.size(); i++){
-				FCElement fce = (FCElement)vct.elementAt(i);
-				addDebug("checking memory for "+fce);
-				EntityItem memoryItem = fce.getElement();
-				String memoryCapStr = PokUtils.getAttributeValue(memoryItem, "MEMRYCAP", "", "0", false);
-				String memoryCapUnitStr = PokUtils.getAttributeValue(memoryItem, "CAPUNIT", "", "", false);
-				addDebug(memoryItem.getKey()+" MEMRYCAP="+memoryCapStr+" CAPUNIT="+memoryCapUnitStr+" quantity:"+fce.getQuantity());
-
-				int memoryCap = Integer.parseInt(memoryCapStr);
-				if (memoryCap>0){
-					if("".equals(memoryCapUnitStr) ||  // wasn't set
-							"--".equals(memoryCapUnitStr) ||  // bad migrated flag value
-							"M".equals(memoryCapUnitStr))  // bad migrated flag value
-					{
-						//Report an error
-						args[0] = memoryItem.getEntityGroup().getLongDescription();
-						args[1] = PokUtils.getAttributeDescription(memoryItem.getEntityGroup(), "MEMRYCAP", "MEMRYCAP");
-						printError("INVALID_FLAG_VALUE_ERR",args); //Error - {0} {1} is empty or invalid flag value.
-						print3b(fce.getFeature(), memoryItem);
-						rptSb.append("</p>" + NEWLINE);
-					}else {
-						memoryCapUnitStr = memoryCapUnitStr.trim().toUpperCase();
-						memoryCapUnit = getUnit(memoryCapUnitStr, "MEMORY.CAPUNIT", memoryItem);
-						memoryRAMStandard += (fce.getQuantity() * memoryCap * memoryCapUnit);
-					}
-				}
-			} // end memory element vct loop
-		}   
-
-		//set the memory
-		if(memoryRAMStandard>0){
-			memoryRAMStandardStr = convertResultToString(memoryRAMStandard);
-			tempStr = getUnitStr(memoryRAMStandard);
-			addDebug("Total memory bytes: "+memoryRAMStandard+" converted:"+memoryRAMStandardStr+
-					" units "+tempStr);
-
-			memoryRAMStandardUnitStr = getFlagCodeForDesc("MEMRYRAMSTDUNIT", tempStr);
-
-			if(null == memoryRAMStandardUnitStr) //MEMRYRAMSTDUNIT	0030	MB
-			{
-				EntityGroup egrp = m_elist.getEntityGroup("DERIVEDDATA");
-				// bad meta or calcs ended in KB
-				memoryRAMStandardUnitStr="0030";  // force it to MB
-				memoryRAMStandardStr = "0";  // force to zero
-				args[0] = egrp.getLongDescription();
-				args[1] = PokUtils.getAttributeDescription(egrp, "MEMRYRAMSTDUNIT", "MEMRYRAMSTDUNIT");
-				args[2] = tempStr;
-				printError("INVALID_FLAGS_ERR",args,true); //Error - {0} {1} flag values do not have {2}");
-			}
-		}//end of if(memoryRAMStandard > 0)
-		else{
-			//Set DERIVEDDATA.MEMRYRAMSTD = 0 AND DERIVEDDATA.MEMRYRAMSTDUNIT = MB
-			memoryRAMStandardUnitStr = getFlagCodeForDesc("MEMRYRAMSTDUNIT", "MB");
-			if(null == memoryRAMStandardUnitStr){
-				// bad meta
-				EntityGroup egrp = m_elist.getEntityGroup("DERIVEDDATA");
-				memoryRAMStandardUnitStr="0030";  // force it to MB
-				args[0] = egrp.getLongDescription();
-				args[1] = PokUtils.getAttributeDescription(egrp, "MEMRYRAMSTDUNIT", "MEMRYRAMSTDUNIT");
-				args[2] = tempStr;
-				printError("INVALID_FLAGS_ERR",args,true); //Error - {0} {1} flag values do not have {2}");
-			}
-		}
-
-		derivedDataAttList.put("DERIVEDDATA:MEMRYRAMSTD", "MEMRYRAMSTD=" + memoryRAMStandardStr);
-		derivedDataAttList.put("DERIVEDDATA:MEMRYRAMSTDUNIT", "MEMRYRAMSTDUNIT=" + memoryRAMStandardUnitStr);
-	}
-
-	/***********************************************
-	 * Get derived data for DERIVEDDATA.TOTL2CACHESTD and DERIVEDDATA.TOTL2CACHESTDUNIT
-	 * D.	Total L2 Cache Standard
-	 * 
-	 * Used for calculation:
-	 * 	PROC.PROCL2CACHE
-	 * 	PROC.PROCL2CACHEUNIT
-	 * 
-	 * Calculation result:
-	 * 	Find the first FEATURE with a PROC.
-	 * 	DERIVEDDATA.TOTL2CACHESTD = PROC.PROCL2CACHE
-	 * 	DERIVEDDATA.TOTL2CACHESTDUNIT = PROC.PROCL2CACHEUNIT
-	 * 
-	 * Verification:
-	 * 	Then verify that DERIVEDDATA.TOTL2CACHESTD & TOTL2CACHESTDUNIT has to match
-	 * 	every PROC.PROCL2CACHE & PROCL2CACHEUNIT.
-	 * 
-	 * If there is a mismatch, then report an error.
-	 * Error Text:  PROCL2CACHE & PROCL2CACHEUNIT are not consistent for all PROCs.
-	 * Line 3b: PROC
-	 * 
-	 * If PROC.PROCL2CACHEUNIT is not set, then report an error.
-	 * Error Text:  PROC PROCL2CACHEUNIT is empty
-	 * Line 3b:  PROC
-	 * 
-	 * If there are no PROC, then the result is �0� (zero) �KB�.
-	 */
-	private String procL2CacheStr = null;
-	private String procL2CacheUnitStr = null;
-
-	private void getDDTotalL2CacheStandard()
-	{
-		String totL2CacheStandardStr = "";
-		String totL2CacheStandardUnitStr = "";
-
-		// get all the processor elements
-		Vector vct = (Vector)fcElemTbl.get("PROC");
-		addDebug("Calculate TOTL2CACHESTD for "+(vct==null?0:vct.size())+" PROC");
-		if (vct != null){
-			for (int i=0; i<vct.size(); i++){
-				// find first feature with a proc
-				// Then verify that DERIVEDDATA.TOTL2CACHESTD & TOTL2CACHESTDUNIT has to match
-				// 	every PROC.PROCL2CACHE & PROCL2CACHEUNIT.
-				FCElement fce = (FCElement)vct.elementAt(i);
-				checkProcL2Cache(fce);
-			}
-		}   
-
-		if (procL2CacheStr == null){
-			procL2CacheStr = "0";
-		}
-		if (procL2CacheUnitStr == null){
-			procL2CacheUnitStr = "KB";
-		}
-
-		totL2CacheStandardStr = getFlagCodeForDesc("TOTL2CACHESTD", procL2CacheStr);
-		if(null == totL2CacheStandardStr){
-			EntityGroup egrp = m_elist.getEntityGroup("DERIVEDDATA");
-			totL2CacheStandardStr ="0010"; //TOTL2CACHESTD	0010	0 
-			args[0] = egrp.getLongDescription();
-			args[1] = PokUtils.getAttributeDescription(egrp, "TOTL2CACHESTD", "TOTL2CACHESTD");
-			args[2] = procL2CacheStr;
-			printError("INVALID_FLAGS_ERR",args,true); //Error - {0} {1} flag values do not have {2}");
-		}
-
-		totL2CacheStandardUnitStr = getFlagCodeForDesc("TOTL2CACHESTDUNIT", procL2CacheUnitStr);
-		if(null == totL2CacheStandardUnitStr){
-			EntityGroup egrp = m_elist.getEntityGroup("DERIVEDDATA");
-			totL2CacheStandardUnitStr= "0010";//TOTL2CACHESTDUNIT	0010	KB
-			args[0] = egrp.getLongDescription();
-			args[1] = PokUtils.getAttributeDescription(egrp, "TOTL2CACHESTDUNIT", "TOTL2CACHESTDUNIT");
-			args[2] = procL2CacheUnitStr;
-			printError("INVALID_FLAGS_ERR",args,true); //Error - {0} {1} flag values do not have {2}");
-		}
-
-		derivedDataAttList.put("DERIVEDDATA:TOTL2CACHESTD", "TOTL2CACHESTD=" + totL2CacheStandardStr);
-		derivedDataAttList.put("DERIVEDDATA:TOTL2CACHESTDUNIT", "TOTL2CACHESTDUNIT=" + totL2CacheStandardUnitStr);
-	}
-
-	private void checkProcL2Cache(FCElement fce)
-	{
-		addDebug("checkProcL2Cache entered for "+fce);
-		EntityItem procItem = fce.getElement();
-		EntityItem featureItem = fce.getFeature();
-		String tmpL2CacheStr = PokUtils.getAttributeValue(procItem, "PROCL2CACHE", "", "0", false);
-		String tmpL2CacheUnitStr = PokUtils.getAttributeValue(procItem, "PROCL2CACHEUNIT", "", "", false);
-		addDebug(procItem.getKey()+" PROCL2CACHE="+tmpL2CacheStr+" PROCL2CACHEUNIT "+
-				tmpL2CacheUnitStr);
-
-		if("".equals(tmpL2CacheUnitStr)) // no units were specified for the cache size
-		{
-			//Report an error
-			EntityGroup egrp = procItem.getEntityGroup();
-			args[0] = egrp.getLongDescription();
-			args[1] = PokUtils.getAttributeDescription(egrp, "PROCL2CACHEUNIT", "PROCL2CACHEUNIT");
-			printError("ATTR_EMPTY_ERR",args); //Error - {0} {1} is empty.
-			print3b(fce.getFeature(), procItem);
-			rptSb.append("</p>" + NEWLINE);
-			tmpL2CacheUnitStr = "KB"; // default to KB
-		} 
-		if (procL2CacheUnitStr ==null){ // first one found
-			procL2CacheStr = tmpL2CacheStr;
-			procL2CacheUnitStr = tmpL2CacheUnitStr.trim().toUpperCase();
-		}else{
-			//If there is a mismatch, then report an error.
-			// Error Text:  PROCL2CACHE & PROCL2CACHEUNIT are not consistent for all PROCs.
-			// Line 3b: PROC
-			//INVALID_L2CACHE_ERR = Error - &quot;{0}&quot; and &quot;{1}&quot; are not consistent for all {2}s.				
-			if ((!tmpL2CacheStr.equals(procL2CacheStr)) ||
-					(!tmpL2CacheUnitStr.equals(procL2CacheUnitStr)))
-			{
-				args[0] = PokUtils.getAttributeDescription(procItem.getEntityGroup(), "PROCL2CACHE", "PROCL2CACHE");
-				args[1] = PokUtils.getAttributeDescription(procItem.getEntityGroup(), "PROCL2CACHEUNIT", "PROCL2CACHEUNIT");
-				args[2] = m_elist.getEntityGroup("PROC").getLongDescription();
-				printError("INVALID_L2CACHE_ERR",args); 
-				print3b(featureItem, procItem);
-				rptSb.append("</p>" + NEWLINE);
-			}
-		}
-
-		// the feature can only have one PROC, check here
-		Vector procVector = getAllLinkedEntities(featureItem, "FEATUREPROC", "PROC"); // get dupes
-		if (procVector.size()>1) { // can only have 1 PROC per FEATURE, output error
-			procItem = (EntityItem) procVector.get(0);
-			String errmsgkey = featureItem.getKey()+":PROC";
-			if (!errMsgVct.contains(errmsgkey)){
-				errMsgVct.add(errmsgkey);
-				args[0] = m_elist.getEntityGroup("PROC").getLongDescription();
-				args[1] = m_elist.getEntityGroup("FEATURE").getLongDescription();
-				printError("TOO_MANY_CHILDREN_ERR",args); //Error - Too many {0} for the {1}.
-				print3b(featureItem, procItem);
-				addDebug(featureItem.getKey()+" Too many PROC: "+procItem.getKey());
-
-				for(int j = 1; j < procVector.size(); j++)	{
-					procItem = (EntityItem) procVector.get(j);
-					print3a(procItem, false);
-					addDebug(featureItem.getKey()+" Too many PROC: "+procItem.getKey());
-				}//end of for(int j = 0; j < procVector.size(); j++)
-				rptSb.append("</p>" + NEWLINE);
-			}
-		}
-
-		procVector.clear();
-	}
-
-	/***********************************************
-	 *
-	 * @param unitStr String
-	 * @param msg String
-	 * @param ei EntityItem
-	 * @returns int
-	 */
-	private long getUnit(String unitStr, String msg, EntityItem ei)
-	{
-		long unit = 0;
-
-		if("KB".equals(unitStr)) {
-			unit = KB;
-		}
-		else if("MB".equals(unitStr)){
-			unit = MB;
-		}
-		else if("GB".equals(unitStr)) {
-			unit = GB;
-		}
-		else  {
-			args[0] = msg;
-			//{0} is not KB or MB or GB. So default to 0. 
-			MessageFormat msgf = new MessageFormat(rsBundle.getString("INVALID_UNIT"));
-			rptSb.append("<p>"+msgf.format(args)+"<br />" + NEWLINE);						
-			print3a(ei);
-		}
-
-		return unit;
-	}
-
-	/***********************************************
-	 * If result >= 1,000,000,000 then remove the right most eight characters and place the decimal point
-	 * to the left of the right most character. The units = GB.
-	 * If result >= 1,000,000 then remove the right most five characters and place the decimal point
-	 * to the left of the right most character. The units = MB.
-	 * If result >= 1,000 then remove the right most two characters and place the decimal point
-	 * to the left of the right most character. The units = KB.
-	 *
-	 * If the right most character is 0 (zero), remove the right most 2 characters(i.e. there is no fraction, therefore remove the decimal point and the fraction).
-	 *
-	 * @param n long
-	 * @returns String
-	 */
-	private String convertResultToString(long n)
-	{
-		String str1 = Long.toString(n);
-		int i = str1.length();
-
-		if(n >= GB) {
-			str1 = str1.substring(0, i - 8);
-			i = str1.length();
-			str1 = str1.substring(0, i - 1) + "." + str1.substring(i - 1);
-		}
-		else if(n >= MB) {
-			str1 = str1.substring(0, i - 5);
-			i = str1.length();
-			str1 = str1.substring(0, i - 1) + "." + str1.substring(i - 1);
-		}
-		else if(n >= KB){
-			str1 = str1.substring(0, i - 2);
-			i = str1.length();
-			str1 = str1.substring(0, i - 1) + "." + str1.substring(i - 1);
-		}
-
-		i = str1.length();
-		if(str1.lastIndexOf("0") == (i - 1)) {
-			str1 = str1.substring(0, i -2);
-		}
-
-		return str1;
-	}
-
-	/***********************************************
-	 *
-	 * @param n long
-	 * @returns String
-	 */
-	private String getUnitStr(long n)
-	{
-		String unit = "";
-
-		if(n >= GB) {
-			unit = "GB";
-		}
-		else if(n >= MB) {
-			unit = "MB";
-		}
-		else if(n >= KB) {
-			unit = "KB";
-		}
-
-		return unit;
-	}
-
-	/***********************************************
-	 * Get derived data for DERIVEDDATA.NOOFPROCSTD and DERIVEDDATA.NOOFPROCMAX
-	 *
-	 *F.	Number of Processors Standard
-	 *
-	 * Used for calculation:
-	 * 	PLANAR.NOOFPROCMAX
-	 * 	EXPDUNIT.NOOFPROCMAX
-	 * 	FEATUREPROC.QTY
-	 * 	WWSEOPRODSTRUCT.CONFQTY
-	 * 
-	 * Calculation result:
-	 * 	For each Feature that is described by one or more PROC, sum the following as DERIVEDDATA.NOOFPROCSTD:
-	 * 	�	WWSEOPRODSTRUCT.CONFQTY * FEATUREPROC.QTY
-	 * 
-	 * Calculation result:
-	 * 	For each FEATURE that is described by one or more EXPDUNIT, sum the following as qtysum1:
-	 * 	�	WWSEOPRODSTRUCT.CONFQTY * EXPDUNIT.NOOFPROCMAX
-	 * 	For each FEATURE that is described by one or more PLANAR, sum the following as qtysum2:
-	 * 	�	WWSEOPRODSTRUCT.CONFQTY * FEATUREPLANAR.QTY * PLANAR.NOOFPROCMAX
-	 * 	DERIVEDDATA.NOOFPROCMAX = qtysum1 + qtysum2
-	 * 	
-	 * If DERIVEDDATA.NOOFPROCSTD is greater than PLANAR.NOOFPROCMAX, report an error.
-	 * 	Error Text:  The DERIVEDDATA NOOFPROCSTD is greater than PLANAR.NOOFPROCMAX plus EXPDUNIT.NOOFPROCMAX.
-	 * 	Line 3b:  PLANAR
-	 * 	Line 3b:  PROC
-	 */
-	private void getDDNoOfProcStandard()
-	{
-		int noOfProcStandard = 0;
-		int procQtySum1 = 0;
-		int procQtySum2 = 0;
-
-		//For each Feature that is described by one or more PROC, sum the following as DERIVEDDATA.NOOFPROCSTD:
-		// 	�	WWSEOPRODSTRUCT.CONFQTY * FEATUREPROC.QTY
-		// get all the proc elements
-		Vector vct = (Vector)fcElemTbl.get("PROC");
-		addDebug("Calculate NOOFPROCSTD for "+(vct==null?0:vct.size())+" PROC");
-		if (vct != null){
-			for (int i=0; i<vct.size(); i++){
-				FCElement fce = (FCElement)vct.elementAt(i);
-				noOfProcStandard+=fce.getQuantity();
-				addDebug("checking PROC["+i+"] for "+fce+" quantity:"+fce.getQuantity()+" noOfProcStandard:"+noOfProcStandard);
-			}
-		}
-
-		//For each FEATURE that is described by one or more EXPDUNIT, sum the following as qtysum1:
-		// 	�	WWSEOPRODSTRUCT.CONFQTY * EXPDUNIT.NOOFPROCMAX
-		vct = (Vector)fcElemTbl.get("EXPDUNIT");
-		addDebug("Calculate qtysum1 for "+(vct==null?0:vct.size())+" EXPDUNIT");
-		if (vct != null){
-			for (int i=0; i<vct.size(); i++){
-				FCElement fce = (FCElement)vct.elementAt(i);
-				addDebug("checking EXPDUNIT["+i+"] for "+fce);
-				// EXPDUNIT.NOOFPROCMAX was missing from meta 
-				EANMetaAttribute metaAttr = fce.getElement().getEntityGroup().getMetaAttribute("NOOFPROCMAX");
-				if (metaAttr==null) {
-					setReturnCode(FAIL);
-					rptSb.append("<p><span style=\"color:#c00; font-weight:bold;\">Attribute &quot;"+
-							"NOOFPROCMAX&quot; NOT found in &quot;"+
-							fce.getElement().getEntityType()+"&quot; META data.</span></p>");
-					procQtySum1 = 0; 
-					break;
-				}				
-				String noOfProcMaxStr = PokUtils.getAttributeValue(fce.getElement(), "NOOFPROCMAX", "", "0", false);
-				int noOfProcMax = Integer.parseInt(noOfProcMaxStr); 				
-				procQtySum1+=(fce.getQuantity()*noOfProcMax);
-				addDebug(fce.getElement().getKey()+" NOOFPROCMAX="+noOfProcMaxStr+" quantity:"+fce.getQuantity()+
-						" procQtySum1="+procQtySum1);
-			}
-		}		
-		//For each FEATURE that is described by one or more PLANAR, sum the following as qtysum2:
-		// 	�	WWSEOPRODSTRUCT.CONFQTY * FEATUREPLANAR.QTY * PLANAR.NOOFPROCMAX
-		vct = (Vector)fcElemTbl.get("PLANAR");
-		addDebug("Calculate qtysum2 for "+(vct==null?0:vct.size())+" PLANAR");
-		if (vct != null){
-			for (int i=0; i<vct.size(); i++){
-				FCElement fce = (FCElement)vct.elementAt(i);
-				addDebug("checking PLANAR["+i+"] for "+fce);
-				String noOfProcMaxStr = PokUtils.getAttributeValue(fce.getElement(), "NOOFPROCMAX", "", "0", false);	            
-				int noOfProcMax = Integer.parseInt(noOfProcMaxStr); 				
-				procQtySum2+=(fce.getQuantity()*noOfProcMax);
-				addDebug(fce.getElement().getKey()+" NOOFPROCMAX="+noOfProcMaxStr+" quantity:"+
-						fce.getQuantity()+" procQtySum2="+procQtySum2);
-			}
-		}	
-
-		//If DERIVEDDATA.NOOFPROCSTD is greater than PLANAR.NOOFPROCMAX plus EXPDUNIT.NOOFPROCMAX, report an error.
-		//Error Text:  The DERIVEDDATA NOOFPROCSTD is greater than PLANAR.NOOFPROCMAX plus EXPDUNIT.NOOFPROCMAX.
-		//Line 3b:  PLANAR
-		//Line 3b:  PROC
-		if (noOfProcStandard > (procQtySum1 +procQtySum2))	{
-			EntityGroup egrp = m_elist.getEntityGroup("DERIVEDDATA");
-			args[0] = egrp.getLongDescription();
-			args[1] = PokUtils.getAttributeDescription(egrp, "NOOFPROCSTD", "NOOFPROCSTD");
-			egrp = m_elist.getEntityGroup("PLANAR");
-			args[2] = egrp.getLongDescription();
-			args[3] = PokUtils.getAttributeDescription(egrp, "NOOFPROCMAX", "NOOFPROCMAX");
-			egrp = m_elist.getEntityGroup("EXPDUNIT");
-			args[4] = egrp.getLongDescription();
-			args[5] = PokUtils.getAttributeDescription(egrp, "NOOFPROCMAX", "NOOFPROCMAX");
-			printError("NOOFPROCSTD_1_ERROR",args); //Error - {0} {1} is greater than {2} {3} plus {4} {5}.
-			vct = (Vector)fcElemTbl.get("PLANAR");
-			if (vct != null){
-				for (int i=0; i<vct.size(); i++){
-					FCElement fce = (FCElement)vct.elementAt(i);
-					print3b(fce.getFeature(), fce.getElement());
-				}
-			}
-			vct = (Vector)fcElemTbl.get("EXPDUNIT");
-			if (vct != null){
-				for (int i=0; i<vct.size(); i++){
-					FCElement fce = (FCElement)vct.elementAt(i);
-					print3b(fce.getFeature(), fce.getElement());
-				}
-			}
-			vct = (Vector)fcElemTbl.get("PROC");
-			if (vct != null){
-				for (int i=0; i<vct.size(); i++){
-					FCElement fce = (FCElement)vct.elementAt(i);
-					print3b(fce.getFeature(), fce.getElement());
-				}
-			}
-
-			rptSb.append("</p>" + NEWLINE);
-		}
-
-		// set this no matter what
-		derivedDataAttList.put("DERIVEDDATA:NOOFPROCSTD", "NOOFPROCSTD=" + noOfProcStandard);
-		//DERIVEDDATA.NOOFPROCMAX = qtysum1 + qtysum2
-		derivedDataAttList.put("DERIVEDDATA:NOOFPROCMAX", "NOOFPROCMAX=" + (procQtySum1 +procQtySum2));
-	}
-
-	/***********************************************
-	 * G.	Number of Installed Hard Drives
-	 * Used for calculation:
-	 * 	HDD.HDDCAP
-	 * 	FEATUREHDD.QTY
-	 * 
-	 * Calculation result:
-	 * DERIVEDDATA.NOOFINSTHARDDRVS
-	 * 
-	 * The quantity is WWSEOPRODSTRUCT.CONFQTY.
-	 * Consider FEATUREs that are described by HDD where HDDCAP > 0, then sum WWSEOPRODSTRUCT.CONFQTY
-	 * times FEATUREHDD.QTY as DERIVEDDATA.NOOFINSTHARDDRVS.
-	 */
-	private void getDDNoOfInstHardDrvs()
-	{
-		int noOfInstHardDrvs = 0;
-		Vector vct = (Vector)fcElemTbl.get("HDD");
-		addDebug("Calculate NOOFINSTHARDDRVS for "+(vct==null?0:vct.size())+" HDD");
-		if (vct != null){
-			for (int i=0; i<vct.size(); i++){
-				FCElement fce = (FCElement)vct.elementAt(i);
-				EntityItem elemItem = fce.getElement();
-				String hddCapStr = PokUtils.getAttributeValue(elemItem, "HDDCAP" , "", "0", false);
-				float hddCap = Float.parseFloat(hddCapStr);
-				if (hddCap>0){
-					noOfInstHardDrvs+=fce.getQuantity();
-				}
-				addDebug(elemItem.getKey()+ ".HDDCAP="+hddCap+" quantity: "+fce.getQuantity()+" noOfInstHardDrvs: "+noOfInstHardDrvs);        		
-			}
-		}
-
-		// this should be set no matter what
-		derivedDataAttList.put("DERIVEDDATA:NOOFINSTHARDDRVS", "NOOFINSTHARDDRVS=" + noOfInstHardDrvs);
-	}
-
-	/**********************************************************************************
-	 * Get Name based on navigation attributes
-	 *
-	 * @return java.lang.String
-	 */
-	private String getNavigationNameWithoutCountryList(EntityItem theItem) throws java.sql.SQLException, MiddlewareException
-	{
-		StringBuffer navName = new StringBuffer();
-
-		EANList metaList = (EANList)metaTbl.get(theItem.getEntityType());
-		if (metaList==null){
-			// NAME is navigate attributes
-			EntityGroup eg =  new EntityGroup(null, m_db, m_prof, theItem.getEntityType(), "Navigate");
-			metaList = eg.getMetaAttribute(); // iterator does not maintain navigate order
-			metaTbl.put(theItem.getEntityType(),metaList);
-		}
-		for(int ii=0; ii<metaList.size(); ii++)
-		{
-			EANMetaAttribute ma = (EANMetaAttribute)metaList.getAt(ii);
-			if(!("COUNTRYLIST".equals(ma.getAttributeCode())))
-			{
-				if (navName.length()>0) {
-					navName.append(", ");
-				}
-				navName.append(PokUtils.getAttributeValue(theItem, ma.getAttributeCode(), DELIMITER, "", false));
-			}
-		}
-
-		return navName.toString();
-	}
-
-	/***********************************************
-	 * Print 3a format message
-	 * Line 3a:
-	 * The entity type long description followed by the entity's Navigation Display Attributes,
-	 * all in a single line.
-	 *
-	 * @param item EntityItem
-	 * @param closeP boolean
-	 */
-	private void print3a(EntityItem item, boolean closeP)
-	{
-		StringBuffer tmpsb = new StringBuffer(INDENT1);
-		String navname = item.getEntityType();
-		tmpsb.append(item.getEntityGroup().getLongDescription());
-
-		try  {
-			navname = getNavigationNameWithoutCountryList(item);
-		} catch(Exception ex) {
-			logMessage("print3a: "+item.getKey()+" Got exception " + ex);
-			ex.printStackTrace();
-		}
-
-		tmpsb.append(" "+navname);
-		if (closeP){
-			tmpsb.append("</p>" + NEWLINE);
-		}
-		else{
-			tmpsb.append("<br />" + NEWLINE); // more lines will follow
-		}
-
-		rptSb.append(tmpsb.toString());
-	}
-
-	/***********************************************
-	 * Print 3a format message
-	 * Line 3a:
-	 * The entity type long description followed by the entity's Navigation Display Attributes,
-	 * all in a single line.
-	 *
-	 * @param item EntityItem
-	 */
-	private void print3a(EntityItem item)
-	{
-		print3a(item, true);
-	}
-
-	/***********************************************
-	 * Print 3b format message
-	 * Line 3b:
-	 * The FEATURE long description followed by FEATURECODE followed by the 'element'
-	 * long description followed by the element's Navigation Display Attributes, all in a single line.
-	 *
-	 * @param featureItem EntityItem
-	 * @param element EntityItem
-	 */
-	private void print3b(EntityItem featureItem, EntityItem element)
-	{
-		StringBuffer tmpsb = new StringBuffer(INDENT1);
-		String navname = element.getEntityType();
-		tmpsb.append(featureItem.getEntityGroup().getLongDescription()+
-				" "+PokUtils.getAttributeValue(featureItem, "FEATURECODE",", ", "", false));
-
-		tmpsb.append(": "+element.getEntityGroup().getLongDescription());
-
-		try  {
-			navname = getNavigationNameWithoutCountryList(element);
-		} catch(Exception ex) {
-			logMessage("print3b: Got exception " + ex);
-		}
-
-		tmpsb.append(": "+navname + "<br />" + NEWLINE);  // 3b always expects another 3a line
-
-		rptSb.append(tmpsb.toString());
-	}
-
-	/***********************************************
-	 * Get the flag code that corresponds to this flag description
-	 *
-	 * @param attributeCode String
-	 * @param flagDesc String
-	 * @return String flag code
-	 */
-	private String getFlagCodeForDesc(String attributeCode, String flagDesc)
-	{
-		String attFlagCode = null;
-
-		EntityGroup eg = m_elist.getEntityGroup("DERIVEDDATA");
-		EANMetaFlagAttribute mfa = (EANMetaFlagAttribute) eg.getMetaAttribute(attributeCode);
-
-		if(null == mfa) {
-			//BAD_META = Can not retrieve Flag values for {0}
-			String msg = rsBundle.getString("BAD_META");
-			args[0] = "DERIVEDDATA." + attributeCode;
-			MessageFormat msgf = new MessageFormat(msg);
-			rptSb.append("<p>"+msgf.format(args) + "</p>" + NEWLINE);        	
-		}else{
-			//rptSb.append("<!-- DERIVEDDATA." + attributeCode + NEWLINE);
-			for(int i = 0; i < mfa.getMetaFlagCount(); i++)	{
-				MetaFlag mf = mfa.getMetaFlag(i);
-				String desc = mf.toString().trim().toUpperCase();
-				//rptSb.append("  " + desc + ", "+mf.getFlagCode()+NEWLINE);
-				if (flagDesc.equals(desc)) {
-					attFlagCode = mf.getFlagCode();
-					break;
-				}
-			}
-			//rptSb.append(" -->" + NEWLINE);
-		}
-
-		return attFlagCode;
-	}
-
-	/**********************************************************************************
-	 * Get Locale based on NLSID
-	 *
-	 * @return java.util.Locale
-	 */
-	private Locale getLocale(int nlsID)
-	{
-		Locale locale = null;
-		switch (nlsID)
-		{
-		case 1:
-			locale = Locale.US;
-			break;
-		case 2:
-			locale = Locale.GERMAN;
-			break;
-		case 3:
-			locale = Locale.ITALIAN;
-			break;
-		case 4:
-			locale = Locale.JAPANESE;
-			break;
-		case 5:
-			locale = Locale.FRENCH;
-			break;
-		case 6:
-			locale = new Locale("es", "ES");
-			break;
-		case 7:
-			locale = Locale.UK;
-			break;
-		default:
-			locale = Locale.US;
-		break;
-		}
-		return locale;
-	}
-
-	/*****************************************************************************
-	 * Get the current Flag Value for the specified attribute, null if not set
-	 *
-	 * @param entityItem EntityItem
-	 * @param attrCode String attribute code to get value for
-	 * @param deli String delimiter
-	 * @return String attribute flag code
-	 */
-	public static String getAttributeFlagValue(EntityItem entityItem, String attrCode, String deli)
-	{
-		EANMetaAttribute metaAttr = entityItem.getEntityGroup().getMetaAttribute(attrCode);
-		// Multi-flag values will be separated by |
-		EANAttribute attr = entityItem.getAttribute(attrCode);
-		String val=null;
-		if (attr != null) {
-			if (attr instanceof EANFlagAttribute)
-			{
-				StringBuffer sb = new StringBuffer();
-
-				// Get the selected Flag codes.
-				MetaFlag[] mfArray = (MetaFlag[]) attr.get();
-				for (int i = 0; i < mfArray.length; i++)
-				{
-					// get selection
-					if (mfArray[i].isSelected())
-					{
-						if (sb.length()>0) {
-							sb.append(deli); }
-						sb.append(mfArray[i].getFlagCode());
-						if (metaAttr.getAttributeType().equals("U")) {
-							break; }
-					}
-				}
-				val = sb.toString();
-			}
-		}
-
-		return val;
-	}
-
-	/********************************************************************************
-	 * display the deriveddata attribute list
-	 *
-	 */
-	private void displayDD()
-	{
-		Set keySet = derivedDataAttList.keySet();
-		Iterator itr = keySet.iterator();
-
-		rptSb.append("<!-- Content of derivedDataAttList" + NEWLINE);
-		while(itr.hasNext())
-		{
-			String key = (String) itr.next();
-			rptSb.append(key + ", " + derivedDataAttList.get(key) + NEWLINE);
-		}
-		rptSb.append("-->" + NEWLINE);
-	}
-
-	/********************************************************************************
-	 * Release memory
-	 *
-	 */
-	private void cleanUp()
-	{
-		if (fcElemTbl != null){
-			for (Enumeration eNum = fcElemTbl.elements(); eNum.hasMoreElements();)  {
-				Vector vct = (Vector)eNum.nextElement();
-				for (int i=0; i<vct.size(); i++){
-					FCElement fce = (FCElement) vct.elementAt(i);
-					fce.dereference();
-				}
-				vct.clear();
-			}
-			fcElemTbl.clear();
-			fcElemTbl = null;
-		}
-
-		errMsgVct.clear();
-		errMsgVct = null;
-		pdgUtil = null;
-		derivedDataAttList.clear();
-		derivedDataAttList = null;
-		metaTbl.clear();
-		metaTbl=null;
-	}
-
-	/**********************************************************************************
-	 * Line 1:
-	 * Error - followed by the error text
-	 * Always use the entity's Long Description (i.e. replace ENTITYTYPE with its Long Description)
-	 * and if applicable, the attribute's Long Description.
-	 * @param bundleid String
-	 * @param msgargs Object[] with replacement strings
-	 */
-	private void printError(String bundleid, Object[] msgargs) {
-		printError(bundleid, msgargs, false);
-	}
-
-	/**********************************************************************************
-	 * Line 1:
-	 * Error - followed by the error text
-	 * Always use the entity's Long Description (i.e. replace ENTITYTYPE with its Long Description)
-	 * and if applicable, the attribute's Long Description.
-	 */
-	private void printError(String bundleid, Object[] msgargs, boolean closep) {
-		String msg = rsBundle.getString(bundleid);
-		MessageFormat msgf = new MessageFormat(msg);
-		rptSb.append("<p>"+msgf.format(msgargs));
-		if (closep){
-			rptSb.append("</p>" + NEWLINE);
-		}else{
-			rptSb.append("<br />" + NEWLINE);
-		}
-		setReturnCode(FAIL);
-	}
-
-	/******
-	 * Elements is a way to refer to the entity types that provide the technical details for both MODEL and FEATURE. 
-	 * Elements are children of MODEL and FEATURE; however, xSeries does not use Elements at Model. Therefore, 
-	 * this ABR will only consider Elements of FEATURE. The following table shows the various Elements with 
-	 * the following columns:
-	 * 	# of Elements - If not blank, then it is the attribute code on the relator from FEATURE to the Element 
-	 * 		that specifies the quantity of the Element related to the  FEATURE
-	 * 	Element - The entity type of the Element
-	 * 	# of Children - If not blank, then it is the attribute code on the relator from the Element to the 
-	 * 		Child that specifies the number of this child related to the Element
-	 * 	Child - The entity type of the Child of the Element
-	 * 
-	 * Whenever checks and/or derivations are made, these quantities must be taken into account.
-	 * A WWSEO has multiple Features defined via WWSEOPRODSTRUCT which has a Quantity (CONFQTY). This is the 
-	 * number of the selected FEATUREs in the configuration. This quantity must be taken into account.
-	 * 
-	 * If any of the �quantity� attributes is empty, then assume a quantity of one.
-	 * 
-	 * For example, the number of processors would be equal to the sum of:
-	 * WWSEOPRODSTRUCT.CONFQTY * WWSEOPRODSTRUCT-d : PRODSTRUCT-u : FEATUREPROC.QTY
-	 * 
-	 * # of Elements	Element			# of Children	Child
-	 * 					EXPDUNIT						SLOT
-	 * QTY				HDD
-	 * QTY				MECHPKG			BAYQTY			BAY
-	 * QTY				MEMORYCARD		SLOTQTY			SLOT
-	 * QTY				PLANAR			SLOTQTY			SLOT
-	 * QTY				PROC							TECHCAP
-	 */
-	private class FCElement {
-		protected String key;
-		private int confQty = 1;
-		private int qty = 1;
-		private EntityItem elementItem=null;
-		private EntityItem featureItem=null;
-
-		/***
-		 * used for elements
-		 * @param wwseops
-		 * @param ps
-		 * @param fc
-		 * @param fcelemrel
-		 * @param elem
-		 */
-		FCElement(EntityItem wwseops, EntityItem ps, EntityItem fc, EntityItem fcelemrel, EntityItem elem){
-			key = wwseops.getKey()+":"+ps.getKey()+":"+fc.getKey()+":"+fcelemrel.getKey()+":"+elem.getKey();
-			elementItem = elem;
-			featureItem = fc;
-			// WWSEOPRODSTRUCT.CONFQTY
-			String qtyStr = PokUtils.getAttributeValue(wwseops, "CONFQTY", "", "1",false);
-			confQty = Integer.parseInt(qtyStr);
-			// check for attribute on FEATURE->ELEMENT relator.QTY
-			EANMetaAttribute metaAttr = fcelemrel.getEntityGroup().getMetaAttribute("QTY");
-			if (metaAttr==null) {
-				addDebug("QTY not found in meta for "+fcelemrel.getKey());
-			}
-			else{
-				qtyStr = PokUtils.getAttributeValue(fcelemrel, "QTY", "", "1",false);
-				qty = Integer.parseInt(qtyStr);
-			}
-		}
-
-		void dereference(){
-			key=null;
-			elementItem = null;
-			featureItem = null;
-		}
-		EntityItem getElement() { return elementItem;}
-		EntityItem getFeature() { return featureItem;}
-		int getQuantity(){
-			return confQty*qty;
-		}
-		int getConfQty() { return confQty;}
-		int getQty() { return qty; }
-
-		/****
-		 * Each instance of Expansion Unit (EXPDUNIT) may have at most one child of type Slot (SLOT) of a 
-		 * given Slot Type (SLOTTYPE) and Slot Size (SLOTSZE). For every SLOTTYPE and Slot Size (SLOTSZE), 
-		 * there must exist a Slots Available (SLOTSAVAIL) of the same SLOTTYPE and Slot Size (SLOTSZE) where 
-		 * ELEMENTTYPE = �Expansion Unit� (0030) for the WWSEO (found via WWSEOSLOTSAVAIL). 
-		 * 
-		 * Each instance of PLANAR may have at most one child of type SLOT of a given SLOTTYPE and Slot Size 
-		 * (SLOTSZE). For every SLOTTYPE and Slot Size (SLOTSZE), there must exist a SLOTSAVAIL of the same 
-		 * SLOTTYPE and Slot Size (SLOTSZE) where ELEMENTTYPE = �Planar� (0020) for the WWSEO (found via WWSEOSLOTSAVAIL).
-		 * If PLANARSLOT.SLOTQTY > 1, then this rule is violated.
-		 * 
-		 * Similarly, each instance of MEMORYCARD may have at most one child of type SLOT of a given SLOTTYPE 
-		 * and Slot Size (SLOTSZE). For every SLOTTYPE and Slot Size (SLOTSZE), there must exist a SLOTSAVAIL 
-		 * of the same SLOTTYPE and Slot Size (SLOTSZE) where ELEMENTTYPE = �Memory Card� (0010) for the WWSEO 
-		 * (found via WWSEOSLOTSAVAIL). If MEMORYCARDSLOT.SLOTQTY > 1, then this rule is violated.
-		 * @throws MiddlewareException 
-		 * @throws SQLException 
-		 */
-		int checkSlots(Hashtable slotsAvailTbl, String elemType, Vector matchedSlotVct) throws SQLException, MiddlewareException{
-			int totalSlotTot = 0;
-			String attrCode = "SLOTQTY";
-			Hashtable slotTbl = new Hashtable();
-			addDebug("checkSlots: entered for "+this);
-			String heading = getLD_NDN(getElement());
-			if(getElement().getDownLinkCount()>0){
-				heading  = heading +" "+
-				((EntityItem)getElement().getDownLink(0)).getEntityGroup().getLongDescription()+" checks:";
-			}else{
-				heading  = heading +" has No SLOTs";
-			}
-			addHeading(4,heading);
-
-			// look at all downlinks
-			for (int ce =0; ce<getElement().getDownLinkCount(); ce++){
-				EntityItem slotrel = (EntityItem)getElement().getDownLink(ce);				
-				EANMetaAttribute metaAttr = slotrel.getEntityGroup().getMetaAttribute(attrCode);
-				if (metaAttr==null) {
-					// EXPDUNITSLOT does not have a quantity
-					addDebug("checkSlots["+ce+"]: "+getElement().getKey()+":"+slotrel.getKey()+" 'Quantity' not found in meta");
-				}else{
-					String qtyStr = PokUtils.getAttributeValue(slotrel, attrCode, "", "1",false);
-					addDebug("checkSlots["+ce+"]: "+getElement().getKey()+":"+slotrel.getKey()+" qty: "+qtyStr);
-					int relqty = Integer.parseInt(qtyStr);
-					if (relqty>1){
-						addDebug("checkSlots: Error qty>1 qty: "+qtyStr+" on "+slotrel.getKey());
-						EntityItem slotItem =  (EntityItem)slotrel.getDownLink(0);
-						// If MEMORYCARDSLOT.SLOTQTY > 1, then this rule is violated., then report an error.
-						//Line 3a:  SLOT
-						//INVALID_QTY_ERROR = Error - Quantity was greater than one for a given &quot;{0}&quot; found.
-						args[0] = slotItem.getEntityGroup().getLongDescription();						
-						printError("INVALID_QTY_ERROR",args); 
-						print3b(getFeature(),getElement());
-						print3a(slotItem);	
-					}
-				}				
-				for (int cr = 0; cr<slotrel.getDownLinkCount(); cr++){
-					EntityItem slotItem = (EntityItem)slotrel.getDownLink(cr);
-					// get slottype
-					String slotType = getAttributeFlagEnabledValue(slotItem, "SLOTTYPE");
-					String slotSze = getAttributeFlagEnabledValue(slotItem, "SLOTSZE");
-
-					addDebug("checkSlots: Checking "+getElement().getKey()+":"+slotrel.getKey()+":"+
-							slotItem.getKey()+" slotType:"+slotType+" slotSze:"+slotSze);
-					if(slotType==null){ // if not set then this is an error
-						//If a SLOT does not have an SLOTTYPE specified, report an error.
-						// Error Text:  SLOT.SLOTTYPE is empty.
-						// Line 3a: SLOT
-						args[0] = slotItem.getEntityGroup().getLongDescription();
-						args[1] = PokUtils.getAttributeDescription(slotItem.getEntityGroup(), "SLOTTYPE", "SLOTTYPE");
-						printError("ATTR_EMPTY_ERR",args); //Error - {0} {1} is empty.
-						print3a(slotItem);
-					} else if(slotSze==null){ // if not set then this is an error
-						//If a SLOT does not have an SLOTSZE specified, report an error.
-						// Error Text:  SLOT.SLOTSZE is empty.
-						// Line 3a: SLOT
-						args[0] = slotItem.getEntityGroup().getLongDescription();
-						args[1] = PokUtils.getAttributeDescription(slotItem.getEntityGroup(), "SLOTSZE", "SLOTSZE");
-						printError("ATTR_EMPTY_ERR",args); //Error - {0} {1} is empty.
-						print3a(slotItem);
-					} else {
-						EntityItem slot = (EntityItem)slotTbl.get(slotType+slotSze);
-						if (slot==null){ // not found yet
-							slotTbl.put(slotType+slotSze, slotItem);							
-							EntityItem slotsAvailItem = (EntityItem)slotsAvailTbl.get(elemType+slotType+slotSze);
-							if (slotsAvailItem == null){
-								//If there isn�t a SLOTSAVAIL of a required ELEMENTTYPE & SLOTTYPE, then report an error.
-								//Error Text:  There is no SLOTSAVAIL of a given ELEMENTTYPE & SLOTTYPE
-								//Line 3b:  Expansion|Planar|MemoryCard
-								//Line 3a:  Slot
-								args[0] = m_elist.getEntityGroup("SLOTSAVAIL").getLongDescription();
-								args[1] = PokUtils.getAttributeDescription(m_elist.getEntityGroup("SLOTSAVAIL"), "ELEMENTTYPE", "ELEMENTTYPE");
-								args[2] = PokUtils.getAttributeDescription(slotItem.getEntityGroup(), "SLOTTYPE", "SLOTTYPE");
-								args[3] = PokUtils.getAttributeDescription(slotItem.getEntityGroup(), "SLOTSZE", "SLOTSZE");
-								//NO_SLOTSAVAIL_ERROR = Error - There is no &quot;{0}&quot; of a given &quot;{1}&quot; and &quot;{2}&quot; and &quot;{3}&quot;.
-								printError("NO_SLOTSAVAIL_ERROR",args); 
-								print3b(getFeature(),getElement());
-								print3a(slotItem);
-							}else{
-								matchedSlotVct.add(elemType+slotType+slotSze);// this one is accounted for
-								String slotTotStr = PokUtils.getAttributeValue(slotItem, "SLOTTOT", "", "0", false);
-								int slotTot = Integer.parseInt(slotTotStr);
-								totalSlotTot += slotTot;
-								addDebug("checkSlots: adding "+slotItem.getKey()+".SLOTTOT="+slotTotStr+" totalSlotTot:"+totalSlotTot);
-							}
-						}else{
-							//If there is more than one SLOT of a given SLOTTYPE, then report an error.
-							//Line 3a:  SLOT
-							args[0] = slotItem.getEntityGroup().getLongDescription();
-							args[1] = PokUtils.getAttributeDescription(slotItem.getEntityGroup(), "SLOTTYPE", "SLOTTYPE");
-							args[2] = PokUtils.getAttributeDescription(slotItem.getEntityGroup(), "SLOTSZE", "SLOTSZE");
-							//DUPLICATE_SLOT_ERROR = Error - More than one &quot;{0}&quot; of a given &quot;{1}&quot; and &quot;{2}&quot; found.
-							printError("DUPLICATE_SLOT_ERROR",args); 
-							print3b(getFeature(),getElement());
-							print3a(slotItem, false);	
-							print3a(slot);
-						}
-					}		
-				}
-			}
-
-			slotTbl.clear();
-			return totalSlotTot;
-		}    	
-		/****
-		 * An instance of MECHPKG may have more than one BAY.  Each combination of a given 
-		 * BAY.BAYTYPE+BAY.ACCSS+BAY.BAYFF must be unique. For every BAY.BAYTYPE+BAY.ACCSS+BAY.BAYFF 
-		 * there must exist a BAYSAVAIL of the same BAYSAVAIL. BAYAVAILTYPE + BAYSAVAIL.ACCSS + BAYSAVAIL.BAYFF.  
-		 * Each combination of a given BAYSAVAIL.BAYAVAILTYPE +BAY.ACCSS+BAY.BAYFF must be unique. 
-		 * If MECHPKGBAY.BAYQTY > 1, then this rule is violated.
-		 * @throws MiddlewareException 
-		 * @throws SQLException 
-		 */
-		int checkBays(Hashtable baysAvailTbl, Vector matchedBaysVct) throws SQLException, MiddlewareException{
-			int totalBayTot = 0;
-			String attrCode = "BAYQTY";
-			Hashtable bayTbl = new Hashtable();
-			addDebug("checkBays: entered for "+this);
-			String heading = getLD_NDN(getElement());
-			if(getElement().getDownLinkCount()>0){
-				heading  = heading +" "+
-				((EntityItem)getElement().getDownLink(0)).getEntityGroup().getLongDescription()+" checks:";
-			}else{
-				heading  = heading +" has No BAYs";
-			}
-			addHeading(4,heading);
-			// look at all downlinks
-			for (int ce =0; ce<getElement().getDownLinkCount(); ce++){
-				EntityItem bayrel = (EntityItem)getElement().getDownLink(ce);
-				String qtyStr = PokUtils.getAttributeValue(bayrel, attrCode, "", "1",false);
-				addDebug("checkBays["+ce+"]: "+getElement().getKey()+":"+bayrel.getKey()+" qty: "+qtyStr);
-				int relqty = Integer.parseInt(qtyStr);
-				if (relqty>1){
-					addDebug("checkBays: Error qty>1 qty: "+qtyStr+" on "+bayrel.getKey());
-					EntityItem bayItem = (EntityItem)bayrel.getDownLink(0);
-					//MECHPKGBAY.BAYQTY > 1, then this rule is violated., then report an error.
-					//INVALID_QTY_ERROR = Error - Quantity was greater than one for a given &quot;{0}&quot; found.
-					args[0] = bayItem.getEntityGroup().getLongDescription();						
-					printError("INVALID_QTY_ERROR",args);
-					print3b(getFeature(),getElement());
-					print3a(bayItem);	
-				}
-
-				for (int cr = 0; cr<bayrel.getDownLinkCount(); cr++){
-					EntityItem bayItem = (EntityItem)bayrel.getDownLink(cr);					
-					// get baytype
-					String bayType = getAttributeFlagEnabledValue(bayItem, "BAYTYPE");
-					String bayAccss = getAttributeFlagEnabledValue(bayItem, "ACCSS"); // use flag value
-					String bayFF = getAttributeFlagEnabledValue(bayItem, "BAYFF"); // use flag value
-					String bayInfo;
-					addDebug("checkBays: Checking "+getElement().getKey()+" "+bayrel.getKey()+" "+
-							bayItem.getKey()+" bayType:"+bayType+" bayAccss:"+bayAccss+" bayFF:"+bayFF);
-					if (bayType == null ||
-							bayAccss == null ||
-							bayFF == null) 
-					{
-						args[0] = bayItem.getEntityGroup().getLongDescription();
-						if (bayType==null){
-							args[1] = PokUtils.getAttributeDescription(bayItem.getEntityGroup(), "BAYTYPE", "BAYTYPE");
-							printError("ATTR_EMPTY_ERR",args); //Error - {0} {1} is empty.
-						}
-						if (bayAccss==null){
-							args[1] = PokUtils.getAttributeDescription(bayItem.getEntityGroup(), "ACCSS", "ACCSS");
-							printError("ATTR_EMPTY_ERR",args); //Error - {0} {1} is empty.
-						}
-						if (bayFF==null){
-							args[1] = PokUtils.getAttributeDescription(bayItem.getEntityGroup(), "BAYFF", "BAYFF");
-							printError("ATTR_EMPTY_ERR",args); //Error - {0} {1} is empty.
-						}
-						print3a(bayItem);
-						continue;
-					}
-					bayInfo = bayType +bayAccss + bayFF;						
-					EntityItem bay = (EntityItem)bayTbl.get(bayInfo);
-					if (bay==null){
-						bayTbl.put(bayInfo, bayItem);							
-						EntityItem baysAvailItem = (EntityItem)baysAvailTbl.get(bayInfo);
-						if (baysAvailItem == null){
-							//If there isn�t a BAYSAVAIL of a required BAY.BAYTYPE+BAY.ACCESS+BAY.BAYFF, then report an error.
-							//Error Text:  There is no BAYSAVAIL of a given BAY.BAYTYPE+BAY.ACCESS+BAY.BAYFF
-							//Line 3b:  MECHPKG
-							//Line 3a:  BAY
-							args[0] = m_elist.getEntityGroup("BAYSAVAIL").getLongDescription();
-							args[1] = PokUtils.getAttributeDescription(bayItem.getEntityGroup(), "BAYTYPE", "BAYTYPE");
-							args[2] = PokUtils.getAttributeDescription(bayItem.getEntityGroup(), "ACCSS", "ACCSS");
-							args[3] = PokUtils.getAttributeDescription(bayItem.getEntityGroup(), "BAYFF", "BAYFF");
-
-							//NO_BAYSAVAIL_ERROR = Error - There is no &quot;{0}&quot; of a required &quot;{1}&quot; and &quot;{2}&quot; and &quot;{3}&quot;.
-							printError("NO_BAYSAVAIL_ERROR",args); 
-							print3b(getFeature(),getElement());
-							print3a(bayItem);								
-						}else{
-							matchedBaysVct.add(bayInfo);// this one is accounted for
-							String bayTotStr = PokUtils.getAttributeValue(bayItem, "BAYTOT", "", "0", false);				            
-							int bayTot = Integer.parseInt(bayTotStr);
-							totalBayTot += bayTot;	
-							addDebug("checkBays: adding "+bayItem.getKey()+".BAYTOT="+bayTotStr+" totalBayTot:"+totalBayTot);
-						}
-					}else{
-						//If there is more than one BAY of a given BAYTYPE+ACCSS+BAYFF, then report an error.
-						//Error Text:  More than one BAY of a given BAYTYPE+ACCSS+BAYFF
-						//Line 3b:  MECHPKG 
-						//Line 3a:  BAY
-						args[0] = bayItem.getEntityGroup().getLongDescription();
-						args[1] = PokUtils.getAttributeDescription(bayItem.getEntityGroup(), "BAYTYPE", "BAYTYPE");
-						args[2] = PokUtils.getAttributeDescription(bayItem.getEntityGroup(), "ACCSS", "ACCSS");
-						args[3] = PokUtils.getAttributeDescription(bayItem.getEntityGroup(), "BAYFF", "BAYFF");
-
-						//DUPLICATE_BAYS_ERROR = Error - More than one &quot;{0}&quot; of a given &quot;{1}&quot; and &quot;{2}&quot; and &quot;{3}&quot; found.
-						printError("DUPLICATE_BAYS_ERROR",args);  
-						print3b(getFeature(),getElement());
-						print3a(bayItem,false);	
-						print3a(bay);	
-					}
-				}
-			}
-
-			bayTbl.clear();
-			return totalBayTot;
-		}    	    	
-		public String toString() {
-			return key;
-		}
-	}
-
-}

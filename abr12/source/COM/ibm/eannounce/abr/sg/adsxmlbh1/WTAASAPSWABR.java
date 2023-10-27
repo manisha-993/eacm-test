@@ -1,1602 +1,1607 @@
-package COM.ibm.eannounce.abr.sg.adsxmlbh1;
+/*      */ package COM.ibm.eannounce.abr.sg.adsxmlbh1;
+/*      */ 
+/*      */ import COM.ibm.eannounce.abr.util.ABRUtil;
+/*      */ import COM.ibm.eannounce.abr.util.EACustom;
+/*      */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*      */ import COM.ibm.eannounce.objects.EANList;
+/*      */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*      */ import COM.ibm.eannounce.objects.EntityGroup;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.EntityList;
+/*      */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*      */ import COM.ibm.opicmpdh.middleware.Database;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*      */ import COM.ibm.opicmpdh.middleware.Profile;
+/*      */ import COM.ibm.opicmpdh.middleware.Stopwatch;
+/*      */ import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.io.BufferedInputStream;
+/*      */ import java.io.File;
+/*      */ import java.io.FileInputStream;
+/*      */ import java.io.FileOutputStream;
+/*      */ import java.io.IOException;
+/*      */ import java.io.OutputStreamWriter;
+/*      */ import java.io.PrintWriter;
+/*      */ import java.io.StringWriter;
+/*      */ import java.sql.Connection;
+/*      */ import java.sql.PreparedStatement;
+/*      */ import java.sql.ResultSet;
+/*      */ import java.sql.SQLException;
+/*      */ import java.text.MessageFormat;
+/*      */ import java.text.ParseException;
+/*      */ import java.text.SimpleDateFormat;
+/*      */ import java.util.ArrayList;
+/*      */ import java.util.Date;
+/*      */ import java.util.HashMap;
+/*      */ import java.util.HashSet;
+/*      */ import java.util.Iterator;
+/*      */ import java.util.Locale;
+/*      */ import java.util.Map;
+/*      */ import java.util.ResourceBundle;
+/*      */ import java.util.Set;
+/*      */ import java.util.StringTokenizer;
+/*      */ import java.util.Vector;
+/*      */ import java.util.zip.ZipEntry;
+/*      */ import java.util.zip.ZipOutputStream;
+/*      */ import javax.xml.transform.TransformerConfigurationException;
+/*      */ import org.xml.sax.SAXException;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public class WTAASAPSWABR
+/*      */   extends PokBaseABR
+/*      */ {
+/*   60 */   private ResourceBundle rsBundle = null;
+/*   61 */   private String annNumber = "";
+/*   62 */   private String annDate = "";
+/*   63 */   private File zipFile = null;
+/*   64 */   private HashMap prodInfo = new HashMap<>();
+/*   65 */   private Set modelSet = new HashSet();
+/*   66 */   private Set featureSet = new HashSet();
+/*   67 */   private StringBuffer rptSb = new StringBuffer();
+/*   68 */   private StringBuffer xmlgenSb = new StringBuffer();
+/*   69 */   private StringBuffer userxmlSb = new StringBuffer();
+/*   70 */   private String t2DTS = "&nbsp;";
+/*   71 */   private SimpleDateFormat sdf = new SimpleDateFormat("yy/MM/dd");
+/*   72 */   private Object[] args = (Object[])new String[10];
+/*      */   public static final String RPTPATH = "_rptpath";
+/*   74 */   private static final char[] FOOL_JTEST = new char[] { '\n' };
+/*   75 */   protected static final String NEWLINE = new String(FOOL_JTEST);
+/*      */   
+/*   77 */   private static int DEBUG_LVL = ABRServerProperties.getABRDebugLevel("WTAASAPSWABR");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void execute_run() {
+/*   84 */     String str1 = "";
+/*      */     
+/*      */     try {
+/*   87 */       long l = System.currentTimeMillis();
+/*      */       
+/*   89 */       start_ABRBuild(false);
+/*      */ 
+/*      */       
+/*   92 */       this.rsBundle = ResourceBundle.getBundle(getClass().getName(), 
+/*   93 */           ABRUtil.getLocale(this.m_prof.getReadLanguage().getNLSID()));
+/*      */ 
+/*      */       
+/*   96 */       setReturnCode(0);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  101 */       this.m_elist = this.m_db.getEntityList(this.m_prof, new ExtractActionItem(null, this.m_db, this.m_prof, "dummy"), new EntityItem[] { new EntityItem(null, this.m_prof, 
+/*      */               
+/*  103 */               getEntityType(), getEntityID()) });
+/*      */       
+/*  105 */       EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*  106 */       addDebug("DEBUG: rootEntity = " + entityItem.getEntityType() + entityItem.getEntityID());
+/*      */       
+/*  108 */       String str6 = getAttributeValue(entityItem, "ADOCNO");
+/*  109 */       addDebug("ANNOUNCEMENT DOCNUM (CDOCNO): " + str6);
+/*      */       
+/*  111 */       this.annDate = getAttributeValue(entityItem, "ANNDATE");
+/*  112 */       addDebug("ANNOUNCEMENT ANNDATE: " + this.annDate);
+/*      */       
+/*  114 */       this.annNumber = getAttributeValue(entityItem, "ANNNUMBER");
+/*  115 */       addDebug("RFA number: " + this.annNumber);
+/*      */       
+/*  117 */       String str7 = getAttributeValue(entityItem, "ANNTYPE");
+/*  118 */       addDebug("ANNOUNCEMENT type: " + str7);
+/*      */       
+/*  120 */       str1 = getNavigationName(entityItem);
+/*      */       
+/*  122 */       if (getReturnCode() == 0) {
+/*  123 */         processThis(this, this.m_prof, entityItem);
+/*      */         
+/*  125 */         boolean bool = generateOutputFile(this.prodInfo);
+/*  126 */         if (bool) {
+/*      */           
+/*  128 */           sendMail(this.zipFile);
+/*      */           
+/*  130 */           if (!getABRItem().getKeepFile() && 
+/*  131 */             this.zipFile.exists()) {
+/*  132 */             this.zipFile.delete();
+/*  133 */             addDebug("Check the keep file is false, delete the zip file");
+/*      */           } 
+/*      */         } else {
+/*      */           
+/*  137 */           setReturnCode(-1);
+/*      */         } 
+/*      */       } 
+/*      */ 
+/*      */       
+/*  142 */       addDebug("Total Time: " + 
+/*  143 */           Stopwatch.format(System.currentTimeMillis() - l));
+/*      */     }
+/*  145 */     catch (Throwable throwable) {
+/*  146 */       StringWriter stringWriter = new StringWriter();
+/*  147 */       String str6 = "<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
+/*  148 */       String str7 = "<pre>{0}</pre>";
+/*  149 */       MessageFormat messageFormat1 = new MessageFormat(str6);
+/*  150 */       setReturnCode(-3);
+/*  151 */       throwable.printStackTrace(new PrintWriter(stringWriter));
+/*      */       
+/*  153 */       this.args[0] = throwable.getMessage();
+/*  154 */       this.rptSb.append(messageFormat1.format(this.args) + NEWLINE);
+/*  155 */       messageFormat1 = new MessageFormat(str7);
+/*  156 */       this.args[0] = stringWriter.getBuffer().toString();
+/*  157 */       this.rptSb.append(messageFormat1.format(this.args) + NEWLINE);
+/*  158 */       logError("Exception: " + throwable.getMessage());
+/*  159 */       logError(stringWriter.getBuffer().toString());
+/*      */     } finally {
+/*  161 */       if ("&nbsp;".equals(this.t2DTS)) {
+/*  162 */         this.t2DTS = getNow();
+/*      */       }
+/*  164 */       setDGTitle(str1);
+/*  165 */       setDGRptName(getShortClassName(getClass()));
+/*  166 */       setDGRptClass(getABRCode());
+/*      */       
+/*  168 */       if (!isReadOnly()) {
+/*  169 */         clearSoftLock();
+/*      */       }
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/*  175 */     println(EACustom.getDocTypeHtml());
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  188 */     String str2 = "<head>" + EACustom.getMetaTags(getDescription()) + NEWLINE + EACustom.getCSS() + NEWLINE + EACustom.getTitle("{0} {1}") + NEWLINE + "</head>" + NEWLINE + "<body id=\"ibm-com\">" + EACustom.getMastheadDiv() + NEWLINE + "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
+/*      */ 
+/*      */ 
+/*      */     
+/*  192 */     MessageFormat messageFormat = new MessageFormat(str2);
+/*  193 */     this.args[0] = getShortClassName(getClass());
+/*  194 */     this.args[1] = str1;
+/*  195 */     String str3 = messageFormat.format(this.args);
+/*  196 */     String str4 = buildAbrHeader();
+/*      */ 
+/*      */     
+/*  199 */     String str5 = str3 + str4 + "<pre>" + this.rsBundle.getString("RESULT_MSG") + "<br />" + this.userxmlSb.toString() + "</pre>" + NEWLINE;
+/*  200 */     this.rptSb.insert(0, str5);
+/*      */     
+/*  202 */     println(this.rptSb.toString());
+/*  203 */     printDGSubmitString();
+/*  204 */     println(EACustom.getTOUDiv());
+/*  205 */     buildReportFooter();
+/*      */ 
+/*      */     
+/*  208 */     this.m_elist.dereference();
+/*  209 */     this.m_elist = null;
+/*  210 */     this.rsBundle = null;
+/*  211 */     this.args = null;
+/*  212 */     messageFormat = null;
+/*  213 */     this.userxmlSb = null;
+/*  214 */     this.rptSb = null;
+/*  215 */     this.xmlgenSb = null;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void processThis(WTAASAPSWABR paramWTAASAPSWABR, Profile paramProfile, EntityItem paramEntityItem) throws TransformerConfigurationException, SAXException, MiddlewareRequestException, SQLException, MiddlewareException, IOException {
+/*  221 */     boolean bool = getModelInfo(paramEntityItem);
+/*  222 */     if (bool) {
+/*  223 */       getSWFeatureInfo(paramEntityItem);
+/*      */     } else {
+/*  225 */       getProdInfo(paramEntityItem);
+/*      */     } 
+/*      */ 
+/*      */     
+/*  229 */     long l = System.currentTimeMillis();
+/*      */     
+/*  231 */     addDebug("get price info Time: " + 
+/*  232 */         Stopwatch.format(System.currentTimeMillis() - l));
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void getProdInfo(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/*  244 */     ResultSet resultSet = null;
+/*  245 */     PreparedStatement preparedStatement = null;
+/*      */     
+/*      */     try {
+/*  248 */       preparedStatement = this.m_db.getPDHConnection().prepareStatement(
+/*  249 */           queryForPROD(paramEntityItem));
+/*  250 */       resultSet = preparedStatement.executeQuery();
+/*  251 */       while (resultSet.next()) {
+/*  252 */         String str3 = resultSet.getString(5);
+/*  253 */         String str4 = resultSet.getString(7);
+/*      */         
+/*  255 */         String str5 = resultSet.getString(1);
+/*  256 */         String str6 = resultSet.getString(2);
+/*  257 */         String str7 = resultSet.getString(3);
+/*  258 */         String str8 = resultSet.getString(4);
+/*      */         
+/*  260 */         String str9 = resultSet.getString(6);
+/*  261 */         String str10 = resultSet.getString(8);
+/*  262 */         String str11 = resultSet.getString(9);
+/*  263 */         String str12 = resultSet.getString(10);
+/*  264 */         String str13 = resultSet.getString(11);
+/*  265 */         String str14 = resultSet.getString(12);
+/*      */         
+/*  267 */         String str15 = resultSet.getString(13);
+/*  268 */         String str16 = resultSet.getString(14);
+/*  269 */         String str17 = resultSet.getString(15);
+/*  270 */         String str18 = resultSet.getString(16);
+/*  271 */         String str19 = resultSet.getString(17);
+/*      */ 
+/*      */         
+/*  274 */         String str1 = str3;
+/*  275 */         String str2 = str12;
+/*      */         
+/*  277 */         if (this.prodInfo.get(str1) != null) {
+/*  278 */           WTAASAPSWENTITY wTAASAPSWENTITY1 = (WTAASAPSWENTITY)this.prodInfo.get(str1);
+/*      */           
+/*  280 */           HashMap<String, ArrayList<PRODINFO>> hashMap1 = wTAASAPSWENTITY1.getPROD();
+/*  281 */           if (hashMap1.get(str2) != null) {
+/*  282 */             PRODINFO pRODINFO2 = new PRODINFO();
+/*  283 */             pRODINFO2.setPRODUCTVRM(str10);
+/*  284 */             pRODINFO2.setMACHTYPEATR(str12);
+/*  285 */             pRODINFO2.setMODELATR(str11);
+/*  286 */             pRODINFO2.setMODELID(str4);
+/*  287 */             pRODINFO2.setMINVNAME(str13);
+/*  288 */             pRODINFO2.setEDUCALLOWMHGHSCH(str14);
+/*      */             
+/*  290 */             pRODINFO2.setSwFeatureId(str15);
+/*  291 */             pRODINFO2.setFEATURECODE(str16);
+/*  292 */             pRODINFO2.setPRICEDFEATURE(str17);
+/*  293 */             pRODINFO2.setCHARGEOPTION(str18);
+/*  294 */             pRODINFO2.setSFINVNAME(str19);
+/*      */             
+/*  296 */             ArrayList<PRODINFO> arrayList2 = (ArrayList)hashMap1.get(str2);
+/*  297 */             arrayList2.add(pRODINFO2); continue;
+/*      */           } 
+/*  299 */           PRODINFO pRODINFO1 = new PRODINFO();
+/*  300 */           pRODINFO1.setPRODUCTVRM(str10);
+/*  301 */           pRODINFO1.setMACHTYPEATR(str12);
+/*  302 */           pRODINFO1.setMODELATR(str11);
+/*  303 */           pRODINFO1.setMODELID(str4);
+/*  304 */           pRODINFO1.setMINVNAME(str13);
+/*  305 */           pRODINFO1.setEDUCALLOWMHGHSCH(str14);
+/*      */           
+/*  307 */           pRODINFO1.setSwFeatureId(str15);
+/*  308 */           pRODINFO1.setFEATURECODE(str16);
+/*  309 */           pRODINFO1.setPRICEDFEATURE(str17);
+/*  310 */           pRODINFO1.setCHARGEOPTION(str18);
+/*  311 */           pRODINFO1.setSFINVNAME(str19);
+/*      */           
+/*  313 */           ArrayList<PRODINFO> arrayList1 = new ArrayList();
+/*  314 */           arrayList1.add(pRODINFO1);
+/*  315 */           hashMap1.put(str2, arrayList1);
+/*      */           
+/*      */           continue;
+/*      */         } 
+/*  319 */         WTAASAPSWENTITY wTAASAPSWENTITY = new WTAASAPSWENTITY();
+/*  320 */         wTAASAPSWENTITY.setADOCNO(str5);
+/*  321 */         wTAASAPSWENTITY.setANNDATE(str6);
+/*  322 */         wTAASAPSWENTITY.setANNNUMBER(str7);
+/*  323 */         wTAASAPSWENTITY.setRFASHRTTITLE(str8);
+/*  324 */         wTAASAPSWENTITY.setAVAILID(str3);
+/*  325 */         wTAASAPSWENTITY.setEFFECTIVEDATE(str9);
+/*      */         
+/*  327 */         PRODINFO pRODINFO = new PRODINFO();
+/*  328 */         pRODINFO.setPRODUCTVRM(str10);
+/*  329 */         pRODINFO.setMODELID(str4);
+/*  330 */         pRODINFO.setMACHTYPEATR(str12);
+/*  331 */         pRODINFO.setMODELATR(str11);
+/*  332 */         pRODINFO.setMINVNAME(str13);
+/*  333 */         pRODINFO.setEDUCALLOWMHGHSCH(str14);
+/*      */         
+/*  335 */         pRODINFO.setSwFeatureId(str15);
+/*  336 */         pRODINFO.setFEATURECODE(str16);
+/*  337 */         pRODINFO.setPRICEDFEATURE(str17);
+/*  338 */         pRODINFO.setCHARGEOPTION(str18);
+/*  339 */         pRODINFO.setSFINVNAME(str19);
+/*      */         
+/*  341 */         ArrayList<PRODINFO> arrayList = new ArrayList();
+/*  342 */         arrayList.add(pRODINFO);
+/*  343 */         HashMap<Object, Object> hashMap = new HashMap<>();
+/*  344 */         hashMap.put(str2, arrayList);
+/*  345 */         wTAASAPSWENTITY.setPROD(hashMap);
+/*      */         
+/*  347 */         this.prodInfo.put(str1, wTAASAPSWENTITY);
+/*      */       } 
+/*      */     } finally {
+/*      */       
+/*  351 */       if (preparedStatement != null) {
+/*      */         try {
+/*  353 */           preparedStatement.close();
+/*  354 */         } catch (SQLException sQLException) {
+/*  355 */           sQLException.printStackTrace();
+/*      */         } 
+/*      */       }
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean getModelInfo(EntityItem paramEntityItem) throws MiddlewareException, SQLException {
+/*  370 */     ResultSet resultSet = null;
+/*  371 */     PreparedStatement preparedStatement = null;
+/*  372 */     boolean bool = false;
+/*      */     
+/*      */     try {
+/*  375 */       Connection connection = this.m_db.getPDHConnection();
+/*      */       
+/*  377 */       preparedStatement = connection.prepareStatement(queryForMODEL(paramEntityItem));
+/*  378 */       resultSet = preparedStatement.executeQuery();
+/*      */       
+/*  380 */       while (resultSet.next()) {
+/*  381 */         String str3 = resultSet.getString(5);
+/*  382 */         String str4 = resultSet.getString(7);
+/*      */         
+/*  384 */         String str5 = resultSet.getString(1);
+/*  385 */         String str6 = resultSet.getString(2);
+/*  386 */         String str7 = resultSet.getString(3);
+/*  387 */         String str8 = resultSet.getString(4);
+/*      */         
+/*  389 */         String str9 = resultSet.getString(6);
+/*  390 */         String str10 = resultSet.getString(8);
+/*      */         
+/*  392 */         String str1 = str3;
+/*  393 */         String str2 = str10;
+/*      */         
+/*  395 */         if (this.prodInfo.get(str1) != null) {
+/*  396 */           WTAASAPSWENTITY wTAASAPSWENTITY = (WTAASAPSWENTITY)this.prodInfo.get(str1);
+/*      */           
+/*  398 */           HashMap<String, ArrayList<PRODINFO>> hashMap = wTAASAPSWENTITY.getPROD();
+/*      */           
+/*  400 */           PRODINFO pRODINFO = new PRODINFO();
+/*  401 */           pRODINFO.setMODELID(str4);
+/*      */           
+/*  403 */           if (hashMap.get(str2) != null) {
+/*  404 */             ArrayList<PRODINFO> arrayList = (ArrayList)hashMap.get(str2);
+/*  405 */             if (!arrayList.contains(pRODINFO))
+/*      */             {
+/*      */               
+/*  408 */               arrayList.add(pRODINFO);
+/*      */             }
+/*      */           } else {
+/*  411 */             ArrayList<PRODINFO> arrayList = new ArrayList();
+/*  412 */             arrayList.add(pRODINFO);
+/*  413 */             hashMap.put(str2, arrayList);
+/*      */           } 
+/*  415 */           wTAASAPSWENTITY.setPROD(hashMap);
+/*      */         } else {
+/*  417 */           WTAASAPSWENTITY wTAASAPSWENTITY = new WTAASAPSWENTITY();
+/*  418 */           wTAASAPSWENTITY.setADOCNO(str5);
+/*  419 */           wTAASAPSWENTITY.setANNDATE(str6);
+/*  420 */           wTAASAPSWENTITY.setANNNUMBER(str7);
+/*  421 */           wTAASAPSWENTITY.setRFASHRTTITLE(str8);
+/*  422 */           wTAASAPSWENTITY.setAVAILID(str3);
+/*  423 */           wTAASAPSWENTITY.setEFFECTIVEDATE(str9);
+/*      */           
+/*  425 */           HashMap<Object, Object> hashMap = new HashMap<>();
+/*  426 */           ArrayList<PRODINFO> arrayList = new ArrayList();
+/*  427 */           PRODINFO pRODINFO = new PRODINFO();
+/*  428 */           pRODINFO.setMODELID(str4);
+/*  429 */           arrayList.add(pRODINFO);
+/*  430 */           hashMap.put(str10, arrayList);
+/*  431 */           wTAASAPSWENTITY.setPROD(hashMap);
+/*      */           
+/*  433 */           this.prodInfo.put(str1, wTAASAPSWENTITY);
+/*      */         } 
+/*  435 */         bool = true;
+/*      */       } 
+/*      */     } finally {
+/*  438 */       if (preparedStatement != null) {
+/*      */         try {
+/*  440 */           preparedStatement.close();
+/*  441 */         } catch (SQLException sQLException) {
+/*  442 */           sQLException.printStackTrace();
+/*      */         } 
+/*      */       }
+/*      */     } 
+/*  446 */     return bool;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void getSWFeatureInfo(EntityItem paramEntityItem) throws MiddlewareException, SQLException {
+/*  457 */     ResultSet resultSet = null;
+/*  458 */     PreparedStatement preparedStatement = null;
+/*      */     
+/*      */     try {
+/*  461 */       Connection connection = this.m_db.getPDHConnection();
+/*  462 */       Iterator<Map.Entry> iterator = this.prodInfo.entrySet().iterator();
+/*  463 */       while (iterator.hasNext()) {
+/*  464 */         Map.Entry entry = iterator.next();
+/*  465 */         WTAASAPSWENTITY wTAASAPSWENTITY = (WTAASAPSWENTITY)entry.getValue();
+/*  466 */         Iterator<Map.Entry> iterator1 = wTAASAPSWENTITY.getPROD().entrySet().iterator();
+/*  467 */         while (iterator1.hasNext()) {
+/*  468 */           Map.Entry entry1 = iterator1.next();
+/*  469 */           ArrayList<PRODINFO> arrayList = (ArrayList)entry1.getValue();
+/*  470 */           int i = arrayList.size();
+/*  471 */           for (byte b = 0; b < i; b++) {
+/*  472 */             PRODINFO pRODINFO = arrayList.get(b);
+/*  473 */             String str = pRODINFO.getMODELID();
+/*      */             
+/*  475 */             preparedStatement = connection.prepareStatement(queryForSWFC(paramEntityItem, str));
+/*  476 */             resultSet = preparedStatement.executeQuery();
+/*      */             
+/*  478 */             while (resultSet.next()) {
+/*  479 */               String str1 = resultSet.getString(1);
+/*  480 */               String str2 = resultSet.getString(2);
+/*  481 */               String str3 = resultSet.getString(3);
+/*  482 */               String str4 = resultSet.getString(4);
+/*  483 */               String str5 = resultSet.getString(5);
+/*  484 */               String str6 = resultSet.getString(6);
+/*  485 */               String str7 = resultSet.getString(7);
+/*  486 */               String str8 = resultSet.getString(8);
+/*  487 */               String str9 = resultSet.getString(9);
+/*  488 */               String str10 = resultSet.getString(10);
+/*      */               
+/*  490 */               PRODINFO pRODINFO1 = new PRODINFO();
+/*  491 */               pRODINFO1.setPRODUCTVRM(str1);
+/*  492 */               pRODINFO1.setMODELATR(str3);
+/*  493 */               pRODINFO1.setMACHTYPEATR(str2);
+/*  494 */               pRODINFO1.setMINVNAME(str4);
+/*  495 */               pRODINFO1.setEDUCALLOWMHGHSCH(str5);
+/*  496 */               pRODINFO1.setMODELID(str);
+/*      */               
+/*  498 */               pRODINFO1.setSwFeatureId(str6);
+/*  499 */               pRODINFO1.setFEATURECODE(str10);
+/*  500 */               pRODINFO1.setPRICEDFEATURE(str7);
+/*  501 */               pRODINFO1.setCHARGEOPTION(str8);
+/*  502 */               pRODINFO1.setSFINVNAME(str9);
+/*      */               
+/*  504 */               arrayList.add(pRODINFO1);
+/*      */             } 
+/*      */             
+/*  507 */             pRODINFO.setMODELID(null);
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } finally {
+/*  512 */       if (preparedStatement != null) {
+/*      */         try {
+/*  514 */           preparedStatement.close();
+/*  515 */         } catch (SQLException sQLException) {
+/*  516 */           sQLException.printStackTrace();
+/*      */         } 
+/*      */       }
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String queryForPROD(EntityItem paramEntityItem) {
+/*  527 */     StringBuffer stringBuffer = new StringBuffer();
+/*  528 */     addDebug("Get ANN related PRODSTRUCT info");
+/*      */     
+/*  530 */     stringBuffer.append("SELECT ADOCNO,ANNDATE,ANNNUMBER,CAST(RFASHRTTITLE AS VARCHAR(500)),AVAILID,EFFECTIVEDATE,MODELID,PRODUCTVRM,MODELATR,MACHTYPEATR,INVNAME,EDUCALLOWMHGHSCH,FEATUREID,FEATURECODE,PRICEDFEATURE,CHARGEOPTION,SFINVNAME FROM  ");
+/*  531 */     stringBuffer.append("(select ann.ADOCNO, ann.ANNDATE, ann.ANNNUMBER, ann.RFASHRTTITLE,f.entityid as availid, a1.EFFECTIVEDATE, m.entityid as modelid, m.PRODUCTVRM, m.MODELATR, m.MACHTYPEATR, m.INVNAME, t.attributevalue as EDUCALLOWMHGHSCH, sf.entityid as featureid, sf.FEATURECODE, sf.PRICEDFEATURE, sf.CHARGEOPTION, sf.INVNAME as SFINVNAME from price.announcement ann ");
+/*  532 */     stringBuffer.append("join price.avail a1 on a1.STATUS='Final' and a1.ANNCODENAME=ann.ANNCODENAME and a1.availType in ('Planned Availability','First Order')  ");
+/*  533 */     stringBuffer.append("join opicm.flag f on f.entitytype='AVAIL' and f.attributecode='GENAREASELECTION' and f.attributevalue in ('1999','6199','6211','6219','6220') and f.valto>current timestamp and f.effto>current timestamp and f.entityid = a1.entityid ");
+/*      */     
+/*  535 */     stringBuffer.append("join opicm.relator r1 on r1.entity1type='SWPRODSTRUCT' and r1.entity2type='AVAIL' and r1.entity2id=f.entityid and r1.valto>current timestamp and r1.effto>current timestamp  ");
+/*  536 */     stringBuffer.append("join price.swprodstruct sw on sw.entityid=r1.entity1id and sw.STATUS='Final' ");
+/*  537 */     stringBuffer.append("join price.SWFEATURE sf on sf.entityid=sw.id1 and sf.STATUS='Final' ");
+/*  538 */     stringBuffer.append("join price.model m on m.entityid=sw.id2 and m.STATUS='Final' and m.COFCAT='Software' ");
+/*  539 */     stringBuffer.append("left join opicm.relator r3 on r3.entity1type='MODEL' and r3.entity1id=m.entityid and r3.entity2type='GEOMOD' and r3.valto>current timestamp and r3.effto>current timestamp ");
+/*  540 */     stringBuffer.append("left join opicm.text t  on t.entitytype='GEOMOD' and t.entityid=r3.entity2id and t.attributecode='EDUCALLOWMHGHSCH' and t.valto>current timestamp and t.effto>current timestamp ");
+/*  541 */     stringBuffer.append("where ann.entityid=");
+/*  542 */     stringBuffer.append(paramEntityItem.getEntityID());
+/*  543 */     stringBuffer.append(" and ann.ANNSTATUS='Final' and ann.nlsid=1 order by m.MACHTYPEATR,m.MODELATR,availid,featureid) ");
+/*  544 */     stringBuffer.append("GROUP BY AVAILID,ADOCNO,ANNDATE,ANNNUMBER,CAST(RFASHRTTITLE AS VARCHAR(500)),EFFECTIVEDATE,MODELID,PRODUCTVRM,MODELATR,MACHTYPEATR,INVNAME,EDUCALLOWMHGHSCH,FEATUREID,FEATURECODE,PRICEDFEATURE,CHARGEOPTION,SFINVNAME WITH UR ");
+/*      */     
+/*  546 */     addDebug("SQL:" + stringBuffer);
+/*  547 */     return stringBuffer.toString();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String queryForMODEL(EntityItem paramEntityItem) {
+/*  555 */     addDebug("Get ANN related MODEL info---------------");
+/*  556 */     StringBuffer stringBuffer = new StringBuffer();
+/*      */     
+/*  558 */     stringBuffer.append("SELECT ADOCNO,ANNDATE,ANNNUMBER,CAST(RFASHRTTITLE AS VARCHAR(500)),AVAILID,EFFECTIVEDATE,MODELID,MACHTYPEATR FROM  ");
+/*  559 */     stringBuffer.append("(select ann.ADOCNO, ann.ANNDATE, ann.ANNNUMBER, ann.RFASHRTTITLE, f.entityid as availid, a1.EFFECTIVEDATE, m.entityid as modelid, m.MACHTYPEATR from price.announcement ann  ");
+/*  560 */     stringBuffer.append("join price.avail a1 on a1.ANNCODENAME=ann.ANNCODENAME and a1.STATUS='Final' and a1.availType in ('Planned Availability','First Order') ");
+/*  561 */     stringBuffer.append("join opicm.flag  f  on f.entitytype='AVAIL' and f.attributecode='GENAREASELECTION' and f.attributevalue in ('1999','6199','6211','6219','6220') and f.valto>current timestamp and f.effto>current timestamp and f.entityid = a1.entityid ");
+/*  562 */     stringBuffer.append("join opicm.relator r on r.entity1type='MODEL' and r.entity2type='AVAIL' and r.entity2id=f.entityid and r.valto>current timestamp and r.effto>current timestamp ");
+/*  563 */     stringBuffer.append("join price.model m on m.entityid=r.entity1id and m.STATUS='Final' and m.COFCAT='Software' ");
+/*  564 */     stringBuffer.append("left join opicm.relator r3 on r3.entity1type='MODEL' and r3.entity1id=m.entityid and r3.entity2type='GEOMOD' and r3.valto>current timestamp and r3.effto>current timestamp ");
+/*  565 */     stringBuffer.append("left join opicm.text t  on t.entitytype='GEOMOD' and t.entityid=r3.entity2id and t.attributecode='EDUCALLOWMHGHSCH' and t.valto>current timestamp and t.effto>current timestamp ");
+/*  566 */     stringBuffer.append("where ann.entityid = ");
+/*  567 */     stringBuffer.append(paramEntityItem.getEntityID());
+/*  568 */     stringBuffer.append(" and ann.ANNSTATUS='Final' and ann.nlsid=1 order by m.MACHTYPEATR,modelid,availid) ");
+/*  569 */     stringBuffer.append("GROUP BY AVAILID,ADOCNO,ANNDATE,ANNNUMBER,CAST(RFASHRTTITLE AS VARCHAR(500)),EFFECTIVEDATE,MODELID,MACHTYPEATR WITH UR ");
+/*      */     
+/*  571 */     addDebug("SQL:" + stringBuffer);
+/*  572 */     return stringBuffer.toString();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String queryForSWFC(EntityItem paramEntityItem, String paramString) {
+/*  583 */     addDebug("Get ANN related SWFeature info---------------");
+/*  584 */     StringBuffer stringBuffer = new StringBuffer();
+/*  585 */     stringBuffer.append("SELECT PRODUCTVRM,MACHTYPEATR,MODELATR,INVNAME,CAST(EDUCALLOWMHGHSCH AS VARCHAR(500)),FEATUREID,PRICEDFEATURE,CHARGEOPTION,SFINVNAME,FEATURECODE FROM  ( ");
+/*  586 */     stringBuffer.append("select m.PRODUCTVRM, m.MACHTYPEATR, m.MODELATR, m.INVNAME, t.attributevalue as EDUCALLOWMHGHSCH, sf.entityid as featureid,sf.PRICEDFEATURE,sf.CHARGEOPTION,sf.INVNAME as SFINVNAME,sf.FEATURECODE from price.announcement ann ");
+/*  587 */     stringBuffer.append("join price.avail a1 on a1.ANNCODENAME=ann.ANNCODENAME and a1.STATUS='Final' and a1.availType in ('Planned Availability','First Order') ");
+/*  588 */     stringBuffer.append("join opicm.flag  f  on f.entitytype='AVAIL' and f.attributecode='GENAREASELECTION' and f.attributevalue in ('1999','6199','6211','6219','6220') and f.valto>current timestamp and f.effto>current timestamp and f.entityid = a1.entityid ");
+/*  589 */     stringBuffer.append("join opicm.relator r1 on r1.entity1type='SWPRODSTRUCT' and r1.entity2type='AVAIL' and r1.entity2id=a1.entityid and r1.valto>current timestamp and r1.effto>current timestamp ");
+/*  590 */     stringBuffer.append("join price.swprodstruct sw on sw.entityid=r1.entity1id and sw.STATUS='Final' and sw.id2 = ");
+/*  591 */     stringBuffer.append(paramString);
+/*  592 */     stringBuffer.append(" join price.MODEL m on m.entityid=sw.id2 and m.STATUS='Final' ");
+/*  593 */     stringBuffer.append("left join opicm.relator r3 on r3.entity1type='MODEL' and r3.entity1id=m.entityid and r3.entity2type='GEOMOD' and r3.valto>current timestamp and r3.effto>current timestamp ");
+/*  594 */     stringBuffer.append("left join opicm.text t  on t.entitytype='GEOMOD' and t.entityid=r3.entity2id and t.attributecode='EDUCALLOWMHGHSCH' and t.valto>current timestamp and t.effto>current timestamp ");
+/*  595 */     stringBuffer.append(" join price.SWFEATURE sf on sf.entityid=sw.id1 and sf.STATUS='Final' ");
+/*  596 */     stringBuffer.append("where ann.entityid= ");
+/*  597 */     stringBuffer.append(paramEntityItem.getEntityID());
+/*  598 */     stringBuffer.append(" and ann.ANNSTATUS='Final' and ann.nlsid=1 order by featureid ) ");
+/*  599 */     stringBuffer.append("GROUP BY PRODUCTVRM,MACHTYPEATR,MODELATR,INVNAME,CAST(EDUCALLOWMHGHSCH AS VARCHAR(500)),FEATUREID,PRICEDFEATURE,CHARGEOPTION,SFINVNAME,FEATURECODE WITH UR ");
+/*      */     
+/*  601 */     addDebug("SQL:" + stringBuffer);
+/*      */     
+/*  603 */     return stringBuffer.toString();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getModifyNum(String paramString) {
+/*  612 */     String str = null;
+/*  613 */     if (paramString == null || "".equals(paramString)) {
+/*  614 */       str = "00";
+/*      */     } else {
+/*  616 */       String[] arrayOfString = splitStr(paramString, ".");
+/*  617 */       if (arrayOfString.length > 2) {
+/*  618 */         String str1 = arrayOfString[2].trim();
+/*  619 */         if (str1.length() < 2) {
+/*  620 */           str = "0" + str1;
+/*  621 */         } else if (str1.length() == 2) {
+/*  622 */           str = str1;
+/*      */         } else {
+/*  624 */           str = str1.substring(0, 2);
+/*      */         } 
+/*      */       } else {
+/*  627 */         str = "00";
+/*      */       } 
+/*      */     } 
+/*  630 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getReleaseNum(String paramString) {
+/*  638 */     String str = null;
+/*  639 */     if (paramString == null || "".equals(paramString)) {
+/*  640 */       str = "01";
+/*      */     } else {
+/*  642 */       String[] arrayOfString = splitStr(paramString, ".");
+/*  643 */       if (arrayOfString.length > 1) {
+/*  644 */         String str1 = arrayOfString[1].trim();
+/*  645 */         if (str1.length() < 2) {
+/*  646 */           str = "0" + str1;
+/*  647 */         } else if (str1.length() == 2) {
+/*  648 */           str = str1;
+/*      */         } else {
+/*  650 */           str = str1.substring(0, 2).trim();
+/*      */         } 
+/*  652 */       } else if (arrayOfString.length == 1) {
+/*      */         
+/*  654 */         str = "00";
+/*      */       } 
+/*      */     } 
+/*  657 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getVersionNum(String paramString) {
+/*  666 */     String str = "";
+/*  667 */     if (paramString == null || "".equals(paramString)) {
+/*  668 */       str = "01";
+/*      */     } else {
+/*      */       
+/*  671 */       String[] arrayOfString = splitStr(paramString, ".");
+/*  672 */       String str1 = arrayOfString[0].trim();
+/*  673 */       if (str1.startsWith("V")) {
+/*  674 */         str1 = str1.substring(1, str1.length()).trim();
+/*      */       }
+/*  676 */       if (str1.length() < 2) {
+/*  677 */         str = "0" + str1;
+/*  678 */       } else if (str1.length() == 2) {
+/*  679 */         str = str1;
+/*      */       } 
+/*      */     } 
+/*      */     
+/*  683 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String[] splitStr(String paramString1, String paramString2) {
+/*  693 */     StringTokenizer stringTokenizer = new StringTokenizer(paramString1, paramString2);
+/*  694 */     String[] arrayOfString = new String[stringTokenizer.countTokens()];
+/*  695 */     byte b = 0;
+/*  696 */     while (stringTokenizer.hasMoreTokens()) {
+/*  697 */       arrayOfString[b] = stringTokenizer.nextToken();
+/*  698 */       b++;
+/*      */     } 
+/*  700 */     return arrayOfString;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String setFileName(String paramString) {
+/*  708 */     StringBuffer stringBuffer = new StringBuffer(paramString.trim());
+/*  709 */     String str1 = getNow();
+/*      */     
+/*  711 */     str1 = str1.replace(' ', '_');
+/*  712 */     stringBuffer.append(str1 + ".SCRIPT");
+/*  713 */     String str2 = ABRServerProperties.getValue(this.m_abri.getABRCode(), "_rptpath", "/Dgq");
+/*  714 */     if (!str2.endsWith("/")) {
+/*  715 */       str2 = str2 + "/";
+/*      */     }
+/*  717 */     String str3 = str2 + stringBuffer.toString();
+/*      */     
+/*  719 */     addDebug("**** ffPathName: " + str3 + " ffFileName: " + stringBuffer.toString());
+/*  720 */     return str3;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean generateOutputFile(HashMap paramHashMap) {
+/*  728 */     if (paramHashMap.size() == 0) {
+/*  729 */       this.userxmlSb.append("File generate failed, for there is no qualified data related, please check ");
+/*  730 */       return false;
+/*      */     } 
+/*      */ 
+/*      */     
+/*      */     try {
+/*  735 */       Iterator<Map.Entry> iterator = paramHashMap.entrySet().iterator();
+/*  736 */       Vector<String> vector = new Vector(1);
+/*  737 */       byte b = 1;
+/*  738 */       while (iterator.hasNext()) {
+/*  739 */         Map.Entry entry = iterator.next();
+/*  740 */         WTAASAPSWENTITY wTAASAPSWENTITY = (WTAASAPSWENTITY)entry.getValue();
+/*  741 */         String str1 = wTAASAPSWENTITY.getADOCNO();
+/*  742 */         str1 = (str1 != null) ? str1 : "";
+/*      */         
+/*  744 */         String str2 = setFileName("FP" + str1 + b);
+/*      */         
+/*  746 */         boolean bool = generateFile(str2, wTAASAPSWENTITY);
+/*  747 */         if (bool) {
+/*  748 */           vector.add(str2);
+/*  749 */           b++;
+/*      */         } 
+/*      */       } 
+/*      */       
+/*  753 */       generateZipfile(vector);
+/*  754 */       this.userxmlSb.append("File generate success");
+/*  755 */       return true;
+/*      */     }
+/*  757 */     catch (Exception exception) {
+/*  758 */       exception.printStackTrace();
+/*  759 */       return false;
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean generateFile(String paramString, WTAASAPSWENTITY paramWTAASAPSWENTITY) throws Exception {
+/*  771 */     FileOutputStream fileOutputStream = new FileOutputStream(paramString);
+/*  772 */     OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, "UTF-8");
+/*      */     try {
+/*  774 */       String str1 = "";
+/*  775 */       byte b1 = 1;
+/*  776 */       ArrayList<String> arrayList = new ArrayList();
+/*  777 */       String str2 = this.annNumber;
+/*      */ 
+/*      */       
+/*  780 */       Iterator<Map.Entry> iterator = paramWTAASAPSWENTITY.getPROD().entrySet().iterator();
+/*  781 */       while (iterator.hasNext()) {
+/*  782 */         Map.Entry entry = iterator.next();
+/*  783 */         String str5 = (String)entry.getKey();
+/*      */         
+/*  785 */         String str4 = generateFactSection(str2, str5, paramWTAASAPSWENTITY, b1);
+/*  786 */         if (str4 != null) {
+/*  787 */           arrayList.add(str4);
+/*  788 */           b1++;
+/*      */         } 
+/*      */       } 
+/*      */       
+/*  792 */       String str3 = "IJ";
+/*  793 */       str1 = str1 + generateHeadSection(str2, paramWTAASAPSWENTITY, 'P', str3) + "\r\n";
+/*      */       
+/*  795 */       b1 = 1; byte b2;
+/*  796 */       for (b2 = 0; b2 < arrayList.size(); b2++) {
+/*  797 */         String str = arrayList.get(b2);
+/*      */         
+/*  799 */         str1 = str1 + "  ---------------------------- FACT " + b1 + " OF " + arrayList.size() + " -------------------------------      \r\n" + str;
+/*      */         
+/*  801 */         b1++;
+/*      */       } 
+/*      */       
+/*  804 */       outputStreamWriter.write(str1);
+/*  805 */       this.userxmlSb.append(str2 + paramWTAASAPSWENTITY.getAVAILID() + " File generate success \n");
+/*  806 */       b2 = 1; return b2;
+/*  807 */     } catch (IOException iOException) {
+/*  808 */       this.userxmlSb.append(iOException);
+/*  809 */       throw new Exception("File create failed " + paramString);
+/*  810 */     } catch (WTAASException wTAASException) {
+/*  811 */       this.userxmlSb.append(wTAASException);
+/*  812 */       return false;
+/*      */     } finally {
+/*  814 */       outputStreamWriter.flush();
+/*  815 */       outputStreamWriter.close();
+/*      */       try {
+/*  817 */         if (outputStreamWriter != null) {
+/*  818 */           outputStreamWriter.close();
+/*      */         }
+/*  820 */       } catch (Exception exception) {
+/*  821 */         throw new Exception("File create failed " + paramString);
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   public String getValue(String paramString) {
+/*  828 */     if (paramString == null) {
+/*  829 */       return "";
+/*      */     }
+/*  831 */     return paramString;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String generateHeadSection(String paramString1, WTAASAPSWENTITY paramWTAASAPSWENTITY, char paramChar, String paramString2) throws Exception {
+/*  844 */     HashMap<Object, Object> hashMap = new HashMap<>();
+/*  845 */     hashMap.put("PANNRFA", paramString1);
+/*      */     
+/*  847 */     String str1 = formatValue(paramWTAASAPSWENTITY.getADOCNO(), "DOCID");
+/*  848 */     String str2 = formatValue(paramWTAASAPSWENTITY.getADOCNO(), "LETNO");
+/*  849 */     String str3 = formatDate(paramWTAASAPSWENTITY.getANNDATE(), "yyyy-MM-dd", "yyyyMMdd");
+/*      */     
+/*  851 */     String str4 = fixLength(paramWTAASAPSWENTITY.getRFASHRTTITLE(), 69);
+/*  852 */     String str5 = fixLength(paramWTAASAPSWENTITY.getRFASHRTTITLE(), 78);
+/*  853 */     String str6 = this.sdf.format(new Date());
+/*  854 */     String str7 = fixLength(formatDate(paramWTAASAPSWENTITY.getANNDATE(), "yyyy-MM-dd", "EEEEE, MMMMM dd, yyyy").toUpperCase(), 39);
+/*  855 */     String str8 = fixLength(formatDate(paramWTAASAPSWENTITY.getANNDATE(), "yyyy-MM-dd", "MMMMM dd, yyyy").toUpperCase(), 55);
+/*      */     
+/*  857 */     String str9 = ".*DOCID    F" + paramChar + "" + str1 + "\r\n.*LETNO    F" + paramChar + "" + str2 + "\r\n.*DATE     " + str3 + "\r\n.*REVISED  " + str3 + "\r\n.*TITLE    " + str4 + "                                       \r\n.ss                                                                           \r\n";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  865 */     str9 = str9 + ".*  Modified on " + str6 + " by " + paramString2 + "\r\n.fo on;.sk;.sv on;.tm 0;.bm 0;.pn off;.hy off;.ju off;.ti ?05               \r\n.pl 62;.ll 69;.co;.tr ! 40;.rf cancel;.rc 9 0;.rc 1 1                         \r\n.rc 2 2;.rc 3 3;.rc 4 4;.rc 5 5;.rc 6 6;.rc 7 7;.rc 8 8                       \r\n.fo off                                                                       \r\nCONFIDENTIAL UNTIL 8 AM NEW YORK TIME, " + str7 + "\r\n.fo off                                                                       \r\n.*DIST                                                                        \r\n:H2.AP Distribution:                                                          \r\n.sk                                                                           \r\nRefer to Fact Sheet details.                                                  \r\n.fo off;.sk                                                                   \r\n:H2.AP-RELEASE DATE:  " + str8 + "                                         \r\n.fo off;.sk                                                                   \r\nTHIS SECTION IS CLASSIFIED INTERNAL USE ONLY.                                 \r\n.in                                                                           \r\n.*LETTERNO                                                                    \r\n:H2.FACT SHEET NO. F" + paramChar + "" + str1 + "\r\n.*ELETTERNO                                                                   \r\nPROGRAMMING ANNOUNCEMENT                                                      \r\n.in                                                                           \r\nWORLD TRADE ASIA PACIFIC                                                      \r\n.sk;.in                                                                       \r\nRFA NUMBER:      " + paramString1 + "                                                        \r\n.sp                                                                           \r\n.fo left                                                                      \r\n.*TITLE                                                                       \r\n:H2.TITLE:                                                                    \r\n.br                                                                           \r\n" + str5 + "\r\n.*ETITLE                                                                      \r\n:h2.Fact sheet                                                                \r\n.sk;.fo off                                                                   \r\n ";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  900 */     return str9;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String formatValue(String paramString1, String paramString2) throws WTAASException {
+/*  906 */     String str = "      ";
+/*  907 */     if (paramString1 == null)
+/*  908 */       return str; 
+/*  909 */     if (paramString1.length() < 9)
+/*  910 */       throw new WTAASException("ADOC Number length is short than 9, please check"); 
+/*  911 */     if ("DOCID".equals(paramString2)) {
+/*  912 */       str = paramString1.substring(2, 4) + paramString1.substring(5, 9);
+/*  913 */       return str;
+/*  914 */     }  if ("LETNO".equals(paramString2)) {
+/*  915 */       str = paramString1.substring(2);
+/*  916 */       return str;
+/*      */     } 
+/*  918 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String generateFactSection(String paramString1, String paramString2, WTAASAPSWENTITY paramWTAASAPSWENTITY, int paramInt) throws Exception {
+/*  925 */     String str1 = formatDate(paramWTAASAPSWENTITY.getANNDATE(), "yyyy-MM-dd", "dd/MM/yy");
+/*  926 */     String str2 = paramWTAASAPSWENTITY.getADOCNO();
+/*  927 */     String str3 = "  REMARKS:                                                                      \r\n";
+/*  928 */     String str4 = null;
+/*  929 */     Vector vector = new Vector();
+/*  930 */     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+/*  931 */     String str5 = simpleDateFormat.format(new Date());
+/*      */     
+/*  933 */     int i = paramWTAASAPSWENTITY.getEFFECTIVEDATE().compareTo(str5);
+/*  934 */     if (i > 0) {
+/*  935 */       str4 = generateModelSection(paramString1, paramString2, paramWTAASAPSWENTITY, vector);
+/*      */     }
+/*      */     
+/*  938 */     String str6 = generateFeatureSection(paramString1, paramString2, paramInt, paramWTAASAPSWENTITY);
+/*      */     
+/*  940 */     if (str4 == null && str6 == null) {
+/*  941 */       return null;
+/*      */     }
+/*  943 */     if (str4 == null) {
+/*  944 */       str4 = "  MAJOR TYPE/MODEL BM FILE UPDATE                                               \r\n                                                                                \r\n  ADDITIONAL TYPE AND/OR MODELS                                                 \r\n                                     1ST DEL                                    \r\n  DESCRIPTION (ENGLISH/LOCAL)        DATE      MV       TYPE-MDL                \r\n                                                                                \r\n  END OF ADDITIONAL TYPE AND/OR MODELS                                          ";
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  953 */     if (str6 == null) {
+/*  954 */       str6 = "  MAJOR TYPE/FEATURE BF FILE UPDATE                                             \r\n                                                                                \r\n                                                                                \r\n  ADDITIONAL FEATURES                                                           \r\n                                                                                \r\n  Product Type: " + paramString2 + "                                                            \r\n                                        D                                       \r\n                                  ME O  S                                       \r\n                                   D T  L  1st DEL/                             \r\n  DESCRIPTION (ENGLISH/LOCAL)     IA C  O  PROC GROUP    MV    FEAT    P/N      \r\n                                                                                \r\n  END OF ADDITIONAL FEATURES                                                    ";
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  969 */     return "                                                                                \r\n              LICENSED PROGRAM ADMINISTRATIVE FACT SHEET                        \r\n                                                                                \r\n                    IBM CONFIDENTIAL UNTIL ANNOUNCED                            \r\n                                                                                \r\n  REFERENCE RFA/LA NO.: " + paramString1 + "          PROGRAM ANNOUNCEMENT: " + str2 + "          \r\n  PUBLICATION DATE: " + str1 + "                                                    \r\n                                                                                \r\n  RELEASED TO:  ALL AP ( X )    ASPA ONLY (  )    JAPAN ONLY (  )               \r\n                COUNTRY ONLY (SPECIFY)                                          \r\n                                                                                \r\n" + str3 + "                                                                                \r\n                                Distribution: BTO                               \r\n                                                                                \r\n" + str4 + "\r\n                                                                                \r\n" + str6 + "\r\n                                                                                \r\n  END OF FACT SHEET                                                             \r\n                                                                                \r\n";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String generateModelSection(String paramString1, String paramString2, WTAASAPSWENTITY paramWTAASAPSWENTITY, Vector<String> paramVector) throws Exception {
+/* 1005 */     String str1 = "";
+/* 1006 */     String str2 = "";
+/* 1007 */     HashMap hashMap = paramWTAASAPSWENTITY.getPROD();
+/* 1008 */     ArrayList<PRODINFO> arrayList = (ArrayList)hashMap.get(paramString2);
+/* 1009 */     for (byte b = 0; b < arrayList.size(); b++) {
+/* 1010 */       PRODINFO pRODINFO = arrayList.get(b);
+/* 1011 */       if (pRODINFO.getMODELID() != null) {
+/*      */ 
+/*      */         
+/* 1014 */         String str3 = formatDate(paramWTAASAPSWENTITY.getEFFECTIVEDATE(), "yyyy-MM-dd", "MMyy");
+/* 1015 */         String str4 = "N";
+/*      */ 
+/*      */         
+/* 1018 */         String str5 = (pRODINFO.getEDUCALLOWMHGHSCH() == null || pRODINFO.getEDUCALLOWMHGHSCH().trim().length() == 0) ? "000000" : matchformat(pRODINFO.getEDUCALLOWMHGHSCH());
+/* 1019 */         String str6 = "N";
+/*      */         
+/* 1021 */         String str7 = pRODINFO.getMACHTYPEATR();
+/* 1022 */         String str8 = pRODINFO.getMODELATR();
+/* 1023 */         String str9 = formatDate(paramWTAASAPSWENTITY.getANNDATE(), "yyyy-MM-dd", "ddMMyy");
+/* 1024 */         String str10 = pRODINFO.getPRODUCTVRM();
+/* 1025 */         String str11 = getVersionNum(str10);
+/* 1026 */         String str12 = getReleaseNum(str10);
+/* 1027 */         String str13 = getModifyNum(str10);
+/* 1028 */         String str14 = getValue(pRODINFO.getMINVNAME());
+/*      */         
+/* 1030 */         String str15 = "N";
+/*      */         
+/* 1032 */         String str16 = "N";
+/* 1033 */         String str17 = "N";
+/* 1034 */         String str18 = "Y";
+/* 1035 */         String str19 = fixLength(str14, 35);
+/*      */         
+/* 1037 */         if (this.modelSet.add(pRODINFO.getMACHTYPEATR())) {
+/*      */ 
+/*      */           
+/* 1040 */           str19 = fixLength(str14, 56);
+/*      */           
+/* 1042 */           str1 = "  Program No: " + str7 + "-" + str8 + "          Ver " + str11 + "   Rel " + str12 + "  Mod " + str13 + "                         \r\n  Description (English) " + str14 + "\r\n  Description (Local)                                                           \r\n  PP: Y PN:   PRPQ:   PO:   Media Feature: " + str6 + "             Use in Cty: Y          \r\n  Orders Rejected: N        DP Install,Post Order: NN    Price Print: Y         \r\n  Call Off: N               License,Install,Usage: " + str16 + "" + str17 + "" + str18 + "   S/W Warranty: " + str4 + "        \r\n  Auto Sftw Sched: Y        Mat Check,Pass: NN           DSLO Elig: " + str15 + "           \r\n  Restricted Material: N                                                        \r\n                                                                                \r\n  Product ID Code: 5             First Del Date: " + str3 + "/                          \r\n  Program Lib Code: 88/          Ser Support ID Code: M                         \r\n  Default Order Sys:             Education Allowance: " + str5 + "                    \r\n  Pre-Install Test: 00/000       Limited Billing Period (leave blank):   /      \r\n  Central Ser Code: 0            Central End Support:                           \r\n  A - B - C: A                   Local Ser Code:                                \r\n  Local Service:                 Order Confirmation: 05                         \r\n  Normal Billing Period: 0101    Product Lead:                                  \r\n  Normal M/A / ITC Code: T/B                                                    \r\n                                                                                \r\n  Points Effective Date: " + str9 + "     Points (MV): 000000*                        \r\n  Values Effective Date: " + str9 + "     Monthly Rental Value: 000                   \r\n  Initial Charge Value: 000                                                     \r\n                                                                                \r\n  BL FILE UPDATE                                                                \r\n                                                                                \r\n  Price Code: 0                   Announcement Date: " + str9 + "                     \r\n  Monthly Charge/SUC/OTC: 000                                                   \r\n                                                                                \r\n";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */           
+/* 1071 */           paramVector.add(pRODINFO.getMODELID());
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/*      */         }
+/* 1078 */         else if (!paramVector.contains(pRODINFO.getMODELID())) {
+/* 1079 */           str2 = str2 + "  " + str19 + str3 + "    000000*    " + str7 + "-" + str8 + "                \r\n                                                                                \r\n";
+/*      */ 
+/*      */           
+/* 1082 */           paramVector.add(pRODINFO.getMODELID());
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 1087 */     if (str2.trim().length() == 0) {
+/* 1088 */       str2 = "                                                                                \r\n";
+/*      */     }
+/* 1090 */     return "  MAJOR TYPE/MODEL BM FILE UPDATE                                               \r\n                                                                                \r\n" + str1 + "  ADDITIONAL TYPE AND/OR MODELS                                                 \r\n                                     1ST DEL                                    \r\n  DESCRIPTION (ENGLISH/LOCAL)        DATE      MV       TYPE-MDL                \r\n" + str2 + "  END OF ADDITIONAL TYPE AND/OR MODELS                                          ";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String generateFeatureSection(String paramString1, String paramString2, int paramInt, WTAASAPSWENTITY paramWTAASAPSWENTITY) throws Exception {
+/* 1106 */     String str1 = "";
+/* 1107 */     String str2 = "";
+/* 1108 */     String str3 = "";
+/* 1109 */     String str4 = "";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1114 */     HashMap hashMap = paramWTAASAPSWENTITY.getPROD();
+/* 1115 */     ArrayList arrayList = (ArrayList)hashMap.get(paramString2);
+/* 1116 */     if (arrayList.size() > 0) {
+/*      */       
+/* 1118 */       String str = formatDate(paramWTAASAPSWENTITY.getEFFECTIVEDATE(), "yyyy-MM-dd", "MMyy");
+/*      */       
+/* 1120 */       String[] arrayOfString = featureTreatment(paramWTAASAPSWENTITY, paramString2, str, paramInt);
+/* 1121 */       str2 = arrayOfString[0];
+/* 1122 */       str3 = arrayOfString[1];
+/* 1123 */       str1 = arrayOfString[2];
+/*      */     }
+/*      */     else {
+/*      */       
+/* 1127 */       return null;
+/*      */     } 
+/*      */     
+/* 1130 */     if (str3.trim().length() == 0) {
+/* 1131 */       str3 = "                                                                                \r\n";
+/*      */     }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1141 */     str4 = "  MAJOR TYPE/FEATURE BF FILE UPDATE                                             \r\n                                                                                \r\n" + str2 + "                                                                                \r\n  ADDITIONAL FEATURES                                                           \r\n                                                                                \r\n  Product Type: " + fixLength(str1, 4) + "                                                            \r\n                                        D                                       \r\n                                  ME O  S                                       \r\n                                   D T  L  1st DEL/                             \r\n  DESCRIPTION (ENGLISH/LOCAL)     IA C  O  PROC GROUP    MV    FEAT    P/N      \r\n" + str3 + "  END OF ADDITIONAL FEATURES                                                    ";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1149 */     return str4;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String[] featureTreatment(WTAASAPSWENTITY paramWTAASAPSWENTITY, String paramString1, String paramString2, int paramInt) throws Exception {
+/* 1164 */     String str1 = "";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1176 */     String str2 = "";
+/* 1177 */     String str3 = "";
+/*      */     
+/* 1179 */     HashMap hashMap = paramWTAASAPSWENTITY.getPROD();
+/* 1180 */     ArrayList<PRODINFO> arrayList = (ArrayList)hashMap.get(paramString1);
+/* 1181 */     for (byte b = 0; b < arrayList.size(); b++) {
+/*      */       
+/* 1183 */       String str = "N";
+/* 1184 */       PRODINFO pRODINFO = arrayList.get(b);
+/* 1185 */       if (pRODINFO.getMODELID() != null) {
+/*      */         String str8, str9, str10, str12, str13;
+/*      */         
+/* 1188 */         str1 = pRODINFO.getMACHTYPEATR();
+/* 1189 */         String str4 = pRODINFO.getMODELATR();
+/* 1190 */         String str5 = pRODINFO.getFEATURECODE();
+/* 1191 */         String str6 = getValue(pRODINFO.getSFINVNAME());
+/* 1192 */         String str7 = formatDate(paramWTAASAPSWENTITY.getANNDATE(), "yyyy-MM-dd", "ddMMyy");
+/*      */         
+/* 1194 */         String str11 = "N";
+/* 1195 */         if ("Yes".equals(pRODINFO.getPRICEDFEATURE())) {
+/* 1196 */           str12 = "Y";
+/* 1197 */           str8 = "000001";
+/* 1198 */           str10 = "100";
+/* 1199 */           str13 = "OTC";
+/* 1200 */           str9 = "100";
+/*      */         } else {
+/* 1202 */           str12 = "N";
+/* 1203 */           str8 = "000000";
+/* 1204 */           str10 = "000";
+/* 1205 */           str13 = "NC";
+/* 1206 */           str9 = "000";
+/*      */         } 
+/*      */ 
+/*      */         
+/* 1210 */         if (!this.featureSet.contains(str1)) {
+/*      */           
+/* 1212 */           if ("OTC".equals(str13) || (str2.equals("") && b == arrayList.size() - 1))
+/*      */           {
+/* 1214 */             String str14 = fixLength(str13 + " " + str6 + "/" + str4, 56);
+/*      */ 
+/*      */ 
+/*      */             
+/* 1218 */             String str15 = (pRODINFO.getEDUCALLOWMHGHSCH() == null || pRODINFO.getEDUCALLOWMHGHSCH().trim().length() == 0) ? "000000" : matchformat(pRODINFO.getEDUCALLOWMHGHSCH());
+/*      */             
+/* 1220 */             str2 = "  Type/Model/Feature No.: " + str1 + "-" + str4 + "/" + str5 + "      Part Number:                       \r\n  Description (English) " + str14 + "\r\n  Description (Local)                                                           \r\n  Media Feature: " + str + "      Orders Rejected: N      Price Print: Y                  \r\n  Usable in Cty: Y      One Time Charge: " + str12 + "      DP Install Program: N           \r\n  Specify Feature: N    DSLO: N                 Restricted Material: N          \r\n                                                                                \r\n  1st Del Date/Min&Max Proc Grp: " + paramString2 + "/         Education Allowance: " + str15 + "      \r\n  Service Support ID Code: P/                                                   \r\n  Product Lead Time:             Pre-Install Test/Inter-Co Chg Code: 00/B       \r\n                                                                                \r\n  Points Effective Date: " + str7 + "  Points: " + str8 + "*                                \r\n  Values Effective Date: " + str7 + "  Monthly Rental Value: " + str9 + "                      \r\n  Initial Charge Value: 000                                                     \r\n                                                                                \r\n  BL FILE UPDATE                                                                \r\n                                                                                \r\n  Price Code: 0                   Announcement Date: " + str7 + "                     \r\n  Monthly Charge/SUC/OTC: " + str10 + "                                                   \r\n";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */             
+/* 1242 */             this.featureSet.add(str1);
+/*      */           
+/*      */           }
+/*      */         
+/*      */         }
+/*      */         else {
+/*      */           
+/* 1249 */           String str14 = fixLength(str13 + " " + str6, 26) + "/" + str4;
+/*      */           
+/* 1251 */           str3 = str3 + "  " + str14 + "  " + str + "  " + str12 + "  " + str11 + "  " + paramString2 + "/      " + str8 + "*  " + str5 + "             \r\n                                                                                \r\n";
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 1256 */     return new String[] { str2, str3, str1 };
+/*      */   }
+/*      */   
+/*      */   private String matchformat(String paramString) {
+/* 1260 */     String str = "";
+/* 1261 */     if (paramString.length() == 1) {
+/* 1262 */       paramString = "0" + paramString;
+/* 1263 */     } else if (paramString.length() > 2) {
+/* 1264 */       paramString = paramString.substring(0, 2);
+/*      */     } 
+/* 1266 */     for (byte b = 0; b < 3; b++) {
+/* 1267 */       str = str + paramString;
+/*      */     }
+/* 1269 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public static String formatDate(String paramString1, String paramString2, String paramString3) throws Exception {
+/*      */     try {
+/* 1283 */       SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat(paramString2, Locale.US);
+/* 1284 */       Date date = simpleDateFormat1.parse(paramString1);
+/*      */ 
+/*      */ 
+/*      */       
+/* 1288 */       if (!paramString1.equals(simpleDateFormat1.format(date))) {
+/* 1289 */         throw new Exception("Invalid date");
+/*      */       }
+/*      */ 
+/*      */       
+/* 1293 */       SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat(paramString3, Locale.US);
+/* 1294 */       return simpleDateFormat2.format(date);
+/* 1295 */     } catch (ParseException parseException) {
+/* 1296 */       throw new Exception("Invalid format", parseException.getCause());
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String fixLength(String paramString1, int paramInt, String paramString2) {
+/* 1307 */     paramString1 = (paramString1 != null) ? paramString1 : "";
+/* 1308 */     if (paramString2.equalsIgnoreCase("R")) {
+/* 1309 */       if (paramString1.length() >= paramInt) {
+/* 1310 */         return paramString1.substring(0, paramInt);
+/*      */       }
+/* 1312 */       String str = "";
+/* 1313 */       for (byte b = 0; b < paramInt - paramString1.length(); b++) {
+/* 1314 */         str = str + " ";
+/*      */       }
+/* 1316 */       paramString1 = paramString1 + str;
+/*      */     }
+/* 1318 */     else if (paramString2.equalsIgnoreCase("L")) {
+/* 1319 */       if (paramString1.length() >= paramInt) {
+/* 1320 */         return paramString1.substring(paramString1.length() - paramInt, paramString1.length());
+/*      */       }
+/* 1322 */       String str = "";
+/* 1323 */       for (byte b = 0; b < paramInt - paramString1.length(); b++) {
+/* 1324 */         str = str + " ";
+/*      */       }
+/* 1326 */       paramString1 = str + paramString1;
+/*      */     } 
+/*      */     
+/* 1329 */     return paramString1;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String fixLength(String paramString, int paramInt) {
+/* 1339 */     return fixLength(paramString, paramInt, "R");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void generateZipfile(Vector<String> paramVector) {
+/*      */     try {
+/* 1349 */       FileOutputStream fileOutputStream = null;
+/* 1350 */       ZipOutputStream zipOutputStream = null;
+/* 1351 */       String str1 = getNow();
+/* 1352 */       String str2 = ABRServerProperties.getOutputPath() + this.annNumber + str1 + ".zip";
+/* 1353 */       this.zipFile = new File(str2);
+/*      */       try {
+/* 1355 */         char c = 'ࠀ';
+/* 1356 */         fileOutputStream = new FileOutputStream(this.zipFile);
+/* 1357 */         zipOutputStream = new ZipOutputStream(fileOutputStream);
+/* 1358 */         for (byte b = 0; b < paramVector.size(); b++) {
+/* 1359 */           String str = paramVector.get(b);
+/* 1360 */           File file = new File(str);
+/* 1361 */           if (file.exists()) {
+/* 1362 */             zipOutputStream.putNextEntry(new ZipEntry(file.getName()));
+/* 1363 */             BufferedInputStream bufferedInputStream = null;
+/*      */             try {
+/* 1365 */               bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
+/*      */               
+/* 1367 */               byte[] arrayOfByte = new byte[c]; int i;
+/* 1368 */               while ((i = bufferedInputStream.read(arrayOfByte, 0, c)) != -1) {
+/* 1369 */                 zipOutputStream.write(arrayOfByte, 0, i);
+/*      */               }
+/* 1371 */               zipOutputStream.closeEntry();
+/* 1372 */               zipOutputStream.flush();
+/* 1373 */               addDebug("Zip file " + str + " successfully");
+/*      */             } finally {
+/*      */               
+/* 1376 */               if (bufferedInputStream != null) {
+/* 1377 */                 bufferedInputStream.close();
+/*      */               }
+/*      */             } 
+/*      */             
+/* 1381 */             file.delete();
+/*      */           } else {
+/* 1383 */             addError("Zip file..., Missing file " + str);
+/*      */           } 
+/*      */         } 
+/*      */       } finally {
+/*      */         
+/* 1388 */         if (zipOutputStream != null) {
+/* 1389 */           zipOutputStream.flush();
+/* 1390 */           zipOutputStream.close();
+/*      */         } 
+/* 1392 */         if (fileOutputStream != null) {
+/* 1393 */           fileOutputStream.flush();
+/* 1394 */           fileOutputStream.close();
+/*      */         } 
+/*      */       } 
+/* 1397 */       paramVector.clear();
+/* 1398 */       paramVector = null;
+/*      */     
+/*      */     }
+/* 1401 */     catch (Exception exception) {
+/* 1402 */       exception.printStackTrace();
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void sendMail(File paramFile) throws Exception {
+/* 1413 */     FileInputStream fileInputStream = null;
+/*      */     try {
+/* 1415 */       fileInputStream = new FileInputStream(paramFile);
+/* 1416 */       int i = fileInputStream.available();
+/* 1417 */       byte[] arrayOfByte = new byte[i];
+/* 1418 */       fileInputStream.read(arrayOfByte);
+/* 1419 */       setAttachByteForDG(arrayOfByte);
+/* 1420 */       getABRItem().setFileExtension("zip");
+/* 1421 */       addDebug("Sending mail for file " + paramFile);
+/* 1422 */     } catch (IOException iOException) {
+/* 1423 */       addDebug("sendMail IO Exception");
+/*      */     }
+/*      */     finally {
+/*      */       
+/* 1427 */       if (fileInputStream != null) {
+/* 1428 */         fileInputStream.close();
+/*      */       }
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected String getAttributeFlagValue(EntityItem paramEntityItem, String paramString) {
+/* 1440 */     return PokUtils.getAttributeFlagValue(paramEntityItem, paramString);
+/*      */   }
+/*      */   
+/*      */   public String getDescription() {
+/* 1444 */     return "WTAASAPSWABR";
+/*      */   }
+/*      */   
+/*      */   public String getABRVersion() {
+/* 1448 */     return "1.0";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addError(String paramString) {
+/* 1455 */     addOutput(paramString);
+/* 1456 */     setReturnCode(-1);
+/*      */   }
+/*      */   
+/*      */   protected void addDebug(String paramString) {
+/* 1460 */     if (3 <= DEBUG_LVL) {
+/* 1461 */       this.rptSb.append("<!-- " + paramString + " -->" + NEWLINE);
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addDebugComment(int paramInt, String paramString) {
+/* 1473 */     if (paramInt <= DEBUG_LVL) {
+/* 1474 */       this.rptSb.append("<!-- " + paramString + " -->" + NEWLINE);
+/*      */     }
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected EntityList getEntityList(Profile paramProfile, String paramString, EntityItem paramEntityItem) throws MiddlewareRequestException, SQLException, MiddlewareException {
+/* 1491 */     return this.m_db.getEntityList(paramProfile, new ExtractActionItem(null, this.m_db, paramProfile, paramString), new EntityItem[] { new EntityItem(null, paramProfile, paramEntityItem
+/*      */             
+/* 1493 */             .getEntityType(), paramEntityItem.getEntityID()) });
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected EntityItem getEntityItem(Profile paramProfile, EntityItem paramEntityItem) throws MiddlewareRequestException, SQLException, MiddlewareException {
+/* 1511 */     EntityList entityList = this.m_db.getEntityList(paramProfile, new ExtractActionItem(null, this.m_db, paramProfile, "dummy"), new EntityItem[] { new EntityItem(null, paramProfile, paramEntityItem
+/*      */             
+/* 1513 */             .getEntityType(), paramEntityItem.getEntityID()) });
+/* 1514 */     return entityList.getParentEntityGroup().getEntityItem(0);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected EntityItem getEntityItem(Profile paramProfile, String paramString, int paramInt) throws MiddlewareRequestException, SQLException, MiddlewareException {
+/* 1532 */     EntityList entityList = this.m_db.getEntityList(paramProfile, new ExtractActionItem(null, this.m_db, paramProfile, "dummy"), new EntityItem[] { new EntityItem(null, paramProfile, paramString, paramInt) });
+/*      */ 
+/*      */     
+/* 1535 */     return entityList.getParentEntityGroup().getEntityItem(0);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected Database getDB() {
+/* 1542 */     return this.m_db;
+/*      */   }
+/*      */   
+/*      */   protected String getABRTime() {
+/* 1546 */     return String.valueOf(System.currentTimeMillis());
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void addOutput(String paramString) {
+/* 1553 */     this.rptSb.append("<p>" + paramString + "</p>" + NEWLINE);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String buildAbrHeader() {
+/* 1563 */     String str = "<table>" + NEWLINE + "<tr><th>Userid: </th><td>{0}</td></tr>" + NEWLINE + "<tr><th>Role: </th><td>{1}</td></tr>" + NEWLINE + "<tr><th>Workgroup: </th><td>{2}</td></tr>" + NEWLINE + "<tr><th>Date/Time: </th><td>{3}</td></tr>" + NEWLINE + "<tr><th>Action Taken: </th><td>{4}</td></tr>" + NEWLINE + "</table>" + NEWLINE + "<!-- {5} -->" + NEWLINE;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/* 1570 */     MessageFormat messageFormat = new MessageFormat(str);
+/* 1571 */     this.args[0] = this.m_prof.getOPName();
+/* 1572 */     this.args[1] = this.m_prof.getRoleDescription();
+/* 1573 */     this.args[2] = this.m_prof.getWGName();
+/* 1574 */     this.args[3] = this.t2DTS;
+/* 1575 */     this.args[4] = "WATTS AP SW ABR feed trigger<br/>" + this.xmlgenSb.toString();
+/* 1576 */     this.args[5] = getABRVersion();
+/* 1577 */     return messageFormat.format(this.args);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getNavigationName(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 1587 */     StringBuffer stringBuffer = new StringBuffer();
+/*      */ 
+/*      */     
+/* 1590 */     EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, paramEntityItem.getEntityType(), "Navigate");
+/* 1591 */     EANList eANList = entityGroup.getMetaAttribute();
+/*      */     
+/* 1593 */     for (byte b = 0; b < eANList.size(); b++) {
+/* 1594 */       EANMetaAttribute eANMetaAttribute = (EANMetaAttribute)eANList.getAt(b);
+/* 1595 */       stringBuffer.append(PokUtils.getAttributeValue(paramEntityItem, eANMetaAttribute
+/* 1596 */             .getAttributeCode(), ", ", "", false));
+/* 1597 */       stringBuffer.append(" ");
+/*      */     } 
+/* 1599 */     return stringBuffer.toString();
+/*      */   }
+/*      */ }
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.Vector;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
-import javax.xml.transform.TransformerConfigurationException;
-
-
-
-
-import org.xml.sax.SAXException;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-import COM.ibm.eannounce.abr.util.ABRUtil;
-import COM.ibm.eannounce.abr.util.EACustom;
-import COM.ibm.eannounce.abr.util.PokBaseABR;
-import COM.ibm.eannounce.objects.EANList;
-import COM.ibm.eannounce.objects.EANMetaAttribute;
-import COM.ibm.eannounce.objects.EntityGroup;
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.eannounce.objects.EntityList;
-import COM.ibm.eannounce.objects.ExtractActionItem;
-import COM.ibm.opicmpdh.middleware.D;
-import COM.ibm.opicmpdh.middleware.Database;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
-import COM.ibm.opicmpdh.middleware.Profile;
-import COM.ibm.opicmpdh.middleware.Stopwatch;
-import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
-
-public class WTAASAPSWABR extends PokBaseABR{
-	
-	private ResourceBundle rsBundle = null;
-	private String annNumber = "";
-	private String annDate = "";
-	private File zipFile = null; 
-	private HashMap prodInfo = new HashMap();
-	private Set modelSet = new HashSet();
-	private Set featureSet = new HashSet();
-	private StringBuffer rptSb = new StringBuffer();
-	private StringBuffer xmlgenSb = new StringBuffer();
-	private StringBuffer userxmlSb = new StringBuffer();
-	private String t2DTS = "&nbsp;"; // T2
-	private SimpleDateFormat sdf = new SimpleDateFormat("yy/MM/dd");
-	private Object[] args = new String[10];
-	public final static String RPTPATH = "_rptpath";	
-	private static final char[] FOOL_JTEST = { '\n' };
-	protected static final String NEWLINE = new String(FOOL_JTEST);
-	private static int DEBUG_LVL = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties
-			.getABRDebugLevel("WTAASAPSWABR");
-	
-	/**
-	 * Execute ABR
-	 */
-	public void execute_run() {
-		
-		String navName = "";
-		MessageFormat msgf;
-		try {
-			long startTime = System.currentTimeMillis();
-
-			start_ABRBuild(false); // don't pull VE yet
-
-			// get properties file for the base class
-			rsBundle = ResourceBundle.getBundle(getClass().getName(),
-					ABRUtil.getLocale(m_prof.getReadLanguage().getNLSID()));
-
-			// Default set to pass
-			setReturnCode(PASS);
-
-			// get the root entity using current timestamp, need this to get the
-			// timestamps or info for VE pulls		
-			
-			m_elist = m_db.getEntityList(m_prof, new ExtractActionItem(null,
-					m_db, m_prof, "dummy"), new EntityItem[] { new EntityItem(
-					null, m_prof, getEntityType(), getEntityID()) });
-
-			EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-			addDebug("DEBUG: rootEntity = " + rootEntity.getEntityType() + rootEntity.getEntityID());
-			
-			String docNum = getAttributeValue(rootEntity, "ADOCNO");
-			addDebug("ANNOUNCEMENT DOCNUM (CDOCNO): " + docNum);
-			
-			annDate = getAttributeValue(rootEntity, "ANNDATE");
-			addDebug("ANNOUNCEMENT ANNDATE: " + annDate);
-			
-			annNumber = getAttributeValue(rootEntity, "ANNNUMBER");
-			addDebug("RFA number: " + annNumber);
-			// NAME is navigate attributes
-			String annType = getAttributeValue(rootEntity, "ANNTYPE");
-			addDebug("ANNOUNCEMENT type: " + annType);
-						
-			navName = getNavigationName(rootEntity);
-			
-			if (getReturnCode() == PASS) {
-				processThis(this, m_prof, rootEntity);
-				// generate file
-				boolean createfile=generateOutputFile(prodInfo);
-				if (createfile) {
-					//send mail
-					sendMail(zipFile);
-					// check keep file
-					if (!getABRItem().getKeepFile()){
-						if (zipFile.exists()) {
-							zipFile.delete();
-							addDebug("Check the keep file is false, delete the zip file");
-						}
-					}
-				}else{
-					setReturnCode(FAIL);
-				}
-				
-			}
-
-			addDebug("Total Time: "
-					+ Stopwatch.format(System.currentTimeMillis() - startTime));
-
-		} catch (Throwable exc) {
-			java.io.StringWriter exBuf = new java.io.StringWriter();
-			String Error_EXCEPTION = "<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
-			String Error_STACKTRACE = "<pre>{0}</pre>";
-			msgf = new MessageFormat(Error_EXCEPTION);
-			setReturnCode(INTERNAL_ERROR);
-			exc.printStackTrace(new java.io.PrintWriter(exBuf));
-			// Put exception into document
-			args[0] = exc.getMessage();
-			rptSb.append(msgf.format(args) + NEWLINE);
-			msgf = new MessageFormat(Error_STACKTRACE);
-			args[0] = exBuf.getBuffer().toString();
-			rptSb.append(msgf.format(args) + NEWLINE);
-			logError("Exception: " + exc.getMessage());
-			logError(exBuf.getBuffer().toString());
-		} finally {
-			if (("&nbsp;").equals(t2DTS)) {
-				t2DTS = getNow();
-			}
-			setDGTitle(navName);
-			setDGRptName(getShortClassName(getClass()));
-			setDGRptClass(getABRCode());
-			// make sure the lock is released
-			if (!isReadOnly()) {
-				clearSoftLock();
-			}
-		}
-
-		// Print everything up to </html>
-		// Insert Header into beginning of report
-		println(EACustom.getDocTypeHtml());
-		// must split because too many arguments for messageformat, max of 10..
-		// this was 11
-		String HEADER = "<head>"
-				+ EACustom.getMetaTags(getDescription())
-				+ NEWLINE
-				+ EACustom.getCSS()
-				+ NEWLINE
-				+ EACustom.getTitle("{0} {1}")
-				+ NEWLINE
-				+ "</head>"
-				+ NEWLINE
-				+ "<body id=\"ibm-com\">"
-				+ EACustom.getMastheadDiv()
-				+ NEWLINE
-				+ "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>"
-				+ NEWLINE;
-		msgf = new MessageFormat(HEADER);
-		args[0] = getShortClassName(getClass());
-		args[1] = navName;
-		String header1 = msgf.format(args);
-		String header2 = buildAbrHeader();
-		String info = header1 + header2 + "<pre>"
-				+ rsBundle.getString("RESULT_MSG") + "<br />"
-				+ userxmlSb.toString() + "</pre>" + NEWLINE;
-		rptSb.insert(0, info);
-
-		println(rptSb.toString());
-		printDGSubmitString();
-		println(EACustom.getTOUDiv());
-		buildReportFooter();
-
-		// release memory
-		m_elist.dereference();
-		m_elist = null;
-		rsBundle = null;
-		args = null;
-		msgf = null;
-		userxmlSb = null;
-		rptSb = null;
-		xmlgenSb = null;
-		
-	}
-	
-	public void processThis(WTAASAPSWABR abr, Profile profileT2, EntityItem rootEntity) throws TransformerConfigurationException,SAXException, MiddlewareRequestException, SQLException, MiddlewareException, IOException {
-
-		boolean isGetModelInfo = getModelInfo(rootEntity);
-		if(isGetModelInfo){
-			getSWFeatureInfo(rootEntity);
-		}else{
-			getProdInfo(rootEntity);
-		}
-	
-		// get related price info
-		long startTime = System.currentTimeMillis();			
-		//getPriceInfo(prodInfo);
-		addDebug("get price info Time: "
-				+ Stopwatch.format(System.currentTimeMillis() - startTime));											
-	
-	}
-	/**
-	 * store data into prodInfo using queryForPROD(rootEntity) 
-	 * @param rootEntity
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	private void getProdInfo(EntityItem rootEntity) throws SQLException, MiddlewareException{
-		String key1,key2;
-		
-		ResultSet result = null;
-		PreparedStatement statement = null;
-		
-		try {
-			statement = m_db.getPDHConnection().prepareStatement(
-					queryForPROD(rootEntity));
-			result = statement.executeQuery();
-			while (result.next()) {
-				String availId = result.getString(5);
-				String modelId = result.getString(7);
-
-				String aletNum = result.getString(1);
-				String annDate = result.getString(2);
-				String annNumber = result.getString(3);
-				String rfaShortTitle = result.getString(4);
-				
-				String effectiveDate = result.getString(6);
-				String productVrm = result.getString(8);
-				String modelAtr = result.getString(9);
-				String machtypeAtr = result.getString(10);				
-				String minvname = result.getString(11);				
-				String educAllow = result.getString(12);
-				
-				String swfeatureId = result.getString(13);
-				String featureCode = result.getString(14);
-				String pricedFeature = result.getString(15);
-				String chargeOption = result.getString(16);
-				String swfeatdesc = result.getString(17);
-				
-								
-				key1 = availId ;
-				key2 = machtypeAtr ;
-				
-				if(prodInfo.get(key1)!=null){						
-					WTAASAPSWENTITY w = (WTAASAPSWENTITY)prodInfo.get(key1);
-					
-					HashMap map = (HashMap)w.getPROD();
-					if (map.get(key2)!=null){
-						PRODINFO prod = new PRODINFO();
-						prod.setPRODUCTVRM(productVrm);
-						prod.setMACHTYPEATR(machtypeAtr);
-						prod.setMODELATR(modelAtr);
-						prod.setMODELID(modelId);
-						prod.setMINVNAME(minvname);
-						prod.setEDUCALLOWMHGHSCH(educAllow);
-						
-						prod.setSwFeatureId(swfeatureId);
-						prod.setFEATURECODE(featureCode);
-						prod.setPRICEDFEATURE(pricedFeature);
-						prod.setCHARGEOPTION(chargeOption);
-						prod.setSFINVNAME(swfeatdesc);
-						
-						ArrayList ar = (ArrayList) map.get(key2);
-						ar.add(prod);
-					}else{
-						PRODINFO prod = new PRODINFO();
-						prod.setPRODUCTVRM(productVrm);
-						prod.setMACHTYPEATR(machtypeAtr);
-						prod.setMODELATR(modelAtr);
-						prod.setMODELID(modelId);
-						prod.setMINVNAME(minvname);
-						prod.setEDUCALLOWMHGHSCH(educAllow);
-						
-						prod.setSwFeatureId(swfeatureId);
-						prod.setFEATURECODE(featureCode);
-						prod.setPRICEDFEATURE(pricedFeature);
-						prod.setCHARGEOPTION(chargeOption);
-						prod.setSFINVNAME(swfeatdesc);
-						
-						ArrayList ar = new ArrayList();
-						ar.add(prod);
-						map.put(key2, ar);
-					}					
-				}
-				else{
-					WTAASAPSWENTITY entity = new WTAASAPSWENTITY();
-					entity.setADOCNO(aletNum);
-					entity.setANNDATE(annDate);
-					entity.setANNNUMBER(annNumber);
-					entity.setRFASHRTTITLE(rfaShortTitle);
-					entity.setAVAILID(availId);
-					entity.setEFFECTIVEDATE(effectiveDate);
-					
-					PRODINFO prod = new PRODINFO();					
-					prod.setPRODUCTVRM(productVrm);
-					prod.setMODELID(modelId);
-					prod.setMACHTYPEATR(machtypeAtr);
-					prod.setMODELATR(modelAtr);
-					prod.setMINVNAME(minvname);
-					prod.setEDUCALLOWMHGHSCH(educAllow);
-					
-					prod.setSwFeatureId(swfeatureId);
-					prod.setFEATURECODE(featureCode);
-					prod.setPRICEDFEATURE(pricedFeature);
-					prod.setCHARGEOPTION(chargeOption);
-					prod.setSFINVNAME(swfeatdesc);	
-										
-					ArrayList prods= new ArrayList();					
-					prods.add(prod);
-					HashMap map = new HashMap();
-					map.put(key2, prods);
-					entity.setPROD(map);
-					
-					prodInfo.put(key1, entity);								
-				}
-			}
-		}finally {
-			if (statement != null){
-				try {
-					statement.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	
-	}
-	/**
-	 * store data into prodInfo using queryForMODEL(rootEntity)
-	 * @param rootEntity
-	 * @return
-	 * @throws MiddlewareException
-	 * @throws SQLException
-	 */
-	private boolean getModelInfo(EntityItem rootEntity) throws MiddlewareException, SQLException {
-		String key1,key2;
-		ResultSet result = null;
-		PreparedStatement statement = null;
-		boolean hasModelInfo = false;
-		  
-		try {
-			Connection conn = m_db.getPDHConnection();
-				
-			statement = conn.prepareStatement(queryForMODEL(rootEntity));
-			result = statement.executeQuery();		
-											
-			while(result.next()){
-				String availId = result.getString(5);
-				String modelId = result.getString(7);
-
-				String aletNum = result.getString(1);
-				String annDate = result.getString(2);
-				String annNumber = result.getString(3);
-				String rfaShortTitle = result.getString(4);
-				
-				String effectiveDate = result.getString(6);				
-				String machtypeAtr = result.getString(8);
-				
-				key1 = availId;
-				key2 = machtypeAtr;
-				
-				if(prodInfo.get(key1)!=null){
-					WTAASAPSWENTITY w = (WTAASAPSWENTITY)prodInfo.get(key1);
-					
-					HashMap map = (HashMap)w.getPROD();	
-					
-					PRODINFO prod = new PRODINFO();																		
-					prod.setMODELID(modelId);
-					
-					if (map.get(key2)!=null){												
-						ArrayList ar = (ArrayList) map.get(key2);
-						if(ar.contains(prod)){
-							
-						}else{
-							ar.add(prod);
-						}												
-					}else{
-						ArrayList ar = new ArrayList();
-						ar.add(prod);
-						map.put(key2, ar);
-					}										
-					w.setPROD(map);
-				}else{
-					WTAASAPSWENTITY entity = new WTAASAPSWENTITY();
-					entity.setADOCNO(aletNum);
-					entity.setANNDATE(annDate);
-					entity.setANNNUMBER(annNumber);
-					entity.setRFASHRTTITLE(rfaShortTitle);
-					entity.setAVAILID(availId);
-					entity.setEFFECTIVEDATE(effectiveDate);
-					
-					HashMap map = new HashMap();
-					ArrayList ar = new ArrayList();
-					PRODINFO prod = new PRODINFO();
-					prod.setMODELID(modelId);
-					ar.add(prod);
-					map.put(machtypeAtr, ar);
-					entity.setPROD(map);
-														
-					prodInfo.put(key1, entity);	
-				}						
-				hasModelInfo=true;
-			}
-		}finally {
-			if (statement != null){
-				try {
-					statement.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return hasModelInfo;
-	
-	}
-	/**
-	 * store data into prodInfo using queryForSWFC(rootEntity)
-	 * @param rootEntity
-	 * @throws MiddlewareException
-	 * @throws SQLException
-	 */
-	private void getSWFeatureInfo(EntityItem rootEntity) throws MiddlewareException, SQLException {
-	
-		ResultSet result = null;
-		PreparedStatement statement = null;
-		  
-		try {
-			Connection conn = m_db.getPDHConnection();
-			Iterator entries = prodInfo.entrySet().iterator();
-			while(entries.hasNext()){
-				Map.Entry entry = (Map.Entry) entries.next();
-				WTAASAPSWENTITY entity = (WTAASAPSWENTITY) entry.getValue();
-				Iterator prodIts = entity.getPROD().entrySet().iterator();
-				while(prodIts.hasNext()){
-					Map.Entry prodMap = (Map.Entry) prodIts.next();
-					ArrayList prods = (ArrayList) prodMap.getValue();
-					int count = prods.size();
-					for(int i=0;i<count;i++){
-						PRODINFO prod = (PRODINFO) prods.get(i);	
-						String modelid = prod.getMODELID();
-						
-						statement = conn.prepareStatement(queryForSWFC(rootEntity, modelid));
-						result = statement.executeQuery();		
-														
-						while(result.next()){
-							String productVrm = result.getString(1);
-							String machtpeAtr = result.getString(2);
-							String modelAtr = result.getString(3);
-							String minvname = result.getString(4);				
-							String educAllow = result.getString(5);
-							String swfeatureId = result.getString(6);	
-							String pricedFeature = result.getString(7);
-							String chargeOption = result.getString(8);		
-							String swfeatdesc = result.getString(9);
-							String featureCode = result.getString(10);
-								
-							PRODINFO prodf = new PRODINFO();
-							prodf.setPRODUCTVRM(productVrm);
-							prodf.setMODELATR(modelAtr);
-							prodf.setMACHTYPEATR(machtpeAtr);
-							prodf.setMINVNAME(minvname);
-							prodf.setEDUCALLOWMHGHSCH(educAllow);
-							prodf.setMODELID(modelid);
-							
-							prodf.setSwFeatureId(swfeatureId);
-							prodf.setFEATURECODE(featureCode);
-							prodf.setPRICEDFEATURE(pricedFeature);
-							prodf.setCHARGEOPTION(chargeOption);
-							prodf.setSFINVNAME(swfeatdesc);
-								
-							prods.add(prodf);
-																	
-						}
-						prod.setMODELID(null);
-					}
-				}
-			}
-		}finally {
-			if (statement != null){
-				try {
-					statement.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}		
-	}
-	/**
-	 * SQL for extract date from ANN->AVAIL->SWPRODSTRUCT->MODEL&SWFEATURE
-	 * @param rootEntity
-	 * @return
-	 */
-	private String queryForPROD(EntityItem rootEntity){
-		StringBuffer strbSQL = new StringBuffer();
-		addDebug("Get ANN related PRODSTRUCT info");
-		
-		strbSQL.append("SELECT ADOCNO,ANNDATE,ANNNUMBER,CAST(RFASHRTTITLE AS VARCHAR(500)),AVAILID,EFFECTIVEDATE,MODELID,PRODUCTVRM,MODELATR,MACHTYPEATR,INVNAME,EDUCALLOWMHGHSCH,FEATUREID,FEATURECODE,PRICEDFEATURE,CHARGEOPTION,SFINVNAME FROM  ");
-		strbSQL.append("(select ann.ADOCNO, ann.ANNDATE, ann.ANNNUMBER, ann.RFASHRTTITLE,f.entityid as availid, a1.EFFECTIVEDATE, m.entityid as modelid, m.PRODUCTVRM, m.MODELATR, m.MACHTYPEATR, m.INVNAME, t.attributevalue as EDUCALLOWMHGHSCH, sf.entityid as featureid, sf.FEATURECODE, sf.PRICEDFEATURE, sf.CHARGEOPTION, sf.INVNAME as SFINVNAME from price.announcement ann ");
-		strbSQL.append("join price.avail a1 on a1.STATUS='Final' and a1.ANNCODENAME=ann.ANNCODENAME and a1.availType in ('Planned Availability','First Order')  ");
-		strbSQL.append("join opicm.flag f on f.entitytype='AVAIL' and f.attributecode='GENAREASELECTION' and f.attributevalue in ('1999','6199','6211','6219','6220') and f.valto>current timestamp and f.effto>current timestamp and f.entityid = a1.entityid ");
-		
-		strbSQL.append("join opicm.relator r1 on r1.entity1type='SWPRODSTRUCT' and r1.entity2type='AVAIL' and r1.entity2id=f.entityid and r1.valto>current timestamp and r1.effto>current timestamp  ");
-		strbSQL.append("join price.swprodstruct sw on sw.entityid=r1.entity1id and sw.STATUS='Final' ");
-		strbSQL.append("join price.SWFEATURE sf on sf.entityid=sw.id1 and sf.STATUS='Final' ");
-		strbSQL.append("join price.model m on m.entityid=sw.id2 and m.STATUS='Final' and m.COFCAT='Software' ");
-		strbSQL.append("left join opicm.relator r3 on r3.entity1type='MODEL' and r3.entity1id=m.entityid and r3.entity2type='GEOMOD' and r3.valto>current timestamp and r3.effto>current timestamp ");
-		strbSQL.append("left join opicm.text t  on t.entitytype='GEOMOD' and t.entityid=r3.entity2id and t.attributecode='EDUCALLOWMHGHSCH' and t.valto>current timestamp and t.effto>current timestamp ");
-		strbSQL.append("where ann.entityid=");
-		strbSQL.append(rootEntity.getEntityID());
-		strbSQL.append(" and ann.ANNSTATUS='Final' and ann.nlsid=1 order by m.MACHTYPEATR,m.MODELATR,availid,featureid) ");
-		strbSQL.append("GROUP BY AVAILID,ADOCNO,ANNDATE,ANNNUMBER,CAST(RFASHRTTITLE AS VARCHAR(500)),EFFECTIVEDATE,MODELID,PRODUCTVRM,MODELATR,MACHTYPEATR,INVNAME,EDUCALLOWMHGHSCH,FEATUREID,FEATURECODE,PRICEDFEATURE,CHARGEOPTION,SFINVNAME WITH UR ");
-		
-		addDebug("SQL:" + strbSQL);
-		return strbSQL.toString();
-	}
-	/**
-	 * SQL for extract data from ANN->AVIAL->MODEL
-	 * @param rootEntity
-	 * @return
-	 */
-	private String queryForMODEL(EntityItem rootEntity){
-		addDebug("Get ANN related MODEL info---------------");
-		StringBuffer strbSQL = new StringBuffer();
-		
-		strbSQL.append("SELECT ADOCNO,ANNDATE,ANNNUMBER,CAST(RFASHRTTITLE AS VARCHAR(500)),AVAILID,EFFECTIVEDATE,MODELID,MACHTYPEATR FROM  ");		
-		strbSQL.append("(select ann.ADOCNO, ann.ANNDATE, ann.ANNNUMBER, ann.RFASHRTTITLE, f.entityid as availid, a1.EFFECTIVEDATE, m.entityid as modelid, m.MACHTYPEATR from price.announcement ann  ");
-		strbSQL.append("join price.avail a1 on a1.ANNCODENAME=ann.ANNCODENAME and a1.STATUS='Final' and a1.availType in ('Planned Availability','First Order') ");
-		strbSQL.append("join opicm.flag  f  on f.entitytype='AVAIL' and f.attributecode='GENAREASELECTION' and f.attributevalue in ('1999','6199','6211','6219','6220') and f.valto>current timestamp and f.effto>current timestamp and f.entityid = a1.entityid ");
-		strbSQL.append("join opicm.relator r on r.entity1type='MODEL' and r.entity2type='AVAIL' and r.entity2id=f.entityid and r.valto>current timestamp and r.effto>current timestamp ");
-		strbSQL.append("join price.model m on m.entityid=r.entity1id and m.STATUS='Final' and m.COFCAT='Software' ");
-		strbSQL.append("left join opicm.relator r3 on r3.entity1type='MODEL' and r3.entity1id=m.entityid and r3.entity2type='GEOMOD' and r3.valto>current timestamp and r3.effto>current timestamp ");
-		strbSQL.append("left join opicm.text t  on t.entitytype='GEOMOD' and t.entityid=r3.entity2id and t.attributecode='EDUCALLOWMHGHSCH' and t.valto>current timestamp and t.effto>current timestamp ");
-		strbSQL.append("where ann.entityid = ");
-		strbSQL.append(rootEntity.getEntityID());
-		strbSQL.append(" and ann.ANNSTATUS='Final' and ann.nlsid=1 order by m.MACHTYPEATR,modelid,availid) ");
-		strbSQL.append("GROUP BY AVAILID,ADOCNO,ANNDATE,ANNNUMBER,CAST(RFASHRTTITLE AS VARCHAR(500)),EFFECTIVEDATE,MODELID,MACHTYPEATR WITH UR ");
-		
-		addDebug("SQL:" + strbSQL);	
-		return strbSQL.toString();
-	}
-	/**
-	 * SQL for extract data from ANN->AVAIL->SWPRODSTRUCT->SWFEATURE
-	 * @param rootEntity
-	 * @param modelid
-	 * @return
-	 */
-	private String queryForSWFC(EntityItem rootEntity, String modelid){
-		
-	
-		addDebug("Get ANN related SWFeature info---------------");
-		StringBuffer strbSQL = new StringBuffer();
-		strbSQL.append("SELECT PRODUCTVRM,MACHTYPEATR,MODELATR,INVNAME,CAST(EDUCALLOWMHGHSCH AS VARCHAR(500)),FEATUREID,PRICEDFEATURE,CHARGEOPTION,SFINVNAME,FEATURECODE FROM  ( ");
-		strbSQL.append("select m.PRODUCTVRM, m.MACHTYPEATR, m.MODELATR, m.INVNAME, t.attributevalue as EDUCALLOWMHGHSCH, sf.entityid as featureid,sf.PRICEDFEATURE,sf.CHARGEOPTION,sf.INVNAME as SFINVNAME,sf.FEATURECODE from price.announcement ann ");
-		strbSQL.append("join price.avail a1 on a1.ANNCODENAME=ann.ANNCODENAME and a1.STATUS='Final' and a1.availType in ('Planned Availability','First Order') ");
-		strbSQL.append("join opicm.flag  f  on f.entitytype='AVAIL' and f.attributecode='GENAREASELECTION' and f.attributevalue in ('1999','6199','6211','6219','6220') and f.valto>current timestamp and f.effto>current timestamp and f.entityid = a1.entityid ");
-		strbSQL.append("join opicm.relator r1 on r1.entity1type='SWPRODSTRUCT' and r1.entity2type='AVAIL' and r1.entity2id=a1.entityid and r1.valto>current timestamp and r1.effto>current timestamp ");
-		strbSQL.append("join price.swprodstruct sw on sw.entityid=r1.entity1id and sw.STATUS='Final' and sw.id2 = ");
-		strbSQL.append(modelid);
-		strbSQL.append(" join price.MODEL m on m.entityid=sw.id2 and m.STATUS='Final' ");
-		strbSQL.append("left join opicm.relator r3 on r3.entity1type='MODEL' and r3.entity1id=m.entityid and r3.entity2type='GEOMOD' and r3.valto>current timestamp and r3.effto>current timestamp ");
-		strbSQL.append("left join opicm.text t  on t.entitytype='GEOMOD' and t.entityid=r3.entity2id and t.attributecode='EDUCALLOWMHGHSCH' and t.valto>current timestamp and t.effto>current timestamp ");
-		strbSQL.append(" join price.SWFEATURE sf on sf.entityid=sw.id1 and sf.STATUS='Final' ");
-		strbSQL.append("where ann.entityid= ");
-		strbSQL.append(rootEntity.getEntityID());
-		strbSQL.append(" and ann.ANNSTATUS='Final' and ann.nlsid=1 order by featureid ) ");
-		strbSQL.append("GROUP BY PRODUCTVRM,MACHTYPEATR,MODELATR,INVNAME,CAST(EDUCALLOWMHGHSCH AS VARCHAR(500)),FEATUREID,PRICEDFEATURE,CHARGEOPTION,SFINVNAME,FEATURECODE WITH UR ");
-		
-		addDebug("SQL:" + strbSQL);
-		
-		return strbSQL.toString();	
-			
-	}
-	/**
-	 * ModifyNum is productVrm's two bits after second decimal points, default '00'
-	 * @param productVrm
-	 * @return
-	 */
-	private String getModifyNum(String productVrm) {
-		String modifyNum = null;
-		if(productVrm == null ||"".equals(productVrm)){
-			modifyNum = "00";
-		}else{
-			String[] arr = splitStr(productVrm, ".");
-			if(arr.length > 2){
-				String term = arr[2].trim();
-				if(term.length() < 2){
-					modifyNum = "0" + term ;
-				}else if(term.length() == 2){
-					modifyNum = term;
-				}else{
-					modifyNum = term.substring(0,2);
-				}		
-			}else{
-				modifyNum = "00";
-			}		
-		}
-		return modifyNum;
-	}
-	/**
-	 * ReleaseNum is productVrm's two bits after first decimal points, default '00'
-	 * @param productVrm
-	 * @return
-	 */
-	private String getReleaseNum(String productVrm) {
-		String releaseNum = null;
-		if(productVrm == null ||"".equals(productVrm)){
-			releaseNum = "01";
-		}else{
-			String[] arr = splitStr(productVrm, ".");
-			if(arr.length > 1){
-				String term = arr[1].trim();
-				if(term.length() < 2){
-					releaseNum = "0" + term ;
-				}else if(term.length() == 2){
-					releaseNum = term;
-				}else{
-					releaseNum = term.substring(0,2).trim();
-				}		
-			}else if (arr.length == 1){
-
-				releaseNum = "00";
-			}		
-		}
-		return releaseNum;
-	}
-
-	/**
-	 * VersionNum is productVrm's two bits before first decimal points, default '00'
-	 * @param productVrm
-	 * @return
-	 */
-	private String getVersionNum(String productVrm) {
-		String versionNum = "";
-		if(productVrm == null ||"".equals(productVrm)){
-			versionNum = "01";
-		}else{
-			
-			String[] arr = splitStr(productVrm, ".");
-			String term = arr[0].trim();
-			if(term.startsWith("V")){
-				term = term.substring(1,term.length()).trim();
-			}
-			if(term.length() < 2){
-				versionNum = "0" + term;
-			}else if(term.length() == 2){
-				versionNum = term;
-			}
-						
-		}	
-		return versionNum;
-	}
-	
-	/**
-	 * split string
-	 * @param str
-	 * @param delim
-	 * @return
-	 */
-	public String[] splitStr(String str, String delim) {
-        StringTokenizer stringTokenizer = new StringTokenizer( str, delim );
-        String[] strArr = new String[stringTokenizer.countTokens()];
-        int i = 0;
-        while( stringTokenizer.hasMoreTokens() ) {
-            strArr[i] = stringTokenizer.nextToken();
-            i++ ;
-        }
-        return strArr;
-    } 
-	/**
-	 * set . file name
-	 * 
-	 * @param filename
-	 */
-	private String setFileName(String filename) {
-		StringBuffer sb = new StringBuffer(filename.trim());
-		String dts = getNow();
-		// replace special characters
-		dts = dts.replace(' ', '_');
-		sb.append(dts + ".SCRIPT");
-		String dir = ABRServerProperties.getValue(m_abri.getABRCode(), RPTPATH, "/Dgq");
-		if (!dir.endsWith("/")) {
-			dir = dir + "/";
-		}
-		String pathName = dir + sb.toString();
-	
-		addDebug("**** ffPathName: " + pathName + " ffFileName: " + sb.toString());
-		return pathName;
-	}
-	/**
-	 * generate report
-	 * @param map
-	 * @return
-	 */
-	private boolean generateOutputFile(HashMap map) {
-		if(map.size()==0){
-			userxmlSb.append("File generate failed, for there is no qualified data related, please check ");
-			return false;
-		}
-		else{
-		
-			try{
-				Iterator entrie1 = map.entrySet().iterator();
-				Vector files = new Vector(1);
-				int count=1;
-				while(entrie1.hasNext()){
-					Map.Entry entry1 = (Map.Entry) entrie1.next();
-					WTAASAPSWENTITY entity = (WTAASAPSWENTITY) entry1.getValue();					
-					String aletNum = entity.getADOCNO();
-					aletNum = (aletNum != null? aletNum : "");
-					//file name need change
-					String fileName = setFileName("FP"+aletNum+count);					
-					
-					boolean createfile=generateFile(fileName, entity);
-					if (createfile){
-						files.add(fileName);
-						count++;
-					}
-				}
-				// generate Zip file
-				generateZipfile(files);
-				userxmlSb.append("File generate success");
-				return true;
-				
-			}catch(Exception e){			
-				e.printStackTrace();
-				return false;
-			}
-		}	
-				
-	}
-	/**
-	 * generate file for each announcement associate avail
-	 * @param fileName
-	 * @param entity
-	 * @throws Exception
-	 */
-	private boolean generateFile(String fileName, WTAASAPSWENTITY entity) throws Exception {
-		FileOutputStream fos = new FileOutputStream(fileName);
-		OutputStreamWriter wOut = new OutputStreamWriter(fos, "UTF-8");
-		try{
-			String fileContent = "";
-			int factNumber=1;
-			List listFactSection = new ArrayList();
-			String rfa = annNumber;
-			
-			String factSection;
-			Iterator it = entity.getPROD().entrySet().iterator();
-			while (it.hasNext()){
-				Map.Entry entry = (Entry) it.next();
-				String type = (String) entry.getKey();
-				
-				factSection = generateFactSection(rfa, type, entity, factNumber);
-				if(factSection != null ){ // FACT Empty -> Skip
-					listFactSection.add(factSection);
-					factNumber++;
-				}			
-			}
-			
-			String user_CN = "IJ";
-			fileContent += generateHeadSection(rfa, entity, 'P',user_CN) +"\r\n";
-			
-			factNumber=1;
-			for(int i=0; i<listFactSection.size();i++){
-				String fact = (String) listFactSection.get(i);
-				fileContent += 
-					"  ---------------------------- FACT " + factNumber + " OF " + listFactSection.size() + " -------------------------------      " + "\r\n" +
-					fact;
-				factNumber++;
-			}
-			
-			wOut.write(fileContent);
-			userxmlSb.append(rfa + entity.getAVAILID() +" File generate success \n");
-			return true;
-		}catch(IOException e){
-			userxmlSb.append(e);
-			throw new Exception("File create failed " + fileName);
-		}catch (WTAASException ex){
-			userxmlSb.append(ex);
-			return false;
-		}finally {
-			wOut.flush();
-			wOut.close();
-			try {
-				if (wOut != null)
-					wOut.close();
-					
-			} catch (Exception e) {
-				throw new Exception("File create failed " + fileName);
-			}
-			
-		}
-		
-	}
-	public String getValue(String value){
-		if(value==null){
-			return "";
-		}else{
-			return value;
-		}
-	}
-	/**
-	 * generate common head part
-	 * @param rfa
-	 * @param entity
-	 * @param flag
-	 * @param userCn
-	 * @return
-	 * @throws Exception
-	 */
-	private String generateHeadSection(String rfa,WTAASAPSWENTITY entity,char flag,String userCn) throws Exception{
-		Map conditions = new HashMap();
-		conditions.put("PANNRFA",rfa);
-		
-		String DOCID 		= formatValue(entity.getADOCNO(),"DOCID");
-		String LETNO 		= formatValue(entity.getADOCNO(),"LETNO");
-		String ANNDATE 		= formatDate(entity.getANNDATE(),"yyyy-MM-dd","yyyyMMdd");
-		//String EFFECTIVED	= formatDate(entity.getEFFECTIVEDATE(),"yyyy-MM-dd","yyyyMMdd");
-		String TITLE 		= fixLength(entity.getRFASHRTTITLE(), 69);
-		String TITLE2 		= fixLength(entity.getRFASHRTTITLE(), 78);
-		String currentDate  = sdf.format(new Date());
-		String DATE 		= fixLength(formatDate(entity.getANNDATE(),"yyyy-MM-dd","EEEEE, MMMMM dd, yyyy").toUpperCase(),39);
-		String RELDATE 		= fixLength(formatDate(entity.getANNDATE(),"yyyy-MM-dd","MMMMM dd, yyyy").toUpperCase(),55);
-		String 	
-		   head = 
-				".*DOCID    F" + flag + "" + DOCID + "" + "\r\n" +
-				".*LETNO    F" + flag + "" + LETNO + "" + "\r\n" +
-				".*DATE     " + ANNDATE + "" + "\r\n" +
-				".*REVISED  " + ANNDATE+ "" + "\r\n" +
-				".*TITLE    " + TITLE + "                                       " +"\r\n"+
-				".ss                                                                           "+"\r\n";	
-	
-		head += 
-			    ".*  Modified on "+currentDate+" by "+userCn+"\r\n" +
-			    ".fo on;.sk;.sv on;.tm 0;.bm 0;.pn off;.hy off;.ju off;.ti ?05               " + "\r\n" +
-				".pl 62;.ll 69;.co;.tr ! 40;.rf cancel;.rc 9 0;.rc 1 1                         " + "\r\n" +
-				".rc 2 2;.rc 3 3;.rc 4 4;.rc 5 5;.rc 6 6;.rc 7 7;.rc 8 8                       " + "\r\n" +
-				".fo off                                                                       " + "\r\n" +
-				"CONFIDENTIAL UNTIL 8 AM NEW YORK TIME, " + DATE + "\r\n" +
-				".fo off                                                                       " + "\r\n" +
-				".*DIST                                                                        " + "\r\n" +
-				":H2.AP Distribution:                                                          " + "\r\n" +
-				".sk                                                                           " + "\r\n" +
-				"Refer to Fact Sheet details.                                                  " + "\r\n" +
-				".fo off;.sk                                                                   " + "\r\n" +
-				":H2.AP-RELEASE DATE:  " + RELDATE + "                                         "+ "\r\n" +
-				".fo off;.sk                                                                   " + "\r\n" +
-				"THIS SECTION IS CLASSIFIED INTERNAL USE ONLY.                                 " + "\r\n" +
-				".in                                                                           " + "\r\n" +
-				".*LETTERNO                                                                    " + "\r\n" +
-				":H2.FACT SHEET NO. F" + flag + "" + DOCID + "" + "\r\n" +
-				".*ELETTERNO                                                                   " + "\r\n" +
-				"PROGRAMMING ANNOUNCEMENT                                                      " + "\r\n" +
-				".in                                                                           " +"\r\n"+
-				"WORLD TRADE ASIA PACIFIC                                                      " + "\r\n" +
-				".sk;.in                                                                       " + "\r\n"+
-				"RFA NUMBER:      " + rfa + "                                                        " + "\r\n" +
-				".sp                                                                           " + "\r\n" +
-				".fo left                                                                      " + "\r\n" +
-				".*TITLE                                                                       " + "\r\n" +
-				":H2.TITLE:                                                                    " + "\r\n" +
-				".br                                                                           " + "\r\n" +
-				"" + TITLE2 + "\r\n" +
-				".*ETITLE                                                                      " + "\r\n" +
-				":h2.Fact sheet                                                                " + "\r\n" +
-				".sk;.fo off                                                                   " + "\r\n" +
-				" ";
-		return head;
-	
-	}
-	
-	private String formatValue(String number,String flag) throws WTAASException {
-
-		String value = "      ";
-		if(number==null){
-			return value;
-		}else if(number.length()<9){
-			throw new WTAASException("ADOC Number length is short than 9, please check");
-		}else if ("DOCID".equals(flag)){
-			value = number.substring(2, 4)+number.substring(5, 9);
-			return value;
-		}else if ("LETNO".equals(flag)){
-			value = number.substring(2);
-			return value;
-		}
-		return value;
-			
-	}
-
-	private String generateFactSection(String rfa, String type, WTAASAPSWENTITY entity, int factNumber) throws Exception{
-		
-
-		String ANNDATE		= formatDate(entity.getANNDATE(),"yyyy-MM-dd","dd/MM/yy");
-		String ALETNUM 		= entity.getADOCNO();
-		String REMCOMMENT	= "  REMARKS:                                                                      \r\n";
-		String modelSection = null;
-		Vector modelVct = new Vector();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		String date = sdf.format(new Date());	
-
-		int len = entity.getEFFECTIVEDATE().compareTo(date);
-		if(len > 0){
-			modelSection = generateModelSection(rfa, type, entity, modelVct);
-		}
-		 
-		String featureSection = generateFeatureSection(rfa, type, factNumber, entity);		
-		
-		if(modelSection == null && featureSection == null){
-			return null;
-		}
-		if(modelSection == null){
-			modelSection =
-			"  MAJOR TYPE/MODEL BM FILE UPDATE                                               " + "\r\n" +
-			"                                                                                " + "\r\n" +
-			"  ADDITIONAL TYPE AND/OR MODELS                                                 " + "\r\n" +
-			"                                     1ST DEL                                    " + "\r\n" +
-			"  DESCRIPTION (ENGLISH/LOCAL)        DATE      MV       TYPE-MDL                " + "\r\n" +
-			"                                                                                " + "\r\n" +
-			"  END OF ADDITIONAL TYPE AND/OR MODELS                                          " ;
-		}
-		if(featureSection == null){
-			featureSection = 
-				"  MAJOR TYPE/FEATURE BF FILE UPDATE                                             " + "\r\n" +
-				"                                                                                " + "\r\n" + 
-				"                                                                                " + "\r\n" + 
-				"  ADDITIONAL FEATURES                                                           " + "\r\n" +
-				"                                                                                " + "\r\n" +
-				"  Product Type: " + type + "                                                            " + "\r\n" +
-				"                                        D                                       " + "\r\n" +
-				"                                  ME O  S                                       " + "\r\n" +
-				"                                   D T  L  1st DEL/                             " + "\r\n" +
-				"  DESCRIPTION (ENGLISH/LOCAL)     IA C  O  PROC GROUP    MV    FEAT    P/N      " + "\r\n" +
-				"                                                                                " + "\r\n" +
-				"  END OF ADDITIONAL FEATURES                                                    " ;	
-		}
-		
-		String fact = 
-			"                                                                                " + "\r\n" +
-			"              LICENSED PROGRAM ADMINISTRATIVE FACT SHEET                        " + "\r\n" +
-			"                                                                                " + "\r\n" +
-			"                    IBM CONFIDENTIAL UNTIL ANNOUNCED                            " + "\r\n" +
-			"                                                                                " + "\r\n" +
-			"  REFERENCE RFA/LA NO.: " + rfa + "          PROGRAM ANNOUNCEMENT: " + ALETNUM + "          " + "\r\n" +
-			"  PUBLICATION DATE: " + ANNDATE + "                                                    " + "\r\n" +
-			"                                                                                " + "\r\n" +
-			"  RELEASED TO:  ALL AP ( X )    ASPA ONLY (  )    JAPAN ONLY (  )               " + "\r\n" +
-			"                COUNTRY ONLY (SPECIFY)                                          " + "\r\n" +
-			"                                                                                " + "\r\n" +
-			REMCOMMENT +
-			"                                                                                " + "\r\n" +
-			"                                Distribution: BTO                               " + "\r\n" +
-			"                                                                                " + "\r\n" +
-			modelSection + "\r\n" +
-			"                                                                                " + "\r\n" +
-			featureSection + "\r\n" +
-			"                                                                                " + "\r\n" +
-			"  END OF FACT SHEET                                                             " + "\r\n" +
-			"                                                                                " + "\r\n" ;
-		
-		return fact;
-		
-	}
-	/**
-	 * generate model info into report
-	 * @param rfa
-	 * @param type
-	 * @param entity
-	 * @return
-	 * @throws Exception
-	 */
-	private String generateModelSection(String rfa, String type, WTAASAPSWENTITY entity, Vector modelVct) throws Exception{
-	
-		String majorModel = "";
-		String additionalModel = "";
-		HashMap map = entity.getPROD();
-		ArrayList prods = (ArrayList) map.get(type);
-		for(int i=0;i<prods.size();i++){
-			PRODINFO prod = (PRODINFO) prods.get(i);
-			if(prod.getMODELID()==null){
-				continue;
-			}
-			String GENAVAILDT 	= formatDate(entity.getEFFECTIVEDATE(),"yyyy-MM-dd","MMyy");
-			String PRODWAR 		= "N";
-			String PPEPEDU		= prod.getEDUCALLOWMHGHSCH() == null ||  prod.getEDUCALLOWMHGHSCH().trim().length() == 0 
-									? "000000" 
-									:  matchformat(prod.getEDUCALLOWMHGHSCH());
-			String PPCKPID = "N";
-			
-				String TYPE = prod.getMACHTYPEATR();
-				String MODEL = prod.getMODELATR();
-				String ANNDATE = formatDate(entity.getANNDATE(),"yyyy-MM-dd","ddMMyy");
-				String productvrm = prod.getPRODUCTVRM();
-				String VER = getVersionNum(productvrm);
-				String REL = getReleaseNum(productvrm);
-				String MOD = getModifyNum(productvrm);
-				String description = getValue(prod.getMINVNAME());				
-				
-				String DSLOELIG = "N";
-				
-				String LOCATIONLC = "N";
-				String INST_LIC	= "N";
-				String FPEPRCT = "Y";				
-				String POFFTIT=fixLength(description,35);
-				
-				if(modelSet.add(prod.getMACHTYPEATR())){ // if this machtype is not first print.
-				
-					//modelSet.add(MODEL);
-					POFFTIT = fixLength(description,56);
-					
-					majorModel = 
-						"  Program No: " + TYPE + "-" + MODEL + "          Ver " + VER + "   Rel " + REL + "  Mod " + MOD + "                         " + "\r\n" +
-						"  Description (English) " + description + "\r\n" +
-						"  Description (Local)                                                           " + "\r\n" +
-						"  PP: Y PN:   PRPQ:   PO:   Media Feature: " + PPCKPID + "             Use in Cty: Y          " + "\r\n" +
-						"  Orders Rejected: N        DP Install,Post Order: NN    Price Print: Y         " + "\r\n" +
-						"  Call Off: N               License,Install,Usage: " + LOCATIONLC + "" + INST_LIC + "" + FPEPRCT + "   S/W Warranty: " + PRODWAR + "        " + "\r\n" +
-						"  Auto Sftw Sched: Y        Mat Check,Pass: NN           DSLO Elig: " + DSLOELIG + "           " + "\r\n" +
-						"  Restricted Material: N                                                        " + "\r\n" +
-						"                                                                                " + "\r\n" +
-						"  Product ID Code: 5             First Del Date: " + GENAVAILDT + "/                          " + "\r\n" +
-						"  Program Lib Code: 88/          Ser Support ID Code: M                         " + "\r\n" +
-						"  Default Order Sys:             Education Allowance: " + PPEPEDU + "                    " + "\r\n" +
-						"  Pre-Install Test: 00/000       Limited Billing Period (leave blank):   /      " + "\r\n" +
-						"  Central Ser Code: 0            Central End Support:                           " + "\r\n" +
-						"  A - B - C: A                   Local Ser Code:                                " + "\r\n" +
-						"  Local Service:                 Order Confirmation: 05                         " + "\r\n" +
-						"  Normal Billing Period: 0101    Product Lead:                                  " + "\r\n" +
-						"  Normal M/A / ITC Code: T/B                                                    " + "\r\n" +
-						"                                                                                " + "\r\n" +
-						"  Points Effective Date: " + ANNDATE + "     Points (MV): 000000*                        " + "\r\n" +
-						"  Values Effective Date: " + ANNDATE + "     Monthly Rental Value: 000                   " + "\r\n" +
-						"  Initial Charge Value: 000                                                     " + "\r\n" +
-						"                                                                                " + "\r\n" +
-						"  BL FILE UPDATE                                                                " + "\r\n" +
-						"                                                                                " + "\r\n" +
-						"  Price Code: 0                   Announcement Date: " + ANNDATE + "                     " + "\r\n" +
-						"  Monthly Charge/SUC/OTC: 000                                                   " + "\r\n" +
-						"                                                                                " + "\r\n";
-					modelVct.add(prod.getMODELID());	
-					continue;			
-				}
-				//if(!modelSet.add(MODEL)){ // if this model has been printed, not print again
-					//continue;
-				//}
-				// The 2nd and next Features are used as 'ADDITIONAL FEATURES'
-				if(!modelVct.contains(prod.getMODELID())){
-				additionalModel += 
-					"  " + POFFTIT + GENAVAILDT + "    000000*    " + TYPE + "-" + MODEL + "                " + "\r\n" +
-					"                                                                                " + "\r\n" ;
-				modelVct.add(prod.getMODELID());
-				}
-			
-		}
-		
-		if(additionalModel.trim().length() == 0)
-			additionalModel = "                                                                                \r\n";
-		
-		String modelSection =
-			"  MAJOR TYPE/MODEL BM FILE UPDATE                                               " + "\r\n" +
-			"                                                                                " + "\r\n" +
-			majorModel +
-			"  ADDITIONAL TYPE AND/OR MODELS                                                 " + "\r\n" +
-			"                                     1ST DEL                                    " + "\r\n" +
-			"  DESCRIPTION (ENGLISH/LOCAL)        DATE      MV       TYPE-MDL                " + "\r\n" +
-			additionalModel +
-			"  END OF ADDITIONAL TYPE AND/OR MODELS                                          " ;
-			
-		return modelSection;
-		
-	}
-	
-	private String generateFeatureSection(String rfa, String type, int factNumber, WTAASAPSWENTITY entity) throws Exception{
-	
-		String TYPE="";
-		String majorFeature = "";
-		String additionalFeatures = "";
-		String featuresSection ="";
-		
-		// Get only the NEW features for the current FACT
-		// SELECT * FROM GSALTDATA.GSALTLFT01 WHERE PANNRFA LIKE <rfa> AND ONLYMODEL LIKE 'No' AND PACHAFF LIKE <type> AND ...another filter
-
-		HashMap map = entity.getPROD();
-		ArrayList prods = (ArrayList) map.get(type);
-		if(prods.size() > 0){
-			
-			String GENAVAILDT 	= formatDate(entity.getEFFECTIVEDATE(),"yyyy-MM-dd","MMyy");
-			
-			String []retorno = featureTreatment(entity, type, GENAVAILDT, factNumber);
-			majorFeature = retorno[0];
-			additionalFeatures = retorno[1];
-			TYPE = retorno[2];
-			
-		}
-		else{ // if not exist any Feature for print in mayor section
-			return null;
-		}
-			
-		if(additionalFeatures.trim().length() == 0){
-			additionalFeatures = "                                                                                \r\n";
-		}
-		
-		featuresSection =
-				"  MAJOR TYPE/FEATURE BF FILE UPDATE                                             " + "\r\n" +
-				"                                                                                " + "\r\n" +
-				majorFeature +
-				"                                                                                " + "\r\n" + 
-				"  ADDITIONAL FEATURES                                                           " + "\r\n" +
-				"                                                                                " + "\r\n" +
-				"  Product Type: " + fixLength(TYPE,4) + "                                                            " + "\r\n" +
-				"                                        D                                       " + "\r\n" +
-				"                                  ME O  S                                       " + "\r\n" +
-				"                                   D T  L  1st DEL/                             " + "\r\n" +
-				"  DESCRIPTION (ENGLISH/LOCAL)     IA C  O  PROC GROUP    MV    FEAT    P/N      " + "\r\n" +
-				additionalFeatures +
-				"  END OF ADDITIONAL FEATURES                                                    " ;
-							
-		return featuresSection;
-	}
-	
-	/**
-	 * generate feature part
-	 * @param entity
-	 * @param type
-	 * @param GENAVAILDT
-	 * @param factNumber
-	 * @return
-	 * @throws Exception
-	 */
-private String[] featureTreatment(WTAASAPSWENTITY entity,String type, String GENAVAILDT, int factNumber)throws Exception{
-		
-		String DESCRIPTION; // "SUBTITLE/MODEL"
-		String TYPE = "";
-		String MODEL;
-		String FEATURECODE;
-		String PPCKPID;
-		String FEATUREDES;
-		String ANNDATE;
-		String POINTS;
-		String MNTHRENTVL;
-		String MNTHCHRG;
-		String DSLOELIG;
-		String OTC;
-		String CHARGEOPTION;
-		String majorFeature="";
-		String additionalFeatures="";
-		
-		HashMap map = entity.getPROD();
-		ArrayList prods = (ArrayList) map.get(type);
-		for(int i=0;i<prods.size();i++){
-			
-			PPCKPID = "N";
-			PRODINFO prod = (PRODINFO) prods.get(i);
-			if(prod.getMODELID()==null){
-				continue;
-			}
-			TYPE 		= prod.getMACHTYPEATR();
-			MODEL 		= prod.getMODELATR();
-			FEATURECODE = prod.getFEATURECODE();
-			FEATUREDES 	= getValue(prod.getSFINVNAME());
-			ANNDATE 	= formatDate(entity.getANNDATE(),"yyyy-MM-dd","ddMMyy");//
-			//
-			DSLOELIG 	= "N";
-			if("Yes".equals(prod.getPRICEDFEATURE())){
-				OTC = "Y";
-				POINTS = "000001";
-				MNTHCHRG = "100";
-				CHARGEOPTION = "OTC";
-				MNTHRENTVL 	= "100";
-			}else{
-				OTC = "N";
-				POINTS = "000000";
-				MNTHCHRG = "000";
-				CHARGEOPTION = "NC";
-				MNTHRENTVL 	= "000";
-			}
-			
-			// The 1st Feature in the DB is used as 'MAJOR TYPE/FEATURE'
-			if(!featureSet.contains(TYPE)){
-			
-				if(("OTC".equals(CHARGEOPTION)||majorFeature.equals("")&&i==prods.size()-1)){
-					
-					DESCRIPTION =  fixLength(CHARGEOPTION+" "+FEATUREDES + "/" + MODEL, 56); 
-								
-					String PPEPEDU		= prod.getEDUCALLOWMHGHSCH() == null ||  prod.getEDUCALLOWMHGHSCH().trim().length() == 0 
-							? "000000" 
-							:  matchformat(prod.getEDUCALLOWMHGHSCH());
-				
-					majorFeature = 
-							"  Type/Model/Feature No.: " + TYPE + "-" + MODEL + "/" + FEATURECODE + "      Part Number:                       " + "\r\n" +
-							"  Description (English) " + DESCRIPTION + "\r\n" +
-							"  Description (Local)                                                           " + "\r\n" + 
-							"  Media Feature: " + PPCKPID + "      Orders Rejected: N      Price Print: Y                  " + "\r\n" +
-							"  Usable in Cty: Y      One Time Charge: " + OTC + "      DP Install Program: N           " + "\r\n" +
-							"  Specify Feature: N    DSLO: N                 Restricted Material: N          " + "\r\n" +
-							"                                                                                " + "\r\n" +
-							"  1st Del Date/Min&Max Proc Grp: " + GENAVAILDT + "/         Education Allowance: " + PPEPEDU + "      " + "\r\n" +
-							"  Service Support ID Code: P/                                                   " + "\r\n" +
-							"  Product Lead Time:             Pre-Install Test/Inter-Co Chg Code: 00/B       " + "\r\n" +
-							"                                                                                " + "\r\n" +
-							"  Points Effective Date: " + ANNDATE + "  Points: " + POINTS + "*                                " + "\r\n" +
-							"  Values Effective Date: " + ANNDATE + "  Monthly Rental Value: " + MNTHRENTVL + "                      " + "\r\n" +
-							"  Initial Charge Value: 000                                                     " + "\r\n" +
-							"                                                                                " + "\r\n" +
-							"  BL FILE UPDATE                                                                " + "\r\n" +
-							"                                                                                " + "\r\n" +
-							"  Price Code: 0                   Announcement Date: " + ANNDATE + "                     " + "\r\n" +
-							"  Monthly Charge/SUC/OTC: " + MNTHCHRG + "                                                   " + "\r\n";
-				
-				
-					featureSet.add(TYPE);	
-				}
-				continue;
-			}
-			
-			// The 2nd and next Features are used as 'ADDITIONAL FEATURES'
-			
-			DESCRIPTION  =  fixLength(CHARGEOPTION + " " + FEATUREDES, 26)+ "/" + MODEL;
-			
-			additionalFeatures += 
-				"  " + DESCRIPTION + "  " + PPCKPID + "  " + OTC + "  " + DSLOELIG + "  " + GENAVAILDT + "/      " + POINTS + "*  " + FEATURECODE + "             " + "\r\n" +
-				"                                                                                " + "\r\n" ; 			
-		}
-		
-		return new String[]{majorFeature,additionalFeatures,TYPE};
-	}
-
-	private String matchformat(String educallowmhghsch) {
-		String result = "";
-		if (educallowmhghsch.length()==1){
-			educallowmhghsch = "0" + educallowmhghsch;
-		}else if(educallowmhghsch.length()>2){
-			educallowmhghsch = educallowmhghsch.substring(0, 2);
-		}		
-		for(int i=0;i<3;i++){
-			result+=educallowmhghsch;
-		}		
-		return result;
-	}
-
-	/**
-	 * Format a date with a input Format to a date with certain output Value.
-	 * @param date : Valid date
-	 * @param inputFormat : input Pattern Format {@link java.text.SimpleDateFormat}.
-	 * @param outputFormat : output Pattern Format {@link java.text.SimpleDateFormat}.
-	 * @return String with the date formated.
-	 * @throws Exception : When the date does not exist or when the some Pattern Format is invalid.
-	 */
-	public static String formatDate(String date, String inputFormat, String outputFormat) throws Exception{
-		try{
-			// Create a temporal Date object
-			SimpleDateFormat inputDateFormat = new SimpleDateFormat(inputFormat,Locale.US);		
-			Date objDate = inputDateFormat.parse(date);
-
-			// SimpleDateFormat parse any date, inclusive if the date does not exist.
-			// For make sure than the date is valid, parse and un-parse should to return the same date
-			if(!date.equals(inputDateFormat.format(objDate))){
-				throw new Exception("Invalid date");
-			}
-
-			// Composite the output date.
-			SimpleDateFormat outputDateFormat = new SimpleDateFormat(outputFormat,Locale.US);
-			return outputDateFormat.format(objDate);
-		}catch (ParseException e){
-			throw new Exception("Invalid format", e.getCause());
-		}
-	}
-	/**
-	 * Fill o Trim down  a Text to certain size.
-	 * @param text : Text to format
-	 * @param width : Expected size
-	 * @param side : L/R. Indicate the side where fill o trim
-	 * @return : Fixed text
-	 */
-	public String fixLength(String text, int width, String side){
-		text= (text != null ? text : "");
-		if(side.equalsIgnoreCase("R")){ // Left-to-Right
-			if(text.length() >= width){
-				return text.substring(0, width);
-			}else{
-				String term = "";
-				for(int i=0;i<width-text.length();i++){
-					term += " ";
-				}
-				text = text + term;
-			}
-		}else if(side.equalsIgnoreCase("L")){ // Right-to-Left
-			if(text.length() >= width){
-				return text.substring(text.length() - width, text.length());
-			}else{
-				String term = "";
-				for(int i=0;i<width-text.length();i++){
-					term += " ";
-				}
-				text = term + text;
-			}
-		}
-		return text;
-	}
-	 
-	/**
-	 * Fill o Trim  a Text to certain size. By default trim/ fill at Right
-	 * @param text : Text to format
-	 * @param width : Expected size
-	 * @return : Fix text
-	 */
-	public String fixLength(String text, int width){
-		return fixLength(text, width, "R");
-	}
-	
-	
-	/**
-	 * generate all file into one zip file
-	 * @param files
-	 */
-	private void generateZipfile(Vector files) {
-		try{
-			FileOutputStream fos = null;
-			ZipOutputStream zos = null;
-			String dts = getNow();
-	        String zipFileName = ABRServerProperties.getOutputPath()+ annNumber + dts +".zip";
-	        zipFile = new File(zipFileName);
-			try {
-				int buffer = 2048;
-				fos = new FileOutputStream(zipFile);
-				zos = new ZipOutputStream(fos);
-				for (int i = 0; i < files.size(); i++) {
-					String fileName = (String)files.get(i);
-					File outFile = new File(fileName);
-					if (outFile.exists()) {
-						zos.putNextEntry(new ZipEntry(outFile.getName()));
-						BufferedInputStream bis = null;
-						try {
-							bis = new BufferedInputStream(new FileInputStream(outFile));
-							int count;
-							byte data[] = new byte[buffer];  
-					        while ((count = bis.read(data, 0, buffer)) != -1) {  
-					        	zos.write(data, 0, count);  
-					        }
-					        zos.closeEntry();
-					        zos.flush();
-					        addDebug("Zip file " + fileName + " successfully");
-					        
-						} finally {
-							if (bis != null) {
-								bis.close(); 
-							}
-						}
-						// delete wrksht file
-						outFile.delete();
-					} else {
-						addError("Zip file..., Missing file " + fileName);
-					}
-				}
-			
-			} finally {
-				if (zos != null) {
-					zos.flush();
-					zos.close();
-				}
-				if (fos != null) {
-					fos.flush();
-					fos.close();
-				}
-			}
-			files.clear();
-			files = null;
-			
-			
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-	}
-	/**
-	 * send mail with zip file generated
-	 * 
-	 * @param zipFile2
-	 * @throws Exception
-	 */
-	public void sendMail(File zipFile2) throws Exception {
-		
-		FileInputStream fisBlob = null;
-		try {
-			fisBlob = new FileInputStream(zipFile2);
-			int iSize = fisBlob.available();
-			byte[] baBlob = new byte[iSize];
-			fisBlob.read(baBlob);
-			setAttachByteForDG(baBlob);
-			getABRItem().setFileExtension("zip");
-			addDebug("Sending mail for file " + zipFile2);
-		} catch (IOException e) {
-			addDebug("sendMail IO Exception");
-		}
-
-		finally {
-			if (fisBlob != null) {
-				fisBlob.close();
-			}
-		}
-
-	}
-	/**
-	 * 
-	 * @param item
-	 * @param attrCode
-	 * @return
-	 */
-	protected String getAttributeFlagValue(EntityItem item, String attrCode) {
-		return PokUtils.getAttributeFlagValue(item, attrCode);
-	}
-
-	public String getDescription() {
-		return "WTAASAPSWABR";
-	}
-
-	public String getABRVersion() {
-		return "1.0";
-	}
-
-	/**
-	 * add error info and fail abr
-	 */
-	protected void addError(String msg) {
-		addOutput(msg);
-		setReturnCode(FAIL);
-	}
-
-	protected void addDebug(String msg) {
-		if (D.EBUG_DETAIL <= DEBUG_LVL) {
-			rptSb.append("<!-- " + msg + " -->" + NEWLINE);
-		}
-	}
-
-	/**
-	 * add msg as an html comment if meets debuglevel set in
-	 * abr.server.properties
-	 * 
-	 * @param debuglvl
-	 * @param msg
-	 */
-	protected void addDebugComment(int debuglvl, String msg) {
-		if (debuglvl <= DEBUG_LVL) {
-			rptSb.append("<!-- " + msg + " -->" + NEWLINE);
-		}
-	}
-
-	/**
-	 * 
-	 * @param prof
-	 * @param veName
-	 * @param item
-	 * @return
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	protected EntityList getEntityList(Profile prof, String veName,
-			EntityItem item) throws MiddlewareRequestException, SQLException,
-			MiddlewareException {
-		EntityList list = m_db.getEntityList(prof, new ExtractActionItem(null,
-				m_db, prof, veName), new EntityItem[] { new EntityItem(null,
-				prof, item.getEntityType(), item.getEntityID()) });
-		return list;
-	}
-
-	/**
-	 * search action only returns navigate attributes, pull a full extract on
-	 * the EntityItems returned from search to see the other attributes
-	 * 
-	 * @param prof
-	 * @param item
-	 * @return EntityItem
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	protected EntityItem getEntityItem(Profile prof, EntityItem item)
-			throws MiddlewareRequestException, SQLException,
-			MiddlewareException {
-		EntityList list = m_db.getEntityList(prof, new ExtractActionItem(null,
-				m_db, prof, "dummy"), new EntityItem[] { new EntityItem(null,
-				prof, item.getEntityType(), item.getEntityID()) });
-		return list.getParentEntityGroup().getEntityItem(0);
-	}
-
-	/**
-	 * search action only returns navigate attributes, pull a full extract on
-	 * the EntityItems returned from search to see the other attributes
-	 *
-	 * @param prof
-	 * @param entityType
-	 * @param entityId
-	 * @return EntityItem
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 */
-	protected EntityItem getEntityItem(Profile prof, String entityType,
-			int entityId) throws MiddlewareRequestException, SQLException,
-			MiddlewareException {
-		EntityList list = m_db.getEntityList(prof, new ExtractActionItem(null,
-				m_db, prof, "dummy"), new EntityItem[] { new EntityItem(null,
-				prof, entityType, entityId) });
-		return list.getParentEntityGroup().getEntityItem(0);
-	}
-
-	/**
-	 * get database
-	 */
-	protected Database getDB() {
-		return m_db;
-	}
-
-	protected String getABRTime() {
-		return String.valueOf(System.currentTimeMillis());
-	}
-
-	/**
-	 * add msg to report output
-	 */
-	private void addOutput(String msg) {
-		rptSb.append("<p>" + msg + "</p>" + NEWLINE);
-	}
-
-	/**
-	 * EACM to WATTS Triggered ABRs
-	 *
-	 * The Report should identify: - USERID (USERTOKEN) - Role - Workgroup -
-	 * Date/Time - Action Taken
-	 */
-	private String buildAbrHeader() {
-		String HEADER2 = "<table>" + NEWLINE
-				+ "<tr><th>Userid: </th><td>{0}</td></tr>" + NEWLINE
-				+ "<tr><th>Role: </th><td>{1}</td></tr>" + NEWLINE
-				+ "<tr><th>Workgroup: </th><td>{2}</td></tr>" + NEWLINE
-				+ "<tr><th>Date/Time: </th><td>{3}</td></tr>" + NEWLINE
-				+ "<tr><th>Action Taken: </th><td>{4}</td></tr>" + NEWLINE
-				+ "</table>" + NEWLINE + "<!-- {5} -->" + NEWLINE;
-		MessageFormat msgf = new MessageFormat(HEADER2);
-		args[0] = m_prof.getOPName();
-		args[1] = m_prof.getRoleDescription();
-		args[2] = m_prof.getWGName();
-		args[3] = t2DTS;
-		args[4] = "WATTS AP SW ABR feed trigger<br/>" + xmlgenSb.toString();
-		args[5] = getABRVersion();
-		return msgf.format(args);
-	}
-
-	/**
-	 * Get Name based on navigation attributes
-	 *
-	 * @return java.lang.String
-	 */
-	private String getNavigationName(EntityItem theItem)
-			throws java.sql.SQLException, MiddlewareException {
-		StringBuffer navName = new StringBuffer();
-		// NAME is navigate attributes
-		EntityGroup eg = new EntityGroup(null, m_db, m_prof,
-				theItem.getEntityType(), "Navigate");
-		EANList metaList = eg.getMetaAttribute(); // iterator does not maintain
-													// navigate order
-		for (int ii = 0; ii < metaList.size(); ii++) {
-			EANMetaAttribute ma = (EANMetaAttribute) metaList.getAt(ii);
-			navName.append(PokUtils.getAttributeValue(theItem,
-					ma.getAttributeCode(), ", ", "", false));
-			navName.append(" ");
-		}
-		return navName.toString();
-	}
-	
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\adsxmlbh1\WTAASAPSWABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

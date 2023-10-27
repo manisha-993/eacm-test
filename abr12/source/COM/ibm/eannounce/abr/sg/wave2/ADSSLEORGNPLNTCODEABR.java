@@ -1,78 +1,84 @@
-//Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2009  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//<?xml version="1.0" encoding="UTF-8" ?>	
-/**********************************************************************************
-*
-<SLEORGNPLNTCODE_UPDATE xmlns="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/SLEORGNPLNTCODE_UPDATE">	
-<DTSOFMSG>	</DTSOFMSG>         Entity          Attribute
-<ACTIVITY>	</ACTIVITY>         SLEORGNPLNTCODE Activity Update or "Delete"
-<STATUS>	</STATUS>           SLEORGNPLNTCODE Status
-<ENTITYTYPE>    </ENTITYTYPE>       SLEORGNPLNTCODE ENTITYTYPE
-<ENTITYID>      </ENTITYID>         SLEORGNPLNTCODE ENTITYID
-<COUNTRY_FC>	</COUNTRY_FC>       SLEORGNPLNTCODE COUNTRYLIST
-<MODCATG>	</MODCATG>          SLEORGNPLNTCODE MODCATG
-<PLNTCD>	</PLNTCD>           SLEORGNPLNTCODE PLNTCD
-<SLEORG>	</SLEORG>           SLEORGNPLNTCODE SLEORG
-</SLEORGNPLNTCODE_UPDATE>
-*/
-package COM.ibm.eannounce.abr.sg.wave2;
+/*    */ package COM.ibm.eannounce.abr.sg.wave2;
+/*    */ 
+/*    */ import COM.ibm.eannounce.abr.util.XMLActivityElem;
+/*    */ import COM.ibm.eannounce.abr.util.XMLElem;
+/*    */ import COM.ibm.eannounce.abr.util.XMLGroupElem;
+/*    */ import COM.ibm.eannounce.abr.util.XMLNotificationElem;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class ADSSLEORGNPLNTCODEABR
+/*    */   extends XMLMQRoot
+/*    */ {
+/* 30 */   private static final XMLElem XMLMAP = (XMLElem)new XMLGroupElem("SLEORGNPLNTCODE_UPDATE");
+/*    */   static {
+/* 32 */     XMLMAP.addChild((XMLElem)new XMLNotificationElem("DTSOFMSG"));
+/* 33 */     XMLMAP.addChild((XMLElem)new XMLActivityElem("ACTIVITY"));
+/* 34 */     XMLMAP.addChild(new XMLElem("STATUS", "STATUS", 1));
+/* 35 */     XMLMAP.addChild(new XMLElem("ENTITYTYPE", "ENTITYTYPE"));
+/* 36 */     XMLMAP.addChild(new XMLElem("ENTITYID", "ENTITYID"));
+/*    */     
+/* 38 */     XMLElem xMLElem = new XMLElem("COUNTRY_FC", "COUNTRYLIST", 1);
+/* 39 */     XMLMAP.addChild(xMLElem);
+/* 40 */     XMLMAP.addChild(new XMLElem("MODCATG", "MODCATG", 0));
+/* 41 */     XMLMAP.addChild(new XMLElem("PLNTCD", "PLNTCD", 2));
+/* 42 */     XMLMAP.addChild(new XMLElem("SLEORG", "SLEORG"));
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public XMLElem getXMLMap() {
+/* 50 */     return XMLMAP;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getVeName() {
+/* 56 */     return "dummy";
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public String getStatusAttr() {
+/* 61 */     return "STATUS";
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getMQCID() {
+/* 67 */     return "SLEORGNPLNTCODE";
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public String getVersion() {
+/* 76 */     return "$Revision: 1.2 $";
+/*    */   }
+/*    */ }
 
-import COM.ibm.eannounce.abr.util.*;
 
-public class ADSSLEORGNPLNTCODEABR extends XMLMQRoot
-{
-    private static final XMLElem XMLMAP;
-
-    static {
-        XMLMAP = new XMLGroupElem("SLEORGNPLNTCODE_UPDATE");
-         // level2
-        XMLMAP.addChild(new XMLNotificationElem("DTSOFMSG")); // pull from profile.endofday
-        XMLMAP.addChild(new XMLActivityElem("ACTIVITY"));
-        XMLMAP.addChild(new XMLElem("STATUS","STATUS",XMLElem.FLAGVAL));
-        XMLMAP.addChild(new XMLElem("ENTITYTYPE","ENTITYTYPE"));
-        XMLMAP.addChild(new XMLElem("ENTITYID","ENTITYID"));
-
-        XMLElem list = new XMLElem("COUNTRY_FC","COUNTRYLIST",XMLElem.FLAGVAL);
-        XMLMAP.addChild(list);
-        XMLMAP.addChild(new XMLElem("MODCATG","MODCATG",XMLElem.ATTRVAL));
-        XMLMAP.addChild(new XMLElem("PLNTCD","PLNTCD",XMLElem.SHORTDESC));
-        XMLMAP.addChild(new XMLElem("SLEORG","SLEORG"));
-
-    }
-
-    /**********************************
-    * get xml object mapping
-    */
-    public XMLElem getXMLMap() {
-        return XMLMAP;
-    }
-
-    /**********************************
-    * get the name of the VE to use
-    */
-    public String getVeName() { return "dummy";}
-
-    /**********************************
-    * get the status attribute to use for this ABR
-    */
-    public String getStatusAttr() { return "STATUS";}
-
-    /**********************************
-    *
-	A.	MQ-Series CID
-    */
-    public String getMQCID() { return "SLEORGNPLNTCODE"; }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getVersion()
-    {
-        return "$Revision: 1.2 $";
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\wave2\ADSSLEORGNPLNTCODEABR.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

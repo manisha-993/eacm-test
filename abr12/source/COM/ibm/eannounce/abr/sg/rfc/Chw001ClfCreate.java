@@ -1,626 +1,630 @@
-package COM.ibm.eannounce.abr.sg.rfc;
+/*     */ package COM.ibm.eannounce.abr.sg.rfc;
+/*     */ 
+/*     */ import java.sql.Connection;
+/*     */ import java.sql.PreparedStatement;
+/*     */ import java.sql.ResultSet;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.HashMap;
+/*     */ import java.util.List;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class Chw001ClfCreate
+/*     */   extends RfcCallerBase
+/*     */ {
+/*     */   MODEL chwModel;
+/*     */   String materialType;
+/*     */   String materialID;
+/*     */   Connection odsConnection;
+/*     */   String rfaNum;
+/*     */   
+/*     */   public Chw001ClfCreate(MODEL paramMODEL, String paramString1, String paramString2, String paramString3, Connection paramConnection) {
+/*  27 */     this.chwModel = paramMODEL;
+/*  28 */     this.materialType = paramString1;
+/*  29 */     this.materialID = paramString2;
+/*  30 */     this.odsConnection = paramConnection;
+/*  31 */     this.rfaNum = paramString3;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute() throws Exception {
+/*  39 */     if (this.chwModel == null)
+/*     */       return; 
+/*  41 */     RdhClassificationMaint rdhClassificationMaint = new RdhClassificationMaint(this.materialID, "MG_COMMON", "001", "H", this.rfaNum);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*  48 */     addRfcName(rdhClassificationMaint);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*  57 */     String str1 = "CH";
+/*  58 */     if ("ZPRT".equalsIgnoreCase(this.materialType)) {
+/*  59 */       if ("Hardware".equalsIgnoreCase(this.chwModel.getCATEGORY())) {
+/*  60 */         str1 = "HW";
+/*  61 */       } else if ("Service".equalsIgnoreCase(this.chwModel.getCATEGORY())) {
+/*  62 */         str1 = "SP";
+/*     */       } 
+/*     */     }
+/*  65 */     rdhClassificationMaint.addCharacteristic("MG_PRODUCTTYPE", str1);
+/*  66 */     rdhClassificationMaint.execute();
+/*  67 */     addRfcResult(rdhClassificationMaint);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*  72 */     rdhClassificationMaint = null;
+/*  73 */     rdhClassificationMaint = new RdhClassificationMaint(this.materialID, "MM_FIELDS", "001", "H", this.rfaNum);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*  80 */     addRfcName(rdhClassificationMaint);
+/*     */ 
+/*     */ 
+/*     */     
+/*  84 */     str1 = CommonUtils.getFirstSubString(this.materialID, 4);
+/*  85 */     rdhClassificationMaint.addCharacteristic("MM_MACH_TYPE", str1);
+/*     */     
+/*  87 */     if ("ZPRT".equalsIgnoreCase(this.materialType)) {
+/*  88 */       str1 = CommonUtils.getLastSubString(this.materialID, 3);
+/*  89 */       rdhClassificationMaint.addCharacteristic("MM_MODEL", str1);
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/*  98 */     str1 = "";
+/*  99 */     if ("SIU-CPU".equalsIgnoreCase(this.chwModel.getUNITCLASS())) {
+/* 100 */       str1 = "1";
+/* 101 */     } else if ("Non SIU- CPU".equalsIgnoreCase(this.chwModel.getUNITCLASS())) {
+/* 102 */       str1 = "0";
+/* 103 */     } else if ("SIU-Non CPU".equalsIgnoreCase(this.chwModel.getUNITCLASS())) {
+/* 104 */       str1 = "2";
+/*     */     } 
+/*     */     
+/* 107 */     rdhClassificationMaint.addCharacteristic("MM_SIU", str1);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 118 */     str1 = "";
+/* 119 */     String str2 = this.chwModel.getPRICEDIND().toUpperCase();
+/* 120 */     String str3 = this.chwModel.getZEROPRICE().toUpperCase();
+/* 121 */     if ("YES".equals(str2) && "YES".equals(str3)) {
+/* 122 */       str1 = "Z";
+/* 123 */     } else if ("NO".equals(str2) && "NO".equals(str3)) {
+/* 124 */       str1 = "Z";
+/* 125 */     } else if ("YES".equals(str2) && "NO".equals(str3)) {
+/* 126 */       str1 = "G";
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 135 */     rdhClassificationMaint.addCharacteristic("MM_PRICERELEVANT", str1);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 144 */     str1 = "";
+/* 145 */     str2 = this.chwModel.getINSTALL().toUpperCase();
+/* 146 */     if ("CIF".equals(str2)) {
+/* 147 */       str1 = "C";
+/* 148 */     } else if ("CE".equals(str2)) {
+/* 149 */       str1 = "I";
+/* 150 */     } else if ("N/A".equals(str2)) {
+/* 151 */       str1 = "";
+/* 152 */     } else if ("DOES NOT APPLY".equals(str2)) {
+/* 153 */       str1 = "";
+/*     */     } 
+/* 155 */     rdhClassificationMaint.addCharacteristic("MM_FG_INSTALLABLE", str1);
+/*     */ 
+/*     */ 
+/*     */     
+/* 159 */     str1 = this.chwModel.getUNSPSC();
+/* 160 */     rdhClassificationMaint.addCharacteristic("MM_UNSPSC", CommonUtils.getFirstSubString(str1, 8));
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 166 */     String str4 = this.chwModel.getAMRTZTNLNGTH();
+/* 167 */     str1 = CommonUtils.getNoLetter(str4);
+/* 168 */     rdhClassificationMaint.addCharacteristic("MM_AMORTLENGTH", str1);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 173 */     str4 = this.chwModel.getAMRTZTNSTRT();
+/* 174 */     str1 = CommonUtils.getNoLetter(str4);
+/* 175 */     rdhClassificationMaint.addCharacteristic("MM_AMORTSTART", str1);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 181 */     str1 = "";
+/* 182 */     str2 = this.chwModel.getPRODID().toUpperCase();
+/* 183 */     if ("O-OTHER/OPTIONS".equalsIgnoreCase(str2)) {
+/* 184 */       str1 = "O";
+/* 185 */     } else if ("U-SYSTEM UNIT".equalsIgnoreCase(str2)) {
+/* 186 */       str1 = "U";
+/*     */     } 
+/* 188 */     rdhClassificationMaint.addCharacteristic("MM_IDENTITY", str1);
+/*     */ 
+/*     */     
+/* 191 */     str1 = this.chwModel.getSWROYALBEARING();
+/* 192 */     rdhClassificationMaint.addCharacteristic("MM_ROYALTY_BEAR_IND", CommonUtils.getFirstSubString(str1, 20));
+/*     */ 
+/*     */     
+/* 195 */     str1 = this.chwModel.getSOMFAMILY();
+/* 196 */     rdhClassificationMaint.addCharacteristic("MM_SOM_FAMILY", CommonUtils.getFirstSubString(str1, 2));
+/*     */ 
+/*     */     
+/* 199 */     str1 = this.chwModel.getLIC();
+/* 200 */     rdhClassificationMaint.addCharacteristic("MM_LIC", CommonUtils.getFirstSubString(str1, 3));
+/*     */ 
+/*     */     
+/* 203 */     str1 = this.chwModel.getBPCERTSPECBID();
+/* 204 */     if ("YES".equalsIgnoreCase(str1)) {
+/* 205 */       str1 = "Y";
+/* 206 */     } else if ("NO".equalsIgnoreCase(str1)) {
+/* 207 */       str1 = "N";
+/*     */     } 
+/*     */     
+/* 210 */     rdhClassificationMaint.addCharacteristic("MM_BP_CERT_SPECBID", str1);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 218 */     str1 = "";
+/* 219 */     str2 = this.chwModel.getPRPQAPPRVTYPE().toUpperCase();
+/* 220 */     if ("RPQ APPROVE I-LISTED".equalsIgnoreCase(str2)) {
+/* 221 */       str1 = "RPQ APPROVE";
+/* 222 */     } else if ("RPQ OTHER P-LISTED".equalsIgnoreCase(str2)) {
+/* 223 */       str1 = "RPQ OTHER";
+/*     */     } 
+/* 225 */     rdhClassificationMaint.addCharacteristic("MM_RPQTYPE", str1);
+/*     */ 
+/*     */ 
+/*     */     
+/* 229 */     str1 = "YES".equalsIgnoreCase(this.chwModel.getSPECBID()) ? "SPB" : "RFA";
+/* 230 */     rdhClassificationMaint.addCharacteristic("MM_ANNOUNCEMENT_TYPE", str1);
+/*     */ 
+/*     */     
+/* 233 */     str1 = this.chwModel.getPRODSUPRTCD();
+/* 234 */     rdhClassificationMaint.addCharacteristic("MM_PRODUCT_SUPPORT_CODE", CommonUtils.getFirstSubString(str1, 3));
+/*     */     
+/* 236 */     str1 = this.chwModel.getSYSTEMTYPE();
+/* 237 */     rdhClassificationMaint.addCharacteristic("MM_SYSTEM_TYPE", CommonUtils.getFirstSubString(str1, 30));
+/*     */     
+/* 239 */     if ("ZPRT".equalsIgnoreCase(this.materialType)) {
+/* 240 */       str1 = this.chwModel.getPHANTOMMODINDC();
+/* 241 */       rdhClassificationMaint.addCharacteristic("MM_PHANTOM_IND", CommonUtils.getFirstSubString(str1, 5));
+/*     */     } 
+/*     */     
+/* 244 */     str1 = "Yes";
+/* 245 */     rdhClassificationMaint.addCharacteristic("REMARKETER_REPORTER", str1);
+/*     */ 
+/*     */     
+/* 248 */     if ("ZPRT".equalsIgnoreCase(this.materialType)) {
+/* 249 */       if ("Hardware".equalsIgnoreCase(this.chwModel.getCATEGORY())) {
+/* 250 */         str1 = "1";
+/*     */       } else {
+/* 252 */         str1 = "";
+/*     */       } 
+/*     */     } else {
+/* 255 */       str1 = "1";
+/*     */     } 
+/* 257 */     rdhClassificationMaint.addCharacteristic("MM_PHYSICAL_RETURN", str1);
+/*     */     
+/* 259 */     str1 = this.chwModel.getWWOCCODE();
+/* 260 */     rdhClassificationMaint.addCharacteristic("MM_OPPORTUNITY_CODE", CommonUtils.getFirstSubString(str1, 5));
+/*     */     
+/* 262 */     if ("ZPRT".equalsIgnoreCase(this.materialType)) {
+/* 263 */       str1 = this.chwModel.getACQRCOCD();
+/* 264 */       rdhClassificationMaint.addCharacteristic("MM_ACQ_COMPANY", CommonUtils.getFirstSubString(str1, 3));
+/*     */     } 
+/*     */ 
+/*     */     
+/* 268 */     if ("Service".equalsIgnoreCase(this.chwModel.getCATEGORY())) {
+/* 269 */       str1 = this.materialID;
+/* 270 */       rdhClassificationMaint.addCharacteristic("MM_SP_MTM", CommonUtils.getFirstSubString(str1, 7));
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 277 */     if ("ZPRT".equals(this.materialType)) {
+/* 278 */       List<RELEXPCAMT> list = this.chwModel.getRELEXPCAMTLIST();
+/* 279 */       if (list != null) {
+/* 280 */         for (byte b = 0; b < list.size(); b++) {
+/* 281 */           rdhClassificationMaint.addCharacteristic("MM_RELEXPCAMT", ((RELEXPCAMT)list.get(b)).getRELEXPCAMT());
+/*     */         }
+/*     */       }
+/*     */     } 
+/*     */     
+/* 286 */     rdhClassificationMaint.execute();
+/* 287 */     addRfcResult(rdhClassificationMaint);
+/*     */ 
+/*     */ 
+/*     */     
+/* 291 */     if ("Service".equalsIgnoreCase(this.chwModel.getCATEGORY())) {
+/*     */       
+/* 293 */       RdhClassificationMaint rdhClassificationMaint1 = new RdhClassificationMaint(this.materialID, "MM_SERVICEPAC", "001", "H", this.rfaNum);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 300 */       addRfcName(rdhClassificationMaint1);
+/*     */ 
+/*     */       
+/* 303 */       str1 = this.chwModel.getSDFCD();
+/* 304 */       rdhClassificationMaint1.addCharacteristic("MM_SP_SDF", CommonUtils.getFirstSubString(str1, 10));
+/*     */       
+/* 306 */       str1 = this.chwModel.getSVCLEVCD();
+/* 307 */       rdhClassificationMaint1.addCharacteristic("MM_SP_SLC", CommonUtils.getFirstSubString(str1, 10));
+/*     */       
+/* 309 */       str1 = this.chwModel.getSVCPACMACHBRAND();
+/* 310 */       rdhClassificationMaint1.addCharacteristic("MM_HW_SPMACHBRAND", CommonUtils.getFirstSubString(str1, 5));
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 317 */       int i = this.chwModel.getSUBCATEGORY().indexOf(" ");
+/* 318 */       if (i > 0) {
+/* 319 */         str1 = CommonUtils.getFirstSubString(this.chwModel.getSUBCATEGORY(), i);
+/*     */       } else {
+/* 321 */         str1 = this.chwModel.getSUBCATEGORY();
+/*     */       } 
+/* 323 */       rdhClassificationMaint1.addCharacteristic("MM_HW_SPTYPE", CommonUtils.getFirstSubString(str1, 10));
+/*     */       
+/* 325 */       str4 = this.chwModel.getSUBCATEGORY();
+/* 326 */       str1 = ATWRTforService(str4);
+/* 327 */       rdhClassificationMaint1.addCharacteristic("MM_SP_IDENTIFIER", CommonUtils.getFirstSubString(str1, 5));
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 345 */       str2 = this.chwModel.getCOVRPRIOD().toUpperCase();
+/* 346 */       HashMap<Object, Object> hashMap = new HashMap<>();
+/* 347 */       hashMap.put("FIVE YEARS", "60");
+/* 348 */       hashMap.put("FIVE YEAR PARTS AND LABOR", "60");
+/* 349 */       hashMap.put("FOUR YEARS", "48");
+/* 350 */       hashMap.put("ONE YEAR", "12");
+/* 351 */       hashMap.put("FOUR YEAR PARTS AND LABOR", "48");
+/* 352 */       hashMap.put("THREE YEARS", "36");
+/* 353 */       hashMap.put("THREE YEAR PARTS AND LABOR", "36");
+/* 354 */       hashMap.put("TWO YEARS", "24");
+/* 355 */       hashMap.put("TWO YEAR PARTS AND LABOR (EXTENDS EXISTING 3 YEAR COVERAGE)", "24");
+/* 356 */       hashMap.put("SIX YEARS", "72");
+/* 357 */       hashMap.put("SEVEN YEARS", "84");
+/* 358 */       hashMap.put("THREE MONTHS", "3");
+/* 359 */       hashMap.put("3 MONTHS", "3");
+/* 360 */       str1 = (String)hashMap.get(str2);
+/* 361 */       rdhClassificationMaint1.addCharacteristic("MM_HW_SPTERM", str1);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 366 */       String str5 = this.chwModel.getSVCLEVCD();
+/* 367 */       String str6 = "";
+/*     */       try {
+/* 369 */         str6 = getSVCLEVFromXML(str5);
+/* 370 */       } catch (SQLException sQLException) {}
+/*     */ 
+/*     */       
+/* 373 */       SVCLEV sVCLEV = null;
+/* 374 */       if (!"".equals(str6)) {
+/* 375 */         sVCLEV = CommonEntities.getSVCLEVFromXml(str6);
+/*     */       }
+/*     */       
+/* 378 */       if (sVCLEV != null) {
+/*     */ 
+/*     */         
+/* 381 */         str1 = sVCLEV.getCOVRSHRTDESC();
+/* 382 */         rdhClassificationMaint1.addCharacteristic("MM_SP_COVHRS", CommonUtils.getFirstSubString(str1, 5));
+/*     */         
+/* 384 */         str4 = sVCLEV.getSVCDELIVMETH();
+/* 385 */         str1 = getMM_SP_SDMValue(str4);
+/* 386 */         rdhClassificationMaint1.addCharacteristic("MM_SP_SDM", CommonUtils.getFirstSubString(str1, 10));
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 393 */         String str7 = (sVCLEV.getFIXTME() == null) ? "" : sVCLEV.getFIXTME();
+/* 394 */         String str8 = (sVCLEV.getFIXTMEUOM() == null) ? "" : sVCLEV.getFIXTMEUOM();
+/* 395 */         String str9 = (sVCLEV.getFIXTMEOBJIVE() == null) ? "" : sVCLEV.getFIXTMEOBJIVE();
+/* 396 */         if ("".equals(str7) || "".equals(str8) || "".equals(str9)) {
+/* 397 */           str1 = "";
+/*     */         } else {
+/* 399 */           str1 = str7 + " " + str8 + " " + str9;
+/*     */         } 
+/* 401 */         rdhClassificationMaint1.addCharacteristic("MM_SPFIXEDTIME", CommonUtils.getFirstSubString(str1, 30));
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 408 */         String str10 = (sVCLEV.getONSITERESPTME() == null) ? "" : sVCLEV.getONSITERESPTME();
+/* 409 */         String str11 = (sVCLEV.getONSITERESPTMEUOM() == null) ? "" : sVCLEV.getONSITERESPTMEUOM();
+/* 410 */         String str12 = (sVCLEV.getONSITERESPTMEOBJIVE() == null) ? "" : sVCLEV.getONSITERESPTMEOBJIVE();
+/* 411 */         if ("".equals(str10) || "".equals(str11) || "".equals(str12)) {
+/* 412 */           str1 = "";
+/*     */         } else {
+/* 414 */           str1 = str10 + " " + str11 + " " + CommonUtils.getSubstrToChar(str12, "(");
+/*     */         } 
+/* 416 */         rdhClassificationMaint1.addCharacteristic("MM_SP_OSRESPTIME", CommonUtils.getFirstSubString(str1, 16));
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 423 */         String str13 = (sVCLEV.getCONTTME() == null) ? "" : sVCLEV.getCONTTME();
+/* 424 */         String str14 = (sVCLEV.getCONTTMEUOM() == null) ? "" : sVCLEV.getCONTTMEUOM();
+/* 425 */         String str15 = (sVCLEV.getCONTTMEOBJIVE() == null) ? "" : sVCLEV.getCONTTMEOBJIVE();
+/* 426 */         if ("".equals(str13) || "".equals(str14) || "".equals(str15)) {
+/* 427 */           str1 = "";
+/*     */         } else {
+/* 429 */           str1 = str13 + " " + str14 + " " + str15;
+/*     */         } 
+/* 431 */         rdhClassificationMaint1.addCharacteristic("MM_SP_CNTACTIME", CommonUtils.getFirstSubString(str1, 30));
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 450 */         String str16 = (sVCLEV.getPARTARRVTME() == null) ? "" : sVCLEV.getPARTARRVTME();
+/* 451 */         String str17 = (sVCLEV.getPARTARRVTMEUOM() == null) ? "" : sVCLEV.getPARTARRVTMEUOM();
+/* 452 */         String str18 = (sVCLEV.getPARTARRVTMEOBJIVE() == null) ? "" : sVCLEV.getPARTARRVTMEOBJIVE();
+/* 453 */         if ("".equals(str16) || "".equals(str17) || "".equals(str18)) {
+/* 454 */           str1 = "";
+/*     */         } else {
+/* 456 */           if ("HOURS".equals(str17.toUpperCase())) {
+/* 457 */             str1 = "hrs";
+/*     */           } else {
+/* 459 */             str1 = str17;
+/*     */           } 
+/* 461 */           if ("T (Target)".equalsIgnoreCase(str18)) {
+/* 462 */             str1 = str1 + " Target";
+/*     */           } else {
+/* 464 */             str1 = str1 + " " + str18;
+/*     */           } 
+/* 466 */           str1 = str16 + " " + str1;
+/*     */         } 
+/* 468 */         rdhClassificationMaint1.addCharacteristic("MM_SP_PARIVTIME", CommonUtils.getFirstSubString(str1, 15));
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 475 */         String str19 = (sVCLEV.getTRNARNDTME() == null) ? "" : sVCLEV.getTRNARNDTME();
+/* 476 */         String str20 = (sVCLEV.getTRNARNDTMEUOM() == null) ? "" : sVCLEV.getTRNARNDTMEUOM();
+/* 477 */         String str21 = (sVCLEV.getTRNARNDTMEOBJIVE() == null) ? "" : sVCLEV.getTRNARNDTMEOBJIVE();
+/* 478 */         if ("".equals(str19) || "".equals(str20) || "".equals(str21)) {
+/* 479 */           str1 = "";
+/*     */         } else {
+/* 481 */           str1 = str19 + " " + str20 + " " + str21;
+/*     */         } 
+/* 483 */         rdhClassificationMaint1.addCharacteristic("MM_SP_TARNDTIME", CommonUtils.getFirstSubString(str1, 30));
+/*     */       } 
+/*     */ 
+/*     */       
+/* 487 */       rdhClassificationMaint1.execute();
+/* 488 */       addRfcResult(rdhClassificationMaint1);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String getMM_SP_SDMValue(String paramString) {
+/* 495 */     HashMap<Object, Object> hashMap = new HashMap<>();
+/* 496 */     hashMap.put("CCR", "CCR");
+/* 497 */     hashMap.put("IOE", "IOE");
+/* 498 */     hashMap.put("IOR", "IOR");
+/* 499 */     hashMap.put("LOR", "LOR");
+/* 500 */     String str = (String)hashMap.get(paramString.toUpperCase());
+/* 501 */     if (str == null) str = ""; 
+/* 502 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String ATWRTforService(String paramString) {
+/* 508 */     HashMap<Object, Object> hashMap = new HashMap<>();
+/* 509 */     hashMap.put("EURBUNSP", "OTHER");
+/* 510 */     hashMap.put("EUREMXSP", "OTHER");
+/* 511 */     hashMap.put("EUREXSP", "OTHER");
+/* 512 */     hashMap.put("EURMIGSP", "OTHER");
+/* 513 */     hashMap.put("EURMVSSP", "OTHER");
+/* 514 */     hashMap.put("GENERICHW1", "OTHER");
+/* 515 */     hashMap.put("GENERICHW3", "OTHER");
+/* 516 */     hashMap.put("GENERICHW5", "OTHER");
+/* 517 */     hashMap.put("GENERICHW7", "OTHER");
+/* 518 */     hashMap.put("HELPDESK", "OTHER");
+/*     */     
+/* 520 */     hashMap.put("INSTALL", "OTHER");
+/* 521 */     hashMap.put("IPSINSTALL", "OTHER");
+/* 522 */     hashMap.put("IPSMA", "OTHER");
+/* 523 */     hashMap.put("IPSMAEXT", "OTHER");
+/* 524 */     hashMap.put("IPSWAMO", "OTHER");
+/* 525 */     hashMap.put("IPSWMOEXT", "OTHER");
+/* 526 */     hashMap.put("ITESEDUC", "OTHER");
+/* 527 */     hashMap.put("LENINSTL", "OTHER");
+/* 528 */     hashMap.put("LENPWUPG", "OTHER");
+/* 529 */     hashMap.put("LENTPPOF", "OTHER");
+/*     */     
+/* 531 */     hashMap.put("LENWAUPG", "OTHER");
+/* 532 */     hashMap.put("N/A", "OTHER");
+/* 533 */     hashMap.put("SBUNDLE", "OTHER");
+/* 534 */     hashMap.put("SBUNDLE1", "OTHER");
+/* 535 */     hashMap.put("SBUNDLE2", "OTHER");
+/* 536 */     hashMap.put("SBUNDLE3", "OTHER");
+/* 537 */     hashMap.put("SBUNDLE4", "OTHER");
+/* 538 */     hashMap.put("SBUNDLE5", "OTHER");
+/* 539 */     hashMap.put("SBUNDLE6", "OTHER");
+/* 540 */     hashMap.put("SERVACCT", "OTHER");
+/*     */     
+/* 542 */     hashMap.put("STG LAB SERVICES", "OTHER");
+/*     */     
+/* 544 */     hashMap.put("ENSPEURP", "HW");
+/* 545 */     hashMap.put("EURETSSWU", "HW");
+/* 546 */     hashMap.put("GENERICHW4", "HW");
+/* 547 */     hashMap.put("MAINONLY", "HW");
+/* 548 */     hashMap.put("MAINSWSUPP", "HW");
+/* 549 */     hashMap.put("MEMEAMAP", "HW");
+/* 550 */     hashMap.put("MEMEAWMO", "HW");
+/* 551 */     hashMap.put("WMAINOCS", "HW");
+/* 552 */     hashMap.put("WMAINTOPT", "HW");
+/* 553 */     hashMap.put("GTMSEUR", "HW");
+/*     */     
+/* 555 */     hashMap.put("PROACTSYS", "HW");
+/*     */ 
+/*     */     
+/* 558 */     hashMap.put("GENERICHW2", "SW");
+/* 559 */     hashMap.put("PSSWSUPP", "SW");
+/* 560 */     hashMap.put("RTECHSUPEU", "SW");
+/* 561 */     hashMap.put("RTECHSUPP", "SW");
+/* 562 */     hashMap.put("RTSOS", "SW");
+/* 563 */     hashMap.put("RTSSWEU", "SW");
+/* 564 */     hashMap.put("RTSXSERIES", "SW");
+/* 565 */     hashMap.put("SLEMEASW", "SW");
+/* 566 */     hashMap.put("SMOOTHSTRT", "SW");
+/* 567 */     hashMap.put("STRTUPSUP", "SW");
+/*     */     
+/* 569 */     hashMap.put("STRUPSUPEU", "SW");
+/* 570 */     hashMap.put("SUPLINEEU", "SW");
+/* 571 */     hashMap.put("SUPPORTLN", "SW");
+/* 572 */     hashMap.put("SYSEXPERT", "SW");
+/* 573 */     hashMap.put("TSEMEASW", "SW");
+/* 574 */     hashMap.put("ETSAAEUR", "SW");
+/*     */ 
+/*     */     
+/* 577 */     String str = (String)hashMap.get(paramString.toUpperCase());
+/*     */     
+/* 579 */     if (str == null) str = "";
+/*     */     
+/* 581 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String getSVCLEVFromXML(String paramString) throws SQLException {
+/* 587 */     System.out.println("SVCLEVCD=" + paramString);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 595 */     String str1 = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLCACHEVALIDTO > current timestamp and  XMLENTITYTYPE = 'SVCLEV' and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/SVCLEV_UPDATE\"; $i/SVCLEV_UPDATE[SVCLEVCD/text() = \"" + paramString + "\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\") ORDER BY XMLCACHEDTS with ur";
+/*     */ 
+/*     */ 
+/*     */     
+/* 599 */     PreparedStatement preparedStatement = this.odsConnection.prepareStatement(str1);
+/*     */     
+/* 601 */     ResultSet resultSet = preparedStatement.executeQuery();
+/* 602 */     String str2 = "";
+/* 603 */     if (resultSet.next()) {
+/* 604 */       str2 = resultSet.getString("XMLMESSAGE");
+/* 605 */       System.out.println("xml=" + str2);
+/*     */     } 
+/*     */     
+/* 608 */     return str2;
+/*     */   }
+/*     */   
+/*     */   public static void main(String[] paramArrayOfString) {
+/* 612 */     HashMap<Object, Object> hashMap = new HashMap<>();
+/* 613 */     hashMap.put("EURBUNSP", "OTHER");
+/* 614 */     hashMap.put("EUREMXSP", "OTHER");
+/* 615 */     hashMap.put("EUREXSP", "OTHER");
+/* 616 */     hashMap.put("EURMIGSP", "OTHER");
+/* 617 */     String str = (String)hashMap.get("123");
+/* 618 */     System.out.println("value=" + str);
+/* 619 */     str = (String)hashMap.get("EURBUNSP");
+/* 620 */     System.out.println("value=" + str);
+/* 621 */     str = (String)hashMap.get(null);
+/* 622 */     System.out.println("value=" + str);
+/*     */   }
+/*     */ }
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
-/**
- * This function contains the instructions for adding the SAP characteristics to a machine type model material master record.
- * @author wangyul
- *
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\Chw001ClfCreate.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class Chw001ClfCreate extends RfcCallerBase{
-	
-	MODEL chwModel;
-	String materialType;
-	String materialID;
-	Connection odsConnection;
-	String rfaNum;
-	
-	
-	public Chw001ClfCreate (MODEL model, String materialType, String materialID, String rfaNum, Connection odsConnection ) {
-		this.chwModel = model;
-		this.materialType = materialType;
-		this.materialID = materialID;
-		this.odsConnection = odsConnection;
-		this.rfaNum = rfaNum;
-	}
-
-	
-	
-	public void execute() throws Exception {
-			//1. Assign the MG_COMMON classification and its characteristics to the product's material master record:
-			//1.a Call the TssClassificationMaint constructor to assign the MG_COMMON classification to the product.
-			if(chwModel==null) return;
-			
-			RdhClassificationMaint rdhClassificationMaint = 
-			new RdhClassificationMaint(
-					materialID 							//Copy from <materialID>
-					, "MG_COMMON"  						//String class_name   Set to "MG_COMMON".
-					, "001"  							//String class_type   Set to "001"
-					, "H"
-					, rfaNum);
-			this.addRfcName(rdhClassificationMaint);
-			//1.b Call the TssClassificationMaint.addCharacteristic() method to add the
-			//MG_PRODUCTTYPE characteristic to the MG_COMMON classification and indicate the product type.
-			/**
-			 * If <materialType> = "ZPRT", then
-				    If <chwProduct/CATEGORY>='Hardware' , then set to "HW".    
-				    else if <chwProduct/CATEGORY>='Service', then set to "SP".
-				Else set to "CH".
-			 */
-			String value ="CH";
-			if("ZPRT".equalsIgnoreCase(materialType)){
-				if("Hardware".equalsIgnoreCase(chwModel.getCATEGORY())){
-					value = "HW";
-				}else if ("Service".equalsIgnoreCase(chwModel.getCATEGORY())){
-					value = "SP";
-				}	
-			}
-			rdhClassificationMaint.addCharacteristic("MG_PRODUCTTYPE", value);
-			rdhClassificationMaint.execute();
-			this.addRfcResult(rdhClassificationMaint);
-			
-			
-			//rdhClassificationMaint.execute();
-			//2.a Call the TssClassificationMaint constructor to assign the MM_FIELDS classification to the product
-			rdhClassificationMaint = null;
-			rdhClassificationMaint = 
-					new RdhClassificationMaint(
-							materialID 								//Copy from <materialID>
-							, "MM_FIELDS"  						//String class_name   Set to "MM_FIELDS".
-							, "001"  							//String class_type   Set to "001"
-							, "H"
-							, rfaNum);
-			this.addRfcName(rdhClassificationMaint);
-			
-			//2.b Call the TssClassificationMaint.addCharacteristic() method to add the MM_MACH_TYPE characteristic to the MM_FIELDS classification.
-			//Set to first 4 characters of <materialID>. Example: If <materialID> == "9080HC1", then set to "9080".
-			value = CommonUtils.getFirstSubString(materialID,4);
-			rdhClassificationMaint.addCharacteristic("MM_MACH_TYPE", value);
-			//2.c If <materialType> = "ZPRT", then call the TssClassificationMaint.addCharacteristic() method to add the MM_MODEL characteristic to the MM_FIELDS classification. S
-			if("ZPRT".equalsIgnoreCase(materialType)){
-				value = CommonUtils.getLastSubString(materialID,3);
-				rdhClassificationMaint.addCharacteristic("MM_MODEL", value);
-				//rdhClassificationMaint.execute();
-			}
-			//2.d Call the TssClassificationMaint.addCharacteristic() method to add the MM_SIU characteristic to the MM_FIELDS classification.
-			/**
-			 * If chwProduct/UNITCLASS = "SIU-CPU", then set to "1";
-				Else if chwProduct/UNITCLASS = "Non SIU- CPU", then set to "0";
-				Else if chwProduct/UNITCLASS = "SIU-Non CPU", then set to "2";
-			 */
-			value ="";
-			if("SIU-CPU".equalsIgnoreCase(chwModel.getUNITCLASS())){
-				value = "1";
-			} else if("Non SIU- CPU".equalsIgnoreCase(chwModel.getUNITCLASS())){
-				value = "0";
-			} else if("SIU-Non CPU".equalsIgnoreCase(chwModel.getUNITCLASS())){
-				value = "2";
-			}
-			
-			rdhClassificationMaint.addCharacteristic("MM_SIU", value);
-			//2.e Call the TssClassificationMaint.addCharacteristic() method to add the MM_PRICERELEVANT characteristic to the MM_FIELDS classification
-			/**
-			 *  Set var=UPPER(chwProduct/PRICEDIND);
-				Set var1=UPPER(chwProduct/ZEROPRICE);
-				If (var='YES' AND var1='YES') or (var='NO' AND var1='NO'), then
-				     Set value to 'Z';
-				Eles if (var='YES' and var1='NO'), then
-				      Set value to 'G'.
-			 */
-			//EACM-6790 change back to old value on 2022-07-05
-			value = "";
-			String var= chwModel.getPRICEDIND().toUpperCase();
-			String var1= chwModel.getZEROPRICE().toUpperCase();
-			if("YES".equals(var) && "YES".equals(var1)){
-				value ="Z";
-			}else if("NO".equals(var) && "NO".equals(var1)){
-				value ="Z";
-			}else if("YES".equals(var) && "NO".equals(var1)){
-				value ="G";
-			} 
-//			//new change on 2022-05-26 
-//			if("YES".equals(var)){
-//				value ="G";
-//			}else if("NO".equals(var)){
-//				value ="Z";
-//			}
-//			//new change end
-			rdhClassificationMaint.addCharacteristic("MM_PRICERELEVANT", value);
-			//2.f Call the TssClassificationMaint.addCharacteristic() method to add the MM_FG_INSTALLABLE characteristic to the MM_FIELDS classification. 
-			/**
-			 * Set var=UPPER(chwProduct/INSTALL);
-				If var = 'CIF', then set value to C';
-				Else if var = 'CE', then set value to 'I';
-				Else if var = 'N/A', then set value to '';
-				Else if var = 'DOES NOT APPLY', then set value to ''.
-			 */
-			value ="";
-			var = chwModel.getINSTALL().toUpperCase();
-			if("CIF".equals(var)){
-				value = "C";
-			} else if("CE".equals(var)){
-				value = "I";
-			} else if("N/A".equals(var)){
-				value = "";
-			} else if("DOES NOT APPLY".equals(var)){
-				value = "";
-			}			
-			rdhClassificationMaint.addCharacteristic("MM_FG_INSTALLABLE", value);
-			
-			//2.g Call the TssClassificationMaint.addCharacteristic() method to add the MM_UNSPSC characteristic to the MM_FIELDS classification
-			//value  Copy from chwProduct/UNSPSC
-			value = chwModel.getUNSPSC();
-			rdhClassificationMaint.addCharacteristic("MM_UNSPSC", CommonUtils.getFirstSubString(value, 8));
-			
-			//2.h Call the TssClassificationMaint.addCharacteristic() method to add the MM_AMORTLENGTH characteristic to the MM_FIELDS classification.
-			//confirm with carol of the design  N or empty  
-			//value If containsLetter , then set value to chwProduct/AMRTZTNLNGTH
-			//Else set value to "".
-			String input = chwModel.getAMRTZTNLNGTH();			
-			value = CommonUtils.getNoLetter(input);
-			rdhClassificationMaint.addCharacteristic("MM_AMORTLENGTH", value);
-			
-			//2.i Call the TssClassificationMaint.addCharacteristic() method to add the MM_AMORTSTART characteristic to the MM_FIELDS classification.
-			//value If containsLetter(chwProduct/AMRTZTNSTRT)='N', then set value to chwProduct/AMRTZTNSTRT
-			//Else set value to "".
-			input = chwModel.getAMRTZTNSTRT();			
-			value = CommonUtils.getNoLetter(input);
-			rdhClassificationMaint.addCharacteristic("MM_AMORTSTART", value);
-			
-			//2.j Call the TssClassificationMaint.addCharacteristic() method to add the MM_IDENTITY characteristic to the MM_FIELDS classification.
-			//value Set var=UPPER(chwProduct/PRODID);
-			//		If var = 'O-OTHER/OPTIONS', then set value to 'O';
-			//		Else if var = 'U-SYSTEM UNIT', then set value to 'U';  
-			value = "";
-			var = chwModel.getPRODID().toUpperCase();
-			if("O-OTHER/OPTIONS".equalsIgnoreCase(var)){
-				value = "O";
-			} else if("U-SYSTEM UNIT".equalsIgnoreCase(var)){
-				value = "U";
-			} 
-			rdhClassificationMaint.addCharacteristic("MM_IDENTITY", value);
-			//2.K Call the TssClassificationMaint.addCharacteristic() method to add the MM_ROYALTY_BEAR_IND characteristic to the MM_FIELDS classification.
-			//value 	Copy from chwProduct/SWROYALBEARING  --YES NO
-			value = chwModel.getSWROYALBEARING();
-			rdhClassificationMaint.addCharacteristic("MM_ROYALTY_BEAR_IND", CommonUtils.getFirstSubString(value, 20));
-			
-			//2.l Call the TssClassificationMaint.addCharacteristic() method to add the MM_SOM_FAMILY characteristic to the MM_FIELDS classification.
-			value = chwModel.getSOMFAMILY();
-			rdhClassificationMaint.addCharacteristic("MM_SOM_FAMILY", CommonUtils.getFirstSubString(value, 2));
-			
-			//2.m Call the TssClassificationMaint.addCharacteristic() method to add the MM_LIC characteristic to the MM_FIELDS classification. 
-			value = chwModel.getLIC();
-			rdhClassificationMaint.addCharacteristic("MM_LIC", CommonUtils.getFirstSubString(value, 3));
-			
-			//2.n Call the TssClassificationMaint.addCharacteristic() method to add the MM_BP_CERT_SPECBID characteristic to the MM_FIELDS classification 
-			value = chwModel.getBPCERTSPECBID();
-			if("YES".equalsIgnoreCase(value)){
-				value = "Y";
-			}else if("NO".equalsIgnoreCase(value)){
-				value = "N";
-			}		
-			
-			rdhClassificationMaint.addCharacteristic("MM_BP_CERT_SPECBID", value);
-			
-			//2.O Call the TssClassificationMaint.addCharacteristic() method to add the MM_RPQTYPE characteristic to the MM_FIELDS classification
-			/**
-			 * Set var=UPPER(chwProduct/PRPQAPPRVTYPE);
-				If var = 'RPQ APPROVE I-LISTED', then set value to 'RPQ APPROVE';
-				Else if var = 'RPQ OTHER P-LISTED', then set value to 'RPQ OTHER';
-			 */
-			value = "";
-			var = chwModel.getPRPQAPPRVTYPE().toUpperCase();
-			if("RPQ APPROVE I-LISTED".equalsIgnoreCase(var)){
-				value = "RPQ APPROVE";
-			} else if("RPQ OTHER P-LISTED".equalsIgnoreCase(var)){
-				value = "RPQ OTHER";
-			} 
-			rdhClassificationMaint.addCharacteristic("MM_RPQTYPE", value);
-			//2.P Call the TssClassificationMaint.addCharacteristic() method to add the MM_ANNOUNCEMENT_TYPE characteristic to the MM_FIELDS classification
-			//value If chwProduct/SPECBID = 'Yes', then set value to 'SPB';
-			//Else set value to 'RFA';
-			value = "YES".equalsIgnoreCase(chwModel.getSPECBID())? "SPB" : "RFA";
-			rdhClassificationMaint.addCharacteristic("MM_ANNOUNCEMENT_TYPE", value);
-			
-			//2.Q Call the TssClassificationMaint.addCharacteristic() method to add the MM_PRODUCT_SUPPORT_CODE characteristic to the MM_FIELDS classification
-			value = chwModel.getPRODSUPRTCD();
-			rdhClassificationMaint.addCharacteristic("MM_PRODUCT_SUPPORT_CODE", CommonUtils.getFirstSubString(value, 3));
-			//2.r Call the TssClassificationMaint.addCharacteristic() method to add the MM_SYSTEM_TYPE characteristic to the MM_FIELDS classification.
-			value = chwModel.getSYSTEMTYPE();
-			rdhClassificationMaint.addCharacteristic("MM_SYSTEM_TYPE", CommonUtils.getFirstSubString(value, 30));
-			//2.s If <materialType> = "ZPRT", then call the TssClassificationMaint.addCharacteristic() method to add the MM_PHANTOM_IND characteristic to the MM_FIELDS classification
-			if("ZPRT".equalsIgnoreCase(materialType)){
-				value = chwModel.getPHANTOMMODINDC();
-				rdhClassificationMaint.addCharacteristic("MM_PHANTOM_IND", CommonUtils.getFirstSubString(value, 5));
-			}
-			//2.t Call the TssClassificationMaint.addCharacteristic() method to add the REMARKETER_REPORTER characteristic to the MM_FIELDS classification
-			value = "Yes";
-			rdhClassificationMaint.addCharacteristic("REMARKETER_REPORTER", value);
-			//2.u Call the TssClassificationMaint.addCharacteristic() method to add the MM_PHYSICAL_RETURN characteristic to the MM_FIELDS classification.
-			//value ="Hardware".equalsIgnoreCase(chwModel.getCATEGORY()) ? "1": "1";
-			if("ZPRT".equalsIgnoreCase(materialType)){
-				if("Hardware".equalsIgnoreCase(chwModel.getCATEGORY())){
-					value="1";
-				}else{
-					value ="";
-				}
-			}else{
-				value ="1";
-			}
-			rdhClassificationMaint.addCharacteristic("MM_PHYSICAL_RETURN", value);
-			//2. v Call the TssClassificationMaint.addCharacteristic() method to add the MM_OPPORTUNITY_CODE characteristic to the MM_FIELDS classification. 
-			value = chwModel.getWWOCCODE();
-			rdhClassificationMaint.addCharacteristic("MM_OPPORTUNITY_CODE", CommonUtils.getFirstSubString(value, 5));
-			//2.w If <materialType> = "ZPRT", then call the TssClassificationMaint.addCharacteristic() method to add the MM_ACQ_COMPANY characteristic to the MM_FIELDS classification.
-			if("ZPRT".equalsIgnoreCase(materialType)){
-				value = chwModel.getACQRCOCD();
-				rdhClassificationMaint.addCharacteristic("MM_ACQ_COMPANY", CommonUtils.getFirstSubString(value, 3));
-			}
-			//2.x move Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_MTM characteristic to the MM_FIELDS classification.
-			//when chwModel.getCATEGORY is service
-			if("Service".equalsIgnoreCase(chwModel.getCATEGORY())){
-				value = materialID;
-				rdhClassificationMaint.addCharacteristic("MM_SP_MTM", CommonUtils.getFirstSubString(value, 7));
-			}	
-			//2.y
-		    //If <materialType> = "ZPRT", then
-
-		     //For each chwProduct/RELEXPCAMTLIST/RELEXPCAMTELEMENT, then call the TssClassificationMaint.addCharacteristic() method to add the ZZ_RELEXPCAMT characteristic to the MM_FIELDS classification. Supply the parameter values as described below:
-
-			if("ZPRT".equals(materialType)) {
-				List<RELEXPCAMT> relexpcamts =   chwModel.getRELEXPCAMTLIST();
-				if(relexpcamts!=null) {
-					for(int i=0;i<relexpcamts.size();i++) {
-						rdhClassificationMaint.addCharacteristic("MM_RELEXPCAMT",relexpcamts.get(i).getRELEXPCAMT());
-					}
-				}
-			}
-			//2.final 
-			rdhClassificationMaint.execute();
-			this.addRfcResult(rdhClassificationMaint);
-			
-			
-			//3. If <chwProduct/CATEGORY>="Service", assign the MM_SERVICEPAC classification and its characteristics to the product's material master record
-			if("Service".equalsIgnoreCase(chwModel.getCATEGORY())){
-				//3.a Call the TssClassificationMaint constructor to assign the MM_SERVICEPAC classification to the product. 
-				RdhClassificationMaint TssClassificationMaint = 
-						new RdhClassificationMaint(
-								materialID 								//Copy from <materialID>
-								, "MM_SERVICEPAC"  					//String class_name   Set to "MM_SERVICEPAC".
-								, "001"  							//String class_type   Set to "001"
-								, "H"
-								, rfaNum);
-				this.addRfcName(TssClassificationMaint);
-				
-				//3.c Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_SDF characteristic to the MM_SERVICEPAC classification.
-				value = chwModel.getSDFCD();
-				TssClassificationMaint.addCharacteristic("MM_SP_SDF", CommonUtils.getFirstSubString(value, 10));
-				//3.d Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_SLC characteristic to the MM_SERVICEPAC classification
-				value = chwModel.getSVCLEVCD();
-				TssClassificationMaint.addCharacteristic("MM_SP_SLC", CommonUtils.getFirstSubString(value, 10));
-				//3.e Call the TssClassificationMaint.addCharacteristic() method to add the MM_HW_SPMACHBRAND characteristic to the MM_SERVICEPAC classification. 
-				value = chwModel.getSVCPACMACHBRAND();
-				TssClassificationMaint.addCharacteristic("MM_HW_SPMACHBRAND", CommonUtils.getFirstSubString(value, 5));
-				//3.f Call the TssClassificationMaint.addCharacteristic() method to add the MM_HW_SPTYPE characteristic to the MM_SERVICEPAC classification 
-				/**
-				 * Set postn=POSITION(' ' in wProduct/SUBCATEGORY;
-						If (postn > 0), then set the value to SUBSTRING(hwProduct/SUBCATEGORY from 1 for postn);
-						Else set the value to hwProduct/SUBCATEGORY.
-				 */
-				int postn = chwModel.getSUBCATEGORY().indexOf(" ");
-				if(postn>0) {
-					value = CommonUtils.getFirstSubString(chwModel.getSUBCATEGORY(), postn);
-				}else{
-					value = chwModel.getSUBCATEGORY();
-				}
-				TssClassificationMaint.addCharacteristic("MM_HW_SPTYPE", CommonUtils.getFirstSubString(value, 10));
-				//3.g Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_IDENTIFIER characteristic to the MM_SERVICEPAC classification.
-				input = chwModel.getSUBCATEGORY();
-				value = ATWRTforService(input);
-				TssClassificationMaint.addCharacteristic("MM_SP_IDENTIFIER", CommonUtils.getFirstSubString(value, 5));
-				//3.h Call the TssClassificationMaint.addCharacteristic() method to add the MM_HW_SPTERM characteristic to the MM_SERVICEPAC classification.
-				/**
-				 * Set var=UPPER(hwProduct/COVRPRIOD);
-					If var = 'FIVE YEARS', then set the value to '60';
-					Else if var = 'FIVE YEAR PARTS AND LABOR', then set the value to '60';
-					Else if var = 'FOUR YEARS', then set the value to '48';
-					Else if var = 'ONE YEAR' , then set the value to '12';
-					Else if var = 'FOUR YEAR PARTS AND LABOR' , then set the value to '48';
-					Else if var = 'THREE YEARS',  then set the value to '36';
-					Else if var = 'THREE YEAR PARTS AND LABOR' , then set the value to '36';
-					Else if var = 'TWO YEARS' , then set the value to '24';
-					Else if var =  'TWO YEAR PARTS AND LABOR (EXTENDS EXISTING 3 YEAR COVERAGE)' , then set the value to '24';
-					Else if var = 'SIX YEARS' , then set the value to '72';
-					Else if var =  'SEVEN YEARS' , then set the value to '84';
-					Else if var =  'THREE MONTHS' , then set the value to '3';
-					Else if var =  '3 MONTHS', then set the value to '3';
-				 */
-				var = chwModel.getCOVRPRIOD().toUpperCase();
-				Map<String, String> COVRPRIOD = new HashMap<String, String>();
-				COVRPRIOD.put("FIVE YEARS", "60");
-				COVRPRIOD.put("FIVE YEAR PARTS AND LABOR", "60");
-				COVRPRIOD.put("FOUR YEARS", "48");
-				COVRPRIOD.put("ONE YEAR", "12");
-				COVRPRIOD.put("FOUR YEAR PARTS AND LABOR", "48");
-				COVRPRIOD.put("THREE YEARS", "36");
-				COVRPRIOD.put("THREE YEAR PARTS AND LABOR", "36");
-				COVRPRIOD.put("TWO YEARS", "24");
-				COVRPRIOD.put("TWO YEAR PARTS AND LABOR (EXTENDS EXISTING 3 YEAR COVERAGE)", "24");
-				COVRPRIOD.put("SIX YEARS", "72");
-				COVRPRIOD.put("SEVEN YEARS", "84");
-				COVRPRIOD.put("THREE MONTHS", "3");
-				COVRPRIOD.put("3 MONTHS", "3");
-				value = COVRPRIOD.get(var);
-				TssClassificationMaint.addCharacteristic("MM_HW_SPTERM", value);
-				
-				
-				//value Copy from SVCLEV_UPDATE/COVRSHRTDESC where SVCLEV_UPDATE/SVCLEVCD = hwProduct/SVCLEVCD
-				//sql query the cache, get the xml to SVCLEV
-				String SVCLEVCD = chwModel.getSVCLEVCD();
-				String xml ="";
-				try {
-					xml = getSVCLEVFromXML(SVCLEVCD);
-				} catch (SQLException e) {
-				}
-				
-				SVCLEV SVCLEV = null;
-				if(!"".equals(xml)){
-					SVCLEV = CommonEntities.getSVCLEVFromXml(xml);
-				}
-				
-				if(SVCLEV!=null){					
-					
-					//3.i Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_COVHRS characteristic to the MM_SERVICEPAC classification.//3.i Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_COVHRS characteristic to the MM_SERVICEPAC classification.
-					value = SVCLEV.getCOVRSHRTDESC();
-					TssClassificationMaint.addCharacteristic("MM_SP_COVHRS", CommonUtils.getFirstSubString(value, 5));
-					//3. j Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_SDM characteristic to the MM_SERVICEPAC classification.
-					input = SVCLEV.getSVCDELIVMETH();					
-					value = getMM_SP_SDMValue(input);
-					TssClassificationMaint.addCharacteristic("MM_SP_SDM", CommonUtils.getFirstSubString(value, 10));
-					//3.k Call the TssClassificationMaint.addCharacteristic() method to add the MM_SPFIXEDTIME characteristic to the MM_SERVICEPAC classification.
-					/**
-					 * If SVCLEV_UPDATE/FIXTME=''" or SVCLEV_UPDATE/FIXTMEUOM=''" or SVCLEV_UPDATE/FIXTMEOBJIVE=''", then
-					 * set the value to "";
-					 *	Else set the value to SVCLEV_UPDATE/FIXTME||' '||SVCLEV_UPDATE/FIXTMEUOM||' '||SVCLEV_UPDATE/FIXTMEOBJIVE.
-					 */
-					String FIXTME = SVCLEV.getFIXTME()==null ? "":SVCLEV.getFIXTME();
-					String FIXTMEUOM = SVCLEV.getFIXTMEUOM()==null ? "":SVCLEV.getFIXTMEUOM();
-					String FIXTMEOBJIVE = SVCLEV.getFIXTMEOBJIVE()==null ? "": SVCLEV.getFIXTMEOBJIVE();
-					if("".equals(FIXTME) || "".equals(FIXTMEUOM) || "".equals(FIXTMEOBJIVE)){
-						value ="";
-					}else{
-						value = FIXTME + " " + FIXTMEUOM + " " + FIXTMEOBJIVE;
-					}					
-					TssClassificationMaint.addCharacteristic("MM_SPFIXEDTIME", CommonUtils.getFirstSubString(value, 30));
-					//3.l Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_OSRESPTIME characteristic to the MM_SERVICEPAC classification.
-					/**
-					 * If SVCLEV_UPDATE/ONSITERESP=''" or SVCLEV_UPDATE/ONSITERESPUOM=''" or f SVCLEV_UPDATE/ONSITERESPOBJIVE=''", then
-					 * set the value to "";
-					 * Else set the value to SVCLEV_UPDATE/ONSITERESP||' '||SVCLEV_UPDATE/ONSITERESPUOM||' '||SUBSTRING (SVCLEV_UPDATE/ONSITERESPOBJIVE FROM 0 FOR 2)
-					 */
-					String ONSITERESPTME = SVCLEV.getONSITERESPTME()==null ? "": SVCLEV.getONSITERESPTME();					
-					String ONSITERESPTMEUOM = SVCLEV.getONSITERESPTMEUOM()==null ? "": SVCLEV.getONSITERESPTMEUOM();
-					String ONSITERESPTMEOBJIVE = SVCLEV.getONSITERESPTMEOBJIVE()==null ? "":SVCLEV.getONSITERESPTMEOBJIVE();
-					if("".equals(ONSITERESPTME) || "".equals(ONSITERESPTMEUOM) || "".equals(ONSITERESPTMEOBJIVE)){
-						value ="";
-					}else{
-						value = ONSITERESPTME + " " + ONSITERESPTMEUOM + " " + CommonUtils.getSubstrToChar(ONSITERESPTMEOBJIVE, "(");
-					}	
-					TssClassificationMaint.addCharacteristic("MM_SP_OSRESPTIME", CommonUtils.getFirstSubString(value, 16));
-					//3.m Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_CNTACTIME characteristic to the MM_SERVICEPAC classification.
-					/**
-					 * If SVCLEV_UPDATE/CONTTME=''" or f SVCLEV_UPDATE/CONTTMEUOM=''" or SVCLEV_UPDATE/CONTTMEOBJIVE=''", then
-					 * set the value to "";
-					 * Else set the value to SVCLEV_UPDATE/CONTTME||' '||SVCLEV_UPDATE/CONTTMEUOM||' '||SVCLEV_UPDATE/CONTTMEOBJIVE.
-					 */
-					String CONTTME = SVCLEV.getCONTTME()==null ? "": SVCLEV.getCONTTME();					
-					String CONTTMEUOM = SVCLEV.getCONTTMEUOM()==null ? "": SVCLEV.getCONTTMEUOM();
-					String CONTTMEOBJIVE = SVCLEV.getCONTTMEOBJIVE() ==null ? "" : SVCLEV.getCONTTMEOBJIVE();
-					if("".equals(CONTTME) || "".equals(CONTTMEUOM) || "".equals(CONTTMEOBJIVE)){
-						value ="";
-					}else{
-						value = CONTTME + " " + CONTTMEUOM + " " + CONTTMEOBJIVE;
-					}
-					TssClassificationMaint.addCharacteristic("MM_SP_CNTACTIME", CommonUtils.getFirstSubString(value, 30));
-					//3.n Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_PARIVTIME characteristic to the MM_SERVICEPAC classification.//3.m Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_CNTACTIME characteristic to the MM_SERVICEPAC classification.
-					/**
-					 * If SVCLEV_UPDATE/PARTARRVTME=''" or SVCLEV_UPDATE/PARTARRVTMEUOM=''" or SVCLEV_UPDATE/PARTARRVTMEOBJIVE=''", then
-						     set the value to "";
-						Else {
-						     If UPPER(SVCLEV_UPDATE/PARTARRVTMEUOM)="HOURS" , then
-						          set the value to "hrs";
-						     Else
-						          set the value to SVCLEV_UPDATE/PARTARRVTMEUOM;
-						
-						     If SVCLEV_UPDATE/PARTARRVTMEOBJIVE="T (Target)", then
-						          set the value = value+ " Target";
-						     Else
-						          set the value =value + " " + SVCLEV_UPDATE/PARTARRVTMEOBJIVE;
-						             
-						      set the value = SVCLEV_UPDATE/PARTARRVTME + " " + value.
-						             }
-					 */
-					String PARTARRVTME = SVCLEV.getPARTARRVTME() ==null ? "": SVCLEV.getPARTARRVTME();					
-					String PARTARRVTMEUOM = SVCLEV.getPARTARRVTMEUOM() ==null ? "":SVCLEV.getPARTARRVTMEUOM();
-					String PARTARRVTMEOBJIVE = SVCLEV.getPARTARRVTMEOBJIVE() ==null ? "" : SVCLEV.getPARTARRVTMEOBJIVE();
-					if("".equals(PARTARRVTME) || "".equals(PARTARRVTMEUOM) || "".equals(PARTARRVTMEOBJIVE)){
-						value ="";
-					}else {
-						if("HOURS".equals(PARTARRVTMEUOM.toUpperCase())){
-							value = "hrs";
-						}else{
-							value = PARTARRVTMEUOM;
-						}
-						if("T (Target)".equalsIgnoreCase(PARTARRVTMEOBJIVE)){
-							value = value + " " + "Target";
-						}else{
-							value = value + " " + PARTARRVTMEOBJIVE;
-						}
-						value = PARTARRVTME + " " + value;
-					}
-					TssClassificationMaint.addCharacteristic("MM_SP_PARIVTIME", CommonUtils.getFirstSubString(value, 15));
-					//3.o Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_TARNDTIME characteristic to the MM_SERVICEPAC classification.
-					/**
-					 * If SVCLEV_UPDATE/TRNARNDTME=''" or SVCLEV_UPDATE/TRNARNDTMEUOM=''" or SVCLEV_UPDATE/TRNARNDTMEOBJIVE=''", then
-					 * set the value to "";
-					 * Else set the value to SVCLEV_UPDATE/TRNARNDTME||' '||SVCLEV_UPDATE/TRNARNDTMEUOM||' '||SVCLEV_UPDATE/TRNARNDTMEOBJIVE;
-					 */
-					String TRNARNDTME = SVCLEV.getTRNARNDTME()==null ? "": SVCLEV.getTRNARNDTME();					
-					String TRNARNDTMEUOM = SVCLEV.getTRNARNDTMEUOM()==null ? "": SVCLEV.getTRNARNDTMEUOM();
-					String TRNARNDTMEOBJIVE = SVCLEV.getTRNARNDTMEOBJIVE() ==null ? "": SVCLEV.getTRNARNDTMEOBJIVE();
-					if("".equals(TRNARNDTME) || "".equals(TRNARNDTMEUOM) || "".equals(TRNARNDTMEOBJIVE)){
-						value ="";
-					}else{
-						value = TRNARNDTME + " " + TRNARNDTMEUOM + " " + TRNARNDTMEOBJIVE;
-					}
-					TssClassificationMaint.addCharacteristic("MM_SP_TARNDTIME", CommonUtils.getFirstSubString(value, 30));					
-				}		
-				
-				
-				TssClassificationMaint.execute();
-				this.addRfcResult(TssClassificationMaint);
-			}
-		
-	}
-
-
-	private String getMM_SP_SDMValue(String input) {
-		Map<String,String> valueMap = new HashMap<String,String>();
-		valueMap.put("CCR", "CCR");
-		valueMap.put("IOE", "IOE");
-		valueMap.put("IOR", "IOR");
-		valueMap.put("LOR", "LOR");
-		String value = valueMap.get(input.toUpperCase());		
-		if(value ==null) value ="";		
-		return value;
-	}
-
-
-
-	private String ATWRTforService(String input) {
-		Map<String,String> valueMap = new HashMap<String,String>();
-		valueMap.put("EURBUNSP", "OTHER");
-		valueMap.put("EUREMXSP", "OTHER");
-		valueMap.put("EUREXSP", "OTHER");
-		valueMap.put("EURMIGSP", "OTHER");
-		valueMap.put("EURMVSSP", "OTHER");
-		valueMap.put("GENERICHW1", "OTHER");
-		valueMap.put("GENERICHW3", "OTHER");
-		valueMap.put("GENERICHW5", "OTHER");
-		valueMap.put("GENERICHW7", "OTHER");
-		valueMap.put("HELPDESK", "OTHER");
-		
-		valueMap.put("INSTALL", "OTHER");
-		valueMap.put("IPSINSTALL", "OTHER");
-		valueMap.put("IPSMA", "OTHER");
-		valueMap.put("IPSMAEXT", "OTHER");
-		valueMap.put("IPSWAMO", "OTHER");
-		valueMap.put("IPSWMOEXT", "OTHER");
-		valueMap.put("ITESEDUC", "OTHER");
-		valueMap.put("LENINSTL", "OTHER");
-		valueMap.put("LENPWUPG", "OTHER");
-		valueMap.put("LENTPPOF", "OTHER");
-		
-		valueMap.put("LENWAUPG", "OTHER");
-		valueMap.put("N/A", "OTHER");
-		valueMap.put("SBUNDLE", "OTHER");
-		valueMap.put("SBUNDLE1", "OTHER");
-		valueMap.put("SBUNDLE2", "OTHER");
-		valueMap.put("SBUNDLE3", "OTHER");
-		valueMap.put("SBUNDLE4", "OTHER");
-		valueMap.put("SBUNDLE5", "OTHER");
-		valueMap.put("SBUNDLE6", "OTHER");
-		valueMap.put("SERVACCT", "OTHER");
-		
-		valueMap.put("STG LAB SERVICES", "OTHER");
-		
-		valueMap.put("ENSPEURP", "HW");
-		valueMap.put("EURETSSWU", "HW");
-		valueMap.put("GENERICHW4", "HW");
-		valueMap.put("MAINONLY", "HW");
-		valueMap.put("MAINSWSUPP", "HW");
-		valueMap.put("MEMEAMAP", "HW");
-		valueMap.put("MEMEAWMO", "HW");
-		valueMap.put("WMAINOCS", "HW");
-		valueMap.put("WMAINTOPT", "HW");
-		valueMap.put("GTMSEUR", "HW");
-		
-		valueMap.put("PROACTSYS", "HW");
-		
-		
-		valueMap.put("GENERICHW2", "SW");
-		valueMap.put("PSSWSUPP", "SW");
-		valueMap.put("RTECHSUPEU", "SW");
-		valueMap.put("RTECHSUPP", "SW");
-		valueMap.put("RTSOS", "SW");
-		valueMap.put("RTSSWEU", "SW");
-		valueMap.put("RTSXSERIES", "SW");
-		valueMap.put("SLEMEASW", "SW");
-		valueMap.put("SMOOTHSTRT", "SW");
-		valueMap.put("STRTUPSUP", "SW");
-		
-		valueMap.put("STRUPSUPEU", "SW");
-		valueMap.put("SUPLINEEU", "SW");
-		valueMap.put("SUPPORTLN", "SW");
-		valueMap.put("SYSEXPERT", "SW");
-		valueMap.put("TSEMEASW", "SW");
-		valueMap.put("ETSAAEUR", "SW");
-		
-		
-		String value = valueMap.get(input.toUpperCase());
-		
-		if(value ==null) value ="";
-		
-		return value;
-	}
-
-
-
-	private String getSVCLEVFromXML(String SVCLEVCD) throws SQLException {
-		System.out.println("SVCLEVCD=" + SVCLEVCD);
-		/**
-		 * 
-		 *	select xmlentitytype,xmlentityid,xmlmessage,xmlcachedts from cache.XMLIDLCACHE 
-		 *		where XMLCACHEVALIDTO > current timestamp and  XMLENTITYTYPE = 'SVCLEV'
-		 *	and xmlexists('declare default element namespace "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/SVCLEV_UPDATE"; 
-		 *      $i/SVCLEV_UPDATE[SVCLEVCD/text() = "M19"]' passing cache.XMLIDLCACHE.XMLMESSAGE as "i") ORDER BY XMLCACHEDTS with ur
-		 */
-		String cacheSql = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLCACHEVALIDTO > current timestamp and  XMLENTITYTYPE = 'SVCLEV'"
-				+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/SVCLEV_UPDATE\";"
-				+ " $i/SVCLEV_UPDATE[SVCLEVCD/text() = \""+SVCLEVCD+"\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\") ORDER BY XMLCACHEDTS with ur";
-		
-		PreparedStatement statement = odsConnection.prepareStatement(cacheSql);
-		//statement.setString(1, SVCLEVCD);
-		ResultSet resultSet = statement.executeQuery();
-		String xml = "";
-		while (resultSet.next()) {
-			xml = resultSet.getString("XMLMESSAGE");
-			System.out.println("xml=" + xml);
-			break; //only can get one SVCLEV				
-		}
-		return xml;
-	}
-
-	public static void main(String[] args) {
-		Map<String,String> valueMap = new HashMap<String,String>();
-		valueMap.put("EURBUNSP", "OTHER");
-		valueMap.put("EUREMXSP", "OTHER");
-		valueMap.put("EUREXSP", "OTHER");
-		valueMap.put("EURMIGSP", "OTHER");
-		String value = valueMap.get("123");
-		System.out.println("value=" + value);
-		value = valueMap.get("EURBUNSP");
-		System.out.println("value=" + value);
-		value = valueMap.get(null);
-		System.out.println("value=" + value);
-
-	}
-
-}

@@ -1,209 +1,212 @@
-// Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2007  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*     */ package COM.ibm.eannounce.abr.util;
+/*     */ 
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.eannounce.objects.RowSelectableTable;
+/*     */ import COM.ibm.eannounce.objects.SearchActionItem;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import COM.ibm.opicmpdh.transactions.NLSItem;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.IOException;
+/*     */ import java.rmi.RemoteException;
+/*     */ import java.sql.SQLException;
+/*     */ import org.w3c.dom.Document;
+/*     */ import org.w3c.dom.Element;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class SAPLCHQISOElem
+/*     */   extends SAPLElem
+/*     */ {
+/*     */   public SAPLCHQISOElem(String paramString) {
+/*  66 */     super(paramString, (String)null, (String)null, false);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void addElements(Database paramDatabase, EntityList paramEntityList, Document paramDocument, Element paramElement, StringBuffer paramStringBuffer) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/*  92 */     String str = getCHQISO(paramDatabase, paramEntityList.getProfile());
+/*     */ 
+/*     */     
+/*  95 */     Element element = paramDocument.createElement(this.nodeName);
+/*  96 */     addXMLAttrs(element);
+/*  97 */     element.appendChild(paramDocument.createTextNode(str));
+/*  98 */     paramElement.appendChild(element);
+/*     */ 
+/*     */     
+/* 101 */     for (byte b = 0; b < this.childVct.size(); b++) {
+/* 102 */       SAPLElem sAPLElem = this.childVct.elementAt(b);
+/* 103 */       sAPLElem.addElements(paramDatabase, paramEntityList, paramDocument, element, paramStringBuffer);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean hasNodeValueForNLS(EntityList paramEntityList, StringBuffer paramStringBuffer) {
+/* 115 */     return false;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String getCHQISO(Database paramDatabase, Profile paramProfile) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 145 */     String str1 = "SRDCHQISONLSIDMAP";
+/* 146 */     NLSItem nLSItem = paramProfile.getReadLanguage();
+/* 147 */     String str2 = "" + nLSItem.getNLSID();
+/* 148 */     String str3 = "No CHQISONLSIDMAP match found for " + nLSItem + " (" + str2 + ")";
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 154 */     SearchActionItem searchActionItem = new SearchActionItem(null, paramDatabase, paramProfile, str1);
+/* 155 */     searchActionItem.setCheckLimit(false);
+/*     */     
+/* 157 */     RowSelectableTable rowSelectableTable = searchActionItem.getDynaSearchTable(paramDatabase);
+/* 158 */     if (rowSelectableTable == null) {
+/* 159 */       throw new IOException("Error using " + str1 + " search action.  No searchtable returned.");
+/*     */     }
+/*     */     
+/* 162 */     String str4 = "CHQISONLSIDMAP:CHQNLSID";
+/* 163 */     int i = rowSelectableTable.getRowIndex(str4);
+/* 164 */     if (i < 0) {
+/* 165 */       i = rowSelectableTable.getRowIndex(str4 + ":C");
+/*     */     }
+/* 167 */     if (i < 0) {
+/* 168 */       i = rowSelectableTable.getRowIndex(str4 + ":R");
+/*     */     }
+/* 170 */     if (i != -1) {
+/* 171 */       rowSelectableTable.put(i, 1, str2);
+/*     */     } else {
+/* 173 */       throw new IOException("Error can't find " + str4 + " in searchtable.");
+/*     */     } 
+/*     */     
+/* 176 */     rowSelectableTable.commit(paramDatabase);
+/*     */     
+/* 178 */     EntityList entityList = searchActionItem.executeAction(paramDatabase, paramProfile);
+/*     */     
+/* 180 */     EntityGroup entityGroup = entityList.getEntityGroup("CHQISONLSIDMAP");
+/*     */     
+/* 182 */     if (entityGroup != null && entityGroup.getEntityItemCount() > 0)
+/*     */     {
+/*     */       
+/* 185 */       for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/* 186 */         EntityItem entityItem = entityGroup.getEntityItem(b);
+/* 187 */         if (str2.equals(PokUtils.getAttributeValue(entityItem, "CHQNLSID", "", "", false))) {
+/*     */           
+/* 189 */           entityGroup = new EntityGroup(null, paramDatabase, paramProfile, entityItem.getEntityType(), "Edit", false);
+/* 190 */           entityItem = new EntityItem(entityGroup, paramProfile, paramDatabase, entityItem.getEntityType(), entityItem.getEntityID());
+/*     */           
+/* 192 */           str3 = PokUtils.getAttributeValue(entityItem, "CHQISOLANG", "", "@@", false);
+/*     */           break;
+/*     */         } 
+/*     */       } 
+/*     */     }
+/*     */     try {
+/* 198 */       entityList.dereference();
+/* 199 */     } catch (Exception exception) {
+/*     */       
+/* 201 */       System.out.println(exception);
+/*     */     } 
+/*     */     
+/* 204 */     return str3;
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.util;
 
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.opicmpdh.transactions.*;
-import COM.ibm.eannounce.objects.*;
-import com.ibm.transform.oim.eacm.util.*;
-
-import java.io.*;
-
-import org.w3c.dom.*;
-
-/**********************************************************************************
-*  Class used to hold info and structure to be generated for the xml feed
-* for SAPLABRSTATUS abrs
-* this class will map the nlsid to CHQISONLSIDMAP and fill in node for it
-*
-* For each Read NLSID of the Profile that has a 'Description' in a matching NLSID, create an
-* instance of the Description. To obtain the 'DescriptionLanguage', use the NLSID to match
-* CHQISONLSIDMAP.CHQNLSID and then use CHQISONLSID.CHQISOLANG from the same instance as the
-* 'DescriptionLanguage'.
-*/
-// $Log: SAPLCHQISOElem.java,v $
-// Revision 1.4  2008/02/19 17:18:25  wendy
-// Cleanup RSA warnings
-//
-// Revision 1.3  2007/05/04 17:31:39  wendy
-// Only generate tabs for nls section if values exist in that nls
-//
-// Revision 1.2  2007/04/20 14:58:33  wendy
-// RQ0417075638 updates
-//
-// Revision 1.1  2007/04/02 17:38:17  wendy
-// Support classes for SAPL xml generation
-//
-
-public class SAPLCHQISOElem extends SAPLElem
-{
-/*
-	CHQISONLSIDMAP	40	CHQIBMCTRYLANG
-	CHQISONLSIDMAP	50	CHQIBMCTRYLANGDESC
-	CHQISONLSIDMAP	60	CHQISOLANG
-	CHQISONLSIDMAP	70	CHQISOLANG2
-	CHQISONLSIDMAP	80	CHQISOLANG3B
-	CHQISONLSIDMAP	90	CHQISOLANGDESC
-	CHQISONLSIDMAP	20	CHQNLSID
-	CHQISONLSIDMAP	30	CHQNLSIDDESC
-	CHQISONLSIDMAP	900	ID
-	CHQISONLSIDMAP	10	NAME
-*/
-    /**********************************************************************************
-    * Constructor for CHQISONLSIDMAP NLSID elements
-    *
-    *Description Language   4   <DescriptionLanguage>   NLSID ==> CHQISONLSIDMAP.CHQNLSID : CHQISONLSID.CHQISOLANG
-    *
-    *@param nname String with name of node to be created
-    */
-    public SAPLCHQISOElem(String nname)
-    {
-        super(nname,null,null,false);
-    }
-
-    /**********************************************************************************
-    * Create a node for this element add to the parent and any children this node has
-    *
-	*@param dbCurrent Database
-	*@param list EntityList
-	*@param document Document needed to create nodes
-	*@param parent Element node to add this node too
-	*@param debugSb StringBuffer for debug output
-    */
-    public void addElements(Database dbCurrent, EntityList list, Document document, Element parent,
-        StringBuffer debugSb)
-    throws COM.ibm.eannounce.objects.EANBusinessRuleException,
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-        java.rmi.RemoteException,
-        IOException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {
-        //NLSItem nlsitem = list.getProfile().getReadLanguage();
-        //String nlsid = ""+nlsitem.getNLSID();
-        // do a search action for CHQISONLSIDMAP.CHQNLSID using nlsid
-        String CHQISOLANG = getCHQISO(dbCurrent, list.getProfile());
-
-        // create elem using CHQISOLANG for text node
-        Element elem = (Element) document.createElement(nodeName);
-        addXMLAttrs(elem);
-        elem.appendChild(document.createTextNode(CHQISOLANG));
-        parent.appendChild(elem);
-
-        // add any children (this node doesn't have any but leave here for consistency)
-        for (int c=0; c<childVct.size(); c++){
-            SAPLElem childElem = (SAPLElem)childVct.elementAt(c);
-            childElem.addElements(dbCurrent,list, document,elem,debugSb);
-        }
-    }
-
-	/**********************************************************************************
-	* This should return false because it isnt part of a nls sensitive attribute
-	*
-	*@param list EntityList
-	*@param debugSb StringBuffer for debug output
-	*/
-	protected boolean hasNodeValueForNLS(EntityList list, StringBuffer debugSb)
-	{
-		boolean hasvalue=false;
-		return hasvalue;
-	}
-
-    /*************************************************************************************
-    * Find the CHQISONLSIDMAP with CHQNLSID matching NLSID.  Return CHQISONLSIDMAP.CHQISOLANG
-    *
-    *@param dbCurrent       Database object
-    *@param profile         Profile object
-    *
-    *@return String
-    *@throws COM.ibm.eannounce.objects.EANBusinessRuleException
-    *@throws java.sql.SQLException
-    *@throws COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException
-    *@throws COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-    *@throws java.rmi.RemoteException
-    *@throws IOException
-    *@throws COM.ibm.opicmpdh.middleware.MiddlewareException
-    *@throws COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    */
-    private String getCHQISO(Database dbCurrent, Profile profile)
-        throws COM.ibm.eannounce.objects.EANBusinessRuleException,
-        java.sql.SQLException,
-        COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-        COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-        java.rmi.RemoteException,
-        IOException,
-        COM.ibm.opicmpdh.middleware.MiddlewareException,
-        COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {
-        String actionName="SRDCHQISONLSIDMAP";
-        NLSItem nlsitem = profile.getReadLanguage();
-        String nlsid = ""+nlsitem.getNLSID();
-        String isoCode="No CHQISONLSIDMAP match found for "+nlsitem+" ("+nlsid+")";
-        RowSelectableTable searchTable;
-        EntityList list;
-        EntityGroup eg;
-
-        // find any entity ids with this type that match the partnumber using a dynamic search
-        SearchActionItem sai = new SearchActionItem(null, dbCurrent, profile, actionName);
-        sai.setCheckLimit(false);  // allow more than 2500
-
-        searchTable = sai.getDynaSearchTable(dbCurrent);
-        if (searchTable==null){
-            throw new IOException("Error using "+actionName+" search action.  No searchtable returned.");
-        }
-
-        String keyStr = "CHQISONLSIDMAP:CHQNLSID";
-        int row = searchTable.getRowIndex(keyStr);
-        if (row < 0) {
-            row = searchTable.getRowIndex(keyStr + ":C");
-        }
-        if (row < 0) {
-            row = searchTable.getRowIndex(keyStr + ":R");
-        }
-        if (row != -1) {
-            searchTable.put(row, 1, nlsid);
-        }else{
-            throw new IOException("Error can't find "+keyStr+" in searchtable.");
-        }
-
-        searchTable.commit(dbCurrent);
-
-        list = sai.executeAction(dbCurrent,profile);
-
-        eg = list.getEntityGroup("CHQISONLSIDMAP");
-        // group will be null if no matches are found
-        if (eg!=null&&eg.getEntityItemCount() >0)
-        {
-			// find right one.. 1 and 13 are returned for nlsid=1
-			for(int i=0; i<eg.getEntityItemCount(); i++){
-				EntityItem chqItem = eg.getEntityItem(i);
-				if (nlsid.equals(PokUtils.getAttributeValue(chqItem, "CHQNLSID","","",false))){
-					//CHQISOLANG is not a nav attr.. so must get it now
-					eg = new EntityGroup(null, dbCurrent, profile, chqItem.getEntityType(), "Edit", false);
-					chqItem = new EntityItem(eg, profile, dbCurrent, chqItem.getEntityType(), chqItem.getEntityID());
-
-					isoCode = PokUtils.getAttributeValue(chqItem, "CHQISOLANG","",CHEAT,false);
-					break;
-				}
-			}
-        }
-        try{
-            list.dereference();
-        }catch(Exception e){
-            // get nullptr sometimes.. ignore it
-            System.out.println(e);
-        }
-
-        return isoCode;
-    }
-}
-
-
-
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\ab\\util\SAPLCHQISOElem.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

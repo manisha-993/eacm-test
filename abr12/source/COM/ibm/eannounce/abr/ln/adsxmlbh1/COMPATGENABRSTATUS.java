@@ -1,1336 +1,1341 @@
-//Licensed Materials -- Property of IBM
-//(C) Copyright IBM Corp. 2008  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-package COM.ibm.eannounce.abr.ln.adsxmlbh1;
+/*      */ package COM.ibm.eannounce.abr.ln.adsxmlbh1;
+/*      */ 
+/*      */ import COM.ibm.eannounce.abr.util.EACustom;
+/*      */ import COM.ibm.eannounce.objects.AttributeChangeHistoryGroup;
+/*      */ import COM.ibm.eannounce.objects.AttributeChangeHistoryItem;
+/*      */ import COM.ibm.eannounce.objects.DeleteActionItem;
+/*      */ import COM.ibm.eannounce.objects.EANAttribute;
+/*      */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*      */ import COM.ibm.eannounce.objects.EANList;
+/*      */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*      */ import COM.ibm.eannounce.objects.EntityGroup;
+/*      */ import COM.ibm.eannounce.objects.EntityItem;
+/*      */ import COM.ibm.eannounce.objects.ExtractActionItem;
+/*      */ import COM.ibm.eannounce.objects.PDGUtility;
+/*      */ import COM.ibm.opicmpdh.middleware.D;
+/*      */ import COM.ibm.opicmpdh.middleware.Database;
+/*      */ import COM.ibm.opicmpdh.middleware.LockException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*      */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*      */ import COM.ibm.opicmpdh.middleware.Profile;
+/*      */ import COM.ibm.opicmpdh.middleware.Stopwatch;
+/*      */ import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+/*      */ import COM.ibm.opicmpdh.transactions.NLSItem;
+/*      */ import COM.ibm.opicmpdh.transactions.OPICMList;
+/*      */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*      */ import java.io.BufferedInputStream;
+/*      */ import java.io.BufferedReader;
+/*      */ import java.io.File;
+/*      */ import java.io.FileInputStream;
+/*      */ import java.io.FileOutputStream;
+/*      */ import java.io.IOException;
+/*      */ import java.io.InputStreamReader;
+/*      */ import java.io.OutputStreamWriter;
+/*      */ import java.io.PrintWriter;
+/*      */ import java.io.StringWriter;
+/*      */ import java.rmi.RemoteException;
+/*      */ import java.sql.SQLException;
+/*      */ import java.text.MessageFormat;
+/*      */ import java.text.StringCharacterIterator;
+/*      */ import java.util.HashSet;
+/*      */ import java.util.Hashtable;
+/*      */ import java.util.MissingResourceException;
+/*      */ import java.util.Properties;
+/*      */ import java.util.ResourceBundle;
+/*      */ import java.util.StringTokenizer;
+/*      */ import javax.xml.parsers.ParserConfigurationException;
+/*      */ import javax.xml.transform.TransformerException;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ public class COMPATGENABRSTATUS
+/*      */   extends ADSABRSTATUS
+/*      */ {
+/*  120 */   private StringBuffer rptSb = new StringBuffer();
+/*      */   
+/*  122 */   private StringBuffer xmlgenSb = new StringBuffer();
+/*      */   
+/*  124 */   private PrintWriter dbgPw = null;
+/*      */   
+/*  126 */   private String dbgfn = null;
+/*      */   
+/*  128 */   private int dbgLen = 0;
+/*      */   
+/*  130 */   private ResourceBundle rsBundle = null;
+/*      */   
+/*  132 */   private String priorStatus = "&nbsp;";
+/*      */   
+/*  134 */   private String curStatus = "&nbsp;";
+/*      */ 
+/*      */   
+/*      */   private boolean isPeriodicABR = false;
+/*      */ 
+/*      */   
+/*      */   private boolean isXMLIDLABR = false;
+/*      */   
+/*      */   private boolean RFRPassedFinal = false;
+/*      */   
+/*  144 */   private String actionTaken = "";
+/*      */   
+/*  146 */   private String navName = "";
+/*      */   
+/*  148 */   private String rootDesc = "";
+/*      */   
+/*  150 */   private static Hashtable CompatABR_TBL = new Hashtable<>();
+/*      */   
+/*      */   private static final String MODELCG_DELETEACTION_NAME = "DELMODELCG";
+/*      */   
+/*      */   private static final String SEOCG_DELETEACTION_NAME = "DELSEOCG";
+/*      */   
+/*      */   private static final String MDLCGOSMDL_DELETEACTION_NAME = "DELMDLCGOSMDL";
+/*      */   
+/*      */   private static final String SEOCGOSSEO_DELETEACTION_NAME = "DELSEOCGOSSEO";
+/*      */   
+/*      */   private static final String SEOCGOSBDL_DELETEACTION_NAME = "DELSEOCGOSBDL";
+/*      */   
+/*      */   private static final String SEOCGOSSVCSEO_DELETEACTION_NAME = "DELSEOCGOSSVCSEO";
+/*      */   
+/*      */   private static final String STATUS_INPROCESS = "0050";
+/*      */   
+/*      */   static {
+/*  167 */     CompatABR_TBL.put("MODEL", "COM.ibm.eannounce.abr.ln.adsxmlbh1.WWCOMPATMODABR");
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  172 */     CompatABR_TBL.put("SEOCG", "COM.ibm.eannounce.abr.ln.adsxmlbh1.WWCOMPATSEOCGABR");
+/*  173 */     CompatABR_TBL.put("SEOCGOS", "COM.ibm.eannounce.abr.ln.adsxmlbh1.WWCOMPATSEOCGOSABR");
+/*  174 */     CompatABR_TBL.put("SEOCGOSBDL", "COM.ibm.eannounce.abr.ln.adsxmlbh1.WWCOMPATSEOCGOSBDLABR");
+/*  175 */     CompatABR_TBL.put("SEOCGOSSEO", "COM.ibm.eannounce.abr.ln.adsxmlbh1.WWCOMPATSEOCGOSSEOABR");
+/*      */     
+/*  177 */     CompatABR_TBL.put("WWSEO", "COM.ibm.eannounce.abr.ln.adsxmlbh1.WWCOMPATWWSEOABR");
+/*  178 */     CompatABR_TBL.put("LSEOBUNDLE", "COM.ibm.eannounce.abr.ln.adsxmlbh1.WWCOMPATLSEOBUNDLEABR");
+/*      */   }
+/*      */   
+/*  181 */   private Object[] args = (Object[])new String[10];
+/*      */   
+/*  183 */   private String abrversion = "";
+/*      */   
+/*  185 */   private String t2DTS = "&nbsp;";
+/*      */   
+/*  187 */   private String t1DTS = "&nbsp;";
+/*      */   
+/*  189 */   private StringBuffer userxmlSb = new StringBuffer();
+/*      */   
+/*  191 */   private static Properties wwprt_propABR = null;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private static final String PROPERTIES_FILENAME = "wwcompat.properties";
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected String getSimpleABRName(String paramString) {
+/*  225 */     String str = (String)CompatABR_TBL.get(paramString);
+/*  226 */     addDebug("creating instance of CompatABR_TBL  = '" + str + "' for " + paramString);
+/*  227 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public void execute_run() {
+/*  238 */     String str1 = "<head>" + EACustom.getMetaTags(getDescription()) + NEWLINE + EACustom.getCSS() + NEWLINE + EACustom.getTitle("{0} {1}") + NEWLINE + "</head>" + NEWLINE + "<body id=\"ibm-com\">" + EACustom.getMastheadDiv() + NEWLINE + "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
+/*      */ 
+/*      */ 
+/*      */     
+/*  242 */     println(EACustom.getDocTypeHtml());
+/*      */     try {
+/*  244 */       long l = System.currentTimeMillis();
+/*      */       
+/*  246 */       start_ABRBuild(false);
+/*      */ 
+/*      */       
+/*  249 */       this.rsBundle = ResourceBundle.getBundle(getClass().getName(), getLocale(this.m_prof.getReadLanguage().getNLSID()));
+/*      */ 
+/*      */       
+/*  252 */       setReturnCode(0);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */       
+/*  258 */       this.m_elist = this.m_db.getEntityList(this.m_prof, new ExtractActionItem(null, this.m_db, this.m_prof, "dummy"), new EntityItem[] { new EntityItem(null, this.m_prof, 
+/*  259 */               getEntityType(), getEntityID()) });
+/*      */ 
+/*      */       
+/*      */       try {
+/*  263 */         EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*  264 */         this.rootDesc = this.m_elist.getParentEntityGroup().getLongDescription();
+/*  265 */         this.isPeriodicABR = getEntityType().equals("ADSXMLSETUP");
+/*      */         
+/*  267 */         String str5 = getEntityType();
+/*      */         
+/*  269 */         String str6 = PokUtils.getAttributeFlagValue(entityItem, "ADSTYPE");
+/*  270 */         String str7 = PokUtils.getAttributeFlagValue(entityItem, "ADSENTITY");
+/*      */         
+/*  272 */         if (this.isPeriodicABR) {
+/*      */           
+/*  274 */           if (str6 != null) {
+/*  275 */             str5 = (String)ADSTYPES_TBL.get(str6);
+/*      */           }
+/*  277 */           if ("20".equals(str7)) {
+/*  278 */             str5 = "DEL" + str5;
+/*      */           }
+/*      */         } 
+/*      */ 
+/*      */ 
+/*      */         
+/*  284 */         String str8 = getSimpleABRName(str5);
+/*  285 */         if (str8 != null) {
+/*  286 */           boolean bool = true;
+/*  287 */           XMLMQ xMLMQ = (XMLMQ)Class.forName(str8).newInstance();
+/*      */           
+/*  289 */           this.abrversion = getShortClassName(xMLMQ.getClass()) + " " + xMLMQ.getVersion();
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */           
+/*  296 */           if (!this.isPeriodicABR) {
+/*  297 */             String str9 = xMLMQ.getStatusAttr();
+/*      */             
+/*  299 */             String str10 = getAttributeFlagEnabledValue(entityItem, str9);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */             
+/*  306 */             if (!"0020".equals(str10) && !"0040".equals(str10)) {
+/*  307 */               addDebug(entityItem.getKey() + " is not Final or R4R");
+/*      */               
+/*  309 */               addError(this.rsBundle.getString("NOT_R4RFINAL"));
+/*      */             } else {
+/*  311 */               bool = xMLMQ.createXML(entityItem);
+/*      */               
+/*  313 */               if (!bool) {
+/*  314 */                 addDebug(entityItem.getKey() + " will not have XML generated, createXML=false");
+/*      */               }
+/*      */             } 
+/*      */           } else {
+/*      */             
+/*  319 */             addDebug("execute: periodic " + entityItem.getKey());
+/*      */           } 
+/*      */           
+/*  322 */           AttributeChangeHistoryGroup attributeChangeHistoryGroup1 = null;
+/*      */ 
+/*      */           
+/*  325 */           attributeChangeHistoryGroup1 = getADSABRSTATUSHistory();
+/*      */           
+/*  327 */           AttributeChangeHistoryGroup attributeChangeHistoryGroup2 = getSTATUSHistory(xMLMQ);
+/*  328 */           setT2DTS(entityItem, xMLMQ, attributeChangeHistoryGroup1, attributeChangeHistoryGroup2, "@@");
+/*  329 */           setT1DTS(xMLMQ, attributeChangeHistoryGroup1, attributeChangeHistoryGroup2, "@@");
+/*      */           
+/*  331 */           if (getReturnCode() == 0 && bool) {
+/*      */ 
+/*      */             
+/*  334 */             Profile profile = switchRole(xMLMQ.getRoleCode());
+/*  335 */             if (profile != null) {
+/*  336 */               profile.setValOnEffOn(this.t2DTS, this.t2DTS);
+/*  337 */               profile.setEndOfDay(this.t2DTS);
+/*  338 */               profile.setReadLanguage(Profile.ENGLISH_LANGUAGE);
+/*      */               
+/*  340 */               Profile profile1 = profile.getNewInstance(this.m_db);
+/*  341 */               profile1.setValOnEffOn(this.t1DTS, this.t1DTS);
+/*  342 */               profile1.setEndOfDay(this.t2DTS);
+/*  343 */               profile1.setReadLanguage(Profile.ENGLISH_LANGUAGE);
+/*      */               
+/*  345 */               String str = "";
+/*      */               try {
+/*  347 */                 if (this.isPeriodicABR) {
+/*      */                   
+/*  349 */                   String str9 = "";
+/*  350 */                   if (str6 != null) {
+/*  351 */                     str9 = (String)ADSTYPES_TBL.get(str6);
+/*      */                   }
+/*  353 */                   str = "Periodic " + str9;
+/*  354 */                   if ("20".equals(str7)) {
+/*  355 */                     str = "Deleted " + str9;
+/*      */                   }
+/*  357 */                   setupPrintWriters();
+/*  358 */                   xMLMQ.processThis(this, profile1, profile, entityItem);
+/*      */                 } else {
+/*  360 */                   str = entityItem.getKey();
+/*      */                   
+/*  362 */                   if (domainNeedsChecks(entityItem)) {
+/*  363 */                     if (!this.RFRPassedFinal) {
+/*      */                       
+/*  365 */                       setupPrintWriters();
+/*  366 */                       xMLMQ.processThis(this, profile1, profile, entityItem);
+/*      */                       
+/*  368 */                       if (isDeactivatedEntity(entityItem)) {
+/*  369 */                         deactivateEntities(entityItem);
+/*      */                       }
+/*      */                     } 
+/*      */                   } else {
+/*  373 */                     addXMLGenMsg("DOMAIN_NOT_LISTED", str);
+/*      */                   } 
+/*      */                 } 
+/*  376 */               } catch (IOException iOException) {
+/*      */ 
+/*      */                 
+/*  379 */                 MessageFormat messageFormat1 = new MessageFormat(this.rsBundle.getString("REQ_ERROR"));
+/*  380 */                 this.args[0] = iOException.getMessage();
+/*  381 */                 addError(messageFormat1.format(this.args));
+/*  382 */                 addXMLGenMsg("FAILED", str);
+/*  383 */               } catch (SQLException sQLException) {
+/*  384 */                 addXMLGenMsg("FAILED", str);
+/*  385 */                 throw sQLException;
+/*  386 */               } catch (MiddlewareRequestException middlewareRequestException) {
+/*  387 */                 addXMLGenMsg("FAILED", str);
+/*  388 */                 throw middlewareRequestException;
+/*  389 */               } catch (MiddlewareException middlewareException) {
+/*  390 */                 addXMLGenMsg("FAILED", str);
+/*  391 */                 throw middlewareException;
+/*  392 */               } catch (ParserConfigurationException parserConfigurationException) {
+/*  393 */                 addXMLGenMsg("FAILED", str);
+/*  394 */                 throw parserConfigurationException;
+/*  395 */               } catch (TransformerException transformerException) {
+/*  396 */                 addXMLGenMsg("FAILED", str);
+/*  397 */                 throw transformerException;
+/*  398 */               } catch (MissingResourceException missingResourceException) {
+/*  399 */                 addXMLGenMsg("FAILED", str);
+/*  400 */                 throw missingResourceException;
+/*      */               } 
+/*      */             } 
+/*      */           } 
+/*      */         } else {
+/*  405 */           addError(getShortClassName(getClass()) + " does not support " + str5);
+/*      */         } 
+/*      */         
+/*  408 */         this.navName = getNavigationName(entityItem);
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/*  414 */         if (this.isPeriodicABR && !this.isXMLIDLABR && getReturnCode() == 0) {
+/*  415 */           PDGUtility pDGUtility = new PDGUtility();
+/*  416 */           OPICMList oPICMList = new OPICMList();
+/*  417 */           oPICMList.put("ADSDTS", "ADSDTS=" + this.t2DTS);
+/*  418 */           pDGUtility.updateAttribute(this.m_db, this.m_prof, entityItem, oPICMList);
+/*      */         } 
+/*      */         
+/*  421 */         addDebug("Total Time: " + Stopwatch.format(System.currentTimeMillis() - l));
+/*  422 */       } catch (Exception exception) {
+/*  423 */         throw exception;
+/*      */       } 
+/*  425 */     } catch (Throwable throwable) {
+/*  426 */       StringWriter stringWriter = new StringWriter();
+/*  427 */       String str5 = "<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
+/*  428 */       String str6 = "<pre>{0}</pre>";
+/*  429 */       MessageFormat messageFormat1 = new MessageFormat(str5);
+/*  430 */       setReturnCode(-3);
+/*  431 */       throwable.printStackTrace(new PrintWriter(stringWriter));
+/*      */       
+/*  433 */       this.args[0] = throwable.getMessage();
+/*  434 */       this.rptSb.append(messageFormat1.format(this.args) + NEWLINE);
+/*  435 */       messageFormat1 = new MessageFormat(str6);
+/*  436 */       this.args[0] = stringWriter.getBuffer().toString();
+/*  437 */       this.rptSb.append(messageFormat1.format(this.args) + NEWLINE);
+/*  438 */       logError("Exception: " + throwable.getMessage());
+/*  439 */       logError(stringWriter.getBuffer().toString());
+/*      */     } finally {
+/*  441 */       setDGTitle(this.navName);
+/*  442 */       setDGRptName(getShortClassName(getClass()));
+/*  443 */       setDGRptClass(getABRCode());
+/*      */       
+/*  445 */       if (!isReadOnly()) {
+/*  446 */         clearSoftLock();
+/*      */       }
+/*  448 */       closePrintWriters();
+/*      */     } 
+/*      */ 
+/*      */ 
+/*      */     
+/*  453 */     MessageFormat messageFormat = new MessageFormat(str1);
+/*  454 */     this.args[0] = getShortClassName(getClass());
+/*  455 */     this.args[1] = this.navName;
+/*  456 */     String str2 = messageFormat.format(this.args);
+/*      */     
+/*  458 */     String str3 = null;
+/*  459 */     if (this.isPeriodicABR) {
+/*  460 */       str3 = buildPeriodicRptHeader();
+/*  461 */       restoreXtraContent();
+/*      */     } else {
+/*  463 */       str3 = buildDQTriggeredRptHeader();
+/*  464 */       restoreXtraContent();
+/*      */     } 
+/*      */ 
+/*      */     
+/*  468 */     String str4 = str2 + str3 + "<pre>" + this.rsBundle.getString("XML_MSG") + "<br />" + this.userxmlSb.toString() + "</pre>" + NEWLINE;
+/*      */     
+/*  470 */     this.rptSb.insert(0, str4);
+/*      */     
+/*  472 */     println(this.rptSb.toString());
+/*  473 */     printDGSubmitString();
+/*  474 */     println(EACustom.getTOUDiv());
+/*  475 */     buildReportFooter();
+/*      */   }
+/*      */   
+/*      */   private void setupPrintWriters() {
+/*  479 */     String str = this.m_abri.getFileName();
+/*  480 */     int i = str.lastIndexOf(".");
+/*  481 */     this.dbgfn = str.substring(0, i + 1) + "dbg";
+/*      */     try {
+/*  483 */       this.dbgPw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.dbgfn, true), "UTF-8"));
+/*  484 */     } catch (Exception exception) {
+/*  485 */       D.ebug(0, "trouble creating debug PrintWriter " + exception);
+/*      */     } 
+/*      */   }
+/*      */   
+/*      */   private void closePrintWriters() {
+/*  490 */     if (this.dbgPw != null) {
+/*  491 */       this.dbgPw.flush();
+/*  492 */       this.dbgPw.close();
+/*  493 */       this.dbgPw = null;
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private void restoreXtraContent() {
+/*  499 */     if (this.dbgLen + this.userxmlSb.length() + this.rptSb.length() < 5000000) {
+/*      */       
+/*  501 */       BufferedInputStream bufferedInputStream = null;
+/*  502 */       FileInputStream fileInputStream = null;
+/*  503 */       BufferedReader bufferedReader = null;
+/*      */       try {
+/*  505 */         fileInputStream = new FileInputStream(this.dbgfn);
+/*  506 */         bufferedInputStream = new BufferedInputStream(fileInputStream);
+/*      */         
+/*  508 */         String str = null;
+/*  509 */         StringBuffer stringBuffer = new StringBuffer();
+/*  510 */         bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream, "UTF-8"));
+/*      */         
+/*  512 */         while ((str = bufferedReader.readLine()) != null) {
+/*  513 */           stringBuffer.append(str + NEWLINE);
+/*      */         }
+/*  515 */         this.rptSb.append("<!-- " + stringBuffer.toString() + " -->" + NEWLINE);
+/*      */ 
+/*      */         
+/*  518 */         File file = new File(this.dbgfn);
+/*  519 */         if (file.exists()) {
+/*  520 */           file.delete();
+/*      */         }
+/*  522 */       } catch (Exception exception) {
+/*  523 */         exception.printStackTrace();
+/*      */       } finally {
+/*  525 */         if (bufferedInputStream != null) {
+/*      */           try {
+/*  527 */             bufferedInputStream.close();
+/*  528 */           } catch (Exception exception) {
+/*  529 */             exception.printStackTrace();
+/*      */           } 
+/*      */         }
+/*  532 */         if (fileInputStream != null) {
+/*      */           try {
+/*  534 */             fileInputStream.close();
+/*  535 */           } catch (Exception exception) {
+/*  536 */             exception.printStackTrace();
+/*      */           } 
+/*      */         }
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addXMLGenMsg(String paramString1, String paramString2) {
+/*  547 */     MessageFormat messageFormat = new MessageFormat(this.rsBundle.getString(paramString1));
+/*  548 */     Object[] arrayOfObject = { paramString2 };
+/*  549 */     this.xmlgenSb.append(messageFormat.format(arrayOfObject) + "<br />");
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String buildDQTriggeredRptHeader() {
+/*  566 */     String str = "<table>" + NEWLINE + "<tr><th>Userid: </th><td>{0}</td></tr>" + NEWLINE + "<tr><th>Role: </th><td>{1}</td></tr>" + NEWLINE + "<tr><th>Workgroup: </th><td>{2}</td></tr>" + NEWLINE + "<tr><th>Date/Time: </th><td>{3}</td></tr>" + NEWLINE + "<tr><th>Status: </th><td>{4}</td></tr>" + NEWLINE + "<tr><th>Prior feed Date/Time: </th><td>{5}</td></tr>" + NEWLINE + "<tr><th>Prior Status: </th><td>{6}</td></tr>" + NEWLINE + "<tr><th>Description: </th><td>{7}</td></tr>" + NEWLINE + "<tr><th>Action Taken: </th><td>{8}</td></tr>" + NEWLINE + "</table>" + NEWLINE + "<!-- {9} -->" + NEWLINE;
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */     
+/*  575 */     MessageFormat messageFormat = new MessageFormat(str);
+/*  576 */     this.args[0] = this.m_prof.getOPName();
+/*  577 */     this.args[1] = this.m_prof.getRoleDescription();
+/*  578 */     this.args[2] = this.m_prof.getWGName();
+/*  579 */     this.args[3] = this.t2DTS;
+/*  580 */     this.args[4] = this.curStatus;
+/*  581 */     this.args[5] = this.t1DTS;
+/*  582 */     this.args[6] = this.priorStatus;
+/*  583 */     this.args[7] = this.rootDesc + ": " + this.navName;
+/*  584 */     this.args[8] = this.actionTaken + "<br />" + this.xmlgenSb.toString();
+/*  585 */     this.args[9] = this.abrversion + " " + getABRVersion();
+/*      */     
+/*  587 */     return messageFormat.format(this.args);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String buildPeriodicRptHeader() {
+/*  599 */     String str = "<table>" + NEWLINE + "<tr><th>Date/Time of this Run: </th><td>{0}</td></tr>" + NEWLINE + "<tr><th>Last Ran Date/Time Stamp: </th><td>{1}</td></tr>" + NEWLINE + "<tr><th>Action Taken: </th><td>{2}</td></tr>" + NEWLINE + "</table>" + NEWLINE + "<!-- {3} -->" + NEWLINE;
+/*      */ 
+/*      */     
+/*  602 */     MessageFormat messageFormat = new MessageFormat(str);
+/*  603 */     this.args[0] = this.t2DTS;
+/*  604 */     this.args[1] = this.t1DTS;
+/*  605 */     this.args[2] = this.xmlgenSb.toString();
+/*  606 */     this.args[3] = this.abrversion + " " + getABRVersion();
+/*      */     
+/*  608 */     return messageFormat.format(this.args);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setT1DTS(XMLMQ paramXMLMQ, AttributeChangeHistoryGroup paramAttributeChangeHistoryGroup1, AttributeChangeHistoryGroup paramAttributeChangeHistoryGroup2, String paramString) throws MiddlewareRequestException, MiddlewareException {
+/*  665 */     this.t1DTS = this.m_strEpoch;
+/*  666 */     String str = this.m_strEpoch;
+/*  667 */     EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*  668 */     if (this.isPeriodicABR && !this.isXMLIDLABR) {
+/*  669 */       addDebug("getT1 entered for Periodic ABR " + entityItem.getKey());
+/*      */       
+/*  671 */       EANMetaAttribute eANMetaAttribute = entityItem.getEntityGroup().getMetaAttribute("ADSDTS");
+/*  672 */       if (eANMetaAttribute == null) {
+/*  673 */         throw new MiddlewareException("ADSDTS not in meta for Periodic ABR " + entityItem.getKey());
+/*      */       }
+/*      */       
+/*  676 */       this.t1DTS = PokUtils.getAttributeValue(entityItem, "ADSDTS", ", ", this.m_strEpoch, false);
+/*      */ 
+/*      */     
+/*      */     }
+/*  680 */     else if (!this.isXMLIDLABR) {
+/*      */       
+/*  682 */       String str1 = getT2Status(paramAttributeChangeHistoryGroup2);
+/*      */       
+/*  684 */       if (existBefore(paramAttributeChangeHistoryGroup1, "0030")) {
+/*      */         
+/*  686 */         if (str1.equals("0040")) {
+/*  687 */           this.t1DTS = getTQRFR(paramAttributeChangeHistoryGroup1, paramAttributeChangeHistoryGroup2, paramString);
+/*  688 */           if (this.t1DTS.equals(this.m_strEpoch)) {
+/*  689 */             this.actionTaken = this.rsBundle.getString("ACTION_R4R_FIRSTTIME");
+/*  690 */           } else if (this.RFRPassedFinal != true) {
+/*  691 */             this.actionTaken = this.rsBundle.getString("ACTION_R4R_CHANGES");
+/*      */           }
+/*      */         
+/*      */         }
+/*  695 */         else if (str1.equals("0020")) {
+/*  696 */           this.t1DTS = getTQFinal(paramAttributeChangeHistoryGroup1, paramAttributeChangeHistoryGroup2, paramString);
+/*  697 */           if (this.t1DTS.equals(this.m_strEpoch)) {
+/*  698 */             this.actionTaken = this.rsBundle.getString("ACTION_FINAL_FIRSTTIME");
+/*      */           } else {
+/*  700 */             this.actionTaken = this.rsBundle.getString("ACTION_FINAL_CHANGES");
+/*      */           } 
+/*      */         } 
+/*      */       } else {
+/*      */         
+/*  705 */         if (str1.equals("0040")) {
+/*  706 */           this.actionTaken = this.rsBundle.getString("ACTION_R4R_FIRSTTIME");
+/*  707 */         } else if (str1.equals("0020")) {
+/*  708 */           this.actionTaken = this.rsBundle.getString("ACTION_FINAL_FIRSTTIME");
+/*      */         } 
+/*  710 */         addDebug("getT1 for " + entityItem.getKey() + " never was passed before, set T1 = 1980-01-01 00:00:00.00000");
+/*      */       } 
+/*  712 */       str = getTimeofIDL();
+/*  713 */       if (this.t1DTS.compareTo(str) < 0) {
+/*  714 */         this.t1DTS = str;
+/*  715 */         addOutput("Found T1 DTS is earlier than the time of initializing WWTECHCOMPAT, the time of last run initializing WWTECHCOMPAT be used as T1");
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean existBefore(AttributeChangeHistoryGroup paramAttributeChangeHistoryGroup, String paramString) {
+/*  725 */     if (paramAttributeChangeHistoryGroup != null) {
+/*  726 */       for (int i = paramAttributeChangeHistoryGroup.getChangeHistoryItemCount() - 1; i >= 0; i--) {
+/*  727 */         AttributeChangeHistoryItem attributeChangeHistoryItem = (AttributeChangeHistoryItem)paramAttributeChangeHistoryGroup.getChangeHistoryItem(i);
+/*  728 */         if (attributeChangeHistoryItem.getFlagCode().equals(paramString)) {
+/*  729 */           return true;
+/*      */         }
+/*      */       } 
+/*      */     }
+/*      */     
+/*  734 */     return false;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private void setT2DTS(EntityItem paramEntityItem, XMLMQ paramXMLMQ, AttributeChangeHistoryGroup paramAttributeChangeHistoryGroup1, AttributeChangeHistoryGroup paramAttributeChangeHistoryGroup2, String paramString) throws MiddlewareException {
+/*  750 */     addDebug("getT2 entered for The ADS ABR handles this as an IDL:" + this.isXMLIDLABR);
+/*  751 */     if (!this.isXMLIDLABR) {
+/*  752 */       if (paramAttributeChangeHistoryGroup1 != null && paramAttributeChangeHistoryGroup1.getChangeHistoryItemCount() > 1) {
+/*      */         
+/*  754 */         int i = paramAttributeChangeHistoryGroup1.getChangeHistoryItemCount();
+/*      */ 
+/*      */         
+/*  757 */         AttributeChangeHistoryItem attributeChangeHistoryItem = (AttributeChangeHistoryItem)paramAttributeChangeHistoryGroup1.getChangeHistoryItem(i - 1);
+/*  758 */         if (attributeChangeHistoryItem != null) {
+/*  759 */           addDebug("getT2Time [" + (i - 1) + "] isActive: " + attributeChangeHistoryItem.isActive() + " isValid: " + attributeChangeHistoryItem.isValid() + " chgdate: " + attributeChangeHistoryItem
+/*  760 */               .getChangeDate() + " flagcode: " + attributeChangeHistoryItem.getFlagCode());
+/*  761 */           if (attributeChangeHistoryItem.getFlagCode().equals("0050")) {
+/*  762 */             this.t2DTS = attributeChangeHistoryItem.getChangeDate();
+/*      */           } else {
+/*      */             
+/*  765 */             addDebug("getT2Time for the value of " + attributeChangeHistoryItem.getFlagCode() + "is not Queued, set getNow() to t2DTS and find the prior &DTFS!");
+/*      */             
+/*  767 */             this.t2DTS = getNow();
+/*      */           } 
+/*      */         } 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */         
+/*  774 */         attributeChangeHistoryItem = (AttributeChangeHistoryItem)paramAttributeChangeHistoryGroup1.getChangeHistoryItem(i - 3);
+/*  775 */         if (attributeChangeHistoryItem != null) {
+/*  776 */           addDebug("getT2Time [" + (i - 3) + "] isActive: " + attributeChangeHistoryItem.isActive() + " isValid: " + attributeChangeHistoryItem.isValid() + " chgdate: " + attributeChangeHistoryItem
+/*  777 */               .getChangeDate() + " flagcode: " + attributeChangeHistoryItem.getFlagCode());
+/*  778 */           if (attributeChangeHistoryItem.getFlagCode().equals(paramString)) {
+/*  779 */             this.t2DTS = attributeChangeHistoryItem.getChangeDate();
+/*      */           } else {
+/*      */             
+/*  782 */             addDebug("getT2Time for the value of " + attributeChangeHistoryItem.getFlagCode() + "is not &DTFS " + paramString + " return valfrom of queued.");
+/*      */           } 
+/*      */         } 
+/*      */       } else {
+/*      */         
+/*  787 */         this.t2DTS = getNow();
+/*  788 */         addDebug("getT2Time for COMPATGENABRSTATUS changedHistoryGroup has no history, set getNow to t2DTS");
+/*      */       } 
+/*      */     } else {
+/*  791 */       EANMetaAttribute eANMetaAttribute = paramEntityItem.getEntityGroup().getMetaAttribute("STATUS");
+/*  792 */       if (eANMetaAttribute != null) {
+/*  793 */         if (existBefore(paramAttributeChangeHistoryGroup2, "0020")) {
+/*  794 */           for (int i = paramAttributeChangeHistoryGroup2.getChangeHistoryItemCount() - 1; i >= 0; i--) {
+/*  795 */             AttributeChangeHistoryItem attributeChangeHistoryItem = (AttributeChangeHistoryItem)paramAttributeChangeHistoryGroup2.getChangeHistoryItem(i);
+/*  796 */             if (attributeChangeHistoryItem.getFlagCode().equals("0020")) {
+/*  797 */               this.t2DTS = attributeChangeHistoryItem.getChangeDate();
+/*  798 */               this.curStatus = attributeChangeHistoryItem.getAttributeValue();
+/*      */               
+/*  800 */               AttributeChangeHistoryItem attributeChangeHistoryItem1 = (AttributeChangeHistoryItem)paramAttributeChangeHistoryGroup2.getChangeHistoryItem(i - 1);
+/*      */               
+/*  802 */               if (attributeChangeHistoryItem1 != null) {
+/*  803 */                 this.priorStatus = attributeChangeHistoryItem1.getAttributeValue();
+/*  804 */                 addDebug("priorStatus [" + (i - 1) + "] chgdate: " + attributeChangeHistoryItem1.getChangeDate() + " flagcode: " + attributeChangeHistoryItem1
+/*  805 */                     .getFlagCode());
+/*      */               } 
+/*      */               break;
+/*      */             } 
+/*      */           } 
+/*  810 */         } else if (existBefore(paramAttributeChangeHistoryGroup2, "0040")) {
+/*  811 */           for (int i = paramAttributeChangeHistoryGroup2.getChangeHistoryItemCount() - 1; i >= 0; i--) {
+/*  812 */             AttributeChangeHistoryItem attributeChangeHistoryItem = (AttributeChangeHistoryItem)paramAttributeChangeHistoryGroup2.getChangeHistoryItem(i);
+/*  813 */             if (attributeChangeHistoryItem.getFlagCode().equals("0040")) {
+/*  814 */               this.t2DTS = attributeChangeHistoryItem.getChangeDate();
+/*  815 */               this.curStatus = attributeChangeHistoryItem.getAttributeValue();
+/*      */               
+/*  817 */               AttributeChangeHistoryItem attributeChangeHistoryItem1 = (AttributeChangeHistoryItem)paramAttributeChangeHistoryGroup2.getChangeHistoryItem(i - 1);
+/*      */               
+/*  819 */               if (attributeChangeHistoryItem1 != null) {
+/*  820 */                 this.priorStatus = attributeChangeHistoryItem1.getAttributeValue();
+/*  821 */                 addDebug("priorStatus [" + (i - 1) + "] chgdate: " + attributeChangeHistoryItem1.getChangeDate() + " flagcode: " + attributeChangeHistoryItem1
+/*  822 */                     .getFlagCode());
+/*      */               } 
+/*      */               break;
+/*      */             } 
+/*      */           } 
+/*      */         } else {
+/*  828 */           addError(this.rsBundle.getString("IDL_NOT_R4RFINAL"));
+/*  829 */           addDebug("getT2Time for IDL ABR, the Status never being RFR or Final");
+/*      */         } 
+/*      */       } else {
+/*  832 */         this.t2DTS = getNow();
+/*  833 */         addDebug(paramEntityItem.getKey() + " , There is not such attribute STATUS, set t2DTS is getNow().");
+/*      */       } 
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getT2Status(AttributeChangeHistoryGroup paramAttributeChangeHistoryGroup) throws MiddlewareRequestException {
+/*  847 */     String str = "";
+/*  848 */     EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*  849 */     if (paramAttributeChangeHistoryGroup != null && paramAttributeChangeHistoryGroup.getChangeHistoryItemCount() > 0) {
+/*      */       
+/*  851 */       for (int i = paramAttributeChangeHistoryGroup.getChangeHistoryItemCount() - 1; i >= 0; i--) {
+/*  852 */         AttributeChangeHistoryItem attributeChangeHistoryItem = (AttributeChangeHistoryItem)paramAttributeChangeHistoryGroup.getChangeHistoryItem(i);
+/*  853 */         if (attributeChangeHistoryItem != null)
+/*      */         {
+/*      */ 
+/*      */           
+/*  857 */           if (attributeChangeHistoryItem.getChangeDate().compareTo(this.t2DTS) < 0) {
+/*      */             
+/*  859 */             if (!"0020".equals(attributeChangeHistoryItem.getFlagCode()) && !"0040".equals(attributeChangeHistoryItem.getFlagCode())) {
+/*  860 */               addDebug(entityItem.getKey() + " is not Final or R4R");
+/*  861 */               addError(this.rsBundle.getString("NOT_R4RFINAL"));
+/*      */               break;
+/*      */             } 
+/*  864 */             this.curStatus = attributeChangeHistoryItem.getAttributeValue();
+/*  865 */             str = attributeChangeHistoryItem.getFlagCode();
+/*  866 */             attributeChangeHistoryItem = (AttributeChangeHistoryItem)paramAttributeChangeHistoryGroup.getChangeHistoryItem(i - 1);
+/*      */             
+/*  868 */             if (attributeChangeHistoryItem != null) {
+/*  869 */               this.priorStatus = attributeChangeHistoryItem.getAttributeValue();
+/*  870 */               addDebug("getT2Status [" + (i - 1) + "] chgdate: " + attributeChangeHistoryItem.getChangeDate() + " flagcode: " + attributeChangeHistoryItem
+/*  871 */                   .getFlagCode());
+/*      */             } 
+/*      */             
+/*      */             break;
+/*      */           } 
+/*      */         }
+/*      */       } 
+/*      */     } else {
+/*  879 */       addDebug("getT2Status for " + entityItem.getKey() + " getChangeHistoryItemCount less than 0.");
+/*      */     } 
+/*  881 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getTQFinal(AttributeChangeHistoryGroup paramAttributeChangeHistoryGroup1, AttributeChangeHistoryGroup paramAttributeChangeHistoryGroup2, String paramString) throws MiddlewareRequestException {
+/*  896 */     String str = this.m_strEpoch;
+/*  897 */     if (paramAttributeChangeHistoryGroup1 != null && paramAttributeChangeHistoryGroup1.getChangeHistoryItemCount() > 1) {
+/*  898 */       boolean bool = false;
+/*      */       
+/*  900 */       for (int i = paramAttributeChangeHistoryGroup1.getChangeHistoryItemCount() - 3; i >= 0; i--) {
+/*  901 */         AttributeChangeHistoryItem attributeChangeHistoryItem = (AttributeChangeHistoryItem)paramAttributeChangeHistoryGroup1.getChangeHistoryItem(i);
+/*  902 */         if (attributeChangeHistoryItem != null) {
+/*      */ 
+/*      */           
+/*  905 */           if (attributeChangeHistoryItem.getFlagCode().equals("0030"))
+/*      */           {
+/*  907 */             bool = true;
+/*      */           }
+/*  909 */           if (bool && attributeChangeHistoryItem.getFlagCode().equals("0020")) {
+/*  910 */             str = attributeChangeHistoryItem.getChangeDate();
+/*      */             
+/*  912 */             attributeChangeHistoryItem = (AttributeChangeHistoryItem)paramAttributeChangeHistoryGroup1.getChangeHistoryItem(i - 1);
+/*      */             
+/*  914 */             if (attributeChangeHistoryItem != null && attributeChangeHistoryItem.getFlagCode().equals(paramString)) {
+/*  915 */               str = attributeChangeHistoryItem.getChangeDate();
+/*      */             } else {
+/*  917 */               addDebug("getPreveTQFinalDTS[" + (i - 1) + "]. there is no a Preceding &DTFS :" + paramString);
+/*      */             } 
+/*      */ 
+/*      */             
+/*  921 */             String str1 = getTQStatus(paramAttributeChangeHistoryGroup2, str);
+/*  922 */             if (str1.equals("0020")) {
+/*      */               break;
+/*      */             }
+/*  925 */             bool = false;
+/*  926 */             str = this.m_strEpoch;
+/*      */           } 
+/*      */         } 
+/*      */       } 
+/*      */     } else {
+/*      */       
+/*  932 */       addDebug("getTQFinalDTS for COMPATGENABRSTATUS has no changed history");
+/*      */     } 
+/*  934 */     return str;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getTQRFR(AttributeChangeHistoryGroup paramAttributeChangeHistoryGroup1, AttributeChangeHistoryGroup paramAttributeChangeHistoryGroup2, String paramString) throws MiddlewareRequestException {
+/*  948 */     String str1 = this.m_strEpoch;
+/*  949 */     String str2 = this.m_strEpoch;
+/*      */     
+/*  951 */     if (paramAttributeChangeHistoryGroup1 != null && paramAttributeChangeHistoryGroup1.getChangeHistoryItemCount() > 1) {
+/*  952 */       boolean bool1 = false;
+/*  953 */       boolean bool2 = false;
+/*      */       
+/*  955 */       for (int i = paramAttributeChangeHistoryGroup1.getChangeHistoryItemCount() - 3; i >= 0; i--) {
+/*  956 */         AttributeChangeHistoryItem attributeChangeHistoryItem = (AttributeChangeHistoryItem)paramAttributeChangeHistoryGroup1.getChangeHistoryItem(i);
+/*  957 */         if (attributeChangeHistoryItem != null) {
+/*      */ 
+/*      */           
+/*  960 */           if (attributeChangeHistoryItem.getFlagCode().equals("0030"))
+/*      */           {
+/*  962 */             bool1 = true;
+/*      */           }
+/*  964 */           if (bool1 && attributeChangeHistoryItem.getFlagCode().equals("0020"))
+/*      */           {
+/*  966 */             str1 = attributeChangeHistoryItem.getChangeDate();
+/*      */             
+/*  968 */             attributeChangeHistoryItem = (AttributeChangeHistoryItem)paramAttributeChangeHistoryGroup1.getChangeHistoryItem(i - 1);
+/*      */             
+/*  970 */             if (attributeChangeHistoryItem != null && attributeChangeHistoryItem.getFlagCode().equals(paramString)) {
+/*  971 */               str1 = attributeChangeHistoryItem.getChangeDate();
+/*      */             } else {
+/*  973 */               addDebug("getPreveTQRFRDTS[" + (i - 1) + "]. there is no a Preceding &DTFS :" + paramString);
+/*      */             } 
+/*  975 */             if (!bool2) {
+/*  976 */               bool2 = true;
+/*  977 */               str2 = str1;
+/*      */             } 
+/*      */ 
+/*      */             
+/*  981 */             String str = getTQStatus(paramAttributeChangeHistoryGroup2, str1);
+/*  982 */             if (str.equals("0020")) {
+/*  983 */               this.RFRPassedFinal = true;
+/*  984 */               this.actionTaken = this.rsBundle.getString("ACTION_R4R_PASSEDFINAL");
+/*  985 */               return str1;
+/*      */             } 
+/*  987 */             bool1 = false;
+/*      */           }
+/*      */         
+/*      */         } 
+/*      */       } 
+/*      */     } else {
+/*      */       
+/*  994 */       addDebug("getTQRFRDTS for COMPATGENABRSTATUS has no changed history");
+/*      */     } 
+/*  996 */     return str2;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getTQStatus(AttributeChangeHistoryGroup paramAttributeChangeHistoryGroup, String paramString) throws MiddlewareRequestException {
+/* 1002 */     if (paramAttributeChangeHistoryGroup != null && paramAttributeChangeHistoryGroup.getChangeHistoryItemCount() > 0) {
+/*      */       
+/* 1004 */       for (int i = paramAttributeChangeHistoryGroup.getChangeHistoryItemCount() - 1; i >= 0; i--) {
+/* 1005 */         AttributeChangeHistoryItem attributeChangeHistoryItem = (AttributeChangeHistoryItem)paramAttributeChangeHistoryGroup.getChangeHistoryItem(i);
+/* 1006 */         if (attributeChangeHistoryItem != null)
+/*      */         {
+/*      */           
+/* 1009 */           if (paramString.compareTo(attributeChangeHistoryItem.getChangeDate()) > 0) {
+/* 1010 */             return attributeChangeHistoryItem.getFlagCode();
+/*      */           }
+/*      */         }
+/*      */       } 
+/*      */     } else {
+/* 1015 */       addDebug("getTQStatus for STATUS has no changed history!");
+/*      */     } 
+/* 1017 */     return "@@";
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private AttributeChangeHistoryGroup getADSABRSTATUSHistory() throws MiddlewareException {
+/* 1022 */     String str = "COMPATGENABR";
+/* 1023 */     EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/*      */     
+/* 1025 */     EANAttribute eANAttribute = entityItem.getAttribute(str);
+/* 1026 */     if (eANAttribute != null) {
+/* 1027 */       return new AttributeChangeHistoryGroup(this.m_db, this.m_prof, eANAttribute);
+/*      */     }
+/* 1029 */     addDebug(" COMPATGENABR of " + entityItem.getKey() + "  was null");
+/* 1030 */     return null;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private AttributeChangeHistoryGroup getSTATUSHistory(XMLMQ paramXMLMQ) throws MiddlewareException {
+/* 1036 */     String str = paramXMLMQ.getStatusAttr();
+/* 1037 */     EntityItem entityItem = this.m_elist.getParentEntityGroup().getEntityItem(0);
+/* 1038 */     EANAttribute eANAttribute = entityItem.getAttribute(str);
+/* 1039 */     if (eANAttribute != null) {
+/* 1040 */       return new AttributeChangeHistoryGroup(this.m_db, this.m_prof, eANAttribute);
+/*      */     }
+/* 1042 */     addDebug(" STATUS of " + entityItem.getKey() + "  was null");
+/* 1043 */     return null;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private Profile switchRole(String paramString) throws EANBusinessRuleException, SQLException, MiddlewareBusinessRuleException, MiddlewareRequestException, RemoteException, IOException, MiddlewareException, MiddlewareShutdownInProgressException {
+/* 1052 */     Profile profile = this.m_prof.getProfileForRoleCode(this.m_db, paramString, paramString, 1);
+/* 1053 */     if (profile == null) {
+/* 1054 */       addError("Could not switch to " + paramString + " role");
+/*      */     } else {
+/* 1056 */       addDebug("Switched role from " + this.m_prof.getRoleCode() + " to " + profile.getRoleCode());
+/*      */       
+/* 1058 */       String str = ABRServerProperties.getNLSIDs(this.m_abri.getABRCode());
+/* 1059 */       addDebug("switchRole nlsids: " + str);
+/* 1060 */       StringTokenizer stringTokenizer = new StringTokenizer(str, ",");
+/* 1061 */       while (stringTokenizer.hasMoreTokens()) {
+/* 1062 */         String str1 = stringTokenizer.nextToken();
+/* 1063 */         NLSItem nLSItem = (NLSItem)READ_LANGS_TBL.get(str1);
+/* 1064 */         if (!profile.getReadLanguages().contains(nLSItem)) {
+/* 1065 */           profile.getReadLanguages().addElement(nLSItem);
+/* 1066 */           addDebug("added nlsitem " + nLSItem + " to new prof");
+/*      */         } 
+/*      */       } 
+/*      */     } 
+/*      */     
+/* 1071 */     return profile;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getNavigationName(EntityItem paramEntityItem) throws SQLException, MiddlewareException {
+/* 1080 */     StringBuffer stringBuffer = new StringBuffer();
+/*      */     
+/* 1082 */     EntityGroup entityGroup = new EntityGroup(null, this.m_db, this.m_prof, paramEntityItem.getEntityType(), "Navigate");
+/* 1083 */     EANList eANList = entityGroup.getMetaAttribute();
+/* 1084 */     for (byte b = 0; b < eANList.size(); b++) {
+/* 1085 */       EANMetaAttribute eANMetaAttribute = (EANMetaAttribute)eANList.getAt(b);
+/* 1086 */       stringBuffer.append(PokUtils.getAttributeValue(paramEntityItem, eANMetaAttribute.getAttributeCode(), ", ", "", false));
+/* 1087 */       stringBuffer.append(" ");
+/*      */     } 
+/*      */     
+/* 1090 */     return stringBuffer.toString();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected Database getDB() {
+/* 1097 */     return this.m_db;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected String getABRAttrCode() {
+/* 1104 */     return this.m_abri.getABRCode();
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addOutput(String paramString) {
+/* 1111 */     this.rptSb.append("<p>" + paramString + "</p>" + NEWLINE);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addDebug(String paramString) {
+/* 1118 */     if (this.dbgPw != null) {
+/* 1119 */       this.dbgLen += paramString.length();
+/* 1120 */       this.dbgPw.println(paramString);
+/* 1121 */       this.dbgPw.flush();
+/*      */     } else {
+/* 1123 */       this.rptSb.append("<!-- " + paramString + " -->" + NEWLINE);
+/*      */     } 
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected void addError(String paramString) {
+/* 1131 */     addOutput(paramString);
+/* 1132 */     setReturnCode(-1);
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected ResourceBundle getBundle() {
+/* 1139 */     return this.rsBundle;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected boolean domainNeedsChecks(EntityItem paramEntityItem) {
+/* 1151 */     boolean bool = false;
+/* 1152 */     String str = ABRServerProperties.getDomains(this.m_abri.getABRCode());
+/* 1153 */     addDebug("domainNeedsChecks pdhdomains needing checks: " + str);
+/* 1154 */     if (str.equals("all")) {
+/* 1155 */       bool = true;
+/*      */     } else {
+/* 1157 */       HashSet<String> hashSet = new HashSet();
+/* 1158 */       StringTokenizer stringTokenizer = new StringTokenizer(str, ",");
+/* 1159 */       while (stringTokenizer.hasMoreTokens()) {
+/* 1160 */         hashSet.add(stringTokenizer.nextToken());
+/*      */       }
+/* 1162 */       bool = PokUtils.contains(paramEntityItem, "PDHDOMAIN", hashSet);
+/* 1163 */       hashSet.clear();
+/*      */     } 
+/*      */     
+/* 1166 */     if (!bool) {
+/* 1167 */       addDebug("PDHDOMAIN for " + paramEntityItem.getKey() + " did not include " + str + ", execution is bypassed [" + 
+/* 1168 */           PokUtils.getAttributeValue(paramEntityItem, "PDHDOMAIN", ", ", "", false) + "]");
+/*      */     }
+/* 1170 */     return bool;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getABRVersion() {
+/* 1180 */     return "1.12";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   public String getDescription() {
+/* 1189 */     return "COMPATGENABRSTATUS";
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   protected static String convertToHTML(String paramString) {
+/* 1199 */     String str = "";
+/* 1200 */     StringBuffer stringBuffer = new StringBuffer();
+/* 1201 */     StringCharacterIterator stringCharacterIterator = null;
+/* 1202 */     char c = ' ';
+/* 1203 */     if (paramString != null) {
+/* 1204 */       stringCharacterIterator = new StringCharacterIterator(paramString);
+/* 1205 */       c = stringCharacterIterator.first();
+/* 1206 */       while (c != '￿') {
+/* 1207 */         switch (c) {
+/*      */           case '<':
+/* 1209 */             stringBuffer.append("&lt;");
+/*      */             break;
+/*      */           case '>':
+/* 1212 */             stringBuffer.append("&gt;");
+/*      */             break;
+/*      */ 
+/*      */ 
+/*      */           
+/*      */           case '"':
+/* 1218 */             stringBuffer.append("&#" + c + ";");
+/*      */             break;
+/*      */           default:
+/* 1221 */             stringBuffer.append(c);
+/*      */             break;
+/*      */         } 
+/* 1224 */         c = stringCharacterIterator.next();
+/*      */       } 
+/* 1226 */       str = stringBuffer.toString();
+/*      */     } 
+/*      */     
+/* 1229 */     return str;
+/*      */   }
+/*      */ 
+/*      */   
+/*      */   private void deactivateEntities(EntityItem paramEntityItem) throws MiddlewareRequestException, SQLException, MiddlewareException, LockException, MiddlewareShutdownInProgressException, EANBusinessRuleException {
+/* 1234 */     String str1 = paramEntityItem.getEntityType();
+/* 1235 */     String str2 = null;
+/* 1236 */     if ("MODELCG".equals(str1)) {
+/* 1237 */       str2 = "DELMODELCG";
+/* 1238 */     } else if ("SEOCG".equals(str1)) {
+/* 1239 */       str2 = "DELSEOCG";
+/* 1240 */     } else if ("MDLCGOSMDL".equals(str1)) {
+/* 1241 */       str2 = "DELMDLCGOSMDL";
+/* 1242 */     } else if ("SEOCGOSSEO".equals(str1)) {
+/* 1243 */       str2 = "DELSEOCGOSSEO";
+/* 1244 */     } else if ("SEOCGOSBDL".equals(str1)) {
+/* 1245 */       str2 = "DELSEOCGOSBDL";
+/* 1246 */     } else if ("SEOCGOSSVCSEO".equals(str1)) {
+/* 1247 */       str2 = "DELSEOCGOSSVCSEO";
+/*      */     } else {
+/* 1249 */       addError("Delete Action Not support " + str1);
+/*      */     } 
+/* 1251 */     if (paramEntityItem == null) {
+/*      */       return;
+/*      */     }
+/* 1254 */     addDebug("delete " + paramEntityItem.getKey());
+/* 1255 */     EntityItem[] arrayOfEntityItem = new EntityItem[1];
+/* 1256 */     DeleteActionItem deleteActionItem = new DeleteActionItem(null, this.m_db, this.m_prof, str2);
+/*      */ 
+/*      */     
+/* 1259 */     arrayOfEntityItem[0] = paramEntityItem;
+/*      */     
+/* 1261 */     long l = System.currentTimeMillis();
+/*      */ 
+/*      */ 
+/*      */     
+/* 1265 */     deleteActionItem.setEntityItems(arrayOfEntityItem);
+/* 1266 */     this.m_db.executeAction(this.m_prof, deleteActionItem);
+/*      */ 
+/*      */     
+/* 1269 */     addDebug("Time to delete : " + Stopwatch.format(System.currentTimeMillis() - l));
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private boolean isDeactivatedEntity(EntityItem paramEntityItem) {
+/* 1284 */     boolean bool = false;
+/* 1285 */     String str = paramEntityItem.getEntityType();
+/* 1286 */     if ("MODELCG".equals(str) || "SEOCG".equals(str)) {
+/* 1287 */       String str1 = PokUtils.getAttributeValue(paramEntityItem, "OKTOPUB", ", ", "@@", false);
+/* 1288 */       addDebug(paramEntityItem.getKey() + " attrbute OKTOPUB: " + str1);
+/* 1289 */       if ("Delete".equals(str1)) {
+/* 1290 */         bool = true;
+/*      */       }
+/* 1292 */     } else if ("MDLCGOSMDL".equals(str) || "SEOCGOSSEO".equals(str) || "SEOCGOSBDL".equals(str) || "SEOCGOSSVCSEO"
+/* 1293 */       .equals(str)) {
+/* 1294 */       String str1 = PokUtils.getAttributeValue(paramEntityItem, "COMPATPUBFLG", ", ", "@@", false);
+/*      */ 
+/*      */ 
+/*      */       
+/* 1298 */       addDebug(paramEntityItem.getKey() + " attribute COMPATPUBFLG: " + str1);
+/* 1299 */       if ("Delete".equals(str1)) {
+/* 1300 */         bool = true;
+/*      */       }
+/*      */     } 
+/* 1303 */     return bool;
+/*      */   }
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */ 
+/*      */   
+/*      */   private String getTimeofIDL() {
+/* 1312 */     String str = this.m_strEpoch;
+/*      */ 
+/*      */     
+/*      */     try {
+/* 1316 */       if (wwprt_propABR == null) {
+/* 1317 */         wwprt_propABR = new Properties();
+/* 1318 */         FileInputStream fileInputStream = new FileInputStream("./wwcompat.properties");
+/* 1319 */         wwprt_propABR.load(fileInputStream);
+/* 1320 */         fileInputStream.close();
+/* 1321 */         str = wwprt_propABR.getProperty("TIMEOFIDL", this.m_strEpoch);
+/*      */       } else {
+/* 1323 */         str = wwprt_propABR.getProperty("TIMEOFIDL", this.m_strEpoch);
+/*      */       } 
+/* 1325 */       addDebug("loadProperties for wwcompat.properties " + str);
+/*      */     
+/*      */     }
+/* 1328 */     catch (Exception exception) {
+/* 1329 */       addDebug("Unable to loadProperties for wwcompat.properties " + exception);
+/*      */     } 
+/*      */ 
+/*      */     
+/* 1333 */     return str;
+/*      */   }
+/*      */ }
 
-import COM.ibm.opicmpdh.middleware.*;
-import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.opicmpdh.transactions.*;
-import java.sql.SQLException;
-import com.ibm.transform.oim.eacm.util.*;
-import java.util.*;
-import java.text.*;
-import java.io.*;
 
-import javax.xml.parsers.*;
-
-/**********************************************************************************
- *
- A single ABR supports this functionality based on the Entity Type that queues this function 
- utilizing AttributeCode COMPATGENABR of Type A.
- 
- B.	Populate Table GBLI.WWTECHCOMPATGEN 
- The Virtual Entity (VE) extract will be performed two times:
- 1.	T1 is the DTS determined by the prior section
- 2.	T2 is the Date/Time Stamp (DTS) that the ABR was Queued (0020).
-
- C. Deactivate MODELCG ,MDLCGOSMDL... in the following cases.
- 1. In the spec XIII. MODELCG.  
- For MODELCG.OKTOPUB = Delete (Delete) as a change, then
- Set  Activity = “D”
- Updated = NOW()
- TimeOfChange = T2
- If MODELCG.OKTOPUB = Delete (Delete) then after the preceding is processed, deactivate MODELCG in the PDH.
- 2. XV. MDLCGOSMDL.
- If MDLCGOSMDL.COMPATPUBFLG = Delete (Delete) as a change, then 
- Set
- Activity = “D”
- Updated = NOW()
- TimeOfChange = T2
- f MDLCGOSMDL.COMPATPUBFLG = Delete (Delete) then after the preceding is processed, deactivate MDLCGOSMDL in the PDH.
- 
- 3. XVII SEOCG.
- For this SEOCG.OKTOPUB = Delete (Delete) as a change, then
- Set
- Activity = “D”
- Updated = NOW()
- TimeOfChange = T2
- If SEOCG.OKTOPUB = Delete (Delete) then after the preceding is processed, deactivate SEOCG in the PDH.
- 
- 3. XIX SEOCGOSSEO
- If SEOCGOSSEO.COMPATPUBFLG = Delete (Delete) as a change, then
- Set
- Activity = “D”
- Updated = NOW()
- TimeOfChange = T2
- If SEOCGOSSEO.COMPATPUBFLG = Delete (Delete) then after the preceding is processed, deactivate SEOCGOSSEO in the PDH..
- 
- 
- 4. XIX SEOCGOSBDL
- If SEOCGOSBDL.COMPATPUBFLG = Delete (Delete) added, then
- Set
- Activity = “D”
- Updated = NOW()
- TimeOfChange = T2
- If SEOCGOSBDL.COMPATPUBFLG = Delete (Delete) then after the preceding is processed, deactivate SEOCGOSBDL in the PDH.
- 
- 
- 5. XXII SEOCGOSSVCSEO
- 
- 
- If SEOCGOSSVCSEO.COMPATPUBFLG = Delete (Delete) added, then
- Set
- Activity = “D”
- Updated = NOW()
- TimeOfChange = T2
- If SEOCGOSSVCSEO.COMPATPUBFLG = Delete (Delete) then after the preceding is processed, deactivate SEOCGOSSVCSEO in the PDH.
-
-
- actionTaken
- ACTION_R4R_FIRSTTIME = Ready for Review - First Time
- ACTION_R4R_CHANGES = Ready for Review - Changes
- ACTION_R4R_RESEND = Ready for Review - Resend
- ACTION_FINAL_FIRSTTIME = Final - First Time
- ACTION_FINAL_CHANGES = Final - Changes
- ACTION_FINAL_RESEND = Final - Resend
- 
- 
- Differt VE apply to this different root Entity
- VENAME            ROOT        DQ
- //{"ADSWWCOMPATMOD","MODEL","RFR Final"},
- //{"ADSWWCOMPATMODCG","MODELCG","RFR Final"},
- 
- //{"ADSWWCOMPATMODCGOS","MODELCGOS","RFR Final"},
- 
- //{"ADSWWCOMPATMDLCGOSMDL1","MDLCGOSMDL","RFR Final"},
- //{"ADSWWCOMPATWWSEO1","WWSEO","RFR Final"},
-
- //{"ADSWWCOMPATWWSEO2","WWSEO","RFR Final"},
-
- //{"ADSWWCOMPATLSEOBUNDLE1","LSEOBUNDEL","RFR Final"},
- //{"ADSWWCOMPATLSEOBUNDLE2","LSEOBUNDEL","RFR Final"},
- 
- //{"ADSWWCOMPATSEOCG","SEOCG","RFR Final"},
- 
- //{"ADSWWCOMPATSEOCGOS","SEOCGOS","RFR Final"},
- 
- //{"ADSWWCOMPATSEOCGOSBDL","SEOCGOSBDL","RFR Final"},
- 
- //{"ADSWWCOMPATSEOCGOSSEO","SEOCGOSSEO","RFR Final"},
- 
- //{"ADSWWCOMPATSEOCGOSSVCSEO","SEOCGOSSVCSEO","RFR Final"},
- 
- //{"ADSWWCOMPATSEOCGOS2","SEOCGOS","RFR Final"},
- *
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\ln\adsxmlbh1\COMPATGENABRSTATUS.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-
-public class COMPATGENABRSTATUS extends ADSABRSTATUS {
-	private StringBuffer rptSb = new StringBuffer();
-
-	private StringBuffer xmlgenSb = new StringBuffer();
-
-	private PrintWriter dbgPw = null;
-
-	private String dbgfn = null;
-
-	private int dbgLen = 0;
-
-	private ResourceBundle rsBundle = null;
-
-	private String priorStatus = "&nbsp;";
-
-	private String curStatus = "&nbsp;";
-
-	private boolean isPeriodicABR = false;
-
-	//private boolean isSystemResend = false;
-	private boolean isXMLIDLABR = false;
-
-	// when Status goes to RFR, but it has been Final before,it is True; Status never been Final, it is False. 
-	private boolean RFRPassedFinal = false;
-
-	private String actionTaken = "";
-	
-	private String navName = "";
-	
-	private String rootDesc = "";
-
-	private static Hashtable CompatABR_TBL = new Hashtable();
-
-	private static final String MODELCG_DELETEACTION_NAME = "DELMODELCG";
-
-	private static final String SEOCG_DELETEACTION_NAME = "DELSEOCG";
-
-	private static final String MDLCGOSMDL_DELETEACTION_NAME = "DELMDLCGOSMDL";
-
-	private static final String SEOCGOSSEO_DELETEACTION_NAME = "DELSEOCGOSSEO";
-
-	private static final String SEOCGOSBDL_DELETEACTION_NAME = "DELSEOCGOSBDL";
-
-	private static final String SEOCGOSSVCSEO_DELETEACTION_NAME = "DELSEOCGOSSVCSEO";
-	
-    private static final String STATUS_INPROCESS = "0050";
-
-	static {
-		CompatABR_TBL.put("MODEL", "COM.ibm.eannounce.abr.ln.adsxmlbh1.WWCOMPATMODABR");
-		//TODO according to Doc of BH ABR Catalog DB Compatibility Gen20120627.doc comment out MODELCG MODELCGOS MDLCGOSMDL and SEOCGOSSVVSEO
-		//CompatABR_TBL.put("MODELCG", "COM.ibm.eannounce.abr.ln.adsxmlbh1.WWCOMPATMODCGABR");
-		//CompatABR_TBL.put("MODELCGOS", "COM.ibm.eannounce.abr.ln.adsxmlbh1.WWCOMPATMODCGOSABR");
-		//CompatABR_TBL.put("MDLCGOSMDL", "COM.ibm.eannounce.abr.ln.adsxmlbh1.WWCOMPATMDLCGOSMDLABR");
-		CompatABR_TBL.put("SEOCG", "COM.ibm.eannounce.abr.ln.adsxmlbh1.WWCOMPATSEOCGABR");
-		CompatABR_TBL.put("SEOCGOS", "COM.ibm.eannounce.abr.ln.adsxmlbh1.WWCOMPATSEOCGOSABR");
-		CompatABR_TBL.put("SEOCGOSBDL", "COM.ibm.eannounce.abr.ln.adsxmlbh1.WWCOMPATSEOCGOSBDLABR");
-		CompatABR_TBL.put("SEOCGOSSEO", "COM.ibm.eannounce.abr.ln.adsxmlbh1.WWCOMPATSEOCGOSSEOABR");
-		//CompatABR_TBL.put("SEOCGOSSVCSEO", "COM.ibm.eannounce.abr.ln.adsxmlbh1.WWCOMPATSEOCGOSSVCSEOABR");
-		CompatABR_TBL.put("WWSEO", "COM.ibm.eannounce.abr.ln.adsxmlbh1.WWCOMPATWWSEOABR");
-		CompatABR_TBL.put("LSEOBUNDLE", "COM.ibm.eannounce.abr.ln.adsxmlbh1.WWCOMPATLSEOBUNDLEABR");
-	}
-
-	private Object[] args = new String[10];
-
-	private String abrversion = "";
-
-	private String t2DTS = "&nbsp;"; // T2
-
-	private String t1DTS = "&nbsp;"; // T1
-
-	private StringBuffer userxmlSb = new StringBuffer(); // output in the report, not value sent to MQ - diff transform used
-
-	private static Properties wwprt_propABR = null;
-	 
-	private static final String PROPERTIES_FILENAME = "wwcompat.properties";
-	/*
-	 ADSTYPE	10	CATNAV
-	 ADSTYPE	100	Service Product Structure
-	 ADSTYPE	110	Software Feature
-	 ADSTYPE	120	Software Product Structure
-	 ADSTYPE	130	WWCOMPAT
-	 ADSTYPE 140     Lseo
-	 ADSTYPE 150     Svcmod
-	 ADSTYPE	20	GENAREA
-	 ADSTYPE	30	Feature
-	 ADSTYPE	40	Feature Transaction
-	 ADSTYPE	50	Flags
-	 ADSTYPE	60	Model
-	 ADSTYPE	70	Model Conversion
-	 ADSTYPE	80	Product Structure
-	 ADSTYPE	90	Service Feature
-
-	 ADSENTITY	10	CATNAV
-	 ADSENTITY	20	Deletes
-	 ADSENTITY	30	NA
-
-	 ADSATTRIBUTE	10	NA
-	 ADSATTRIBUTE	20	OSLEVEL
-	 ADSATTRIBUTE	30	WARRPRIOD
-	 ADSATTRIBUTE	40	WARRTYPE
-
-	 */
-
-	protected String getSimpleABRName(String type) {
-		// find class to instantiate based on entitytype
-		// Load the specified ABR class in preparation for execution
-		String clsname = (String) CompatABR_TBL.get(type);
-		addDebug("creating instance of CompatABR_TBL  = '" + clsname + "' for " + type);
-		return clsname;
-	}
-
-	/**
-	 *  Execute ABR.
-	 *
-	 */
-	public void execute_run() {
-		// must split because too many arguments for messageformat, max of 10.. this was 11
-		String HEADER = "<head>" + EACustom.getMetaTags(getDescription()) + NEWLINE + EACustom.getCSS() + NEWLINE
-			+ EACustom.getTitle("{0} {1}") + NEWLINE + "</head>" + NEWLINE + "<body id=\"ibm-com\">"
-			+ EACustom.getMastheadDiv() + NEWLINE + "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
-
-		MessageFormat msgf;
-
-		println(EACustom.getDocTypeHtml()); //Output the doctype and html
-		try {
-			long startTime = System.currentTimeMillis();
-
-			start_ABRBuild(false); // dont pull VE yet
-
-			//get properties file for the base class
-			rsBundle = ResourceBundle.getBundle(getClass().getName(), getLocale(m_prof.getReadLanguage().getNLSID()));
-
-			//Default set to pass
-			setReturnCode(PASS);
-
-			//Default set to false
-			//RFRPassedFinal = false;
-
-			//get the root entity using current timestamp, need this to get the timestamps or info for VE pulls
-			m_elist = m_db.getEntityList(m_prof, new ExtractActionItem(null, m_db, m_prof, "dummy"),
-				new EntityItem[] { new EntityItem(null, m_prof, getEntityType(), getEntityID()) });
-
-			try {
-				// get root from VE
-				EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-				rootDesc = m_elist.getParentEntityGroup().getLongDescription();
-				isPeriodicABR = getEntityType().equals("ADSXMLSETUP");
-
-				String etype = getEntityType();
-				//int eid = getEntityID();
-				String ADSTYPE = PokUtils.getAttributeFlagValue(rootEntity, "ADSTYPE");
-				String ADSENTITY = PokUtils.getAttributeFlagValue(rootEntity, "ADSENTITY");
-
-				if (isPeriodicABR) {
-					// look at ADSTYPE, ADSENTITY
-					if (ADSTYPE != null) {
-						etype = (String) ADSTYPES_TBL.get(ADSTYPE);
-					}
-					if ("20".equals(ADSENTITY)) { // this is deletes
-						etype = "DEL" + etype;
-					}
-				}
-
-				// find class to instantiate based on entitytype
-				// Load the specified ABR class in preparation for execution
-				String clsname = getSimpleABRName(etype);
-				if (clsname != null) {
-					boolean shouldExecute = true;
-					XMLMQ mqAbr = (XMLMQ) Class.forName(clsname).newInstance();
-
-					abrversion = getShortClassName(mqAbr.getClass()) + " " + mqAbr.getVersion();
-					//					 RQK check to see if MQ propfile name exists on root entity
-					// if it exists then set isXMLIDLABR true
-					// else set it to false
-					// call new checkIDLMQPropertiesFN()
-					//isXMLIDLABR = mqAbr.checkIDLMQPropertiesFN(rootEntity);
-
-					if (!isPeriodicABR) {
-						String statusAttr = mqAbr.getStatusAttr();
-						//String sysfeedFlag = getAttributeFlagEnabledValue(rootEntity, "SYSFEEDRESEND");
-						String statusFlag = getAttributeFlagEnabledValue(rootEntity, statusAttr);
-						//isSystemResend = SYSFEEDRESEND_YES.equals(sysfeedFlag);
-						//addDebug("execute: "+rootEntity.getKey()+" "+statusAttr+": "+
-						//	PokUtils.getAttributeValue(rootEntity, statusAttr,", ", "", false)+" ["+statusFlag+"] sysfeedFlag: "+
-						//	sysfeedFlag + " is XMLIDLABR: " + isXMLIDLABR);
-
-						// running in ADSABR
-						if (!STATUS_FINAL.equals(statusFlag) && !STATUS_R4REVIEW.equals(statusFlag)) {
-							addDebug(rootEntity.getKey() + " is not Final or R4R");
-							//NOT_R4RFINAL = Status is not Ready for Review or Final.
-							addError(rsBundle.getString("NOT_R4RFINAL"));
-						} else {
-							shouldExecute = mqAbr.createXML(rootEntity);
-
-							if (!shouldExecute) {
-								addDebug(rootEntity.getKey() + " will not have XML generated, createXML=false");
-							}
-						}
-
-					} else {
-						addDebug("execute: periodic " + rootEntity.getKey());
-					}
-					//get COMPATGENABRSTATUS changed history group
-					AttributeChangeHistoryGroup adsStatusHistoy = null;
-					// For the IDL case COMPATGENABRSTATUS may have never been set
-					//if (!isXMLIDLABR)
-					adsStatusHistoy = getADSABRSTATUSHistory();
-					//get STATUS changed history group
-					AttributeChangeHistoryGroup statusHistory = getSTATUSHistory(mqAbr);
-					setT2DTS(rootEntity, mqAbr, adsStatusHistoy, statusHistory, CHEAT); // T2 timestamp
-					setT1DTS(mqAbr, adsStatusHistoy, statusHistory, CHEAT); // T1 timestamp
-
-					if (getReturnCode() == PASS && shouldExecute) {
-
-						// switch the role and use the time2 DTS (current change)
-						Profile profileT2 = switchRole(mqAbr.getRoleCode());
-						if (profileT2 != null) {
-							profileT2.setValOnEffOn(t2DTS, t2DTS);
-							profileT2.setEndOfDay(t2DTS); // used for notification time
-							profileT2.setReadLanguage(Profile.ENGLISH_LANGUAGE); // default to US english
-
-							Profile profileT1 = profileT2.getNewInstance(m_db);
-							profileT1.setValOnEffOn(t1DTS, t1DTS);
-							profileT1.setEndOfDay(t2DTS); // used for notification time
-							profileT1.setReadLanguage(Profile.ENGLISH_LANGUAGE); // default to US english
-
-							String errmsg = "";
-							try {
-								if (isPeriodicABR) {
-									// look at ADSTYPE, ADSENTITY and ADSATTRIBUTE
-									String typeToChk = "";
-									if (ADSTYPE != null) {
-										typeToChk = (String) ADSTYPES_TBL.get(ADSTYPE);
-									}
-									errmsg = "Periodic " + typeToChk;
-									if ("20".equals(ADSENTITY)) { // this is deletes
-										errmsg = "Deleted " + typeToChk;
-									}
-									setupPrintWriters();
-									mqAbr.processThis(this, profileT1, profileT2, rootEntity);
-								} else { // queued from DQ ABRs
-									errmsg = rootEntity.getKey();
-									// check if pdhdomain is in domain list for this entity
-									if (domainNeedsChecks(rootEntity)) {
-										if (!RFRPassedFinal) {
-											//TODO setupPrintWriters() to avoid StringBufer out of memory.
-											setupPrintWriters();
-											mqAbr.processThis(this, profileT1, profileT2, rootEntity);
-											// Deactivate in PDH
-											if (isDeactivatedEntity(rootEntity))
-												deactivateEntities(rootEntity);
-										}
-									} else {
-										//DOMAIN_NOT_LISTED = Domain was not in the list of supported Domains. Execution bypassed for {0}.
-										addXMLGenMsg("DOMAIN_NOT_LISTED", errmsg);
-									}
-								}
-							} catch (IOException ioe) {
-								// only get this if a required node was not populated
-								//REQ_ERROR = Error: {0}
-								msgf = new MessageFormat(rsBundle.getString("REQ_ERROR"));
-								args[0] = ioe.getMessage();
-								addError(msgf.format(args));
-								addXMLGenMsg("FAILED", errmsg);
-							} catch (java.sql.SQLException x) {
-								addXMLGenMsg("FAILED", errmsg);
-								throw x;
-							} catch (COM.ibm.opicmpdh.middleware.MiddlewareRequestException x) {
-								addXMLGenMsg("FAILED", errmsg);
-								throw x;
-							} catch (COM.ibm.opicmpdh.middleware.MiddlewareException x) {
-								addXMLGenMsg("FAILED", errmsg);
-								throw x;
-							} catch (ParserConfigurationException x) {
-								addXMLGenMsg("FAILED", errmsg);
-								throw x;
-							} catch (javax.xml.transform.TransformerException x) {
-								addXMLGenMsg("FAILED", errmsg);
-								throw x;
-							} catch (java.util.MissingResourceException x) {
-								addXMLGenMsg("FAILED", errmsg);
-								throw x;
-							}
-						}
-					}
-				} else {
-					addError(getShortClassName(getClass()) + " does not support " + etype);
-				}
-				//NAME is navigate attributes
-				navName = getNavigationName(rootEntity);
-
-				// fixme remove
-				//	setCreateDGEntity(false);
-
-				// update lastran date
-				if (isPeriodicABR && !isXMLIDLABR && getReturnCode() == PASS) {
-					PDGUtility pdgUtility = new PDGUtility();
-					OPICMList attList = new OPICMList();
-					attList.put("ADSDTS", "ADSDTS=" + t2DTS);
-					pdgUtility.updateAttribute(m_db, m_prof, rootEntity, attList);
-				}
-
-				addDebug("Total Time: " + Stopwatch.format(System.currentTimeMillis() - startTime));
-			} catch (Exception e) {
-				throw e;
-			}
-		} catch (Throwable exc) {
-			java.io.StringWriter exBuf = new java.io.StringWriter();
-			String Error_EXCEPTION = "<h3><span style=\"color:#c00; font-weight:bold;\">Error: {0}</span></h3>";
-			String Error_STACKTRACE = "<pre>{0}</pre>";
-			msgf = new MessageFormat(Error_EXCEPTION);
-			setReturnCode(INTERNAL_ERROR);
-			exc.printStackTrace(new java.io.PrintWriter(exBuf));
-			// Put exception into document
-			args[0] = exc.getMessage();
-			rptSb.append(msgf.format(args) + NEWLINE);
-			msgf = new MessageFormat(Error_STACKTRACE);
-			args[0] = exBuf.getBuffer().toString();
-			rptSb.append(msgf.format(args) + NEWLINE);
-			logError("Exception: " + exc.getMessage());
-			logError(exBuf.getBuffer().toString());
-		} finally {
-			setDGTitle(navName);
-			setDGRptName(getShortClassName(getClass()));
-			setDGRptClass(getABRCode());
-			// make sure the lock is released
-			if (!isReadOnly()) {
-				clearSoftLock();
-			}
-			closePrintWriters();
-		}
-
-		//Print everything up to </html>
-		//Insert Header into beginning of report
-		msgf = new MessageFormat(HEADER);
-		args[0] = getShortClassName(getClass());
-		args[1] = navName;
-		String header1 = msgf.format(args);
-		//
-		String header2 = null;
-		if (isPeriodicABR) {
-			header2 = buildPeriodicRptHeader();
-			restoreXtraContent();
-		} else {
-			header2 = buildDQTriggeredRptHeader();
-			restoreXtraContent();
-		}
-
-		//XML_MSG= XML Message
-		String info = header1 + header2 + "<pre>" + rsBundle.getString("XML_MSG") + "<br />" + userxmlSb.toString() + "</pre>"
-			+ NEWLINE;
-		rptSb.insert(0, info);
-
-		println(rptSb.toString()); // Output the Report
-		printDGSubmitString();
-		println(EACustom.getTOUDiv());
-		buildReportFooter(); // Print </html>
-	}
-
-	private void setupPrintWriters() {
-		String fn = m_abri.getFileName();
-		int extid = fn.lastIndexOf(".");
-		dbgfn = fn.substring(0, extid + 1) + "dbg";
-		try {
-			dbgPw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(dbgfn, true), "UTF-8"));
-		} catch (Exception x) {
-			D.ebug(D.EBUG_ERR, "trouble creating debug PrintWriter " + x);
-		}
-	}
-
-	private void closePrintWriters() {
-		if (dbgPw != null) {
-			dbgPw.flush();
-			dbgPw.close();
-			dbgPw = null;
-		}
-	}
-
-	private void restoreXtraContent() {
-		// if written to file and still small enough, restore debug and xmlgen to the abr rpt and delete the file
-		if (dbgLen + userxmlSb.length() + rptSb.length() < MAXFILE_SIZE) {
-			// read the file in and put into the stringbuffer
-			InputStream is = null;
-			FileInputStream fis = null;
-			BufferedReader rdr = null;
-			try {
-				fis = new FileInputStream(dbgfn);
-				is = new BufferedInputStream(fis);
-
-				String s = null;
-				StringBuffer sb = new StringBuffer();
-				rdr = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-				// append lines until done
-				while ((s = rdr.readLine()) != null) {
-					sb.append(s + NEWLINE);
-				}
-				rptSb.append("<!-- " + sb.toString() + " -->" + NEWLINE);
-
-				// remove the file
-				File f1 = new File(dbgfn);
-				if (f1.exists()) {
-					f1.delete();
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				if (is != null) {
-					try {
-						is.close();
-					} catch (Exception x) {
-						x.printStackTrace();
-					}
-				}
-				if (fis != null) {
-					try {
-						fis.close();
-					} catch (Exception x) {
-						x.printStackTrace();
-					}
-				}
-			}
-		}
-	}
-
-	/******************************************
-	 * build xml generation msg
-	 */
-	protected void addXMLGenMsg(String rsrc, String info) {
-		MessageFormat msgf = new MessageFormat(rsBundle.getString(rsrc));
-		Object args[] = new Object[] { info };
-		xmlgenSb.append(msgf.format(args) + "<br />");
-	}
-
-	/******************************************
-	 * A.	Data Quality Triggered ABRs
-	 *
-	 * The Report should identify:
-	 * -	USERID (USERTOKEN)
-	 * -	Role
-	 * -	Workgroup
-	 * -	Date/Time
-	 * -	Status
-	 * -	Prior feed Date/Time
-	 * -	Prior Status
-	 * -	Action Taken
-	 */
-	private String buildDQTriggeredRptHeader() {
-		String HEADER2 = "<table>" + NEWLINE + "<tr><th>Userid: </th><td>{0}</td></tr>" + NEWLINE
-			+ "<tr><th>Role: </th><td>{1}</td></tr>" + NEWLINE
-			+ "<tr><th>Workgroup: </th><td>{2}</td></tr>" + NEWLINE
-			+ "<tr><th>Date/Time: </th><td>{3}</td></tr>" + NEWLINE
-			+ "<tr><th>Status: </th><td>{4}</td></tr>" + NEWLINE
-			+ "<tr><th>Prior feed Date/Time: </th><td>{5}</td></tr>" + NEWLINE 
-			+ "<tr><th>Prior Status: </th><td>{6}</td></tr>" + NEWLINE   
-			+ "<tr><th>Description: </th><td>{7}</td></tr>"+NEWLINE 
-			+ "<tr><th>Action Taken: </th><td>{8}</td></tr>" + NEWLINE + "</table>" + NEWLINE + "<!-- {9} -->" + NEWLINE;
-		MessageFormat msgf = new MessageFormat(HEADER2);
-		args[0] = m_prof.getOPName();
-		args[1] = m_prof.getRoleDescription();
-		args[2] = m_prof.getWGName();
-		args[3] = t2DTS;
-		args[4] = curStatus;
-		args[5] = t1DTS;
-		args[6] = priorStatus;
-		args[7] = rootDesc+": "+navName;
-		args[8] = actionTaken + "<br />" + xmlgenSb.toString();
-		args[9] = abrversion + " " + getABRVersion();
-
-		return msgf.format(args);
-	}
-
-	/******************************************
-	 * B.	Periodic ABRs
-	 *
-	 * The Report should identify:
-	 * -	Date/Time of this Run
-	 * -	Last Ran Date/Time Stamp
-	 * -	Action Taken
-	 */
-	private String buildPeriodicRptHeader() {
-		String HEADER2 = "<table>" + NEWLINE + "<tr><th>Date/Time of this Run: </th><td>{0}</td></tr>" + NEWLINE
-			+ "<tr><th>Last Ran Date/Time Stamp: </th><td>{1}</td></tr>" + NEWLINE
-			+ "<tr><th>Action Taken: </th><td>{2}</td></tr>" + NEWLINE + "</table>" + NEWLINE + "<!-- {3} -->" + NEWLINE;
-		MessageFormat msgf = new MessageFormat(HEADER2);
-		args[0] = t2DTS;
-		args[1] = t1DTS;
-		args[2] = xmlgenSb.toString();
-		args[3] = abrversion + " " + getABRVersion();
-
-		return msgf.format(args);
-	}
-
-	/**********************************************************************************
-
-	 * Get the history of the ABR (COMPATGENABRSTATUS) in VALFROM order
-	 * T2STATUS = the active value of STATUS for TQ 
-	 * T2 = VALFROM of T2STATUS
-	 * Is there a prior value of “Passed�? (0030) for COMPATGENABRSTATUS
-	 * No:
-	 *    T1 = “1980-01-01 00:00:00.00000�?
-	 *    EXIT this logic since T1 and T2 have values
-	 * Yes:
-	 *    Is the value T2STATUS = “Final�? (0020)
-	 *    No:
-	 *     f. If the value T2STATUS <> “Ready for Review�? (0040) then this is an error and the ABR should not send data and it should set its attribute to “Failed�?
-	 *      Does STATUS have a prior value of “Final�? (0020)
-	 *      Yes: 
-	 *          EXIT this logic and do not send any data.
-	 *          Set the ABR attribute to “Passed�?
-	 *      No: 
-	 *          RFRNEXT: 
-	 *          Note: TQ is the current time for looking at COMPATGENABRSTATUS
-	 *          Is there a prior value of “Passed�? for COMPATGENABRSTATUS?
-	 *          No: 
-	 *             T1 = “1980-01-01 00:00:00.00000�?
-	 *             EXIT this logic since T1 and T2 have values
-	 *          Yes:
-	 *             The prior value should be “Queued�? (0020)
-	 *             Find the prior value for &DTFS if it is not null
-	 *             TQ = VALFROM of this row
-	 *             T1STATUS = the active value of STATUS for TQ
-	 *             T1 = VALFROM of T1STATUS
-	 *             If T1STATUS <> “Ready for Review�? then go to RFRNEXT
-	 *             T1 = VALFROM of T1STATUS
-	 *             EXIT this logic since T1 and T2 have values
-	 *  Yes:
-	 *  RFRNEXT: 
-	 *  Note: TQ is the current time for looking at COMPATGENABRSTATUS
-	 *  Is there a prior value of “Passed�? for COMPATGENABRSTATUS?
-	 *     No: 
-	 *         T1 = “1980-01-01 00:00:00.00000�?
-	 *         EXIT this logic since T1 and T2 have values
-	 *     Yes:
-	 *         The prior value should be “Queued�? (0020)
-	 *         Find the prior value for &DTFS if it is not null
-	 *         TQ = VALFROM of this row
-	 *         T1STATUS = the active value of STATUS for TQ
-	 *         T1 = VALFROM of T1STATUS
-	 *         If T1STATUS <> “Final�? then go to RFRNEXT
-	 *         T1 = VALFROM of T1STATUS
-	 *         EXIT this logic since T1 and T2 have values
-	 * 	END IF
-	 */
-	//TODO get last runing time of IDL which store in properies file WWPRTMQSERIES.properties, t1 = MAX {T1 and timeofIDL
-	private void setT1DTS(XMLMQ mqAbr, AttributeChangeHistoryGroup adsStatusHistoy, AttributeChangeHistoryGroup statusHistoy,
-		String dtfs) throws COM.ibm.opicmpdh.middleware.MiddlewareRequestException, MiddlewareException {
-		t1DTS = m_strEpoch;
-		String timeofidl = m_strEpoch;
-		EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-		if (isPeriodicABR && !isXMLIDLABR) {
-			addDebug("getT1 entered for Periodic ABR " + rootEntity.getKey());
-			// get it from the attribute
-			EANMetaAttribute metaAttr = rootEntity.getEntityGroup().getMetaAttribute("ADSDTS");
-			if (metaAttr == null) {
-				throw new MiddlewareException("ADSDTS not in meta for Periodic ABR " + rootEntity.getKey());
-			}
-
-			t1DTS = PokUtils.getAttributeValue(rootEntity, "ADSDTS", ", ", m_strEpoch, false);
-		} else {
-			//String attCode = mqAbr.getStatusAttr();
-			//addDebug("getT1 entered for DQ ABR "+rootEntity.getKey()+" "+attCode+" isSystemResend:"+isSystemResend + " isIDLABR:" + isXMLIDLABR);
-			if (!isXMLIDLABR) {
-				// get T2Status and set curstatus and priorStatus.
-				String t2Status = getT2Status(statusHistoy);
-				// look back in the ADS history for any prior "Passed" value. if exist ,then return ture.
-				if (existBefore(adsStatusHistoy, STATUS_PASSED)) {
-					// if T2 status is RFR
-					if (t2Status.equals(STATUS_R4REVIEW)) {
-						t1DTS = getTQRFR(adsStatusHistoy, statusHistoy, dtfs);
-						if (t1DTS.equals(m_strEpoch)) {
-							actionTaken = rsBundle.getString("ACTION_R4R_FIRSTTIME");
-						} else if (RFRPassedFinal != true) {
-							actionTaken = rsBundle.getString("ACTION_R4R_CHANGES");
-							//t1DTS = adjustTimeSecond(t1DTS, 40);
-						}
-						// get valfrom of "RFR(0040)" for prior &DTFS.		
-					} else if (t2Status.equals(STATUS_FINAL)) {
-						t1DTS = getTQFinal(adsStatusHistoy, statusHistoy, dtfs);
-						if (t1DTS.equals(m_strEpoch)) {
-							actionTaken = rsBundle.getString("ACTION_FINAL_FIRSTTIME");
-						} else {
-							actionTaken = rsBundle.getString("ACTION_FINAL_CHANGES");
-							//t1DTS = adjustTimeSecond(t1DTS, 40);
-						}
-					}
-				} else {
-					if (t2Status.equals(STATUS_R4REVIEW)) {
-						actionTaken = rsBundle.getString("ACTION_R4R_FIRSTTIME");
-					} else if (t2Status.equals(STATUS_FINAL)) {
-						actionTaken = rsBundle.getString("ACTION_FINAL_FIRSTTIME");
-					}
-					addDebug("getT1 for " + rootEntity.getKey() + " never was passed before, set T1 = 1980-01-01 00:00:00.00000");
-				}
-				timeofidl = getTimeofIDL();
-				if (t1DTS.compareTo(timeofidl) < 0){
-					t1DTS = timeofidl;
-					addOutput("Found T1 DTS is earlier than the time of initializing WWTECHCOMPAT, the time of last run initializing WWTECHCOMPAT be used as T1");
-				}	
-			}
-		}
-	}
-
-	/***************************************************************************
-	 * checking whether has passed queue in COMPATGENABRSTATUS
-	 */
-	private boolean existBefore(AttributeChangeHistoryGroup achg, String value) {
-		if (achg != null) {
-			for (int i = achg.getChangeHistoryItemCount() - 1; i >= 0; i--) {
-				AttributeChangeHistoryItem achi = (AttributeChangeHistoryItem) achg.getChangeHistoryItem(i);
-				if (achi.getFlagCode().equals(value)) {
-					return true;
-				}
-			}
-
-		}
-		return false;
-	}
-
-	/**********************************************************************************
-	 * Get the history of the ABR (COMPATGENABRSTATUS) in VALFROM order
-	 *  The current value should be “In Process�? (0050)
-	 *  The prior value should be “Queued�? (0020)
-	 *  Find the prior value for &DTFS if it is not null
-	 *  TQ = VALFROM of this row.
-	 *  T2 = TQ
-	 *  //TODO BH FS ABR Catalog DB Compatibility Gen 20121011b.doc  T2 is derive from valfrom of "in process"
-	 * @throws MiddlewareException 
-	 */
-	private void setT2DTS(EntityItem rootEntity, XMLMQ mqAbr, AttributeChangeHistoryGroup adsStatusHistoy,
-		AttributeChangeHistoryGroup statusHistory, String dtfs) throws MiddlewareException {
-
-		addDebug("getT2 entered for The ADS ABR handles this as an IDL:" + isXMLIDLABR);
-		if (!isXMLIDLABR) {
-			if (adsStatusHistoy != null && adsStatusHistoy.getChangeHistoryItemCount() > 1) {
-				// get the historyitem count.
-				int i = adsStatusHistoy.getChangeHistoryItemCount();
-				// Find the time stamp for "Queued" Status. Notic: last
-				// chghistory is the current one(in process),-2 is queued.
-				AttributeChangeHistoryItem achi = (AttributeChangeHistoryItem) adsStatusHistoy.getChangeHistoryItem(i - 1);
-				if (achi != null) {
-					addDebug("getT2Time [" + (i - 1) + "] isActive: " + achi.isActive() + " isValid: " + achi.isValid()
-						+ " chgdate: " + achi.getChangeDate() + " flagcode: " + achi.getFlagCode());
-					if (achi.getFlagCode().equals(STATUS_INPROCESS)) {
-						t2DTS = achi.getChangeDate();
-						//t2DTS = adjustTimeSecond(t2DTS, 40);
-					} else {
-						addDebug("getT2Time for the value of " + achi.getFlagCode()
-							+ "is not Queued, set getNow() to t2DTS and find the prior &DTFS!");
-						t2DTS = getNow();
-						//t2DTS = adjustTimeSecond(t2DTS, 40);
-					}
-				}
-				// Continue find time stamp for &DTFS Status. Notic: last
-				// chghistory is the current one(in process),-2 is queued, -3
-				// Maybe is &DTFS
-				achi = (AttributeChangeHistoryItem) adsStatusHistoy.getChangeHistoryItem(i - 3);
-				if (achi != null) {
-					addDebug("getT2Time [" + (i - 3) + "] isActive: " + achi.isActive() + " isValid: " + achi.isValid()
-						+ " chgdate: " + achi.getChangeDate() + " flagcode: " + achi.getFlagCode());
-					if (achi.getFlagCode().equals(dtfs)) {
-						t2DTS = achi.getChangeDate();
-						//t2DTS = adjustTimeSecond(t2DTS, 40);
-					} else {
-						addDebug("getT2Time for the value of " + achi.getFlagCode() + "is not &DTFS " + dtfs
-							+ " return valfrom of queued.");
-					}
-				}
-			} else {
-				t2DTS = getNow();
-				addDebug("getT2Time for COMPATGENABRSTATUS changedHistoryGroup has no history, set getNow to t2DTS");
-			}
-		} else {
-			EANMetaAttribute metaAttr = rootEntity.getEntityGroup().getMetaAttribute("STATUS");
-			if (metaAttr != null) {
-				if (existBefore(statusHistory, STATUS_FINAL)) {
-					for (int i = statusHistory.getChangeHistoryItemCount() - 1; i >= 0; i--) {
-						AttributeChangeHistoryItem achi = (AttributeChangeHistoryItem) statusHistory.getChangeHistoryItem(i);
-						if (achi.getFlagCode().equals(STATUS_FINAL)) {
-							t2DTS = achi.getChangeDate();
-							curStatus = achi.getAttributeValue();
-							AttributeChangeHistoryItem priorachi = (AttributeChangeHistoryItem) statusHistory
-								.getChangeHistoryItem(i - 1);
-							// set prior Status at the xml header. 
-							if (priorachi != null) {
-								priorStatus = priorachi.getAttributeValue();
-								addDebug("priorStatus [" + (i - 1) + "] chgdate: " + priorachi.getChangeDate() + " flagcode: "
-									+ priorachi.getFlagCode());
-							}
-							break;
-						}
-					}
-				} else if (existBefore(statusHistory, STATUS_R4REVIEW)) {
-					for (int i = statusHistory.getChangeHistoryItemCount() - 1; i >= 0; i--) {
-						AttributeChangeHistoryItem achi = (AttributeChangeHistoryItem) statusHistory.getChangeHistoryItem(i);
-						if (achi.getFlagCode().equals(STATUS_R4REVIEW)) {
-							t2DTS = achi.getChangeDate();
-							curStatus = achi.getAttributeValue();
-							AttributeChangeHistoryItem priorachi = (AttributeChangeHistoryItem) statusHistory
-								.getChangeHistoryItem(i - 1);
-							// set prior Status at the xml header. 
-							if (priorachi != null) {
-								priorStatus = priorachi.getAttributeValue();
-								addDebug("priorStatus [" + (i - 1) + "] chgdate: " + priorachi.getChangeDate() + " flagcode: "
-									+ priorachi.getFlagCode());
-							}
-							break;
-						}
-					}
-				} else {
-					addError(rsBundle.getString("IDL_NOT_R4RFINAL"));
-					addDebug("getT2Time for IDL ABR, the Status never being RFR or Final");
-				}
-			} else {
-				t2DTS = getNow();
-				addDebug(rootEntity.getKey() + " , There is not such attribute STATUS, set t2DTS is getNow().");
-			}
-		}
-	}
-
-	/*
-	 * Get the history of the ABR (COMPATGENABRSTATUS) in VALFROM order The current
-	 * value should be “In Process�? (0050) The prior value should be “Queued�?
-	 * (0020) Find the prior value for &DTFS if it is not null TQ = VALFROM of
-	 * this row T2 = TQ look into the STATUS history find the value at T2.
-	 * return STATUS at T2
-	 */
-	private String getT2Status(AttributeChangeHistoryGroup statusHistory)
-		throws COM.ibm.opicmpdh.middleware.MiddlewareRequestException {
-		String status = "";
-		EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-		if (statusHistory != null && statusHistory.getChangeHistoryItemCount() > 0) {
-			// last chghistory is the current one
-			for (int i = statusHistory.getChangeHistoryItemCount() - 1; i >= 0; i--) {
-				AttributeChangeHistoryItem achi = (AttributeChangeHistoryItem) statusHistory.getChangeHistoryItem(i);
-				if (achi != null) {
-					//addDebug("getT2Status [" + i + "] isActive: " + achi.isActive() + " isValid: " + achi.isValid()
-					//			+ " chgdate: " + achi.getChangeDate() + " flagcode: " + achi.getFlagCode());
-					// Because the time stamp of Status will be prior to T2, find the first item which time stamp less than T2. 
-					if (achi.getChangeDate().compareTo(t2DTS) < 0) {
-						// If Status is not Final or RFR, then addError and break.
-						if (!STATUS_FINAL.equals(achi.getFlagCode()) && !STATUS_R4REVIEW.equals(achi.getFlagCode())) {
-							addDebug(rootEntity.getKey() + " is not Final or R4R");
-							addError(rsBundle.getString("NOT_R4RFINAL"));
-							break;
-						} else {
-							curStatus = achi.getAttributeValue();
-							status = achi.getFlagCode();
-							achi = (AttributeChangeHistoryItem) statusHistory.getChangeHistoryItem(i - 1);
-							// set prior Status at the xml header. 
-							if (achi != null) {
-								priorStatus = achi.getAttributeValue();
-								addDebug("getT2Status [" + (i - 1) + "] chgdate: " + achi.getChangeDate() + " flagcode: "
-									+ achi.getFlagCode());
-							}
-							break;
-						}
-					}
-				}
-			}
-		} else {
-			addDebug("getT2Status for " + rootEntity.getKey() + " getChangeHistoryItemCount less than 0.");
-		}
-		return status;
-	}
-
-	/*   when T2Status == Final
-	 *   Find the time stamp to use for 'Passed' status by looking back from "Passed" to its "Queued" 
-	 *   and then checking to see if there is a preceding "&DTFS".  
-	 *   This is TQ.
-	 *   This time stamp is the one used to find TQSTATUS.  
-	 *   If TQSTATUS is Final, T1 = TQ
-	 *   If TQSTATUS is not Final, repeat the process looking back for any prior "Passed" with its TQSTATUS=Final.  
-	 *   If no TQSTATUS=Final is found, T1 is the 1980.....
-	 * */
-
-	private String getTQFinal(AttributeChangeHistoryGroup adsStatusHistory, AttributeChangeHistoryGroup statusHistory, String dtfs)
-		throws COM.ibm.opicmpdh.middleware.MiddlewareRequestException {
-		String tq = m_strEpoch;
-		if (adsStatusHistory != null && adsStatusHistory.getChangeHistoryItemCount() > 1) {
-			boolean nextQueued = false;
-			// last chghistory is the current one(in process), -1 is queued, -2 is &DTFS or Pass\faild\Error
-			for (int i = adsStatusHistory.getChangeHistoryItemCount() - 3; i >= 0; i--) {
-				AttributeChangeHistoryItem achi = (AttributeChangeHistoryItem) adsStatusHistory.getChangeHistoryItem(i);
-				if (achi != null) {
-					//addDebug("getTQFinalDTS [" + i + "] isActive: " + achi.isActive() + " isValid: " + achi.isValid()
-					//	+ " chgdate: " + achi.getChangeDate() + " flagcode: " + achi.getFlagCode());
-					if (achi.getFlagCode().equals(STATUS_PASSED)) { //Passed
-						// get previous queued
-						nextQueued = true;
-					}
-					if (nextQueued && achi.getFlagCode().equals(STATUS_QUEUE)) { //get preceding Queue.
-						tq = achi.getChangeDate();
-						//set time stamp to tq.
-						achi = (AttributeChangeHistoryItem) adsStatusHistory.getChangeHistoryItem(i - 1);
-						// get the preceding item, check whether it is &DTFS
-						if (achi != null && achi.getFlagCode().equals(dtfs)) { // if there is a preceding &DTFS, this is TQ.
-							tq = achi.getChangeDate();
-						} else {
-							addDebug("getPreveTQFinalDTS[" + (i - 1) + "]. there is no a Preceding &DTFS :" + dtfs);
-						}
-						//						 In case of it was queued before status was set to RFR. 
-						//tq = adjustTimeSecond(tq,1);
-						String status = getTQStatus(statusHistory, tq);
-						if (status.equals(STATUS_FINAL)) {
-							break;
-						} else {
-							nextQueued = false;
-							tq = m_strEpoch;
-						}
-					}
-				}
-			}
-		} else {
-			addDebug("getTQFinalDTS for COMPATGENABRSTATUS has no changed history");
-		}
-		return tq;
-	}
-
-	/*  
-	 *   If T2STATUS = "Ready For Review" 
-	 *   Find the time stamp to use for 'Passed' status by looking back from "Passed" to its "Queued" and then checking to see if there is a preceding "&DTFS".  This is TQ.
-	 *   This time stamp is the one used to find TQSTATUS.  
-	 *   If TQSTATUS is Final, then exit.
-	 *   If TQSTATUS is not Final, repeat the process looking back for any prior "Passed" with its TQSTATUS=Final.  If no TQSTATUS=Final is found, T1 is the first TQ found.
-	 *   
-	 * */
-
-	private String getTQRFR(AttributeChangeHistoryGroup adsStatusHistory, AttributeChangeHistoryGroup statusHistory, String dtfs)
-		throws COM.ibm.opicmpdh.middleware.MiddlewareRequestException {
-		String tq = m_strEpoch;
-		String fistTQ = m_strEpoch;
-
-		if (adsStatusHistory != null && adsStatusHistory.getChangeHistoryItemCount() > 1) {
-			boolean nextQueued = false;
-			boolean fistTQfound = false;
-			// last chghistory is the current one(in process), -2 is queued, -3 is &DTFS or Pass\failed\Error
-			for (int i = adsStatusHistory.getChangeHistoryItemCount() - 3; i >= 0; i--) {
-				AttributeChangeHistoryItem achi = (AttributeChangeHistoryItem) adsStatusHistory.getChangeHistoryItem(i);
-				if (achi != null) {
-					//addDebug("getTQRFRDTS [" + i + "] isActive: " + achi.isActive() + " isValid: " + achi.isValid()
-					//	+ " chgdate: " + achi.getChangeDate() + " flagcode: " + achi.getFlagCode());
-					if (achi.getFlagCode().equals(STATUS_PASSED)) { //Passed
-						// get previous queued
-						nextQueued = true;
-					}
-					if (nextQueued && achi.getFlagCode().equals(STATUS_QUEUE)) { //get preceding Queue.
-
-						tq = achi.getChangeDate();
-						//set time stamp to tq.	
-						achi = (AttributeChangeHistoryItem) adsStatusHistory.getChangeHistoryItem(i - 1);
-						// get the preceding item, check whether it is &DTFS
-						if (achi != null && achi.getFlagCode().equals(dtfs)) { // if there is a preceding &DTFS, this is TQ.
-							tq = achi.getChangeDate();
-						} else {
-							addDebug("getPreveTQRFRDTS[" + (i - 1) + "]. there is no a Preceding &DTFS :" + dtfs);
-						}
-						if (fistTQfound == false) {
-							fistTQfound = true;
-							fistTQ = tq;
-						}
-						// In case of it was queued before status was set to RFR. 
-						//tq = adjustTimeSecond(tq,1);
-						String status = getTQStatus(statusHistory, tq);
-						if (status.equals(STATUS_FINAL)) {
-							RFRPassedFinal = true;
-							actionTaken = rsBundle.getString("ACTION_R4R_PASSEDFINAL");
-							return tq;
-						} else {
-							nextQueued = false;
-						}
-
-					}
-				}
-			}
-		} else {
-			addDebug("getTQRFRDTS for COMPATGENABRSTATUS has no changed history");
-		}
-		return fistTQ;
-	}
-
-	// get valfrom of status Final or R4R at TQ time.
-	private String getTQStatus(AttributeChangeHistoryGroup statusHistory, String tqtime)
-		throws COM.ibm.opicmpdh.middleware.MiddlewareRequestException {
-		if (statusHistory != null && statusHistory.getChangeHistoryItemCount() > 0) {
-			// last chghistory is the current one
-			for (int i = statusHistory.getChangeHistoryItemCount() - 1; i >= 0; i--) {
-				AttributeChangeHistoryItem achi = (AttributeChangeHistoryItem) statusHistory.getChangeHistoryItem(i);
-				if (achi != null) {
-					//addDebug("getTQStatus [" + i + "] isActive: " + achi.isActive() + " isValid: " + achi.isValid()
-					//	+ " chgdate: " + achi.getChangeDate() + " flagcode: " + achi.getFlagCode());
-					if (tqtime.compareTo(achi.getChangeDate()) > 0) {
-						return achi.getFlagCode();
-					}
-				}
-			}
-		} else {
-			addDebug("getTQStatus for STATUS has no changed history!");
-		}
-		return CHEAT;
-	}
-
-	// set instance variable ADSABRSTATUSHistory
-	private AttributeChangeHistoryGroup getADSABRSTATUSHistory() throws MiddlewareException {
-		String attCode = "COMPATGENABR";
-		EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-
-		EANAttribute att = rootEntity.getAttribute(attCode);
-		if (att != null) {
-			return new AttributeChangeHistoryGroup(m_db, m_prof, att);
-		} else {
-			addDebug(" COMPATGENABR of " + rootEntity.getKey() + "  was null");
-			return null;
-		}
-	}
-
-	// set instance variable ADSABRSTATUSHistory
-	private AttributeChangeHistoryGroup getSTATUSHistory(XMLMQ mqAbr) throws MiddlewareException {
-		String attCode = mqAbr.getStatusAttr();
-		EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-		EANAttribute att = rootEntity.getAttribute(attCode);
-		if (att != null) {
-			return new AttributeChangeHistoryGroup(m_db, m_prof, att);
-		} else {
-			addDebug(" STATUS of " + rootEntity.getKey() + "  was null");
-			return null;
-		}
-	}
-
-	// role must have access to all attributes
-	private Profile switchRole(String roleCode) throws COM.ibm.eannounce.objects.EANBusinessRuleException, java.sql.SQLException,
-		COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException, COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-		java.rmi.RemoteException, IOException, COM.ibm.opicmpdh.middleware.MiddlewareException,
-		COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException {
-		Profile profile2 = m_prof.getProfileForRoleCode(m_db, roleCode, roleCode, 1);
-		if (profile2 == null) {
-			addError("Could not switch to " + roleCode + " role");
-		} else {
-			addDebug("Switched role from " + m_prof.getRoleCode() + " to " + profile2.getRoleCode());
-
-			String nlsids = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getNLSIDs(m_abri.getABRCode());
-			addDebug("switchRole nlsids: " + nlsids);
-			StringTokenizer st1 = new StringTokenizer(nlsids, ",");
-			while (st1.hasMoreTokens()) {
-				String nlsid = st1.nextToken();
-				NLSItem nlsitem = (NLSItem) READ_LANGS_TBL.get(nlsid);
-				if (!profile2.getReadLanguages().contains(nlsitem)) {
-					profile2.getReadLanguages().addElement(nlsitem); // this is really cheating
-					addDebug("added nlsitem " + nlsitem + " to new prof");
-				}
-			}
-		}
-
-		return profile2;
-	}
-
-	/**********************************************************************************
-	 *  Get Name based on navigation attributes
-	 *
-	 *@return java.lang.String
-	 */
-	private String getNavigationName(EntityItem theItem) throws java.sql.SQLException, MiddlewareException {
-		StringBuffer navName = new StringBuffer();
-		// NAME is navigate attributes
-		EntityGroup eg = new EntityGroup(null, m_db, m_prof, theItem.getEntityType(), "Navigate");
-		EANList metaList = eg.getMetaAttribute(); // iterator does not maintain navigate order
-		for (int ii = 0; ii < metaList.size(); ii++) {
-			EANMetaAttribute ma = (EANMetaAttribute) metaList.getAt(ii);
-			navName.append(PokUtils.getAttributeValue(theItem, ma.getAttributeCode(), ", ", "", false));
-			navName.append(" ");
-		}
-
-		return navName.toString();
-	}
-
-	/**********************************
-	 * get database
-	 */
-	protected Database getDB() {
-		return m_db;
-	}
-
-	/**********************************
-	 * get attributecode
-	 */
-	protected String getABRAttrCode() {
-		return m_abri.getABRCode();
-	}
-
-	/**********************************
-	 * add msg to report output
-	 */
-	protected void addOutput(String msg) {
-		rptSb.append("<p>" + msg + "</p>" + NEWLINE);
-	}
-
-	/**********************************
-	 * add debug info as html comment
-	 */
-	protected void addDebug(String msg) {
-		if (dbgPw != null) {
-			dbgLen += msg.length();
-			dbgPw.println(msg);
-			dbgPw.flush();
-		} else {
-			rptSb.append("<!-- " + msg + " -->" + NEWLINE);
-		}
-	}
-
-	/**********************************
-	 * add error info and fail abr
-	 */
-	protected void addError(String msg) {
-		addOutput(msg);
-		setReturnCode(FAIL);
-	}
-
-	/**********************************
-	 * get the resource bundle
-	 */
-	protected ResourceBundle getBundle() {
-		return rsBundle;
-	}
-
-	/*************************************************************************************
-	 * Check the PDHDOMAIN
-	 * xseries and converged prod need DQ checks in the ABRs but the other domains like iseries don't
-	 * because those Brands do not want any checking, they do not use STATUS, they want no process
-	 * criteria apply if PDHDOMAIN = (0050) 'xSeries' or (0390) 'Converged Products'
-	 *@param item    EntityItem
-	 * domainInList set to true if matches one of these domains
-	 */
-	protected boolean domainNeedsChecks(EntityItem item) {
-		boolean bdomainInList = false;
-		String domains = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getDomains(m_abri.getABRCode());
-		addDebug("domainNeedsChecks pdhdomains needing checks: " + domains);
-		if (domains.equals("all")) {
-			bdomainInList = true;
-		} else {
-			Set testSet = new HashSet();
-			StringTokenizer st1 = new StringTokenizer(domains, ",");
-			while (st1.hasMoreTokens()) {
-				testSet.add(st1.nextToken());
-			}
-			bdomainInList = PokUtils.contains(item, "PDHDOMAIN", testSet);
-			testSet.clear();
-		}
-
-		if (!bdomainInList) {
-			addDebug("PDHDOMAIN for " + item.getKey() + " did not include " + domains + ", execution is bypassed ["
-				+ PokUtils.getAttributeValue(item, "PDHDOMAIN", ", ", "", false) + "]");
-		}
-		return bdomainInList;
-	}
-
-	/***********************************************
-	 *  Get the version
-	 *
-	 *@return java.lang.String
-	 */
-	public String getABRVersion() {
-		//return "1.8"; cvs failure
-		return "1.12";//"1.10";
-	}
-
-	/***********************************************
-	 *  Get ABR description
-	 *
-	 *@return java.lang.String
-	 */
-	public String getDescription() {
-		return "COMPATGENABRSTATUS";
-	}
-
-	/********************************************************************************
-	 * Convert string into valid html.  Special HTML characters are converted.
-	 *
-	 * @param txt    String to convert
-	 * @return String
-	 */
-	protected static String convertToHTML(String txt) {
-		String retVal = "";
-		StringBuffer htmlSB = new StringBuffer();
-		StringCharacterIterator sci = null;
-		char ch = ' ';
-		if (txt != null) {
-			sci = new StringCharacterIterator(txt);
-			ch = sci.first();
-			while (ch != CharacterIterator.DONE) {
-				switch (ch) {
-				case '<':
-					htmlSB.append("&lt;");
-					break;
-				case '>':
-					htmlSB.append("&gt;");
-					break;
-				case '"': // could be saved as &quot; also. this will be &#34;
-					// this should be included too, but left out to be consistent with west coast
-					//case '&': // ignore entity references such as &lt; if user typed it, user will see it
-					// could be saved as &amp; also. this will be &#38;
-					htmlSB.append("&#" + ((int) ch) + ";");
-					break;
-				default:
-					htmlSB.append(ch);
-					break;
-				}
-				ch = sci.next();
-			}
-			retVal = htmlSB.toString();
-		}
-
-		return retVal;
-	}
-
-	private void deactivateEntities(EntityItem deleteItem) throws MiddlewareRequestException, SQLException, MiddlewareException,
-		LockException, MiddlewareShutdownInProgressException, EANBusinessRuleException {
-		String rootType = deleteItem.getEntityType();
-		String DeleteActionName = null;
-		if ("MODELCG".equals(rootType)) {
-			DeleteActionName = MODELCG_DELETEACTION_NAME;
-		} else if ("SEOCG".equals(rootType)) {
-			DeleteActionName = SEOCG_DELETEACTION_NAME;
-		} else if ("MDLCGOSMDL".equals(rootType)) {
-			DeleteActionName = MDLCGOSMDL_DELETEACTION_NAME;
-		} else if ("SEOCGOSSEO".equals(rootType)) {
-			DeleteActionName = SEOCGOSSEO_DELETEACTION_NAME;
-		} else if ("SEOCGOSBDL".equals(rootType)) {
-			DeleteActionName = SEOCGOSBDL_DELETEACTION_NAME;
-		} else if ("SEOCGOSSVCSEO".equals(rootType)) {
-			DeleteActionName = SEOCGOSSVCSEO_DELETEACTION_NAME;
-		} else {
-			addError("Delete Action Not support " + rootType);
-		}
-		if (deleteItem == null) {
-			return;
-		}
-		addDebug("delete " + deleteItem.getKey());
-		EntityItem childArray[] = new EntityItem[1];
-		DeleteActionItem dai = new DeleteActionItem(null, m_db, m_prof, DeleteActionName);
-
-		// get the relator
-		childArray[0] = deleteItem;
-		//addDebug("delete " + deleteItem.getKey() + " " + childArray[0].getKey());
-		long startTime = System.currentTimeMillis();
-
-		// do the delete
-	
-		dai.setEntityItems(childArray);
-		m_db.executeAction(m_prof, dai);
-		//int deletedCnt = childArray.length;
-
-		addDebug("Time to delete : " + Stopwatch.format(System.currentTimeMillis() - startTime));
-	}
-
-	/**
-	 * In order to delete a MODELCG, a user will have to set “OK to Publish” to “Delete” and then move Status to Ready for Review. 
-	 * Once the Compatibility updates are created, this ABR will then delete the MODELCG.
-	 * 
-	 * 
-	 * Check the rootEntity whether in the case of Delete.
-	 * (COMPATPUBFLG) = Delete and then Data Quality (DATAQUALITY) = Final. 
-	 * The ABR will first remove this compatibility information and then it will delete (deactivate) this relator in the PDH.
-	 * @param rootEntity
-	 * @return
-	 */
-	private boolean isDeactivatedEntity(EntityItem rootEntity) {
-		boolean result = false;
-		String rootType = rootEntity.getEntityType();
-		if ("MODELCG".equals(rootType) || "SEOCG".equals(rootType)) {
-			String OKTOPUB = PokUtils.getAttributeValue(rootEntity, "OKTOPUB", ", ", XMLElem.CHEAT, false);
-			addDebug(rootEntity.getKey() + " attrbute OKTOPUB: " + OKTOPUB);
-			if ("Delete".equals(OKTOPUB)) {
-				result = true;
-			}
-		} else if ("MDLCGOSMDL".equals(rootType) || "SEOCGOSSEO".equals(rootType) || "SEOCGOSBDL".equals(rootType)
-			|| "SEOCGOSSVCSEO".equals(rootType)) {
-			String COMPATPUBFLG = PokUtils.getAttributeValue(rootEntity, "COMPATPUBFLG", ", ", XMLElem.CHEAT, false);
-			//TODO commment out the  Status =Final as the removal condition. according to the doc of  BH FS ABR Catlog DB Compatibility Gen 20120627.doc
-			//String statusFlag = getAttributeFlagEnabledValue(rootEntity, "STATUS");
-			//(COMPATPUBFLG) = Delete and then Data Quality (DATAQUALITY) = Final. The ABR will first remove this compatibility information and then it will delete (deactivate) this relator in the PDH.
-			addDebug(rootEntity.getKey() + " attribute COMPATPUBFLG: " + COMPATPUBFLG );
-			if ("Delete".equals(COMPATPUBFLG)) {
-				result = true;
-			}
-		}
-		return result;
-
-	}
-	
-
-    /**
-     * Load the ABR properties from the properties file
-     */
-    private String getTimeofIDL() {
-    	String timeofidl = m_strEpoch;
-
-        try {
-
-            if (wwprt_propABR == null) {
-            	wwprt_propABR = new Properties();
-                FileInputStream inProperties = new FileInputStream("./" + PROPERTIES_FILENAME); //$NON-NLS-1$
-                wwprt_propABR.load(inProperties);
-                inProperties.close();
-                timeofidl = wwprt_propABR.getProperty("TIMEOFIDL", m_strEpoch);                    
-            } else{
-            	timeofidl = wwprt_propABR.getProperty("TIMEOFIDL", m_strEpoch); 
-            }
-            addDebug("loadProperties for " //$NON-NLS-1$
-                +PROPERTIES_FILENAME + " " //$NON-NLS-1$
-                + timeofidl);
-        } catch (Exception x) {
-            addDebug("Unable to loadProperties for " //$NON-NLS-1$
-            +PROPERTIES_FILENAME + " " //$NON-NLS-1$
-            +x);
-        }
-        return timeofidl;
-       
-    }
-}

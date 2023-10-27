@@ -1,106 +1,109 @@
-/* Copyright IBM Corp. 2016 */
-package COM.ibm.eannounce.abr.sg.rfc;
+/*    */ package COM.ibm.eannounce.abr.sg.rfc;
+/*    */ 
+/*    */ import COM.ibm.eannounce.abr.sg.rfc.entity.OutputData;
+/*    */ import com.google.gson.annotations.SerializedName;
+/*    */ import java.util.HashMap;
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ public class ChwBapiClassCharRead
+/*    */   extends RdhBase
+/*    */ {
+/*    */   @SerializedName("OBJ_ID")
+/*    */   private String obj_id;
+/*    */   @SerializedName("FEATURE_CODE")
+/*    */   private String feature_code;
+/*    */   @SerializedName("TARGET_INDC")
+/*    */   private String target_indc;
+/*    */   @SerializedName("CHAR_TYPE")
+/*    */   private String char_type;
+/*    */   private String suffix;
+/*    */   
+/*    */   public String getSuffix() {
+/* 38 */     return this.suffix;
+/*    */   }
+/*    */   
+/*    */   public void setSuffix(String paramString) {
+/* 42 */     this.suffix = paramString;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public ChwBapiClassCharRead(String paramString1, String paramString2, String paramString3, String paramString4) {
+/* 48 */     super(paramString1, "BAPI_CLASS_CHAR_READ".toLowerCase(), null);
+/* 49 */     this.pims_identity = "H";
+/* 50 */     this.obj_id = paramString1;
+/* 51 */     this.default_mandt = "10H";
+/*    */     
+/* 53 */     this.feature_code = paramString2;
+/* 54 */     this.target_indc = paramString3;
+/* 55 */     this.char_type = paramString4;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   protected boolean isReadyToExecute() {
+/* 63 */     if (checkFieldsNotEmplyOrNull(this.feature_code, "feature_code") && 
+/* 64 */       checkFieldsNotEmplyOrNull(this.target_indc, "target_indc")) {
+/* 65 */       return checkFieldsNotEmplyOrNull(this.char_type, "char_type");
+/*    */     }
+/*    */     
+/* 68 */     return false;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   protected void setDefaultValues() {}
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void saveRfcResults(OutputData paramOutputData) {
+/* 88 */     super.saveRfcResults(paramOutputData);
+/* 89 */     HashMap hashMap = paramOutputData.getRETURN_OBJ();
+/* 90 */     if (hashMap != null) {
+/*    */       
+/* 92 */       HashMap hashMap1 = (HashMap)hashMap.get("RETURNMAP");
+/* 93 */       if (hashMap1 != null) {
+/*    */         
+/* 95 */         String str = (String)hashMap1.get("SUFFIX");
+/* 96 */         if (str != null)
+/*    */         {
+/* 98 */           this.suffix = str;
+/*    */         }
+/*    */       } 
+/*    */     } 
+/*    */   }
+/*    */ }
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
-import COM.ibm.eannounce.abr.sg.rfc.entity.OutputData;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhConp_cpdep_dat;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhConp_cpro_attr;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhConp_object_key;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhConp_rcuco;
-
-import com.google.gson.annotations.SerializedName;
-
-/**
- * creates a configuration profile for a material master
- * @author wangyul
- *
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\ChwBapiClassCharRead.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class ChwBapiClassCharRead extends RdhBase
-{
-     
-	@SerializedName("OBJ_ID")
-    private String obj_id;
-	@SerializedName("FEATURE_CODE")
-	private String feature_code;
-	
-	@SerializedName("TARGET_INDC")
-	private String target_indc;
-	
-	@SerializedName("CHAR_TYPE")
-	private String char_type;
-	
-	private String suffix;
-	
-    public String getSuffix() {
-		return suffix;
-	}
-
-	public void setSuffix(String suffix) {
-		this.suffix = suffix;
-	}
-
-	public ChwBapiClassCharRead(String obj_id, String feature_code, 
-    		String target_indc, String char_type)
-    {
-        super(obj_id, "BAPI_CLASS_CHAR_READ".toLowerCase(), null);
-        this.pims_identity = "H";
-        this.obj_id = obj_id;
-        this.default_mandt ="10H";
-        
-        this.feature_code = feature_code;
-        this.target_indc = target_indc;
-        this.char_type = char_type;
-        
-       
-    }
-
-    @Override
-    protected boolean isReadyToExecute()
-    { 
-        if(this.checkFieldsNotEmplyOrNull(feature_code, "feature_code")){
-            if(this.checkFieldsNotEmplyOrNull(target_indc, "target_indc")){
-            	return this.checkFieldsNotEmplyOrNull(char_type, "char_type");
-            }
-        }
-        return false;
-    }
-    
- 
-    /* (non-Javadoc)
-     * @see com.ibm.sdpi.cmd.interfaces.rdh.esw.caller.RdhBase#setDefaultValues()
-     */
-    @Override
-    protected void setDefaultValues()
-    {
-        
-    }
-    
-//    protected String saveRfcResults (){
-//    	this.suffix = this.getError_text();  
-//    	return suffix;
-//    }
-    @Override
-    public void saveRfcResults(OutputData output) 
-    {
-        super.saveRfcResults(output);
-        HashMap<String, HashMap<String, String>> return_OBJ = output.getRETURN_OBJ();
-        if(return_OBJ != null)
-        {
-        	HashMap<String,String> returnMap = return_OBJ.get("RETURNMAP");
-            if(returnMap != null)
-            {
-                String suffix = returnMap.get("SUFFIX");
-                if(suffix != null)
-                {
-                    this.suffix = suffix;
-                }
-            }
-            
-        }
-    }
-    
-    
-}

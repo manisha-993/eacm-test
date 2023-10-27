@@ -1,289 +1,295 @@
-//  (c) Copyright International Business Machines Corporation, 2001
-//  All Rights Reserved.</pre>
-//
-//AFHWUPGRADEABR01.java,v
-//Revision 1.12  2006/03/03 19:23:24  bala
-//remove reference to Constants.CSS
-//
-//Revision 1.11  2006/01/24 16:37:59  yang
-//J-test
-//
-//Revision 1.10  2005/02/08 18:29:12  joan
-//changes for Jtest
-//
-//Revision 1.9  2004/03/18 00:49:03  joan
-//spelling
-//
-//Revision 1.8  2004/03/18 00:44:10  joan
-//remove recursive call
-//
-//Revision 1.7  2003/10/07 23:25:36  joan
-//change for subs.
-//
-//Revision 1.6  2003/10/07 21:45:56  joan
-//fix fb
-//
-//Revision 1.5  2003/10/02 15:09:57  joan
-//fb fix
-//
-//Revision 1.4  2003/09/23 22:58:19  joan
-//add changes
-//
-//Revision 1.3  2003/09/18 16:29:57  joan
-//fix error
-//
-//Revision 1.2  2003/09/11 22:24:08  joan
-//fb fixes
-//
-//Revision 1.1  2003/09/10 18:10:02  joan
-//initial load
-//
-//Revision 1.1  2003/09/09 20:31:23  joan
-//add HWUPGRADE abr
-//
+/*     */ package COM.ibm.eannounce.abr.sg;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.LockPDHEntityException;
+/*     */ import COM.ibm.eannounce.abr.util.PokBaseABR;
+/*     */ import COM.ibm.eannounce.abr.util.UpdatePDHEntityException;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.HWUpgradePIPDG;
+/*     */ import COM.ibm.eannounce.objects.SBRException;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class AFHWUPGRADEABR01
+/*     */   extends PokBaseABR
+/*     */ {
+/*  63 */   public static final String DEF_NOT_POPULATED_HTML = new String("");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*  68 */   public static final String ABR = new String("AFHWUPGRADEABR01");
+/*     */   
+/*  70 */   private EntityGroup m_egParent = null;
+/*  71 */   private EntityItem m_ei = null;
+/*     */   private boolean m_bPDGComplete = false;
+/*  73 */   private int m_iExeCount = 0;
+/*  74 */   private HWUpgradePIPDG m_pdg = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void execute_run() {
+/*  81 */     String str1 = null;
+/*  82 */     int i = 0;
+/*  83 */     String str2 = null;
+/*  84 */     String str3 = System.getProperty("line.separator");
+/*     */     try {
+/*  86 */       this.m_iExeCount++;
+/*     */ 
+/*     */       
+/*  89 */       if (this.m_iExeCount == 1) {
+/*  90 */         start_ABRBuild();
+/*     */         
+/*  92 */         buildReportHeaderII();
+/*     */         
+/*  94 */         this.m_egParent = this.m_elist.getParentEntityGroup();
+/*  95 */         this.m_ei = this.m_egParent.getEntityItem(0);
+/*  96 */         println("<br><b>Hardware Upgrade PDG Request: " + this.m_ei
+/*     */             
+/*  98 */             .getKey() + "</b>");
+/*     */ 
+/*     */         
+/* 101 */         printNavigateAttributes(this.m_ei, this.m_egParent, true);
+/*     */         
+/* 103 */         setReturnCode(0);
+/*     */       } 
+/*     */ 
+/*     */       
+/* 107 */       if (getReturnCode() == 0) {
+/* 108 */         log("AFHWUPGRADEABR01 generating data");
+/* 109 */         if (this.m_iExeCount == 1) {
+/* 110 */           log("AFHWUPGRADEABR01 first time generating");
+/* 111 */           this.m_pdg = new HWUpgradePIPDG(null, this.m_db, this.m_prof, "HWUPPIPDG");
+/* 112 */           this.m_pdg.setEntityItem(this.m_ei);
+/* 113 */           this.m_pdg.executeAction(this.m_db, this.m_prof);
+/*     */         } else {
+/* 115 */           log("AFHWUPGRADEABR01 " + this.m_iExeCount + " time generating");
+/* 116 */           this.m_pdg.checkMissingDataAgain(this.m_db, this.m_prof, true);
+/*     */         } 
+/*     */ 
+/*     */         
+/* 120 */         if (this.m_iExeCount > 1) {
+/* 121 */           this.m_pdg.savePDGStatus(this.m_db, this.m_prof);
+/*     */         }
+/* 123 */         this.m_bPDGComplete = true;
+/* 124 */         log("AFHWUPGRADEABR01 finish generating data");
+/*     */       } 
+/*     */       
+/* 127 */       println("<br /><b>" + 
+/*     */           
+/* 129 */           buildMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 132 */               getABRDescription(), 
+/* 133 */               (getReturnCode() == 0) ? "Passed" : "Failed"
+/*     */             }) + "</b>");
+/*     */       
+/* 136 */       log(
+/* 137 */           buildLogMessage("IAB2016I: %1# has %2#.", new String[] {
+/*     */ 
+/*     */               
+/* 140 */               getABRDescription(), 
+/* 141 */               (getReturnCode() == 0) ? "Passed" : "Failed" }));
+/* 142 */     } catch (LockPDHEntityException lockPDHEntityException) {
+/* 143 */       this.m_bPDGComplete = true;
+/* 144 */       setReturnCode(-2);
+/* 145 */       println("<h3><font color=red>IAB1007E: Could not get soft lock.  Rule execution is terminated.<br />" + lockPDHEntityException
+/*     */ 
+/*     */ 
+/*     */           
+/* 149 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 151 */       logError(lockPDHEntityException.getMessage());
+/* 152 */     } catch (UpdatePDHEntityException updatePDHEntityException) {
+/* 153 */       this.m_bPDGComplete = true;
+/* 154 */       setReturnCode(-2);
+/* 155 */       println("<h3><font color=red>UpdatePDH error: " + updatePDHEntityException
+/*     */           
+/* 157 */           .getMessage() + "</font></h3>");
+/*     */       
+/* 159 */       logError(updatePDHEntityException.getMessage());
+/* 160 */     } catch (SBRException sBRException) {
+/* 161 */       this.m_bPDGComplete = true;
+/* 162 */       str1 = sBRException.toString();
+/* 163 */       i = str1.indexOf("(ok)");
+/* 164 */       if (i < 0) {
+/* 165 */         setReturnCode(-2);
+/* 166 */         println("<h3><font color=red>Generate Data error: " + 
+/*     */             
+/* 168 */             replace(str1, str3, "<br>") + "</font></h3>");
+/*     */         
+/* 170 */         logError(sBRException.toString());
+/*     */       } else {
+/* 172 */         str1 = str1.substring(0, i);
+/* 173 */         println("<h3> " + replace(str1, str3, "<br>") + "</h3>");
+/*     */       } 
+/* 175 */     } catch (Exception exception) {
+/* 176 */       this.m_bPDGComplete = true;
+/*     */       
+/* 178 */       println("Error in " + this.m_abri.getABRCode() + ":" + exception.getMessage());
+/* 179 */       println("" + exception);
+/* 180 */       exception.printStackTrace();
+/*     */       
+/* 182 */       if (getABRReturnCode() != -2) {
+/* 183 */         setReturnCode(-3);
+/*     */       }
+/*     */     }
+/*     */     finally {
+/*     */       
+/* 188 */       if (!this.m_bPDGComplete) {
+/* 189 */         setReturnCode(-3);
+/* 190 */         println("<h3><font color=red>Generating Data is not complete. </font></h3>");
+/*     */       } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 197 */       str2 = this.m_ei.toString();
+/* 198 */       if (str2.length() > 64) {
+/* 199 */         str2 = str2.substring(0, 64);
+/*     */       }
+/* 201 */       setDGTitle(str2);
+/* 202 */       setDGRptName(ABR);
+/*     */ 
+/*     */       
+/* 205 */       setDGString(getABRReturnCode());
+/* 206 */       printDGSubmitString();
+/*     */ 
+/*     */ 
+/*     */       
+/* 210 */       buildReportFooter();
+/*     */       
+/* 212 */       if (!isReadOnly()) {
+/* 213 */         clearSoftLock();
+/*     */       }
+/*     */     } 
+/*     */   }
+/*     */   
+/*     */   private String replace(String paramString1, String paramString2, String paramString3) {
+/* 219 */     String str = "";
+/* 220 */     int i = paramString1.indexOf(paramString2);
+/*     */     
+/* 222 */     while (paramString1.length() > 0 && i >= 0) {
+/* 223 */       str = str + paramString1.substring(0, i) + paramString3;
+/* 224 */       paramString1 = paramString1.substring(i + paramString2.length());
+/* 225 */       i = paramString1.indexOf(paramString2);
+/*     */     } 
+/* 227 */     str = str + paramString1;
+/* 228 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getABREntityDesc(String paramString, int paramInt) {
+/* 239 */     return null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 248 */     return "Hardware Upgrade Proc|? to Proc|? ABR.";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected String getStyle() {
+/* 259 */     return "";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getRevision() {
+/* 269 */     return new String("1.12");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String getVersion() {
+/* 279 */     return "AFHWUPGRADEABR01.java,v 1.12 2006/03/03 19:23:24 bala Exp";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 287 */     return "AFHWUPGRADEABR01.java";
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.sg;
 
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.eannounce.abr.util.*;
-
-/**
- * AFHWUPGRADEABR01
- *
- *@author     Administrator
- *@created    August 30, 2002
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\AFHWUPGRADEABR01.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-public class AFHWUPGRADEABR01 extends PokBaseABR {
-  /**
-  *  Execute ABR.
-  *
-  */
-
-  // Class constants
-  public final static String DEF_NOT_POPULATED_HTML = new String("");
-  /**
-     * ABR
-     *
-     */
-  public final static String ABR = new String("AFHWUPGRADEABR01");
-
-  private EntityGroup m_egParent = null;
-  private EntityItem m_ei = null;
-  private boolean m_bPDGComplete = false;
-  private int m_iExeCount = 0;
-  private HWUpgradePIPDG m_pdg = null;
-
-  /**
-   * @see COM.ibm.opicmpdh.middleware.taskmaster.AbstractTask#execute_run()
-   * @author Administrator
-   */
-  public void execute_run() {
-    String strError = null;
-    int i = 0;
-    String strDgName = null;
-    String RETURN = System.getProperty("line.separator");
-    try {
-      m_iExeCount++;
-
-      // if it's the first time, build the report header
-      if (m_iExeCount == 1) {
-        start_ABRBuild();
-        // Build the report header
-        buildReportHeaderII();
-
-        m_egParent = m_elist.getParentEntityGroup();
-        m_ei = m_egParent.getEntityItem(0);
-        println(
-          "<br><b>Hardware Upgrade PDG Request: "
-            + m_ei.getKey()
-            + "</b>");
-
-        printNavigateAttributes(m_ei, m_egParent, true);
-
-        setReturnCode(PASS);
-      }
-
-      //============= run the PDG to generate data ==========================================
-      if (getReturnCode() == PASS) {
-        log("AFHWUPGRADEABR01 generating data");
-        if (m_iExeCount == 1) {
-          log("AFHWUPGRADEABR01 first time generating");
-          m_pdg = new HWUpgradePIPDG(null, m_db, m_prof, "HWUPPIPDG");
-          m_pdg.setEntityItem(m_ei);
-          m_pdg.executeAction(m_db, m_prof);
-        } else {
-          log("AFHWUPGRADEABR01 " + m_iExeCount + " time generating");
-          m_pdg.checkMissingDataAgain(m_db, m_prof, true);
-        }
-
-        //it gets to the end of generating data
-        if (m_iExeCount > 1) {
-          m_pdg.savePDGStatus(m_db, m_prof);
-        }
-        m_bPDGComplete = true;
-        log("AFHWUPGRADEABR01 finish generating data");
-      }
-
-      println(
-        "<br /><b>"
-          + buildMessage(
-            MSG_IAB2016I,
-            new String[] {
-              getABRDescription(),
-              (getReturnCode() == PASS ? "Passed" : "Failed")})
-          + "</b>");
-
-      log(
-        buildLogMessage(
-          MSG_IAB2016I,
-          new String[] {
-            getABRDescription(),
-            (getReturnCode() == PASS ? "Passed" : "Failed")}));
-    } catch (LockPDHEntityException le) {
-      m_bPDGComplete = true;
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>"
-          + ERR_IAB1007E
-          + "<br />"
-          + le.getMessage()
-          + "</font></h3>");
-      logError(le.getMessage());
-    } catch (UpdatePDHEntityException le) {
-      m_bPDGComplete = true;
-      setReturnCode(UPDATE_ERROR);
-      println(
-        "<h3><font color=red>UpdatePDH error: "
-          + le.getMessage()
-          + "</font></h3>");
-      logError(le.getMessage());
-    } catch (SBRException _sbrex) {
-      m_bPDGComplete = true;
-      strError = _sbrex.toString();
-      i = strError.indexOf("(ok)");
-      if (i < 0) {
-        setReturnCode(UPDATE_ERROR);
-        println(
-          "<h3><font color=red>Generate Data error: "
-            + replace(strError, RETURN, "<br>")
-            + "</font></h3>");
-        logError(_sbrex.toString());
-      } else {
-        strError = strError.substring(0, i);
-        println("<h3> " + replace(strError, RETURN, "<br>") + "</h3>");
-      }
-    } catch (Exception exc) {
-      m_bPDGComplete = true;
-      // Report this error to both the datbase log and the PrintWriter
-      println("Error in " + m_abri.getABRCode() + ":" + exc.getMessage());
-      println("" + exc);
-      exc.printStackTrace();
-      // don't overwrite an update exception
-      if (getABRReturnCode() != UPDATE_ERROR) {
-        setReturnCode(INTERNAL_ERROR);
-      }
-    } finally {
-      // this is to check if it's time out in the middle of generating data.
-      // if so, run again.
-      if (!m_bPDGComplete) {
-        setReturnCode(INTERNAL_ERROR);
-        println(
-          "<h3><font color=red>Generating Data is not complete. "
-            + "</font></h3>");
-        //        execute_run();
-      }
-
-      // set DG title
-      strDgName = m_ei.toString();
-      if (strDgName.length() > 64) {
-        strDgName = strDgName.substring(0, 64);
-      }
-      setDGTitle(strDgName);
-      setDGRptName(ABR);
-
-      // set DG submit string
-      setDGString(getABRReturnCode());
-      printDGSubmitString();
-      //Stuff into report for subscription and notification
-
-      // Tack on the DGString
-      buildReportFooter();
-      // make sure the lock is released
-      if (!isReadOnly()) {
-        clearSoftLock();
-      }
-    }
-  }
-
-  private String replace(String _s, String _s1, String _s2) {
-    String sResult = "";
-    int iTab = _s.indexOf(_s1);
-
-    while (_s.length() > 0 && iTab >= 0) {
-      sResult = sResult + _s.substring(0, iTab) + _s2;
-      _s = _s.substring(iTab + _s1.length());
-      iTab = _s.indexOf(_s1);
-    }
-    sResult = sResult + _s;
-    return sResult;
-  }
-
-  /**
-  *  Get the entity description to use in error messages
-  *
-  *@param  entityType  Description of the Parameter
-  *@param  entityId    Description of the Parameter
-  *@return             String
-  */
-  protected String getABREntityDesc(String entityType, int entityId) {
-    return null;
-  }
-
-  /**
-   *  Get ABR description
-   *
-   *@return    java.lang.String
-   */
-  public String getDescription() {
-    return "Hardware Upgrade Proc|? to Proc|? ABR.";
-  }
-
-  /**
-   *  Get any style that should be used for this page. Derived classes can
-   *  override this to set styles They must include the <style>...</style> tags
-   *
-   *@return    String
-   */
-  protected String getStyle() {
-    // Print out the PSG stylesheet
-    return "";
-  }
-
-  /**
-     * getRevision
-     *
-     * @return
-     * @author Administrator
-     */
-  public String getRevision() {
-    return new String("1.12");
-  }
-
-  /**
-     * getVersion
-     *
-     * @return
-     * @author Administrator
-     */
-  public static String getVersion() {
-    return ("AFHWUPGRADEABR01.java,v 1.12 2006/03/03 19:23:24 bala Exp");
-  }
-
-  /**
-   * @see COM.ibm.eannounce.abr.util.PokBaseABR#getABRVersion()
-   * @author Administrator
-   */
-  public String getABRVersion() {
-    return "AFHWUPGRADEABR01.java";
-  }
-}

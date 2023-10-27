@@ -1,43 +1,46 @@
-package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ package COM.ibm.eannounce.abr.sg.rfc.entity;
+/*    */ 
+/*    */ public class Chv_descrTable {
+/*    */   private String CHARACT;
+/*    */   private String LANGUAGE;
+/*    */   private String VALUE;
+/*    */   private String VALDESCR;
+/*    */   private String FLDELETE;
+/*    */   
+/*    */   public String getCHARACT() {
+/* 11 */     return this.CHARACT;
+/*    */   }
+/*    */   public void setCHARACT(String paramString) {
+/* 14 */     this.CHARACT = paramString;
+/*    */   }
+/*    */   public String getLANGUAGE() {
+/* 17 */     return this.LANGUAGE;
+/*    */   }
+/*    */   public void setLANGUAGE(String paramString) {
+/* 20 */     this.LANGUAGE = paramString;
+/*    */   }
+/*    */   public String getVALUE() {
+/* 23 */     return this.VALUE;
+/*    */   }
+/*    */   public void setVALUE(String paramString) {
+/* 26 */     this.VALUE = paramString;
+/*    */   }
+/*    */   public String getVALDESCR() {
+/* 29 */     return this.VALDESCR;
+/*    */   }
+/*    */   public void setVALDESCR(String paramString) {
+/* 32 */     this.VALDESCR = paramString;
+/*    */   }
+/*    */   public String getFLDELETE() {
+/* 35 */     return this.FLDELETE;
+/*    */   }
+/*    */   public void setFLDELETE(String paramString) {
+/* 38 */     this.FLDELETE = paramString;
+/*    */   }
+/*    */ }
 
-public class Chv_descrTable {
-	private String CHARACT;  	//30	Required=Yes
-	private String LANGUAGE;	//1  	Required=Yes
-	private String VALUE; 		//30 	Required=No
-	private String VALDESCR;    //30 	Required=No
-	private String FLDELETE;    //1 	Required=No
-	
-	public String getCHARACT() {
-		return CHARACT;
-	}
-	public void setCHARACT(String cHARACT) {
-		CHARACT = cHARACT;
-	}
-	public String getLANGUAGE() {
-		return LANGUAGE;
-	}
-	public void setLANGUAGE(String lANGUAGE) {
-		LANGUAGE = lANGUAGE;
-	}
-	public String getVALUE() {
-		return VALUE;
-	}
-	public void setVALUE(String vALUE) {
-		VALUE = vALUE;
-	}
-	public String getVALDESCR() {
-		return VALDESCR;
-	}
-	public void setVALDESCR(String vALDESCR) {
-		VALDESCR = vALDESCR;
-	}
-	public String getFLDELETE() {
-		return FLDELETE;
-	}
-	public void setFLDELETE(String fLDELETE) {
-		FLDELETE = fLDELETE;
-	}
-	
-	
 
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\rfc\entity\Chv_descrTable.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

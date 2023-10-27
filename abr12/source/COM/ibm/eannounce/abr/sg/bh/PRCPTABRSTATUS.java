@@ -1,559 +1,565 @@
-//Licensed Materials -- Property of IBM
-//
-// (C) Copyright IBM Corp. 2010  All Rights Reserved.
-// The source code for this program is not published or otherwise divested of
-// its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
+/*     */ package COM.ibm.eannounce.abr.sg.bh;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.AttrComparator;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.ArrayList;
+/*     */ import java.util.Collections;
+/*     */ import java.util.Comparator;
+/*     */ import java.util.Vector;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class PRCPTABRSTATUS
+/*     */   extends DQABRSTATUS
+/*     */ {
+/*     */   protected void doDQChecking(EntityItem paramEntityItem, String paramString) throws Exception {
+/*  96 */     Vector vector1 = PokUtils.getAllLinkedEntities(paramEntityItem, "CHRGCOMPPRCPT", "CHRGCOMP");
+/*  97 */     Vector vector2 = PokUtils.getAllLinkedEntities(vector1, "SVCMODCHRGCOMP", "SVCMOD");
+/*  98 */     Vector vector3 = PokUtils.getAllLinkedEntities(vector2, "SVCMODAVAIL", "AVAIL");
+/*  99 */     Vector vector4 = PokUtils.getEntitiesWithMatchedAttr(vector3, "AVAILTYPE", "146");
+/*     */ 
+/*     */     
+/* 102 */     ArrayList arrayList1 = getCountriesAsList(vector4, 4);
+/*     */     
+/* 104 */     addDebug(paramEntityItem.getKey() + " chrgcompVct " + vector1.size() + " svcmodVct " + vector2
+/* 105 */         .size() + " svcmodAvailVct " + vector3.size() + " svcmodPlaAvailVctA " + vector4
+/* 106 */         .size() + " all svcmod plaAvailCtry " + arrayList1);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 111 */     Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(paramEntityItem, "SVCSEOPRCPT", "SVCSEO");
+/* 112 */     Vector vector5 = PokUtils.getAllLinkedEntities(vector, "SVCSEOAVAIL", "AVAIL");
+/* 113 */     Vector vector6 = PokUtils.getEntitiesWithMatchedAttr(vector5, "AVAILTYPE", "146");
+/* 114 */     ArrayList arrayList2 = getCountriesAsList(vector6, 4);
+/* 115 */     addDebug(" svcseoVct " + vector.size() + " svcseoAvailVct " + vector5
+/* 116 */         .size() + " svcseoPlaAvailVctB " + vector6
+/* 117 */         .size());
+/* 118 */     addDebug("all svcseoPlaAvailVctB countrys " + arrayList2);
+/*     */     
+/* 120 */     EntityGroup entityGroup1 = this.m_elist.getEntityGroup("CNTRYEFF");
+/* 121 */     addHeading(3, entityGroup1.getLongDescription() + " and Planned Availability checks:");
+/*     */     
+/* 123 */     ArrayList arrayList3 = new ArrayList();
+/*     */     
+/*     */     int i;
+/* 126 */     for (i = 0; i < entityGroup1.getEntityItemCount(); i++) {
+/* 127 */       ArrayList arrayList = new ArrayList();
+/* 128 */       EntityItem entityItem = entityGroup1.getEntityItem(i);
+/* 129 */       getCountriesAsList(entityItem, arrayList, 4);
+/* 130 */       addDebug(entityItem.getKey() + " cntryeffCtry " + arrayList);
+/* 131 */       arrayList3.addAll(arrayList);
+/*     */       
+/* 133 */       String str = null;
+/*     */       
+/* 135 */       if (vector4.size() > 0) {
+/* 136 */         str = checkCtryMismatch(entityItem, arrayList1, 4);
+/* 137 */         if (str.length() > 0) {
+/* 138 */           addDebug(entityItem.getKey() + " COUNTRYLIST had extra [" + str + "] from svcmod A:AVAIL");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */           
+/* 143 */           this.args[0] = "";
+/* 144 */           this.args[1] = getLD_NDN(entityItem);
+/* 145 */           this.args[2] = this.m_elist.getEntityGroup("SVCMOD").getLongDescription() + " " + this.m_elist
+/* 146 */             .getEntityGroup("AVAIL").getLongDescription();
+/* 147 */           this.args[3] = PokUtils.getAttributeDescription(entityGroup1, "COUNTRYLIST", "COUNTRYLIST");
+/* 148 */           this.args[4] = str;
+/* 149 */           createMessage(4, "INCLUDE_ERR2", this.args);
+/*     */         } 
+/*     */       } 
+/*     */ 
+/*     */       
+/* 154 */       if (vector6.size() > 0) {
+/* 155 */         str = checkCtryMismatch(entityItem, arrayList2, 4);
+/* 156 */         if (str.length() > 0) {
+/* 157 */           addDebug(entityItem.getKey() + " COUNTRYLIST had extra [" + str + "] from svcseo B:AVAIL");
+/*     */ 
+/*     */           
+/* 160 */           this.args[0] = "";
+/* 161 */           this.args[1] = getLD_NDN(entityItem);
+/* 162 */           this.args[2] = this.m_elist.getEntityGroup("SVCSEO").getLongDescription() + " " + this.m_elist
+/* 163 */             .getEntityGroup("AVAIL").getLongDescription();
+/* 164 */           this.args[3] = PokUtils.getAttributeDescription(entityGroup1, "COUNTRYLIST", "COUNTRYLIST");
+/* 165 */           this.args[4] = str;
+/* 166 */           createMessage(4, "INCLUDE_ERR2", this.args);
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/*     */     
+/* 171 */     addDebug(paramEntityItem.getKey() + " allCntryeffCtry " + arrayList3);
+/*     */     
+/* 173 */     addHeading(3, this.m_elist.getEntityGroup("CVMSPEC").getLongDescription() + " checks:");
+/*     */ 
+/*     */     
+/* 176 */     i = getCount("PRCPTCVMSPEC");
+/* 177 */     EntityGroup entityGroup2 = this.m_elist.getEntityGroup("CVMSPEC");
+/*     */     
+/* 179 */     if (i == 0) {
+/*     */       
+/* 181 */       this.args[0] = entityGroup2.getLongDescription();
+/* 182 */       createMessage(4, "MINIMUM_ERR", this.args);
+/*     */     } 
+/*     */     int j;
+/* 185 */     for (j = 0; j < entityGroup2.getEntityItemCount(); j++) {
+/* 186 */       EntityItem entityItem = entityGroup2.getEntityItem(j);
+/* 187 */       addDebug("doDQChecking: " + entityItem.getKey());
+/*     */       
+/* 189 */       checkStatusVsDQ(entityItem, "STATUS", paramEntityItem, 4);
+/*     */     } 
+/*     */     
+/* 192 */     addHeading(3, this.m_elist.getEntityGroup("SVCSEO").getLongDescription() + " Planned Availability checks:");
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 197 */     for (j = 0; j < vector.size(); j++) {
+/* 198 */       EntityItem entityItem = vector.elementAt(j);
+/* 199 */       Vector vector7 = PokUtils.getAllLinkedEntities(entityItem, "SVCSEOAVAIL", "AVAIL");
+/* 200 */       Vector<EntityItem> vector8 = PokUtils.getEntitiesWithMatchedAttr(vector7, "AVAILTYPE", "146");
+/* 201 */       addDebug(" svcseoitem " + entityItem.getKey() + " availVct " + vector7.size() + " plaAvailVctB " + vector8.size());
+/* 202 */       for (byte b1 = 0; b1 < vector8.size(); b1++) {
+/* 203 */         EntityItem entityItem1 = vector8.elementAt(b1);
+/* 204 */         String str = checkCtryMismatch(entityItem1, arrayList3, 4);
+/* 205 */         if (str.length() > 0) {
+/* 206 */           addDebug(" " + entityItem1.getKey() + " COUNTRYLIST had extra [" + str + "] not in PRCPT CNTRYEFF COUNTRYLIST");
+/*     */ 
+/*     */ 
+/*     */           
+/* 210 */           this.args[0] = getLD_NDN(entityItem) + " " + getLD_NDN(entityItem1);
+/* 211 */           this.args[1] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "COUNTRYLIST", "COUNTRYLIST");
+/* 212 */           this.args[2] = paramEntityItem.getEntityGroup().getLongDescription() + " " + entityGroup1.getLongDescription();
+/* 213 */           this.args[3] = this.args[1];
+/* 214 */           this.args[4] = str;
+/* 215 */           createMessage(4, "INCLUDE_ERR2", this.args);
+/*     */         } 
+/*     */       } 
+/* 218 */       vector7.clear();
+/* 219 */       vector8.clear();
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */     
+/* 225 */     oneValidOverTime(paramEntityItem);
+/*     */     
+/* 227 */     j = getCheck_W_E_E(paramString);
+/*     */ 
+/*     */     
+/* 230 */     EntityGroup entityGroup3 = this.m_elist.getEntityGroup("PRCPTCVMSPEC");
+/*     */     
+/* 232 */     addHeading(3, entityGroup3.getLongDescription() + " and " + this.m_elist
+/* 233 */         .getEntityGroup("CVMSPEC").getLongDescription() + " checks:");
+/*     */     
+/* 235 */     for (byte b = 0; b < entityGroup3.getEntityItemCount(); b++) {
+/* 236 */       EntityItem entityItem1 = entityGroup3.getEntityItem(b);
+/* 237 */       EntityItem entityItem2 = getDownLinkEntityItem(entityItem1, "CVMSPEC");
+/* 238 */       String str1 = PokUtils.getAttributeValue(entityItem1, "EFFECTIVEDATE", ", ", null, false);
+/* 239 */       String str2 = PokUtils.getAttributeValue(entityItem2, "EFFECTIVEDATE", ", ", null, false);
+/* 240 */       String str3 = PokUtils.getAttributeValue(entityItem1, "ENDDATE", ", ", "9999-12-31", false);
+/* 241 */       String str4 = PokUtils.getAttributeValue(entityItem2, "ENDDATE", ", ", "9999-12-31", false);
+/* 242 */       addDebug("doDQChecking: " + entityItem1.getKey() + " prcptcvmspecEffdate " + str1 + " prcptcvmspecEnddate " + str3 + " " + entityItem2
+/* 243 */           .getKey() + " cvmspecEffdate " + str2 + " cvmspecEnddate " + str4);
+/*     */       
+/* 245 */       if (str1 != null && str2 != null) {
+/*     */         
+/* 247 */         boolean bool1 = checkDates(str1, str2, 1);
+/* 248 */         if (!bool1) {
+/*     */ 
+/*     */           
+/* 251 */           this.args[0] = getLD_NDN(entityItem1);
+/* 252 */           this.args[1] = getLD_Value(entityItem1, "EFFECTIVEDATE");
+/* 253 */           this.args[2] = getLD_NDN(entityItem2);
+/* 254 */           this.args[3] = getLD_Value(entityItem2, "EFFECTIVEDATE");
+/* 255 */           createMessage(j, "CANNOT_BE_EARLIER_ERR2", this.args);
+/*     */         } 
+/*     */       } 
+/*     */ 
+/*     */       
+/* 260 */       boolean bool = checkDates(str3, str4, 2);
+/* 261 */       if (!bool) {
+/*     */ 
+/*     */         
+/* 264 */         this.args[0] = getLD_NDN(entityItem1);
+/* 265 */         this.args[1] = getLD_Value(entityItem1, "ENDDATE");
+/* 266 */         this.args[2] = getLD_NDN(entityItem2);
+/* 267 */         this.args[3] = getLD_Value(entityItem2, "ENDDATE");
+/* 268 */         createMessage(j, "CANNOT_BE_LATER_ERR", this.args);
+/*     */       } 
+/*     */     } 
+/*     */ 
+/*     */     
+/* 273 */     arrayList3.clear();
+/* 274 */     vector1.clear();
+/* 275 */     vector2.clear();
+/* 276 */     vector3.clear();
+/* 277 */     vector4.clear();
+/* 278 */     vector.clear();
+/* 279 */     vector5.clear();
+/* 280 */     vector6.clear();
+/* 281 */     arrayList1.clear();
+/* 282 */     arrayList2.clear();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void oneValidOverTime(EntityItem paramEntityItem) {
+/* 300 */     StringBuffer stringBuffer = new StringBuffer(paramEntityItem.getEntityGroup().getLongDescription());
+/* 301 */     stringBuffer.append(" " + this.m_elist.getEntityGroup("CNTRYEFF").getLongDescription());
+/* 302 */     stringBuffer.append(" and " + this.m_elist.getEntityGroup("PRCPTCVMSPEC").getLongDescription());
+/*     */     
+/* 304 */     Vector<?> vector1 = getDownLinkEntityItems(paramEntityItem, "PRCPTCVMSPEC");
+/* 305 */     Vector<?> vector2 = PokUtils.getAllLinkedEntities(paramEntityItem, "PRCPTCNTRYEFF", "CNTRYEFF");
+/*     */     
+/* 307 */     addHeading(3, stringBuffer.toString() + " validity checks:");
+/*     */     
+/* 309 */     addDebug("oneValidOverTime entered for " + paramEntityItem.getKey() + " PRCPTCVMSPEC-childVct.cnt " + vector1.size() + " CNTRYEFF-parentVct.cnt " + vector2
+/* 310 */         .size());
+/*     */     
+/* 312 */     if (vector2.size() == 0) {
+/* 313 */       vector1.clear();
+/*     */       
+/*     */       return;
+/*     */     } 
+/* 317 */     AttrComparator attrComparator1 = new AttrComparator("EFFECTIVEDATE");
+/*     */     
+/* 319 */     Collections.sort(vector1, (Comparator<?>)attrComparator1);
+/*     */     
+/* 321 */     Collections.sort(vector2, (Comparator<?>)attrComparator1);
+/*     */     
+/* 323 */     EntityItem entityItem1 = (EntityItem)vector2.firstElement();
+/* 324 */     String str1 = PokUtils.getAttributeValue(entityItem1, "EFFECTIVEDATE", "", "1980-01-01", false);
+/* 325 */     addDebug("oneValidOverTime first parent " + entityItem1.getKey() + " parentEffFrom " + str1);
+/* 326 */     if (vector1.size() == 0) {
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 332 */       vector2.clear();
+/*     */       
+/*     */       return;
+/*     */     } 
+/*     */     
+/* 337 */     EntityItem entityItem2 = (EntityItem)vector1.firstElement();
+/* 338 */     String str2 = PokUtils.getAttributeValue(entityItem2, "EFFECTIVEDATE", "", "1980-01-01", false);
+/* 339 */     String str3 = PokUtils.getAttributeValue(entityItem2, "ENDDATE", "", "9999-12-31", false);
+/* 340 */     addDebug("oneValidOverTime first child " + entityItem2.getKey() + " childEffFrom " + str2 + " prevEffTo " + str3);
+/* 341 */     if (str2.compareTo(str1) > 0) {
+/*     */ 
+/*     */       
+/* 344 */       this.args[0] = entityItem2.getEntityGroup().getLongDescription();
+/* 345 */       this.args[1] = paramEntityItem.getEntityGroup().getLongDescription();
+/* 346 */       this.args[2] = entityItem1.getEntityGroup().getLongDescription();
+/* 347 */       this.args[3] = str1;
+/* 348 */       this.args[4] = PokUtils.getAttributeValue((EntityItem)vector2.lastElement(), "ENDDATE", "", "9999-12-31", false);
+/* 349 */       createMessage(4, "INVALID_CHILD_ERR2", this.args);
+/*     */ 
+/*     */       
+/* 352 */       this.args[0] = entityItem2.getEntityGroup().getLongDescription();
+/* 353 */       this.args[1] = PokUtils.getAttributeDescription(entityItem2.getEntityGroup(), "EFFECTIVEDATE", "EFFECTIVEDATE") + " (" + str2 + ")";
+/*     */       
+/* 355 */       this.args[2] = paramEntityItem.getEntityGroup().getLongDescription() + " " + entityItem1.getEntityGroup().getLongDescription();
+/* 356 */       this.args[3] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "EFFECTIVEDATE", "EFFECTIVEDATE") + " (" + str1 + ")";
+/*     */       
+/* 358 */       addResourceMsg("CANNOT_BE_LATER_ERR", this.args);
+/* 359 */       vector1.clear();
+/* 360 */       vector2.clear();
+/*     */       
+/*     */       return;
+/*     */     } 
+/* 364 */     AttrComparator attrComparator2 = new AttrComparator("ENDDATE");
+/*     */     
+/* 366 */     Collections.sort(vector1, (Comparator<?>)attrComparator2);
+/*     */     
+/* 368 */     Collections.sort(vector2, (Comparator<?>)attrComparator2);
+/*     */     
+/* 370 */     entityItem2 = (EntityItem)vector1.lastElement();
+/* 371 */     entityItem1 = (EntityItem)vector2.lastElement();
+/* 372 */     String str4 = PokUtils.getAttributeValue(entityItem2, "ENDDATE", "", "9999-12-31", false);
+/* 373 */     String str5 = PokUtils.getAttributeValue(entityItem1, "ENDDATE", "", "9999-12-31", false);
+/* 374 */     addDebug("oneValidOverTime last child " + entityItem2.getKey() + " childEffTo " + str4);
+/* 375 */     addDebug("oneValidOverTime last parent " + entityItem1.getKey() + " parentEffTo " + str5);
+/* 376 */     if (str4.compareTo(str5) < 0) {
+/*     */       
+/* 378 */       this.args[0] = entityItem2.getEntityGroup().getLongDescription();
+/* 379 */       this.args[1] = paramEntityItem.getEntityGroup().getLongDescription();
+/* 380 */       this.args[2] = entityItem1.getEntityGroup().getLongDescription();
+/* 381 */       this.args[3] = PokUtils.getAttributeValue((EntityItem)vector2.firstElement(), "EFFECTIVEDATE", "", "1980-01-01", false);
+/* 382 */       this.args[4] = str5;
+/* 383 */       createMessage(4, "INVALID_CHILD_ERR2", this.args);
+/*     */ 
+/*     */       
+/* 386 */       this.args[0] = entityItem2.getEntityGroup().getLongDescription();
+/* 387 */       this.args[1] = PokUtils.getAttributeDescription(entityItem2.getEntityGroup(), "ENDDATE", "ENDDATE") + " (" + str4 + ")";
+/*     */       
+/* 389 */       this.args[2] = paramEntityItem.getEntityGroup().getLongDescription() + " " + entityItem1.getEntityGroup().getLongDescription();
+/* 390 */       this.args[3] = PokUtils.getAttributeDescription(entityItem1.getEntityGroup(), "EFFECTIVEDATE", "EFFECTIVEDATE") + " (" + str5 + ")";
+/*     */       
+/* 392 */       addResourceMsg("CANNOT_BE_EARLIER_ERR2", this.args);
+/* 393 */       vector1.clear();
+/* 394 */       vector2.clear();
+/*     */       
+/*     */       return;
+/*     */     } 
+/*     */     
+/* 399 */     Collections.sort(vector1, (Comparator<?>)attrComparator1);
+/*     */     
+/* 401 */     Collections.sort(vector2, (Comparator<?>)attrComparator1);
+/*     */ 
+/*     */     
+/* 404 */     for (byte b = 1; b < vector1.size(); b++) {
+/* 405 */       entityItem2 = (EntityItem)vector1.elementAt(b);
+/* 406 */       String str6 = PokUtils.getAttributeValue(entityItem2, "EFFECTIVEDATE", "", "1980-01-01", false);
+/* 407 */       String str7 = PokUtils.getAttributeValue(entityItem2, "ENDDATE", "", "9999-12-31", false);
+/* 408 */       addDebug("oneValidOverTime gaps " + entityItem2.getKey() + " prevEffTo " + str3 + " nextEffFrom " + str6 + " nextEffTo " + str7);
+/*     */       
+/* 410 */       if (str6.compareTo(str3) > 0) {
+/*     */         
+/* 412 */         this.args[0] = entityItem2.getEntityGroup().getLongDescription();
+/* 413 */         this.args[1] = paramEntityItem.getEntityGroup().getLongDescription() + " " + entityItem1.getEntityGroup().getLongDescription();
+/* 414 */         createMessage(4, "INVALID_CHILD_ERR", this.args);
+/*     */         
+/* 416 */         this.args[0] = entityItem2.getEntityGroup().getLongDescription();
+/* 417 */         this.args[1] = str3;
+/* 418 */         this.args[2] = str6;
+/*     */         
+/* 420 */         addResourceMsg("GAPS_ERR", this.args);
+/*     */         break;
+/*     */       } 
+/* 423 */       str3 = str7;
+/*     */     } 
+/*     */     
+/* 426 */     vector1.clear();
+/* 427 */     vector2.clear();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void completeNowFinalProcessing() throws SQLException, MiddlewareException, MiddlewareRequestException {
+/* 451 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("CHRGCOMP");
+/* 452 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/* 453 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/* 454 */       addDebug("completeNowFinalProcessing: " + entityItem.getKey());
+/*     */       
+/* 456 */       if (statusIsRFRorFinal(entityItem)) {
+/* 457 */         Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(entityItem, "SVCMODCHRGCOMP", "SVCMOD");
+/* 458 */         for (byte b1 = 0; b1 < vector.size(); b1++) {
+/* 459 */           EntityItem entityItem1 = vector.elementAt(b1);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */           
+/* 466 */           if (statusIsFinal(entityItem1)) {
+/*     */             
+/* 468 */             if (statusIsFinal(entityItem))
+/*     */             {
+/*     */               
+/* 471 */               setFlagValue(this.m_elist.getProfile(), "ADSABRSTATUS", getQueuedValueForItem(entityItem1, "ADSABRSTATUS"), entityItem1);
+/*     */             
+/*     */             }
+/*     */           }
+/*     */           else {
+/*     */             
+/* 477 */             doRFR_ADSXML(entityItem1);
+/*     */           } 
+/*     */         } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */         
+/* 485 */         vector.clear();
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void completeNowR4RProcessing() throws SQLException, MiddlewareException, MiddlewareRequestException {
+/* 510 */     EntityGroup entityGroup = this.m_elist.getEntityGroup("CHRGCOMP");
+/* 511 */     for (byte b = 0; b < entityGroup.getEntityItemCount(); b++) {
+/* 512 */       EntityItem entityItem = entityGroup.getEntityItem(b);
+/* 513 */       addDebug("completeNowR4RProcessing: " + entityGroup.getKey());
+/*     */       
+/* 515 */       if (statusIsRFRorFinal(entityItem)) {
+/* 516 */         Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(entityItem, "SVCMODCHRGCOMP", "SVCMOD");
+/* 517 */         for (byte b1 = 0; b1 < vector.size(); b1++) {
+/* 518 */           EntityItem entityItem1 = vector.elementAt(b1);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */           
+/* 526 */           if (statusIsRFR(entityItem1))
+/*     */           {
+/*     */ 
+/*     */             
+/* 530 */             setFlagValue(this.m_elist.getProfile(), "ADSABRSTATUS", getRFRQueuedValueForItem(entityItem1, "ADSABRSTATUS"), entityItem1);
+/*     */           }
+/*     */         } 
+/* 533 */         vector.clear();
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getDescription() {
+/* 545 */     return "PRCPT ABR.";
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String getABRVersion() {
+/* 557 */     return "$Revision: 1.5 $";
+/*     */   }
+/*     */ }
 
-package COM.ibm.eannounce.abr.sg.bh;
 
-import java.util.*;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
-import COM.ibm.eannounce.objects.*;
-import COM.ibm.eannounce.abr.util.AttrComparator;
-
-/**********************************************************************************
-* PRCPTABRSTATUS class
-*
-* From "BH FS ABR Data Quality 20101220.doc"
-* need CNTRYEFF and PRCPTCNTRYEFF and actions to create them
-*
-*need updated ve - DQVEPRCPT
-*
-PRCPTABRSTATUS_class=COM.ibm.eannounce.abr.sg.bh.PRCPTABRSTATUS
-PRCPTABRSTATUS_enabled=true
-PRCPTABRSTATUS_idler_class=A
-PRCPTABRSTATUS_keepfile=true
-PRCPTABRSTATUS_report_type=DGTYPE01
-PRCPTABRSTATUS_vename=DQVEPRCPT
-PRCPTABRSTATUS_CAT1=RPTCLASS.PRCPTABRSTATUS
-PRCPTABRSTATUS_CAT2=
-PRCPTABRSTATUS_CAT3=RPTSTATUS
-*/
-//$Log: PRCPTABRSTATUS.java,v $
-//Revision 1.5  2013/11/04 14:27:55  liuweimi
-//Change based on document: BH FS ABR Data Quality 20130904b.doc to fix Defect:  BH 185136
-//
-//Revision 1.4  2011/01/05 21:53:03  wendy
-//Add more info to output for onevalidovertime
-//
-//Revision 1.3  2011/01/05 17:10:01  wendy
-//pick up countrylist description from cntryeff grp
-//
-//Revision 1.2  2011/01/05 13:57:06  wendy
-//Added CNTRYEFF and onevalidovertime
-//
-//Revision 1.1  2010/10/20 16:01:43  wendy
-//Init for spec chg BH FS ABR Data Quality 20101012.doc
-//
-public class PRCPTABRSTATUS extends DQABRSTATUS
-{
-
-    /**********************************
-	* Note the ABR is only called when
-	* DATAQUALITY transitions from 'Draft to Ready for Review',
-	*	'Change Request to Ready for Review' and from 'Ready for Review to Final'
-	*
-	1.00	PRCPT		Root									
-Add			C	PRCPTCNTRYEFF-d		CNTRYEFF							
-	2.00			CHRGCOMPPRCPT-u		CHRGCOMP							
-	3.00			SVCMODCHRGCOMP-u		SVCMOD							
-	4.00		A	SVCMODAVAIL-d		AVAIL							
-	5.00	WHEN		"Planned Availability" (146)	=	A: AVAIL	AVAILTYPE						
-Change	6.00			C: COUNTRYLIST	"IN aggregate G"	A: AVAIL	COUNTRYLIST		E	E	E	PRCPT CNTRYEFF COUNTRYLIST must be a subset of SVCMOD AVAIL COUNTRYLIST	{LD: PRCPT} {NDN: PRCPT} {LD: CNTRYEFF} {NDN: CNTRYEFF} must not include a country that is not in the {LD: SVCMOD} {LD: AVAIL} {LD: COUNTRYLIST}
-	7.00	END	5.00										
-	8.00	PRCPT		Root									
-	9.00			PRCPTCVMSPEC-d		CVMSPEC							
-	10.00			STATUS	<=	CVMSPEC	DATAQUALITY		E	E	E		{LD: STATUS} can not be higher than the {LD: CVMSPEC} {NDN: CVMSPEC} {LD: STATUS} {STATUS}
-	11.00			CountOf	=>	1			E	E	E	PRCPT must have at least one CVMSPEC	{LD: PRCPT} {NDN: PRCPT} must reference at least one {LD: CVMSPEC}
-	12.00	PRCPT		Root									
-	13.00			SVCSEOPRCPT-u		SVCSEO							
-	14.00		B	SVCSEOAVAIL-d		AVAIL							
-15.00	WHEN		"Planned Availability" (146)	=	B: AVAIL	AVAILTYPE						
-16.00			C: COUNTRYLIST	"IN aggregate G"	B: AVAIL	COUNTRYLIST		E	E	E	PRCPT CNTRYEFF COUNTRYLIST must be a subset of SVCSEO AVAIL COUNTRYLIST	{LD: PRCPT} {NDN: PRCPT}  {LD: CNTRYEFF} {NDN: CNTRYEFF} must not include a country that is not in the {LD: SVCSEO} {LD: AVAIL} {LD: COUNTRYLIST}
-17.00			B: COUNTRYLIST	"IN aggregate G"	C: CNTRYEFF	COUNTRYLIST		E	E	E	SVCSEO AVAIL COUNTRYLIST must exist in PRCPT CNTRYEFF COUNTRYLIST	{LD: AVAIL} {NDN: B: AVAIL} must not include a country that is not in the {LD: PRCPT}  {LD: CNTRYEFF} {NDN: CNTRYEFF}  {LD: COUNTRYLIST}
-18.00	END	15.00										
-								
-19.00	PRCPT		Root									
-20.00				OneValidOverTime				E	E	E	From PRCPT, find the children CTRYEFF and get min{EFFECTIVEDATE) and max(ENDDATE). Then look at all children of PRCPT of type CVMSPEC. The relator PRCPTCVMSPEC has EFFECTIVEDATE and ENDATE. This date range must cover the CTRYEFF min/max dates	must have at least one valid {LD: PRCPTCVMSPEC) during the time that the {LD: PRCPT} {LD: CNTRYEFF) is valid.
-21.00				ParentFrom	"PRCPTCNTRYEFF-d: CTRYEFF"	EFFECTIVEDATE						
-22.00				ParentTo	"PRCPTCNTRYEFF-d: CTRYEFF"	ENDDATE						
-23.00				ChildFrom	PRCPTCVMSPEC	EFFECTIVEDATE						
-24.00				ChildTo	PRCPTCVMSPEC	ENDDATE						
-30.00	PRCPT		Root									
-31.00			PRCPTCVMSPEC								This relator has the date attributes that follow in column E and gets you to the enitytype in column G	
-32.00			EFFECTIVEDATE	=>	CVMSPEC	EFFECTIVEDATE		W	E	E		the {LD: PRCPTCVMSPEC} {NDN: PRCPTCVMSPEC} {LD: EFFECTIVEDATE} {PRCPTCVMSPEC.EFFECTIVEDATE} must not be earlier than the {LD: CVMSPEC} {NDN: CVMSPEC} {LD: EFFECTIVEDATE} {CVMSPEC.EFFECTiVEDATE}
-33.00			ENDDATE	<=	CVMSPEC	ENDDATE		W	E	E		the {LD: PRCPTCVMSPEC} {NDN: PRCPTCVMSPEC} {LD: ENDDATE} {PRCPTCVMSPEC.ENDDATE} must not be later than the {LD: CVMSPEC} {NDN: CVMSPEC} {LD: ENDDATE} {CVMSPEC.ENDDATE}
-	*/
-    protected void doDQChecking(EntityItem rootEntity, String statusFlag) throws Exception
-    {
-    	//1.00	PRCPT		Root									
-    	//Add			C	PRCPTCNTRYEFF-d		CNTRYEFF							
-
-      	//2.00			CHRGCOMPPRCPT-u		CHRGCOMP							
-    	//3.00			SVCMODCHRGCOMP-u		SVCMOD							
-    	Vector chrgcompVct = PokUtils.getAllLinkedEntities(rootEntity, "CHRGCOMPPRCPT", "CHRGCOMP");
-    	Vector svcmodVct = PokUtils.getAllLinkedEntities(chrgcompVct, "SVCMODCHRGCOMP", "SVCMOD");
-    	Vector svcmodAvailVct = PokUtils.getAllLinkedEntities(svcmodVct, "SVCMODAVAIL", "AVAIL");
-    	Vector svcmodPlaAvailVctA = PokUtils.getEntitiesWithMatchedAttr(svcmodAvailVct, "AVAILTYPE", PLANNEDAVAIL);
-       	//4.00		A	SVCMODAVAIL-d		AVAIL							
-    	//5.00	WHEN		"Planned Availability" (146)	=	A: AVAIL	AVAILTYPE						
-    	ArrayList plaAvailCtry = getCountriesAsList(svcmodPlaAvailVctA, CHECKLEVEL_E);
-  	
-    	addDebug(rootEntity.getKey()+" chrgcompVct "+chrgcompVct.size()+
-    			" svcmodVct "+svcmodVct.size()+" svcmodAvailVct "+svcmodAvailVct.size()+
-    			" svcmodPlaAvailVctA "+svcmodPlaAvailVctA.size()+" all svcmod plaAvailCtry "+plaAvailCtry);
-    	
-		//12.00	PRCPT		Root									
-		//13.00			SVCSEOPRCPT-u		SVCSEO							
-		//14.00		B	SVCSEOAVAIL-d		AVAIL		
-		Vector svcseoVct = PokUtils.getAllLinkedEntities(rootEntity, "SVCSEOPRCPT", "SVCSEO");
-    	Vector svcseoAvailVct = PokUtils.getAllLinkedEntities(svcseoVct, "SVCSEOAVAIL", "AVAIL");
-    	Vector svcseoPlaAvailVctB = PokUtils.getEntitiesWithMatchedAttr(svcseoAvailVct, "AVAILTYPE", PLANNEDAVAIL);
-    	ArrayList svcseoplaAvailCtry = getCountriesAsList(svcseoPlaAvailVctB, CHECKLEVEL_E);
-    	addDebug(" svcseoVct "+svcseoVct.size()+
-    			" svcseoAvailVct "+svcseoAvailVct.size()+
-    			" svcseoPlaAvailVctB "+svcseoPlaAvailVctB.size());
-    	addDebug("all svcseoPlaAvailVctB countrys "+svcseoplaAvailCtry); 
-    	
-		EntityGroup egCNTRYEFF = m_elist.getEntityGroup("CNTRYEFF");
-     	addHeading(3,egCNTRYEFF.getLongDescription()+" and Planned Availability checks:");
-     	
-		ArrayList allCntryeffCtry = new ArrayList();
-		
-    	// check each CNTRYEFF countries
-		for(int i=0; i<egCNTRYEFF.getEntityItemCount(); i++){
-			ArrayList cntryeffCtry = new ArrayList();
-			EntityItem cntryeffItem = egCNTRYEFF.getEntityItem(i);
-			getCountriesAsList(cntryeffItem, cntryeffCtry,CHECKLEVEL_E);
-			addDebug(cntryeffItem.getKey()+" cntryeffCtry "+cntryeffCtry);
-			allCntryeffCtry.addAll(cntryeffCtry); // accumulate all cntryeff countrys
-			
-	    	String missingCtry = null;
-			//5.00	WHEN		"Planned Availability" (146)	=	A: AVAIL	AVAILTYPE						
-	    	if(svcmodPlaAvailVctA.size()>0){
-	    		missingCtry = checkCtryMismatch(cntryeffItem, plaAvailCtry, CHECKLEVEL_E);
-	    		if (missingCtry.length()>0){
-	    			addDebug(cntryeffItem.getKey()+" COUNTRYLIST had extra ["+missingCtry+"] from svcmod A:AVAIL");
-	    	    	//6.00			C: COUNTRYLIST	"IN	aggregate G"	A: AVAIL	COUNTRYLIST		E	E	E	
-	    	    	//PRCPT CNTRYEFF COUNTRYLIST must be a subset of SVCMOD AVAIL COUNTRYLIST	
-	    	    	//{LD: PRCPT} {NDN: PRCPT} {LD: CNTRYEFF} {NDN: CNTRYEFF} must not include a country that is not in the {LD: SVCMOD} {LD: AVAIL} {LD: COUNTRYLIST}
-	    			//INCLUDE_ERR2 = {0} {1} must not include a Country that is not in the {2} {3}. Extra countries are: {4}
-	    			args[0]="";
-	    			args[1]=getLD_NDN(cntryeffItem);
-	    			args[2]=m_elist.getEntityGroup("SVCMOD").getLongDescription()+" "+
-	    				m_elist.getEntityGroup("AVAIL").getLongDescription();
-	    			args[3]=PokUtils.getAttributeDescription(egCNTRYEFF, "COUNTRYLIST", "COUNTRYLIST");
-	    			args[4]=missingCtry;
-	    			createMessage(CHECKLEVEL_E,"INCLUDE_ERR2",args);
-	    		}
-	    	}
-	    	//7.00	END	5.00
-	    	//15.00	WHEN		"Planned Availability" (146)	=	B: AVAIL	AVAILTYPE						
-	    	if(svcseoPlaAvailVctB.size()>0){
-	    		missingCtry = checkCtryMismatch(cntryeffItem, svcseoplaAvailCtry, CHECKLEVEL_E);
-	    		if (missingCtry.length()>0){
-	    			addDebug(cntryeffItem.getKey()+" COUNTRYLIST had extra ["+missingCtry+"] from svcseo B:AVAIL");
-	    	    	//16.00			C: COUNTRYLIST	"IN aggregate G"	B: AVAIL	COUNTRYLIST		E	E	E	PRCPT CNTRYEFF COUNTRYLIST must be a subset of SVCSEO AVAIL COUNTRYLIST	{LD: PRCPT} {NDN: PRCPT}  {LD: CNTRYEFF} {NDN: CNTRYEFF} must not include a country that is not in the {LD: SVCSEO} {LD: AVAIL} {LD: COUNTRYLIST}
-	    			//INCLUDE_ERR2 = {0} {1} must not include a Country that is not in the {2} {3}. Extra countries are: {4}
-	    			args[0]="";
-	    			args[1]=getLD_NDN(cntryeffItem);
-	    			args[2]=m_elist.getEntityGroup("SVCSEO").getLongDescription()+" "+
-	    				m_elist.getEntityGroup("AVAIL").getLongDescription();
-	    			args[3]=PokUtils.getAttributeDescription(egCNTRYEFF, "COUNTRYLIST", "COUNTRYLIST");
-	    			args[4]=missingCtry;
-	    			createMessage(CHECKLEVEL_E,"INCLUDE_ERR2",args);
-	    		}
-	    	}
-		}
-    	
-    	addDebug(rootEntity.getKey()+" allCntryeffCtry "+allCntryeffCtry);
-    
-	 	addHeading(3,m_elist.getEntityGroup("CVMSPEC").getLongDescription()+" checks:");
-		//8.00	PRCPT		Root									
-		//9.00			PRCPTCVMSPEC-d		CVMSPEC							
-	   	int cnt = getCount("PRCPTCVMSPEC");
-		EntityGroup cvmspecGrp = m_elist.getEntityGroup("CVMSPEC");
-		//11.00			CountOf	=>	1	E E E	PRCPT must have at least one CVMSPEC	{LD: PRCPT} {NDN: PRCPT} must reference at least one {LD: CVMSPEC}
-		if(cnt==0){
-			//MINIMUM_ERR =  must have at least one {0}
-			args[0] = cvmspecGrp.getLongDescription();
-			createMessage(CHECKLEVEL_E,"MINIMUM_ERR",args);
-		}
-    	
-		for (int i=0; i<cvmspecGrp.getEntityItemCount(); i++){
-			EntityItem cvmspecitem = cvmspecGrp.getEntityItem(i);
-			addDebug("doDQChecking: "+cvmspecitem.getKey());
-			//10.00			STATUS	<=	CVMSPEC	DATAQUALITY		E	E	E		{LD: STATUS} can not be higher than the {LD: CVMSPEC} {NDN: CVMSPEC} {LD: STATUS} {STATUS}
-			checkStatusVsDQ(cvmspecitem, "STATUS", rootEntity,CHECKLEVEL_E);
-		}
-		
-	 	addHeading(3,m_elist.getEntityGroup("SVCSEO").getLongDescription()+" Planned Availability checks:");
-		
-   		//12.00	PRCPT		Root									
-    	//13.00			SVCSEOPRCPT-u		SVCSEO							
-    	//14.00		B	SVCSEOAVAIL-d		AVAIL							
-		for (int i=0; i<svcseoVct.size(); i++){
-			EntityItem svcseoitem = (EntityItem)svcseoVct.elementAt(i);
-	    	Vector availVct = PokUtils.getAllLinkedEntities(svcseoitem, "SVCSEOAVAIL", "AVAIL");
-	    	Vector plaAvailVctB = PokUtils.getEntitiesWithMatchedAttr(availVct, "AVAILTYPE", PLANNEDAVAIL);
-	    	addDebug(" svcseoitem "+svcseoitem.getKey()+" availVct "+availVct.size()+" plaAvailVctB "+plaAvailVctB.size());
-	    	for (int i2=0; i2<plaAvailVctB.size(); i2++){
-	    		EntityItem availitem = (EntityItem)plaAvailVctB.elementAt(i2);
-	    		String missingCtry = checkCtryMismatch(availitem, allCntryeffCtry, CHECKLEVEL_E);
-	    		if (missingCtry.length()>0){
-	    			addDebug(" "+availitem.getKey()+" COUNTRYLIST had extra ["+missingCtry+"] not in PRCPT CNTRYEFF COUNTRYLIST");
-	    	    	//17.00			B: COUNTRYLIST	"IN aggregate G"	C: CNTRYEFF	COUNTRYLIST		E	E	E	SVCSEO AVAIL COUNTRYLIST must exist in PRCPT CNTRYEFF COUNTRYLIST	{LD: AVAIL} {NDN: B: AVAIL} must not include a country that is not in the {LD: PRCPT}  {LD: CNTRYEFF} {NDN: CNTRYEFF}  {LD: COUNTRYLIST}
-
-	    			//INCLUDE_ERR2 = {0} {1} must not include a Country that is not in the {2} {3}. Extra countries are: {4}
-	    			args[0]=getLD_NDN(svcseoitem)+" "+getLD_NDN(availitem);
-	    			args[1]=PokUtils.getAttributeDescription(availitem.getEntityGroup(), "COUNTRYLIST", "COUNTRYLIST");
-	    			args[2]=rootEntity.getEntityGroup().getLongDescription()+" "+egCNTRYEFF.getLongDescription();
-	    			args[3]=args[1];
-	    			args[4]=missingCtry;
-	    			createMessage(CHECKLEVEL_E,"INCLUDE_ERR2",args);
-	    		}
-			}
-			availVct.clear();
-			plaAvailVctB.clear();
-		}
-    	//18.00	END	15.00
-    	
-		//19.00	PRCPT		Root									
-		//20.00				OneValidOverTime				E	E	E	
-		oneValidOverTime(rootEntity);
-		
-		int checklvl = getCheck_W_E_E(statusFlag);
-		//30.00	PRCPT		Root									
-		//31.00			PRCPTCVMSPEC								This relator has the date attributes that follow in column E and gets you to the enitytype in column G	
-		EntityGroup prcptcvmspecGrp = m_elist.getEntityGroup("PRCPTCVMSPEC");
-		
-	 	addHeading(3,prcptcvmspecGrp.getLongDescription()+" and "+
-	 			m_elist.getEntityGroup("CVMSPEC").getLongDescription()+" checks:");
-	 	
-		for (int i=0; i<prcptcvmspecGrp.getEntityItemCount(); i++){
-			EntityItem prcptcvmspec = prcptcvmspecGrp.getEntityItem(i);
-			EntityItem  cvmspecitem= getDownLinkEntityItem(prcptcvmspec, "CVMSPEC");
-			String prcptcvmspecEffdate = PokUtils.getAttributeValue(prcptcvmspec,  "EFFECTIVEDATE",", ", null, false);
-			String cvmspecEffdate = PokUtils.getAttributeValue(cvmspecitem,  "EFFECTIVEDATE",", ", null, false);
-			String prcptcvmspecEnddate = PokUtils.getAttributeValue(prcptcvmspec,  "ENDDATE",", ", FOREVER_DATE, false);
-			String cvmspecEnddate = PokUtils.getAttributeValue(cvmspecitem,  "ENDDATE",", ", FOREVER_DATE, false);
-			addDebug("doDQChecking: "+prcptcvmspec.getKey()+" prcptcvmspecEffdate "+prcptcvmspecEffdate+
-					" prcptcvmspecEnddate "+prcptcvmspecEnddate+" "+cvmspecitem.getKey()+" cvmspecEffdate "+
-					cvmspecEffdate+" cvmspecEnddate "+cvmspecEnddate);
-			if(prcptcvmspecEffdate!=null && cvmspecEffdate!=null){ //bad data, should have exist rule!
-				//32.00			EFFECTIVEDATE	=>	CVMSPEC	EFFECTIVEDATE		W	E	E		
-				boolean isok = checkDates(prcptcvmspecEffdate, cvmspecEffdate, DATE_GR_EQ);	//date1=>date2	
-				if(!isok){
-					//CANNOT_BE_EARLIER_ERR2 = {0} {1} must not be earlier than the {2} {3}
-					//the {LD: PRCPTCVMSPEC} {NDN: PRCPTCVMSPEC} {LD: EFFECTIVEDATE} {PRCPTCVMSPEC.EFFECTIVEDATE} must not be earlier than the {LD: CVMSPEC} {NDN: CVMSPEC} {LD: EFFECTIVEDATE} {CVMSPEC.EFFECTiVEDATE}
-					args[0]=getLD_NDN(prcptcvmspec);
-					args[1]=this.getLD_Value(prcptcvmspec, "EFFECTIVEDATE");
-					args[2]=getLD_NDN(cvmspecitem);
-					args[3]=getLD_Value(cvmspecitem, "EFFECTIVEDATE");
-					createMessage(checklvl,"CANNOT_BE_EARLIER_ERR2",args);
-				}
-			}
-
-			//33.00			ENDDATE	<=	CVMSPEC	ENDDATE		W	E	E		
-			boolean isok = checkDates(prcptcvmspecEnddate, cvmspecEnddate, DATE_LT_EQ);	//date1<=date2
-			if(!isok){
-				//CANNOT_BE_LATER_ERR = {0} {1} must not be later than the {2} {3}
-				//the {LD: PRCPTCVMSPEC} {NDN: PRCPTCVMSPEC} {LD: ENDDATE} {PRCPTCVMSPEC.ENDDATE} must not be later than the {LD: CVMSPEC} {NDN: CVMSPEC} {LD: ENDDATE} {CVMSPEC.ENDDATE}
-				args[0]=getLD_NDN(prcptcvmspec);
-				args[1]=this.getLD_Value(prcptcvmspec, "ENDDATE");
-				args[2]=getLD_NDN(cvmspecitem);
-				args[3]=getLD_Value(cvmspecitem, "ENDDATE");
-				createMessage(checklvl,"CANNOT_BE_LATER_ERR",args);
-			}
-		}
-	
-		// release memory
-		allCntryeffCtry.clear();
-		chrgcompVct.clear();
-    	svcmodVct.clear();
-    	svcmodAvailVct.clear();
-    	svcmodPlaAvailVctA.clear();
-    	svcseoVct.clear();
-    	svcseoAvailVct.clear();
-    	svcseoPlaAvailVctB.clear();
-    	plaAvailCtry.clear();
-    	svcseoplaAvailCtry.clear();
-    }
-    
-	/**
-	 * 
-		20.00				OneValidOverTime				E	E	E	
-		From PRCPT, find the children CNTRYEFF and get min{EFFECTIVEDATE) and max(ENDDATE). 
-		Then look at all children of PRCPT of type CVMSPEC. The relator PRCPTCVMSPEC has EFFECTIVEDATE and ENDATE. 
-		This date range must cover the CNTRYEFF min/max dates	
-		must have at least one valid {LD: PRCPTCVMSPEC) during the time that the {LD: PRCPT} {LD: CNTRYEFF) is valid.
-		
-		21.00				ParentFrom	"PRCPTCNTRYEFF-d: CNTRYEFF"	EFFECTIVEDATE						
-		22.00				ParentTo	"PRCPTCNTRYEFF-d: CNTRYEFF"	ENDDATE						
-		23.00				ChildFrom	PRCPTCVMSPEC	EFFECTIVEDATE						
-		24.00				ChildTo	PRCPTCVMSPEC	ENDDATE	
-	 * @param root
-	 */
-    private void oneValidOverTime(EntityItem root){
-    	StringBuffer chksSb = new StringBuffer(root.getEntityGroup().getLongDescription());
-    	chksSb.append(" "+m_elist.getEntityGroup("CNTRYEFF").getLongDescription());
-    	chksSb.append(" and "+m_elist.getEntityGroup("PRCPTCVMSPEC").getLongDescription());
-    	//get entities with from dates
-    	Vector childVct = this.getDownLinkEntityItems(root, "PRCPTCVMSPEC");
-    	Vector parentVct = PokUtils.getAllLinkedEntities(root, "PRCPTCNTRYEFF", "CNTRYEFF");
-
-    	addHeading(3,chksSb.toString()+" validity checks:");
-    	
-    	addDebug("oneValidOverTime entered for "+root.getKey()+" PRCPTCVMSPEC-childVct.cnt "+childVct.size()+
-    			" CNTRYEFF-parentVct.cnt "+parentVct.size());
-    	
-    	if (parentVct.size()==0){// no CNTRYEFF, nothing to check
-    		childVct.clear();
-    		return;
-    	}
-
-    	AttrComparator attrcomp = new AttrComparator("EFFECTIVEDATE");
-    	// sort children by efffrom
-    	Collections.sort(childVct, attrcomp);
-    	// sort parent by efffrom
-    	Collections.sort(parentVct, attrcomp);
-
-    	EntityItem parent = (EntityItem)parentVct.firstElement();
-    	String parentEffFrom = PokUtils.getAttributeValue(parent, "EFFECTIVEDATE", "", EPOCH_DATE, false);
-    	addDebug("oneValidOverTime first parent "+parent.getKey()+" parentEffFrom "+parentEffFrom);
-    	if (childVct.size()==0){// there is no RE so no error for now.
-    		//	must have at least one valid {LD: PRCPTCVMSPEC) during the time that the {LD: PRCPT} {LD: CNTRYEFF) is valid.
-    		//INVALID_CHILD_ERR= must have at least one valid {0} during the time that the {1} is valid.
-    //		args[0]= m_elist.getEntityGroup("PRCPTCVMSPEC").getLongDescription();
-    //		args[1]= root.getEntityGroup().getLongDescription()+" "+parent.getEntityGroup().getLongDescription();
-    //		createMessage(CHECKLEVEL_E,"INVALID_CHILD_ERR",args);
-    		parentVct.clear();
-    		return;
-    	}
-
-    	// look at first one
-    	EntityItem child = (EntityItem)childVct.firstElement();
-    	String childEffFrom = PokUtils.getAttributeValue(child, "EFFECTIVEDATE", "", EPOCH_DATE, false);// has EXIST rule
-    	String prevEffTo = PokUtils.getAttributeValue(child, "ENDDATE", "", FOREVER_DATE, false);
-    	addDebug("oneValidOverTime first child "+child.getKey()+" childEffFrom "+childEffFrom+" prevEffTo "+prevEffTo);
-    	if(childEffFrom.compareTo(parentEffFrom)>0){
-    		//	must have at least one valid {LD: PRCPTCVMSPEC) during the time that the {LD: PRCPT} {LD: CNTRYEFF) is valid.
-    		//INVALID_CHILD_ERR2= must have at least one valid {0} during the time that the {1} {2} is valid ({3}-{4}).
-    		args[0]= child.getEntityGroup().getLongDescription();
-    		args[1]= root.getEntityGroup().getLongDescription();
-    		args[2]=parent.getEntityGroup().getLongDescription();
-    		args[3]=parentEffFrom;
-    		args[4]=PokUtils.getAttributeValue((EntityItem)parentVct.lastElement(), "ENDDATE", "", FOREVER_DATE, false);
-    		createMessage(CHECKLEVEL_E,"INVALID_CHILD_ERR2",args);
-    		
-    		//CANNOT_BE_LATER_ERR = {0} {1} must not be later than the {2} {3}
-    		args[0]= child.getEntityGroup().getLongDescription();
-    		args[1] =PokUtils.getAttributeDescription(child.getEntityGroup(),"EFFECTIVEDATE", "EFFECTIVEDATE")+
-    			" ("+childEffFrom+")";
-    		args[2]= root.getEntityGroup().getLongDescription()+" "+parent.getEntityGroup().getLongDescription();
-    		args[3] = PokUtils.getAttributeDescription(parent.getEntityGroup(), 
-    				"EFFECTIVEDATE", "EFFECTIVEDATE")+" ("+parentEffFrom+")";
-    		addResourceMsg("CANNOT_BE_LATER_ERR",args);
-    		childVct.clear();
-    		parentVct.clear();
-    		return;
-    	}
-    	
-    	AttrComparator endattrcomp = new AttrComparator("ENDDATE");
-    	// sort children by effto
-    	Collections.sort(childVct, endattrcomp);
-    	// sort parent by effto
-    	Collections.sort(parentVct, endattrcomp);
-    	// look at last one
-    	child = (EntityItem)childVct.lastElement();
-    	parent = (EntityItem)parentVct.lastElement();
-    	String childEffTo = PokUtils.getAttributeValue(child, "ENDDATE", "", FOREVER_DATE, false);
-    	String parentEffTo = PokUtils.getAttributeValue(parent, "ENDDATE", "", FOREVER_DATE, false); 
-    	addDebug("oneValidOverTime last child "+child.getKey()+" childEffTo "+childEffTo);
-    	addDebug("oneValidOverTime last parent "+parent.getKey()+" parentEffTo "+parentEffTo);
-    	if(childEffTo.compareTo(parentEffTo)<0){
-    		//INVALID_CHILD_ERR2= must have at least one valid {0} during the time that the {1} {2} is valid ({3}-{4}).
-    		args[0]= child.getEntityGroup().getLongDescription();
-    		args[1]= root.getEntityGroup().getLongDescription();
-    		args[2]=parent.getEntityGroup().getLongDescription();
-    		args[3]=PokUtils.getAttributeValue((EntityItem)parentVct.firstElement(), "EFFECTIVEDATE", "", EPOCH_DATE, false);
-    		args[4]=parentEffTo;
-    		createMessage(CHECKLEVEL_E,"INVALID_CHILD_ERR2",args);
-    		
-    		//CANNOT_BE_EARLIER_ERR2 = {0} {1} must not be earlier than the {2} {3} 
-       		args[0]= child.getEntityGroup().getLongDescription();
-    		args[1] = PokUtils.getAttributeDescription(child.getEntityGroup(), 
-    				"ENDDATE", "ENDDATE")+" ("+childEffTo+")";
-    		args[2]= root.getEntityGroup().getLongDescription()+" "+parent.getEntityGroup().getLongDescription();
-    		args[3] = PokUtils.getAttributeDescription(parent.getEntityGroup(), 
-    				"EFFECTIVEDATE", "EFFECTIVEDATE")+" ("+parentEffTo+")";
-    		addResourceMsg("CANNOT_BE_EARLIER_ERR2",args);
-    		childVct.clear();
-    		parentVct.clear();
-    		return;
-    	}
-
-    	// sort children by efffrom again
-    	Collections.sort(childVct, attrcomp);
-    	// sort parent by efffrom
-    	Collections.sort(parentVct, attrcomp);
-    	
-    	// look for gaps
-    	for (int i=1; i<childVct.size(); i++){
-    		child = (EntityItem)childVct.elementAt(i);
-    		String nextEffFrom = PokUtils.getAttributeValue(child, "EFFECTIVEDATE", "", EPOCH_DATE, false); // has EXIST rule
-    		String nextEffTo = PokUtils.getAttributeValue(child, "ENDDATE", "", FOREVER_DATE, false);
-    		addDebug("oneValidOverTime gaps "+child.getKey()+" prevEffTo "+prevEffTo+" nextEffFrom "+
-    				nextEffFrom+" nextEffTo "+nextEffTo);
-    		if(nextEffFrom.compareTo(prevEffTo)>0){
-    			//INVALID_CHILD_ERR= must have at least one valid {0} during the time that the {1} is valid.
-    			args[0]= child.getEntityGroup().getLongDescription();
-    			args[1]= root.getEntityGroup().getLongDescription()+" "+parent.getEntityGroup().getLongDescription();
-    			createMessage(CHECKLEVEL_E,"INVALID_CHILD_ERR",args);
-        		//GAPS_ERR = {0} has gaps in time between {1} and {2}
-        		args[0]= child.getEntityGroup().getLongDescription();
-        		args[1]= prevEffTo;
-        		args[2]= nextEffFrom;
-
-        		addResourceMsg("GAPS_ERR",args);
-    			break;
-    		}
-    		prevEffTo= nextEffTo;
-    	}
-
-    	childVct.clear();
-    	parentVct.clear();
-    }
-
-    /**********************************
-     * complete abr processing after status moved to final; (status was r4r)
-150.02	R1.0	PRCPT									
-150.04	R1.0	IF		"CHRGCOMPPRCPT-u: SVCMODCHRGCOMP-u"	CHRGCOMP	STATUS	=	"Ready for Review" (0040) | "Final" (0020)			
-150.06	R1.0	AND			SVCMOD	STATUS	=	"Ready for Review" (0040)			
-150.08	R1.0	AND			SVCMOD	LIFECYCLE	=	"Develop" (LF02)  | "Plan" (LF01)			
-150.10	R1.0	SET			SVCMOD				ADSABRSTATUS	&ADSFEEDRFR	
-150.12	R1.0	ELSE	150.04								
-150.14	R1.0	IF			SVCMOD	STATUS	=	"Final" (0020)			
-150.16	R1.0	AND			CHRGCOMP	STATUS	=	"Final" (0020)			
-150.18	R1.0	AND			PRCPT	STATUS	=	"Final" (0020)			
-150.20	R1.0	SET			SVCMOD				ADSABRSTATUS		&ADSFEED
-150.22	R1.0	END	150.14								
-150.24	R1.0	END	150.04								
-						
-     */
-    protected void completeNowFinalProcessing() throws
-    java.sql.SQLException,
-    COM.ibm.opicmpdh.middleware.MiddlewareException,
-    COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-    {
-    	EntityGroup chrgcompGrp = m_elist.getEntityGroup("CHRGCOMP");
-    	for (int i=0; i<chrgcompGrp.getEntityItemCount(); i++){
-    		EntityItem chrgcomp = chrgcompGrp.getEntityItem(i);
-    		addDebug("completeNowFinalProcessing: "+chrgcomp.getKey());
-    		//150.04	R1.0	IF		"CHRGCOMPPRCPT-u: CHRGCOMPSVCMOD-u"	CHRGCOMP	STATUS	=	"Ready for Review" (0040) | "Final" (0020)			
-    		if (this.statusIsRFRorFinal(chrgcomp)){
-    			Vector svcmodVct = PokUtils.getAllLinkedEntities(chrgcomp, "SVCMODCHRGCOMP", "SVCMOD");
-    			for (int s=0; s<svcmodVct.size(); s++)	{
-    				EntityItem svcmod = (EntityItem)svcmodVct.elementAt(s);
-//    	        	String lifecycle = PokUtils.getAttributeFlagValue(svcmod, "LIFECYCLE");
-//    	    	  	addDebug("completeNowFinalProcessing: "+svcmod.getKey()+" lifecycle "+lifecycle);
-//    	    		if (lifecycle==null || lifecycle.length()==0){ 
-//    	        		lifecycle = LIFECYCLE_Plan;
-//    	        	}
-    	    		//150.14	R1.0	IF			SVCMOD	STATUS	=	"Final" (0020)			
-    	    		if (statusIsFinal(svcmod)){
-    	    			//150.16	R1.0	AND			CHRGCOMP	STATUS	=	"Final" (0020)		
-    	    			if(statusIsFinal(chrgcomp)){
-    	    				//150.18	R1.0	AND			PRCPT	STATUS	=	"Final" (0020)			
-    	    	    		//150.20	R1.0	SET			SVCMOD				ADSABRSTATUS		&ADSFEED
-    	    				setFlagValue(m_elist.getProfile(),"ADSABRSTATUS", getQueuedValueForItem(svcmod,"ADSABRSTATUS"),svcmod);
-    	    			}
-    	    			//150.22	R1.0	END	150.14	
-    				}else{
-    			   		//150.06	R1.0	AND			SVCMOD	STATUS	=	"Ready for Review" (0040)			
-    		    		//20130904 Delete 150.08	R1.0	AND			SVCMOD	LIFECYCLE	=	"Develop" (LF02)  | "Plan" (LF01)	//delete
-    					doRFR_ADSXML(svcmod);
-//        		    	if (this.statusIsRFR(svcmod) && (LIFECYCLE_Plan.equals(lifecycle) ||  // first time moving to RFR
-//        		    			LIFECYCLE_Develop.equals(lifecycle))){ // been RFR before
-//            	    		//150.10	R1.0	SET			SVCMOD				ADSABRSTATUS	&ADSFEEDRFR	        		    			
-//        					setFlagValue(m_elist.getProfile(),"ADSABRSTATUS", getRFRQueuedValueForItem(svcmod,"ADSABRSTATUS"),svcmod);
-//        				}
-    				}
-    			}
-    			svcmodVct.clear();
-    		}
-    	}
-    }
-    /**********************************
-     * complete abr processing after status moved to readyForReview; (status was chgreq)
- 	* B.	Status changed to Ready for Review	
-150.02	R1.0	PRCPT									
-150.04	R1.0	IF		"CHRGCOMPPRCPT-u: SVCMODCHRGCOMP-u"	CHRGCOMP	STATUS	=	"Ready for Review" (0040) | "Final" (0020)			
-150.06	R1.0	AND			SVCMOD	STATUS	=	"Ready for Review" (0040)			
-150.08	R1.0	AND			SVCMOD	LIFECYCLE	=	"Develop" (LF02)  | "Plan" (LF01)			
-150.10	R1.0	SET			SVCMOD				ADSABRSTATUS	&ADSFEEDRFR	
-150.12	R1.0	ELSE	150.04								
-150.14	R1.0	IF			SVCMOD	STATUS	=	"Final" (0020)			
-150.16	R1.0	AND			CHRGCOMP	STATUS	=	"Final" (0020)			
-150.18	R1.0	AND			PRCPT	STATUS	=	"Final" (0020)			
-150.20	R1.0	SET			SVCMOD				ADSABRSTATUS		&ADSFEED
-150.22	R1.0	END	150.14								
-150.24	R1.0	END	150.04								
-     */
-    protected void completeNowR4RProcessing() throws
-    java.sql.SQLException,
-    COM.ibm.opicmpdh.middleware.MiddlewareException,
-    COM.ibm.opicmpdh.middleware.MiddlewareRequestException
-    {
-    	EntityGroup chrgcompGrp = m_elist.getEntityGroup("CHRGCOMP");
-    	for (int i=0; i<chrgcompGrp.getEntityItemCount(); i++){
-    		EntityItem chrgcomp = chrgcompGrp.getEntityItem(i);
-    		addDebug("completeNowR4RProcessing: "+chrgcompGrp.getKey());
-    		//150.04	R1.0	IF		"CHRGCOMPPRCPT-u:CHRGCOMPSVCMOD-u"	CHRGCOMP	STATUS	=	"Ready for Review" (0040) | "Final" (0020)			
-    		if (this.statusIsRFRorFinal(chrgcomp)){
-    			Vector svcmodVct = PokUtils.getAllLinkedEntities(chrgcomp, "SVCMODCHRGCOMP", "SVCMOD");
-    			for (int s=0; s<svcmodVct.size(); s++)	{
-    				EntityItem svcmod = (EntityItem)svcmodVct.elementAt(s);
-//    		    	String lifecycle = PokUtils.getAttributeFlagValue(svcmod, "LIFECYCLE");
-//    		    	addDebug("completeNowR4RProcessing: "+svcmod.getKey()+" lifecycle "+lifecycle);
-//    		    	if (lifecycle==null || lifecycle.length()==0){ 
-//    		    		lifecycle = LIFECYCLE_Plan;
-//    		    	}
-    	    		//150.06	R1.0	AND			SVCMOD	STATUS	=	"Ready for Review" (0040)			
-    	    		//150.08	R1.0	AND			SVCMOD	LIFECYCLE	=	"Develop" (LF02)  | "Plan" (LF01)			
-    		    	if (this.statusIsRFR(svcmod)){
-//    		    			&& (LIFECYCLE_Plan.equals(lifecycle) ||  // first time moving to RFR
-//    		    			LIFECYCLE_Develop.equals(lifecycle))){ // been RFR before
-        	    		//150.10	R1.0	SET			SVCMOD				ADSABRSTATUS	&ADSFEEDRFR	
-    					setFlagValue(m_elist.getProfile(),"ADSABRSTATUS", getRFRQueuedValueForItem(svcmod,"ADSABRSTATUS"),svcmod);
-    				}
-    			}
-    			svcmodVct.clear();
-    		}
-    	}
-    }
-	
-    /***********************************************
-    *  Get ABR description
-    *
-    *@return java.lang.String
-    */
-    public String getDescription()
-    {
-        String desc =  "PRCPT ABR.";
-
-        return desc;
-    }
-
-    /***********************************************
-    *  Get the version
-    *
-    *@return java.lang.String
-    */
-    public String getABRVersion()
-    {
-        return "$Revision: 1.5 $";
-    }
-}
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\abr\sg\bh\PRCPTABRSTATUS.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

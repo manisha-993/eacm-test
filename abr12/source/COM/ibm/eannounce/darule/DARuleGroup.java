@@ -1,817 +1,1116 @@
-//Licensed Materials -- Property of IBM
-//(C) Copyright IBM Corp. 2011  All Rights Reserved.
-//The source code for this program is not published or otherwise divested of
-//its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
-//
-package COM.ibm.eannounce.darule;
+/*     */ package COM.ibm.eannounce.darule;
+/*     */ 
+/*     */ import COM.ibm.eannounce.abr.util.ABRUtil;
+/*     */ import COM.ibm.eannounce.objects.DeleteActionItem;
+/*     */ import COM.ibm.eannounce.objects.EANBusinessRuleException;
+/*     */ import COM.ibm.eannounce.objects.EANMetaAttribute;
+/*     */ import COM.ibm.eannounce.objects.EntityGroup;
+/*     */ import COM.ibm.eannounce.objects.EntityItem;
+/*     */ import COM.ibm.eannounce.objects.EntityList;
+/*     */ import COM.ibm.opicmpdh.middleware.Database;
+/*     */ import COM.ibm.opicmpdh.middleware.LockException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+/*     */ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
+/*     */ import COM.ibm.opicmpdh.middleware.Profile;
+/*     */ import com.ibm.transform.oim.eacm.util.PokUtils;
+/*     */ import java.io.Serializable;
+/*     */ import java.sql.SQLException;
+/*     */ import java.util.Collections;
+/*     */ import java.util.Hashtable;
+/*     */ import java.util.Vector;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class DARuleGroup
+/*     */   implements Serializable
+/*     */ {
+/*     */   private static final long serialVersionUID = 1L;
+/*  95 */   private String relatorType = null;
+/*  96 */   private String createActionName = null;
+/*  97 */   private String attributeCode = null;
+/*  98 */   private Vector daRuleVct = null;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 111 */   protected static final Hashtable CATREL_TBL = new Hashtable<>(); static {
+/* 112 */     CATREL_TBL.put("FEATURE", "FEATURECATDATA");
+/* 113 */     CATREL_TBL.put("MODEL", "MODELCATDATA");
+/* 114 */     CATREL_TBL.put("WWSEO", "WWSEOCATDATA");
+/* 115 */     CATREL_TBL.put("SVCMOD", "SVCMODCATDATA");
+/* 116 */     CATREL_TBL.put("LSEO", "LSEOCATDATA");
+/* 117 */     CATREL_TBL.put("LSEOBUNDLE", "LSEOBUNDLECATDATA");
+/* 118 */     CATREL_TBL.put("SWFEATURE", "SWFEATURECATDATA");
+/*     */   }
+/*     */ 
+/*     */   
+/* 122 */   private static final Hashtable CATACTION_TBL = new Hashtable<>(); static {
+/* 123 */     CATACTION_TBL.put("FEATURE", "CRFEATCATDATA");
+/* 124 */     CATACTION_TBL.put("MODEL", "CRMDLCATDATA");
+/* 125 */     CATACTION_TBL.put("WWSEO", "CRWWSEOCATDATA");
+/* 126 */     CATACTION_TBL.put("SVCMOD", "CRSVCMCATDATA");
+/* 127 */     CATACTION_TBL.put("LSEO", "CRLSEOCATDATA");
+/* 128 */     CATACTION_TBL.put("LSEOBUNDLE", "CRLSEOBCATDATA");
+/* 129 */     CATACTION_TBL.put("SWFEATURE", "CRSWFCATDATA");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private static final String DELETEACTION_NAME = "DELCATDATA";
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected DARuleGroup(Database paramDatabase, Profile paramProfile, String paramString1, String paramString2, StringBuffer paramStringBuffer) throws Exception {
+/* 147 */     this(paramString2, paramString1);
+/*     */ 
+/*     */     
+/* 150 */     EntityItem[] arrayOfEntityItem = DARuleEngine.searchForDARules(paramDatabase, paramProfile, paramString1, paramString2, paramStringBuffer);
+/* 151 */     if (arrayOfEntityItem != null) {
+/*     */       
+/* 153 */       verifyDARules(arrayOfEntityItem, paramStringBuffer);
+/*     */ 
+/*     */       
+/* 156 */       for (byte b = 0; b < arrayOfEntityItem.length; b++) {
+/* 157 */         EntityItem entityItem = arrayOfEntityItem[b];
+/* 158 */         String str1 = PokUtils.getAttributeFlagValue(entityItem, "DARULETYPE");
+/* 159 */         String str2 = PokUtils.getAttributeFlagValue(entityItem, "DALIFECYCLE");
+/* 160 */         DARuleEngineMgr.addDebugComment(3, paramStringBuffer, "DARuleGroup:[" + b + "] " + entityItem.getKey() + " ruletype " + str1 + " lifecycle " + str2);
+/*     */ 
+/*     */         
+/* 163 */         if ("20".equals(str2) || "10"
+/* 164 */           .equals(str2) || "50"
+/* 165 */           .equals(str2)) {
+/* 166 */           DARuleEquation dARuleEquation; DARuleSubstitution dARuleSubstitution = null;
+/* 167 */           if ("20".equals(str1)) {
+/* 168 */             dARuleSubstitution = new DARuleSubstitution(entityItem);
+/* 169 */           } else if ("30".equals(str1)) {
+/* 170 */             DARuleScanReplace dARuleScanReplace = new DARuleScanReplace(entityItem);
+/* 171 */           } else if ("40".equals(str1)) {
+/* 172 */             dARuleEquation = new DARuleEquation(entityItem);
+/*     */           } 
+/* 174 */           if (dARuleEquation != null) {
+/* 175 */             addRuleItem(dARuleEquation);
+/*     */           } else {
+/* 177 */             DARuleEngineMgr.addDebugComment(0, paramStringBuffer, "DARuleGroup: " + entityItem.getKey() + " ruletype " + str1 + " is not supported");
+/*     */           } 
+/*     */         } else {
+/* 180 */           DARuleEngineMgr.addDebugComment(1, paramStringBuffer, "DARuleGroup: " + entityItem.getKey() + " lifecycle " + str2 + " is not used for IDL");
+/*     */         } 
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void verifyDARules(EntityItem[] paramArrayOfEntityItem, StringBuffer paramStringBuffer) throws InvalidDARuleException {
+/*     */     // Byte code:
+/*     */     //   0: aconst_null
+/*     */     //   1: astore_3
+/*     */     //   2: aconst_null
+/*     */     //   3: astore #4
+/*     */     //   5: aconst_null
+/*     */     //   6: astore #5
+/*     */     //   8: new java/lang/StringBuffer
+/*     */     //   11: dup
+/*     */     //   12: ldc 'Invalid DARULE found:'
+/*     */     //   14: invokespecial <init> : (Ljava/lang/String;)V
+/*     */     //   17: astore #6
+/*     */     //   19: iconst_0
+/*     */     //   20: istore #7
+/*     */     //   22: iload #7
+/*     */     //   24: aload_1
+/*     */     //   25: arraylength
+/*     */     //   26: if_icmpge -> 521
+/*     */     //   29: aload_1
+/*     */     //   30: iload #7
+/*     */     //   32: aaload
+/*     */     //   33: astore #8
+/*     */     //   35: aload #8
+/*     */     //   37: ldc 'RULESEQ'
+/*     */     //   39: ldc ''
+/*     */     //   41: ldc '0'
+/*     */     //   43: iconst_0
+/*     */     //   44: invokestatic getAttributeValue : (LCOM/ibm/eannounce/objects/EntityItem;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)Ljava/lang/String;
+/*     */     //   47: astore #9
+/*     */     //   49: aload #8
+/*     */     //   51: ldc 'DALIFECYCLE'
+/*     */     //   53: invokestatic getAttributeFlagValue : (LCOM/ibm/eannounce/objects/EntityItem;Ljava/lang/String;)Ljava/lang/String;
+/*     */     //   56: astore #10
+/*     */     //   58: iconst_3
+/*     */     //   59: aload_2
+/*     */     //   60: new java/lang/StringBuilder
+/*     */     //   63: dup
+/*     */     //   64: invokespecial <init> : ()V
+/*     */     //   67: ldc 'verifyDARules: '
+/*     */     //   69: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   72: aload #8
+/*     */     //   74: invokevirtual getKey : ()Ljava/lang/String;
+/*     */     //   77: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   80: ldc ' sequence '
+/*     */     //   82: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   85: aload #9
+/*     */     //   87: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   90: ldc ' lifecycle '
+/*     */     //   92: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   95: aload #10
+/*     */     //   97: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   100: invokevirtual toString : ()Ljava/lang/String;
+/*     */     //   103: invokestatic addDebugComment : (ILjava/lang/StringBuffer;Ljava/lang/String;)V
+/*     */     //   106: ldc '30'
+/*     */     //   108: aload #10
+/*     */     //   110: invokevirtual equals : (Ljava/lang/Object;)Z
+/*     */     //   113: ifeq -> 172
+/*     */     //   116: aload_3
+/*     */     //   117: ifnonnull -> 128
+/*     */     //   120: new java/util/Vector
+/*     */     //   123: dup
+/*     */     //   124: invokespecial <init> : ()V
+/*     */     //   127: astore_3
+/*     */     //   128: aload #6
+/*     */     //   130: new java/lang/StringBuilder
+/*     */     //   133: dup
+/*     */     //   134: invokespecial <init> : ()V
+/*     */     //   137: ldc ' '
+/*     */     //   139: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   142: aload #8
+/*     */     //   144: invokevirtual getKey : ()Ljava/lang/String;
+/*     */     //   147: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   150: ldc ' DALIFECYCLE is Production.'
+/*     */     //   152: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   155: invokevirtual toString : ()Ljava/lang/String;
+/*     */     //   158: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuffer;
+/*     */     //   161: pop
+/*     */     //   162: aload_3
+/*     */     //   163: aload #8
+/*     */     //   165: invokevirtual add : (Ljava/lang/Object;)Z
+/*     */     //   168: pop
+/*     */     //   169: goto -> 515
+/*     */     //   172: ldc '60'
+/*     */     //   174: aload #10
+/*     */     //   176: invokevirtual equals : (Ljava/lang/Object;)Z
+/*     */     //   179: ifeq -> 238
+/*     */     //   182: aload_3
+/*     */     //   183: ifnonnull -> 194
+/*     */     //   186: new java/util/Vector
+/*     */     //   189: dup
+/*     */     //   190: invokespecial <init> : ()V
+/*     */     //   193: astore_3
+/*     */     //   194: aload #6
+/*     */     //   196: new java/lang/StringBuilder
+/*     */     //   199: dup
+/*     */     //   200: invokespecial <init> : ()V
+/*     */     //   203: ldc ' '
+/*     */     //   205: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   208: aload #8
+/*     */     //   210: invokevirtual getKey : ()Ljava/lang/String;
+/*     */     //   213: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   216: ldc ' DALIFECYCLE is Retire.'
+/*     */     //   218: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   221: invokevirtual toString : ()Ljava/lang/String;
+/*     */     //   224: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuffer;
+/*     */     //   227: pop
+/*     */     //   228: aload_3
+/*     */     //   229: aload #8
+/*     */     //   231: invokevirtual add : (Ljava/lang/Object;)Z
+/*     */     //   234: pop
+/*     */     //   235: goto -> 515
+/*     */     //   238: ldc '20'
+/*     */     //   240: aload #10
+/*     */     //   242: invokevirtual equals : (Ljava/lang/Object;)Z
+/*     */     //   245: ifeq -> 363
+/*     */     //   248: aload #5
+/*     */     //   250: ifnull -> 359
+/*     */     //   253: aload_3
+/*     */     //   254: ifnonnull -> 265
+/*     */     //   257: new java/util/Vector
+/*     */     //   260: dup
+/*     */     //   261: invokespecial <init> : ()V
+/*     */     //   264: astore_3
+/*     */     //   265: aload_3
+/*     */     //   266: aload #8
+/*     */     //   268: invokevirtual add : (Ljava/lang/Object;)Z
+/*     */     //   271: pop
+/*     */     //   272: aload #6
+/*     */     //   274: new java/lang/StringBuilder
+/*     */     //   277: dup
+/*     */     //   278: invokespecial <init> : ()V
+/*     */     //   281: ldc ' '
+/*     */     //   283: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   286: aload #8
+/*     */     //   288: invokevirtual getKey : ()Ljava/lang/String;
+/*     */     //   291: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   294: ldc ' DALIFECYCLE is Ready.'
+/*     */     //   296: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   299: invokevirtual toString : ()Ljava/lang/String;
+/*     */     //   302: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuffer;
+/*     */     //   305: pop
+/*     */     //   306: aload_3
+/*     */     //   307: aload #5
+/*     */     //   309: invokevirtual contains : (Ljava/lang/Object;)Z
+/*     */     //   312: ifne -> 515
+/*     */     //   315: aload_3
+/*     */     //   316: aload #5
+/*     */     //   318: invokevirtual add : (Ljava/lang/Object;)Z
+/*     */     //   321: pop
+/*     */     //   322: aload #6
+/*     */     //   324: new java/lang/StringBuilder
+/*     */     //   327: dup
+/*     */     //   328: invokespecial <init> : ()V
+/*     */     //   331: ldc ' '
+/*     */     //   333: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   336: aload #5
+/*     */     //   338: invokevirtual getKey : ()Ljava/lang/String;
+/*     */     //   341: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   344: ldc ' DALIFECYCLE is Ready.'
+/*     */     //   346: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   349: invokevirtual toString : ()Ljava/lang/String;
+/*     */     //   352: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuffer;
+/*     */     //   355: pop
+/*     */     //   356: goto -> 515
+/*     */     //   359: aload #8
+/*     */     //   361: astore #5
+/*     */     //   363: ldc '20'
+/*     */     //   365: aload #10
+/*     */     //   367: invokevirtual equals : (Ljava/lang/Object;)Z
+/*     */     //   370: ifne -> 393
+/*     */     //   373: ldc '10'
+/*     */     //   375: aload #10
+/*     */     //   377: invokevirtual equals : (Ljava/lang/Object;)Z
+/*     */     //   380: ifne -> 393
+/*     */     //   383: ldc '50'
+/*     */     //   385: aload #10
+/*     */     //   387: invokevirtual equals : (Ljava/lang/Object;)Z
+/*     */     //   390: ifeq -> 515
+/*     */     //   393: ldc '0'
+/*     */     //   395: aload #9
+/*     */     //   397: invokevirtual equals : (Ljava/lang/Object;)Z
+/*     */     //   400: ifeq -> 515
+/*     */     //   403: aload #4
+/*     */     //   405: ifnull -> 511
+/*     */     //   408: aload_3
+/*     */     //   409: ifnonnull -> 420
+/*     */     //   412: new java/util/Vector
+/*     */     //   415: dup
+/*     */     //   416: invokespecial <init> : ()V
+/*     */     //   419: astore_3
+/*     */     //   420: aload_3
+/*     */     //   421: aload #8
+/*     */     //   423: invokevirtual add : (Ljava/lang/Object;)Z
+/*     */     //   426: pop
+/*     */     //   427: aload #6
+/*     */     //   429: new java/lang/StringBuilder
+/*     */     //   432: dup
+/*     */     //   433: invokespecial <init> : ()V
+/*     */     //   436: ldc ' '
+/*     */     //   438: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   441: aload #5
+/*     */     //   443: invokevirtual getKey : ()Ljava/lang/String;
+/*     */     //   446: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   449: ldc ' duplicate Sequence 0 or empty.'
+/*     */     //   451: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   454: invokevirtual toString : ()Ljava/lang/String;
+/*     */     //   457: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuffer;
+/*     */     //   460: pop
+/*     */     //   461: aload_3
+/*     */     //   462: aload #4
+/*     */     //   464: invokevirtual contains : (Ljava/lang/Object;)Z
+/*     */     //   467: ifne -> 511
+/*     */     //   470: aload_3
+/*     */     //   471: aload #4
+/*     */     //   473: invokevirtual add : (Ljava/lang/Object;)Z
+/*     */     //   476: pop
+/*     */     //   477: aload #6
+/*     */     //   479: new java/lang/StringBuilder
+/*     */     //   482: dup
+/*     */     //   483: invokespecial <init> : ()V
+/*     */     //   486: ldc ' '
+/*     */     //   488: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   491: aload #4
+/*     */     //   493: invokevirtual getKey : ()Ljava/lang/String;
+/*     */     //   496: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   499: ldc ' duplicate Sequence 0 or empty.'
+/*     */     //   501: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuilder;
+/*     */     //   504: invokevirtual toString : ()Ljava/lang/String;
+/*     */     //   507: invokevirtual append : (Ljava/lang/String;)Ljava/lang/StringBuffer;
+/*     */     //   510: pop
+/*     */     //   511: aload #8
+/*     */     //   513: astore #4
+/*     */     //   515: iinc #7, 1
+/*     */     //   518: goto -> 22
+/*     */     //   521: aload_3
+/*     */     //   522: ifnull -> 539
+/*     */     //   525: new COM/ibm/eannounce/darule/InvalidDARuleException
+/*     */     //   528: dup
+/*     */     //   529: aload #6
+/*     */     //   531: invokevirtual toString : ()Ljava/lang/String;
+/*     */     //   534: aload_3
+/*     */     //   535: invokespecial <init> : (Ljava/lang/String;Ljava/util/Vector;)V
+/*     */     //   538: athrow
+/*     */     //   539: return
+/*     */     // Line number table:
+/*     */     //   Java source line number -> byte code offset
+/*     */     //   #200	-> 0
+/*     */     //   #201	-> 2
+/*     */     //   #202	-> 5
+/*     */     //   #203	-> 8
+/*     */     //   #204	-> 19
+/*     */     //   #205	-> 29
+/*     */     //   #206	-> 35
+/*     */     //   #207	-> 49
+/*     */     //   #208	-> 58
+/*     */     //   #211	-> 106
+/*     */     //   #212	-> 116
+/*     */     //   #213	-> 120
+/*     */     //   #215	-> 128
+/*     */     //   #216	-> 162
+/*     */     //   #217	-> 169
+/*     */     //   #219	-> 172
+/*     */     //   #220	-> 182
+/*     */     //   #221	-> 186
+/*     */     //   #223	-> 194
+/*     */     //   #224	-> 228
+/*     */     //   #225	-> 235
+/*     */     //   #228	-> 238
+/*     */     //   #229	-> 248
+/*     */     //   #230	-> 253
+/*     */     //   #231	-> 257
+/*     */     //   #233	-> 265
+/*     */     //   #234	-> 272
+/*     */     //   #235	-> 306
+/*     */     //   #236	-> 315
+/*     */     //   #237	-> 322
+/*     */     //   #241	-> 359
+/*     */     //   #245	-> 363
+/*     */     //   #246	-> 377
+/*     */     //   #247	-> 387
+/*     */     //   #248	-> 393
+/*     */     //   #249	-> 403
+/*     */     //   #250	-> 408
+/*     */     //   #251	-> 412
+/*     */     //   #253	-> 420
+/*     */     //   #254	-> 427
+/*     */     //   #255	-> 461
+/*     */     //   #256	-> 470
+/*     */     //   #257	-> 477
+/*     */     //   #260	-> 511
+/*     */     //   #204	-> 515
+/*     */     //   #265	-> 521
+/*     */     //   #266	-> 525
+/*     */     //   #268	-> 539
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected DARuleGroup(String paramString1, String paramString2) {
+/* 276 */     this.attributeCode = paramString1;
+/* 277 */     this.relatorType = CATREL_TBL.get(paramString2).toString();
+/* 278 */     this.createActionName = CATACTION_TBL.get(paramString2).toString();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void addRuleItem(DARuleItem paramDARuleItem) {
+/* 286 */     if (this.daRuleVct == null) {
+/* 287 */       this.daRuleVct = new Vector();
+/*     */     }
+/* 289 */     this.daRuleVct.add(paramDARuleItem);
+/* 290 */     if (this.daRuleVct.size() > 1)
+/*     */     {
+/* 292 */       Collections.sort(this.daRuleVct);
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected boolean updateCatData(Database paramDatabase, Profile paramProfile, EntityItem paramEntityItem, StringBuffer paramStringBuffer) throws Exception {
+/* 319 */     String str = getDerivedValue(paramDatabase, paramProfile, paramEntityItem, paramStringBuffer);
+/*     */ 
+/*     */ 
+/*     */     
+/* 323 */     return doCatdataUpdate(paramDatabase, paramProfile, paramEntityItem, str, paramStringBuffer);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public boolean[] idlCatData(Database paramDatabase, Profile paramProfile, EntityItem[] paramArrayOfEntityItem, StringBuffer paramStringBuffer1, StringBuffer paramStringBuffer2) throws Exception {
+/* 352 */     String[] arrayOfString = getDerivedValues(paramDatabase, paramProfile, paramArrayOfEntityItem, paramStringBuffer2);
+/*     */ 
+/*     */ 
+/*     */     
+/* 356 */     return doCatdataUpdates(paramDatabase, paramProfile, paramArrayOfEntityItem, arrayOfString, paramStringBuffer1, paramStringBuffer2);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public Vector getDARULEEntitys() {
+/* 367 */     if (this.daRuleVct == null) {
+/* 368 */       return null;
+/*     */     }
+/* 370 */     Vector<EntityItem> vector = new Vector(this.daRuleVct.size());
+/* 371 */     for (byte b = 0; b < this.daRuleVct.size(); b++) {
+/* 372 */       DARuleItem dARuleItem = this.daRuleVct.elementAt(b);
+/* 373 */       vector.add(dARuleItem.getDARULEEntity());
+/*     */     } 
+/* 375 */     return vector;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private boolean doCatdataUpdate(Database paramDatabase, Profile paramProfile, EntityItem paramEntityItem, String paramString, StringBuffer paramStringBuffer) throws Exception {
+/* 391 */     boolean bool = false;
+/*     */     
+/* 393 */     EntityList entityList = paramEntityItem.getEntityGroup().getEntityList();
+/* 394 */     if (entityList == null) {
+/* 395 */       throw new DARuleException("CATDATA EntityGroup not found.  No EntityList for " + paramEntityItem.getKey());
+/*     */     }
+/* 397 */     EntityGroup entityGroup = entityList.getEntityGroup("CATDATA");
+/* 398 */     if (entityGroup == null) {
+/* 399 */       throw new DARuleException("CATDATA EntityGroup not found in EntityList for " + paramEntityItem.getKey());
+/*     */     }
+/*     */ 
+/*     */     
+/* 403 */     int i = 254;
+/* 404 */     EANMetaAttribute eANMetaAttribute = entityGroup.getMetaAttribute("DAATTRIBUTEVALUE");
+/* 405 */     if (eANMetaAttribute != null) {
+/* 406 */       i = eANMetaAttribute.getMaxLen();
+/*     */     }
+/*     */     
+/* 409 */     Vector<EntityItem> vector = PokUtils.getAllLinkedEntities(paramEntityItem, this.relatorType, "CATDATA");
+/* 410 */     DARuleEngineMgr.addDebugComment(3, paramStringBuffer, "doCatdataUpdate: " + this.relatorType + " catdataVct.size " + vector
+/* 411 */         .size() + " darGrpAttrcode " + this.attributeCode);
+/*     */ 
+/*     */     
+/* 414 */     EntityItem entityItem = null;
+/* 415 */     for (byte b = 0; b < vector.size(); b++) {
+/* 416 */       EntityItem entityItem1 = vector.elementAt(b);
+/* 417 */       String str = PokUtils.getAttributeFlagValue(entityItem1, "DAATTRIBUTECODE");
+/* 418 */       DARuleEngineMgr.addDebugComment(3, paramStringBuffer, "doCatdataUpdate: " + entityItem1.getKey() + " catDataAttrcode " + str);
+/* 419 */       if (this.attributeCode.equals(str)) {
+/* 420 */         entityItem = entityItem1;
+/*     */         
+/*     */         break;
+/*     */       } 
+/*     */     } 
+/* 425 */     if (paramString != null && paramString.trim().length() > 0 && 
+/* 426 */       paramString.length() > i) {
+/*     */       
+/* 428 */       DARuleEngineMgr.addInformation(paramStringBuffer, "Warning: Derived value exceeded " + i + " characters.  It was truncated.");
+/*     */ 
+/*     */       
+/* 431 */       paramString = paramString.substring(0, i - 1);
+/*     */     } 
+/*     */ 
+/*     */     
+/* 435 */     if (entityItem == null) {
+/* 436 */       if (paramString != null && paramString.trim().length() > 0)
+/*     */       {
+/* 438 */         bool = createCATDATA(paramDatabase, paramProfile, entityList, paramEntityItem, paramString, paramStringBuffer, paramStringBuffer);
+/*     */       }
+/*     */     }
+/* 441 */     else if (paramString != null && paramString.trim().length() > 0) {
+/*     */       
+/* 443 */       String str = PokUtils.getAttributeValue(entityItem, "DAATTRIBUTEVALUE", "", null, false);
+/* 444 */       if (!paramString.equals(str)) {
+/* 445 */         bool = true;
+/* 446 */         updateAttribute(paramDatabase, entityItem, paramString, paramStringBuffer);
+/*     */         
+/* 448 */         DARuleEngineMgr.addInformation(paramStringBuffer, "Updated " + 
+/* 449 */             DARuleEngineMgr.getNavigationName(paramDatabase, paramProfile, entityItem) + " for " + 
+/* 450 */             DARuleEngineMgr.getNavigationName(paramDatabase, paramProfile, paramEntityItem));
+/*     */       } else {
+/* 452 */         DARuleEngineMgr.addDebugComment(3, paramStringBuffer, " " + entityItem.getKey() + " value did not change " + str);
+/*     */       } 
+/*     */     } else {
+/*     */       
+/* 456 */       bool = true;
+/*     */       
+/* 458 */       DARuleEngineMgr.addInformation(paramStringBuffer, "Deleted " + 
+/* 459 */           DARuleEngineMgr.getNavigationName(paramDatabase, paramProfile, entityItem) + " for " + 
+/* 460 */           DARuleEngineMgr.getNavigationName(paramDatabase, paramProfile, paramEntityItem));
+/* 461 */       deleteCatdata(paramDatabase, paramProfile, new EntityItem[] { entityItem });
+/*     */     } 
+/*     */ 
+/*     */     
+/* 465 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private boolean createCATDATA(Database paramDatabase, Profile paramProfile, EntityList paramEntityList, EntityItem paramEntityItem, String paramString, StringBuffer paramStringBuffer1, StringBuffer paramStringBuffer2) throws Exception {
+/* 483 */     boolean bool = false;
+/*     */     
+/* 485 */     EntityItem entityItem = createCATDATA(paramDatabase, paramProfile, paramEntityItem, paramString, paramStringBuffer2);
+/* 486 */     if (entityItem != null) {
+/* 487 */       bool = true;
+/* 488 */       EntityGroup entityGroup1 = paramEntityList.getEntityGroup("CATDATA");
+/* 489 */       EntityList entityList = entityItem.getEntityGroup().getEntityList();
+/* 490 */       EntityGroup entityGroup2 = entityList.getEntityGroup("CATDATA");
+/* 491 */       entityGroup1.putEntityItem(entityItem);
+/* 492 */       entityItem.reassign(entityGroup1);
+/*     */       
+/* 494 */       entityGroup2.removeEntityItem(entityItem);
+/*     */       
+/* 496 */       EntityItem entityItem1 = (EntityItem)entityItem.getUpLink(0);
+/* 497 */       entityGroup1 = paramEntityList.getEntityGroup(this.relatorType);
+/* 498 */       entityGroup2 = entityList.getEntityGroup(this.relatorType);
+/* 499 */       entityGroup1.putEntityItem(entityItem1);
+/* 500 */       entityItem1.reassign(entityGroup1);
+/*     */       
+/* 502 */       entityGroup2.removeEntityItem(entityItem1);
+/*     */ 
+/*     */       
+/* 505 */       entityList.dereference();
+/*     */ 
+/*     */       
+/* 508 */       DARuleEngineMgr.addInformation(paramStringBuffer1, "Created and referenced " + 
+/* 509 */           DARuleEngineMgr.getNavigationName(paramDatabase, paramProfile, entityItem) + " for " + 
+/* 510 */           DARuleEngineMgr.getNavigationName(paramDatabase, paramProfile, paramEntityItem));
+/*     */     } else {
+/* 512 */       throw new DARuleException("Unable to create CATDATA for " + 
+/* 513 */           DARuleEngineMgr.getNavigationName(paramDatabase, paramProfile, paramEntityItem));
+/*     */     } 
+/*     */     
+/* 516 */     return bool;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected static void deleteCatdata(Database paramDatabase, Profile paramProfile, EntityItem[] paramArrayOfEntityItem) throws MiddlewareRequestException, SQLException, MiddlewareException, LockException, MiddlewareShutdownInProgressException, EANBusinessRuleException {
+/* 535 */     DeleteActionItem deleteActionItem = new DeleteActionItem(null, paramDatabase, paramProfile, "DELCATDATA");
+/*     */ 
+/*     */     
+/* 538 */     deleteActionItem.setEntityItems(paramArrayOfEntityItem);
+/* 539 */     paramDatabase.executeAction(paramProfile, deleteActionItem);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private boolean[] doCatdataUpdates(Database paramDatabase, Profile paramProfile, EntityItem[] paramArrayOfEntityItem, String[] paramArrayOfString, StringBuffer paramStringBuffer1, StringBuffer paramStringBuffer2) throws Exception {
+/* 555 */     boolean[] arrayOfBoolean = new boolean[paramArrayOfEntityItem.length];
+/* 556 */     boolean bool = false;
+/*     */     
+/* 558 */     EntityList entityList = paramArrayOfEntityItem[0].getEntityGroup().getEntityList();
+/* 559 */     if (entityList == null) {
+/* 560 */       throw new DARuleException("CATDATA EntityGroup not found.  No EntityList for " + paramArrayOfEntityItem[0]
+/* 561 */           .getEntityType() + ".  Execution terminated.");
+/*     */     }
+/* 563 */     EntityGroup entityGroup = entityList.getEntityGroup("CATDATA");
+/* 564 */     if (entityGroup == null) {
+/* 565 */       throw new DARuleException("CATDATA EntityGroup not found in EntityList for " + paramArrayOfEntityItem[0]
+/* 566 */           .getEntityType() + ".  Execution terminated.");
+/*     */     }
+/*     */ 
+/*     */     
+/* 570 */     int i = 254;
+/* 571 */     EANMetaAttribute eANMetaAttribute = entityGroup.getMetaAttribute("DAATTRIBUTEVALUE");
+/* 572 */     if (eANMetaAttribute != null) {
+/* 573 */       i = eANMetaAttribute.getMaxLen();
+/*     */     }
+/*     */     
+/* 576 */     Vector<EntityItem> vector = new Vector();
+/*     */     
+/* 578 */     for (byte b = 0; b < paramArrayOfEntityItem.length; b++) {
+/* 579 */       EntityItem entityItem1 = paramArrayOfEntityItem[b];
+/* 580 */       arrayOfBoolean[b] = false;
+/* 581 */       String str = null;
+/* 582 */       if (paramArrayOfString != null) {
+/* 583 */         str = paramArrayOfString[b];
+/*     */       }
+/* 585 */       DARuleEngineMgr.addDebugComment(3, paramStringBuffer2, "doCatdataUpdates: " + entityItem1.getKey() + " darattrcode " + this.attributeCode);
+/*     */ 
+/*     */       
+/* 588 */       if (str != null && str.trim().length() > 0 && 
+/* 589 */         str.length() > i) {
+/*     */         
+/* 591 */         DARuleEngineMgr.addInformation(paramStringBuffer1, "Warning: Derived value exceeded " + i + " characters.  It was truncated for " + 
+/* 592 */             DARuleEngineMgr.getNavigationName(paramDatabase, paramProfile, entityItem1) + ".");
+/*     */         
+/* 594 */         str = str.substring(0, i - 1);
+/*     */       } 
+/*     */ 
+/*     */       
+/* 598 */       Vector<EntityItem> vector1 = PokUtils.getAllLinkedEntities(entityItem1, this.relatorType, "CATDATA");
+/* 599 */       DARuleEngineMgr.addDebugComment(3, paramStringBuffer2, "doCatdataUpdates: " + entityItem1.getKey() + " " + this.relatorType + " catdataVct.size " + vector1
+/* 600 */           .size());
+/*     */ 
+/*     */       
+/* 603 */       EntityItem entityItem2 = null;
+/* 604 */       for (byte b1 = 0; b1 < vector1.size(); b1++) {
+/* 605 */         EntityItem entityItem = vector1.elementAt(b1);
+/* 606 */         String str1 = PokUtils.getAttributeFlagValue(entityItem, "DAATTRIBUTECODE");
+/* 607 */         DARuleEngineMgr.addDebugComment(3, paramStringBuffer2, "doCatdataUpdates: " + entityItem.getKey() + " attrcode " + str1);
+/* 608 */         if (this.attributeCode.equals(str1)) {
+/* 609 */           entityItem2 = entityItem;
+/*     */           
+/*     */           break;
+/*     */         } 
+/*     */       } 
+/* 614 */       if (entityItem2 == null) {
+/* 615 */         if (str != null && str.trim().length() > 0)
+/*     */         {
+/* 617 */           arrayOfBoolean[b] = createCATDATA(paramDatabase, paramProfile, entityList, entityItem1, str, paramStringBuffer1, paramStringBuffer2);
+/*     */         }
+/*     */       }
+/* 620 */       else if (str != null && str.trim().length() > 0) {
+/*     */         
+/* 622 */         String str1 = PokUtils.getAttributeValue(entityItem2, "DAATTRIBUTEVALUE", "", null, false);
+/* 623 */         if (!str.equals(str1)) {
+/* 624 */           arrayOfBoolean[b] = true;
+/* 625 */           bool = true;
+/* 626 */           StringBuffer stringBuffer = new StringBuffer();
+/*     */           
+/* 628 */           ABRUtil.setText(entityItem2, "DAATTRIBUTEVALUE", str, stringBuffer);
+/* 629 */           if (stringBuffer.length() > 0) {
+/* 630 */             DARuleEngineMgr.addDebugComment(3, paramStringBuffer2, "updateAttribute " + entityItem2.getKey() + " value " + str);
+/* 631 */             DARuleEngineMgr.addDebugComment(3, paramStringBuffer2, stringBuffer.toString());
+/*     */           } 
+/*     */           
+/* 634 */           DARuleEngineMgr.addInformation(paramStringBuffer1, "Updated " + 
+/* 635 */               DARuleEngineMgr.getNavigationName(paramDatabase, paramProfile, entityItem2) + " for " + 
+/* 636 */               DARuleEngineMgr.getNavigationName(paramDatabase, paramProfile, entityItem1));
+/*     */         } 
+/*     */       } else {
+/*     */         
+/* 640 */         arrayOfBoolean[b] = true;
+/*     */         
+/* 642 */         DARuleEngineMgr.addInformation(paramStringBuffer1, "Deleted " + 
+/* 643 */             DARuleEngineMgr.getNavigationName(paramDatabase, paramProfile, entityItem2) + " for " + 
+/* 644 */             DARuleEngineMgr.getNavigationName(paramDatabase, paramProfile, entityItem1));
+/* 645 */         vector.add(entityItem2);
+/*     */       } 
+/*     */     } 
+/*     */ 
+/*     */     
+/* 650 */     if (bool)
+/*     */     {
+/* 652 */       entityGroup.commit(paramDatabase, null);
+/*     */     }
+/*     */     
+/* 655 */     if (vector.size() > 0) {
+/* 656 */       EntityItem[] arrayOfEntityItem = new EntityItem[vector.size()];
+/* 657 */       vector.copyInto((Object[])arrayOfEntityItem);
+/* 658 */       deleteCatdata(paramDatabase, paramProfile, arrayOfEntityItem);
+/* 659 */       vector.clear();
+/* 660 */       arrayOfEntityItem = null;
+/*     */     } 
+/*     */     
+/* 663 */     return arrayOfBoolean;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String getDerivedValue(Database paramDatabase, Profile paramProfile, EntityItem paramEntityItem, StringBuffer paramStringBuffer) throws Exception {
+/* 681 */     String str = null;
+/* 682 */     if (this.daRuleVct != null) {
+/* 683 */       for (byte b = 0; b < this.daRuleVct.size(); b++) {
+/* 684 */         DARuleItem dARuleItem = this.daRuleVct.elementAt(b);
+/* 685 */         str = dARuleItem.getDerivedValue(paramDatabase, paramProfile, paramEntityItem, str, paramStringBuffer);
+/* 686 */         DARuleEngineMgr.addDebugComment(4, paramStringBuffer, "getDerivedValue[" + b + "]: " + dARuleItem.getKey() + " results " + str);
+/*     */       } 
+/*     */     }
+/* 689 */     return str;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private String[] getDerivedValues(Database paramDatabase, Profile paramProfile, EntityItem[] paramArrayOfEntityItem, StringBuffer paramStringBuffer) throws Exception {
+/* 703 */     String[] arrayOfString = null;
+/* 704 */     if (this.daRuleVct != null && paramArrayOfEntityItem != null && paramArrayOfEntityItem.length > 0) {
+/* 705 */       for (byte b = 0; b < this.daRuleVct.size(); b++) {
+/* 706 */         DARuleItem dARuleItem = this.daRuleVct.elementAt(b);
+/* 707 */         arrayOfString = dARuleItem.getDerivedValues(paramDatabase, paramProfile, paramArrayOfEntityItem, arrayOfString, paramStringBuffer);
+/*     */       } 
+/*     */     }
+/* 710 */     return arrayOfString;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void dereference() {
+/* 717 */     if (this.daRuleVct != null) {
+/* 718 */       for (byte b = 0; b < this.daRuleVct.size(); b++) {
+/* 719 */         DARuleItem dARuleItem = this.daRuleVct.elementAt(b);
+/* 720 */         dARuleItem.dereference();
+/*     */       } 
+/* 722 */       this.daRuleVct.clear();
+/* 723 */       this.daRuleVct = null;
+/*     */     } 
+/*     */     
+/* 726 */     this.attributeCode = null;
+/* 727 */     this.relatorType = null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String toString() {
+/* 734 */     StringBuffer stringBuffer = new StringBuffer("DARuleGroup: ");
+/* 735 */     stringBuffer.append("DAATTRIBUTECODE: " + this.attributeCode + " \n");
+/* 736 */     if (this.daRuleVct != null) {
+/* 737 */       for (byte b = 0; b < this.daRuleVct.size(); b++) {
+/* 738 */         DARuleItem dARuleItem = this.daRuleVct.elementAt(b);
+/* 739 */         stringBuffer.append(dARuleItem.toString() + "\n");
+/*     */       } 
+/*     */     } else {
+/* 742 */       stringBuffer.append("No DARULEs");
+/*     */     } 
+/*     */     
+/* 745 */     return stringBuffer.toString();
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private void updateAttribute(Database paramDatabase, EntityItem paramEntityItem, String paramString, StringBuffer paramStringBuffer) throws Exception {
+/* 760 */     StringBuffer stringBuffer = new StringBuffer();
+/*     */     
+/* 762 */     ABRUtil.setText(paramEntityItem, "DAATTRIBUTEVALUE", paramString, stringBuffer);
+/* 763 */     DARuleEngineMgr.addDebugComment(3, paramStringBuffer, "updateAttribute " + paramEntityItem.getKey() + " to value " + paramString);
+/* 764 */     if (stringBuffer.length() > 0) {
+/* 765 */       DARuleEngineMgr.addDebugComment(1, paramStringBuffer, stringBuffer.toString());
+/*     */     }
+/*     */     
+/* 768 */     paramEntityItem.commit(paramDatabase, null);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   private EntityItem createCATDATA(Database paramDatabase, Profile paramProfile, EntityItem paramEntityItem, String paramString, StringBuffer paramStringBuffer) throws Exception {
+/* 785 */     EntityItem entityItem = null;
+/* 786 */     DARuleEngineMgr.addDebugComment(4, paramStringBuffer, "createCATDATA  darattrcode " + this.attributeCode + " derivedvalue " + paramString);
+/*     */ 
+/*     */     
+/* 789 */     Vector<String> vector = new Vector();
+/* 790 */     Hashtable<Object, Object> hashtable = new Hashtable<>();
+/* 791 */     vector.addElement("DAATTRIBUTECODE");
+/* 792 */     hashtable.put("DAATTRIBUTECODE", this.attributeCode);
+/* 793 */     vector.addElement("DAATTRIBUTEVALUE");
+/* 794 */     hashtable.put("DAATTRIBUTEVALUE", paramString);
+/*     */     
+/* 796 */     StringBuffer stringBuffer = new StringBuffer();
+/* 797 */     entityItem = ABRUtil.createEntity(paramDatabase, paramProfile, this.createActionName, paramEntityItem, "CATDATA", vector, hashtable, stringBuffer);
+/*     */     
+/* 799 */     if (stringBuffer.length() > 0) {
+/* 800 */       DARuleEngineMgr.addDebugComment(3, paramStringBuffer, "createCATDATA " + stringBuffer.toString());
+/*     */     }
+/*     */     
+/* 803 */     vector.clear();
+/* 804 */     hashtable.clear();
+/*     */     
+/* 806 */     return entityItem;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static String getVersion() {
+/* 815 */     return "$Revision: 1.9 $";
+/*     */   }
+/*     */ }
 
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Hashtable;
 
-import java.util.Vector;
-
-import COM.ibm.eannounce.abr.util.ABRUtil;
-
-import COM.ibm.eannounce.objects.DeleteActionItem;
-import COM.ibm.eannounce.objects.EANBusinessRuleException;
-import COM.ibm.eannounce.objects.EANMetaAttribute;
-import COM.ibm.eannounce.objects.EntityGroup;
-import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.eannounce.objects.EntityList;
-import COM.ibm.opicmpdh.middleware.D;
-import COM.ibm.opicmpdh.middleware.Database;
-import COM.ibm.opicmpdh.middleware.LockException;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
-import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
-import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
-import COM.ibm.opicmpdh.middleware.Profile;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-
-/*********************************
- * 
- * One for each DARULE DAATTRIBUTECODE
- * 
- * E.	Sequence
- * A derived Entity Type Attribute Code may have multiple Attribute Derivation Rules. This is an integer value 
- * that indicates the sequence that the Rules should be applied
- * 
-Knows how to build/update the CATDATA for its rule.
-Does a create/link or update CATDATA ->assumption that EntityItem passed in is part of an extract with a CATDATA group
-(create/link must add the new CATDATA to the EntityGroup so it can be dereferenced)
-Multiple DARULEs will be ordered by sequence and executed in that order.
-It must know the create action name.
-
-DARULE  Entity  Attribute Derivation Rule
-
-DARULE  ATTRDERIVEABRSTATUS A   Attribute Derivation ABR Status
-DARULE  COMMENTS    L   Comments
-DARULE  DAATTRIBUTECODE U   Attribute
-DARULE  DAENTITYTYPE    U   Entity Type
-DARULE  DALIFECYCLE S   Life Cycle
-DARULE  DARULETYPE  U   Rule Type
-DARULE  PDHDOMAIN   F   Domains
-DARULE  RULEFAIL    L   Fail Results
-DARULE  RULEMULTIPLE    T   Rule Concatenation String
-DARULE  RULEPASS    L   Pass Results
-DARULE  RULESEQ T   Sequence
-DARULE  RULETEST    T   Test
-
+/* Location:              C:\Users\06490K744\Documents\fromServer\deployments\codeSync2\abr.jar!\COM\ibm\eannounce\darule\DARuleGroup.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
  */
-// $Log: DARuleGroup.java,v $
-// Revision 1.9  2011/07/13 19:44:03  wendy
-// added to error msg for idl
-//
-// Revision 1.8  2011/06/06 16:53:59  wendy
-// Added information to error message
-//
-// Revision 1.7  2011/04/27 12:10:46  wendy
-// add root info to truncation warning for idl
-//
-// Revision 1.6  2011/04/25 20:11:50  wendy
-// Expire cache if DARULE that was part of cache was modified
-//
-// Revision 1.5  2011/04/14 01:15:45  wendy
-// Added delete CATDATA if it existed and newly derived value was empty
-// also truncate if value> maxlen
-//
-// Revision 1.4  2011/04/08 17:13:58  wendy
-// Check for more than 1 Ready in IDL
-//
-// Revision 1.3  2011/03/23 14:44:27  wendy
-// remove asis ruletype
-//
-// Revision 1.2  2011/03/21 18:47:57  wendy
-// Deref createlist
-//
-// Revision 1.1  2011/03/15 21:12:10  wendy
-// Init for BH FS ABR Catalog Attr Derivation 20110221b.doc
-//
-public class DARuleGroup implements Serializable {
-	private static final long serialVersionUID = 1L;
-	private String relatorType = null;
-	private String createActionName = null;
-	private String attributeCode = null;
-	private Vector daRuleVct = null;  // must allow for multiple DARULE entitys for a single attrcode
-
-	/*
-FEATURECATDATA	FEATURE	CATDATA
-LSEOBUNDLECATDATA	LSEOBUNDLE	CATDATA
-MODELCATDATA	MODEL	CATDATA
-SVCMODCATDATA	SVCMOD	CATDATA
-WWSEOCATDATA	WWSEO	CATDATA
-SWFEATURECATDATA	SWFEATURE	CATDATA
-LSEOCATDATA	LSEO	CATDATA
-	 */
-	protected static final Hashtable CATREL_TBL;
-	static {
-		CATREL_TBL = new Hashtable(); 
-		CATREL_TBL.put("FEATURE", "FEATURECATDATA");
-		CATREL_TBL.put("MODEL", "MODELCATDATA");
-		CATREL_TBL.put("WWSEO", "WWSEOCATDATA");
-		CATREL_TBL.put("SVCMOD", "SVCMODCATDATA");
-		CATREL_TBL.put("LSEO", "LSEOCATDATA");
-		CATREL_TBL.put("LSEOBUNDLE", "LSEOBUNDLECATDATA");
-		CATREL_TBL.put("SWFEATURE", "SWFEATURECATDATA");
-	}
-	private static final Hashtable CATACTION_TBL;
-    static {
-    	CATACTION_TBL = new Hashtable(); 
-    	CATACTION_TBL.put("FEATURE", "CRFEATCATDATA");
-    	CATACTION_TBL.put("MODEL", "CRMDLCATDATA");
-    	CATACTION_TBL.put("WWSEO", "CRWWSEOCATDATA");
-    	CATACTION_TBL.put("SVCMOD", "CRSVCMCATDATA");
-    	CATACTION_TBL.put("LSEO", "CRLSEOCATDATA");
-    	CATACTION_TBL.put("LSEOBUNDLE", "CRLSEOBCATDATA");
-    	CATACTION_TBL.put("SWFEATURE", "CRSWFCATDATA");
-    }
-    
-	private static final String DELETEACTION_NAME="DELCATDATA"; 
-  
-	/**
-	 * constructor for IDL, will not be cached
-	 * @param db
-	 * @param prof
-	 * @param entityType
-	 * @param attrCode
-	 * @param debugSb
-	 * @throws Exception
-	 */
-	protected DARuleGroup(Database db, Profile prof,String entityType, String attrCode, 
-			StringBuffer debugSb) 
-	throws Exception
-	{
-		this(attrCode,entityType);
-		
-		// search for DARules for this entitytype
-		EntityItem eia[] = DARuleEngine.searchForDARules(db, prof,entityType,attrCode,debugSb);
-		if(eia !=null){
-			// look for any invalid lifecycle or sequence
-			verifyDARules(eia, debugSb);
-			
-			//find executable rules for this attributecode
-			for(int i=0; i<eia.length; i++){
-				EntityItem daruleItem = eia[i];
-				String ruletype = PokUtils.getAttributeFlagValue(daruleItem, "DARULETYPE");
-				String lifecycle = PokUtils.getAttributeFlagValue(daruleItem, "DALIFECYCLE");
-				DARuleEngineMgr.addDebugComment(D.EBUG_DETAIL,debugSb,"DARuleGroup:["+i+"] "+daruleItem.getKey()+" ruletype "+
-						ruletype+" lifecycle "+lifecycle);
-
-				if(DARuleEngine.DALIFECYCLE_Ready.equals(lifecycle) ||
-						DARuleEngine.DALIFECYCLE_Draft.equals(lifecycle)||
-						DARuleEngine.DALIFECYCLE_Change.equals(lifecycle)){
-					DARuleItem darItem  = null;
-					if(DARuleEngine.DARULETYPE_Substitution.equals(ruletype)){	//DARULETYPE  20  Substitution
-						darItem = new DARuleSubstitution(daruleItem);
-					}else if(DARuleEngine.DARULETYPE_ScanReplace.equals(ruletype)){ 	//DARULETYPE  30  ScanReplace
-						darItem = new DARuleScanReplace(daruleItem);
-					}else if(DARuleEngine.DARULETYPE_Equation.equals(ruletype)){	//DARULETYPE  40  Equation
-						darItem = new DARuleEquation(daruleItem);
-					}
-					if(darItem!=null){
-						addRuleItem(darItem);
-					}else{
-						DARuleEngineMgr.addDebugComment(D.EBUG_ERR,debugSb,"DARuleGroup: "+daruleItem.getKey()+" ruletype "+ruletype+" is not supported");
-					}
-				}else{
-					DARuleEngineMgr.addDebugComment(D.EBUG_WARN,debugSb,"DARuleGroup: "+daruleItem.getKey()+" lifecycle "+lifecycle+" is not used for IDL");
-				}
-			}
-		}
-	}
-    /**
-     * NOTE: only used for IDL 
-     * 
-     * 	A derived Entity Type Attribute Code may have multiple Attribute Derivation Rules that are applied in a sequence;
-     * however, there is a single definition. For example, there cannot be two DARULEs with a Sequence = 0 or empty
-     * for the same Entity Attribute. Sequence is an integer value that indicates the sequence that the Rules should
-     * be applied.
-     * 
-     *  2.	If any of the DARULEs have DALIFECYCLE of Production, then this is an error
-     * @param eia
-     * @param debugSb 
-     * @throws InvalidDARuleException 
-     */
-    private void verifyDARules(EntityItem eia[], StringBuffer debugSb) throws InvalidDARuleException
-    {
-    	Vector errvct = null;
-    	EntityItem daruleSeq0=null;
-    	EntityItem daruleReady=null;
-    	StringBuffer sb = new StringBuffer("Invalid DARULE found:");
-		for(int i=0; i<eia.length; i++){
-			EntityItem daruleItem = eia[i];
-			String sequence = PokUtils.getAttributeValue(daruleItem, "RULESEQ", "", "0", false);
-			String lifecycle = PokUtils.getAttributeFlagValue(daruleItem, "DALIFECYCLE");
-			DARuleEngineMgr.addDebugComment(D.EBUG_DETAIL,debugSb,"verifyDARules: "+daruleItem.getKey()+
-					" sequence "+sequence+" lifecycle "+lifecycle);
-			
-			if(DARuleEngine.DALIFECYCLE_Production.equals(lifecycle)){
-				if(errvct==null){
-					errvct = new Vector();
-				}
-				sb.append(" "+daruleItem.getKey()+" DALIFECYCLE is Production.");
-				errvct.add(daruleItem);
-				continue;
-			}
-			if(DARuleEngine.DALIFECYCLE_Retire.equals(lifecycle)){
-				if(errvct==null){
-					errvct = new Vector();
-				}
-				sb.append(" "+daruleItem.getKey()+" DALIFECYCLE is Retire.");
-				errvct.add(daruleItem);
-				continue;
-			}
-			// only one in the set can be 'Ready'
-			if(DARuleEngine.DALIFECYCLE_Ready.equals(lifecycle)){
-				if(daruleReady!=null){
-					if(errvct==null){
-						errvct = new Vector();
-					}
-					errvct.add(daruleItem);
-					sb.append(" "+daruleItem.getKey()+" DALIFECYCLE is Ready.");
-					if(!errvct.contains(daruleReady)){
-						errvct.add(daruleReady);
-						sb.append(" "+daruleReady.getKey()+" DALIFECYCLE is Ready.");
-					}
-					continue;
-				}
-				daruleReady = daruleItem;
-			}
-			
-			//ignore Obsolete
-			if(DARuleEngine.DALIFECYCLE_Ready.equals(lifecycle) ||
-					DARuleEngine.DALIFECYCLE_Draft.equals(lifecycle)||
-					DARuleEngine.DALIFECYCLE_Change.equals(lifecycle)){
-				if("0".equals(sequence)){
-					if(daruleSeq0!=null){
-						if(errvct==null){
-							errvct = new Vector();
-						}
-						errvct.add(daruleItem);
-						sb.append(" "+daruleReady.getKey()+" duplicate Sequence 0 or empty.");
-						if(!errvct.contains(daruleSeq0)){
-							errvct.add(daruleSeq0);
-							sb.append(" "+daruleSeq0.getKey()+" duplicate Sequence 0 or empty.");
-						}
-					}
-					daruleSeq0 = daruleItem;
-				}
-			}
-		}
-		
-		if(errvct!=null){
-			throw new InvalidDARuleException(sb.toString(),errvct);
-		}
-    }
-	/**
-	 * constructor 
-	 * 
-	 * @param attrCode - flag value
-	 * @param entityType - description like FEATURE, not flag code
-	 */
-	protected DARuleGroup(String attrCode, String entityType){
-		attributeCode = attrCode;
-		relatorType = CATREL_TBL.get(entityType).toString();	
-		createActionName = CATACTION_TBL.get(entityType).toString();
-	}
-	 
-	/**
-	 * some attribute codes have multiple rule items
-	 * @param dar
-	 */
-	protected void addRuleItem(DARuleItem dar){
-		if(daRuleVct==null){
-			daRuleVct = new Vector();
-		}
-		daRuleVct.add(dar);
-		if(daRuleVct.size()>1){
-			//sort on sequence number 
-			Collections.sort(daRuleVct);
-		}
-	}
-	
-	/**
-	 * update or create and link CATDATA for this rule
-	 * used by RuleEngine from RuleEngineMgr for DQ ABR or workflow ABR on a specific offering entity instance
-	 * not used for IDL
-	 * 
-	 * It derives DAATTRIBUTEVALUE for DAATTRIBUTECODE.
-	 *  If the root entity has a child CATDATA for this attribute code (CATDATA.DAATTRIBUTECODE),
-	 *  then
-	 *  update the value if the derived value does not exactly match DAATTRIBUTEVALUE.
-	 *  else
-	 *  create a new instance of CATDATA for DAATRIBUTECODE and DAATTRIBUTEVALUE.
-	 *  
-	 * @param db
-	 * @param prof
-	 * @param root
-	 * @param msgSb
-	 * @return
-	 * @throws Exception
-	 */
-	protected boolean updateCatData(Database db, Profile prof, EntityItem root, StringBuffer msgSb) 
-	throws Exception
-	{
-		// get the derived value
-		String derivedValue = getDerivedValue(db, prof, root,msgSb);
-		//if null returned - no rules applied
-		  
-		//update the CATDATA	
-		boolean chgsmade = doCatdataUpdate(db, prof, root, derivedValue, msgSb);
-
-		return chgsmade;
-	}
-
-	/**
-	 * update or create and link CATDATA for this DAATTRIBUTECODE
-	 * called directly from IDL abr for subsets of entityitems it finds that meet the criteria
-	 * 
-	 * It derives DAATTRIBUTEVALUE for DAATTRIBUTECODE.
-	 *  If the root entity has a child CATDATA for this attribute code (CATDATA.DAATTRIBUTECODE),
-	 *  then
-	 *  update the value if the derived value does not exactly match DAATTRIBUTEVALUE.
-	 *  else
-	 *  create a new instance of CATDATA for DAATRIBUTECODE and DAATTRIBUTEVALUE.
-	 *  
-	 * @param db
-	 * @param prof 
-	 * @param rootArray
-	 * @param msgSb
-	 * @param debugSb - separate buffer to stream out
-	 * @return
-	 * @throws Exception
-	 */
-	public boolean[] idlCatData(Database db, Profile prof, EntityItem rootArray[], StringBuffer msgSb,
-			StringBuffer debugSb) 
-	throws Exception
-	{		
-		// get the derived value
-		String derivedValues[] = getDerivedValues(db, prof, rootArray, debugSb);
-		//if null returned - no rules applied
-
-		//update the CATDATA	
-		boolean[] chgsmade = doCatdataUpdates(db, prof, rootArray, derivedValues, msgSb,debugSb);
-
-		return chgsmade;
-	}
-	
-	/**
-	 * expose all DARULE entityItems for this entitytype and attributecode
-	 * ATTRDERIVEABRSTATUS ABR must update DALIFECYCLE for all DARULEs in a set
-	 * @return
-	 */
-	public Vector getDARULEEntitys(){
-		if(daRuleVct==null){
-			return null;
-		}
-		Vector eiVct = new Vector(daRuleVct.size());
-		for(int i=0; i<daRuleVct.size(); i++){
-			DARuleItem darItem = (DARuleItem)daRuleVct.elementAt(i);
-			eiVct.add(darItem.getDARULEEntity());
-		}
-		return eiVct;
-	}
-
-	/**
-	 * update or create CATDATA with the derived value
-	 * @param db
-	 * @param prof
-	 * @param root
-	 * @param derivedValue
-	 * @param msgSb
-	 * @return
-	 * @throws Exception
-	 */
-	private boolean doCatdataUpdate(Database db, Profile prof, EntityItem root, String derivedValue, 
-			StringBuffer msgSb) throws Exception 
-	{
-		boolean chgsmade = false;
-		// make sure it was in the extract
-		EntityList list = root.getEntityGroup().getEntityList();
-		if(list==null){
-			throw new DARuleException("CATDATA EntityGroup not found.  No EntityList for "+root.getKey());
-		}
-		EntityGroup eGrp = list.getEntityGroup("CATDATA");
-		if(eGrp==null){
-			throw new DARuleException("CATDATA EntityGroup not found in EntityList for "+root.getKey());
-		}
-		
-		// truncate if exceeds maxlen
-	   	int maxLen = EANMetaAttribute.TEXT_MAX_LEN;
-		EANMetaAttribute metaAttr = eGrp.getMetaAttribute("DAATTRIBUTEVALUE");
-		if(metaAttr!=null){
-			maxLen = metaAttr.getMaxLen();
-		}
-		
-		Vector catdataVct = PokUtils.getAllLinkedEntities(root, relatorType, "CATDATA");
-		DARuleEngineMgr.addDebugComment(D.EBUG_DETAIL,msgSb,"doCatdataUpdate: "+relatorType+" catdataVct.size "+
-				catdataVct.size()+" darGrpAttrcode "+attributeCode);
-		
-		// is there a CATADATA for this rule
-		EntityItem catdata = null;
-		for(int i=0; i<catdataVct.size(); i++){
-			EntityItem ei = (EntityItem)catdataVct.elementAt(i);
-			String attrcode = PokUtils.getAttributeFlagValue(ei, "DAATTRIBUTECODE");
-			DARuleEngineMgr.addDebugComment(D.EBUG_DETAIL,msgSb,"doCatdataUpdate: "+ei.getKey()+" catDataAttrcode "+attrcode);
-			if(attributeCode.equals(attrcode)){
-				catdata = ei;
-				break;
-			}
-		}
-		
-		if(derivedValue!=null && derivedValue.trim().length()>0){
-			if(derivedValue.length()>maxLen){
-				//notify user 
-				DARuleEngineMgr.addInformation(msgSb, "Warning: Derived value exceeded "+maxLen+
-						" characters.  It was truncated.");
-				// truncate
-				derivedValue = derivedValue.substring(0,maxLen-1);
-			}
-		}
-		
-		if(catdata==null){
-			if(derivedValue!=null && derivedValue.trim().length()>0){
-				//create and link catdata
-				chgsmade = createCATDATA(db, prof, list, root, derivedValue, msgSb, msgSb);
-			}
-		}else{
-			if(derivedValue!=null && derivedValue.trim().length()>0){
-				//update catdata
-				String curvalue = PokUtils.getAttributeValue(catdata, "DAATTRIBUTEVALUE", "", null, false);
-				if(!derivedValue.equals(curvalue)){
-					chgsmade = true;
-					updateAttribute(db, catdata, derivedValue, msgSb);
-					//Updated {0} for {1}
-					DARuleEngineMgr.addInformation(msgSb,"Updated "+
-							DARuleEngineMgr.getNavigationName(db, prof, catdata)+" for "+
-							DARuleEngineMgr.getNavigationName(db, prof, root));
-				}else{
-					DARuleEngineMgr.addDebugComment(D.EBUG_DETAIL,msgSb," "+catdata.getKey()+" value did not change "+curvalue);
-				}
-			}else{
-				//delete the CATDATA
-				chgsmade = true;
-				//Deleted {0} for {1}
-				DARuleEngineMgr.addInformation(msgSb,"Deleted "+
-						DARuleEngineMgr.getNavigationName(db, prof, catdata)+" for "+
-						DARuleEngineMgr.getNavigationName(db, prof, root));
-				deleteCatdata(db, prof, new EntityItem[]{catdata});
-			}
-		} 
-		
-		return chgsmade;
-	}
-	
-	/**
-	 * create the CATDATA and its relator, move those items to the root's entitylist
-	 * @param db
-	 * @param prof
-	 * @param list
-	 * @param root
-	 * @param derivedValue
-	 * @param msgSb
-	 * @param debugSb
-	 * @return
-	 * @throws Exception
-	 */
-	private boolean createCATDATA(Database db, Profile prof, EntityList list, EntityItem root, String derivedValue, 
-			StringBuffer msgSb, StringBuffer debugSb) throws Exception 
-	{
-		boolean chgsmade = false;
-		//create and link catdata
-		EntityItem catdata = createCATDATA(db, prof, root, derivedValue, debugSb);
-		if(catdata!=null){
-			chgsmade = true;
-			EntityGroup eGrp = list.getEntityGroup("CATDATA");
-			EntityList createList = catdata.getEntityGroup().getEntityList();
-			EntityGroup createGrp = createList.getEntityGroup("CATDATA");
-			eGrp.putEntityItem(catdata);
-			catdata.reassign(eGrp);
-			// remove it from create list
-			createGrp.removeEntityItem(catdata);
-			
-			EntityItem catRel = (EntityItem)catdata.getUpLink(0);
-			eGrp = list.getEntityGroup(relatorType);
-			createGrp = createList.getEntityGroup(relatorType);
-			eGrp.putEntityItem(catRel);
-			catRel.reassign(eGrp);
-			// remove it from create list
-			createGrp.removeEntityItem(catRel);
-			
-			//release memory
-			createList.dereference();
-
-			//Created and referenced {0} for {1}
-			DARuleEngineMgr.addInformation(msgSb,"Created and referenced "+
-					DARuleEngineMgr.getNavigationName(db, prof, catdata)+" for "+
-					DARuleEngineMgr.getNavigationName(db, prof, root));
-		}else{
-			throw new DARuleException("Unable to create CATDATA for "+
-					DARuleEngineMgr.getNavigationName(db, prof, root));
-		}
-		
-		return chgsmade;
-	}
-	
-	/**
-	 * delete the CATDATA and its relator
-	 * @param db
-	 * @param prof
-	 * @param catdata
-	 * @throws MiddlewareRequestException
-	 * @throws SQLException
-	 * @throws MiddlewareException
-	 * @throws LockException
-	 * @throws MiddlewareShutdownInProgressException
-	 * @throws EANBusinessRuleException
-	 */
-	protected static void deleteCatdata(Database db, Profile prof, EntityItem[] catdata)
-	throws MiddlewareRequestException, SQLException, MiddlewareException, LockException, 
-	MiddlewareShutdownInProgressException, EANBusinessRuleException
-	{
-    	DeleteActionItem dai = new DeleteActionItem(null, db,prof,DELETEACTION_NAME);
-
-    	// do the delete
-    	dai.setEntityItems(catdata);
-    	db.executeAction(prof, dai);
-	}
-	/**
-	 * NOTE: used for IDL
-	 * @param db
-	 * @param prof
-	 * @param rootArray
-	 * @param derivedValues
-	 * @param msgSb
-	 * @param debugSb
-	 * @return
-	 * @throws Exception
-	 */
-	private boolean[] doCatdataUpdates(Database db, Profile prof, EntityItem[] rootArray, String[] derivedValues, 
-			StringBuffer msgSb, StringBuffer debugSb) throws Exception 
-	{
-		boolean[] chgsmade = new boolean[rootArray.length];
-		boolean commitGrp = false;
-		// make sure it was in the extract
-		EntityList list = rootArray[0].getEntityGroup().getEntityList();
-		if(list==null){
-			throw new DARuleException("CATDATA EntityGroup not found.  No EntityList for "+
-					rootArray[0].getEntityType()+".  Execution terminated.");
-		}
-		EntityGroup eGrp = list.getEntityGroup("CATDATA");
-		if(eGrp==null){
-			throw new DARuleException("CATDATA EntityGroup not found in EntityList for "+
-					rootArray[0].getEntityType()+".  Execution terminated.");
-		}
-		
-		// truncate if exceeds maxlen
-	   	int maxLen = EANMetaAttribute.TEXT_MAX_LEN;
-		EANMetaAttribute metaAttr = eGrp.getMetaAttribute("DAATTRIBUTEVALUE");
-		if(metaAttr!=null){
-			maxLen = metaAttr.getMaxLen();
-		}
-		
-		Vector catdata2deleteVct = new Vector();
-
-		for(int x=0; x<rootArray.length; x++){
-			EntityItem root = rootArray[x];
-			chgsmade[x] = false;
-			String derivedValue = null;
-			if(derivedValues != null){
-				derivedValue = derivedValues[x];
-			}
-			DARuleEngineMgr.addDebugComment(D.EBUG_DETAIL,debugSb,"doCatdataUpdates: "+root.getKey()
-					+" darattrcode "+attributeCode);
-
-			if(derivedValue!=null && derivedValue.trim().length()>0){
-				if(derivedValue.length()>maxLen){
-					//notify user 
-					DARuleEngineMgr.addInformation(msgSb, "Warning: Derived value exceeded "+maxLen+
-							" characters.  It was truncated for "+DARuleEngineMgr.getNavigationName(db, prof, root)+".");
-					// truncate
-					derivedValue = derivedValue.substring(0,maxLen-1);
-				}
-			}
-			
-			Vector catdataVct = PokUtils.getAllLinkedEntities(root, relatorType, "CATDATA");
-			DARuleEngineMgr.addDebugComment(D.EBUG_DETAIL,debugSb,"doCatdataUpdates: "+root.getKey()+" "+relatorType+" catdataVct.size "+
-					catdataVct.size());
-
-			// is there a CATADATA for this rule
-			EntityItem catdata = null;
-			for(int i=0; i<catdataVct.size(); i++){
-				EntityItem ei = (EntityItem)catdataVct.elementAt(i);
-				String attrcode = PokUtils.getAttributeFlagValue(ei, "DAATTRIBUTECODE");
-				DARuleEngineMgr.addDebugComment(D.EBUG_DETAIL,debugSb,"doCatdataUpdates: "+ei.getKey()+" attrcode "+attrcode);
-				if(attributeCode.equals(attrcode)){
-					catdata = ei;
-					break;
-				}
-			}
-
-			if(catdata==null){
-				if(derivedValue!=null && derivedValue.trim().length()>0){
-					//create and link catdata
-					chgsmade[x] = createCATDATA(db, prof, list, root, derivedValue, msgSb, debugSb);
-				}
-			}else{
-				if(derivedValue!=null && derivedValue.trim().length()>0){
-					//update existing catdata
-					String curvalue = PokUtils.getAttributeValue(catdata, "DAATTRIBUTEVALUE", "", null, false);
-					if(!derivedValue.equals(curvalue)){
-						chgsmade[x] = true;
-						commitGrp = true;
-						StringBuffer debugSb2 = new StringBuffer();
-						// save the attribute
-						ABRUtil.setText(catdata,"DAATTRIBUTEVALUE", derivedValue, debugSb2); 
-						if (debugSb2.length()>0){
-							DARuleEngineMgr.addDebugComment(D.EBUG_DETAIL,debugSb,"updateAttribute "+catdata.getKey()+" value "+derivedValue);
-							DARuleEngineMgr.addDebugComment(D.EBUG_DETAIL,debugSb,debugSb2.toString());
-						}
-						//Updated {0} for {1}
-						DARuleEngineMgr.addInformation(msgSb,"Updated "+
-								DARuleEngineMgr.getNavigationName(db, prof, catdata)+" for "+
-								DARuleEngineMgr.getNavigationName(db, prof, root));
-					}
-				}else{
-					//delete the CATDATA
-					chgsmade[x] = true;
-					//Deleted {0} for {1}
-					DARuleEngineMgr.addInformation(msgSb,"Deleted "+
-							DARuleEngineMgr.getNavigationName(db, prof, catdata)+" for "+
-							DARuleEngineMgr.getNavigationName(db, prof, root));
-					catdata2deleteVct.add(catdata);
-				}
-			}
-		}
-		
-		if(commitGrp){
-			// one or more existing CATDATA was updated, commit entitygroup
-			eGrp.commit(db, null);
-		}
-		
-		if(catdata2deleteVct.size()>0){
-			EntityItem[] eia = new EntityItem[catdata2deleteVct.size()];
-			catdata2deleteVct.copyInto(eia);
-			deleteCatdata(db, prof, eia);
-			catdata2deleteVct.clear();
-			eia = null;
-		}
-		
-		return chgsmade;
-	}
-	/**
-	 * apply a subset of Attribute Derivation Rules (DARULE) based on the following criteria:
-	 * 	The root entity type = DARULE.DAENTITYTYPE
-	 * 	DARULE.LIFECYCLE = “Production” (???) - filtered when group was built
-	 * 	The root entity type PDHDOMAIN is in DARULE.PDHDOMAIN
-	 * 
-	 * @param db
-	 * @param prof
-	 * @param rootItem
-	 * @param debugSb
-	 * @return
-	 * @throws Exception
-	 */
-	private String getDerivedValue(Database db, Profile prof, EntityItem rootItem,StringBuffer debugSb) 
-	throws Exception
-	{
-		String results = null;
-		if(daRuleVct!=null){
-			for(int i=0; i<daRuleVct.size(); i++){
-				DARuleItem darItem = (DARuleItem)daRuleVct.elementAt(i);
-				results = darItem.getDerivedValue(db, prof, rootItem, results, debugSb);
-				DARuleEngineMgr.addDebugComment(D.EBUG_SPEW,debugSb,"getDerivedValue["+i+"]: "+darItem.getKey()+" results "+results);
-			}
-		}
-		return results;
-	}
-	/**
-	 * used for IDL to improve performance
-	 * @param db
-	 * @param prof
-	 * @param rootItemArray
-	 * @param debugSb
-	 * @return
-	 * @throws Exception
-	 */
-	private String[] getDerivedValues(Database db, Profile prof, EntityItem rootItemArray[],StringBuffer debugSb) 
-	throws Exception
-	{
-		String results[] = null;
-		if(daRuleVct!=null && rootItemArray !=null && rootItemArray.length>0){
-			for(int i=0; i<daRuleVct.size(); i++){
-				DARuleItem darItem = (DARuleItem)daRuleVct.elementAt(i);
-				results = darItem.getDerivedValues(db, prof, rootItemArray, results, debugSb);
-			}
-		}
-		return results;
-	}
-	/**
-	 * release memory
-	 */
-	public void dereference()
-	{
-		if(daRuleVct!=null){
-			for(int i=0; i<daRuleVct.size(); i++){
-				DARuleItem darObj = (DARuleItem)daRuleVct.elementAt(i);
-				darObj.dereference();
-			}
-			daRuleVct.clear();
-			daRuleVct = null;
-		}
-		
-		attributeCode = null;
-		relatorType = null;
-	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString(){
-		StringBuffer sb = new StringBuffer("DARuleGroup: ");
-		sb.append("DAATTRIBUTECODE: "+attributeCode+" \n");
-		if(daRuleVct!=null){
-			for(int i=0; i<daRuleVct.size(); i++){
-				DARuleItem darItem = (DARuleItem)daRuleVct.elementAt(i);
-				sb.append(darItem.toString()+"\n");
-			}
-		}else{
-			sb.append("No DARULEs");
-		}
-		
-		return sb.toString();
-	}
-	
-	/** 
-	 * update an existing CATDATA
-	 * CATDATA DAATTRIBUTEVALUE    T   Attribute Value
-	 * @param db
-	 * @param catdataItem
-	 * @param value
-	 * @param debugSb
-	 * @throws Exception
-	 */
-	private void updateAttribute(Database db,EntityItem catdataItem, String value,StringBuffer debugSb) 
-	throws Exception
-	{
-		StringBuffer debugSb2 = new StringBuffer();
-		// save the attribute
-		ABRUtil.setText(catdataItem,"DAATTRIBUTEVALUE", value, debugSb2); 
-		DARuleEngineMgr.addDebugComment(D.EBUG_DETAIL,debugSb,"updateAttribute "+catdataItem.getKey()+" to value "+value);
-		if (debugSb2.length()>0){
-			DARuleEngineMgr.addDebugComment(D.EBUG_WARN,debugSb,debugSb2.toString());
-		}
-		// must commit changed entity to the PDH 
-		catdataItem.commit(db, null);	
-	}
-	
-	/**
-	 * create CATDATA with specified value and link the CATADATA entity to the root item
-	 * @param db
-	 * @param prof
-	 * @param rootitem
-	 * @param derivedValue
-	 * @param debugSb
-	 * @return
-	 * @throws Exception
-	 */
-	private EntityItem createCATDATA(Database db, Profile prof,EntityItem rootitem, 
-			String derivedValue, StringBuffer debugSb) 
-	throws Exception
-	{ 
-		EntityItem catdata = null;
-		DARuleEngineMgr.addDebugComment(D.EBUG_SPEW,debugSb,"createCATDATA  darattrcode "+attributeCode+" derivedvalue "+derivedValue);
-		
-		// create the var entity with project parent
-		Vector attrCodeVct = new Vector();
-		Hashtable attrValTbl = new Hashtable();
-		attrCodeVct.addElement("DAATTRIBUTECODE");
-		attrValTbl.put("DAATTRIBUTECODE", attributeCode); 
-		attrCodeVct.addElement("DAATTRIBUTEVALUE");
-		attrValTbl.put("DAATTRIBUTEVALUE", derivedValue); 
-		
-		StringBuffer debugSb2 = new StringBuffer();
-		catdata = ABRUtil.createEntity(db, prof, createActionName, rootitem,  
-				"CATDATA", attrCodeVct, attrValTbl, debugSb2); 
-		if (debugSb2.length()>0){
-			DARuleEngineMgr.addDebugComment(D.EBUG_DETAIL,debugSb,"createCATDATA "+debugSb2.toString());
-		}
-
-		attrCodeVct.clear();
-		attrValTbl.clear();
-		
-		return catdata;
-	}
-    /***********************************************
-     *  Get the version
-     *
-     *@return java.lang.String
-     */
-     public static String getVersion()
-     {
-     	return "$Revision: 1.9 $";
-     }
-}
