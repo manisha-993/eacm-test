@@ -25,4 +25,4 @@ This is the main development component of EACM
 Please add EACM-xxxx to mark the Jira story/defect id, for example:
 
 >git commit -m "EACM-7238 add build.xml"
-test!
+test!!
