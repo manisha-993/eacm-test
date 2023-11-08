@@ -21,7 +21,7 @@ This is the main development component of EACM
     >git update-index --assume-unchanged PATH (PATH is the file we need to ignore)
   - For untracked file, you should add to your local .gitignore file to avoid those files were uploaded.
 
-# How to Commit your change
+# How to Commit your changes
 Please add EACM-xxxx to mark the Jira story/defect id, for example:
 
 >git commit -m "EACM-7238 add build.xml"
