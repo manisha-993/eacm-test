@@ -136,6 +136,7 @@ public class CloudantCatcher {
 	}
 
 	public FindResult pullPriceFromCloudant(Map<String, Object> selector , long skip, int limit){
+		Log.v("Calling cloudant api");
 		Cloudant client = CloudantUtil.getClient();
 		PostFindOptions findOptions= CloudantUtil.getFindOptions(selector,skip,limit);
 		FindResult result = null;
