@@ -34,6 +34,8 @@ public class RdhTssMatCharTest
 
     @BeforeClass
 
+
+
     public static void setUpBeforeClass()
     {
     	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance(); 		
