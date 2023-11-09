@@ -33,6 +33,7 @@ public class RdhTssMatCharTest
     private static SVCMOD svcmod = null;
 
     @BeforeClass
+
     public static void setUpBeforeClass()
     {
     	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance(); 		
