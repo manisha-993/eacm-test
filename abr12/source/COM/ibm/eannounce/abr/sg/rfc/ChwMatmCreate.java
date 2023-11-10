@@ -244,6 +244,10 @@ public class ChwMatmCreate extends RdhBase {
 					bmmh5.get(0).setMaktx("STaaS" + " " + model.getMACHTYPE());
 				}else if("PWaaS".equals(model.getSUBGROUP())){
 					bmmh5.get(0).setMaktx("PWaaS" + " " + model.getMACHTYPE());
+				}else if("IaaS".equals(model.getSUBGROUP())){
+					bmmh5.get(0).setMaktx("IaaS" + " " + model.getMACHTYPE());
+				}else if("Stratos Tier".equals(model.getSUBGROUP())){
+					bmmh5.get(0).setMaktx("Stratos Tier" + " " + model.getMACHTYPE());
 				}else {
 					bmmh5.get(0).setMaktx("MACHINE TYPE " + model.getMACHTYPE() + " - Model NEW");
 				}
@@ -579,6 +583,8 @@ public class ChwMatmCreate extends RdhBase {
 				result="ZPT4";
 			}else if ("LBS".equals(var)) {
 				result="ZPT3";
+			}else if ("5838".equals(model.getMACHTYPE())) {
+				result="ZPT5";
 			}else {
 				result="Z002";
 			}
