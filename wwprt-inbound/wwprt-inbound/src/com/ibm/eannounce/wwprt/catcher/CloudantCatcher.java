@@ -55,7 +55,6 @@ public class CloudantCatcher {
 	}
 
 	public void pullPricetoXML(String t1,String t2){
-		Log.i("calling cloudant api");
 		int size = CloudantUtil.getSize();
 		Map<String, Object>  selector = new HashMap<>();
 		HashMap operate = new HashMap();
